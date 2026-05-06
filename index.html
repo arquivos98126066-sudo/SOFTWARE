@@ -33,6 +33,73 @@
     padding: 0 0 60px;
   }
 
+  /* LOCK SCREEN */
+  #lock-screen {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: var(--bg);
+    z-index: 9999;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 24px;
+    padding: 40px 32px;
+  }
+  #lock-screen.show { display: flex; }
+  .lock-icon { font-size: 48px; }
+  .lock-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--text);
+    text-align: center;
+  }
+  .lock-subtitle { font-size: 13px; color: var(--muted); text-align: center; }
+  .lock-input {
+    width: 100%;
+    max-width: 280px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 18px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 16px;
+    outline: none;
+    text-align: center;
+    letter-spacing: 2px;
+    transition: border-color 0.2s;
+  }
+  .lock-input:focus { border-color: var(--accent); }
+  .lock-input.error { border-color: #ef4444; animation: shake 0.3s; }
+  .lock-btn {
+    width: 100%;
+    max-width: 280px;
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    padding: 14px;
+    font-family: 'Syne', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+  .lock-btn:active { opacity: 0.8; }
+  .lock-error { font-size: 12px; color: #ef4444; display: none; }
+  .lock-error.show { display: block; }
+  @keyframes shake {
+    0%,100% { transform: translateX(0); }
+    25% { transform: translateX(-8px); }
+    75% { transform: translateX(8px); }
+  }
+
+  /* APP CONTENT */
+  #app-content { display: none; }
+  #app-content.show { display: block; }
+
   .header {
     padding: 48px 24px 32px;
     text-align: center;
@@ -57,11 +124,7 @@
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
-  .header p {
-    color: var(--muted);
-    font-size: 14px;
-    margin-top: 6px;
-  }
+  .header p { color: var(--muted); font-size: 14px; margin-top: 6px; }
 
   .grid {
     display: grid;
@@ -98,21 +161,9 @@
   }
 
   .card-icon { font-size: 28px; line-height: 1; }
-  .card-name {
-    font-family: 'Syne', sans-serif;
-    font-size: 15px;
-    font-weight: 700;
-    color: var(--text);
-    line-height: 1.2;
-  }
+  .card-name { font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700; color: var(--text); line-height: 1.2; }
   .card-desc { font-size: 11px; color: var(--muted); line-height: 1.4; }
-  .card-arrow {
-    position: absolute;
-    bottom: 14px; right: 14px;
-    font-size: 16px;
-    color: var(--muted);
-    opacity: 0.5;
-  }
+  .card-arrow { position: absolute; bottom: 14px; right: 14px; font-size: 16px; color: var(--muted); opacity: 0.5; }
 
   .c-purple { --c1: #7c6aff; --c2: #a78bff; }
   .c-pink   { --c1: #ff6a8a; --c2: #ff9eb5; }
@@ -133,15 +184,8 @@
   .card-wide .card-text { flex: 1; }
   .card-wide .card-icon { font-size: 32px; }
 
-  .footer {
-    text-align: center;
-    color: var(--muted);
-    font-size: 11px;
-    margin-top: 40px;
-    padding: 0 24px;
-  }
+  .footer { text-align: center; color: var(--muted); font-size: 11px; margin-top: 40px; padding: 0 24px; }
 
-  /* Banner instalar PWA */
   #pwa-banner {
     display: none;
     position: fixed;
@@ -159,125 +203,141 @@
   }
   #pwa-banner.show { display: flex; }
   #pwa-banner span { flex: 1; font-size: 13px; color: var(--text); }
-  #pwa-install {
-    background: var(--accent);
-    color: white;
-    border: none;
-    border-radius: 8px;
-    padding: 8px 14px;
-    font-size: 13px;
-    font-weight: 600;
-    cursor: pointer;
-  }
-  #pwa-dismiss {
-    background: none;
-    border: none;
-    color: var(--muted);
-    font-size: 20px;
-    cursor: pointer;
-    padding: 0 4px;
-  }
+  #pwa-install { background: var(--accent); color: white; border: none; border-radius: 8px; padding: 8px 14px; font-size: 13px; font-weight: 600; cursor: pointer; }
+  #pwa-dismiss { background: none; border: none; color: var(--muted); font-size: 20px; cursor: pointer; padding: 0 4px; }
 </style>
 </head>
 <body>
 
-<div class="header">
-  <h1>Meus Apps</h1>
-  <p>Toque para abrir</p>
+<!-- TELA DE SENHA -->
+<div id="lock-screen">
+  <div class="lock-icon">🔒</div>
+  <div class="lock-title">Acesso restrito</div>
+  <div class="lock-subtitle">Digite a senha para continuar</div>
+  <input class="lock-input" type="password" id="pw-input" placeholder="••••••••" maxlength="30">
+  <div class="lock-error" id="pw-error">Senha incorreta. Tente novamente.</div>
+  <button class="lock-btn" onclick="checkPassword()">Entrar</button>
 </div>
 
-<div class="grid">
+<!-- CONTEÚDO DO APP -->
+<div id="app-content">
 
-  <a class="card c-purple" href="TAPETE_CRM.html">
-    <span class="card-icon">🪴</span>
-    <span class="card-name">Tapete CRM</span>
-    <span class="card-desc">Clientes e registros</span>
-    <span class="card-arrow">→</span>
-  </a>
+  <div class="header">
+    <h1>Meus Apps</h1>
+    <p>Toque para abrir</p>
+  </div>
 
-  <a class="card c-teal" href="TAPETES.html">
-    <span class="card-icon">🗂️</span>
-    <span class="card-name">Tapetes</span>
-    <span class="card-desc">Catálogo</span>
-    <span class="card-arrow">→</span>
-  </a>
+  <div class="grid">
+    <a class="card c-purple" href="TAPETE_CRM.html">
+      <span class="card-icon">🪴</span>
+      <span class="card-name">Tapete CRM</span>
+      <span class="card-desc">Clientes e registros</span>
+      <span class="card-arrow">→</span>
+    </a>
+    <a class="card c-teal" href="TAPETES.html">
+      <span class="card-icon">🗂️</span>
+      <span class="card-name">Tapetes</span>
+      <span class="card-desc">Catálogo</span>
+      <span class="card-arrow">→</span>
+    </a>
+    <a class="card c-pink" href="PRÉ-VENDA.html">
+      <span class="card-icon">💬</span>
+      <span class="card-name">Pré-Venda</span>
+      <span class="card-desc">Atendimento</span>
+      <span class="card-arrow">→</span>
+    </a>
+    <a class="card c-amber" href="MEU%20CRM.html">
+      <span class="card-icon">👥</span>
+      <span class="card-name">Meu CRM</span>
+      <span class="card-desc">Gestão de clientes</span>
+      <span class="card-arrow">→</span>
+    </a>
+    <a class="card c-blue" href="MÉTODO%20OPA.html">
+      <span class="card-icon">🎯</span>
+      <span class="card-name">Método OPA</span>
+      <span class="card-desc">Processo de vendas</span>
+      <span class="card-arrow">→</span>
+    </a>
+    <a class="card c-green" href="RETINA.html">
+      <span class="card-icon">👁️</span>
+      <span class="card-name">Retina</span>
+      <span class="card-desc">Análise visual</span>
+      <span class="card-arrow">→</span>
+    </a>
+    <a class="card card-wide c-coral" href="ADM.html">
+      <span class="card-icon">⚙️</span>
+      <div class="card-text">
+        <div class="card-name">ADM</div>
+        <div class="card-desc">Painel administrativo geral</div>
+      </div>
+      <span class="card-arrow">→</span>
+    </a>
+    <a class="card card-wide c-red" href="WEBSITE.html">
+      <span class="card-icon">🌐</span>
+      <div class="card-text">
+        <div class="card-name">Website</div>
+        <div class="card-desc">Página principal do negócio</div>
+      </div>
+      <span class="card-arrow">→</span>
+    </a>
+  </div>
 
-  <a class="card c-pink" href="PRÉ-VENDA.html">
-    <span class="card-icon">💬</span>
-    <span class="card-name">Pré-Venda</span>
-    <span class="card-desc">Atendimento</span>
-    <span class="card-arrow">→</span>
-  </a>
+  <div class="footer">
+    <p>arquivos98126066-sudo · SOFTWARE</p>
+  </div>
 
-  <a class="card c-amber" href="MEU%20CRM.html">
-    <span class="card-icon">👥</span>
-    <span class="card-name">Meu CRM</span>
-    <span class="card-desc">Gestão de clientes</span>
-    <span class="card-arrow">→</span>
-  </a>
+  <div id="pwa-banner">
+    <span>📲 Instalar como app na tela inicial?</span>
+    <button id="pwa-install">Instalar</button>
+    <button id="pwa-dismiss">×</button>
+  </div>
 
-  <a class="card c-blue" href="MÉTODO%20OPA.html">
-    <span class="card-icon">🎯</span>
-    <span class="card-name">Método OPA</span>
-    <span class="card-desc">Processo de vendas</span>
-    <span class="card-arrow">→</span>
-  </a>
-
-  <a class="card c-green" href="RETINA.html">
-    <span class="card-icon">👁️</span>
-    <span class="card-name">Retina</span>
-    <span class="card-desc">Análise visual</span>
-    <span class="card-arrow">→</span>
-  </a>
-
-  <a class="card card-wide c-coral" href="ADM.html">
-    <span class="card-icon">⚙️</span>
-    <div class="card-text">
-      <div class="card-name">ADM</div>
-      <div class="card-desc">Painel administrativo geral</div>
-    </div>
-    <span class="card-arrow">→</span>
-  </a>
-
-  <a class="card card-wide c-red" href="WEBSITE.html">
-    <span class="card-icon">🌐</span>
-    <div class="card-text">
-      <div class="card-name">Website</div>
-      <div class="card-desc">Página principal do negócio</div>
-    </div>
-    <span class="card-arrow">→</span>
-  </a>
-
-</div>
-
-<div class="footer">
-  <p>arquivos98126066-sudo · SOFTWARE</p>
-</div>
-
-<!-- Banner instalar como app -->
-<div id="pwa-banner">
-  <span>📲 Instalar como app na tela inicial?</span>
-  <button id="pwa-install">Instalar</button>
-  <button id="pwa-dismiss">×</button>
 </div>
 
 <script>
-  // Registrar Service Worker
+  const SENHA = '*#Index*#007*#';
+  const CHAVE = 'app_auth_ok';
+
+  function checkPassword() {
+    const val = document.getElementById('pw-input').value;
+    const input = document.getElementById('pw-input');
+    const error = document.getElementById('pw-error');
+    if (val === SENHA) {
+      localStorage.setItem(CHAVE, '1');
+      document.getElementById('lock-screen').classList.remove('show');
+      document.getElementById('app-content').classList.add('show');
+    } else {
+      input.classList.add('error');
+      error.classList.add('show');
+      setTimeout(() => input.classList.remove('error'), 400);
+      input.value = '';
+    }
+  }
+
+  document.getElementById('pw-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter') checkPassword();
+  });
+
+  // Verifica se já autenticou antes
+  if (localStorage.getItem(CHAVE) === '1') {
+    document.getElementById('app-content').classList.add('show');
+  } else {
+    document.getElementById('lock-screen').classList.add('show');
+  }
+
+  // PWA
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/SOFTWARE/service-worker.js')
       .then(reg => console.log('SW registrado:', reg.scope))
       .catch(err => console.warn('SW erro:', err));
   }
 
-  // Banner de instalação PWA
   let deferredPrompt;
-
   window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault();
     deferredPrompt = e;
     document.getElementById('pwa-banner').classList.add('show');
   });
-
   document.getElementById('pwa-install').addEventListener('click', async () => {
     if (deferredPrompt) {
       deferredPrompt.prompt();
@@ -286,7 +346,6 @@
       document.getElementById('pwa-banner').classList.remove('show');
     }
   });
-
   document.getElementById('pwa-dismiss').addEventListener('click', () => {
     document.getElementById('pwa-banner').classList.remove('show');
   });
