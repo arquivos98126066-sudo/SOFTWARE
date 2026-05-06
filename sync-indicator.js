@@ -1,0 +1,46 @@
+(function() {
+  // Cria o indicador na página
+  const indicator = document.createElement('div');
+  indicator.id = 'sync-status';
+  indicator.style.cssText = `
+    position: fixed;
+    top: 10px;
+    right: 12px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    color: #aaa;
+    z-index: 9999;
+    opacity: 0;
+    transition: opacity 0.4s;
+  `;
+  document.body.appendChild(indicator);
+
+  function show(msg, color, autoHide) {
+    indicator.innerHTML = `
+      <span style="
+        width: 7px; height: 7px;
+        border-radius: 50%;
+        background: ${color};
+        display: inline-block;
+      "></span>
+      <span>${msg}</span>
+    `;
+    indicator.style.opacity = '1';
+    if (autoHide) {
+      clearTimeout(indicator._timer);
+      indicator._timer = setTimeout(() => {
+        indicator.style.opacity = '0';
+      }, 2500);
+    }
+  }
+
+  // Funções globais para os apps usarem
+  window.syncShow = {
+    syncing: () => show('sincronizando...', '#888', false),
+    synced: (nome) => show((nome || '') + ' ✓', '#aaa', true),
+    offline: () => show('offline', '#e57', false),
+    local: () => show('salvo local', '#fa0', false),
+  };
+})();
