@@ -6,6 +6,7 @@
 <title>Administração</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://arquivos98126066-sudo.github.io/SOFTWARE/sync-indicator.js"></script>
 <style>
 :root{--az:#1a73e8;--az2:#1557b0;--azl:#e8f0fe;--vd:#137333;--vd2:#e6f4ea;--vd3:#34a853;--vm:#c5221f;--vm2:#fce8e6;--am:#e37400;--am2:#fef7e0;--bg:#f1f3f4;--card:#fff;--txt:#202124;--txt2:#5f6368;--brd:#dadce0;--brd2:#e8eaed;--bg2:#f0f4ff;}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
@@ -73,7 +74,6 @@ textarea{resize:vertical;min-height:100px;line-height:1.6}
 .filtros{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
 .fbtn{padding:7px 13px;border:2px solid var(--brd);border-radius:99px;background:#fff;font-family:'Nunito',sans-serif;font-size:.72rem;font-weight:800;color:var(--txt2);cursor:pointer;transition:.2s}
 .fbtn.on{border-color:var(--az);color:var(--az);background:var(--azl)}
-/* HISTÓRICO AGRUPADO */
 .hcat-card{background:#fff;border-radius:14px;box-shadow:rgba(0,0,0,.06) 0 2px 8px;margin-bottom:10px;overflow:hidden}
 .hcat-head{display:flex;align-items:center;gap:10px;padding:12px 14px;cursor:pointer;border-left:4px solid var(--vd3)}
 .hcat-head.saida{border-left-color:var(--vm)}
@@ -101,7 +101,6 @@ textarea{resize:vertical;min-height:100px;line-height:1.6}
 .hlanc-mot{margin-top:6px;background:#f1f3f4;border-radius:8px;padding:6px 10px;font-size:.72rem;color:var(--txt2);font-weight:700;font-style:italic}
 .hlanc-mot-placeholder{margin-top:4px;font-size:.68rem;color:var(--txt2);font-style:italic;cursor:pointer;text-decoration:underline}
 .hlanc-desc{margin-top:4px;font-size:.72rem;color:var(--txt2);line-height:1.5;background:#f1f3f4;border-radius:6px;padding:5px 8px;font-style:italic}
-/* RELATÓRIO */
 .rel-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--brd2);font-size:.83rem}
 .rel-row:last-child{border-bottom:none}
 .rel-row.total{font-weight:900;font-size:.9rem}
@@ -111,7 +110,6 @@ textarea{resize:vertical;min-height:100px;line-height:1.6}
 .ncard .lbl{font-size:.6rem;font-weight:800;color:var(--txt2);text-transform:uppercase;letter-spacing:.3px;margin-top:3px}
 .ncard.vd .num{color:var(--vd)}
 .ncard.vm .num{color:var(--vm)}
-/* MODAL */
 .moverlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:300;align-items:flex-end;justify-content:center}
 .moverlay.open{display:flex}
 .mbox{background:#fff;border-radius:22px 22px 0 0;padding:20px 16px 36px;width:100%;max-width:520px;max-height:90vh;overflow-y:auto;animation:.25s ease upAnim}
@@ -157,7 +155,6 @@ hr.hr{border:none;border-top:1px solid var(--brd2);margin:10px 0}
 <!-- ════════ ABA 0 — REGISTRAR ════════ -->
 <div id="p0" class="pnl on">
 
-  <!-- ANALISAR COM IA -->
   <div class="card card-bl vd">
     <div class="card-b" style="padding:14px 16px;">
       <div style="font-size:.65rem;font-weight:900;letter-spacing:.14em;text-transform:uppercase;color:var(--vd);margin-bottom:10px;">✨ Analisar com IA</div>
@@ -176,7 +173,6 @@ hr.hr{border:none;border-top:1px solid var(--brd2);margin:10px 0}
     </div>
   </div>
 
-  <!-- LANÇAMENTO RÁPIDO -->
   <div class="card">
     <div class="card-t">Lançamento rápido</div>
     <div class="card-b">
@@ -184,7 +180,6 @@ hr.hr{border:none;border-top:1px solid var(--brd2);margin:10px 0}
         <label class="lbl-inp">Data</label>
         <input type="date" id="lData">
       </div>
-
       <div class="igroup">
         <label class="lbl-inp">Tipo</label>
         <select id="lTipo" onchange="onTipoChange()">
@@ -217,7 +212,6 @@ hr.hr{border:none;border-top:1px solid var(--brd2);margin:10px 0}
 <!-- ════════ ABA 1 — ADM ════════ -->
 <div id="p1" class="pnl">
 
-  <!-- SALDO PRINCIPAL -->
   <div class="card" style="border:1px solid #e0e0e0;">
     <div class="card-b" style="padding:20px;">
       <div style="font-size:.65rem;font-weight:900;letter-spacing:.18em;text-transform:uppercase;color:#555;margin-bottom:6px;">Saldo disponível</div>
@@ -231,7 +225,6 @@ hr.hr{border:none;border-top:1px solid var(--brd2);margin:10px 0}
     </div>
   </div>
 
-  <!-- OUTRAS ENTRADAS -->
   <div class="card" style="border:1px solid #e0e0e0;">
     <div class="card-b" style="padding:14px 16px;">
       <div style="background:linear-gradient(135deg,#e8f0fe,#dbeafe);border-radius:14px;padding:14px 16px;margin-bottom:12px;border-left:5px solid var(--az);">
@@ -262,7 +255,6 @@ hr.hr{border:none;border-top:1px solid var(--brd2);margin:10px 0}
     </div>
   </div>
 
-  <!-- TAPETE -->
   <div class="card">
     <div class="card-b" style="padding:14px 16px;">
       <div style="background:var(--bg2);border-radius:14px;padding:14px 16px;margin-bottom:12px;border-left:5px solid #2563eb;">
@@ -286,7 +278,6 @@ hr.hr{border:none;border-top:1px solid var(--brd2);margin:10px 0}
     </div>
   </div>
 
-  <!-- DISTRIBUIÇÃO -->
   <div class="card">
     <div class="card-t">Distribuição 50 / 30 / 10 / 10</div>
     <div class="card-b">
@@ -354,7 +345,6 @@ hr.hr{border:none;border-top:1px solid var(--brd2);margin:10px 0}
     </div>
   </div>
 
-  <!-- PAGAR DÍVIDA -->
   <div class="card" id="cardPagarDiv" style="display:none;">
     <div class="card-t" style="color:var(--vm);">⚠️ Pagar dívidas</div>
     <div class="card-b" id="listaPagarDiv"></div>
@@ -432,7 +422,7 @@ hr.hr{border:none;border-top:1px solid var(--brd2);margin:10px 0}
   </div>
 </div>
 
-<!-- MODAL POR QUÊ (histórico) -->
+<!-- MODAL POR QUÊ -->
 <div class="moverlay" id="mPorque">
   <div class="mbox">
     <div class="mbox-t">
@@ -444,707 +434,657 @@ hr.hr{border:none;border-top:1px solid var(--brd2);margin:10px 0}
   </div>
 </div>
 
-<script>
-// ===== INDEXEDDB =====
-var _db=null;
-var _cache={lancamentos:[],adm:{retiradas:{despesas:0,negocio:0,invest:0,diversao:0},tapeteRetirada:0}};
+<script type="module">
+import { db } from "https://arquivos98126066-sudo.github.io/SOFTWARE/firebase-sync.js";
+import { doc, getDoc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-function _abrirDB(){
-  return new Promise(function(res,rej){
-    var r=indexedDB.open('AdmDB1',1);
-    r.onupgradeneeded=function(e){
-      var d=e.target.result;
-      if(!d.objectStoreNames.contains('dados'))d.createObjectStore('dados',{keyPath:'chave'});
-    };
-    r.onsuccess=function(e){_db=e.target.result;res();};
-    r.onerror=function(e){rej(e.target.error);};
-  });
+// ===== CACHE LOCAL =====
+var _cache = {
+  lancamentos: [],
+  adm: {
+    retiradas: { despesas: 0, negocio: 0, invest: 0, diversao: 0 },
+    tapeteRetirada: 0,
+    outrasRetirada: 0,
+    outrasNome: 'Outras Entradas'
+  }
+};
+
+// ===== FIRESTORE REFS =====
+var docLanc = doc(db, 'adm', 'lancamentos');
+var docConfig = doc(db, 'adm', 'config');
+
+// ===== SALVAR NO FIRESTORE =====
+async function salvar() {
+  if (window.syncShow) window.syncShow.syncing();
+  try {
+    await setDoc(docLanc, { itens: _cache.lancamentos });
+    await setDoc(docConfig, _cache.adm);
+    if (window.syncShow) window.syncShow.synced('ADM');
+  } catch (e) {
+    console.error('Erro ao salvar:', e);
+    // fallback offline
+    try {
+      localStorage.setItem('adm_cache_offline', JSON.stringify(_cache));
+      localStorage.setItem('adm_pendingSync', 'true');
+    } catch (_) {}
+    if (window.syncShow) window.syncShow.offline();
+  }
 }
-function _dbLer(){
-  return new Promise(function(res,rej){
-    var r=_db.transaction(['dados'],'readonly').objectStore('dados').get('admv1');
-    r.onsuccess=function(){
-      if(r.result)_cache=r.result.valor;
-      // garantir estrutura
-      if(!_cache.lancamentos)_cache.lancamentos=[];
-      if(!_cache.adm)_cache.adm={};
-      if(!_cache.adm.retiradas)_cache.adm.retiradas={despesas:0,negocio:0,invest:0,diversao:0};
-      if(!_cache.adm.tapeteRetirada)_cache.adm.tapeteRetirada=0;
-      if(!_cache.adm.outrasRetirada)_cache.adm.outrasRetirada=0;
-      if(!_cache.adm.outrasNome)_cache.adm.outrasNome='Outras Entradas';
-      res(_cache);
-    };
-    r.onerror=function(){rej(r.error);};
-  });
+
+function gd() { return _cache; }
+
+// ===== GARANTIR ESTRUTURA =====
+function garantirEstrutura() {
+  if (!_cache.lancamentos) _cache.lancamentos = [];
+  if (!_cache.adm) _cache.adm = {};
+  if (!_cache.adm.retiradas) _cache.adm.retiradas = { despesas: 0, negocio: 0, invest: 0, diversao: 0 };
+  if (!_cache.adm.tapeteRetirada) _cache.adm.tapeteRetirada = 0;
+  if (!_cache.adm.outrasRetirada) _cache.adm.outrasRetirada = 0;
+  if (!_cache.adm.outrasNome) _cache.adm.outrasNome = 'Outras Entradas';
 }
-function _dbGravar(){
-  var r=_db.transaction(['dados'],'readwrite').objectStore('dados').put({chave:'admv1',valor:_cache});
-  r.onerror=function(e){console.error('Erro DB:',e.target.error);};
+
+// ===== CARREGAR DADOS INICIAIS =====
+async function carregarDados() {
+  try {
+    var [snapLanc, snapConfig] = await Promise.all([getDoc(docLanc), getDoc(docConfig)]);
+    if (snapLanc.exists()) _cache.lancamentos = snapLanc.data().itens || [];
+    if (snapConfig.exists()) _cache.adm = snapConfig.data();
+    garantirEstrutura();
+  } catch (e) {
+    console.error('Erro ao carregar:', e);
+    // tenta carregar do fallback offline
+    try {
+      var offline = localStorage.getItem('adm_cache_offline');
+      if (offline) _cache = JSON.parse(offline);
+    } catch (_) {}
+    garantirEstrutura();
+    if (window.syncShow) window.syncShow.offline();
+  }
 }
-function salvar(){_dbGravar();}
-function gd(){return _cache;}
+
+// ===== ESCUTA EM TEMPO REAL =====
+function iniciarListeners() {
+  onSnapshot(docLanc, function(snap) {
+    if (snap.exists()) {
+      _cache.lancamentos = snap.data().itens || [];
+      renderHistorico();
+      renderRelatorio();
+      atualizarHeader();
+    }
+  }, function(e) { console.error('Listener lancamentos:', e); });
+
+  onSnapshot(docConfig, function(snap) {
+    if (snap.exists()) {
+      _cache.adm = snap.data();
+      garantirEstrutura();
+      renderADM();
+    }
+  }, function(e) { console.error('Listener config:', e); });
+}
 
 // ===== UTIL =====
-function toast(msg,tipo){
-  var t=document.getElementById('toast');
-  t.textContent=msg;
-  t.style.background=tipo==='erro'?'#c5221f':tipo==='aviso'?'#e37400':'#202124';
+function toast(msg, tipo) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.background = tipo === 'erro' ? '#c5221f' : tipo === 'aviso' ? '#e37400' : '#202124';
   t.classList.add('show');
-  setTimeout(function(){t.classList.remove('show');},2800);
+  setTimeout(function() { t.classList.remove('show'); }, 2800);
 }
-function fmtVal(n){return 'R$ '+Number(n||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});}
-function fmtNum(s){return parseFloat(String(s||0).replace(/\./g,'').replace(',','.'))||0;}
-function hoje(){var d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
-function fmtBR(iso){if(!iso)return'';var p=iso.split('-');var ms=['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];return parseInt(p[2])+' de '+ms[parseInt(p[1])-1]+' de '+p[0];}
-function fmtDataCurta(iso){if(!iso)return'';var p=iso.split('-');var ms=['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];return parseInt(p[2])+'/'+ms[parseInt(p[1])-1];}
+function fmtVal(n) { return 'R$ ' + Number(n || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+function fmtNum(s) { return parseFloat(String(s || 0).replace(/\./g, '').replace(',', '.')) || 0; }
+function hoje() { var d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
+function fmtBR(iso) { if (!iso) return ''; var p = iso.split('-'); var ms = ['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez']; return parseInt(p[2]) + ' de ' + ms[parseInt(p[1]) - 1] + ' de ' + p[0]; }
+function fmtDataCurta(iso) { if (!iso) return ''; var p = iso.split('-'); var ms = ['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez']; return parseInt(p[2]) + '/' + ms[parseInt(p[1]) - 1]; }
 
 // ===== CÁLCULOS =====
-function calcSaldo(){
-  var d=gd();var total=0;
-  d.lancamentos.forEach(function(l){
-    if(l.tipo==='entrada')total+=l.valor;
-    else if(l.tipo==='saida')total-=l.valor;
+function calcSaldo() {
+  var d = gd(); var total = 0;
+  d.lancamentos.forEach(function(l) {
+    if (l.tipo === 'entrada') total += l.valor;
+    else if (l.tipo === 'saida') total -= l.valor;
   });
   return total;
 }
-function calcEntradas(){
-  var d=gd();var t=0;
-  // quitacao=true não entra na base de distribuição
-  d.lancamentos.forEach(function(l){if(l.tipo==='entrada'&&!l.quitacao)t+=l.valor;});
+function calcEntradas() {
+  var d = gd(); var t = 0;
+  d.lancamentos.forEach(function(l) { if (l.tipo === 'entrada' && !l.quitacao) t += l.valor; });
   return t;
 }
-function calcTapeteDisp(){
-  var d=gd();var ent=0,gas=0;
-  d.lancamentos.forEach(function(l){
-    if(l.tipo==='tapete_entrada')ent+=l.valor;
-    else if(l.tipo==='tapete_gasto')gas+=l.valor;
+function calcTapeteDisp() {
+  var d = gd(); var ent = 0, gas = 0;
+  d.lancamentos.forEach(function(l) {
+    if (l.tipo === 'tapete_entrada') ent += l.valor;
+    else if (l.tipo === 'tapete_gasto') gas += l.valor;
   });
-  return ent-gas-(d.adm.tapeteRetirada||0);
+  return ent - gas - (d.adm.tapeteRetirada || 0);
 }
-function calcTapeteGasto(){
-  var d=gd();var t=0;
-  d.lancamentos.forEach(function(l){if(l.tipo==='tapete_gasto')t+=l.valor;});
+function calcTapeteGasto() {
+  var d = gd(); var t = 0;
+  d.lancamentos.forEach(function(l) { if (l.tipo === 'tapete_gasto') t += l.valor; });
   return t;
 }
-function calcDist(){
-  var base=calcEntradas();
-  return{despesas:base*0.50,negocio:base*0.30,invest:base*0.10,diversao:base*0.10,base:base};
+function calcDist() {
+  var base = calcEntradas();
+  return { despesas: base * 0.50, negocio: base * 0.30, invest: base * 0.10, diversao: base * 0.10, base: base };
 }
-function calcOutrasEntradas(){
-  var d=gd();var t=0;
-  d.lancamentos.forEach(function(l){if(l.tipo==='outras_entrada')t+=l.valor;});
+function calcOutrasEntradas() {
+  var d = gd(); var t = 0;
+  d.lancamentos.forEach(function(l) { if (l.tipo === 'outras_entrada') t += l.valor; });
   return t;
 }
-function calcOutrasRetiradas(){
-  var d=gd();
-  return d.adm.outrasRetirada||0;
-}
-function calcOutrasDisp(){
-  return calcOutrasEntradas()-calcOutrasRetiradas();
-}
-function calcDividas(){
-  var ret=gd().adm.retiradas;
-  var dist=calcDist();
-  // mostra dívida sempre que houver retirada manual, limitada ao que foi retirado
-  return{
-    despesas:ret.despesas||0,
-    negocio:ret.negocio||0,
-    invest:ret.invest||0,
-    diversao:ret.diversao||0,
-    tapete:0
-  };
+function calcOutrasRetiradas() { return gd().adm.outrasRetirada || 0; }
+function calcOutrasDisp() { return calcOutrasEntradas() - calcOutrasRetiradas(); }
+function calcDividas() {
+  var ret = gd().adm.retiradas;
+  return { despesas: ret.despesas || 0, negocio: ret.negocio || 0, invest: ret.invest || 0, diversao: ret.diversao || 0, tapete: 0 };
 }
 
 // ===== CATEGORIA ADM =====
-var _catMap={
-  despesas:['mercado','aliment','comida','feira','supermercado','padaria','açougue','farmácia','remédio','saúde','aluguel','energia','água','luz','gás','internet','telefone','ônibus','transporte','passagem','combustível','gasolina','roupa','calçado','escola','mensalidade','conta','boleto','taxa','imposto','hygiene','higiene','limpeza','pet'],
-  negocio:['negócio','negocio','trabalho','material','ferramenta','equipamento','produto','estoque','fornecedor','serviço','servico','marketing','propaganda','curso','treinamento','capacitação'],
-  invest:['investimento','poupança','reserva','aplicação','cdb','tesouro','ação','fundo'],
-  diversao:['lanche','restaurante','cinema','show','viagem','lazer','entretenimento','festa','bar','pizza','hamburguer','hamburger','sorvete','açaí','açai','jogo','streaming','netflix','spotify']
+var _catMap = {
+  despesas: ['mercado','aliment','comida','feira','supermercado','padaria','açougue','farmácia','remédio','saúde','aluguel','energia','água','luz','gás','internet','telefone','ônibus','transporte','passagem','combustível','gasolina','roupa','calçado','escola','mensalidade','conta','boleto','taxa','imposto','hygiene','higiene','limpeza','pet'],
+  negocio: ['negócio','negocio','trabalho','material','ferramenta','equipamento','produto','estoque','fornecedor','serviço','servico','marketing','propaganda','curso','treinamento','capacitação'],
+  invest: ['investimento','poupança','reserva','aplicação','cdb','tesouro','ação','fundo'],
+  diversao: ['lanche','restaurante','cinema','show','viagem','lazer','entretenimento','festa','bar','pizza','hamburguer','hamburger','sorvete','açaí','açai','jogo','streaming','netflix','spotify']
 };
-function inferirCatDist(cat){
-  var c=cat.toLowerCase();
-  for(var k in _catMap){
-    var arr=_catMap[k];
-    for(var i=0;i<arr.length;i++){if(c.indexOf(arr[i])>=0)return k;}
-  }
-  return 'despesas';// padrão
+function inferirCatDist(cat) {
+  var c = cat.toLowerCase();
+  for (var k in _catMap) { var arr = _catMap[k]; for (var i = 0; i < arr.length; i++) { if (c.indexOf(arr[i]) >= 0) return k; } }
+  return 'despesas';
 }
 
 // ===== RENDER ADM =====
-function renderADM(){
-  var saldo=calcSaldo();
-  var entradas=calcEntradas();
-  var tapDisp=calcTapeteDisp();
-  var tapGasto=calcTapeteGasto();
-  var outrasDisp=calcOutrasDisp();
-  var outrasEnt=calcOutrasEntradas();
-  var dist=calcDist();
-  var ret=gd().adm.retiradas;
-  var divs=calcDividas();
-  var divTotal=divs.despesas+divs.negocio+divs.invest+divs.diversao;
+function renderADM() {
+  var saldo = calcSaldo();
+  var tapDisp = calcTapeteDisp();
+  var tapGasto = calcTapeteGasto();
+  var outrasDisp = calcOutrasDisp();
+  var dist = calcDist();
+  var ret = gd().adm.retiradas;
+  var divs = calcDividas();
+  var divTotal = divs.despesas + divs.negocio + divs.invest + divs.diversao;
 
-  document.getElementById('admSaldo').textContent=fmtVal(saldo);
-  document.getElementById('admSaldo').className='saldo-g '+(saldo>=0?'pos':'neg');
-  document.getElementById('admDivTotal').textContent=fmtVal(divTotal);
-  document.getElementById('admTapete').textContent=fmtVal(tapDisp);
-  document.getElementById('tapeteGastoAdm').textContent='Gasto: '+fmtVal(tapGasto);
+  document.getElementById('admSaldo').textContent = fmtVal(saldo);
+  document.getElementById('admSaldo').className = 'saldo-g ' + (saldo >= 0 ? 'pos' : 'neg');
+  document.getElementById('admDivTotal').textContent = fmtVal(divTotal);
+  document.getElementById('admTapete').textContent = fmtVal(tapDisp);
+  document.getElementById('tapeteGastoAdm').textContent = 'Gasto: ' + fmtVal(tapGasto);
 
-  // outras entradas
-  document.getElementById('admOutras').textContent=fmtVal(outrasDisp);
-  document.getElementById('admOutras').style.color=outrasDisp>=0?'var(--az)':'var(--vm)';
-  var nomeAtual=gd().adm.outrasNome||'Outras Entradas';
-  document.getElementById('outrasNomeDisplay').textContent=nomeAtual+' ✏️';
+  document.getElementById('admOutras').textContent = fmtVal(outrasDisp);
+  document.getElementById('admOutras').style.color = outrasDisp >= 0 ? 'var(--az)' : 'var(--vm)';
+  var nomeAtual = gd().adm.outrasNome || 'Outras Entradas';
+  document.getElementById('outrasNomeDisplay').textContent = nomeAtual + ' ✏️';
 
-  // tapete dívida por retirada
-  var tapDiv=document.getElementById('tapeteDivida');
-  if(gd().adm.tapeteRetirada>0){
-    tapDiv.innerHTML='<div style="font-size:.65rem;color:var(--vm);font-weight:800;margin-top:4px;">⚠️ Retirada fora do fluxo: '+fmtVal(gd().adm.tapeteRetirada)+'</div>';
-  }else{tapDiv.innerHTML='';}
+  var tapDiv = document.getElementById('tapeteDivida');
+  if (gd().adm.tapeteRetirada > 0) {
+    tapDiv.innerHTML = '<div style="font-size:.65rem;color:var(--vm);font-weight:800;margin-top:4px;">⚠️ Retirada fora do fluxo: ' + fmtVal(gd().adm.tapeteRetirada) + '</div>';
+  } else { tapDiv.innerHTML = ''; }
 
-  // distribuição
-  var cats=[
-    {key:'despesas',vId:'vDespesa',dId:'dDespesa',dist:dist.despesas,ret:ret.despesas||0,div:divs.despesas},
-    {key:'negocio',vId:'vNegocio',dId:'dNegocio',dist:dist.negocio,ret:ret.negocio||0,div:divs.negocio},
-    {key:'invest',vId:'vInvest',dId:'dInvest',dist:dist.invest,ret:ret.invest||0,div:divs.invest},
-    {key:'diversao',vId:'vDiversao',dId:'dDiversao',dist:dist.diversao,ret:ret.diversao||0,div:divs.diversao}
+  var cats = [
+    { key: 'despesas', vId: 'vDespesa', dId: 'dDespesa', dist: dist.despesas, ret: ret.despesas || 0, div: divs.despesas },
+    { key: 'negocio', vId: 'vNegocio', dId: 'dNegocio', dist: dist.negocio, ret: ret.negocio || 0, div: divs.negocio },
+    { key: 'invest', vId: 'vInvest', dId: 'dInvest', dist: dist.invest, ret: ret.invest || 0, div: divs.invest },
+    { key: 'diversao', vId: 'vDiversao', dId: 'dDiversao', dist: dist.diversao, ret: ret.diversao || 0, div: divs.diversao }
   ];
-  cats.forEach(function(c){
-    var disp=c.dist-(c.ret||0);
-    document.getElementById(c.vId).textContent=fmtVal(disp);
-    document.getElementById(c.vId).style.color=disp<0?'var(--vm)':'var(--txt)';
-    var dEl=document.getElementById(c.dId);
-    if(c.div>0){dEl.style.display='flex';dEl.textContent='⚠️ Dívida: '+fmtVal(c.div);}
-    else{dEl.style.display='none';}
+  cats.forEach(function(c) {
+    var disp = c.dist - (c.ret || 0);
+    document.getElementById(c.vId).textContent = fmtVal(disp);
+    document.getElementById(c.vId).style.color = disp < 0 ? 'var(--vm)' : 'var(--txt)';
+    var dEl = document.getElementById(c.dId);
+    if (c.div > 0) { dEl.style.display = 'flex'; dEl.textContent = '⚠️ Dívida: ' + fmtVal(c.div); }
+    else { dEl.style.display = 'none'; }
   });
 
-  // card pagar dívida
-  var temDiv=divTotal>0;
-  document.getElementById('cardPagarDiv').style.display=temDiv?'block':'none';
-  if(temDiv){
-    var html='';
-    var nomes={despesas:'🏠 Despesas',negocio:'💼 Negócio',invest:'📈 Investimento',diversao:'🎉 Diversão',tapete:'🧻 Tapete'};
-    for(var k in divs){
-      if(divs[k]>0){
-        html+='<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--brd2);">';
-        html+='<span style="font-size:.85rem;font-weight:800;">'+nomes[k]+'</span>';
-        html+='<div style="display:flex;align-items:center;gap:8px;">';
-        html+='<span style="font-family:\'Courier New\',monospace;font-size:.88rem;font-weight:900;color:var(--vm);">'+fmtVal(divs[k])+'</span>';
-        html+='<button class="btn btn-vd btn-xs" onclick="abrirPagarDiv(\''+k+'\','+divs[k]+')">Pagar</button>';
-        html+='</div></div>';
+  var temDiv = divTotal > 0;
+  document.getElementById('cardPagarDiv').style.display = temDiv ? 'block' : 'none';
+  if (temDiv) {
+    var html = '';
+    var nomes = { despesas: '🏠 Despesas', negocio: '💼 Negócio', invest: '📈 Investimento', diversao: '🎉 Diversão', tapete: '🧻 Tapete' };
+    for (var k in divs) {
+      if (divs[k] > 0) {
+        html += '<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--brd2);">';
+        html += '<span style="font-size:.85rem;font-weight:800;">' + nomes[k] + '</span>';
+        html += '<div style="display:flex;align-items:center;gap:8px;">';
+        html += '<span style="font-family:\'Courier New\',monospace;font-size:.88rem;font-weight:900;color:var(--vm);">' + fmtVal(divs[k]) + '</span>';
+        html += '<button class="btn btn-vd btn-xs" onclick="window._abrirPagarDiv(\'' + k + '\',' + divs[k] + ')">Pagar</button>';
+        html += '</div></div>';
       }
     }
-    document.getElementById('listaPagarDiv').innerHTML=html;
+    document.getElementById('listaPagarDiv').innerHTML = html;
   }
-
   atualizarHeader();
 }
 
 // ===== RETIRAR DISTRIBUIÇÃO =====
-function retirarDist(cat,inputEl){
-  var val=fmtNum(inputEl.value);
-  if(!val||val<=0){toast('Informe o valor','aviso');return;}
-  _cache.adm.retiradas[cat]=(_cache.adm.retiradas[cat]||0)+val;
-  // registrar saída no histórico
-  var nomes={despesas:'Despesas',negocio:'Negócio',invest:'Investimento',diversao:'Diversão'};
-  _cache.lancamentos.push({id:Date.now(),tipo:'saida',categoria:'Retirada '+nomes[cat],valor:val,data:hoje(),motivacao:'Retirada da distribuição '+nomes[cat],catDist:cat});
-  salvar();
-  inputEl.value='';
+window.retirarDist = async function(cat, inputEl) {
+  var val = fmtNum(inputEl.value);
+  if (!val || val <= 0) { toast('Informe o valor', 'aviso'); return; }
+  _cache.adm.retiradas[cat] = (_cache.adm.retiradas[cat] || 0) + val;
+  var nomes = { despesas: 'Despesas', negocio: 'Negócio', invest: 'Investimento', diversao: 'Diversão' };
+  _cache.lancamentos.push({ id: Date.now(), tipo: 'saida', categoria: 'Retirada ' + nomes[cat], valor: val, data: hoje(), motivacao: 'Retirada da distribuição ' + nomes[cat], catDist: cat });
+  await salvar();
+  inputEl.value = '';
   renderADM();
   renderHistorico();
-  toast('Retirado de '+nomes[cat]);
-}
+  toast('Retirado de ' + nomes[cat]);
+};
 
 // ===== QUEBRAR FLUXO TAPETE =====
-document.getElementById('btnQfTapete').onclick=function(){
-  var val=fmtNum(document.getElementById('qfTapete').value);
-  if(!val||val<=0){toast('Informe o valor','aviso');return;}
-  _cache.adm.tapeteRetirada=(_cache.adm.tapeteRetirada||0)+val;
-  _cache.lancamentos.push({id:Date.now(),tipo:'saida',categoria:'Retirada Tapete',valor:val,data:hoje(),motivacao:'Quebra de fluxo do tapete'});
-  salvar();
-  document.getElementById('qfTapete').value='';
+document.getElementById('btnQfTapete').onclick = async function() {
+  var val = fmtNum(document.getElementById('qfTapete').value);
+  if (!val || val <= 0) { toast('Informe o valor', 'aviso'); return; }
+  _cache.adm.tapeteRetirada = (_cache.adm.tapeteRetirada || 0) + val;
+  _cache.lancamentos.push({ id: Date.now(), tipo: 'saida', categoria: 'Retirada Tapete', valor: val, data: hoje(), motivacao: 'Quebra de fluxo do tapete' });
+  await salvar();
+  document.getElementById('qfTapete').value = '';
   renderADM();
   renderHistorico();
   toast('Retirado do tapete');
 };
 
 // ===== OUTRAS ENTRADAS — RETIRAR =====
-document.getElementById('btnQfOutras').onclick=function(){
-  var val=fmtNum(document.getElementById('qfOutras').value);
-  if(!val||val<=0){toast('Informe o valor','aviso');return;}
-  var nome=gd().adm.outrasNome||'Outras Entradas';
-  _cache.adm.outrasRetirada=(_cache.adm.outrasRetirada||0)+val;
-  _cache.lancamentos.push({id:Date.now(),tipo:'outras_retirada',categoria:'Retirada — '+nome,valor:val,data:hoje(),motivacao:'Retirada de '+nome});
-  salvar();
-  document.getElementById('qfOutras').value='';
+document.getElementById('btnQfOutras').onclick = async function() {
+  var val = fmtNum(document.getElementById('qfOutras').value);
+  if (!val || val <= 0) { toast('Informe o valor', 'aviso'); return; }
+  var nome = gd().adm.outrasNome || 'Outras Entradas';
+  _cache.adm.outrasRetirada = (_cache.adm.outrasRetirada || 0) + val;
+  _cache.lancamentos.push({ id: Date.now(), tipo: 'outras_retirada', categoria: 'Retirada — ' + nome, valor: val, data: hoje(), motivacao: 'Retirada de ' + nome });
+  await salvar();
+  document.getElementById('qfOutras').value = '';
   renderADM();
   renderHistorico();
-  toast('Retirado de '+nome);
+  toast('Retirado de ' + nome);
 };
 
-function editarNomeOutras(){
-  var area=document.getElementById('editarNomeOutrasArea');
-  var aberto=area.style.display!=='none';
-  area.style.display=aberto?'none':'block';
-  if(!aberto)document.getElementById('outrasNomeInput').value=gd().adm.outrasNome||'Outras Entradas';
-}
-function salvarNomeOutras(){
-  var v=document.getElementById('outrasNomeInput').value.trim();
-  if(!v){toast('Informe um nome','aviso');return;}
-  _cache.adm.outrasNome=v;
-  salvar();
-  document.getElementById('editarNomeOutrasArea').style.display='none';
+window.editarNomeOutras = function() {
+  var area = document.getElementById('editarNomeOutrasArea');
+  var aberto = area.style.display !== 'none';
+  area.style.display = aberto ? 'none' : 'block';
+  if (!aberto) document.getElementById('outrasNomeInput').value = gd().adm.outrasNome || 'Outras Entradas';
+};
+window.salvarNomeOutras = async function() {
+  var v = document.getElementById('outrasNomeInput').value.trim();
+  if (!v) { toast('Informe um nome', 'aviso'); return; }
+  _cache.adm.outrasNome = v;
+  await salvar();
+  document.getElementById('editarNomeOutrasArea').style.display = 'none';
   renderADM();
   toast('✅ Nome atualizado!');
-}
+};
 
 // ===== PAGAR DÍVIDA =====
-var _pagarCat=null;
-function abrirPagarDiv(cat,divVal){
-  _pagarCat=cat;
-  var nomes={despesas:'🏠 Despesas',negocio:'💼 Negócio',invest:'📈 Investimento',diversao:'🎉 Diversão',tapete:'🧻 Tapete'};
-  document.getElementById('mPagarOpcoes').innerHTML='<div style="background:var(--vm2);border-radius:10px;padding:10px 12px;margin-bottom:10px;font-size:.82rem;font-weight:800;color:var(--vm);">Pagando dívida de: '+nomes[cat]+'<br>Dívida atual: '+fmtVal(divVal)+'</div>';
-  document.getElementById('mPagarValor').value='';
-  document.getElementById('mPagarForm').style.display='block';
+var _pagarCat = null;
+window._abrirPagarDiv = function(cat, divVal) {
+  _pagarCat = cat;
+  var nomes = { despesas: '🏠 Despesas', negocio: '💼 Negócio', invest: '📈 Investimento', diversao: '🎉 Diversão', tapete: '🧻 Tapete' };
+  document.getElementById('mPagarOpcoes').innerHTML = '<div style="background:var(--vm2);border-radius:10px;padding:10px 12px;margin-bottom:10px;font-size:.82rem;font-weight:800;color:var(--vm);">Pagando dívida de: ' + nomes[cat] + '<br>Dívida atual: ' + fmtVal(divVal) + '</div>';
+  document.getElementById('mPagarValor').value = '';
+  document.getElementById('mPagarForm').style.display = 'block';
   abrirModal('mPagarDiv');
-}
-document.getElementById('btnConfirmarPagar').onclick=function(){
-  var val=fmtNum(document.getElementById('mPagarValor').value);
-  if(!val||val<=0){toast('Informe o valor','aviso');return;}
-  var outrasDisp=calcOutrasDisp();
-  if(val>outrasDisp){toast('Saldo de "'+(_cache.adm.outrasNome||'Outras Entradas')+'" insuficiente ('+fmtVal(outrasDisp)+')','aviso');return;}
-  var ret=_cache.adm.retiradas;
-  var nomes={despesas:'Despesas',negocio:'Negócio',invest:'Investimento',diversao:'Diversão'};
-  var nomeOutras=_cache.adm.outrasNome||'Outras Entradas';
-
-  // 1. Abater a dívida da categoria (reduz adm.retiradas)
-  ret[_pagarCat]=Math.max(0,(ret[_pagarCat]||0)-val);
-
-  // 2. Deduzir do saldo de Outras Entradas
-  _cache.adm.outrasRetirada=(_cache.adm.outrasRetirada||0)+val;
-
-  // 3. Injetar o valor de volta no saldo principal como entrada especial
-  //    marcado com catDist para ir direto à categoria certa, sem redistribuir
-  _cache.lancamentos.push({
-    id:Date.now(),
-    tipo:'entrada',
-    categoria:'Quitação — '+nomes[_pagarCat],
-    valor:val,
-    data:hoje(),
-    motivacao:'Pagamento de dívida de '+nomes[_pagarCat]+' via '+nomeOutras,
-    catDist:_pagarCat,
-    quitacao:true
-  });
-
-  // 4. Registrar saída de Outras Entradas no histórico
-  _cache.lancamentos.push({
-    id:Date.now()+1,
-    tipo:'outras_retirada',
-    categoria:'Pagamento dívida — '+nomes[_pagarCat],
-    valor:val,
-    data:hoje(),
-    motivacao:'Saiu de '+nomeOutras+' para quitar dívida de '+nomes[_pagarCat]
-  });
-
-  salvar();
+};
+document.getElementById('btnConfirmarPagar').onclick = async function() {
+  var val = fmtNum(document.getElementById('mPagarValor').value);
+  if (!val || val <= 0) { toast('Informe o valor', 'aviso'); return; }
+  var outrasDisp = calcOutrasDisp();
+  if (val > outrasDisp) { toast('Saldo de "' + (_cache.adm.outrasNome || 'Outras Entradas') + '" insuficiente (' + fmtVal(outrasDisp) + ')', 'aviso'); return; }
+  var ret = _cache.adm.retiradas;
+  var nomes = { despesas: 'Despesas', negocio: 'Negócio', invest: 'Investimento', diversao: 'Diversão' };
+  var nomeOutras = _cache.adm.outrasNome || 'Outras Entradas';
+  ret[_pagarCat] = Math.max(0, (ret[_pagarCat] || 0) - val);
+  _cache.adm.outrasRetirada = (_cache.adm.outrasRetirada || 0) + val;
+  _cache.lancamentos.push({ id: Date.now(), tipo: 'entrada', categoria: 'Quitação — ' + nomes[_pagarCat], valor: val, data: hoje(), motivacao: 'Pagamento de dívida de ' + nomes[_pagarCat] + ' via ' + nomeOutras, catDist: _pagarCat, quitacao: true });
+  _cache.lancamentos.push({ id: Date.now() + 1, tipo: 'outras_retirada', categoria: 'Pagamento dívida — ' + nomes[_pagarCat], valor: val, data: hoje(), motivacao: 'Saiu de ' + nomeOutras + ' para quitar dívida de ' + nomes[_pagarCat] });
+  await salvar();
   fecharModal('mPagarDiv');
   renderADM();
   renderHistorico();
   atualizarHeader();
-  toast('✅ Dívida de '+nomes[_pagarCat]+' quitada! Saldo +'+fmtVal(val));
+  toast('✅ Dívida de ' + nomes[_pagarCat] + ' quitada! Saldo +' + fmtVal(val));
 };
 
 // ===== LANÇAMENTO RÁPIDO =====
-document.getElementById('motBtn').onclick=function(){
-  var area=document.getElementById('motArea');
+document.getElementById('motBtn').onclick = function() {
+  var area = document.getElementById('motArea');
   area.classList.toggle('open');
-  this.classList.toggle('tem',area.classList.contains('open'));
-  this.textContent=area.classList.contains('open')?'−':'＋';
+  this.classList.toggle('tem', area.classList.contains('open'));
+  this.textContent = area.classList.contains('open') ? '−' : '＋';
 };
 
-function onTipoChange(){
-  var tipo=document.getElementById('lTipo').value;
-  document.getElementById('grupoCat').style.display=(tipo==='outras_entrada')?'block':'none';
-}
+window.onTipoChange = function() {
+  var tipo = document.getElementById('lTipo').value;
+  document.getElementById('grupoCat').style.display = (tipo === 'outras_entrada') ? 'block' : 'none';
+};
 
-document.getElementById('btnRegistrarLanc').onclick=function(){
-  var tipo=document.getElementById('lTipo').value;
-  var cat=document.getElementById('lCat').value.trim();
-  var val=fmtNum(document.getElementById('lValor').value);
-  var data=document.getElementById('lData').value;
-  var mot=document.getElementById('lMotivacao').value.trim();
-  if(tipo==='outras_entrada'&&!cat){cat='Outras entradas';}
-  if(!val||val<=0){toast('Informe o valor','aviso');return;}
-  if(!data){toast('Informe a data','aviso');return;}
-  var categoria=tipo==='entrada'?'Saldo':tipo==='tapete_entrada'?'Tapete':tipo==='outras_entrada'?cat:cat;
-  var tipoLabel=tipo==='entrada'?'Entrada no saldo':tipo==='tapete_entrada'?'Entrada no tapete':tipo==='outras_entrada'?'Outras entradas: '+categoria:'Entrada — categoria: '+categoria;
-  if(!confirm('Confirmar lançamento?\n'+tipoLabel+'\nValor: '+fmtVal(val)))return;
-  _cache.lancamentos.push({id:Date.now(),tipo:tipo,categoria:categoria,valor:val,data:data,motivacao:mot});
-  salvar();
-  document.getElementById('lCat').value='';
-  document.getElementById('lValor').value='';
-  document.getElementById('lMotivacao').value='';
+document.getElementById('btnRegistrarLanc').onclick = async function() {
+  var tipo = document.getElementById('lTipo').value;
+  var cat = document.getElementById('lCat').value.trim();
+  var val = fmtNum(document.getElementById('lValor').value);
+  var data = document.getElementById('lData').value;
+  var mot = document.getElementById('lMotivacao').value.trim();
+  if (tipo === 'outras_entrada' && !cat) { cat = 'Outras entradas'; }
+  if (!val || val <= 0) { toast('Informe o valor', 'aviso'); return; }
+  if (!data) { toast('Informe a data', 'aviso'); return; }
+  var categoria = tipo === 'entrada' ? 'Saldo' : tipo === 'tapete_entrada' ? 'Tapete' : tipo === 'outras_entrada' ? cat : cat;
+  var tipoLabel = tipo === 'entrada' ? 'Entrada no saldo' : tipo === 'tapete_entrada' ? 'Entrada no tapete' : tipo === 'outras_entrada' ? 'Outras entradas: ' + categoria : 'Entrada — categoria: ' + categoria;
+  if (!confirm('Confirmar lançamento?\n' + tipoLabel + '\nValor: ' + fmtVal(val))) return;
+  _cache.lancamentos.push({ id: Date.now(), tipo: tipo, categoria: categoria, valor: val, data: data, motivacao: mot });
+  await salvar();
+  document.getElementById('lCat').value = '';
+  document.getElementById('lValor').value = '';
+  document.getElementById('lMotivacao').value = '';
   document.getElementById('motArea').classList.remove('open');
   document.getElementById('motBtn').classList.remove('tem');
-  document.getElementById('motBtn').textContent='＋';
-  renderADM();renderHistorico();atualizarHeader();
+  document.getElementById('motBtn').textContent = '＋';
+  renderADM(); renderHistorico(); atualizarHeader();
   toast('✅ Lançamento registrado!');
 };
 
 // ===== IA — COPIAR & ABRIR =====
-var _PROMPT_IA='Você é um organizador financeiro pessoal. Analise o texto e extraia TODOS os gastos. Retorne APENAS JSON válido (sem texto, sem markdown):\n{"data":"YYYY-MM-DD","saidas":[{"categoria":"Nome","catDist":"despesas","valor":0.00,"descricao":"itens","motivacao":""}],"tapete_gastos":[{"categoria":"Nome","valor":0.00,"descricao":"itens","motivacao":""}],"tapete_entradas":[]}\n\nREGRAS DE SINTAXE (prioridade máxima):\n1. Tudo entre () = gasto do TAPETE → vai para tapete_gastos. Pode estar dentro ou fora de []\n2. Tudo entre [] = saída do SALDO → vai para saidas. Se tiver () dentro, o () vai para tapete_gastos\n3. catDist é definido pelo marcador de categoria:\n   - Se tiver "despesa>" ou "despesas>" antes do conteúdo → catDist="despesas"\n   - Se tiver "negocio>" ou "negócio>" → catDist="negocio"\n   - Se tiver "invest>" ou "investimento>" → catDist="invest"\n   - Se tiver "diversao>" ou "diversão>" → catDist="diversao"\n   - Sem marcador → infere pelo conteúdo\n4. O marcador categoria>..< pode estar dentro do [] ou solto no texto\n\nEXEMPLOS:\n- "[despesa> nota fiscal com ovos arroz <]" → saida catDist=despesas\n- "[negocio> 20 reais de tomate <]" → saida catDist=negocio\n- "[ovos arroz feijão 60,59]" → saida, infere catDist=despesas pelo conteúdo\n- "(ônibus 30, lanche 10)" → tapete_gastos\n- "[despesa> mercado 50 (ônibus 30) <]" → saida R$50 despesas + tapete_gasto R$30\n\nREGRAS DE CATEGORIA (nome amigável):\n- Ovos, farinha, óleo, arroz, feijão, mortadela, pão, leite = "Supermercado"\n- Açougue, carnes = "Açougue"\n- Farmácia, remédio = "Farmácia"\n- Ônibus, passagem = "Transporte"\n- Combustível, gasolina = "Combustível"\n- Restaurante, lanche, pizza, hamburguer, açaí = "Alimentação"\n- Aluguel = "Aluguel"\n- Energia, água, internet, telefone = nome da conta\n\nATENÇÃO: IGNORE códigos de barras, chaves de acesso, protocolos, CPF, números de série — NÃO são valores. tapete_entradas fica [] salvo se houver [valor_numerico] explícito.\n\nTEXTO:\n';
+var _PROMPT_IA = 'Você é um organizador financeiro pessoal. Analise o texto e extraia TODOS os gastos. Retorne APENAS JSON válido (sem texto, sem markdown):\n{"data":"YYYY-MM-DD","saidas":[{"categoria":"Nome","catDist":"despesas","valor":0.00,"descricao":"itens","motivacao":""}],"tapete_gastos":[{"categoria":"Nome","valor":0.00,"descricao":"itens","motivacao":""}],"tapete_entradas":[]}\n\nREGRAS DE SINTAXE (prioridade máxima):\n1. Tudo entre () = gasto do TAPETE → vai para tapete_gastos. Pode estar dentro ou fora de []\n2. Tudo entre [] = saída do SALDO → vai para saidas. Se tiver () dentro, o () vai para tapete_gastos\n3. catDist é definido pelo marcador de categoria:\n   - Se tiver "despesa>" ou "despesas>" antes do conteúdo → catDist="despesas"\n   - Se tiver "negocio>" ou "negócio>" → catDist="negocio"\n   - Se tiver "invest>" ou "investimento>" → catDist="invest"\n   - Se tiver "diversao>" ou "diversão>" → catDist="diversao"\n   - Sem marcador → infere pelo conteúdo\n4. O marcador categoria>..< pode estar dentro do [] ou solto no texto\n\nEXEMPLOS:\n- "[despesa> nota fiscal com ovos arroz <]" → saida catDist=despesas\n- "[negocio> 20 reais de tomate <]" → saida catDist=negocio\n- "[ovos arroz feijão 60,59]" → saida, infere catDist=despesas pelo conteúdo\n- "(ônibus 30, lanche 10)" → tapete_gastos\n- "[despesa> mercado 50 (ônibus 30) <]" → saida R$50 despesas + tapete_gasto R$30\n\nREGRAS DE CATEGORIA (nome amigável):\n- Ovos, farinha, óleo, arroz, feijão, mortadela, pão, leite = "Supermercado"\n- Açougue, carnes = "Açougue"\n- Farmácia, remédio = "Farmácia"\n- Ônibus, passagem = "Transporte"\n- Combustível, gasolina = "Combustível"\n- Restaurante, lanche, pizza, hamburguer, açaí = "Alimentação"\n- Aluguel = "Aluguel"\n- Energia, água, internet, telefone = nome da conta\n\nATENÇÃO: IGNORE códigos de barras, chaves de acesso, protocolos, CPF, números de série — NÃO são valores. tapete_entradas fica [] salvo se houver [valor_numerico] explícito.\n\nTEXTO:\n';
 
-document.getElementById('btnCopiarAbrir').onclick=function(){
-  var txt=document.getElementById('iaCampo').value.trim();
-  var data=document.getElementById('iaData').value;
-  if(!txt){toast('Cole o texto primeiro','aviso');return;}
-  var prompt=_PROMPT_IA+'Data de referência: '+data+'\n\n'+txt;
-  if(navigator.clipboard&&navigator.clipboard.writeText){
-    navigator.clipboard.writeText(prompt).then(function(){
-      document.getElementById('iaCampo').value='';
-      window.open('https://claude.ai','_blank');
+document.getElementById('btnCopiarAbrir').onclick = function() {
+  var txt = document.getElementById('iaCampo').value.trim();
+  var data = document.getElementById('iaData').value;
+  if (!txt) { toast('Cole o texto primeiro', 'aviso'); return; }
+  var prompt = _PROMPT_IA + 'Data de referência: ' + data + '\n\n' + txt;
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(prompt).then(function() {
+      document.getElementById('iaCampo').value = '';
+      window.open('https://claude.ai', '_blank');
       toast('✅ Copiado! Cole no Claude.');
-    }).catch(function(){_copiarFallback(prompt);});
-  }else{_copiarFallback(prompt);}
+    }).catch(function() { _copiarFallback(prompt); });
+  } else { _copiarFallback(prompt); }
 };
-function _copiarFallback(txt){
-  var ta=document.createElement('textarea');
-  ta.value=txt;ta.style.position='fixed';ta.style.opacity='0';
-  document.body.appendChild(ta);ta.select();
-  try{document.execCommand('copy');document.getElementById('iaCampo').value='';toast('✅ Copiado! Abra o Claude manualmente.');}
-  catch(e){toast('Erro ao copiar','erro');}
+function _copiarFallback(txt) {
+  var ta = document.createElement('textarea');
+  ta.value = txt; ta.style.position = 'fixed'; ta.style.opacity = '0';
+  document.body.appendChild(ta); ta.select();
+  try { document.execCommand('copy'); document.getElementById('iaCampo').value = ''; toast('✅ Copiado! Abra o Claude manualmente.'); }
+  catch (e) { toast('Erro ao copiar', 'erro'); }
   document.body.removeChild(ta);
-  setTimeout(function(){window.open('https://claude.ai','_blank');},500);
+  setTimeout(function() { window.open('https://claude.ai', '_blank'); }, 500);
 }
 
 // ===== IA — REGISTRAR =====
-document.getElementById('btnRegistrarIA').onclick=function(){
-  var txt=document.getElementById('iaCampo').value.trim();
-  var data=document.getElementById('iaData').value||hoje();
-  if(!txt){toast('Campo vazio','aviso');return;}
-  var json=null;
-  var match=txt.match(/\{[\s\S]*\}/);
-  if(match){try{json=JSON.parse(match[0]);}catch(e){json=null;}}
-  if(!json){toast('JSON inválido. Copie a resposta do Claude aqui.','erro');return;}
-
-  var data_uso=json.data||data;
-  var count=0;
-
-  // saídas normais — registram no histórico
-  if(json.saidas&&json.saidas.length){
-    json.saidas.forEach(function(s){
-      var catDist=s.catDist||inferirCatDist(s.categoria||'');
-      var val=parseFloat(s.valor)||0;
-      _cache.lancamentos.push({id:Date.now()+Math.random(),tipo:'saida',categoria:s.categoria||'Gasto',valor:val,data:data_uso,motivacao:s.motivacao||'',descricao:s.descricao||'',catDist:catDist});
+document.getElementById('btnRegistrarIA').onclick = async function() {
+  var txt = document.getElementById('iaCampo').value.trim();
+  var data = document.getElementById('iaData').value || hoje();
+  if (!txt) { toast('Campo vazio', 'aviso'); return; }
+  var json = null;
+  var match = txt.match(/\{[\s\S]*\}/);
+  if (match) { try { json = JSON.parse(match[0]); } catch (e) { json = null; } }
+  if (!json) { toast('JSON inválido. Copie a resposta do Claude aqui.', 'erro'); return; }
+  var data_uso = json.data || data;
+  var count = 0;
+  if (json.saidas && json.saidas.length) {
+    json.saidas.forEach(function(s) {
+      var catDist = s.catDist || inferirCatDist(s.categoria || '');
+      var val = parseFloat(s.valor) || 0;
+      _cache.lancamentos.push({ id: Date.now() + Math.random(), tipo: 'saida', categoria: s.categoria || 'Gasto', valor: val, data: data_uso, motivacao: s.motivacao || '', descricao: s.descricao || '', catDist: catDist });
       count++;
     });
   }
-  // entradas tapete — só aceita se for valor razoável (>= 1.00 e sem muitas casas decimais)
-  if(json.tapete_entradas&&json.tapete_entradas.length){
-    json.tapete_entradas.forEach(function(t){
-      var val=parseFloat(t.valor)||0;
-      var str=String(t.valor||'');
-      var decimais=str.indexOf('.')>=0?str.split('.')[1].length:0;
-      // ignora se parecer código: muitas casas decimais (>2) ou valor < 1
-      if(val<1||decimais>2)return;
-      _cache.lancamentos.push({id:Date.now()+Math.random(),tipo:'tapete_entrada',categoria:'Tapete',valor:val,data:data_uso,motivacao:''});
+  if (json.tapete_entradas && json.tapete_entradas.length) {
+    json.tapete_entradas.forEach(function(t) {
+      var val = parseFloat(t.valor) || 0;
+      var str = String(t.valor || '');
+      var decimais = str.indexOf('.') >= 0 ? str.split('.')[1].length : 0;
+      if (val < 1 || decimais > 2) return;
+      _cache.lancamentos.push({ id: Date.now() + Math.random(), tipo: 'tapete_entrada', categoria: 'Tapete', valor: val, data: data_uso, motivacao: '' });
       count++;
     });
   }
-  // gastos tapete
-  if(json.tapete_gastos&&json.tapete_gastos.length){
-    json.tapete_gastos.forEach(function(t){
-      _cache.lancamentos.push({id:Date.now()+Math.random(),tipo:'tapete_gasto',categoria:t.categoria||'Gasto Tapete',valor:parseFloat(t.valor)||0,data:data_uso,motivacao:t.motivacao||'',descricao:t.descricao||''});
+  if (json.tapete_gastos && json.tapete_gastos.length) {
+    json.tapete_gastos.forEach(function(t) {
+      _cache.lancamentos.push({ id: Date.now() + Math.random(), tipo: 'tapete_gasto', categoria: t.categoria || 'Gasto Tapete', valor: parseFloat(t.valor) || 0, data: data_uso, motivacao: t.motivacao || '', descricao: t.descricao || '' });
       count++;
     });
   }
-
-  salvar();
-  document.getElementById('iaCampo').value='';
-  var fb=document.getElementById('iaFeedback');
-  fb.style.display='block';
-  document.getElementById('iaFeedbackTxt').textContent='✅ '+count+' lançamento(s) registrado(s) em '+fmtBR(data_uso);
-  setTimeout(function(){fb.style.display='none';},4000);
-  renderADM();renderHistorico();atualizarHeader();
-  toast('✅ '+count+' lançamentos registrados!');
+  await salvar();
+  document.getElementById('iaCampo').value = '';
+  var fb = document.getElementById('iaFeedback');
+  fb.style.display = 'block';
+  document.getElementById('iaFeedbackTxt').textContent = '✅ ' + count + ' lançamento(s) registrado(s) em ' + fmtBR(data_uso);
+  setTimeout(function() { fb.style.display = 'none'; }, 4000);
+  renderADM(); renderHistorico(); atualizarHeader();
+  toast('✅ ' + count + ' lançamentos registrados!');
 };
 
 // ===== HISTÓRICO =====
-var _filtroHist='todos';
-function filtroHist(f){
-  _filtroHist=f;
-  ['fhTodos','fhHoje','fhSemana','fhMes'].forEach(function(id){document.getElementById(id).classList.remove('on');});
-  var mapa={todos:'fhTodos',hoje:'fhHoje',semana:'fhSemana',mes:'fhMes'};
-  if(mapa[f])document.getElementById(mapa[f]).classList.add('on');
+var _filtroHist = 'todos';
+window.filtroHist = function(f) {
+  _filtroHist = f;
+  ['fhTodos','fhHoje','fhSemana','fhMes'].forEach(function(id) { document.getElementById(id).classList.remove('on'); });
+  var mapa = { todos: 'fhTodos', hoje: 'fhHoje', semana: 'fhSemana', mes: 'fhMes' };
+  if (mapa[f]) document.getElementById(mapa[f]).classList.add('on');
   renderHistorico();
-}
+};
 
-function _filtrarLancs(lancs){
-  var ini=document.getElementById('hInicio').value;
-  var fim=document.getElementById('hFim').value;
-  var hj=hoje();
-  return lancs.filter(function(l){
-    var d=l.data;
-    if(_filtroHist==='hoje')return d===hj;
-    if(_filtroHist==='semana'){var dt=new Date(hj);dt.setDate(dt.getDate()-7);return d>=dt.toISOString().slice(0,10)&&d<=hj;}
-    if(_filtroHist==='mes')return d.slice(0,7)===hj.slice(0,7);
-    if(_filtroHist==='custom'&&ini&&fim)return d>=ini&&d<=fim;
+function _filtrarLancs(lancs) {
+  var ini = document.getElementById('hInicio').value;
+  var fim = document.getElementById('hFim').value;
+  var hj = hoje();
+  return lancs.filter(function(l) {
+    var d = l.data;
+    if (_filtroHist === 'hoje') return d === hj;
+    if (_filtroHist === 'semana') { var dt = new Date(hj); dt.setDate(dt.getDate() - 7); return d >= dt.toISOString().slice(0, 10) && d <= hj; }
+    if (_filtroHist === 'mes') return d.slice(0, 7) === hj.slice(0, 7);
+    if (_filtroHist === 'custom' && ini && fim) return d >= ini && d <= fim;
     return true;
   });
 }
 
-var _porqueEditId=null;
-function renderHistorico(){
-  var d=gd();
-  var lancs=_filtrarLancs(d.lancamentos);
-  // agrupar por categoria
-  var grupos={};
-  lancs.forEach(function(l){
-    var k=l.categoria;
-    if(!grupos[k])grupos[k]={cat:k,tipo:l.tipo,itens:[],total:0};
+var _porqueEditId = null;
+function renderHistorico() {
+  var d = gd();
+  var lancs = _filtrarLancs(d.lancamentos);
+  var grupos = {};
+  lancs.forEach(function(l) {
+    var k = l.categoria;
+    if (!grupos[k]) grupos[k] = { cat: k, tipo: l.tipo, itens: [], total: 0 };
     grupos[k].itens.push(l);
-    if(l.tipo==='entrada'||l.tipo==='tapete_entrada'||l.tipo==='outras_entrada')grupos[k].total+=l.valor;
-    else grupos[k].total-=l.valor;
+    if (l.tipo === 'entrada' || l.tipo === 'tapete_entrada' || l.tipo === 'outras_entrada') grupos[k].total += l.valor;
+    else grupos[k].total -= l.valor;
   });
-
-  var keys=Object.keys(grupos).sort(function(a,b){return grupos[b].itens[0].data.localeCompare(grupos[a].itens[0].data);});
-  var html='';
-  keys.forEach(function(k){
-    var g=grupos[k];
-    var isPos=g.total>=0;
-    var isTapete=g.tipo==='tapete_entrada'||g.tipo==='tapete_gasto';
-    var isOutras=g.tipo==='outras_entrada'||g.tipo==='outras_retirada';
-    var headClass=isTapete?'tapete':isOutras?'outras':(isPos?'':'saida');
-    var icClass=isTapete?'tapete':isOutras?'outras':(isPos?'':'saida');
-    var ic=isTapete?'🧻':isOutras?'🔖':(isPos?'🏷️':'🛒');
-    html+='<div class="hcat-card">';
-    html+='<div class="hcat-head '+headClass+'" onclick="toggleCat(\'hcat_'+_esc(k)+'\')">';
-    html+='<div class="hcat-ic '+icClass+'">'+ic+'</div>';
-    html+='<div class="hcat-info"><div class="hcat-nome">'+_esc2(k)+'</div><div class="hcat-sub">'+g.itens.length+' lançamento'+(g.itens.length>1?'s':'')+'</div></div>';
-    html+='<div class="hcat-val '+(isPos?'pos':'neg')+'">'+(isPos?'+ ':' - ')+fmtVal(Math.abs(g.total))+'</div>';
-    html+='</div>';
-    html+='<div class="hcat-body" id="hcat_'+_esc(k)+'">';
-    g.itens.forEach(function(l){
-      html+='<div class="hlanc">';
-      html+='<div class="hlanc-top">';
-      html+='<div><span class="hlanc-badge '+(l.tipo==='entrada'||l.tipo==='tapete_entrada'||l.tipo==='outras_entrada'?'badge-e':'badge-s')+'">'+(l.tipo==='entrada'?'Entrada':l.tipo==='tapete_entrada'?'Tapete':l.tipo==='outras_entrada'?'Outras Ent.':l.tipo==='outras_retirada'?'Outras Ret.':'Saída')+'</span><span style="font-size:.72rem;color:var(--txt2);font-weight:700;">'+l.data+'</span></div>';
-      html+='<span class="hlanc-val" style="color:'+(l.tipo==='entrada'||l.tipo==='tapete_entrada'||l.tipo==='outras_entrada'?'var(--vd)':'var(--vm)')+';">'+(l.tipo==='entrada'||l.tipo==='tapete_entrada'||l.tipo==='outras_entrada'?'+ ':' - ')+fmtVal(l.valor)+'</span>';
-      html+='</div>';
-      if(l.descricao&&l.descricao.trim()){
-        html+='<div class="hlanc-desc">📋 '+_esc2(l.descricao)+'</div>';
-      }
-      if(l.motivacao&&l.motivacao.trim()){
-        html+='<div class="hlanc-mot">📝 '+_esc2(l.motivacao)+'</div>';
-      }else{
-        html+='<div class="hlanc-mot-placeholder" onclick="abrirPorque(\''+l.id+'\')">📝 adicionar por quê</div>';
-      }
-      html+='</div>';
+  var keys = Object.keys(grupos).sort(function(a, b) { return grupos[b].itens[0].data.localeCompare(grupos[a].itens[0].data); });
+  var html = '';
+  keys.forEach(function(k) {
+    var g = grupos[k];
+    var isPos = g.total >= 0;
+    var isTapete = g.tipo === 'tapete_entrada' || g.tipo === 'tapete_gasto';
+    var isOutras = g.tipo === 'outras_entrada' || g.tipo === 'outras_retirada';
+    var headClass = isTapete ? 'tapete' : isOutras ? 'outras' : (isPos ? '' : 'saida');
+    var icClass = isTapete ? 'tapete' : isOutras ? 'outras' : (isPos ? '' : 'saida');
+    var ic = isTapete ? '🧻' : isOutras ? '🔖' : (isPos ? '🏷️' : '🛒');
+    html += '<div class="hcat-card">';
+    html += '<div class="hcat-head ' + headClass + '" onclick="toggleCat(\'hcat_' + _esc(k) + '\')">';
+    html += '<div class="hcat-ic ' + icClass + '">' + ic + '</div>';
+    html += '<div class="hcat-info"><div class="hcat-nome">' + _esc2(k) + '</div><div class="hcat-sub">' + g.itens.length + ' lançamento' + (g.itens.length > 1 ? 's' : '') + '</div></div>';
+    html += '<div class="hcat-val ' + (isPos ? 'pos' : 'neg') + '">' + (isPos ? '+ ' : ' - ') + fmtVal(Math.abs(g.total)) + '</div>';
+    html += '</div>';
+    html += '<div class="hcat-body" id="hcat_' + _esc(k) + '">';
+    g.itens.forEach(function(l) {
+      html += '<div class="hlanc">';
+      html += '<div class="hlanc-top">';
+      html += '<div><span class="hlanc-badge ' + (l.tipo === 'entrada' || l.tipo === 'tapete_entrada' || l.tipo === 'outras_entrada' ? 'badge-e' : 'badge-s') + '">' + (l.tipo === 'entrada' ? 'Entrada' : l.tipo === 'tapete_entrada' ? 'Tapete' : l.tipo === 'outras_entrada' ? 'Outras Ent.' : l.tipo === 'outras_retirada' ? 'Outras Ret.' : 'Saída') + '</span><span style="font-size:.72rem;color:var(--txt2);font-weight:700;">' + l.data + '</span></div>';
+      html += '<span class="hlanc-val" style="color:' + (l.tipo === 'entrada' || l.tipo === 'tapete_entrada' || l.tipo === 'outras_entrada' ? 'var(--vd)' : 'var(--vm)') + ';">' + (l.tipo === 'entrada' || l.tipo === 'tapete_entrada' || l.tipo === 'outras_entrada' ? '+ ' : ' - ') + fmtVal(l.valor) + '</span>';
+      html += '</div>';
+      if (l.descricao && l.descricao.trim()) { html += '<div class="hlanc-desc">📋 ' + _esc2(l.descricao) + '</div>'; }
+      if (l.motivacao && l.motivacao.trim()) { html += '<div class="hlanc-mot">📝 ' + _esc2(l.motivacao) + '</div>'; }
+      else { html += '<div class="hlanc-mot-placeholder" onclick="abrirPorque(\'' + l.id + '\')">📝 adicionar por quê</div>'; }
+      html += '</div>';
     });
-    html+='</div></div>';
+    html += '</div></div>';
   });
-
-  if(!keys.length)html='<div class="empty"><span class="ic">📭</span>Nenhum lançamento encontrado</div>';
-  document.getElementById('listaHistorico').innerHTML=html;
-
-  // resumo
-  var entTotal=0,saiTotal=0;
-  lancs.forEach(function(l){
-    if(l.tipo==='entrada'||l.tipo==='entrada_cat'||l.tipo==='tapete_entrada')entTotal+=l.valor;
-    else if(l.tipo==='saida'||l.tipo==='tapete_gasto')saiTotal+=l.valor;
+  if (!keys.length) html = '<div class="empty"><span class="ic">📭</span>Nenhum lançamento encontrado</div>';
+  document.getElementById('listaHistorico').innerHTML = html;
+  var entTotal = 0, saiTotal = 0;
+  lancs.forEach(function(l) {
+    if (l.tipo === 'entrada' || l.tipo === 'entrada_cat' || l.tipo === 'tapete_entrada') entTotal += l.valor;
+    else if (l.tipo === 'saida' || l.tipo === 'tapete_gasto') saiTotal += l.valor;
   });
-  var saldoPer=entTotal-saiTotal;
-  document.getElementById('resumoHist').innerHTML=
-    '<div style="font-size:.65rem;font-weight:900;letter-spacing:.14em;text-transform:uppercase;color:var(--txt2);margin-bottom:10px;">Resumo do período</div>'+
-    '<div class="rel-row"><span>Entradas</span><span style="color:var(--vd);font-weight:900;font-family:\'Courier New\',monospace;">'+fmtVal(entTotal)+'</span></div>'+
-    '<div class="rel-row"><span>Saídas</span><span style="color:var(--vm);font-weight:900;font-family:\'Courier New\',monospace;">'+fmtVal(saiTotal)+'</span></div>'+
-    '<div class="rel-row total"><span>Saldo do período</span><span style="color:'+(saldoPer>=0?'var(--vd)':'var(--vm)')+';font-family:\'Courier New\',monospace;">'+fmtVal(saldoPer)+'</span></div>';
+  var saldoPer = entTotal - saiTotal;
+  document.getElementById('resumoHist').innerHTML =
+    '<div style="font-size:.65rem;font-weight:900;letter-spacing:.14em;text-transform:uppercase;color:var(--txt2);margin-bottom:10px;">Resumo do período</div>' +
+    '<div class="rel-row"><span>Entradas</span><span style="color:var(--vd);font-weight:900;font-family:\'Courier New\',monospace;">' + fmtVal(entTotal) + '</span></div>' +
+    '<div class="rel-row"><span>Saídas</span><span style="color:var(--vm);font-weight:900;font-family:\'Courier New\',monospace;">' + fmtVal(saiTotal) + '</span></div>' +
+    '<div class="rel-row total"><span>Saldo do período</span><span style="color:' + (saldoPer >= 0 ? 'var(--vd)' : 'var(--vm)') + ';font-family:\'Courier New\',monospace;">' + fmtVal(saldoPer) + '</span></div>';
 }
 
-function toggleCat(id){
-  var el=document.getElementById(id);
-  if(el)el.classList.toggle('open');
-}
-function _esc(s){return String(s).replace(/[^a-zA-Z0-9]/g,'_');}
-function _esc2(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+window.toggleCat = function(id) { var el = document.getElementById(id); if (el) el.classList.toggle('open'); };
+function _esc(s) { return String(s).replace(/[^a-zA-Z0-9]/g, '_'); }
+function _esc2(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
 
 // ===== POR QUÊ =====
-function abrirPorque(id){
-  _porqueEditId=id;
-  document.getElementById('porqueTexto').value='';
-  abrirModal('mPorque');
-}
-document.getElementById('btnSalvarMotivo').onclick=function(){
-  var txt=document.getElementById('porqueTexto').value.trim();
-  if(!txt){toast('Digite o motivo','aviso');return;}
-  var l=_cache.lancamentos.find(function(x){return String(x.id)===String(_porqueEditId);});
-  if(l){l.motivacao=txt;salvar();renderHistorico();toast('✅ Salvo!');}
+window.abrirPorque = function(id) { _porqueEditId = id; document.getElementById('porqueTexto').value = ''; abrirModal('mPorque'); };
+document.getElementById('btnSalvarMotivo').onclick = async function() {
+  var txt = document.getElementById('porqueTexto').value.trim();
+  if (!txt) { toast('Digite o motivo', 'aviso'); return; }
+  var l = _cache.lancamentos.find(function(x) { return String(x.id) === String(_porqueEditId); });
+  if (l) { l.motivacao = txt; await salvar(); renderHistorico(); toast('✅ Salvo!'); }
   fecharModal('mPorque');
 };
 
 // ===== RELATÓRIO =====
-var _filtroRel='mes';
-function filtroRel(f){
-  _filtroRel=f;
-  ['frMes','frSemana','frTodos'].forEach(function(id){document.getElementById(id).classList.remove('on');});
-  var mapa={mes:'frMes',semana:'frSemana',todos:'frTodos'};
-  if(mapa[f])document.getElementById(mapa[f]).classList.add('on');
+var _filtroRel = 'mes';
+window.filtroRel = function(f) {
+  _filtroRel = f;
+  ['frMes','frSemana','frTodos'].forEach(function(id) { document.getElementById(id).classList.remove('on'); });
+  var mapa = { mes: 'frMes', semana: 'frSemana', todos: 'frTodos' };
+  if (mapa[f]) document.getElementById(mapa[f]).classList.add('on');
   renderRelatorio();
-}
+};
 
-function _filtrarRel(lancs){
-  var ini=document.getElementById('rInicio').value;
-  var fim=document.getElementById('rFim').value;
-  var hj=hoje();
-  return lancs.filter(function(l){
-    var d=l.data;
-    if(_filtroRel==='mes')return d.slice(0,7)===hj.slice(0,7);
-    if(_filtroRel==='semana'){var dt=new Date(hj);dt.setDate(dt.getDate()-7);return d>=dt.toISOString().slice(0,10)&&d<=hj;}
-    if(_filtroRel==='custom'&&ini&&fim)return d>=ini&&d<=fim;
+function _filtrarRel(lancs) {
+  var ini = document.getElementById('rInicio').value;
+  var fim = document.getElementById('rFim').value;
+  var hj = hoje();
+  return lancs.filter(function(l) {
+    var d = l.data;
+    if (_filtroRel === 'mes') return d.slice(0, 7) === hj.slice(0, 7);
+    if (_filtroRel === 'semana') { var dt = new Date(hj); dt.setDate(dt.getDate() - 7); return d >= dt.toISOString().slice(0, 10) && d <= hj; }
+    if (_filtroRel === 'custom' && ini && fim) return d >= ini && d <= fim;
     return true;
   });
 }
 
-function renderRelatorio(){
-  var d=gd();
-  var lancs=_filtrarRel(d.lancamentos);
-  var entTotal=0,saiTotal=0;
-  var catEnt={},catSai={};
-  lancs.forEach(function(l){
-    if(l.tipo==='entrada'||l.tipo==='entrada_cat'){
-      entTotal+=l.valor;
-      if(!catEnt[l.categoria])catEnt[l.categoria]=0;
-      catEnt[l.categoria]+=l.valor;
-    }else if(l.tipo==='tapete_entrada'){
-      entTotal+=l.valor;
-      if(!catEnt['Tapete'])catEnt['Tapete']=0;
-      catEnt['Tapete']+=l.valor;
-    }else if(l.tipo==='saida'){
-      saiTotal+=l.valor;
-      if(!catSai[l.categoria])catSai[l.categoria]=0;
-      catSai[l.categoria]+=l.valor;
-    }else if(l.tipo==='tapete_gasto'){
-      saiTotal+=l.valor;
-      if(!catSai[l.categoria])catSai[l.categoria]=0;
-      catSai[l.categoria]+=l.valor;
-    }
+function renderRelatorio() {
+  var d = gd();
+  var lancs = _filtrarRel(d.lancamentos);
+  var entTotal = 0, saiTotal = 0;
+  var catEnt = {}, catSai = {};
+  lancs.forEach(function(l) {
+    if (l.tipo === 'entrada' || l.tipo === 'entrada_cat') { entTotal += l.valor; if (!catEnt[l.categoria]) catEnt[l.categoria] = 0; catEnt[l.categoria] += l.valor; }
+    else if (l.tipo === 'tapete_entrada') { entTotal += l.valor; if (!catEnt['Tapete']) catEnt['Tapete'] = 0; catEnt['Tapete'] += l.valor; }
+    else if (l.tipo === 'saida') { saiTotal += l.valor; if (!catSai[l.categoria]) catSai[l.categoria] = 0; catSai[l.categoria] += l.valor; }
+    else if (l.tipo === 'tapete_gasto') { saiTotal += l.valor; if (!catSai[l.categoria]) catSai[l.categoria] = 0; catSai[l.categoria] += l.valor; }
   });
-  var saldoPer=entTotal-saiTotal;
-  var dist=calcDist();
-  var ret=d.adm.retiradas;
-
-  var html='';
-
-  // resumo
-  html+='<div class="card" style="margin-bottom:4px;"><div class="card-t">Resumo do período</div><div class="card-b">';
-  html+='<div class="ngrid">';
-  html+='<div class="ncard vd"><div class="num">'+fmtVal(entTotal)+'</div><div class="lbl">Entradas</div></div>';
-  html+='<div class="ncard vm"><div class="num">'+fmtVal(saiTotal)+'</div><div class="lbl">Saídas</div></div>';
-  html+='</div>';
-  html+='<div class="ncard '+(saldoPer>=0?'vd':'vm')+'" style="margin-top:8px;"><div class="num">'+fmtVal(saldoPer)+'</div><div class="lbl">Saldo período</div></div>';
-  html+='</div></div>';
-
-  // entradas por categoria
-  var entKeys=Object.keys(catEnt).sort(function(a,b){return catEnt[b]-catEnt[a];});
-  if(entKeys.length){
-    html+='<div class="card" style="margin-bottom:4px;"><div class="card-t">Entradas por categoria</div><div class="card-b">';
-    entKeys.forEach(function(k){
-      html+='<div class="rel-row"><span>'+_esc2(k)+'</span><span style="font-family:\'Courier New\',monospace;font-weight:900;color:var(--vd);">'+fmtVal(catEnt[k])+'</span></div>';
-    });
-    html+='</div></div>';
+  var saldoPer = entTotal - saiTotal;
+  var dist = calcDist();
+  var ret = d.adm.retiradas;
+  var html = '';
+  html += '<div class="card" style="margin-bottom:4px;"><div class="card-t">Resumo do período</div><div class="card-b">';
+  html += '<div class="ngrid">';
+  html += '<div class="ncard vd"><div class="num">' + fmtVal(entTotal) + '</div><div class="lbl">Entradas</div></div>';
+  html += '<div class="ncard vm"><div class="num">' + fmtVal(saiTotal) + '</div><div class="lbl">Saídas</div></div>';
+  html += '</div>';
+  html += '<div class="ncard ' + (saldoPer >= 0 ? 'vd' : 'vm') + '" style="margin-top:8px;"><div class="num">' + fmtVal(saldoPer) + '</div><div class="lbl">Saldo período</div></div>';
+  html += '</div></div>';
+  var entKeys = Object.keys(catEnt).sort(function(a, b) { return catEnt[b] - catEnt[a]; });
+  if (entKeys.length) {
+    html += '<div class="card" style="margin-bottom:4px;"><div class="card-t">Entradas por categoria</div><div class="card-b">';
+    entKeys.forEach(function(k) { html += '<div class="rel-row"><span>' + _esc2(k) + '</span><span style="font-family:\'Courier New\',monospace;font-weight:900;color:var(--vd);">' + fmtVal(catEnt[k]) + '</span></div>'; });
+    html += '</div></div>';
   }
-
-  // saídas por categoria
-  var saiKeys=Object.keys(catSai).sort(function(a,b){return catSai[b]-catSai[a];});
-  if(saiKeys.length){
-    html+='<div class="card" style="margin-bottom:4px;"><div class="card-t">Saídas por categoria</div><div class="card-b">';
-    saiKeys.forEach(function(k){
-      html+='<div class="rel-row"><span>'+_esc2(k)+'</span><span style="font-family:\'Courier New\',monospace;font-weight:900;color:var(--vm);"> - '+fmtVal(catSai[k])+'</span></div>';
-    });
-    html+='</div></div>';
+  var saiKeys = Object.keys(catSai).sort(function(a, b) { return catSai[b] - catSai[a]; });
+  if (saiKeys.length) {
+    html += '<div class="card" style="margin-bottom:4px;"><div class="card-t">Saídas por categoria</div><div class="card-b">';
+    saiKeys.forEach(function(k) { html += '<div class="rel-row"><span>' + _esc2(k) + '</span><span style="font-family:\'Courier New\',monospace;font-weight:900;color:var(--vm);"> - ' + fmtVal(catSai[k]) + '</span></div>'; });
+    html += '</div></div>';
   }
-
-  // espaço visual antes da distribuição
-  html+='<div style="height:8px;"></div>';
-
-  // distribuição adm (separada visualmente)
-  html+='<div class="card"><div class="card-t">Distribuição ADM atual</div><div class="card-b">';
-  var nomes={despesas:'🏠 Despesas 50%',negocio:'💼 Negócio 30%',invest:'📈 Investimento 10%',diversao:'🎉 Diversão 10%'};
-  for(var k in nomes){
-    var disp=dist[k]-(ret[k]||0);
-    html+='<div class="rel-row"><span>'+nomes[k]+'</span><span style="font-family:\'Courier New\',monospace;font-weight:900;color:'+(disp>=0?'var(--txt)':'var(--vm)')+';">'+fmtVal(disp)+'</span></div>';
+  html += '<div style="height:8px;"></div>';
+  html += '<div class="card"><div class="card-t">Distribuição ADM atual</div><div class="card-b">';
+  var nomes = { despesas: '🏠 Despesas 50%', negocio: '💼 Negócio 30%', invest: '📈 Investimento 10%', diversao: '🎉 Diversão 10%' };
+  for (var k in nomes) {
+    var disp = dist[k] - (ret[k] || 0);
+    html += '<div class="rel-row"><span>' + nomes[k] + '</span><span style="font-family:\'Courier New\',monospace;font-weight:900;color:' + (disp >= 0 ? 'var(--txt)' : 'var(--vm)') + ';">' + fmtVal(disp) + '</span></div>';
   }
-  html+='</div></div>';
-
-  document.getElementById('relConteudo').innerHTML=html;
+  html += '</div></div>';
+  document.getElementById('relConteudo').innerHTML = html;
 }
 
 // ===== BACKUP / RESET =====
-document.getElementById('btnBackup').onclick=function(){
-  var json=JSON.stringify(gd(),null,2);
-  if(navigator.clipboard&&navigator.clipboard.writeText){
-    navigator.clipboard.writeText(json).then(function(){toast('✅ Backup copiado!');}).catch(function(){_copiarFallback(json);});
-  }else{_copiarFallback(json);}
+document.getElementById('btnBackup').onclick = function() {
+  var json = JSON.stringify(gd(), null, 2);
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(json).then(function() { toast('✅ Backup copiado!'); }).catch(function() { _copiarFallback(json); });
+  } else { _copiarFallback(json); }
 };
-document.getElementById('btnImportar').onclick=function(){
-  var area=document.getElementById('importArea');
-  area.style.display=area.style.display==='none'?'block':'none';
+document.getElementById('btnImportar').onclick = function() {
+  var area = document.getElementById('importArea');
+  area.style.display = area.style.display === 'none' ? 'block' : 'none';
 };
-document.getElementById('btnImportarDados').onclick=function(){
-  var txt=document.getElementById('importTexto').value.trim();
-  try{
-    var d=JSON.parse(txt);
-    if(!d.lancamentos)throw new Error('inválido');
-    if(!confirm('Substituir todos os dados pelo backup?'))return;
-    _cache=d;salvar();renderADM();renderHistorico();renderRelatorio();atualizarHeader();
-    document.getElementById('importArea').style.display='none';
+document.getElementById('btnImportarDados').onclick = async function() {
+  var txt = document.getElementById('importTexto').value.trim();
+  try {
+    var d = JSON.parse(txt);
+    if (!d.lancamentos) throw new Error('inválido');
+    if (!confirm('Substituir todos os dados pelo backup?')) return;
+    _cache = d;
+    await salvar();
+    renderADM(); renderHistorico(); renderRelatorio(); atualizarHeader();
+    document.getElementById('importArea').style.display = 'none';
     toast('✅ Dados importados!');
-  }catch(e){toast('JSON inválido','erro');}
+  } catch (e) { toast('JSON inválido', 'erro'); }
 };
-document.getElementById('btnReset').onclick=function(){
-  if(!confirm('Apagar TODOS os dados? Isso não pode ser desfeito.'))return;
-  _cache={lancamentos:[],adm:{retiradas:{despesas:0,negocio:0,invest:0,diversao:0},tapeteRetirada:0,outrasRetirada:0,outrasNome:'Outras Entradas'}};
-  salvar();renderADM();renderHistorico();renderRelatorio();atualizarHeader();
+document.getElementById('btnReset').onclick = async function() {
+  if (!confirm('Apagar TODOS os dados? Isso não pode ser desfeito.')) return;
+  _cache = { lancamentos: [], adm: { retiradas: { despesas: 0, negocio: 0, invest: 0, diversao: 0 }, tapeteRetirada: 0, outrasRetirada: 0, outrasNome: 'Outras Entradas' } };
+  await salvar();
+  renderADM(); renderHistorico(); renderRelatorio(); atualizarHeader();
   toast('Dados apagados');
 };
 
 // ===== HEADER =====
-function atualizarHeader(){
-  var s=calcSaldo();
-  document.getElementById('hdrSaldo').textContent='Saldo: '+fmtVal(s);
-  document.getElementById('drawerSaldo').textContent='Saldo: '+fmtVal(s);
+function atualizarHeader() {
+  var s = calcSaldo();
+  document.getElementById('hdrSaldo').textContent = 'Saldo: ' + fmtVal(s);
+  document.getElementById('drawerSaldo').textContent = 'Saldo: ' + fmtVal(s);
 }
 
 // ===== MODAIS =====
-function abrirModal(id){document.getElementById(id).classList.add('open');}
-function fecharModal(id){document.getElementById(id).classList.remove('open');}
+function abrirModal(id) { document.getElementById(id).classList.add('open'); }
+function fecharModal(id) { document.getElementById(id).classList.remove('open'); }
+window.fecharModal = fecharModal;
 
 // ===== NAV =====
-var abaNomes=['📥 REGISTRAR','💶 ADM','🗂️ HISTÓRICO','📊 RELATÓRIO'];
-function irPara(idx){
-  for(var i=0;i<4;i++){
-    document.getElementById('p'+i).classList.toggle('on',i===idx);
-    document.getElementById('di'+i).classList.toggle('on',i===idx);
+var abaNomes = ['📥 REGISTRAR', '💶 ADM', '🗂️ HISTÓRICO', '📊 RELATÓRIO'];
+window.irPara = function(idx) {
+  for (var i = 0; i < 4; i++) {
+    document.getElementById('p' + i).classList.toggle('on', i === idx);
+    document.getElementById('di' + i).classList.toggle('on', i === idx);
   }
-  document.getElementById('hdrTitle').textContent=abaNomes[idx];
-  if(idx===1)renderADM();
-  if(idx===2)renderHistorico();
-  if(idx===3)renderRelatorio();
+  document.getElementById('hdrTitle').textContent = abaNomes[idx];
+  if (idx === 1) renderADM();
+  if (idx === 2) renderHistorico();
+  if (idx === 3) renderRelatorio();
   fecharMenu();
-}
-function abrirMenu(){document.getElementById('drawer').classList.add('open');document.getElementById('drawerOverlay').classList.add('open');}
-function fecharMenu(){document.getElementById('drawer').classList.remove('open');document.getElementById('drawerOverlay').classList.remove('open');}
+};
+window.abrirMenu = function() { document.getElementById('drawer').classList.add('open'); document.getElementById('drawerOverlay').classList.add('open'); };
+window.fecharMenu = function() { document.getElementById('drawer').classList.remove('open'); document.getElementById('drawerOverlay').classList.remove('open'); };
 
 // ===== INIT =====
-function init(){
-  document.getElementById('iaData').value=hoje();
-  document.getElementById('lData').value=hoje();
-  document.getElementById('drawerData').textContent='📅 '+fmtBR(hoje());
+async function init() {
+  document.getElementById('iaData').value = hoje();
+  document.getElementById('lData').value = hoje();
+  document.getElementById('drawerData').textContent = '📅 ' + fmtBR(hoje());
+  await carregarDados();
+  iniciarListeners();
   renderADM();
   renderHistorico();
   renderRelatorio();
 }
 
-_abrirDB().then(function(){return _dbLer();}).then(function(){init();}).catch(function(e){console.error('Erro DB:',e);init();});
+init();
 </script>
 </body>
 </html>
