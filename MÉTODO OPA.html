@@ -245,6 +245,14 @@ input[type=time]{height:40px}
 .empty .ei{font-size:38px;margin-bottom:10px}
 .dica{background:var(--bg-alt);border:1px solid var(--borda-media);border-radius:8px;padding:11px 13px;font-size:13px;color:var(--texto-sec);line-height:1.5}
 ::-webkit-scrollbar{width:3px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--borda-media);border-radius:99px}
+
+/* FIX: textareas de bloco sem auto-resize que quebra o teclado mobile */
+.bobj,.bprop{
+  min-height:72px;
+  height:auto;
+  overflow-y:auto;
+  resize:none;
+}
 </style>
 </head>
 <body>
@@ -538,11 +546,6 @@ import {
 
 const $=s=>document.querySelector(s),$$=s=>document.querySelectorAll(s);
 
-// ===== FIRESTORE STORAGE =====
-// Estrutura: coleção "metodo_opa" com documentos:
-//   - "dados_principais" → { planejamentos:[], habitos:[], decisoes:[], planos:[] }
-// Usamos onSnapshot para tempo real.
-
 const COL = 'metodo_opa';
 const DOC_ID = 'dados_principais';
 
@@ -559,24 +562,31 @@ function _lsGravar(d) {
 }
 
 async function iniciarSync() {
-  // Tenta carregar do Firestore; se offline, usa localStorage
   try {
     const docRef = doc(db, COL, DOC_ID);
-    // onSnapshot para tempo real
     _unsubscribe = onSnapshot(docRef, (snap) => {
+      // ── FIX: não re-renderiza se o usuário está digitando num campo ──
+      const activeEl = document.activeElement;
+      const isTyping = activeEl && (
+        activeEl.tagName === 'TEXTAREA' ||
+        activeEl.tagName === 'INPUT' ||
+        activeEl.isContentEditable
+      );
+
       if (snap.exists()) {
         _cache = snap.data();
         _lsGravar(_cache);
       } else {
-        // documento não existe ainda; usa cache local se houver
         const ls = _lsLer();
         if (ls) _cache = ls;
       }
-      // re-render tela ativa se necessário
-      _onDataUpdate();
+
+      // Só re-renderiza se não estiver digitando
+      if (!isTyping) {
+        _onDataUpdate();
+      }
     }, (err) => {
       console.warn('onSnapshot erro:', err);
-      // fallback offline
       const ls = _lsLer();
       if (ls) _cache = ls;
       if (window.syncShow) window.syncShow.offline();
@@ -606,7 +616,6 @@ async function salvarFirestore(dados) {
   }
 }
 
-// Funções síncronas usando cache em memória
 function gd(){ return JSON.parse(JSON.stringify(_cache)); }
 function sd(d){ salvarFirestore(d); }
 function md(fn){ const d=gd(); fn(d); sd(d); }
@@ -635,11 +644,9 @@ window.irTHab = function(id){ $('#mod-habitos').querySelectorAll('.tela').forEac
 window.irTDec = function(id){ $('#mod-decisao').querySelectorAll('.tela').forEach(t=>t.classList.remove('ativa')); document.getElementById(id).classList.add('ativa'); };
 window.irTHist = function(id){ $('#mod-historico').querySelectorAll('.tela').forEach(t=>t.classList.remove('ativa')); document.getElementById(id).classList.add('ativa'); };
 
-// INFO BALÕES
 window.tgInfo = function(id){ const el=document.getElementById(id); $$('.info-balao').forEach(b=>{ if(b.id!==id)b.classList.remove('vis'); }); el.classList.toggle('vis'); };
 document.addEventListener('click',e=>{ if(!e.target.classList.contains('info-btn'))$$('.info-balao').forEach(b=>b.classList.remove('vis')); });
 
-// DROPDOWNS
 window.tgDropdown = function(id){ $$('.zona-dropdown,.prior-dropdown').forEach(d=>{ if(d.id!==id)d.classList.remove('vis'); }); document.getElementById(id).classList.toggle('vis'); };
 document.addEventListener('click',e=>{ if(!e.target.closest('.zona-sel-wrap')&&!e.target.closest('.prior-wrap'))$$('.zona-dropdown,.prior-dropdown').forEach(d=>d.classList.remove('vis')); });
 
@@ -717,14 +724,14 @@ function criarBlocoUI(b){
             <div class="info-wrap"><button class="info-btn" onclick="tgInfo('iobj-${b.id}')">i</button>
             <div class="info-balao" id="iobj-${b.id}">O resultado claro que você quer ao final deste bloco. Seja específico.</div></div>
           </div>
-          <textarea class="bobj" data-id="${b.id}" placeholder="O que você quer alcançar?" style="min-height:44px;height:auto;font-size:13px;padding:10px 14px;line-height:1.5;overflow:hidden;resize:none">${b.objetivo}</textarea>
+          <textarea class="bobj" data-id="${b.id}" placeholder="O que você quer alcançar?" style="font-size:13px;padding:10px 14px;line-height:1.5">${b.objetivo}</textarea>
         </div>
         <div class="bloco-secao">
           <div class="bloco-secao-titulo">Por quê?
             <div class="info-wrap"><button class="info-btn" onclick="tgInfo('iprop-${b.id}')">i</button>
             <div class="info-balao" id="iprop-${b.id}">Combine razão prática + como vai se sentir. Ex: "Preciso de energia E vou me sentir vivo e confiante."</div></div>
           </div>
-          <textarea class="bprop" data-id="${b.id}" placeholder="Por que este bloco importa?" style="min-height:44px;height:auto;font-size:13px;padding:10px 14px;line-height:1.5;overflow:hidden;resize:none">${b.proposito}</textarea>
+          <textarea class="bprop" data-id="${b.id}" placeholder="Por que este bloco importa?" style="font-size:13px;padding:10px 14px;line-height:1.5">${b.proposito}</textarea>
         </div>
         <div class="bloco-secao">
           <div class="bloco-secao-titulo">Ações
@@ -745,20 +752,29 @@ function criarBlocoUI(b){
         </div>
       </div>
     </div>`;
-  card.querySelector('.bloco-nome-inp').addEventListener('input',e=>{
-    const bk=blocosTemp.find(x=>x.id===e.target.dataset.id);
-    if(bk){bk.nome=e.target.value; salvarBlocos(); checkBtns();}
+
+  // ── FIX PRINCIPAL: salva no blur, não no input ──
+  // Isso evita que qualquer manipulação de DOM durante a digitação
+  // cause reflow e feche o teclado mobile.
+  card.querySelector('.bloco-nome-inp').addEventListener('input', e => {
+    const bk = blocosTemp.find(x => x.id === e.target.dataset.id);
+    if (bk) { bk.nome = e.target.value; checkBtns(); }
   });
-  card.querySelector('.bobj').addEventListener('input',e=>{
-    e.target.style.height='auto'; e.target.style.height=e.target.scrollHeight+'px';
-    const bk=blocosTemp.find(x=>x.id===e.target.dataset.id);
-    if(bk){bk.objetivo=e.target.value; salvarBlocos();}
+  card.querySelector('.bloco-nome-inp').addEventListener('blur', e => {
+    const bk = blocosTemp.find(x => x.id === e.target.dataset.id);
+    if (bk) { bk.nome = e.target.value; salvarBlocos(); }
   });
-  card.querySelector('.bprop').addEventListener('input',e=>{
-    e.target.style.height='auto'; e.target.style.height=e.target.scrollHeight+'px';
-    const bk=blocosTemp.find(x=>x.id===e.target.dataset.id);
-    if(bk){bk.proposito=e.target.value; salvarBlocos();}
+
+  // .bobj e .bprop: salva no blur (sem auto-resize que quebra o teclado)
+  card.querySelector('.bobj').addEventListener('blur', e => {
+    const bk = blocosTemp.find(x => x.id === e.target.dataset.id);
+    if (bk) { bk.objetivo = e.target.value; salvarBlocos(); }
   });
+  card.querySelector('.bprop').addEventListener('blur', e => {
+    const bk = blocosTemp.find(x => x.id === e.target.dataset.id);
+    if (bk) { bk.proposito = e.target.value; salvarBlocos(); }
+  });
+
   card.querySelector('.bhor-ini').addEventListener('change',e=>{
     const bk=blocosTemp.find(x=>x.id===e.target.dataset.id);
     if(bk){
@@ -827,6 +843,7 @@ function addAcaoBlocoUI(blocoId,acao,foco=false){
   const lista=document.getElementById('balist-'+blocoId); if(!lista)return;
   const row=document.createElement('div'); row.className='bloco-acao-row'; row.dataset.aid=acao.id;
   row.innerHTML=`<input type="text" placeholder="Descreva a ação..." value="${acao.nome}" maxlength="200" style="flex:1;height:38px;font-size:13px"><button class="rm-btn" onclick="remAcaoBloco('${blocoId}','${acao.id}')">×</button>`;
+  // ── FIX: salva no blur, não no input ──
   row.querySelector('input').addEventListener('blur',e=>{
     const b=blocosTemp.find(x=>x.id===blocoId); const a=b&&b.acoes.find(x=>x.id===acao.id);
     if(a){a.nome=e.target.value; salvarBlocos(); checkBtns();}
@@ -864,7 +881,6 @@ function checkConfBlocos(){
   });
 }
 
-// PURIFICAÇÃO
 $('#btn-gbloco-purif').addEventListener('click',()=>{ irT('t-purificar'); renderPurificarBloco(); });
 
 function renderPurificarBloco(){
@@ -943,7 +959,6 @@ function atualizarContPurif(){
 }
 $('#btn-purif-prox').addEventListener('click',()=>{ irT('t-prioridade'); renderPrioridadeBloco(); });
 
-// PRIORIDADE
 function renderPrioridadeBloco(){
   if(!blocoAtual)return;
   const lista=$('#prior-lista'); lista.innerHTML='';
@@ -1006,7 +1021,6 @@ $('#btn-prior-prox').addEventListener('click',()=>{
   irT('t-execucao'); renderExec(); startClock();
 });
 
-// HORÁRIOS
 function renderHorarios(){
   const lista=$('#hor-lista'); lista.innerHTML='';
   blocosTemp.forEach(b=>{
@@ -1043,7 +1057,6 @@ $('#btn-hor-prox').addEventListener('click',()=>{
   p.iniciado=true; sp(p); irT('t-execucao'); renderExec(); startClock();
 });
 
-// RELATÓRIO
 function renderRelatorio(){
   const p=gph(); if(!p)return;
   $('#rel-data').textContent=fBR(p.data).toUpperCase();
@@ -1453,14 +1466,11 @@ window.abrirDetHist = function(id){
 };
 
 // ===== INIT =====
-// Configura callback para re-render quando os dados chegarem do Firestore
 _onDataUpdate = () => {
-  // Re-render a tela ativa conforme o módulo atual
   const modAtivo = document.querySelector('.mod.ativo');
   if (!modAtivo) return;
   const modId = modAtivo.id;
   if (modId === 'mod-hoje') {
-    // Apenas re-inicializa se ainda estiver na tela principal
     const telaAtiva = modAtivo.querySelector('.tela.ativa');
     if (telaAtiva && telaAtiva.id === 't-hoje-main') {
       initHoje();
@@ -1478,7 +1488,6 @@ _onDataUpdate = () => {
   }
 };
 
-// Garante estrutura mínima no cache
 function garantirEstrutura() {
   if (!_cache.planejamentos) _cache.planejamentos = [];
   if (!_cache.habitos) _cache.habitos = [];
@@ -1486,13 +1495,11 @@ function garantirEstrutura() {
   if (!_cache.planos) _cache.planos = [];
 }
 
-// Iniciar: tenta carregar do localStorage enquanto aguarda o Firestore
 const lsInicial = _lsLer();
 if (lsInicial) { _cache = lsInicial; }
 garantirEstrutura();
 initHoje();
 
-// Inicia sincronização Firestore em background
 iniciarSync().then(() => {
   garantirEstrutura();
   initHoje();
@@ -1502,7 +1509,6 @@ iniciarSync().then(() => {
   initHoje();
 });
 
-// Expor fecharModal globalmente
 window.fecharModal = fecharModal;
 </script>
 </body>
