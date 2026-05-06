@@ -1,0 +1,1042 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>V4 CLESS — Automação IA, Vendas e Tráfego Pago</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@300;400;500;600;700;900&family=Barlow+Condensed:wght@600;700;900&display=swap" rel="stylesheet">display=swap" rel="stylesheet">
+<style>
+:root {
+  --red: #0066cc;
+  --red-dark: #004499;
+  --red-glow: rgba(0,102,204,0.18);
+  --bg: #080808;
+  --bg2: #0f0f0f;
+  --bg3: #161616;
+  --bg4: #1e1e1e;
+  --border: rgba(255,255,255,0.07);
+  --text: #f0f0f0;
+  --muted: #777;
+  --h: 70px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden;line-height:1.6}
+
+/* ─── HEADER ─── */
+header{position:fixed;top:0;left:0;right:0;height:var(--h);background:rgba(8,8,8,0.97);backdrop-filter:blur(10px);border-bottom:1px solid rgba(0,102,204,0.4);z-index:999;display:flex;align-items:center;padding:0 24px;gap:20px}
+.logo{font-family:'Inter';font-size:26px;font-weight:600;letter-spacing:2px;white-space:nowrap}
+.logo span{color:var(--red)}
+nav{display:flex;gap:4px;margin-left:auto}
+nav a{color:var(--muted);text-decoration:none;font-size:13px;font-weight:600;letter-spacing:1px;text-transform:uppercase;padding:8px 14px;border-radius:3px;transition:all .2s;cursor:pointer}
+nav a:hover,nav a.active{color:var(--text);background:var(--red-glow)}
+nav a.active{color:var(--red)}
+.ham{display:none;flex-direction:column;gap:5px;background:none;border:none;cursor:pointer;margin-left:auto;padding:8px}
+.ham span{width:24px;height:2px;background:var(--text);transition:.3s;display:block}
+.ham.open span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+.ham.open span:nth-child(2){opacity:0}
+.ham.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+.mob-nav{display:none;position:fixed;top:var(--h);left:0;right:0;background:#0a0a0a;border-bottom:2px solid var(--red);z-index:998;flex-direction:column;padding:10px 0}
+.mob-nav.open{display:flex}
+.mob-nav a{color:var(--muted);text-decoration:none;padding:14px 24px;font-size:14px;font-weight:600;letter-spacing:1px;text-transform:uppercase;border-bottom:1px solid var(--border);cursor:pointer;transition:color .2s}
+.mob-nav a:hover,.mob-nav a.active{color:var(--red)}
+
+/* ─── PAGES ─── */
+.page{display:none;padding-top:var(--h)}
+.page.active{display:block}
+
+/* ─── UTILITIES ─── */
+.wrap{max-width:1140px;margin:0 auto;padding:0 24px;overflow-x:hidden}
+.sec{padding:80px 0}
+.sec-sm{padding:50px 0}
+.bg2{background:var(--bg2)}
+.bg3{background:var(--bg3)}
+.tag{display:inline-block;color:var(--red);font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;border:1px solid var(--red);padding:5px 14px;border-radius:2px;margin-bottom:20px}
+.sec-title{font-family:'Inter';font-size:clamp(36px,6vw,58px);letter-spacing:2px;line-height:1.05;margin-bottom:16px}
+.sec-sub{font-size:clamp(15px,2vw,18px);color:var(--muted);max-width:620px;line-height:1.7}
+.center{text-align:center}
+.center .sec-sub{margin:0 auto}
+.red{color:var(--red)}
+
+/* ─── BUTTONS ─── */
+.btn{display:inline-block;font-family:'Inter';font-size:15px;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:14px 32px;border-radius:3px;text-decoration:none;cursor:pointer;transition:all .2s;border:none}
+.btn-red{background:var(--red);color:#fff}
+.btn-red:hover{background:var(--red-dark);transform:translateY(-2px)}
+.btn-out{background:transparent;color:var(--red);border:2px solid var(--red)}
+.btn-out:hover{background:var(--red);color:#fff;transform:translateY(-2px)}
+.btn-white{background:#fff;color:#111}
+.btn-white:hover{background:#eee;transform:translateY(-2px)}
+.btns{display:flex;gap:12px;flex-wrap:wrap;margin-top:28px}
+
+/* ─── HERO HOME ─── */
+.hero{min-height:calc(100vh - var(--h));display:flex;align-items:center;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 60% 60% at 70% 50%,rgba(224,20,31,0.08) 0%,transparent 70%)}
+.hero-grid{position:absolute;inset:0;background-image:linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px);background-size:60px 60px;opacity:.4}
+.hero-content{position:relative;z-index:1;padding:60px 0}
+.hero-tag{color:var(--red);font-size:12px;font-weight:700;letter-spacing:4px;text-transform:uppercase;margin-bottom:16px}
+.hero h1{font-family:'Inter';font-size:clamp(16px,7vw,30px);line-height:1.30;letter-spacing:0;margin-bottom:24px;white-space:normal}
+.hero h1 span{color:var(--red)}
+.hero p{font-size:clamp(15px,2vw,19px);color:var(--muted);max-width:580px;line-height:1.75;margin-bottom:32px}
+.hero-stats{display:flex;gap:40px;margin-top:48px;flex-wrap:wrap}
+.stat{border-left:3px solid var(--red);padding-left:16px}
+.stat-num{font-family:'Inter';font-size:36px;color:var(--red);line-height:1}
+.stat-label{font-size:12px;color:var(--muted);letter-spacing:1px;text-transform:uppercase}
+
+/* ─── PROBLEM CARDS ─── */
+.prob-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:48px}
+.prob-card{background:var(--bg3);border:1px solid var(--border);border-top:3px solid var(--red);padding:28px;border-radius:4px;transition:transform .2s}
+.prob-card:hover{transform:translateY(-4px)}
+.prob-icon{font-size:32px;margin-bottom:16px}
+.prob-card h3{font-family:'Inter';font-size:20px;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:10px}
+.prob-card p{font-size:14px;color:var(--muted);line-height:1.7}
+
+/* ─── METHOD CARDS ─── */
+.method-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:48px}
+.method-card{background:var(--bg3);border:1px solid var(--border);padding:36px 28px;border-radius:4px;transition:all .25s;cursor:pointer;position:relative;overflow:hidden}
+.method-card::before{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;background:var(--red);transform:scaleX(0);transition:transform .3s}
+.method-card:hover{border-color:rgba(0,102,204,0.4);transform:translateY(-4px)}
+.method-card:hover::before{transform:scaleX(1)}
+.method-num{font-family:'Inter';font-size:72px;color:rgba(0,102,204,0.12);line-height:1;margin-bottom:-10px}
+.method-name{font-family:'Inter';font-size:32px;letter-spacing:2px;margin-bottom:6px}
+.method-sub{font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--red);margin-bottom:16px}
+.method-desc{font-size:14px;color:var(--muted);line-height:1.7;margin-bottom:24px}
+
+/* ─── DOE STEPS ─── */
+.doe-steps{display:grid;grid-template-columns:repeat(3,1fr);gap:0;margin-top:48px;position:relative}
+.doe-steps::before{content:'';position:absolute;top:60px;left:calc(16.66% + 20px);right:calc(16.66% + 20px);height:2px;background:linear-gradient(90deg,var(--red),var(--red-dark));z-index:0}
+.doe-step{background:var(--bg3);border:1px solid var(--border);padding:36px 28px;position:relative;z-index:1}
+.doe-step:first-child{border-radius:4px 0 0 4px}
+.doe-step:last-child{border-radius:0 4px 4px 0}
+.doe-letter{font-family:'Inter';font-size:80px;color:var(--red);line-height:1;opacity:.15;position:absolute;top:16px;right:20px}
+.doe-step-name{font-family:'Inter';font-size:28px;letter-spacing:2px;margin-bottom:8px}
+.doe-step-sub{font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--red);margin-bottom:16px}
+.doe-step p{font-size:14px;color:var(--muted);line-height:1.75}
+
+/* ─── BENEFITS ─── */
+.benefits-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:48px}
+.benefit{background:var(--bg3);border:1px solid var(--border);padding:28px;border-radius:4px;text-align:center}
+.benefit-num{font-family:'Inter';font-size:52px;color:var(--red);line-height:1;margin-bottom:6px}
+.benefit-label{font-size:13px;color:var(--muted);letter-spacing:1px}
+
+/* ─── ACCORDION ─── */
+.acc{margin-top:40px;display:flex;flex-direction:column;gap:8px}
+.acc-item{background:var(--bg3);border:1px solid var(--border);border-radius:4px;overflow:hidden}
+.acc-q{width:100%;background:none;border:none;color:var(--text);font-family:'Inter';font-size:15px;font-weight:600;padding:18px 24px;text-align:left;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:16px;transition:background .2s}
+.acc-q:hover{background:rgba(255,255,255,0.03)}
+.acc-q.open{color:var(--red)}
+.acc-arrow{font-size:18px;color:var(--red);transition:transform .3s;flex-shrink:0}
+.acc-q.open .acc-arrow{transform:rotate(45deg)}
+.acc-a{display:none;padding:0 24px 20px;font-size:14px;color:var(--muted);line-height:1.8}
+.acc-a.open{display:block}
+
+/* ─── BEFORE AFTER ─── */
+.ba-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:48px}
+.ba-card{background:var(--bg3);border:1px solid var(--border);padding:32px;border-radius:4px}
+.ba-card.after{border-color:rgba(224,20,31,0.4)}
+.ba-title{font-family:'Inter';font-size:18px;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:20px;padding-bottom:12px;border-bottom:1px solid var(--border)}
+.ba-title.red{border-color:rgba(224,20,31,0.3)}
+.ba-list{display:flex;flex-direction:column;gap:10px}
+.ba-item{font-size:14px;display:flex;align-items:flex-start;gap:10px}
+.ba-item .icon{font-size:16px;flex-shrink:0;margin-top:2px}
+
+/* ─── LRR FLOW ─── */
+.lrr-flow{display:flex;flex-direction:column;gap:0;margin-top:48px;position:relative}
+.lrr-flow::before{content:'';position:absolute;left:28px;top:40px;bottom:40px;width:2px;background:linear-gradient(180deg,var(--red),var(--red-dark))}
+.lrr-step{display:flex;gap:24px;align-items:flex-start;padding:20px 0;position:relative}
+.lrr-num{width:56px;height:56px;background:var(--red);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Inter';font-size:22px;flex-shrink:0;position:relative;z-index:1}
+.lrr-body{background:var(--bg3);border:1px solid var(--border);padding:20px 24px;border-radius:4px;flex:1}
+.lrr-body h3{font-family:'Inter';font-size:17px;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:6px}
+.lrr-body p{font-size:14px;color:var(--muted);line-height:1.7}
+.rotate-box{background:rgba(224,20,31,0.08);border:2px solid var(--red);border-radius:4px;padding:24px 28px;margin-top:32px}
+.rotate-box h3{font-family:'Inter';font-size:24px;letter-spacing:2px;color:var(--red);margin-bottom:10px}
+.rotate-box p{font-size:14px;color:var(--muted);line-height:1.8}
+
+/* ─── SCMAO STEPS ─── */
+.scmao-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:16px;margin-top:48px}
+.scmao-step{background:var(--bg3);border:1px solid var(--border);padding:24px 18px;border-radius:4px;text-align:center;transition:transform .2s}
+.scmao-step:hover{transform:translateY(-4px);border-color:rgba(224,20,31,0.4)}
+.scmao-letter{font-family:'Inter';font-size:60px;color:var(--red);line-height:1;margin-bottom:8px}
+.scmao-name{font-family:'Inter';font-size:15px;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:10px}
+.scmao-desc{font-size:13px;color:var(--muted);line-height:1.7}
+
+/* ─── CTA BANNER ─── */
+.cta-banner{background:var(--red);padding:70px 0;text-align:center}
+.cta-banner h2{font-family:'Inter';font-size:clamp(24px,5vw,56px);letter-spacing:2px;color:#fff;margin-bottom:16px}
+.cta-banner p{font-size:16px;color:rgba(255,255,255,0.8);margin-bottom:32px}
+.cta-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+
+/* ─── FOOTER ─── */
+footer{background:#050505;border-top:1px solid var(--border);padding:50px 0 30px}
+.footer-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:40px;margin-bottom:40px}
+.footer-brand p{font-size:13px;color:var(--muted);margin-top:10px;line-height:1.7;max-width:220px}
+.footer-col h4{font-family:'Inter';font-size:13px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:16px}
+.footer-col a,.footer-col span{display:block;font-size:13px;color:var(--muted);text-decoration:none;margin-bottom:8px;cursor:pointer;transition:color .2s}
+.footer-col a:hover{color:var(--red)}
+.footer-bottom{border-top:1px solid var(--border);padding-top:24px;text-align:center;font-size:12px;color:var(--muted);letter-spacing:1px}
+
+/* ─── WHATSAPP FLOAT ─── */
+.wa-float{position:fixed;bottom:24px;right:24px;width:56px;height:56px;background:#25d366;border-radius:50%;display:flex;align-items:center;justify-content:center;z-index:1000;box-shadow:0 4px 20px rgba(37,211,102,0.4);transition:transform .2s;text-decoration:none}
+.wa-float:hover{transform:scale(1.1)}
+.wa-float svg{width:28px;height:28px;fill:#fff}
+
+/* ─── ITEM LIST ─── */
+.item-list{display:flex;flex-direction:column;gap:10px;margin-top:32px}
+.item{display:flex;align-items:flex-start;gap:14px;padding:14px 20px;background:var(--bg3);border:1px solid var(--border);border-radius:3px;font-size:14px;color:var(--muted)}
+.item .dot{width:8px;height:8px;background:var(--red);border-radius:50%;flex-shrink:0;margin-top:6px}
+
+/* ─── FADE IN ─── */
+.fade{opacity:0;transform:translateY(24px);transition:opacity .6s,transform .6s}
+.fade.visible{opacity:1;transform:none}
+
+/* ─── MOBILE ─── */
+@media(max-width:768px){
+  nav{display:none}
+  .ham{display:flex}
+  body{overflow-x:hidden}
+  .wrap,
+  .wrap.hero-content,
+  div.wrap{padding-left:24px !important;padding-right:24px !important}
+  .hero-content{padding-top:0px;padding-bottom:36px;margin-top:-155px}
+  .btns{flex-direction:column;gap:10px;margin-top:16px}
+  .btns .btn{display:block;width:100%;text-align:center;padding:14px 12px;font-size:15px;letter-spacing:1px}
+  .hero-stats{gap:16px;margin-top:24px}
+  .stat-num{font-size:22px}
+  .stat-label{font-size:10px}
+  .stat{padding-left:10px}
+  .sec-title{font-size:clamp(22px,6.5vw,34px);letter-spacing:0;line-height:1.1}
+  .sec-sub{font-size:14px}
+  .prob-grid,.method-grid,.benefits-grid,.ba-grid{grid-template-columns:1fr}
+  .doe-steps{grid-template-columns:1fr;gap:10px}
+  .doe-steps::before{display:none}
+  .doe-step:first-child,.doe-step:last-child{border-radius:4px}
+  .scmao-grid{grid-template-columns:1fr 1fr}
+  .scmao-grid .scmao-step:last-child{grid-column:1/-1}
+  .footer-grid{grid-template-columns:1fr 1fr}
+  .sec{padding:44px 0}
+  .sec-sm{padding:30px 0}
+  .cta-banner{padding:44px 0}
+  .cta-btns{flex-direction:column;gap:10px}
+  .cta-btns .btn{display:block;width:100%;text-align:center;padding:14px 12px;font-size:12px;letter-spacing:1px}
+  .method-card{padding:22px 16px}
+  .method-num{font-size:44px}
+  .lrr-flow::before{left:22px}
+  .lrr-num{width:44px;height:44px;font-size:17px;flex-shrink:0}
+  .tag{font-size:10px;letter-spacing:1.5px}
+  .item{font-size:13px;padding:12px 14px}
+  .ba-card{padding:22px 16px}
+  .ba-item{font-size:13px}
+}
+@media(max-width:400px){
+  .hero h1{font-size:22px !important;line-height:1.25;letter-spacing:0}
+  .scmao-grid{grid-template-columns:1fr}
+  .scmao-grid .scmao-step:last-child{grid-column:auto}
+  .footer-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="logo"><span>V4</span> CLESS</div>
+  <nav>
+    <a class="active" onclick="show('home',this)">Home</a>
+    <a onclick="show('doe',this)">Automação IA</a>
+    <a onclick="show('lrr',this)">Estratégia de Vendas</a>
+    <a onclick="show('scmao',this)">Tráfego Pago</a>
+  </nav>
+  <button class="ham" id="ham" onclick="toggleMob()">
+    <span></span><span></span><span></span>
+  </button>
+</header>
+<div class="mob-nav" id="mob">
+  <a onclick="show('home',this);closeMob()">Home</a>
+  <a onclick="show('doe',this);closeMob()">Automação IA</a>
+  <a onclick="show('lrr',this);closeMob()">Estratégia de Vendas</a>
+  <a onclick="show('scmao',this);closeMob()">Tráfego Pago</a>
+</div>
+
+<!-- WhatsApp Float -->
+<a class="wa-float" href="https://wa.me/5548991351667" target="_blank" aria-label="WhatsApp">
+  <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+</a>
+
+<!-- ═══════════════════════════════════════════
+     PAGE: HOME
+═══════════════════════════════════════════ -->
+<div class="page active" id="page-home">
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-grid"></div>
+    <div class="wrap hero-content">
+      <div class="hero-tag">3 métodos comprovados</div>
+      <h1>PARE DE TRABALHAR<br>NO NEGÓCIO<br>COMECE A CRESCER</h1>
+      <p>Automação com IA + Equipe que vende com método + Clientes novos todo mês. Tudo isso sem precisar contratar mais gente.</p>
+      <div class="btns">
+        
+        <a class="btn btn-red" href="https://wa.me/5548991351667" target="_blank">FALAR AGORA NO WHATSAPP</a>
+      </div>
+      <div class="hero-stats fade">
+        <div class="stat"><div class="stat-num">+230%</div><div class="stat-label">Crescimento médio</div></div>
+        <div class="stat"><div class="stat-num">90 dias</div><div class="stat-label">Para ver resultado</div></div>
+        <div class="stat"><div class="stat-num">3</div><div class="stat-label">Métodos estruturados</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROBLEMAS -->
+  <section class="sec bg2">
+    <div class="wrap">
+      <div class="center fade">
+        <div class="tag">Você se identifica?</div>
+        <h2 class="sec-title">A MAIORIA DOS DONOS DE PME VIVE ASSIM:</h2>
+        <p class="sec-sub">Se você se reconhecer em pelo menos um desses cenários, você está no lugar certo.</p>
+      </div>
+      <div class="prob-grid fade">
+        <div class="prob-card">
+          <div class="prob-icon">⏱️</div>
+          <h3>Trabalha 12h/dia e cresce 5%</h3>
+          <p>Você é o gargalo do próprio negócio. Cada decisão passa por você, cada problema bate na sua porta. Trabalha muito, cresce pouco.</p>
+        </div>
+        <div class="prob-card">
+          <div class="prob-icon">📉</div>
+          <h3>Vendedores que não batem meta</h3>
+          <p>Equipe no improviso, desconto fácil, resultado inconsistente. No final do mês, você ainda é o vendedor número 1 da empresa.</p>
+        </div>
+        <div class="prob-card">
+          <div class="prob-icon">📵</div>
+          <h3>Telefone que não toca todo mês</h3>
+          <p>Depende de indicação, não sabe de onde vem o próximo cliente. Mês bom, mês ruim — sem conseguir explicar o porquê.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MÉTODOS -->
+  <section class="sec">
+    <div class="wrap">
+      <div class="center fade">
+        <div class="tag">A solução em 3 pilares</div>
+        <h2 class="sec-title">ESCOLHA SEU GARGALO E RESOLVA DE VEZ</h2>
+      </div>
+      <div class="method-grid fade">
+        <div class="method-card" onclick="show('doe',null)">
+          <div class="method-num">01</div>
+          <div class="method-name">MÉTODO DOE</div>
+          <div class="method-sub">Diagnóstico → Otimização → Automação</div>
+          <p class="method-desc">Elimine 90% das tarefas manuais. IA atende seu WhatsApp, gera orçamentos e cobra clientes enquanto você dorme. Sem precisar entender de tecnologia.</p>
+          <button class="btn btn-red">CONHECER O MÉTODO</button>
+        </div>
+        <div class="method-card" onclick="show('lrr',null)">
+          <div class="method-num">02</div>
+          <div class="method-name">MÉTODO LRR</div>
+          <div class="method-sub">Linha Reta Rotativa</div>
+          <p class="method-desc">Transformamos vendedores medianos em máquinas de fechamento. +45% de conversão em 90 dias. Sem desconto, sem improviso, sem depender do dono.</p>
+          <button class="btn btn-red">CONHECER O MÉTODO</button>
+        </div>
+        <div class="method-card" onclick="show('scmao',null)">
+          <div class="method-num">03</div>
+          <div class="method-name">MÉTODO SCMAO</div>
+          <div class="method-sub">Situação → Conhecimento → Meta → Anúncio → Otimização</div>
+          <p class="method-desc">Clientes novos todo mês de forma previsível. Sem depender de indicação. Sem contrato de 12 meses. Relatório em português simples.</p>
+          <button class="btn btn-red">CONHECER O MÉTODO</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA BANNER -->
+  <div class="cta-banner fade">
+    <div class="wrap">
+      <h2>QUAL É O SEU MAIOR<br>GARGALO HOJE?</h2>
+      <p>Clique no método certo e veja como resolver de forma prática e rápida.</p>
+      <div class="cta-btns">
+        <button class="btn btn-white" onclick="show('doe',null)">🤖 PRECISO DE AUTOMAÇÃO</button>
+        <button class="btn btn-white" onclick="show('lrr',null)">💰 PRECISO VENDER MAIS</button>
+        <button class="btn btn-white" onclick="show('scmao',null)">📢 PRECISO DE CLIENTES</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="wrap">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <div class="logo"><span>V4</span> CLESS</div>
+          <p>Automação com IA, estratégia de vendas e tráfego pago para donos de PME que querem crescer sem trabalhar mais.</p>
+        </div>
+        <div class="footer-col">
+          <h4>Páginas</h4>
+          <a onclick="show('home',null)">Home</a>
+          <a onclick="show('doe',null)">Automação IA</a>
+          <a onclick="show('lrr',null)">Estratégia de Vendas</a>
+          <a onclick="show('scmao',null)">Tráfego Pago</a>
+        </div>
+        <div class="footer-col">
+          <h4>Métodos</h4>
+          <a onclick="show('doe',null)">Método DOE</a>
+          <a onclick="show('lrr',null)">Método LRR</a>
+          <a onclick="show('scmao',null)">Método SCMAO</a>
+        </div>
+        <div class="footer-col">
+          <h4>Contato</h4>
+          <a href="https://wa.me/5548991351667" target="_blank">WhatsApp: +55 48 9135-1667</a>
+          <span>Respondemos em até 4h</span>
+        </div>
+      </div>
+      <div class="footer-bottom">© 2025 V4 CLESS. Todos os direitos reservados.</div>
+    </div>
+  </footer>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     PAGE: AUTOMAÇÃO IA — MÉTODO DOE
+═══════════════════════════════════════════ -->
+<div class="page" id="page-doe">
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-grid"></div>
+    <div class="wrap hero-content">
+      <div class="hero-tag">Método DOE — Automação com IA</div>
+      <h1>VOCÊ TRABALHA 12H<br>POR DIA E SUA<br><span>MARGEM NÃO CRESCE?</span></h1>
+      <p>Enquanto você responde WhatsApp no jantar e faz relatório no fim de semana, seu concorrente automatizou e está faturando mais trabalhando menos.</p>
+      <div class="btns">
+        <a class="btn btn-red" href="https://wa.me/5548991351667?text=Quero%20saber%20mais%20sobre%20o%20M%C3%A9todo%20DOE" target="_blank">QUERO AUTOMATIZAR MEU NEGÓCIO</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROBLEMAS -->
+  <section class="sec-sm bg2">
+    <div class="wrap">
+      <div class="fade">
+        <div class="tag">Isso está acontecendo na sua empresa?</div>
+        <h2 class="sec-title">SE VOCÊ SE RECONHECE<br>AQUI, PRESTE ATENÇÃO:</h2>
+      </div>
+      <div class="item-list fade">
+        <div class="item"><div class="dot"></div>Você é o primeiro a chegar e o último a sair — e ainda assim sente que está no lugar</div>
+        <div class="item"><div class="dot"></div>Responde WhatsApp de cliente às 22h porque ninguém mais faz isso</div>
+        <div class="item"><div class="dot"></div>Já gastou com CRM caro que a equipe nunca usou direito</div>
+        <div class="item"><div class="dot"></div>Se você ficar doente 3 dias, a empresa para junto com você</div>
+        <div class="item"><div class="dot"></div>Sua equipe passa horas em tarefas repetitivas que uma máquina poderia fazer</div>
+        <div class="item"><div class="dot"></div>Tentou implementar IA sozinho com vídeo no YouTube e não deu certo</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- COMO FUNCIONA -->
+  <section class="sec">
+    <div class="wrap">
+      <div class="center fade">
+        <div class="tag">Como funciona</div>
+        <h2 class="sec-title">O MÉTODO DOE EM 3 ETAPAS</h2>
+        <p class="sec-sub">Um processo simples, feito por especialistas. Você não precisa entender de tecnologia.</p>
+      </div>
+      <div class="doe-steps fade">
+        <div class="doe-step">
+          <div class="doe-letter">D</div>
+          <div class="doe-step-name">DIAGNÓSTICO</div>
+          <div class="doe-step-sub">Analisamos sua operação real</div>
+          <p>Mapeamos cada processo, cada hora gasta, cada tarefa repetitiva. Encontramos onde seu tempo e dinheiro estão sendo desperdiçados. Você recebe um relatório claro com os 3 maiores gargalos da sua empresa.</p>
+        </div>
+        <div class="doe-step">
+          <div class="doe-letter">O</div>
+          <div class="doe-step-name">OTIMIZAÇÃO</div>
+          <div class="doe-step-sub">Reestruturamos antes de automatizar</div>
+          <p>Antes de colocar qualquer tecnologia, arrumamos a casa. Eliminamos o que não precisa existir, simplificamos o que é complicado demais, e preparamos o terreno para a automação funcionar do jeito certo.</p>
+        </div>
+        <div class="doe-step">
+          <div class="doe-letter">A</div>
+          <div class="doe-step-name">AUTOMAÇÃO</div>
+          <div class="doe-step-sub">Máquinas trabalham por você 24h</div>
+          <p>Implementamos agentes de IA que atendem clientes no WhatsApp, qualificam leads, geram orçamentos, disparam cobranças e organizam agenda — tudo automático, sem você precisar entender nada de código.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- BENEFÍCIOS -->
+  <section class="sec bg2">
+    <div class="wrap">
+      <div class="center fade">
+        <div class="tag">O que muda na sua vida</div>
+        <h2 class="sec-title">NÚMEROS QUE FAZEM DIFERENÇA</h2>
+      </div>
+      <div class="benefits-grid fade">
+        <div class="benefit"><div class="benefit-num">90%</div><div class="benefit-label">Tarefas repetitivas eliminadas</div></div>
+        <div class="benefit"><div class="benefit-num">60 dias</div><div class="benefit-label">Para o investimento se pagar</div></div>
+        <div class="benefit"><div class="benefit-num">24h</div><div class="benefit-label">Atendimento sem você</div></div>
+        <div class="benefit"><div class="benefit-num">3x</div><div class="benefit-label">Mais margem no final do mês</div></div>
+        <div class="benefit"><div class="benefit-num">15h</div><div class="benefit-label">Por semana de volta para você</div></div>
+        <div class="benefit"><div class="benefit-num">0</div><div class="benefit-label">Linhas de código que você precisa saber</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- OBJEÇÕES -->
+  <section class="sec">
+    <div class="wrap">
+      <div class="center fade">
+        <div class="tag">Suas dúvidas respondidas</div>
+        <h2 class="sec-title">PERGUNTAS QUE TODO<br>EMPRESÁRIO FAZ</h2>
+      </div>
+      <div class="acc fade">
+        <div class="acc-item">
+          <button class="acc-q" onclick="tog(this)">Isso funciona no meu tipo de negócio? <span class="acc-arrow">+</span></button>
+          <div class="acc-a">Sim. Já implementamos em pizzaria, clínica odontológica, escritório de contabilidade, loja de móveis, construtora e e-commerce. O método se adapta ao processo que você já tem — não te obriga a refazer a operação do zero. Se tem tarefa repetitiva, tem automação possível.</div>
+        </div>
+        <div class="acc-item">
+          <button class="acc-q" onclick="tog(this)">Quanto custa e em quanto tempo recupero o investimento? <span class="acc-arrow">+</span></button>
+          <div class="acc-a">O investimento se paga em média em 60 dias. Antes de fechar, fazemos a conta junto com você: quanto custa hoje sua equipe fazendo tarefas manuais? Quanto você perde em clientes que não foram respondidos? Esse é o número que a automação substitui — e normalmente ele é bem maior do que o investimento.</div>
+        </div>
+        <div class="acc-item">
+          <button class="acc-q" onclick="tog(this)">Minha equipe vai conseguir usar? E se rejeitarem? <span class="acc-arrow">+</span></button>
+          <div class="acc-a">Treinamento da equipe está incluído no processo. E a nossa experiência mostra o oposto do que você imagina: quando a equipe percebe que a IA faz o trabalho chato por eles, eles ficam aliviados — não resistentes. Ninguém gosta de ficar anotando pedido no papel.</div>
+        </div>
+        <div class="acc-item">
+          <button class="acc-q" onclick="tog(this)">E se vocês sumirem depois que eu pagar? <span class="acc-arrow">+</span></button>
+          <div class="acc-a">Acompanhamento contínuo faz parte do serviço, não é promessa de venda. Ficamos do seu lado durante toda a implementação, treinamos a equipe e permanecemos disponíveis depois. Nosso modelo depende do seu resultado — se você não tiver resultado, você não indica ninguém.</div>
+        </div>
+        <div class="acc-item">
+          <button class="acc-q" onclick="tog(this)">IA não é só para empresas grandes tipo Magalu e Itaú? <span class="acc-arrow">+</span></button>
+          <div class="acc-a">Era. Hoje qualquer empresa de médio porte acessa exatamente a mesma tecnologia que os grandes usam. A diferença é ter quem saiba implementar do jeito certo no seu processo específico — sem você precisar virar técnico para isso.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ANTES E DEPOIS -->
+  <section class="sec bg2">
+    <div class="wrap">
+      <div class="center fade">
+        <div class="tag">A transformação</div>
+        <h2 class="sec-title">ANTES E DEPOIS DO MÉTODO DOE</h2>
+      </div>
+      <div class="ba-grid fade">
+        <div class="ba-card">
+          <div class="ba-title">❌ ANTES — A realidade atual</div>
+          <div class="ba-list">
+            <div class="ba-item"><span class="icon">❌</span>Trabalha 12h/dia e fatura os mesmos R$50k/mês</div>
+            <div class="ba-item"><span class="icon">❌</span>Margem de 10% porque a folha consome tudo</div>
+            <div class="ba-item"><span class="icon">❌</span>Toda decisão passa por você — você é o gargalo</div>
+            <div class="ba-item"><span class="icon">❌</span>Sem tempo para família, para pensar, para crescer</div>
+            <div class="ba-item"><span class="icon">❌</span>Se você parar, a empresa para junto</div>
+          </div>
+        </div>
+        <div class="ba-card after">
+          <div class="ba-title red">✅ DEPOIS — Com o Método DOE</div>
+          <div class="ba-list">
+            <div class="ba-item"><span class="icon">✅</span>Trabalha 4h/dia no estratégico e fatura R$80k+</div>
+            <div class="ba-item"><span class="icon">✅</span>Margem subindo porque as máquinas substituem horas</div>
+            <div class="ba-item"><span class="icon">✅</span>Sistema roda sozinho — você é o CEO, não o bombeiro</div>
+            <div class="ba-item"><span class="icon">✅</span>Fim de semana de verdade, jantar com a família</div>
+            <div class="ba-item"><span class="icon">✅</span>A empresa funciona mesmo quando você não está</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA FINAL -->
+  <div class="cta-banner">
+    <div class="wrap">
+      <h2>PRONTO PARA ELIMINAR O TRABALHO MANUAL?</h2>
+      <p>Agende uma análise gratuita. A gente olha seu negócio e te diz o que dá para automatizar — sem compromisso.</p>
+      <div class="cta-btns">
+        <a class="btn btn-white" href="https://wa.me/5548991351667?text=Quero%20agendar%20uma%20an%C3%A1lise%20gratuita%20do%20M%C3%A9todo%20DOE" target="_blank">AGENDAR ANÁLISE GRATUITA</a>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <div class="wrap">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <div class="logo"><span>V4</span> CLESS</div>
+          <p>Automação com IA, estratégia de vendas e tráfego pago para donos de PME que querem crescer sem trabalhar mais.</p>
+        </div>
+        <div class="footer-col">
+          <h4>Páginas</h4>
+          <a onclick="show('home',null)">Home</a>
+          <a onclick="show('doe',null)">Automação IA</a>
+          <a onclick="show('lrr',null)">Estratégia de Vendas</a>
+          <a onclick="show('scmao',null)">Tráfego Pago</a>
+        </div>
+        <div class="footer-col">
+          <h4>Métodos</h4>
+          <a onclick="show('doe',null)">Método DOE</a>
+          <a onclick="show('lrr',null)">Método LRR</a>
+          <a onclick="show('scmao',null)">Método SCMAO</a>
+        </div>
+        <div class="footer-col">
+          <h4>Contato</h4>
+          <a href="https://wa.me/5548991351667" target="_blank">WhatsApp: +55 48 9135-1667</a>
+          <span>Respondemos em até 4h</span>
+        </div>
+      </div>
+      <div class="footer-bottom">© 2025 V4 CLESS. Todos os direitos reservados.</div>
+    </div>
+  </footer>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     PAGE: VENDAS — MÉTODO LRR
+═══════════════════════════════════════════ -->
+<div class="page" id="page-lrr">
+
+  <section class="hero">
+    <div class="hero-grid"></div>
+    <div class="wrap hero-content">
+      <div class="hero-tag">Método LRR — Linha Reta Rotativa</div>
+      <h1>SEU TIME DE<br>VENDAS FUNCIONA<br><span>NO IMPROVISO?</span></h1>
+      <p>Você contratou, treinou, motivou. Mas continua sendo você quem fecha os negócios importantes. A equipe trava na objeção, dá desconto fácil e ainda culpa o mercado.</p>
+      <div class="btns">
+        <a class="btn btn-red" href="https://wa.me/5548991351667?text=Quero%20saber%20mais%20sobre%20o%20M%C3%A9todo%20LRR" target="_blank">QUERO TRANSFORMAR MEU TIME</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec-sm bg2">
+    <div class="wrap">
+      <div class="fade">
+        <div class="tag">Você reconhece algum desses cenários?</div>
+        <h2 class="sec-title">SE ISSO ACONTECE<br>NA SUA EMPRESA, LEIA:</h2>
+      </div>
+      <div class="item-list fade">
+        <div class="item"><div class="dot"></div>Vendedor trava quando o cliente fala "tá caro" e dá desconto imediato para não perder</div>
+        <div class="item"><div class="dot"></div>Cada vendedor vende de um jeito diferente — ninguém segue um processo</div>
+        <div class="item"><div class="dot"></div>Os melhores resultados vêm sempre dos mesmos 1 ou 2 talentos naturais</div>
+        <div class="item"><div class="dot"></div>O lead chega qualificado e morre no "vou pensar" sem follow-up</div>
+        <div class="item"><div class="dot"></div>Você ainda precisa entrar em campo para fechar os negócios importantes</div>
+        <div class="item"><div class="dot"></div>Já fez treinamento, animou a equipe por duas semanas e voltou tudo ao normal</div>
+        <div class="item"><div class="dot"></div>Vendedor liga uma vez, não tem resposta e desiste — follow-up inexistente</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec">
+    <div class="wrap">
+      <div class="center fade">
+        <div class="tag">Como funciona</div>
+        <h2 class="sec-title">AS 7 ETAPAS DA<br>LINHA RETA ROTATIVA</h2>
+        <p class="sec-sub">Um fluxo de venda que transforma qualquer vendedor em profissional — do primeiro contato ao fechamento.</p>
+      </div>
+      <div class="lrr-flow fade">
+        <div class="lrr-step">
+          <div class="lrr-num">1</div>
+          <div class="lrr-body">
+            <h3>ABERTURA — Criamos curiosidade, não vendemos</h3>
+            <p>Pergunta instigante que desafia a crença do cliente e faz ele querer ouvir mais. O vendedor nunca começa tentando vender — começa gerando interesse genuíno.</p>
+          </div>
+        </div>
+        <div class="lrr-step">
+          <div class="lrr-num">2</div>
+          <div class="lrr-body">
+            <h3>CONEXÃO — Confiança em 2 minutos</h3>
+            <p>Espelhamento de voz e postura. Elogio específico e verificável. O cliente relaxa, baixa a guarda e começa a abrir o jogo sobre os problemas reais do negócio.</p>
+          </div>
+        </div>
+        <div class="lrr-step">
+          <div class="lrr-num">3</div>
+          <div class="lrr-body">
+            <h3>DIAGNÓSTICO — Descobrimos a necessidade real</h3>
+            <p>3 perguntas estratégicas que revelam a dor verdadeira. O cliente fala com as próprias palavras qual é o problema — e isso torna a oferta muito mais poderosa.</p>
+          </div>
+        </div>
+        <div class="lrr-step">
+          <div class="lrr-num">4</div>
+          <div class="lrr-body">
+            <h3>OFERTA — Lógica + Emoção = Valor percebido</h3>
+            <p>Grande promessa + prova + benefício emocional + 3 concordâncias estratégicas. O cliente não vê preço, vê resultado. Quando o valor está claro, o preço para de ser objeção.</p>
+          </div>
+        </div>
+        <div class="lrr-step">
+          <div class="lrr-num">5</div>
+          <div class="lrr-body">
+            <h3>FECHAMENTO TESTE — Testamos o interesse</h3>
+            <p>Pergunta direta e confortável que mede o nível de interesse sem risco de rejeição. Com base na resposta, o vendedor sabe se avança ou volta para fortalecer a oferta.</p>
+          </div>
+        </div>
+        <div class="lrr-step">
+          <div class="lrr-num">6</div>
+          <div class="lrr-body">
+            <h3>QUEBRA DE OBJEÇÃO — O "não" vira motivo de compra</h3>
+            <p>Concordamos com a objeção, transformamos o argumento e usamos ela como razão para comprar agora. "Tá caro" se torna: o custo de não mudar é muito maior.</p>
+          </div>
+        </div>
+        <div class="lrr-step">
+          <div class="lrr-num">7</div>
+          <div class="lrr-body">
+            <h3>FECHAMENTO FINAL — Assumimos a venda com elegância</h3>
+            <p>Escolha entre opção A ou B — nunca uma pergunta fechada. O cliente escolhe como avançar, nunca se recusa a responder. A venda acontece naturalmente.</p>
+          </div>
+        </div>
+      </div>
+      <div class="rotate-box fade">
+        <h3>⭕ A PARTE ROTATIVA — O diferencial do método</h3>
+        <p>Se o cliente disse "não" na objeção, o vendedor não desiste. Volta para a etapa de Oferta com um novo ângulo, novos gatilhos, novos benefícios. O ciclo se repete até o fechamento ou uma recusa clara. O argumento só acaba quando o vendedor fica sem argumento — e nós treinamos para isso nunca acontecer.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec bg2">
+    <div class="wrap">
+      <div class="center fade">
+        <div class="tag">Resultados do método</div>
+        <h2 class="sec-title">O QUE MUDA EM 90 DIAS</h2>
+      </div>
+      <div class="benefits-grid fade">
+        <div class="benefit"><div class="benefit-num">+45%</div><div class="benefit-label">Conversão em 90 dias</div></div>
+        <div class="benefit"><div class="benefit-num">+35%</div><div class="benefit-label">Ticket médio por venda</div></div>
+        <div class="benefit"><div class="benefit-num">-80%</div><div class="benefit-label">Desconto dado pela equipe</div></div>
+        <div class="benefit"><div class="benefit-num">100%</div><div class="benefit-label">Time batendo meta com consistência</div></div>
+        <div class="benefit"><div class="benefit-num">0</div><div class="benefit-label">Dependência do dono para fechar</div></div>
+        <div class="benefit"><div class="benefit-num">3x</div><div class="benefit-label">Equipe mais confiante</div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec">
+    <div class="wrap">
+      <div class="center fade">
+        <div class="tag">Suas dúvidas</div>
+        <h2 class="sec-title">O QUE TODO EMPRESÁRIO<br>PERGUNTA ANTES DE DECIDIR</h2>
+      </div>
+      <div class="acc fade">
+        <div class="acc-item">
+          <button class="acc-q" onclick="tog(this)">Já fiz treinamento e não funcionou <span class="acc-arrow">+</span></button>
+          <div class="acc-a">Justamente porque você já tentou e não funcionou é que faz sentido conversar. O problema quase nunca é o conteúdo do treinamento — é o acompanhamento depois. Palestrante anima por duas semanas e some. O que a gente faz é diferente: ficamos 90 dias dentro da operação cobrando aplicação ligação por ligação. Vendedor não tem pra onde fugir do método.</div>
+        </div>
+        <div class="acc-item">
+          <button class="acc-q" onclick="tog(this)">Meu setor é muito específico <span class="acc-arrow">+</span></button>
+          <div class="acc-a">Todo dono acha que o setor dele é diferente. Mas objeção é objeção em qualquer mercado. "Tá caro", "vou pensar", "preciso falar com meu sócio" — seu vendedor escuta isso todo dia, independente do que você vende. O método resolve exatamente essas situações.</div>
+        </div>
+        <div class="acc-item">
+          <button class="acc-q" onclick="tog(this)">Meu time não vai aceitar a mudança <span class="acc-arrow">+</span></button>
+          <div class="acc-a">Time resiste a palestra. Time abraça método quando vê resultado. Nas primeiras semanas, quando o vendedor fecha uma venda que antes perderia — com mais confiança e sem dar desconto — a resistência vai embora sozinha. Resultado convence mais do que qualquer discurso.</div>
+        </div>
+        <div class="acc-item">
+          <button class="acc-q" onclick="tog(this)">E se aprenderem o método e forem embora? <span class="acc-arrow">+</span></button>
+          <div class="acc-a">E se não aprenderem e ficarem? O risco de não treinar é muito maior do que o risco de treinar. Equipe bem treinada tem mais resultado, ganha mais comissão e tem menos motivo para sair. Vendedor que bate meta não pede demissão.</div>
+        </div>
+        <div class="acc-item">
+          <button class="acc-q" onclick="tog(this)">Como garantem que vão aplicar de verdade? <span class="acc-arrow">+</span></button>
+          <div class="acc-a">Acompanhamento real por 90 dias. Gravação de ligações, role-play semanal, ajuste fino constante. O vendedor sabe que está sendo acompanhado — e isso muda o comportamento. Não é palestra de 2h e tchau.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec bg2">
+    <div class="wrap">
+      <div class="center fade">
+        <div class="tag">A transformação</div>
+        <h2 class="sec-title">ANTES E DEPOIS DO MÉTODO LRR</h2>
+      </div>
+      <div class="ba-grid fade">
+        <div class="ba-card">
+          <div class="ba-title">❌ ANTES — Como está hoje</div>
+          <div class="ba-list">
+            <div class="ba-item"><span class="icon">❌</span>Venda depende de talento natural ou sorte</div>
+            <div class="ba-item"><span class="icon">❌</span>Dono ainda entra em campo para fechar o importante</div>
+            <div class="ba-item"><span class="icon">❌</span>Time batendo 50% da meta com sorte</div>
+            <div class="ba-item"><span class="icon">❌</span>Desconto em toda negociação para "salvar a venda"</div>
+            <div class="ba-item"><span class="icon">❌</span>Resultado imprevisível — mês bom, mês ruim</div>
+          </div>
+        </div>
+        <div class="ba-card after">
+          <div class="ba-title red">✅ DEPOIS — Com o Método LRR</div>
+          <div class="ba-list">
+            <div class="ba-item"><span class="icon">✅</span>Venda é processo — qualquer vendedor replica</div>
+            <div class="ba-item"><span class="icon">✅</span>Dono estratégico, fora do campo de vendas</div>
+            <div class="ba-item"><span class="icon">✅</span>Time batendo meta com consistência todo mês</div>
+            <div class="ba-item"><span class="icon">✅</span>Desconto quase zerado — valor percebido é alto</div>
+            <div class="ba-item"><span class="icon">✅</span>Previsibilidade de receita para planejar o crescimento</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="cta-banner">
+    <div class="wrap">
+      <h2>TRANSFORME SEU TIME EM MÁQUINA DE VENDAS</h2>
+      <p>Agende uma consultoria gratuita e veja como o Método LRR se aplica no seu time.</p>
+      <div class="cta-btns">
+        <a class="btn btn-white" href="https://wa.me/5548991351667?text=Quero%20saber%20mais%20sobre%20o%20M%C3%A9todo%20LRR" target="_blank">AGENDAR CONSULTORIA GRATUITA</a>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <div class="wrap">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <div class="logo"><span>V4</span> CLESS</div>
+          <p>Automação com IA, estratégia de vendas e tráfego pago para donos de PME que querem crescer sem trabalhar mais.</p>
+        </div>
+        <div class="footer-col">
+          <h4>Páginas</h4>
+          <a onclick="show('home',null)">Home</a>
+          <a onclick="show('doe',null)">Automação IA</a>
+          <a onclick="show('lrr',null)">Estratégia de Vendas</a>
+          <a onclick="show('scmao',null)">Tráfego Pago</a>
+        </div>
+        <div class="footer-col">
+          <h4>Métodos</h4>
+          <a onclick="show('doe',null)">Método DOE</a>
+          <a onclick="show('lrr',null)">Método LRR</a>
+          <a onclick="show('scmao',null)">Método SCMAO</a>
+        </div>
+        <div class="footer-col">
+          <h4>Contato</h4>
+          <a href="https://wa.me/5548991351667" target="_blank">WhatsApp: +55 48 9135-1667</a>
+          <span>Respondemos em até 4h</span>
+        </div>
+      </div>
+      <div class="footer-bottom">© 2025 V4 CLESS. Todos os direitos reservados.</div>
+    </div>
+  </footer>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     PAGE: TRÁFEGO PAGO — MÉTODO SCMAO
+═══════════════════════════════════════════ -->
+<div class="page" id="page-scmao">
+
+  <section class="hero">
+    <div class="hero-grid"></div>
+    <div class="wrap hero-content">
+      <div class="hero-tag">Método SCMAO — Tráfego Pago</div>
+      <h1>SEU TELEFONE<br>NÃO TOCA DE<br><span>FORMA CONSTANTE?</span></h1>
+      <p>Você depende de indicação. Quando vem, vem. Quando para, o caixa aperta. Já pagou agência que entregou PDF bonito e zero cliente. Chega.</p>
+      <div class="btns">
+        <a class="btn btn-red" href="https://wa.me/5548991351667?text=Quero%20saber%20mais%20sobre%20o%20M%C3%A9todo%20SCMAO" target="_blank">QUERO CLIENTES TODO MÊS</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec-sm bg2">
+    <div class="wrap">
+      <div class="fade">
+        <div class="tag">Isso acontece na sua empresa?</div>
+        <h2 class="sec-title">SE VOCÊ SE RECONHECE<br>AQUI, CONTINUE LENDO:</h2>
+      </div>
+      <div class="item-list fade">
+        <div class="item"><div class="dot"></div>Tem meses bons e meses ruins sem conseguir explicar o porquê</div>
+        <div class="item"><div class="dot"></div>Quando tentou anunciar, gastou dinheiro e não conseguiu medir se voltou em venda</div>
+        <div class="item"><div class="dot"></div>Já contratou agência que só entregava relatório com CTR, CPM e ROAS sem dizer quanto entrou de venda</div>
+        <div class="item"><div class="dot"></div>O Instagram está bonito, o site está no ar — mas o telefone não toca de forma constante</div>
+        <div class="item"><div class="dot"></div>Fica olhando o concorrente menor crescendo mais rápido e não entende como</div>
+        <div class="item"><div class="dot"></div>Toda vez que o caixa aperta, a primeira conversa difícil é em casa</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec">
+    <div class="wrap">
+      <div class="center fade">
+        <div class="tag">Como funciona</div>
+        <h2 class="sec-title">O MÉTODO SCMAO EM 5 ETAPAS</h2>
+        <p class="sec-sub">Antes de gastar R$1 em anúncio, a gente entende o negócio. Depois faz os anúncios certos chegarem nas pessoas certas.</p>
+      </div>
+      <div class="scmao-grid fade">
+        <div class="scmao-step">
+          <div class="scmao-letter">S</div>
+          <div class="scmao-name">SITUAÇÃO</div>
+          <p class="scmao-desc">Analisamos seu negócio, produto, região e equipe antes de investir R$1. Se não fizer sentido, falamos antes.</p>
+        </div>
+        <div class="scmao-step">
+          <div class="scmao-letter">C</div>
+          <div class="scmao-name">CONHECIMENTO</div>
+          <p class="scmao-desc">Pesquisa profunda do seu cliente ideal. Dores, desejos, onde está. O Google e o Meta recebem informação precisa para encontrar as pessoas certas.</p>
+        </div>
+        <div class="scmao-step">
+          <div class="scmao-letter">M</div>
+          <div class="scmao-name">META</div>
+          <p class="scmao-desc">Definimos quanto você pode pagar por cliente novo e ainda ter lucro. Você sabe o retorno esperado antes de começar.</p>
+        </div>
+        <div class="scmao-step">
+          <div class="scmao-letter">A</div>
+          <div class="scmao-name">ANÚNCIO</div>
+          <p class="scmao-desc">Criamos campanhas com Gancho + Conteúdo + CTA. No Google, Meta e onde seu cliente estiver. Sem template genérico.</p>
+        </div>
+        <div class="scmao-step">
+          <div class="scmao-letter">O</div>
+          <div class="scmao-name">OTIMIZAÇÃO</div>
+          <p class="scmao-desc">Todo mês ajustamos o que não está funcionando. O objetivo: pagar cada vez menos por cliente cada vez melhor.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec bg2">
+    <div class="wrap">
+      <div class="center fade">
+        <div class="tag">O que você ganha</div>
+        <h2 class="sec-title">DIFERENTE DE TUDO QUE<br>VOCÊ JÁ CONTRATOU</h2>
+      </div>
+      <div class="benefits-grid fade">
+        <div class="benefit"><div class="benefit-num">30 dias</div><div class="benefit-label">Para os primeiros clientes aparecerem</div></div>
+        <div class="benefit"><div class="benefit-num">100%</div><div class="benefit-label">Clareza de retorno antes de começar</div></div>
+        <div class="benefit"><div class="benefit-num">0</div><div class="benefit-label">Contratos longos de 12 meses</div></div>
+        <div class="benefit"><div class="benefit-num">Todo mês</div><div class="benefit-label">Relatório em português, sem termo técnico</div></div>
+        <div class="benefit"><div class="benefit-num">Real</div><div class="benefit-label">Mostramos quanto entrou, não CTR bonito</div></div>
+        <div class="benefit"><div class="benefit-num">Previsível</div><div class="benefit-label">Telefone tocando com consistência</div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec">
+    <div class="wrap">
+      <div class="center fade">
+        <div class="tag">Suas dúvidas</div>
+        <h2 class="sec-title">O QUE TODO EMPRESÁRIO<br>PERGUNTA ANTES DE DECIDIR</h2>
+      </div>
+      <div class="acc fade">
+        <div class="acc-item">
+          <button class="acc-q" onclick="tog(this)">Já paguei agência e não funcionou <span class="acc-arrow">+</span></button>
+          <div class="acc-a">Entendo perfeitamente — e é exatamente por isso que a gente começa com 60 dias e você decide se continua olhando o resultado, não a promessa. Quem nunca se queimou aceita qualquer coisa. Você já sabe filtrar. Mostramos o que está sendo feito, quanto está custando e quanto está voltando em venda.</div>
+        </div>
+        <div class="acc-item">
+          <button class="acc-q" onclick="tog(this)">Está muito caro <span class="acc-arrow">+</span></button>
+          <div class="acc-a">Caro em relação a quê? Se eu te trouxer 10 clientes novos esse mês, o investimento virou barato. Se não trouxer, qualquer valor é caro. A pergunta certa não é o preço — é se funciona. E isso a gente mede em 60 dias, em real, não em gráfico bonito.</div>
+        </div>
+        <div class="acc-item">
+          <button class="acc-q" onclick="tog(this)">Deixa eu pensar / preciso falar com meu sócio <span class="acc-arrow">+</span></button>
+          <div class="acc-a">Faz todo sentido envolver quem decide. Só te peço uma coisa: faz a conta de quantos clientes você perdeu esse mês porque não tinha previsibilidade de aquisição. Esse número é o custo real de continuar esperando.</div>
+        </div>
+        <div class="acc-item">
+          <button class="acc-q" onclick="tog(this)">Agora não é o momento, estou apertado de caixa <span class="acc-arrow">+</span></button>
+          <div class="acc-a">O caixa tá apertado hoje exatamente porque a venda não é previsível. Continuar do mesmo jeito vai apertar mais ou menos mês que vem? Não estou te pedindo para apostar — estou oferecendo um caminho para sair do aperto.</div>
+        </div>
+        <div class="acc-item">
+          <button class="acc-q" onclick="tog(this)">E se eu investir e não voltar nada? <span class="acc-arrow">+</span></button>
+          <div class="acc-a">O que garantimos é transparência total: você sabe o que estamos fazendo, quanto está custando e o que está retornando. Se em 60 dias não estiver fazendo sentido, encerramos sem multa. Sem contrato longo, sem fidelidade forçada.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec bg2">
+    <div class="wrap">
+      <div class="center fade">
+        <div class="tag">A transformação</div>
+        <h2 class="sec-title">ANTES E DEPOIS DO MÉTODO SCMAO</h2>
+      </div>
+      <div class="ba-grid fade">
+        <div class="ba-card">
+          <div class="ba-title">❌ ANTES — Como está hoje</div>
+          <div class="ba-list">
+            <div class="ba-item"><span class="icon">❌</span>Depende de indicação — quando para, o caixa aperta</div>
+            <div class="ba-item"><span class="icon">❌</span>Mês bom, mês ruim, sem conseguir explicar o porquê</div>
+            <div class="ba-item"><span class="icon">❌</span>Agência entregando PDF bonito e zero cliente</div>
+            <div class="ba-item"><span class="icon">❌</span>Não sabe quanto cada real investido em marketing trouxe</div>
+            <div class="ba-item"><span class="icon">❌</span>Concorrente menor crescendo mais rápido</div>
+          </div>
+        </div>
+        <div class="ba-card after">
+          <div class="ba-title red">✅ DEPOIS — Com o Método SCMAO</div>
+          <div class="ba-list">
+            <div class="ba-item"><span class="icon">✅</span>Clientes novos entrando todo mês de forma previsível</div>
+            <div class="ba-item"><span class="icon">✅</span>Previsibilidade de receita para planejar o crescimento</div>
+            <div class="ba-item"><span class="icon">✅</span>Relatório mensal em português mostrando o ROI real</div>
+            <div class="ba-item"><span class="icon">✅</span>Sabe exatamente quanto cada real investido está trazendo</div>
+            <div class="ba-item"><span class="icon">✅</span>Negócio crescendo de forma consistente e previsível</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="cta-banner">
+    <div class="wrap">
+      <h2>TRANSFORME SEU MARKETING EM MÁQUINA DE CLIENTES</h2>
+      <p>Agende uma análise gratuita. A gente avalia se faz sentido investir no seu negócio — antes de cobrar qualquer coisa.</p>
+      <div class="cta-btns">
+        <a class="btn btn-white" href="https://wa.me/5548991351667?text=Quero%20agendar%20uma%20an%C3%A1lise%20de%20tr%C3%A1fego%20gratuita" target="_blank">AGENDAR ANÁLISE DE TRÁFEGO</a>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <div class="wrap">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <div class="logo"><span>V4</span> CLESS</div>
+          <p>Automação com IA, estratégia de vendas e tráfego pago para donos de PME que querem crescer sem trabalhar mais.</p>
+        </div>
+        <div class="footer-col">
+          <h4>Páginas</h4>
+          <a onclick="show('home',null)">Home</a>
+          <a onclick="show('doe',null)">Automação IA</a>
+          <a onclick="show('lrr',null)">Estratégia de Vendas</a>
+          <a onclick="show('scmao',null)">Tráfego Pago</a>
+        </div>
+        <div class="footer-col">
+          <h4>Métodos</h4>
+          <a onclick="show('doe',null)">Método DOE</a>
+          <a onclick="show('lrr',null)">Método LRR</a>
+          <a onclick="show('scmao',null)">Método SCMAO</a>
+        </div>
+        <div class="footer-col">
+          <h4>Contato</h4>
+          <a href="https://wa.me/5548991351667" target="_blank">WhatsApp: +55 48 9135-1667</a>
+          <span>Respondemos em até 4h</span>
+        </div>
+      </div>
+      <div class="footer-bottom">© 2025 V4 CLESS. Todos os direitos reservados.</div>
+    </div>
+  </footer>
+</div>
+
+<script>
+// ─── NAVEGAÇÃO ───
+function show(id, el) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  document.querySelectorAll('nav a, .mob-nav a').forEach(a => a.classList.remove('active'));
+  if (el) el.classList.add('active');
+  window.scrollTo({top: 0, behavior: 'smooth'});
+  observeFades();
+}
+
+// ─── MENU MOBILE ───
+function toggleMob() {
+  document.getElementById('mob').classList.toggle('open');
+  document.getElementById('ham').classList.toggle('open');
+}
+function closeMob() {
+  document.getElementById('mob').classList.remove('open');
+  document.getElementById('ham').classList.remove('open');
+}
+
+// ─── ACCORDION ───
+function tog(btn) {
+  const isOpen = btn.classList.contains('open');
+  const parent = btn.closest('.acc');
+  parent.querySelectorAll('.acc-q').forEach(b => {
+    b.classList.remove('open');
+    b.nextElementSibling.classList.remove('open');
+  });
+  if (!isOpen) {
+    btn.classList.add('open');
+    btn.nextElementSibling.classList.add('open');
+  }
+}
+
+// ─── FADE IN ───
+function observeFades() {
+  const els = document.querySelectorAll('.page.active .fade');
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+  }, {threshold: 0.1});
+  els.forEach(el => obs.observe(el));
+}
+document.addEventListener('DOMContentLoaded', observeFades);
+</script>
+</body>
+</html>
