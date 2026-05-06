@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
   <title>Painel IA — Prompt Generator</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://arquivos98126066-sudo.github.io/SOFTWARE/sync-indicator.js"></script>
   <style>
     :root {
       --bg:       #ffffff;
@@ -248,8 +249,6 @@
     .prompt-box-content::-webkit-scrollbar { width: 3px; }
     .prompt-box-content::-webkit-scrollbar-thumb { background: var(--bdr2); border-radius: 2px; }
 
-
-
     /* INPUT AREA */
     .input-area {
       padding: 8px 13px 12px;
@@ -334,7 +333,7 @@
     .historico-item-data { font-size: 11px; color: var(--muted); }
     .historico-item-preview { font-size: 12px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-    /* PROMPT OVERLAY - aparece fixo na tela */
+    /* PROMPT OVERLAY */
     .prompt-overlay {
       position: fixed;
       top: 58px; left: 0; right: 0; bottom: 0;
@@ -387,7 +386,6 @@
       .prompt-box-actions { width: 100%; }
       .btn-copiar, .btn-claude { flex: 1; justify-content: center; }
     }
-
   </style>
 </head>
 <body>
@@ -461,7 +459,7 @@
         <h2>Painel IA — Prompt Generator</h2>
         <p>Selecione um módulo na sidebar para começar.<br>Responda as perguntas e receba um prompt completo para colar no Claude.</p>
         <div class="welcome-features">
-          <span>✅ 100% Offline</span>
+          <span>☁️ Sincronizado na Nuvem</span>
           <span>✅ Prompts Completos</span>
           <span>✅ Abre no Claude</span>
         </div>
@@ -503,6 +501,99 @@
     <div class="modal-body" id="modal-body"></div>
   </div>
 </div>
+
+<script type="module">
+  import { db } from "https://arquivos98126066-sudo.github.io/SOFTWARE/firebase-sync.js";
+  import {
+    collection, addDoc, getDocs, onSnapshot,
+    query, orderBy, limit, serverTimestamp
+  } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+  // ─── Coleção Firestore ───────────────────────────────────────────────────
+  const COLECAO = 'painel_ia';
+
+  // ─── Cache de histórico em memória (atualizado pelo onSnapshot) ──────────
+  let _historicoCache = [];
+
+  // ─── Listener em tempo real do histórico ────────────────────────────────
+  const q = query(collection(db, COLECAO), orderBy('data', 'desc'), limit(20));
+  onSnapshot(q, (snap) => {
+    _historicoCache = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  }, (err) => {
+    console.warn('onSnapshot error:', err);
+  });
+
+  // ─── Salvar histórico no Firestore ───────────────────────────────────────
+  window._salvarHistoricoFirestore = async function(nome, prompt) {
+    if (window.syncShow) window.syncShow.syncing();
+    try {
+      await addDoc(collection(db, COLECAO), {
+        nome,
+        prompt,
+        data: serverTimestamp(),
+        dataISO: new Date().toISOString()
+      });
+      if (window.syncShow) window.syncShow.synced('Painel IA');
+    } catch (err) {
+      console.warn('Firestore error, salvando local:', err);
+      // Fallback: salva no localStorage com flag pendente
+      try {
+        const local = JSON.parse(localStorage.getItem('painel_ia_pending') || '[]');
+        local.unshift({ nome, prompt, data: new Date().toISOString(), pendingSync: true });
+        if (local.length > 20) local.splice(20);
+        localStorage.setItem('painel_ia_pending', JSON.stringify(local));
+      } catch(e) {}
+      if (window.syncShow) window.syncShow.local();
+    }
+  };
+
+  // ─── Abrir histórico (usa cache do onSnapshot + fallback local) ──────────
+  window._abrirHistoricoFirestore = async function() {
+    const body = document.getElementById('modal-body');
+
+    // Combina nuvem + pendentes locais
+    let itens = [..._historicoCache];
+    try {
+      const pending = JSON.parse(localStorage.getItem('painel_ia_pending') || '[]');
+      if (pending.length) {
+        itens = [...pending, ...itens].slice(0, 20);
+      }
+    } catch(e) {}
+
+    if (itens.length === 0) {
+      body.innerHTML = '<p style="text-align:center;color:var(--muted);padding:24px;font-size:13px">Nenhum prompt gerado ainda.</p>';
+    } else {
+      body.innerHTML = itens.map((item, i) => {
+        const dataStr = item.dataISO
+          ? new Date(item.dataISO).toLocaleDateString('pt-BR')
+          : (item.data && item.data.toDate ? item.data.toDate().toLocaleDateString('pt-BR') : '—');
+        const pendTag = item.pendingSync ? ' <span style="font-size:10px;color:orange">⏳ pendente</span>' : '';
+        return `<div class="historico-item" onclick="window._verHistItem(${i})">
+          <div class="historico-item-header">
+            <span class="historico-item-nome">${item.nome}${pendTag}</span>
+            <span class="historico-item-data">${dataStr}</span>
+          </div>
+          <div class="historico-item-preview">${(item.prompt||'').substring(0,110)}...</div>
+        </div>`;
+      }).join('');
+    }
+
+    document.getElementById('modal-historico').classList.remove('hidden');
+
+    // Expõe função de ver item com o cache atual
+    window._verHistItem = function(i) {
+      const item = itens[i]; if (!item) return;
+      fecharHistorico();
+      limparChat();
+      desativarInput();
+      addSys(`📂 <strong>${item.nome}</strong>`);
+      addPromptBox(item.prompt);
+    };
+  };
+
+  // Expõe referências para uso fora do módulo
+  window._dbReady = true;
+</script>
 
 <script>
 const MODULOS = {
@@ -1168,7 +1259,7 @@ BLOCO 7 — ERROS QUE TRAVAM AS VENDAS
   }
 };
 
-// ESTADO
+// ─── ESTADO ──────────────────────────────────────────────────────────────────
 let S = { modulo:null, q:0, total:0, respostas:{}, ativo:false };
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -1193,10 +1284,6 @@ function selecionarModulo(id, el) {
   fecharSidebar();
   document.querySelectorAll('.nav-item').forEach(e => e.classList.remove('active-red','active-blue2','active-green'));
   if(el) el.classList.add(`active-${m.cor}`);
-  else document.querySelectorAll('.nav-item').forEach(item => {
-    if(item.getAttribute('onclick') && item.getAttribute('onclick').includes(`'${id}'`))
-      item.classList.add(`active-${m.cor}`);
-  });
   document.getElementById('topbar-title').textContent = m.nome;
   const b = document.getElementById('topbar-badge');
   b.textContent = m.cat; b.className = `topbar-badge ${m.cor}`; b.classList.remove('hidden');
@@ -1214,9 +1301,6 @@ function pergunta() {
   addSys(`<span style="color:var(--muted);font-size:11px;font-weight:600">[${S.q+1}/${S.total}]</span><br><br>${p.txt}`);
   const inp = document.getElementById('user-input');
   inp.placeholder = p.ph;
-  const iq = document.getElementById('input-question');
-  iq.textContent = '';
-  iq.classList.remove('show');
   document.getElementById('send-btn').disabled = true;
   document.getElementById('input-hint').textContent = 'Enter para enviar · Shift+Enter para nova linha';
   setTimeout(()=>inp.focus(), 80);
@@ -1232,7 +1316,7 @@ function enviar() {
   S.respostas[p.id] = val;
   inp.value=''; inp.style.height='auto';
   document.getElementById('send-btn').disabled = true;
-  salvarLocal();
+  salvarEstadoLocal();
   S.q++;
   if(S.q < S.total) setTimeout(pergunta, 400);
   else setTimeout(gerarPrompt, 600);
@@ -1243,6 +1327,7 @@ function gerarPrompt() {
   setTimeout(()=>{
     const m = MODULOS[S.modulo];
     const prompt = m.prompt(S.respostas);
+    // Salva no Firestore (ou local se offline)
     salvarHistorico(m.nome, prompt);
     setTimeout(()=>{
       addPromptBox(prompt);
@@ -1251,6 +1336,47 @@ function gerarPrompt() {
   }, 800);
 }
 
+// ─── SALVAR HISTÓRICO — delega para módulo ES (Firestore) ────────────────────
+function salvarHistorico(nome, prompt) {
+  if (window._salvarHistoricoFirestore) {
+    window._salvarHistoricoFirestore(nome, prompt);
+  } else {
+    // fallback se módulo ainda não carregou
+    try {
+      const local = JSON.parse(localStorage.getItem('painel_ia_pending') || '[]');
+      local.unshift({ nome, prompt, data: new Date().toISOString(), pendingSync: true });
+      if (local.length > 20) local.splice(20);
+      localStorage.setItem('painel_ia_pending', JSON.stringify(local));
+    } catch(e) {}
+    if (window.syncShow) window.syncShow.local();
+  }
+}
+
+// ─── SALVAR ESTADO LOCAL (progresso das respostas) ───────────────────────────
+function salvarEstadoLocal() {
+  try {
+    localStorage.setItem('painel_ia_estado', JSON.stringify({
+      modulo: S.modulo, respostas: S.respostas, q: S.q
+    }));
+  } catch(e) {}
+}
+
+// ─── ABRIR HISTÓRICO ─────────────────────────────────────────────────────────
+function abrirHistorico() {
+  if (window._abrirHistoricoFirestore) {
+    window._abrirHistoricoFirestore();
+  } else {
+    document.getElementById('modal-body').innerHTML =
+      '<p style="text-align:center;color:var(--muted);padding:24px;font-size:13px">Carregando histórico...</p>';
+    document.getElementById('modal-historico').classList.remove('hidden');
+    setTimeout(()=>{
+      if (window._abrirHistoricoFirestore) window._abrirHistoricoFirestore();
+    }, 1500);
+  }
+}
+function fecharHistorico() { document.getElementById('modal-historico').classList.add('hidden'); }
+
+// ─── CHAT ─────────────────────────────────────────────────────────────────────
 function limparChat() { document.getElementById('chat-area').innerHTML=''; }
 function scroll() {
   const c = document.getElementById('chat-area');
@@ -1261,7 +1387,6 @@ function scroll() {
   });
 }
 
-// Rola para última mensagem quando teclado abre
 document.getElementById('user-input').addEventListener('focus', () => {
   setTimeout(()=>{ const c=document.getElementById('chat-area'); c.scrollTop=c.scrollHeight; }, 300);
 });
@@ -1277,13 +1402,10 @@ function addSys(html) { addMsg('sistema','🧠',html); }
 function addUser(txt) { addMsg('usuario','👤',txt.replace(/</g,'&lt;').replace(/\n/g,'<br>')); }
 
 function addPromptBox(prompt) {
-  // Guarda o prompt para copiar
   window._currentPrompt = prompt;
-  // Mostra no overlay fixo
   const esc = prompt.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
   document.getElementById('prompt-overlay-content').innerHTML = esc;
   document.getElementById('prompt-overlay').classList.remove('hidden');
-  // Também adiciona no chat para histórico
   const c = document.getElementById('chat-area');
   const d = document.createElement('div');
   d.className = 'prompt-box';
@@ -1313,8 +1435,7 @@ function copiarOverlay(btn) {
   });
 }
 
-
-
+// ─── INPUT ────────────────────────────────────────────────────────────────────
 function ativarInput() {
   const i=document.getElementById('user-input'),b=document.getElementById('send-btn');
   i.disabled=false; b.disabled=true;
@@ -1334,6 +1455,7 @@ function onKey(e) {
   if(e.key==='Enter'&&!e.shiftKey){ e.preventDefault(); if(!document.getElementById('send-btn').disabled) enviar(); }
 }
 
+// ─── PROGRESS ────────────────────────────────────────────────────────────────
 function atualizarProgress() {
   document.getElementById('progress-bar').classList.remove('hidden');
   document.getElementById('progress-fill').style.width=(S.q/S.total*100)+'%';
@@ -1341,23 +1463,7 @@ function atualizarProgress() {
 }
 function esconderProgress() { document.getElementById('progress-bar').classList.add('hidden'); }
 
-function copiar(btn) {
-  const txt=document.getElementById('prompt-content').innerText;
-  navigator.clipboard.writeText(txt).then(()=>{
-    btn.textContent='✅ Copiado!';
-    toast('✅ Copiado! Agora clique em Abrir Claude e cole lá.');
-    setTimeout(()=>btn.textContent='📋 Copiar',3000);
-  }).catch(()=>{
-    const ta=document.createElement('textarea');
-    ta.value=txt; ta.style.cssText='position:fixed;opacity:0';
-    document.body.appendChild(ta); ta.select();
-    document.execCommand('copy'); document.body.removeChild(ta);
-    btn.textContent='✅ Copiado!';
-    toast('✅ Copiado! Agora clique em Abrir Claude e cole lá.');
-    setTimeout(()=>btn.textContent='📋 Copiar',3000);
-  });
-}
-
+// ─── TOAST ───────────────────────────────────────────────────────────────────
 function toast(msg,tipo='ok') {
   const t=document.getElementById('toast');
   t.textContent=msg; t.style.background=tipo==='erro'?'#e0141f':'#1a3a6b';
@@ -1365,34 +1471,6 @@ function toast(msg,tipo='ok') {
 }
 
 function reiniciar() { if(S.modulo) selecionarModulo(S.modulo); }
-
-function db() { try{ return JSON.parse(localStorage.getItem('painel_ia')||'{}'); }catch{ return {}; } }
-function saveDb(d) { try{ localStorage.setItem('painel_ia',JSON.stringify(d)); }catch{} }
-function salvarLocal() { const d=db(); d.estado={modulo:S.modulo,respostas:S.respostas,q:S.q}; saveDb(d); }
-function salvarHistorico(nome,prompt) {
-  const d=db(); if(!d.hist) d.hist=[];
-  d.hist.unshift({nome,prompt,data:new Date().toISOString()});
-  if(d.hist.length>20) d.hist=d.hist.slice(0,20);
-  saveDb(d);
-}
-function abrirHistorico() {
-  const h=db().hist||[];
-  const body=document.getElementById('modal-body');
-  body.innerHTML=h.length===0
-    ?'<p style="text-align:center;color:var(--muted);padding:24px;font-size:13px">Nenhum prompt gerado ainda.</p>'
-    :h.map((item,i)=>`<div class="historico-item" onclick="verHist(${i})">
-        <div class="historico-item-header"><span class="historico-item-nome">${item.nome}</span><span class="historico-item-data">${new Date(item.data).toLocaleDateString('pt-BR')}</span></div>
-        <div class="historico-item-preview">${item.prompt.substring(0,110)}...</div>
-      </div>`).join('');
-  document.getElementById('modal-historico').classList.remove('hidden');
-}
-function verHist(i) {
-  const item=db().hist[i]; if(!item) return;
-  fecharHistorico(); limparChat(); desativarInput();
-  addSys(`📂 <strong>${item.nome}</strong> — ${new Date(item.data).toLocaleDateString('pt-BR')}`);
-  addPromptBox(item.prompt);
-}
-function fecharHistorico() { document.getElementById('modal-historico').classList.add('hidden'); }
 </script>
 </body>
 </html>
