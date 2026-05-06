@@ -9,6 +9,7 @@
 <meta name="apple-mobile-web-app-title" content="MEU CRM">
 <title>MEU CRM</title>
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://arquivos98126066-sudo.github.io/SOFTWARE/sync-indicator.js"></script>
 <style>
   :root {
     --blue: #2563eb;
@@ -47,7 +48,6 @@
     position: relative;
   }
 
-  /* ── TOPBAR ── */
   .topbar {
     position: fixed; top: 0; left: 0; right: 0; z-index: 100;
     background: var(--white);
@@ -74,14 +74,12 @@
   }
   .sync-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); }
 
-  /* ── OVERLAY ── */
   .overlay {
     position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 200;
     opacity: 0; pointer-events: none; transition: opacity 0.3s;
   }
   .overlay.active { opacity: 1; pointer-events: all; }
 
-  /* ── SIDEBAR ── */
   .sidebar {
     position: fixed; top: 0; left: -280px; width: 280px; height: 100%; z-index: 300;
     background: var(--white); box-shadow: var(--shadow-lg);
@@ -121,13 +119,11 @@
     font-size: 12px; color: var(--gray-400);
   }
 
-  /* ── MAIN ── */
   .main { padding-top: 56px; min-height: 100dvh; }
   .page { display: none; padding: 16px; animation: fadeIn 0.2s ease; }
   .page.active { display: block; }
   @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
 
-  /* ── PAGE HEADER ── */
   .page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
   .page-title { font-family: 'Sora', sans-serif; font-size: 20px; font-weight: 700; color: var(--gray-900); }
   .btn-primary {
@@ -138,7 +134,6 @@
   }
   .btn-primary:active { transform: scale(0.97); background: #1d4ed8; }
 
-  /* ── SEARCH ── */
   .search-wrap { position: relative; margin-bottom: 14px; }
   .search-input {
     width: 100%; padding: 11px 16px 11px 40px; border: 1.5px solid var(--gray-200);
@@ -148,7 +143,6 @@
   .search-input:focus { border-color: var(--blue); }
   .search-icon { position: absolute; left: 13px; top: 50%; transform: translateY(-50%); font-size: 16px; color: var(--gray-400); }
 
-  /* ── CARDS ── */
   .card {
     background: var(--white); border-radius: var(--radius); padding: 18px 16px;
     box-shadow: var(--shadow); margin-bottom: 14px; border-left: 4px solid transparent;
@@ -175,7 +169,6 @@
   .contact-btn.whatsapp { background: #dcfce7; color: #15803d; }
   .contact-btn:active { transform: scale(0.96); }
 
-  /* ── TENTATIVAS ── */
   .tentativas-wrap { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
   .tentativa-label { font-size: 12px; color: var(--gray-500); font-weight: 500; }
   .dots { display: flex; gap: 6px; }
@@ -203,7 +196,6 @@
   .card-obs span { font-weight: 600; color: var(--gray-600); }
   .card-indicado { font-size: 11px; color: var(--gray-400); font-weight: 500; text-align: right; }
 
-  /* ── AGENDA CARDS ── */
   .agenda-section-title { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--gray-400); margin: 16px 0 8px; }
   .agenda-card { background: var(--white); border-radius: var(--radius); padding: 18px 16px; box-shadow: var(--shadow); margin-bottom: 14px; }
   .agenda-time { font-family: 'Sora', sans-serif; font-size: 18px; font-weight: 700; color: var(--blue); }
@@ -215,7 +207,6 @@
   }
   .btn-liguei:active { transform: scale(0.97); }
 
-  /* ── REUNIÃO CARDS ── */
   .reuniao-card { background: var(--white); border-radius: var(--radius); padding: 18px 16px; box-shadow: var(--shadow); margin-bottom: 14px; }
   .reuniao-tipo {
     display: inline-flex; align-items: center; gap: 4px;
@@ -233,7 +224,6 @@
   }
   .btn-concluir:active { transform: scale(0.97); }
 
-  /* ── ATIVO CARDS ── */
   .ativo-card { background: var(--white); border-radius: var(--radius); padding: 18px 16px; box-shadow: var(--shadow); margin-bottom: 14px; border-left: 4px solid var(--green); }
   .ativo-nome { font-size: 16px; font-weight: 700; color: var(--gray-900); margin-bottom: 6px; }
   .ativo-servico { font-size: 12px; color: var(--gray-500); margin-bottom: 14px; padding-bottom: 12px; border-bottom: 1px solid var(--gray-100); }
@@ -244,7 +234,6 @@
   }
   .btn-proposta:active { transform: scale(0.97); }
 
-  /* ── ARQUIVO CARDS ── */
   .arquivo-card { background: var(--white); border-radius: var(--radius); padding: 18px 16px; box-shadow: var(--shadow); margin-bottom: 14px; border-left: 4px solid var(--gray-300); }
   .arquivo-nome { font-size: 16px; font-weight: 700; color: var(--gray-900); margin-bottom: 6px; }
   .arquivo-info { font-size: 12px; color: var(--red); font-weight: 500; margin-bottom: 14px; padding-bottom: 12px; border-bottom: 1px solid var(--gray-100); }
@@ -253,13 +242,11 @@
   .btn-excluir { background: var(--red-light); color: var(--red); border: none; padding: 8px 14px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 600; cursor: pointer; font-family: 'Inter', sans-serif; transition: all 0.2s; }
   .btn-reativar:active, .btn-excluir:active { transform: scale(0.97); }
 
-  /* ── EMPTY STATE ── */
   .empty-state { text-align: center; padding: 60px 20px; color: var(--gray-400); }
   .empty-icon { font-size: 48px; margin-bottom: 12px; }
   .empty-text { font-size: 15px; font-weight: 500; }
   .empty-sub { font-size: 13px; margin-top: 4px; }
 
-  /* ── MODAL ── */
   .modal-backdrop {
     position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 500;
     display: flex; align-items: flex-end; opacity: 0; pointer-events: none; transition: opacity 0.3s;
@@ -298,7 +285,6 @@
   .btn-full.green { background: var(--green); color: var(--white); }
   .btn-full.red { background: var(--red); color: var(--white); }
 
-  /* ── MODAL ATENDEU ── */
   .atendeu-options { display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; }
   .atendeu-btn {
     display: flex; align-items: center; gap: 13px; padding: 15px 16px;
@@ -310,7 +296,6 @@
   .atendeu-btn:active { transform: scale(0.98); }
   .atendeu-btn-icon { font-size: 22px; width: 28px; text-align: center; }
 
-  /* ── PROMPT BOX ── */
   .prompt-box {
     background: var(--gray-50); border: 1.5px solid var(--gray-200);
     border-radius: var(--radius-sm); padding: 14px; font-size: 13px;
@@ -324,7 +309,6 @@
   }
   .btn-copy:active { background: var(--blue-light); }
 
-  /* ── CONCLUIR REUNIÃO ── */
   .concluir-options { display: flex; gap: 8px; flex-wrap: wrap; }
   .concluir-btn {
     flex: 1; min-width: 100px; padding: 12px 8px; border-radius: var(--radius-sm); border: 1.5px solid var(--gray-200);
@@ -339,51 +323,42 @@
   .crono-tab { flex:1; padding:9px 8px; border-radius:var(--radius-sm); border:1.5px solid var(--gray-200); background:var(--white); font-size:13px; font-weight:600; color:var(--gray-500); cursor:pointer; font-family:'Inter',sans-serif; transition:all 0.2s; }
   .crono-tab.active { background:var(--blue); color:var(--white); border-color:var(--blue); }
   .crono-item {
-  background: var(--white); border-radius: var(--radius); padding: 14px 16px;
-  box-shadow: var(--shadow); margin-bottom: 10px;
-  border-left: 4px solid var(--blue);
-}
-.crono-item.reuniao { border-left-color: var(--green); }
-.crono-item.agenda { border-left-color: var(--blue); }
-.crono-hora {
-  font-family: 'Sora', sans-serif; font-size: 14px; font-weight: 700;
-  color: var(--gray-500);
-}
-.crono-data-tag {
-  font-size: 12px; color: var(--gray-400); margin-left: 6px;
-}
-.crono-tipo-tag {
-  display: inline-block; font-size: 10px; font-weight: 700; text-transform: uppercase;
-  padding: 2px 8px; border-radius: 20px; margin-bottom: 4px;
-}
-.crono-tipo-tag.reuniao { background: var(--green-light); color: var(--green); }
-.crono-tipo-tag.agenda { background: var(--blue-light); color: var(--blue); }
-.crono-nome {
-  font-family: 'Sora', sans-serif; font-size: 15px; font-weight: 700;
-  color: var(--gray-900); margin: 12px 0 10px;
-}
-.crono-btns-contato { display: flex; gap: 8px; margin-bottom: 10px; }
-.crono-btns-acao { display: flex; gap: 8px; margin-top: 8px; }
-.btn-concluido {
-  flex: 1; padding: 8px; border-radius: var(--radius-sm); border: none;
-  background: var(--green-light); color: var(--green);
-  font-size: 13px; font-weight: 600; cursor: pointer;
-  font-family: 'Inter', sans-serif; transition: all 0.2s;
-}
-.btn-adiado {
-  flex: 1; padding: 8px; border-radius: var(--radius-sm); border: none;
-  background: var(--blue-light); color: var(--blue);
-  font-size: 13px; font-weight: 600; cursor: pointer;
-  font-family: 'Inter', sans-serif; transition: all 0.2s;
-}
-.btn-concluido:active, .btn-adiado:active { transform: scale(0.97); }
-.crono-alerta {
-  margin-top: 10px; padding: 8px 12px; border-radius: var(--radius-sm);
-  background: #fff7ed; border: 1.5px solid #fed7aa;
-  font-size: 12px; font-weight: 600; color: #c2410c;
-}
+    background: var(--white); border-radius: var(--radius); padding: 14px 16px;
+    box-shadow: var(--shadow); margin-bottom: 10px;
+    border-left: 4px solid var(--blue);
+  }
+  .crono-item.reuniao { border-left-color: var(--green); }
+  .crono-item.agenda { border-left-color: var(--blue); }
+  .crono-hora { font-family: 'Sora', sans-serif; font-size: 14px; font-weight: 700; color: var(--gray-500); }
+  .crono-data-tag { font-size: 12px; color: var(--gray-400); margin-left: 6px; }
+  .crono-tipo-tag {
+    display: inline-block; font-size: 10px; font-weight: 700; text-transform: uppercase;
+    padding: 2px 8px; border-radius: 20px; margin-bottom: 4px;
+  }
+  .crono-tipo-tag.reuniao { background: var(--green-light); color: var(--green); }
+  .crono-tipo-tag.agenda { background: var(--blue-light); color: var(--blue); }
+  .crono-nome { font-family: 'Sora', sans-serif; font-size: 15px; font-weight: 700; color: var(--gray-900); margin: 12px 0 10px; }
+  .crono-btns-contato { display: flex; gap: 8px; margin-bottom: 10px; }
+  .crono-btns-acao { display: flex; gap: 8px; margin-top: 8px; }
+  .btn-concluido {
+    flex: 1; padding: 8px; border-radius: var(--radius-sm); border: none;
+    background: var(--green-light); color: var(--green);
+    font-size: 13px; font-weight: 600; cursor: pointer;
+    font-family: 'Inter', sans-serif; transition: all 0.2s;
+  }
+  .btn-adiado {
+    flex: 1; padding: 8px; border-radius: var(--radius-sm); border: none;
+    background: var(--blue-light); color: var(--blue);
+    font-size: 13px; font-weight: 600; cursor: pointer;
+    font-family: 'Inter', sans-serif; transition: all 0.2s;
+  }
+  .btn-concluido:active, .btn-adiado:active { transform: scale(0.97); }
+  .crono-alerta {
+    margin-top: 10px; padding: 8px 12px; border-radius: var(--radius-sm);
+    background: #fff7ed; border: 1.5px solid #fed7aa;
+    font-size: 12px; font-weight: 600; color: #c2410c;
+  }
 
-  /* ── TOAST ── */
   .toast {
     position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(100px);
     background: var(--gray-900); color: var(--white); padding: 12px 20px;
@@ -392,13 +367,11 @@
   }
   .toast.show { transform: translateX(-50%) translateY(0); }
 
-  /* ── CONFIRM ── */
   .confirm-modal { max-width: 340px; margin: auto; border-radius: 20px; padding: 24px 20px; }
   .confirm-title { font-family: 'Sora', sans-serif; font-size: 17px; font-weight: 700; margin-bottom: 8px; }
   .confirm-text { font-size: 14px; color: var(--gray-500); margin-bottom: 20px; }
   .confirm-btns { display: flex; gap: 10px; }
 
-  /* ── STATUS TAG ── */
   .status-tag {
     display: inline-block; font-size: 10px; font-weight: 700; text-transform: uppercase;
     letter-spacing: 0.4px; padding: 2px 8px; border-radius: 20px; margin-bottom: 12px;
@@ -408,10 +381,7 @@
   .status-tag.atendeu { background: var(--green-light); color: var(--green); }
   .status-tag.sem-retorno { background: var(--red-light); color: var(--red); }
 
-  /* ── OBS EDIT ── */
   .obs-edit-btn { font-size: 11px; color: var(--blue); cursor: pointer; margin-left: 6px; }
-
-  /* notificação alerta */
   .alerta-agora { background: var(--blue-light); border: 1.5px solid var(--blue-mid); }
 
   @media (min-width: 480px) {
@@ -422,10 +392,8 @@
 </head>
 <body>
 
-<!-- OVERLAY -->
 <div class="overlay" id="overlay" onclick="closeSidebar()"></div>
 
-<!-- TOPBAR -->
 <div class="topbar">
   <div class="topbar-left">
     <button class="hamburger" onclick="toggleSidebar()" aria-label="Menu">
@@ -435,15 +403,13 @@
   </div>
   <div class="sync-badge">
     <div class="sync-dot"></div>
-    <span id="syncLabel">Local</span>
+    <span id="syncLabel">Sincronizando...</span>
   </div>
 </div>
 
-<!-- SIDEBAR -->
 <div class="sidebar" id="sidebar">
   <div class="sidebar-header">
     <div class="sidebar-logo">MEU CRM</div>
-    
   </div>
   <nav class="sidebar-nav">
     <div class="nav-item active" data-page="contatos" onclick="navigate('contatos')">
@@ -459,20 +425,17 @@
       <span class="nav-icon">⭐</span> Ativos <span class="nav-badge green" id="badge-ativos" style="display:none">0</span>
     </div>
     <div class="nav-item" data-page="arquivo" onclick="navigate('arquivo')">
-      <span class="nav-icon">📁</span> Arquivo <span class="nav-badge" id="badge-arquivo" style="display:none" style="background:var(--gray-400)">0</span>
+      <span class="nav-icon">📁</span> Arquivo <span class="nav-badge" id="badge-arquivo" style="display:none">0</span>
     </div>
-      <div class="nav-item" data-page="cronograma" onclick="navigate('cronograma')">
-        <span class="nav-icon">🕐</span> Cronograma
-        <span class="nav-badge" id="badge-cronograma" style="display:none">0</span>
-      </div>
+    <div class="nav-item" data-page="cronograma" onclick="navigate('cronograma')">
+      <span class="nav-icon">🕐</span> Cronograma
+      <span class="nav-badge" id="badge-cronograma" style="display:none">0</span>
+    </div>
   </nav>
-  <div class="sidebar-footer">v1.0 · Armazenamento local</div>
+  <div class="sidebar-footer">v2.0 · Firebase Firestore</div>
 </div>
 
-<!-- MAIN -->
 <main class="main">
-
-  <!-- CONTATOS -->
   <div class="page active" id="page-contatos">
     <div class="page-header">
       <span class="page-title">Contatos</span>
@@ -485,7 +448,6 @@
     <div id="lista-contatos"></div>
   </div>
 
-  <!-- AGENDA -->
   <div class="page" id="page-agenda">
     <div class="page-header">
       <span class="page-title">Agenda</span>
@@ -493,7 +455,6 @@
     <div id="lista-agenda"></div>
   </div>
 
-  <!-- REUNIÕES -->
   <div class="page" id="page-reunioes">
     <div class="page-header">
       <span class="page-title">Reuniões</span>
@@ -501,7 +462,6 @@
     <div id="lista-reunioes"></div>
   </div>
 
-  <!-- ATIVOS -->
   <div class="page" id="page-ativos">
     <div class="page-header">
       <span class="page-title">Clientes Ativos</span>
@@ -509,7 +469,6 @@
     <div id="lista-ativos"></div>
   </div>
 
-  <!-- ARQUIVO -->
   <div class="page" id="page-arquivo">
     <div class="page-header">
       <span class="page-title">Arquivo</span>
@@ -528,10 +487,7 @@
     </div>
     <div id="lista-cronograma"></div>
   </div>
-
 </main>
-
-<!-- ════════════ MODAIS ════════════ -->
 
 <!-- MODAL NOVO CONTATO -->
 <div class="modal-backdrop" id="modal-novo">
@@ -771,7 +727,6 @@
   </div>
 </div>
 
-<!-- MODAL CONFIRM -->
 <!-- MODAL ADIAR CRONOGRAMA -->
 <div class="modal-backdrop" id="modal-adiar">
   <div class="modal">
@@ -798,6 +753,7 @@
   </div>
 </div>
 
+<!-- MODAL CONFIRM -->
 <div class="modal-backdrop" id="modal-confirm" style="align-items:center">
   <div class="modal confirm-modal">
     <div class="confirm-title" id="confirm-title">Confirmar</div>
@@ -826,19 +782,23 @@
   </div>
 </div>
 
-<!-- TOAST -->
 <div class="toast" id="toast"></div>
 
-<script>
+<script type="module">
+import { db as firestoreDb } from "https://arquivos98126066-sudo.github.io/SOFTWARE/firebase-sync.js";
+import {
+  collection, addDoc, getDocs, updateDoc, deleteDoc, doc, onSnapshot, setDoc, getDoc
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
 // ══════════════════════════════════════════════
-// DADOS
+// ESTADO LOCAL (cache reativo)
 // ══════════════════════════════════════════════
-let db = {
-  contatos: [],   // { id, nome, numero, indicado, obs, tentativas, status, createdAt }
-  agenda: [],     // { id, contatoId, nome, numero, data, hora, obs }
-  reunioes: [],   // { id, contatoId, nome, numero, data, hora, tipo, obs }
-  ativos: [],     // { id, contatoId, nome, numero, servico, obs, proposta }
-  arquivo: []     // { id, contatoId, nome, numero, obs }
+const state = {
+  contatos: [],
+  agenda: [],
+  reunioes: [],
+  ativos: [],
+  arquivo: []
 };
 
 let currentPage = 'contatos';
@@ -847,27 +807,82 @@ let propostaListenersAtivos = false;
 let cronoTab = 'hoje';
 let selectedAgendaId = null;
 let selectedReuniaoId = null;
-let selectedObsTarget = null; // {tipo, id}
+let selectedObsTarget = null;
 let confirmCallback = null;
-let selectedCronoItem = null; // { id, tipo }
+let selectedCronoItem = null;
 
-function save() {
-  localStorage.setItem('meucrm_v2', JSON.stringify(db));
+// Coleções Firestore
+const COLS = {
+  contatos: 'meu_crm_contatos',
+  agenda:   'meu_crm_agenda',
+  reunioes: 'meu_crm_reunioes',
+  ativos:   'meu_crm_ativos',
+  arquivo:  'meu_crm_arquivo'
+};
+
+// ══════════════════════════════════════════════
+// FIREBASE — onSnapshot (tempo real)
+// ══════════════════════════════════════════════
+function initListeners() {
+  Object.entries(COLS).forEach(([key, colName]) => {
+    onSnapshot(collection(firestoreDb, colName), snap => {
+      state[key] = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      renderPage(currentPage);
+      updateBadges();
+    }, err => {
+      console.error('Listener error:', err);
+      if (window.syncShow) window.syncShow.offline();
+    });
+  });
 }
-function load() {
-  const raw = localStorage.getItem('meucrm_v2');
-  if (raw) {
-    try { db = JSON.parse(raw); } catch(e) { db = {contatos:[],agenda:[],reunioes:[],ativos:[],arquivo:[]}; }
+
+// ══════════════════════════════════════════════
+// OPERAÇÕES FIRESTORE
+// ══════════════════════════════════════════════
+async function fsAdd(colKey, data) {
+  if (window.syncShow) window.syncShow.syncing();
+  try {
+    const ref = await addDoc(collection(firestoreDb, COLS[colKey]), { ...data, createdAt: Date.now() });
+    if (window.syncShow) window.syncShow.synced('MEU CRM');
+    return ref.id;
+  } catch(e) {
+    console.error(e);
+    // fallback local
+    const id = uid();
+    const pending = JSON.parse(localStorage.getItem('meucrm_pending') || '[]');
+    pending.push({ op: 'add', col: colKey, id, data, pendingSync: true });
+    localStorage.setItem('meucrm_pending', JSON.stringify(pending));
+    if (window.syncShow) window.syncShow.local();
+    return id;
   }
-  // garantir estrutura
-  ['contatos','agenda','reunioes','ativos','arquivo'].forEach(k => { if (!db[k]) db[k] = []; });
 }
-function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2,6); }
+
+async function fsUpdate(colKey, id, data) {
+  if (window.syncShow) window.syncShow.syncing();
+  try {
+    await updateDoc(doc(firestoreDb, COLS[colKey], id), data);
+    if (window.syncShow) window.syncShow.synced('MEU CRM');
+  } catch(e) {
+    console.error(e);
+    if (window.syncShow) window.syncShow.offline();
+  }
+}
+
+async function fsDelete(colKey, id) {
+  if (window.syncShow) window.syncShow.syncing();
+  try {
+    await deleteDoc(doc(firestoreDb, COLS[colKey], id));
+    if (window.syncShow) window.syncShow.synced('MEU CRM');
+  } catch(e) {
+    console.error(e);
+    if (window.syncShow) window.syncShow.offline();
+  }
+}
 
 // ══════════════════════════════════════════════
 // NAVEGAÇÃO
 // ══════════════════════════════════════════════
-function navigate(page) {
+window.navigate = function(page) {
   currentPage = page;
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
@@ -876,127 +891,12 @@ function navigate(page) {
   closeSidebar();
   renderPage(page);
 }
-function setCronoTab(tab) {
+
+window.setCronoTab = function(tab) {
   cronoTab = tab;
   document.querySelectorAll('.crono-tab').forEach(t => t.classList.remove('active'));
   document.getElementById('tab-' + tab).classList.add('active');
   renderCronograma();
-}
-
-function renderCronograma() {
-  const lista = document.getElementById('lista-cronograma');
-  if (!lista) return;
-
-  const hoje = new Date().toISOString().slice(0,10);
-  const amanha = new Date(Date.now()+86400000).toISOString().slice(0,10);
-  const semanaFim = new Date(Date.now()+7*86400000).toISOString().slice(0,10);
-
-  let todos = [
-    ...db.reunioes.map(r => ({...r, _tipo:'reuniao'})),
-    ...db.agenda.map(a => ({...a, _tipo:'agenda'}))
-  ];
-
-  todos = todos.filter(x => {
-    if (cronoTab === 'hoje') return x.data === hoje;
-    if (cronoTab === 'amanha') return x.data === amanha;
-    if (cronoTab === 'semana') return x.data >= hoje && x.data <= semanaFim;
-    return false;
-  });
-
-  todos.sort((a,b) => (a.data+a.hora).localeCompare(b.data+b.hora));
-
-  if (!todos.length) {
-    lista.innerHTML = `<div class="empty-state"><div class="empty-icon">🕐</div><div class="empty-text">Nenhum compromisso</div><div class="empty-sub">Nada agendado para este período</div></div>`;
-    return;
-  }
-
-  lista.innerHTML = todos.map((item, i) => {
-    const proximo = todos[i+1];
-    let alertaHtml = '';
-    if (proximo && proximo.data === item.data) {
-      const [h1,m1] = item.hora.split(':').map(Number);
-      const [h2,m2] = proximo.hora.split(':').map(Number);
-      const diffMin = (h2*60+m2) - (h1*60+m1);
-      if (diffMin > 0 && diffMin <= 30) {
-        const tipoProx = proximo._tipo === 'reuniao' ? 'Reunião' : 'Ligação';
-        alertaHtml = `<div class="crono-alerta">⚠️ Em ${diffMin} min: ${tipoProx} com ${escHtml(proximo.nome)}</div>`;
-      }
-    }
-    const tipoLabel = item._tipo === 'reuniao' ? 'Reunião' : 'Ligação';
-    const dataTag = `<span class="crono-data-tag">📅 ${formatDate(item.data)}</span>`;
-
-    return `
-    <div class="crono-item ${item._tipo}">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
-        <div style="display:flex;align-items:center;gap:14px">
-          <span class="crono-hora">⏰ ${item.hora}</span>
-          <span class="crono-tipo-tag ${item._tipo}">${tipoLabel}</span>
-        </div>
-        ${dataTag}
-      </div>
-      <div class="crono-nome">${escHtml(item.nome)}</div>
-      <div class="crono-btns-contato">
-        <a href="${fmtTel(item.numero)}" class="contact-btn phone">📞 Ligar</a>
-        <a href="${fmtWA(item.numero)}" target="_blank" class="contact-btn whatsapp">💬 WhatsApp</a>
-      </div>
-      ${alertaHtml}
-      <div class="crono-btns-acao">
-        <button class="btn-concluido" onclick="cronoConcluir('${item.id}','${item._tipo}')">✔ Concluído</button>
-        <button class="btn-adiado" onclick="cronoAdiar('${item.id}','${item._tipo}')">⏩ Adiar</button>
-      </div>
-    </div>`;
-  }).join('');
-}
-
-function cronoConcluir(id, tipo) {
-  confirm2('Concluir compromisso?', 'O item será removido do cronograma.', () => {
-    if (tipo === 'reuniao') db.reunioes = db.reunioes.filter(x => x.id !== id);
-    if (tipo === 'agenda') db.agenda = db.agenda.filter(x => x.id !== id);
-    save(); renderCronograma(); updateBadges(); toast('Compromisso concluído ✅');
-  });
-}
-
-function cronoAdiar(id, tipo) {
-  selectedCronoItem = { id, tipo };
-  document.getElementById('adiar-obs').value = '';
-  document.getElementById('adiar-data').value = '';
-  document.getElementById('adiar-hora').value = '';
-  openModal('modal-adiar');
-}
-
-function confirmarAdiamento() {
-  if (!selectedCronoItem) return;
-  const { id, tipo } = selectedCronoItem;
-  const novaData = document.getElementById('adiar-data').value;
-  const novaHora = document.getElementById('adiar-hora').value;
-  const obs = document.getElementById('adiar-obs').value.trim();
-
-  const arr = tipo === 'reuniao' ? db.reunioes : db.agenda;
-  const item = arr.find(x => x.id === id);
-  if (!item) { closeModal('modal-adiar'); return; }
-
-  if (novaData) item.data = novaData;
-  if (novaHora) item.hora = novaHora;
-  if (obs) item.obs = (item.obs ? item.obs + ' | Adiado: ' + obs : 'Adiado: ' + obs);
-
-  save(); closeModal('modal-adiar'); renderCronograma();
-  updateBadges(); toast('Compromisso adiado ⏩');
-}
-
-function verificarConflitoHorario(data, hora) {
-  const [hN,mN] = hora.split(':').map(Number);
-  const minNovo = hN*60+mN;
-  const todos = [
-    ...db.reunioes.map(r => ({...r, _tipo:'reuniao'})),
-    ...(db.agenda||[]).map(a => ({...a, _tipo:'agenda'}))
-  ].filter(x => x.data === data);
-  for (const item of todos) {
-    const [h,m] = item.hora.split(':').map(Number);
-    const diff = Math.abs(minNovo - (h*60+m));
-    if (diff === 0) { toast('⛔ Já existe ' + (item._tipo==='reuniao'?'Reunião':'Ligação') + ' com ' + item.nome + ' às ' + item.hora + '!'); return 'bloqueado'; }
-    if (diff < 30) { toast('⚠️ Atenção: em ' + diff + ' min você tem ' + (item._tipo==='reuniao'?'Reunião':'Ligação') + ' com ' + item.nome); return 'alerta'; }
-  }
-  return 'livre';
 }
 
 function renderPage(page) {
@@ -1012,37 +912,81 @@ function renderPage(page) {
 // ══════════════════════════════════════════════
 // SIDEBAR
 // ══════════════════════════════════════════════
-function toggleSidebar() {
-  const s = document.getElementById('sidebar');
-  const o = document.getElementById('overlay');
-  s.classList.toggle('open');
-  o.classList.toggle('active');
+window.toggleSidebar = function() {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('overlay').classList.toggle('active');
 }
 function closeSidebar() {
   document.getElementById('sidebar').classList.remove('open');
   document.getElementById('overlay').classList.remove('active');
 }
+window.closeSidebar = closeSidebar;
 
 // ══════════════════════════════════════════════
-// LINKS DE CONTATO
+// UTILS
 // ══════════════════════════════════════════════
-function fmtPhone(n) {
-  const d = n.replace(/\D/g,'');
-  return '0' + d;
+function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2,6); }
+function escHtml(str) {
+  return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
-function fmtWA(n) {
-  const d = n.replace(/\D/g,'');
-  return 'https://wa.me/55' + d;
+function formatDate(d) {
+  if (!d) return '';
+  const [y,m,dia] = d.split('-');
+  return `${dia}/${m}/${y}`;
 }
-function fmtTel(n) {
-  const d = n.replace(/\D/g,'');
-  return 'tel:0' + d;
-}
+function fmtPhone(n) { const d = n.replace(/\D/g,''); return '0' + d; }
+function fmtWA(n) { const d = n.replace(/\D/g,''); return 'https://wa.me/55' + d; }
+function fmtTel(n) { const d = n.replace(/\D/g,''); return 'tel:0' + d; }
 function contactBtns(numero) {
-  return `
-    <a href="${fmtTel(numero)}" class="contact-btn phone">📞 ${fmtPhone(numero)}</a>
-    <a href="${fmtWA(numero)}" target="_blank" class="contact-btn whatsapp">💬 WhatsApp</a>
-  `;
+  return `<a href="${fmtTel(numero)}" class="contact-btn phone">📞 ${fmtPhone(numero)}</a>
+    <a href="${fmtWA(numero)}" target="_blank" class="contact-btn whatsapp">💬 WhatsApp</a>`;
+}
+
+// ══════════════════════════════════════════════
+// TOAST
+// ══════════════════════════════════════════════
+let toastTimer;
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 2800);
+}
+window.toast = toast;
+
+// ══════════════════════════════════════════════
+// MODAIS
+// ══════════════════════════════════════════════
+window.openModal = function(id) { document.getElementById(id).classList.add('active'); }
+window.closeModal = function(id) { document.getElementById(id).classList.remove('active'); }
+
+document.querySelectorAll('.modal-backdrop').forEach(b => {
+  b.addEventListener('click', e => { if (e.target === b) window.closeModal(b.id); });
+});
+
+// ══════════════════════════════════════════════
+// BADGES
+// ══════════════════════════════════════════════
+function updateBadges() {
+  const setB = (id, count) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.textContent = count;
+    el.style.display = count > 0 ? '' : (id === 'badge-contatos' ? '' : 'none');
+  };
+  setB('badge-contatos', state.contatos.length);
+  setB('badge-agenda', state.agenda.length);
+  setB('badge-reunioes', state.reunioes.length);
+  setB('badge-ativos', state.ativos.length);
+  setB('badge-arquivo', state.arquivo.length);
+  // cronograma
+  const hoje = new Date().toISOString().slice(0,10);
+  const amanha = new Date(Date.now()+86400000).toISOString().slice(0,10);
+  const semanaFim = new Date(Date.now()+7*86400000).toISOString().slice(0,10);
+  const cronoCount = [...state.reunioes, ...state.agenda].filter(x =>
+    x.data >= hoje && x.data <= semanaFim
+  ).length;
+  setB('badge-cronograma', cronoCount);
 }
 
 // ══════════════════════════════════════════════
@@ -1051,27 +995,31 @@ function contactBtns(numero) {
 function renderContatos() {
   const q = (document.getElementById('searchContatos')?.value || '').toLowerCase();
   const lista = document.getElementById('lista-contatos');
-  const items = db.contatos.filter(c =>
+  const items = state.contatos.filter(c =>
     c.nome.toLowerCase().includes(q) || c.numero.includes(q)
   );
   if (!items.length) {
     lista.innerHTML = `<div class="empty-state"><div class="empty-icon">📋</div><div class="empty-text">Nenhum contato ainda</div><div class="empty-sub">Toque em "+ Novo" para adicionar</div></div>`;
     return;
   }
-  lista.innerHTML = items.map((c, i) => cardContato(c, i)).join('');
+  lista.innerHTML = items.map(c => cardContato(c)).join('');
 }
 
-function cardContato(c, i) {
-  const statusClass = c.tentativas === 0 ? 'blue' : c.tentativas < 3 ? 'yellow' : 'red';
-  const statusLabel = c.tentativas === 0 ? 'NOVO' : c.tentativas < 3 ? 'TENTANDO' : 'SEM RETORNO';
-  const dots = [0,1,2].map(n => `<div class="dot ${n < c.tentativas ? (c.tentativas >= 3 ? 'filled-red' : 'filled') : ''}"></div>`).join('');
-  const obsHtml = c.obs ? `<div class="card-obs"><span>📝</span> ${escHtml(c.obs)} <span class="obs-edit-btn" onclick="editObs('contatos','${c.id}')">✏️</span></div>` : `<div class="card-obs" style="color:var(--blue);cursor:pointer" onclick="editObs('contatos','${c.id}')">📝 Adicionar observação...</div>`;
+function cardContato(c) {
+  const t = c.tentativas || 0;
+  const dots = [0,1,2].map(n => `<div class="dot ${n < t ? (t >= 3 ? 'filled-red' : 'filled') : ''}"></div>`).join('');
+  const obsHtml = c.obs
+    ? `<div class="card-obs"><span>📝</span> ${escHtml(c.obs)} <span class="obs-edit-btn" onclick="editObs('contatos','${c.id}')">✏️</span></div>`
+    : `<div class="card-obs" style="color:var(--blue);cursor:pointer" onclick="editObs('contatos','${c.id}')">📝 Adicionar observação...</div>`;
   const indicadoHtml = c.indicado ? `<div class="card-indicado">👤 Indicado por: ${escHtml(c.indicado)}</div>` : '';
+  const statusLabel = t === 0 ? 'NOVO' : t < 3 ? 'TENTANDO' : 'SEM RETORNO';
+  const statusCls = t === 0 ? 'novo' : t < 3 ? 'tentando' : 'sem-retorno';
+  const cardCls = t === 0 ? 'blue' : t < 3 ? 'yellow' : 'red';
   return `
-    <div class="card ${statusClass}" id="card-${c.id}">
+    <div class="card ${cardCls}" id="card-${c.id}">
       <div class="card-header">
         <div>
-          <div class="status-tag ${c.tentativas === 0 ? 'novo' : c.tentativas < 3 ? 'tentando' : 'sem-retorno'}">${statusLabel}</div>
+          <div class="status-tag ${statusCls}">${statusLabel}</div>
           <div class="card-name">${escHtml(c.nome)}</div>
         </div>
         <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">
@@ -1083,9 +1031,9 @@ function cardContato(c, i) {
       <div class="tentativas-wrap">
         <span class="tentativa-label">Tentativas:</span>
         <div class="dots">${dots}</div>
-        <span style="font-size:12px;color:var(--gray-400)">${c.tentativas}/3</span>
+        <span style="font-size:12px;color:var(--gray-400)">${t}/3</span>
       </div>
-      ${c.tentativas < 3 ? `
+      ${t < 3 ? `
       <div class="action-btns">
         <button class="btn-nao" onclick="naoAtendeu('${c.id}')">✕ Não Atendeu</button>
         <button class="btn-atendeu" onclick="openAtendeu('${c.id}')">✓ Atendeu</button>
@@ -1099,22 +1047,22 @@ function cardContato(c, i) {
 // ══════════════════════════════════════════════
 function renderAgenda() {
   const lista = document.getElementById('lista-agenda');
-  if (!db.agenda.length) {
+  if (!state.agenda.length) {
     lista.innerHTML = `<div class="empty-state"><div class="empty-icon">🗓️</div><div class="empty-text">Nenhum agendamento</div><div class="empty-sub">Agende retornos após um atendimento</div></div>`;
     return;
   }
-  const sorted = [...db.agenda].sort((a,b) => (a.data+a.hora).localeCompare(b.data+b.hora));
+  const sorted = [...state.agenda].sort((a,b) => (a.data+a.hora).localeCompare(b.data+b.hora));
   const hoje = new Date().toISOString().slice(0,10);
-  const amanha = new Date(Date.now()+86400000).toISOString().slice(0,10);
   let html = '';
   let lastSec = null;
   sorted.forEach(ag => {
-    let sec = ag.data > amanha ? `📅 ${formatDate(ag.data)}` : ag.data === hoje ? '📅 Hoje' : ag.data === amanha ? '📅 Amanhã' : `📅 ${formatDate(ag.data)}`;
+    const amanha = new Date(Date.now()+86400000).toISOString().slice(0,10);
+    let sec = ag.data === hoje ? '📅 Hoje' : ag.data === amanha ? '📅 Amanhã' : `📅 ${formatDate(ag.data)}`;
     if (sec !== lastSec) { html += `<div class="agenda-section-title">${sec}</div>`; lastSec = sec; }
-    const isAgora = ag.data <= hoje;
+    const isAgora = ag.data === hoje;
     const obsHtml = ag.obs ? `<div class="card-obs"><span>📝</span> ${escHtml(ag.obs)}</div>` : '';
     html += `
-      <div class="agenda-card ${isAgora && ag.data === hoje ? 'alerta-agora' : ''}">
+      <div class="agenda-card ${isAgora ? 'alerta-agora' : ''}">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
           <div class="agenda-time" style="font-size:13px;font-weight:600;color:var(--gray-500)">📅 ${formatDate(ag.data)}</div>
           <span style="font-size:13px;font-weight:600;color:var(--gray-500)">⏰ ${ag.hora}</span>
@@ -1136,18 +1084,20 @@ function renderAgenda() {
 // ══════════════════════════════════════════════
 function renderReunioes() {
   const lista = document.getElementById('lista-reunioes');
-  if (!db.reunioes.length) {
+  if (!state.reunioes.length) {
     lista.innerHTML = `<div class="empty-state"><div class="empty-icon">🤝</div><div class="empty-text">Nenhuma reunião</div><div class="empty-sub">Reuniões marcadas aparecem aqui</div></div>`;
     return;
   }
-  const sorted = [...db.reunioes].sort((a,b) => (a.data+a.hora).localeCompare(b.data+b.hora));
+  const sorted = [...state.reunioes].sort((a,b) => (a.data+a.hora).localeCompare(b.data+b.hora));
   lista.innerHTML = sorted.map(r => {
-    const obsHtml = r.obs ? `<div class="card-obs"><span>📝</span> ${escHtml(r.obs)} <span class="obs-edit-btn" onclick="editObs('reunioes','${r.id}')">✏️</span></div>` : `<div class="card-obs" style="color:var(--blue);cursor:pointer" onclick="editObs('reunioes','${r.id}')">📝 Adicionar observação...</div>`;
+    const obsHtml = r.obs
+      ? `<div class="card-obs"><span>📝</span> ${escHtml(r.obs)} <span class="obs-edit-btn" onclick="editObs('reunioes','${r.id}')">✏️</span></div>`
+      : `<div class="card-obs" style="color:var(--blue);cursor:pointer" onclick="editObs('reunioes','${r.id}')">📝 Adicionar observação...</div>`;
     return `
     <div class="reuniao-card">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
         <div class="reuniao-tipo ${r.tipo}" style="margin-bottom:0">${r.tipo === 'presencial' ? '📍 Presencial' : '📱 Remota'}</div>
-        <div class="reuniao-data" style="margin-bottom:0;padding-bottom:0;border-bottom:none;font-size:12px">📅 ${formatDate(r.data)} às ${r.hora}</div>
+        <div class="reuniao-data" style="font-size:12px">📅 ${formatDate(r.data)} às ${r.hora}</div>
       </div>
       <div class="reuniao-nome">${escHtml(r.nome)}</div>
       <div class="contact-btns">${contactBtns(r.numero)}</div>
@@ -1166,12 +1116,14 @@ function renderReunioes() {
 // ══════════════════════════════════════════════
 function renderAtivos() {
   const lista = document.getElementById('lista-ativos');
-  if (!db.ativos.length) {
+  if (!state.ativos.length) {
     lista.innerHTML = `<div class="empty-state"><div class="empty-icon">⭐</div><div class="empty-text">Nenhum cliente ativo</div><div class="empty-sub">Clientes com proposta aceita aparecem aqui</div></div>`;
     return;
   }
-  lista.innerHTML = db.ativos.map(a => {
-    const obsHtml = a.obs ? `<div class="card-obs"><span>📝</span> ${escHtml(a.obs)} <span class="obs-edit-btn" onclick="editObs('ativos','${a.id}')">✏️</span></div>` : `<div class="card-obs" style="color:var(--blue);cursor:pointer" onclick="editObs('ativos','${a.id}')">📝 Adicionar observação...</div>`;
+  lista.innerHTML = state.ativos.map(a => {
+    const obsHtml = a.obs
+      ? `<div class="card-obs"><span>📝</span> ${escHtml(a.obs)} <span class="obs-edit-btn" onclick="editObs('ativos','${a.id}')">✏️</span></div>`
+      : `<div class="card-obs" style="color:var(--blue);cursor:pointer" onclick="editObs('ativos','${a.id}')">📝 Adicionar observação...</div>`;
     return `
     <div class="ativo-card">
       <div style="display:flex;justify-content:space-between">
@@ -1193,11 +1145,11 @@ function renderAtivos() {
 // ══════════════════════════════════════════════
 function renderArquivo() {
   const lista = document.getElementById('lista-arquivo');
-  if (!db.arquivo.length) {
+  if (!state.arquivo.length) {
     lista.innerHTML = `<div class="empty-state"><div class="empty-icon">📁</div><div class="empty-text">Arquivo vazio</div><div class="empty-sub">Contatos com 3 tentativas sem retorno aparecem aqui</div></div>`;
     return;
   }
-  lista.innerHTML = db.arquivo.map(a => {
+  lista.innerHTML = state.arquivo.map(a => {
     const obsHtml = a.obs ? `<div class="card-obs"><span>📝</span> ${escHtml(a.obs)}</div>` : '';
     return `
     <div class="arquivo-card">
@@ -1214,47 +1166,134 @@ function renderArquivo() {
 }
 
 // ══════════════════════════════════════════════
-// BADGES
+// RENDER CRONOGRAMA
 // ══════════════════════════════════════════════
-function updateBadges() {
-  const setB = (id, count) => {
-    const el = document.getElementById(id);
-    if (!el) return;
-    el.textContent = count;
-    el.style.display = count > 0 ? '' : (id === 'badge-contatos' ? '' : 'none');
-  };
-  setB('badge-contatos', db.contatos.length);
-  setB('badge-agenda', db.agenda.length);
-  setB('badge-reunioes', db.reunioes.length);
-  setB('badge-ativos', db.ativos.length);
-  setB('badge-arquivo', db.arquivo.length);
+function renderCronograma() {
+  const lista = document.getElementById('lista-cronograma');
+  if (!lista) return;
+  const hoje = new Date().toISOString().slice(0,10);
+  const amanha = new Date(Date.now()+86400000).toISOString().slice(0,10);
+  const semanaFim = new Date(Date.now()+7*86400000).toISOString().slice(0,10);
+
+  let todos = [
+    ...state.reunioes.map(r => ({...r, _tipo:'reuniao'})),
+    ...state.agenda.map(a => ({...a, _tipo:'agenda'}))
+  ].filter(x => {
+    if (cronoTab === 'hoje') return x.data === hoje;
+    if (cronoTab === 'amanha') return x.data === amanha;
+    if (cronoTab === 'semana') return x.data >= hoje && x.data <= semanaFim;
+    return false;
+  }).sort((a,b) => (a.data+a.hora).localeCompare(b.data+b.hora));
+
+  if (!todos.length) {
+    lista.innerHTML = `<div class="empty-state"><div class="empty-icon">🕐</div><div class="empty-text">Nenhum compromisso</div><div class="empty-sub">Nada agendado para este período</div></div>`;
+    return;
+  }
+
+  lista.innerHTML = todos.map((item, i) => {
+    const proximo = todos[i+1];
+    let alertaHtml = '';
+    if (proximo && proximo.data === item.data) {
+      const [h1,m1] = item.hora.split(':').map(Number);
+      const [h2,m2] = proximo.hora.split(':').map(Number);
+      const diffMin = (h2*60+m2) - (h1*60+m1);
+      if (diffMin > 0 && diffMin <= 30) {
+        const tipoProx = proximo._tipo === 'reuniao' ? 'Reunião' : 'Ligação';
+        alertaHtml = `<div class="crono-alerta">⚠️ Em ${diffMin} min: ${tipoProx} com ${escHtml(proximo.nome)}</div>`;
+      }
+    }
+    const tipoLabel = item._tipo === 'reuniao' ? 'Reunião' : 'Ligação';
+    return `
+    <div class="crono-item ${item._tipo}">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+        <div style="display:flex;align-items:center;gap:14px">
+          <span class="crono-hora">⏰ ${item.hora}</span>
+          <span class="crono-tipo-tag ${item._tipo}">${tipoLabel}</span>
+        </div>
+        <span class="crono-data-tag">📅 ${formatDate(item.data)}</span>
+      </div>
+      <div class="crono-nome">${escHtml(item.nome)}</div>
+      <div class="crono-btns-contato">
+        <a href="${fmtTel(item.numero)}" class="contact-btn phone">📞 Ligar</a>
+        <a href="${fmtWA(item.numero)}" target="_blank" class="contact-btn whatsapp">💬 WhatsApp</a>
+      </div>
+      ${alertaHtml}
+      <div class="crono-btns-acao">
+        <button class="btn-concluido" onclick="cronoConcluir('${item.id}','${item._tipo}')">✔ Concluído</button>
+        <button class="btn-adiado" onclick="cronoAdiar('${item.id}','${item._tipo}')">⏩ Adiar</button>
+      </div>
+    </div>`;
+  }).join('');
 }
 
 // ══════════════════════════════════════════════
-// MODAIS
+// CRONOGRAMA ACTIONS
 // ══════════════════════════════════════════════
-function openModal(id) {
-  document.getElementById(id).classList.add('active');
-}
-function closeModal(id) {
-  document.getElementById(id).classList.remove('active');
+window.cronoConcluir = function(id, tipo) {
+  confirm2('Concluir compromisso?', 'O item será removido do cronograma.', async () => {
+    const colKey = tipo === 'reuniao' ? 'reunioes' : 'agenda';
+    await fsDelete(colKey, id);
+    toast('Compromisso concluído ✅');
+  });
 }
 
-// Fechar clicando fora
-document.querySelectorAll('.modal-backdrop').forEach(b => {
-  b.addEventListener('click', e => { if (e.target === b) closeModal(b.id); });
-});
+window.cronoAdiar = function(id, tipo) {
+  selectedCronoItem = { id, tipo };
+  document.getElementById('adiar-obs').value = '';
+  document.getElementById('adiar-data').value = '';
+  document.getElementById('adiar-hora').value = '';
+  window.openModal('modal-adiar');
+}
 
-// ── NOVO CONTATO ──
-function openModalNovoContato() {
+window.confirmarAdiamento = async function() {
+  if (!selectedCronoItem) return;
+  const { id, tipo } = selectedCronoItem;
+  const novaData = document.getElementById('adiar-data').value;
+  const novaHora = document.getElementById('adiar-hora').value;
+  const obs = document.getElementById('adiar-obs').value.trim();
+  const colKey = tipo === 'reuniao' ? 'reunioes' : 'agenda';
+  const item = state[colKey].find(x => x.id === id);
+  if (!item) { window.closeModal('modal-adiar'); return; }
+
+  const updates = {};
+  if (novaData) updates.data = novaData;
+  if (novaHora) updates.hora = novaHora;
+  if (obs) updates.obs = item.obs ? item.obs + ' | Adiado: ' + obs : 'Adiado: ' + obs;
+
+  await fsUpdate(colKey, id, updates);
+  window.closeModal('modal-adiar');
+  toast('Compromisso adiado ⏩');
+}
+
+function verificarConflitoHorario(data, hora) {
+  const [hN,mN] = hora.split(':').map(Number);
+  const minNovo = hN*60+mN;
+  const todos = [
+    ...state.reunioes.map(r => ({...r, _tipo:'reuniao'})),
+    ...state.agenda.map(a => ({...a, _tipo:'agenda'}))
+  ].filter(x => x.data === data);
+  for (const item of todos) {
+    const [h,m] = item.hora.split(':').map(Number);
+    const diff = Math.abs(minNovo - (h*60+m));
+    if (diff === 0) { toast('⛔ Já existe ' + (item._tipo==='reuniao'?'Reunião':'Ligação') + ' com ' + item.nome + ' às ' + item.hora + '!'); return 'bloqueado'; }
+    if (diff < 30) { toast('⚠️ Atenção: em ' + diff + ' min você tem ' + (item._tipo==='reuniao'?'Reunião':'Ligação') + ' com ' + item.nome); return 'alerta'; }
+  }
+  return 'livre';
+}
+
+// ══════════════════════════════════════════════
+// CONTATOS ACTIONS
+// ══════════════════════════════════════════════
+window.openModalNovoContato = function() {
   document.getElementById('modal-novo-title').textContent = 'Novo Contato';
   document.getElementById('edit-id').value = '';
   ['inp-nome','inp-numero','inp-indicado','inp-obs'].forEach(id => document.getElementById(id).value = '');
-  openModal('modal-novo');
+  window.openModal('modal-novo');
   setTimeout(() => document.getElementById('inp-nome').focus(), 400);
 }
-function editarContato(id) {
-  const c = db.contatos.find(x => x.id === id);
+
+window.editarContato = function(id) {
+  const c = state.contatos.find(x => x.id === id);
   if (!c) return;
   document.getElementById('modal-novo-title').textContent = 'Editar Contato';
   document.getElementById('edit-id').value = id;
@@ -1262,88 +1301,99 @@ function editarContato(id) {
   document.getElementById('inp-numero').value = c.numero;
   document.getElementById('inp-indicado').value = c.indicado || '';
   document.getElementById('inp-obs').value = c.obs || '';
-  openModal('modal-novo');
+  window.openModal('modal-novo');
 }
-function salvarContato() {
+
+window.salvarContato = async function() {
   const nome = document.getElementById('inp-nome').value.trim();
   const numero = document.getElementById('inp-numero').value.trim().replace(/\D/g,'');
   const indicado = document.getElementById('inp-indicado').value.trim();
   const obs = document.getElementById('inp-obs').value.trim();
   if (!nome || !numero) { toast('Preencha nome e número!'); return; }
   const editId = document.getElementById('edit-id').value;
+  window.closeModal('modal-novo');
   if (editId) {
-    const c = db.contatos.find(x => x.id === editId);
-    if (c) { c.nome = nome; c.numero = numero; c.indicado = indicado; c.obs = obs; }
+    await fsUpdate('contatos', editId, { nome, numero, indicado, obs });
+    toast('Contato atualizado!');
   } else {
-    db.contatos.push({ id: uid(), nome, numero, indicado, obs, tentativas: 0, status: 'ativo', createdAt: Date.now() });
+    await fsAdd('contatos', { nome, numero, indicado, obs, tentativas: 0, status: 'ativo' });
+    toast('Contato adicionado!');
   }
-  save(); closeModal('modal-novo'); renderContatos(); updateBadges();
-  toast(editId ? 'Contato atualizado!' : 'Contato adicionado!');
 }
 
-// ── NÃO ATENDEU ──
-function naoAtendeu(id) {
-  const c = db.contatos.find(x => x.id === id);
+window.naoAtendeu = async function(id) {
+  const c = state.contatos.find(x => x.id === id);
   if (!c) return;
-  c.tentativas++;
-  if (c.tentativas >= 3) {
+  const novasTentativas = (c.tentativas || 0) + 1;
+  if (novasTentativas >= 3) {
+    await fsUpdate('contatos', id, { tentativas: novasTentativas });
     confirm2('Mover para Arquivo?', `${c.nome} atingiu 3 tentativas. Deseja mover para o Arquivo?`, () => {
-      moverParaArquivo(c.id);
+      moverParaArquivo(id);
     });
   } else {
-    save(); renderContatos(); toast(`Tentativa ${c.tentativas}/3 registrada`);
+    await fsUpdate('contatos', id, { tentativas: novasTentativas });
+    toast(`Tentativa ${novasTentativas}/3 registrada`);
   }
 }
-function moverParaArquivo(id) {
-  const idx = db.contatos.findIndex(x => x.id === id);
-  if (idx === -1) return;
-  const [c] = db.contatos.splice(idx, 1);
-  db.arquivo.push({ id: uid(), contatoId: c.id, nome: c.nome, numero: c.numero, obs: c.obs });
-  save(); renderContatos(); updateBadges(); toast('Movido para o Arquivo');
+
+async function moverParaArquivo(id) {
+  const c = state.contatos.find(x => x.id === id);
+  if (!c) return;
+  await fsAdd('arquivo', { contatoId: c.id, nome: c.nome, numero: c.numero, obs: c.obs || '' });
+  await fsDelete('contatos', id);
+  toast('Movido para o Arquivo');
 }
 
-// ── ATENDEU ──
-function openAtendeu(id) {
+// ══════════════════════════════════════════════
+// ATENDEU
+// ══════════════════════════════════════════════
+window.openAtendeu = function(id) {
   selectedContatoId = id;
-  const c = db.contatos.find(x => x.id === id);
+  const c = state.contatos.find(x => x.id === id);
   if (!c) return;
   document.getElementById('atendeu-title').textContent = `${c.nome} atendeu! 🎉`;
-  openModal('modal-atendeu');
+  window.openModal('modal-atendeu');
 }
-function atendeuOpcao(opcao) {
-  closeModal('modal-atendeu');
+
+window.atendeuOpcao = function(opcao) {
+  window.closeModal('modal-atendeu');
   if (opcao === 'agenda') { openModalAgendar(); return; }
   if (opcao === 'reuniao') { openModalReuniao(); return; }
   if (opcao === 'proposta') { openModalProposta(); return; }
   if (opcao === 'excluir') {
-    confirm2('Excluir contato?', 'Essa ação é permanente e não pode ser desfeita.', () => {
-      db.contatos = db.contatos.filter(x => x.id !== selectedContatoId);
-      save(); renderContatos(); updateBadges(); toast('Contato excluído');
+    confirm2('Excluir contato?', 'Essa ação é permanente e não pode ser desfeita.', async () => {
+      await fsDelete('contatos', selectedContatoId);
+      toast('Contato excluído');
     });
   }
 }
 
-// ── AGENDAR ──
+// ══════════════════════════════════════════════
+// AGENDAR
+// ══════════════════════════════════════════════
 function openModalAgendar() {
   document.getElementById('ag-data').value = new Date().toISOString().slice(0,10);
   document.getElementById('ag-hora').value = '';
-  openModal('modal-agendar');
+  window.openModal('modal-agendar');
 }
-function confirmarAgenda() {
+
+window.confirmarAgenda = async function() {
   const data = document.getElementById('ag-data').value;
   const hora = document.getElementById('ag-hora').value;
   if (!data || !hora) { toast('Preencha data e hora!'); return; }
   if (verificarConflitoHorario(data, hora) === 'bloqueado') return;
-  const c = db.contatos.find(x => x.id === selectedContatoId);
+  const c = state.contatos.find(x => x.id === selectedContatoId);
   if (!c) return;
-  db.agenda.push({ id: uid(), contatoId: c.id, nome: c.nome, numero: c.numero, data, hora, obs: c.obs });
-  db.contatos = db.contatos.filter(x => x.id !== selectedContatoId);
-  save(); closeModal('modal-agendar'); renderContatos(); updateBadges();
+  window.closeModal('modal-agendar');
+  await fsAdd('agenda', { contatoId: c.id, nome: c.nome, numero: c.numero, data, hora, obs: c.obs || '' });
+  await fsDelete('contatos', selectedContatoId);
   toast('Agendado! ✅');
   scheduleNotification(c.nome, data, hora);
 }
 
-// ── REUNIÃO ──
+// ══════════════════════════════════════════════
+// REUNIÃO
+// ══════════════════════════════════════════════
 function openModalReuniao() {
   document.getElementById('re-data').value = new Date().toISOString().slice(0,10);
   document.getElementById('re-hora').value = '';
@@ -1351,9 +1401,10 @@ function openModalReuniao() {
   document.getElementById('re-msg-dia-antes').value = msgPadrao.diaAntes || '';
   document.getElementById('re-msg-manha').value = msgPadrao.manha || '';
   document.getElementById('re-msg-hora-antes').value = msgPadrao.horaAntes || '';
-  openModal('modal-reuniao');
+  window.openModal('modal-reuniao');
 }
-function confirmarReuniao() {
+
+window.confirmarReuniao = async function() {
   const data = document.getElementById('re-data').value;
   const hora = document.getElementById('re-hora').value;
   const tipo = document.getElementById('re-tipo').value;
@@ -1362,46 +1413,48 @@ function confirmarReuniao() {
   const msgHoraAntes = document.getElementById('re-msg-hora-antes').value.trim();
   if (!data || !hora) { toast('Preencha data e hora!'); return; }
   if (verificarConflitoHorario(data, hora) === 'bloqueado') return;
-  const c = db.contatos.find(x => x.id === selectedContatoId);
+  const c = state.contatos.find(x => x.id === selectedContatoId);
   if (!c) return;
   localStorage.setItem('meucrmMsgReuniao', JSON.stringify({ diaAntes: msgDiaAntes, manha: msgManha, horaAntes: msgHoraAntes }));
-  db.reunioes.push({ id: uid(), contatoId: c.id, nome: c.nome, numero: c.numero, data, hora, tipo, obs: c.obs, msgDiaAntes, msgManha, msgHoraAntes });
-  db.contatos = db.contatos.filter(x => x.id !== selectedContatoId);
-  save(); closeModal('modal-reuniao'); renderContatos(); updateBadges();
+  window.closeModal('modal-reuniao');
+  await fsAdd('reunioes', { contatoId: c.id, nome: c.nome, numero: c.numero, data, hora, tipo, obs: c.obs || '', msgDiaAntes, msgManha, msgHoraAntes });
+  await fsDelete('contatos', selectedContatoId);
   toast('Reunião marcada! 🤝');
   scheduleReuniaoNotifications(c.nome, c.numero, data, hora, msgDiaAntes, msgManha, msgHoraAntes);
 }
 
-// ── PROPOSTA ──
-function openPropostaReuniao(id) {
+// ══════════════════════════════════════════════
+// PROPOSTA
+// ══════════════════════════════════════════════
+window.openPropostaReuniao = function(id) {
   selectedReuniaoId = id;
-  const r = db.reunioes.find(x => x.id === id);
+  const r = state.reunioes.find(x => x.id === id);
   if (!r) return;
   document.getElementById('proposta-title').textContent = `Proposta — ${r.nome}`;
   const _pp = JSON.parse(localStorage.getItem('meucrmPropostaPadrao') || '{}');
-  ['pr-servico','pr-descricao','pr-valor','pr-prazo','pr-pagamento','pr-validade','pr-obs-extra'].forEach(id => {
-    document.getElementById(id).value = _pp[id] || '';
+  ['pr-servico','pr-descricao','pr-valor','pr-prazo','pr-pagamento','pr-validade','pr-obs-extra'].forEach(fid => {
+    document.getElementById(fid).value = _pp[fid] || '';
   });
   document.getElementById('proposta-form-wrap').style.display = '';
   document.getElementById('proposta-prompt-wrap').style.display = 'none';
   window._propostaContexto = 'reuniao';
   formatarCamposProposta();
-  openModal('modal-proposta');
+  window.openModal('modal-proposta');
 }
 
-function abrirEnviarProposta(id) {
+window.abrirEnviarProposta = function(id) {
   selectedReuniaoId = id;
-  const r = db.reunioes.find(x => x.id === id);
+  const r = state.reunioes.find(x => x.id === id);
   if (!r || !r.propostaHtml) { toast('Crie a proposta primeiro!'); return; }
   const padrao = JSON.parse(localStorage.getItem('meucrmTextoEnvioProposta') || '{}');
   document.getElementById('envio-nome').textContent = r.nome;
   document.getElementById('envio-texto').value = padrao.texto || `Olá, ${r.nome}! Segue a proposta conforme conversamos. Qualquer dúvida, estou à disposição!`;
   document.getElementById('envio-wa-btn').href = fmtWA(r.numero);
   window._envioReuniaoId = id;
-  openModal('modal-envio-proposta');
+  window.openModal('modal-envio-proposta');
 }
 
-function aplicarTextoEnvio(salvarPadrao) {
+window.aplicarTextoEnvio = function(salvarPadrao) {
   const texto = document.getElementById('envio-texto').value.trim();
   if (salvarPadrao) {
     localStorage.setItem('meucrmTextoEnvioProposta', JSON.stringify({ texto }));
@@ -1414,8 +1467,8 @@ function aplicarTextoEnvio(salvarPadrao) {
   });
 }
 
-function copiarHtmlProposta() {
-  const r = db.reunioes.find(x => x.id === window._envioReuniaoId);
+window.copiarHtmlProposta = function() {
+  const r = state.reunioes.find(x => x.id === window._envioReuniaoId);
   if (!r || !r.propostaHtml) { toast('Nenhuma proposta encontrada!'); return; }
   navigator.clipboard.writeText(r.propostaHtml).then(() => toast('HTML da proposta copiado! ✅')).catch(() => {
     const ta = document.createElement('textarea'); ta.value = r.propostaHtml;
@@ -1425,34 +1478,35 @@ function copiarHtmlProposta() {
 }
 
 function openModalProposta() {
-  const c = db.contatos.find(x => x.id === selectedContatoId);
+  const c = state.contatos.find(x => x.id === selectedContatoId);
   if (!c) return;
   document.getElementById('proposta-title').textContent = `Proposta — ${c.nome}`;
   const _pp = JSON.parse(localStorage.getItem('meucrmPropostaPadrao') || '{}');
-  ['pr-servico','pr-descricao','pr-valor','pr-prazo','pr-pagamento','pr-validade','pr-obs-extra'].forEach(id => {
-    document.getElementById(id).value = _pp[id] || '';
+  ['pr-servico','pr-descricao','pr-valor','pr-prazo','pr-pagamento','pr-validade','pr-obs-extra'].forEach(fid => {
+    document.getElementById(fid).value = _pp[fid] || '';
   });
   document.getElementById('proposta-form-wrap').style.display = '';
   document.getElementById('proposta-prompt-wrap').style.display = 'none';
+  window._propostaContexto = 'contato';
   formatarCamposProposta();
-  openModal('modal-proposta');
+  window.openModal('modal-proposta');
 }
-function openPropostaAtivo(id) {
-  const a = db.ativos.find(x => x.id === id);
+
+window.openPropostaAtivo = function(id) {
+  const a = state.ativos.find(x => x.id === id);
   if (!a) return;
-  selectedContatoId = a.contatoId || a.id;
-  // cria pseudo-contato temporário para gerar proposta
   selectedContatoId = '__ativo__' + id;
   document.getElementById('proposta-title').textContent = `Nova Proposta — ${a.nome}`;
-  ['pr-servico','pr-descricao','pr-valor','pr-prazo','pr-pagamento','pr-validade','pr-obs-extra'].forEach(id => document.getElementById(id).value = '');
+  ['pr-servico','pr-descricao','pr-valor','pr-prazo','pr-pagamento','pr-validade','pr-obs-extra'].forEach(fid => document.getElementById(fid).value = '');
   document.getElementById('proposta-form-wrap').style.display = '';
   document.getElementById('proposta-prompt-wrap').style.display = 'none';
-  openModal('modal-proposta');
+  window._propostaContexto = 'ativo';
+  window.openModal('modal-proposta');
 }
+
 function formatarCamposProposta() {
   if (propostaListenersAtivos) return;
   propostaListenersAtivos = true;
-
   document.getElementById('pr-valor').addEventListener('blur', function() {
     const raw = this.value.replace(/\D/g,'');
     if (!raw) return;
@@ -1474,7 +1528,8 @@ function formatarCamposProposta() {
     this.value = raw + ' dias';
   });
 }
-function gerarPrompt() {
+
+window.gerarPrompt = function() {
   const servico = document.getElementById('pr-servico').value.trim();
   const descricao = document.getElementById('pr-descricao').value.trim();
   const valor = document.getElementById('pr-valor').value.trim();
@@ -1483,10 +1538,13 @@ function gerarPrompt() {
   let clienteNome = '';
   if (selectedContatoId && selectedContatoId.startsWith('__ativo__')) {
     const aid = selectedContatoId.replace('__ativo__','');
-    const a = db.ativos.find(x => x.id === aid);
+    const a = state.ativos.find(x => x.id === aid);
     clienteNome = a ? a.nome : 'Cliente';
+  } else if (window._propostaContexto === 'reuniao' && selectedReuniaoId) {
+    const r = state.reunioes.find(x => x.id === selectedReuniaoId);
+    clienteNome = r ? r.nome : 'Cliente';
   } else {
-    const c = db.contatos.find(x => x.id === selectedContatoId);
+    const c = state.contatos.find(x => x.id === selectedContatoId);
     clienteNome = c ? c.nome : 'Cliente';
   }
 
@@ -1495,213 +1553,194 @@ function gerarPrompt() {
   const validade = document.getElementById('pr-validade').value.trim();
   const obsExtra = document.getElementById('pr-obs-extra').value.trim();
 
-  const prompt = `Crie uma proposta comercial profissional em HTML completo, visualmente bonita e moderna, com as seguintes informações:
+  const prompt = `Crie uma proposta comercial profissional em HTML completo, visualmente bonita e moderna, com as seguintes informações:\n\nCLIENTE: ${clienteNome}\nCONSULTOR: Klebson\nSERVIÇO: ${servico}\nDESCRIÇÃO: ${descricao}\nVALOR: ${valor}${prazo ? '\nPRAZO: ' + prazo : ''}${pagamento ? '\nPAGAMENTO: ' + pagamento : ''}${validade ? '\nVALIDADE DA PROPOSTA: ' + validade : ''}${obsExtra ? '\nOBSERVAÇÕES: ' + obsExtra : ''}\n\nINSTRUÇÕES DE DESIGN:\n- Cores: azul (#2563eb) e branco, toque de cinza claro\n- Fonte: moderna e profissional\n- Layout: limpo, organizado, com logo/cabeçalho do consultor\n- Incluir: seção de apresentação, escopo do serviço, valores, condições de pagamento, validade, rodapé com contato\n- Pronto para ser enviado ao cliente\n- HTML completo e autocontido (CSS inline ou dentro do arquivo)`;
 
-CLIENTE: ${clienteNome}
-CONSULTOR: Klebson
-SERVIÇO: ${servico}
-DESCRIÇÃO: ${descricao}
-VALOR: ${valor}${prazo ? '\nPRAZO: ' + prazo : ''}${pagamento ? '\nPAGAMENTO: ' + pagamento : ''}${validade ? '\nVALIDADE DA PROPOSTA: ' + validade : ''}${obsExtra ? '\nOBSERVAÇÕES: ' + obsExtra : ''}
-
-INSTRUÇÕES DE DESIGN:
-- Cores: azul (#2563eb) e branco, toque de cinza claro
-- Fonte: moderna e profissional
-- Layout: limpo, organizado, com logo/cabeçalho do consultor
-- Incluir: seção de apresentação, escopo do serviço, valores, condições de pagamento, validade, rodapé com contato
-- Pronto para ser enviado ao cliente
-- HTML completo e autocontido (CSS inline ou dentro do arquivo)`;
-
-  // Salvar prompt temporário e mostrar modal de escolha
   window._propostaPromptTemp = prompt;
   window._propostaDadosTemp = { 'pr-servico': servico, 'pr-descricao': descricao, 'pr-valor': valor, 'pr-prazo': prazo, 'pr-pagamento': pagamento, 'pr-validade': validade, 'pr-obs-extra': obsExtra };
-  openModal('modal-proposta-padrao');
+  window.openModal('modal-proposta-padrao');
 }
-function aplicarProposta(salvarPadrao) {
-  closeModal('modal-proposta-padrao');
+
+window.aplicarProposta = async function(salvarPadrao) {
+  window.closeModal('modal-proposta-padrao');
   if (salvarPadrao) {
     localStorage.setItem('meucrmPropostaPadrao', JSON.stringify(window._propostaDadosTemp));
     toast('Padrão salvo! ✅');
   }
   if (window._propostaContexto === 'reuniao' && selectedReuniaoId) {
-    const r = db.reunioes.find(x => x.id === selectedReuniaoId);
-    if (r) { r.propostaPrompt = window._propostaPromptTemp; save(); }
+    await fsUpdate('reunioes', selectedReuniaoId, { propostaPrompt: window._propostaPromptTemp });
   }
   document.getElementById('pr-html-gerado').value = '';
   document.getElementById('prompt-texto').textContent = window._propostaPromptTemp;
   document.getElementById('proposta-form-wrap').style.display = 'none';
   document.getElementById('proposta-prompt-wrap').style.display = '';
 }
-function salvarHtmlProposta() {
+
+window.salvarHtmlProposta = async function() {
   const html = document.getElementById('pr-html-gerado').value.trim();
   if (!html) { toast('Cole o HTML da proposta primeiro!'); return; }
   if (window._propostaContexto === 'reuniao' && selectedReuniaoId) {
-    const r = db.reunioes.find(x => x.id === selectedReuniaoId);
-    if (r) { r.propostaHtml = html; r.propostaPronta = true; save(); renderReunioes(); }
+    await fsUpdate('reunioes', selectedReuniaoId, { propostaHtml: html, propostaPronta: true });
   }
-  closeModal('modal-proposta');
+  window.closeModal('modal-proposta');
   toast('Proposta salva! Agora você pode enviá-la. 📤');
 }
-function copiarPrompt() {
+
+window.copiarPrompt = function() {
   const txt = document.getElementById('prompt-texto').textContent;
   navigator.clipboard.writeText(txt).then(() => toast('Prompt copiado! ✅')).catch(() => {
-    // fallback
     const ta = document.createElement('textarea');
     ta.value = txt; document.body.appendChild(ta); ta.select(); document.execCommand('copy');
     document.body.removeChild(ta); toast('Prompt copiado! ✅');
   });
 }
-function marcarAtivoEFechar() {
+
+window.marcarAtivoEFechar = async function() {
   if (!selectedContatoId || selectedContatoId.startsWith('__ativo__')) {
-    closeModal('modal-proposta'); toast('Já está em Ativos!'); return;
+    window.closeModal('modal-proposta'); toast('Já está em Ativos!'); return;
   }
-  const c = db.contatos.find(x => x.id === selectedContatoId);
-  if (!c) { closeModal('modal-proposta'); return; }
+  const c = state.contatos.find(x => x.id === selectedContatoId);
+  if (!c) { window.closeModal('modal-proposta'); return; }
   const servico = document.getElementById('pr-servico').value.trim();
-  db.ativos.push({ id: uid(), contatoId: c.id, nome: c.nome, numero: c.numero, servico, obs: c.obs });
-  db.contatos = db.contatos.filter(x => x.id !== selectedContatoId);
-  save(); closeModal('modal-proposta'); navigate('ativos');
+  await fsAdd('ativos', { contatoId: c.id, nome: c.nome, numero: c.numero, servico, obs: c.obs || '' });
+  await fsDelete('contatos', selectedContatoId);
+  window.closeModal('modal-proposta');
+  window.navigate('ativos');
   toast('Cliente movido para Ativos! ⭐');
 }
-function voltarFormProposta() {
+
+window.voltarFormProposta = function() {
   document.getElementById('proposta-form-wrap').style.display = '';
   document.getElementById('proposta-prompt-wrap').style.display = 'none';
 }
 
-// ── LIGUEI (AGENDA) ──
-function openLiguei(agId) {
+// ══════════════════════════════════════════════
+// LIGUEI (AGENDA)
+// ══════════════════════════════════════════════
+window.openLiguei = function(agId) {
   selectedAgendaId = agId;
-  const ag = db.agenda.find(x => x.id === agId);
+  const ag = state.agenda.find(x => x.id === agId);
   if (!ag) return;
   document.getElementById('liguei-title').textContent = `Ligação para ${ag.nome}`;
-  openModal('modal-liguei');
+  window.openModal('modal-liguei');
 }
-function ligueiResultado(resultado) {
-  closeModal('modal-liguei');
-  const ag = db.agenda.find(x => x.id === selectedAgendaId);
+
+window.ligueiResultado = async function(resultado) {
+  window.closeModal('modal-liguei');
+  const ag = state.agenda.find(x => x.id === selectedAgendaId);
   if (!ag) return;
+  await fsDelete('agenda', selectedAgendaId);
   if (resultado === 'atendeu') {
-    // reinsere na lista de contatos para abrir modal atendeu
-    const id = uid();
-    db.contatos.push({ id, nome: ag.nome, numero: ag.numero, indicado: '', obs: ag.obs || '', tentativas: 0, status: 'ativo', createdAt: Date.now() });
-    db.agenda = db.agenda.filter(x => x.id !== selectedAgendaId);
-    save(); selectedContatoId = id;
-    setTimeout(() => openAtendeu(id), 200);
-    renderAgenda(); updateBadges();
+    const newId = await fsAdd('contatos', { nome: ag.nome, numero: ag.numero, indicado: '', obs: ag.obs || '', tentativas: 0, status: 'ativo' });
+    selectedContatoId = newId;
+    setTimeout(() => {
+      const c = state.contatos.find(x => x.id === newId);
+      if (c) window.openAtendeu(newId);
+    }, 800);
   } else {
-    // Não atendeu — devolve para contatos com 1 tentativa
-    const id = uid();
-    db.contatos.push({ id, nome: ag.nome, numero: ag.numero, indicado: '', obs: ag.obs || '', tentativas: 1, status: 'ativo', createdAt: Date.now() });
-    db.agenda = db.agenda.filter(x => x.id !== selectedAgendaId);
-    save(); renderAgenda(); updateBadges(); toast('Voltou para Contatos com 1 tentativa');
-    navigate('contatos');
+    await fsAdd('contatos', { nome: ag.nome, numero: ag.numero, indicado: '', obs: ag.obs || '', tentativas: 1, status: 'ativo' });
+    toast('Voltou para Contatos com 1 tentativa');
+    window.navigate('contatos');
   }
 }
 
-// ── CONCLUIR REUNIÃO ──
-function openConcluir(id) {
+// ══════════════════════════════════════════════
+// CONCLUIR REUNIÃO
+// ══════════════════════════════════════════════
+window.openConcluir = function(id) {
   selectedReuniaoId = id;
-  const r = db.reunioes.find(x => x.id === id);
+  const r = state.reunioes.find(x => x.id === id);
   if (!r) return;
   document.getElementById('concluir-title').textContent = `Reunião — ${r.nome}`;
-  openModal('modal-concluir');
+  window.openModal('modal-concluir');
 }
-function concluirReuniao(resultado) {
-  closeModal('modal-concluir');
-  const r = db.reunioes.find(x => x.id === selectedReuniaoId);
+
+window.concluirReuniao = async function(resultado) {
+  window.closeModal('modal-concluir');
+  const r = state.reunioes.find(x => x.id === selectedReuniaoId);
   if (!r) return;
+  await fsDelete('reunioes', selectedReuniaoId);
   if (resultado === 'fechou') {
-    db.ativos.push({ id: uid(), contatoId: r.contatoId, nome: r.nome, numero: r.numero, servico: '', obs: r.obs || '' });
+    await fsAdd('ativos', { contatoId: r.contatoId || '', nome: r.nome, numero: r.numero, servico: '', obs: r.obs || '' });
     toast('Fechou negócio! Movido para Ativos ⭐');
-    navigate('ativos');
+    window.navigate('ativos');
   } else if (resultado === 'nao-fechou') {
-    db.arquivo.push({ id: uid(), contatoId: r.contatoId, nome: r.nome, numero: r.numero, obs: r.obs || '', motivo: 'nao-fechou' });
+    await fsAdd('arquivo', { contatoId: r.contatoId || '', nome: r.nome, numero: r.numero, obs: r.obs || '', motivo: 'nao-fechou' });
     toast('Não fechou. Movido para Arquivo 📁');
-    navigate('arquivo');
+    window.navigate('arquivo');
   } else {
-    // pendente — devolve para contatos
-    db.contatos.push({ id: uid(), nome: r.nome, numero: r.numero, indicado: '', obs: r.obs || '', tentativas: 0, status: 'ativo', createdAt: Date.now() });
+    await fsAdd('contatos', { nome: r.nome, numero: r.numero, indicado: '', obs: r.obs || '', tentativas: 0, status: 'ativo' });
     toast('Devolvido para Contatos como pendente');
-    navigate('contatos');
+    window.navigate('contatos');
   }
-  db.reunioes = db.reunioes.filter(x => x.id !== selectedReuniaoId);
-  save(); updateBadges();
 }
 
-// ── EXCLUIR AGENDA ──
-function excluirAgenda(id) {
-  confirm2('Excluir agendamento?', 'O contato será removido da agenda permanentemente.', () => {
-    db.agenda = db.agenda.filter(x => x.id !== id);
-    save(); renderAgenda(); updateBadges(); toast('Agendamento removido');
+// ══════════════════════════════════════════════
+// EXCLUIR AGENDA / ATIVO / ARQUIVO
+// ══════════════════════════════════════════════
+window.excluirAgenda = function(id) {
+  confirm2('Excluir agendamento?', 'O contato será removido da agenda permanentemente.', async () => {
+    await fsDelete('agenda', id);
+    toast('Agendamento removido');
   });
 }
 
-// ── EXCLUIR ATIVO ──
-function excluirAtivo(id) {
-  confirm2('Remover cliente ativo?', 'O cliente será removido da lista de ativos.', () => {
-    db.ativos = db.ativos.filter(x => x.id !== id);
-    save(); renderAtivos(); updateBadges(); toast('Removido');
+window.excluirAtivo = function(id) {
+  confirm2('Remover cliente ativo?', 'O cliente será removido da lista de ativos.', async () => {
+    await fsDelete('ativos', id);
+    toast('Removido');
   });
 }
 
-// ── REATIVAR / EXCLUIR ARQUIVO ──
-function reativarContato(id) {
-  const a = db.arquivo.find(x => x.id === id);
+window.reativarContato = async function(id) {
+  const a = state.arquivo.find(x => x.id === id);
   if (!a) return;
-  db.contatos.push({ id: uid(), nome: a.nome, numero: a.numero, indicado: '', obs: a.obs || '', tentativas: 0, status: 'ativo', createdAt: Date.now() });
-  db.arquivo = db.arquivo.filter(x => x.id !== id);
-  save(); renderArquivo(); updateBadges(); toast('Reativado! Voltou para o fim da fila ✅');
+  await fsAdd('contatos', { nome: a.nome, numero: a.numero, indicado: '', obs: a.obs || '', tentativas: 0, status: 'ativo' });
+  await fsDelete('arquivo', id);
+  toast('Reativado! Voltou para o fim da fila ✅');
 }
-function excluirArquivo(id) {
-  confirm2('Excluir permanentemente?', 'Essa ação não pode ser desfeita.', () => {
-    db.arquivo = db.arquivo.filter(x => x.id !== id);
-    save(); renderArquivo(); updateBadges(); toast('Excluído permanentemente');
+
+window.excluirArquivo = function(id) {
+  confirm2('Excluir permanentemente?', 'Essa ação não pode ser desfeita.', async () => {
+    await fsDelete('arquivo', id);
+    toast('Excluído permanentemente');
   });
 }
 
-// ── EDITAR OBS ──
-function editObs(tipo, id) {
+// ══════════════════════════════════════════════
+// EDITAR OBS
+// ══════════════════════════════════════════════
+window.editObs = function(tipo, id) {
   selectedObsTarget = { tipo, id };
   let obs = '';
-  if (tipo === 'contatos') obs = (db.contatos.find(x => x.id === id) || {}).obs || '';
-  if (tipo === 'reunioes') obs = (db.reunioes.find(x => x.id === id) || {}).obs || '';
-  if (tipo === 'ativos') obs = (db.ativos.find(x => x.id === id) || {}).obs || '';
-  if (tipo === 'arquivo') obs = (db.arquivo.find(x => x.id === id) || {}).obs || '';
+  const item = state[tipo]?.find(x => x.id === id);
+  if (item) obs = item.obs || '';
   document.getElementById('obs-textarea').value = obs;
-  openModal('modal-obs');
+  window.openModal('modal-obs');
   setTimeout(() => document.getElementById('obs-textarea').focus(), 400);
 }
-function salvarObs() {
+
+window.salvarObs = async function() {
   if (!selectedObsTarget) return;
   const { tipo, id } = selectedObsTarget;
   const obs = document.getElementById('obs-textarea').value.trim();
-  const arr = db[tipo];
-  const item = arr.find(x => x.id === id);
-  if (item) item.obs = obs;
-  save(); closeModal('modal-obs'); renderPage(currentPage); toast('Observação salva');
+  await fsUpdate(tipo, id, { obs });
+  window.closeModal('modal-obs');
+  toast('Observação salva');
 }
 
-// ── CONFIRM ──
+// ══════════════════════════════════════════════
+// CONFIRM
+// ══════════════════════════════════════════════
 function confirm2(title, text, cb) {
   document.getElementById('confirm-title').textContent = title;
   document.getElementById('confirm-text').textContent = text;
   confirmCallback = cb;
-  openModal('modal-confirm');
+  window.openModal('modal-confirm');
 }
 document.getElementById('confirm-ok').onclick = function() {
-  closeModal('modal-confirm');
+  window.closeModal('modal-confirm');
   if (confirmCallback) { confirmCallback(); confirmCallback = null; }
 };
-
-// ══════════════════════════════════════════════
-// TOAST
-// ══════════════════════════════════════════════
-let toastTimer;
-function toast(msg) {
-  const el = document.getElementById('toast');
-  el.textContent = msg; el.classList.add('show');
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => el.classList.remove('show'), 2800);
-}
 
 // ══════════════════════════════════════════════
 // NOTIFICAÇÕES
@@ -1722,96 +1761,36 @@ function scheduleNotification(nome, data, hora) {
     }
   }, diff);
 }
-
 function scheduleReuniaoNotifications(nome, numero, data, hora, msgDiaAntes, msgManha, msgHoraAntes) {
   if (!('Notification' in window) || Notification.permission !== 'granted') return;
   const reuniaoTime = new Date(`${data}T${hora}`);
   const now = Date.now();
-  const [y,m,d] = data.split('-');
-  const dataFormatada = `${d}/${m}/${y}`;
-  const waLink = 'https://wa.me/55' + numero.replace(/\D/g,'');
 
-  // 1) 1 dia antes
   const umDiaAntes = new Date(reuniaoTime.getTime() - 24*60*60*1000);
-  const diffDiaAntes = umDiaAntes.getTime() - now;
-  if (diffDiaAntes > 0) {
+  if (umDiaAntes.getTime() > now) {
     setTimeout(() => {
-      if (Notification.permission === 'granted') {
-        new Notification('MEU CRM — Reunião Amanhã 📅', {
-          body: msgDiaAntes || `Amanhã você tem reunião com ${nome} às ${hora}. Confirme pelo WhatsApp!`,
-          icon: ''
-        });
-      }
-    }, diffDiaAntes);
+      new Notification('MEU CRM — Reunião Amanhã 📅', { body: msgDiaAntes || `Amanhã você tem reunião com ${nome} às ${hora}.`, icon: '' });
+    }, umDiaAntes.getTime() - now);
   }
-
-  // 2) No dia da reunião às 08:00
   const manha = new Date(`${data}T08:00`);
-  const diffManha = manha.getTime() - now;
-  if (diffManha > 0 && manha < reuniaoTime) {
+  if (manha.getTime() > now && manha < reuniaoTime) {
     setTimeout(() => {
-      if (Notification.permission === 'granted') {
-        new Notification('MEU CRM — Bom dia! ☀️', {
-          body: msgManha || `Hoje você tem reunião com ${nome} às ${hora}. Confirme a presença!`,
-          icon: ''
-        });
-      }
-    }, diffManha);
+      new Notification('MEU CRM — Bom dia! ☀️', { body: msgManha || `Hoje você tem reunião com ${nome} às ${hora}.`, icon: '' });
+    }, manha.getTime() - now);
   }
-
-  // 3) 1 hora antes
   const umaHoraAntes = new Date(reuniaoTime.getTime() - 60*60*1000);
-  const diffUmaHora = umaHoraAntes.getTime() - now;
-  if (diffUmaHora > 0) {
+  if (umaHoraAntes.getTime() > now) {
     setTimeout(() => {
-      if (Notification.permission === 'granted') {
-        new Notification('MEU CRM — Falta 1 hora! ⏰', {
-          body: msgHoraAntes || `Em 1 hora você tem reunião com ${nome} às ${hora}. Não deixe ele faltar!`,
-          icon: ''
-        });
-      }
-    }, diffUmaHora);
+      new Notification('MEU CRM — Falta 1 hora! ⏰', { body: msgHoraAntes || `Em 1 hora você tem reunião com ${nome} às ${hora}.`, icon: '' });
+    }, umaHoraAntes.getTime() - now);
   }
-}
-function checkAgendaHoje() {
-  const agora = new Date();
-  const hoje = agora.toISOString().slice(0,10);
-  db.agenda.forEach(ag => {
-    if (ag.data === hoje) {
-      const target = new Date(`${ag.data}T${ag.hora}`);
-      const diff = target.getTime() - agora.getTime();
-      if (diff > 0 && diff < 24*60*60*1000) scheduleNotification(ag.nome, ag.data, ag.hora);
-    }
-  });
-}
-
-// ══════════════════════════════════════════════
-// UTILS
-// ══════════════════════════════════════════════
-function escHtml(str) {
-  return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
-function formatDate(d) {
-  if (!d) return '';
-  const [y,m,dia] = d.split('-');
-  return `${dia}/${m}/${y}`;
 }
 
 // ══════════════════════════════════════════════
 // PWA SERVICE WORKER
 // ══════════════════════════════════════════════
 if ('serviceWorker' in navigator) {
-  const swCode = `
-const CACHE = 'meucrm-v1';
-self.addEventListener('install', e => {
-  self.skipWaiting();
-});
-self.addEventListener('activate', e => {
-  clients.claim();
-});
-self.addEventListener('fetch', e => {
-  e.respondWith(fetch(e.request).catch(() => caches.match(e.request)));
-});`;
+  const swCode = `const CACHE='meucrm-v2';self.addEventListener('install',e=>{self.skipWaiting();});self.addEventListener('activate',e=>{clients.claim();});self.addEventListener('fetch',e=>{e.respondWith(fetch(e.request).catch(()=>caches.match(e.request)));});`;
   const blob = new Blob([swCode], {type:'application/javascript'});
   const swUrl = URL.createObjectURL(blob);
   navigator.serviceWorker.register(swUrl).catch(()=>{});
@@ -1820,11 +1799,8 @@ self.addEventListener('fetch', e => {
 // ══════════════════════════════════════════════
 // INIT
 // ══════════════════════════════════════════════
-load();
 requestNotifPermission();
-renderContatos();
-updateBadges();
-checkAgendaHoje();
+initListeners();
 </script>
 </body>
 </html>
