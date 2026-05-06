@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>PRÉ-VENDA</title>
-
+<script src="https://arquivos98126066-sudo.github.io/SOFTWARE/sync-indicator.js"></script>
 <style>
 :root{
   --bg:#eef3fc;
@@ -115,7 +115,7 @@ body{font-family:Arial,sans-serif;background:var(--bg);color:var(--text);min-hei
 .bsec{font-family:Arial,sans-serif;width:100%;background:var(--s2);color:var(--accent);border:1.5px solid var(--border2);border-radius:12px;padding:11px;font-size:12px;font-weight:700;cursor:pointer;margin-top:8px;display:flex;align-items:center;justify-content:center;gap:6px;letter-spacing:.5px;transition:opacity .2s;}
 .bsec:active{opacity:.75;}
 
-/* EDITABLE INLINE FIELDS — novo padrão */
+/* EDITABLE INLINE FIELDS */
 .ef{
   display:inline-block;
   background:none;
@@ -300,29 +300,93 @@ body{font-family:Arial,sans-serif;background:var(--bg);color:var(--text);min-hei
   </div>
 </div>
 
-<script>
-// ── STORAGE ──────────────────────────────────────────────
-const SK = 'prevenda_v4';
+<script type="module">
+import { db } from "https://arquivos98126066-sudo.github.io/SOFTWARE/firebase-sync.js";
+import {
+  collection, doc, setDoc, deleteDoc, onSnapshot, getDoc
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-function load() {
-  try { return JSON.parse(localStorage.getItem(SK)) || { prods: [], sel: null }; }
-  catch (e) { return { prods: [], sel: null }; }
-}
-
-function save(s) { localStorage.setItem(SK, JSON.stringify(s)); }
-
-function D() {
-  const s = load();
-  return s.prods.find(p => p.id === s.sel) || null;
-}
+// ── ESTADO EM MEMÓRIA ─────────────────────────────────────
+const STATE = { prods: [], sel: null };
+const COLL = 'pre_venda';
+const SEL_KEY = 'prevenda_sel';
 
 // ── HELPERS ───────────────────────────────────────────────
 function esc(t) {
   if (!t && t !== 0) return '';
   return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
-
 function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2); }
+
+function getProds() { return STATE.prods; }
+function getSel() { return STATE.sel; }
+function D() { return STATE.prods.find(p => p.id === STATE.sel) || null; }
+
+// ── FIRESTORE SAVE ────────────────────────────────────────
+async function saveProd(p) {
+  if (window.syncShow) window.syncShow.syncing();
+  try {
+    await setDoc(doc(db, COLL, p.id), p);
+    if (window.syncShow) window.syncShow.synced('Pré-Venda');
+  } catch (err) {
+    console.error('Firestore save error:', err);
+    // Fallback offline
+    try {
+      const pending = JSON.parse(localStorage.getItem('prevenda_pending') || '{}');
+      pending[p.id] = { ...p, pendingSync: true };
+      localStorage.setItem('prevenda_pending', JSON.stringify(pending));
+    } catch (_) {}
+    if (window.syncShow) window.syncShow.offline();
+  }
+}
+
+async function deleteProdDB(id) {
+  if (window.syncShow) window.syncShow.syncing();
+  try {
+    await deleteDoc(doc(db, COLL, id));
+    if (window.syncShow) window.syncShow.synced('Pré-Venda');
+  } catch (err) {
+    console.error('Firestore delete error:', err);
+    if (window.syncShow) window.syncShow.offline();
+  }
+}
+
+// ── SYNC PENDENTES ────────────────────────────────────────
+async function syncPending() {
+  try {
+    const pending = JSON.parse(localStorage.getItem('prevenda_pending') || '{}');
+    for (const id of Object.keys(pending)) {
+      const p = pending[id];
+      delete p.pendingSync;
+      await setDoc(doc(db, COLL, id), p);
+      delete pending[id];
+    }
+    if (Object.keys(pending).length === 0) {
+      localStorage.removeItem('prevenda_pending');
+    } else {
+      localStorage.setItem('prevenda_pending', JSON.stringify(pending));
+    }
+  } catch (_) {}
+}
+
+// ── onSnapshot TEMPO REAL ─────────────────────────────────
+function initRealtimeSync() {
+  onSnapshot(collection(db, COLL), (snapshot) => {
+    STATE.prods = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+    // Restaurar seleção salva localmente
+    const savedSel = localStorage.getItem(SEL_KEY);
+    if (savedSel && STATE.prods.find(p => p.id === savedSel)) {
+      STATE.sel = savedSel;
+    } else if (STATE.prods.length > 0 && !STATE.sel) {
+      STATE.sel = STATE.prods[0].id;
+    }
+    renderProds();
+    updateTopProd();
+  }, (err) => {
+    console.error('onSnapshot error:', err);
+    if (window.syncShow) window.syncShow.offline();
+  });
+}
 
 // ── NAVEGAÇÃO ─────────────────────────────────────────────
 function goPage(name) {
@@ -334,27 +398,43 @@ function goPage(name) {
   if (name === 'arsenal') renderArsenalSel();
   if (name === 'sh') renderLive();
 }
+window.goPage = goPage;
+
+// ── TOPBAR ────────────────────────────────────────────────
+function updateTopProd() {
+  const tp = document.getElementById('topProd');
+  const p = D();
+  if (p) {
+    tp.textContent = (p.emoji || '') + ' ' + p.name;
+    tp.classList.add('has');
+  } else {
+    tp.textContent = 'Selecionar produto';
+    tp.classList.remove('has');
+  }
+}
 
 // ── PRODUTOS ──────────────────────────────────────────────
 function renderProds() {
-  const s = load();
+  const prods = getProds();
+  const sel = getSel();
   const g = document.getElementById('pgrid');
-  if (!s.prods.length) {
+  if (!prods.length) {
     g.innerHTML = '<div class="pempty"><div class="pempty-icon">📦</div><div class="pempty-txt">Nenhum produto ainda.<br>Crie seu primeiro produto acima.</div></div>';
     return;
   }
-  g.innerHTML = s.prods.map(p => `
-    <div class="pcard${p.id === s.sel ? ' sel' : ''}" onclick="selProd('${p.id}')">
+  g.innerHTML = prods.map(p => `
+    <div class="pcard${p.id === sel ? ' sel' : ''}" onclick="selProd('${p.id}')">
       <div class="pemoji">${p.emoji || '🎯'}</div>
       <div class="pinfo">
         <div class="pname">${esc(p.name)}</div>
         <div class="pmeta">${countArgs(p)} argumentos</div>
       </div>
-      ${p.id === s.sel ? '<div class="psel-badge">✓ Ativo</div>' : ''}
+      ${p.id === sel ? '<div class="psel-badge">✓ Ativo</div>' : ''}
       <button class="pdel" onclick="delProd(event,'${p.id}')">🗑</button>
     </div>
   `).join('');
 }
+window.renderProds = renderProds;
 
 function countArgs(p) {
   let n = 0;
@@ -366,29 +446,26 @@ function countArgs(p) {
 }
 
 function selProd(id) {
-  const s = load();
-  s.sel = id;
-  save(s);
+  STATE.sel = id;
+  localStorage.setItem(SEL_KEY, id);
   renderProds();
-  const p = s.prods.find(x => x.id === id);
-  const tp = document.getElementById('topProd');
-  tp.textContent = (p?.emoji || '') + ' ' + (p?.name || '');
-  tp.classList.add('has');
+  updateTopProd();
 }
+window.selProd = selProd;
 
 function delProd(e, id) {
   e.stopPropagation();
   if (!confirm('Excluir produto?')) return;
-  const s = load();
-  s.prods = s.prods.filter(p => p.id !== id);
-  if (s.sel === id) s.sel = s.prods[0]?.id || null;
-  save(s);
+  STATE.prods = STATE.prods.filter(p => p.id !== id);
+  if (STATE.sel === id) {
+    STATE.sel = STATE.prods[0]?.id || null;
+    localStorage.setItem(SEL_KEY, STATE.sel || '');
+  }
+  deleteProdDB(id);
   renderProds();
-  const p = s.prods.find(x => x.id === s.sel);
-  const tp = document.getElementById('topProd');
-  if (p) { tp.textContent = (p.emoji || '') + ' ' + p.name; tp.classList.add('has'); }
-  else { tp.textContent = 'Selecionar produto'; tp.classList.remove('has'); }
+  updateTopProd();
 }
+window.delProd = delProd;
 
 function openNewProd() {
   document.getElementById('new-prod-name').value = '';
@@ -396,12 +473,12 @@ function openNewProd() {
   openModal('modal-new-prod');
   setTimeout(() => document.getElementById('new-prod-name').focus(), 320);
 }
+window.openNewProd = openNewProd;
 
-function createProd() {
+async function createProd() {
   const name = document.getElementById('new-prod-name').value.trim();
   if (!name) { document.getElementById('new-prod-name').focus(); return; }
   const emoji = document.getElementById('new-prod-emoji').value.trim() || '🎯';
-  const s = load();
   const p = {
     id: uid(), name, emoji,
     beneficios: [], dores: [], prazeres: [], objecoes: [],
@@ -415,17 +492,16 @@ function createProd() {
     objecao: [],
     barometro: '',
     fechamento: { beneficio: '', opcao_a: '', opcao_b: '' },
-    arsenal: { gancho: [], oferta: [], objecao: [], conexao: [] }
+    arsenal: { gancho: [], oferta: [], objecao: [], conexao: [], diagnostico: [], barometro: [], fechamento: [] }
   };
-  s.prods.push(p);
-  if (!s.sel) s.sel = p.id;
-  save(s);
   closeModal('modal-new-prod');
-  renderProds();
-  const tp = document.getElementById('topProd');
-  tp.textContent = emoji + ' ' + name;
-  tp.classList.add('has');
+  await saveProd(p);
+  if (!STATE.sel) {
+    STATE.sel = p.id;
+    localStorage.setItem(SEL_KEY, p.id);
+  }
 }
+window.createProd = createProd;
 
 // Garante campos novos em produtos antigos
 function ensureFields(p) {
@@ -435,7 +511,7 @@ function ensureFields(p) {
   if (!p.conexao) p.conexao = { p1: '', p2: '' };
   if (!p.diagnostico) p.diagnostico = { r1: '', r2: '', r3: '', pergunta: '', periodo: '' };
   if (!p.fechamento) p.fechamento = { beneficio: '', opcao_a: '', opcao_b: '' };
-  if (!p.arsenal) p.arsenal = { gancho: [], oferta: [], objecao: [], conexao: [] };
+  if (!p.arsenal) p.arsenal = { gancho: [], oferta: [], objecao: [], conexao: [], diagnostico: [], barometro: [], fechamento: [] };
   if (!p.arsenal.gancho) p.arsenal.gancho = [];
   if (!p.arsenal.oferta) p.arsenal.oferta = [];
   if (!p.arsenal.objecao) p.arsenal.objecao = [];
@@ -449,6 +525,25 @@ function ensureFields(p) {
 // ── MODAL ─────────────────────────────────────────────────
 function openModal(id) { document.getElementById(id).classList.add('open'); }
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+window.openModal = openModal;
+window.closeModal = closeModal;
+
+// ── SAVE FIELD (atualiza STATE e persiste) ────────────────
+function saveField(path, value) {
+  if (!path) return;
+  const p = D();
+  if (!p) return;
+  const parts = path.split('.');
+  let obj = p;
+  for (let i = 0; i < parts.length - 1; i++) {
+    const k = parts[i];
+    const nextIsNum = !isNaN(parts[i + 1]);
+    if (obj[k] === undefined || obj[k] === null) obj[k] = nextIsNum ? [] : {};
+    obj = obj[k];
+  }
+  obj[parts[parts.length - 1]] = value;
+  saveProd(p);
+}
 
 // ── SCRIPT BUILDER ────────────────────────────────────────
 function renderScript() {
@@ -516,8 +611,8 @@ function renderBDP(body) {
   body.querySelectorAll('.tag-del').forEach(b => {
     b.onclick = () => {
       const arr = b.dataset.arr, idx = parseInt(b.dataset.idx);
-      const s = load(); const p = s.prods.find(x => x.id === s.sel);
-      if (p && p[arr]) { p[arr].splice(idx, 1); save(s); renderBDP(body); }
+      const p = D(); if (!p) return;
+      if (p[arr]) { p[arr].splice(idx, 1); saveProd(p); renderBDP(body); }
     };
   });
   body.querySelectorAll('.tadd-btn').forEach(btn => {
@@ -525,9 +620,9 @@ function renderBDP(body) {
       const arr = btn.dataset.arr;
       const inp = body.querySelector(`.tinput[data-arr="${arr}"]`);
       const v = inp.value.trim(); if (!v) return;
-      const s = load(); const p = s.prods.find(x => x.id === s.sel);
+      const p = D(); if (!p) return;
       if (!p[arr]) p[arr] = [];
-      p[arr].push(v); save(s); inp.value = ''; renderBDP(body);
+      p[arr].push(v); saveProd(p); inp.value = ''; renderBDP(body);
     };
   });
   body.querySelectorAll('.tinput').forEach(i => {
@@ -567,8 +662,13 @@ function renderConcorrentes(body) {
       <textarea class="cfield-area" data-field="concorrentes.minhas_vantagens" placeholder="Por que eu sou a melhor escolha...">${esc(c.minhas_vantagens||'')}</textarea>
     </div>
   `;
+  // Debounce para evitar writes excessivos
   body.querySelectorAll('.cfield-area').forEach(ta => {
-    ta.oninput = () => saveField(ta.dataset.field, ta.value);
+    let timer;
+    ta.oninput = () => {
+      clearTimeout(timer);
+      timer = setTimeout(() => saveField(ta.dataset.field, ta.value), 800);
+    };
   });
 }
 
@@ -594,14 +694,14 @@ function renderAbord(body) {
     `;
     setupEf(body);
     body.querySelector('#save-abord-arsenal').onclick = () => {
-      const s = load(); const p = s.prods.find(x => x.id === s.sel); if (!p) return;
+      const p = D(); if (!p) return;
       ensureFields(p);
       const txt = body.querySelector('#prev-abord').innerText.trim();
       if (!txt) { showToast('Preencha antes de salvar'); return; }
       p.arsenal.conexao.push({ titulo: 'Abordagem ' + (p.arsenal.conexao.length+1), texto: txt });
-      save(s);
+      saveProd(p);
       showToast('Salvo no Arsenal!');
-      buildAbord(); // limpa para nova entrada
+      buildAbord();
     };
   }
   buildAbord();
@@ -651,16 +751,15 @@ function renderGancho(body) {
   setupEf(body);
   body.querySelectorAll('.save-gancho-btn').forEach(btn => {
     btn.onclick = () => {
-      const s = load(); const p = s.prods.find(x => x.id === s.sel); if (!p) return;
+      const p = D(); if (!p) return;
       ensureFields(p);
       const prevEl = body.querySelector('#' + btn.dataset.prev);
       const txt = prevEl?.innerText?.trim();
       if (!txt) { showToast('Preencha antes de salvar'); return; }
       const n = p.arsenal.gancho.length + 1;
       p.arsenal.gancho.push({ titulo: 'Gancho ' + n, texto: txt });
-      save(s);
+      saveProd(p);
       showToast('Gancho salvo no Arsenal!');
-      // Limpa apenas os campos editáveis deste preview
       prevEl.querySelectorAll('.ef').forEach(el => {
         el.textContent = '';
         el.classList.remove('ok');
@@ -701,16 +800,15 @@ function renderConexao(body) {
   setupEf(body);
   body.querySelectorAll('.save-conexao-btn').forEach(btn => {
     btn.onclick = () => {
-      const s = load(); const p = s.prods.find(x => x.id === s.sel); if (!p) return;
+      const p = D(); if (!p) return;
       ensureFields(p);
       const prevEl = body.querySelector('#' + btn.dataset.prev);
       const txt = prevEl?.innerText?.trim();
       if (!txt) { showToast('Preencha antes de salvar'); return; }
       const n = p.arsenal.conexao.length + 1;
       p.arsenal.conexao.push({ titulo: 'Conexão ' + n, texto: txt });
-      save(s);
+      saveProd(p);
       showToast('Conexão salva no Arsenal!');
-      // Limpa apenas os campos editáveis deste preview
       prevEl.querySelectorAll('.ef').forEach(el => {
         el.textContent = '';
         el.classList.remove('ok');
@@ -723,7 +821,6 @@ function renderConexao(body) {
 function renderDiag(body) {
   const d = D(); if (!d) return;
   ensureFields(d);
-  // compatibilidade
   const diag = d.diagnostico || d.diag || {};
   const r1 = diag.r1 || '';
   const r2 = diag.r2 || '';
@@ -744,14 +841,15 @@ function renderDiag(body) {
   `;
   setupEf(body);
   body.querySelector('#save-diag-arsenal').onclick = () => {
-    const s = load(); const p = s.prods.find(x => x.id === s.sel); if (!p) return;
+    const p = D(); if (!p) return;
     ensureFields(p);
     const txt = body.querySelector('#prev-diag').innerText.trim();
     if (!txt) { showToast('Preencha antes de salvar'); return; }
     if (!p.arsenal.diagnostico) p.arsenal.diagnostico = [];
     const n = p.arsenal.diagnostico.length + 1;
     p.arsenal.diagnostico.push({ titulo: 'Diagnóstico ' + n, texto: txt });
-    save(s); showToast('Diagnóstico salvo no Arsenal!');
+    saveProd(p);
+    showToast('Diagnóstico salvo no Arsenal!');
     body.querySelectorAll('#prev-diag .ef').forEach(el => { el.textContent = ''; el.classList.remove('ok'); });
   };
 }
@@ -799,27 +897,28 @@ function renderOfertas(body) {
   body.querySelectorAll('.oferta-del').forEach(btn => {
     btn.onclick = () => {
       const idx = parseInt(btn.dataset.idx);
-      const s = load(); const p = s.prods.find(x => x.id === s.sel); if (!p) return;
-      p.ofertas.splice(idx, 1); save(s); renderOfertas(body);
+      const p = D(); if (!p) return;
+      p.ofertas.splice(idx, 1); saveProd(p); renderOfertas(body);
     };
   });
 
   body.querySelector('#addOfertaBtn').onclick = () => {
-    const s = load(); const p = s.prods.find(x => x.id === s.sel); if (!p) return;
+    const p = D(); if (!p) return;
     if (!p.ofertas) p.ofertas = [];
-    p.ofertas.push({}); save(s); renderOfertas(body);
+    p.ofertas.push({}); saveProd(p); renderOfertas(body);
   };
 
   body.querySelectorAll('.save-oferta-btn').forEach(btn => {
     btn.onclick = () => {
       const idx = parseInt(btn.dataset.idx);
-      const s = load(); const p = s.prods.find(x => x.id === s.sel); if (!p) return;
+      const p = D(); if (!p) return;
       ensureFields(p);
       const cards = body.querySelectorAll('.oferta-card');
       const txt = cards[idx]?.querySelector('.prev-block')?.innerText?.trim() || '';
       const n = p.arsenal.oferta.length + 1;
       p.arsenal.oferta.push({ titulo: 'Oferta ' + n, texto: txt });
-      save(s); showToast('Oferta salva no Arsenal!');
+      saveProd(p);
+      showToast('Oferta salva no Arsenal!');
     };
   });
 
@@ -846,14 +945,15 @@ function renderBarometro(body) {
   `;
   setupEf(body);
   body.querySelector('#save-baro-arsenal').onclick = () => {
-    const s = load(); const p = s.prods.find(x => x.id === s.sel); if (!p) return;
+    const p = D(); if (!p) return;
     ensureFields(p);
     const txt = body.querySelector('#prev-baro').innerText.trim();
     if (!txt) { showToast('Preencha antes de salvar'); return; }
     if (!p.arsenal.barometro) p.arsenal.barometro = [];
     const n = p.arsenal.barometro.length + 1;
     p.arsenal.barometro.push({ titulo: 'Barômetro ' + n, texto: txt });
-    save(s); showToast('Barômetro salvo no Arsenal!');
+    saveProd(p);
+    showToast('Barômetro salvo no Arsenal!');
     body.querySelectorAll('#prev-baro .ef').forEach(el => { el.textContent = ''; el.classList.remove('ok'); });
   };
 }
@@ -894,32 +994,31 @@ function renderObjArgs(body) {
   h += `<button class="bprim" id="addObjBtn">＋ Adicionar objeção</button>`;
   body.innerHTML = h;
 
-  // Select de objeção é apenas referência visual — não preenche o preview automaticamente
-
   body.querySelectorAll('.obj-del').forEach(btn => {
     btn.onclick = () => {
       const idx = parseInt(btn.dataset.idx);
-      const s = load(); const p = s.prods.find(x => x.id === s.sel); if (!p) return;
-      p.obj_args.splice(idx, 1); save(s); renderObjArgs(body);
+      const p = D(); if (!p) return;
+      p.obj_args.splice(idx, 1); saveProd(p); renderObjArgs(body);
     };
   });
 
   body.querySelector('#addObjBtn').onclick = () => {
-    const s = load(); const p = s.prods.find(x => x.id === s.sel); if (!p) return;
+    const p = D(); if (!p) return;
     if (!p.obj_args) p.obj_args = [];
-    p.obj_args.push({}); save(s); renderObjArgs(body);
+    p.obj_args.push({}); saveProd(p); renderObjArgs(body);
   };
 
   body.querySelectorAll('.save-obj-btn').forEach(btn => {
     btn.onclick = () => {
       const idx = parseInt(btn.dataset.idx);
-      const s = load(); const p = s.prods.find(x => x.id === s.sel); if (!p) return;
+      const p = D(); if (!p) return;
       ensureFields(p);
       const cards = body.querySelectorAll('.obj-card');
       const txt = cards[idx]?.querySelector('.prev-block')?.innerText?.trim() || '';
       const n = p.arsenal.objecao.length + 1;
       p.arsenal.objecao.push({ titulo: 'Objeção ' + n, texto: txt });
-      save(s); showToast('Objeção salva no Arsenal!');
+      saveProd(p);
+      showToast('Objeção salva no Arsenal!');
     };
   });
 
@@ -948,14 +1047,15 @@ function renderFechamento(body) {
   `;
   setupEf(body);
   body.querySelector('#save-fech-arsenal').onclick = () => {
-    const s = load(); const p = s.prods.find(x => x.id === s.sel); if (!p) return;
+    const p = D(); if (!p) return;
     ensureFields(p);
     const txt = body.querySelector('#prev-fech').innerText.trim();
     if (!txt) { showToast('Preencha antes de salvar'); return; }
     if (!p.arsenal.fechamento) p.arsenal.fechamento = [];
     const n = p.arsenal.fechamento.length + 1;
     p.arsenal.fechamento.push({ titulo: 'Fechamento ' + n, texto: txt });
-    save(s); showToast('Fechamento salvo no Arsenal!');
+    saveProd(p);
+    showToast('Fechamento salvo no Arsenal!');
     body.querySelectorAll('#prev-fech .ef').forEach(el => { el.textContent = ''; el.classList.remove('ok'); });
   };
 }
@@ -963,30 +1063,15 @@ function renderFechamento(body) {
 // ── CAMPOS EDITÁVEIS ──────────────────────────────────────
 function setupEf(body) {
   body.querySelectorAll('.ef').forEach(el => {
+    let timer;
     el.oninput = () => {
       const v = el.textContent.trim();
       el.classList.toggle('ok', v.length > 0);
-      saveField(el.dataset.field, v);
+      clearTimeout(timer);
+      timer = setTimeout(() => saveField(el.dataset.field, v), 800);
     };
     el.onkeydown = e => { if (e.key === 'Enter') { e.preventDefault(); el.blur(); } };
   });
-}
-
-function saveField(path, value) {
-  if (!path) return;
-  const s = load();
-  const p = s.prods.find(x => x.id === s.sel);
-  if (!p) return;
-  const parts = path.split('.');
-  let obj = p;
-  for (let i = 0; i < parts.length - 1; i++) {
-    const k = parts[i];
-    const nextIsNum = !isNaN(parts[i + 1]);
-    if (obj[k] === undefined || obj[k] === null) obj[k] = nextIsNum ? [] : {};
-    obj = obj[k];
-  }
-  obj[parts[parts.length - 1]] = value;
-  save(s);
 }
 
 // ── TOAST ─────────────────────────────────────────────────
@@ -1006,14 +1091,15 @@ function showToast(msg) {
 
 // ── ARSENAL ───────────────────────────────────────────────
 function renderArsenalSel() {
-  const s = load();
+  const prods = getProds();
   const sel = document.getElementById('asel');
-  sel.innerHTML = s.prods.map(p =>
-    `<option value="${p.id}"${p.id === s.sel ? ' selected' : ''}>${p.emoji || '🎯'} ${esc(p.name)}</option>`
+  sel.innerHTML = prods.map(p =>
+    `<option value="${p.id}"${p.id === getSel() ? ' selected' : ''}>${p.emoji || '🎯'} ${esc(p.name)}</option>`
   ).join('');
-  if (!s.prods.length) sel.innerHTML = '<option>Nenhum produto cadastrado</option>';
+  if (!prods.length) sel.innerHTML = '<option>Nenhum produto cadastrado</option>';
   renderArsenal();
 }
+window.renderArsenalSel = renderArsenalSel;
 
 function makeAcat(icon, name, items, onDel) {
   if (!items.length) return null;
@@ -1039,9 +1125,8 @@ function makeAcat(icon, name, items, onDel) {
 }
 
 function renderArsenal() {
-  const s = load();
   const id = document.getElementById('asel')?.value;
-  const p = s.prods.find(x => x.id === id);
+  const p = getProds().find(x => x.id === id);
   const body = document.getElementById('arsenal-body');
   body.innerHTML = '';
   if (!p) { body.innerHTML = '<div class="fpmt">Nenhum produto selecionado.</div>'; return; }
@@ -1055,10 +1140,11 @@ function renderArsenal() {
   ];
 
   function saveAndRefresh(arr, idx) {
-    const s2 = load(); const pp = s2.prods.find(x => x.id === id); if (!pp) return;
+    const pp = getProds().find(x => x.id === id); if (!pp) return;
     ensureFields(pp);
     pp.arsenal[arr].splice(idx, 1);
-    save(s2); renderArsenal();
+    saveProd(pp);
+    renderArsenal();
   }
 
   const cats = [
@@ -1080,6 +1166,7 @@ function renderArsenal() {
   cats.forEach(c => { if (c) body.appendChild(c); });
   if (!body.children.length) body.innerHTML = '<div class="fpmt">Nenhum argumento cadastrado ainda.</div>';
 }
+window.renderArsenal = renderArsenal;
 
 // ── SCRIPT AO VIVO ────────────────────────────────────────
 function renderLive() {
@@ -1122,29 +1209,7 @@ function renderLive() {
   </div>`;
 
   wrap.innerHTML = h;
-  // armazenar etapas para uso no build
   wrap._etapas = etapas;
-}
-
-function buildDiagItem(d) {
-  const diag = d.diagnostico || d.diag || {};
-  if (!diag.r1) return [];
-  const txt = `Se fôssemos ${diag.r1||'...'}, ${diag.r2||'...'} e ${diag.r3||'...'} — desses três, qual é o mais importante de todos? E o que de pior pode acontecer se você não conseguir alcançar esses resultados nos próximos ${diag.periodo||'...'}?`;
-  return [{ titulo: 'Diagnóstico', texto: txt }];
-}
-
-function buildBaroItem(d) {
-  if (!d.fech_ben) return [];
-  const txt = `Na sua opinião, ${d.barometro_nome||'[nome]'}, o senhor sente que ${d.fech_produto||'[produto]'}, que ${d.fech_ben} e ${d.barometro_sec||'[benefícios secundários]'}, seria um investimento inteligente para se fazer agora?`;
-  return [{ titulo: 'Barômetro', texto: txt }];
-}
-
-function buildFechItem(d) {
-  const fech = d.fechamento || {};
-  const ben = fech.beneficio || d.fecha_ben || '';
-  if (!ben) return [];
-  const txt = `Para avançarmos com sua decisão de ${ben}, você prefere ${fech.opcao_a||d.fecha_a||'[opção A]'} ou ${fech.opcao_b||d.fecha_b||'[opção B]'}?`;
-  return [{ titulo: 'Fechamento', texto: txt }];
 }
 
 function buildLiveScript() {
@@ -1182,11 +1247,11 @@ function buildLiveScript() {
   resultEl.classList.add('show');
   resultEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
+window.buildLiveScript = buildLiveScript;
 
 function copyLiveScript() {
   const innerEl = document.getElementById('live-result-inner');
   if (!innerEl) return;
-  // Montar texto limpo
   const parts = [];
   innerEl.querySelectorAll('.live-sec-hd').forEach(hd => {
     const next = hd.nextElementSibling;
@@ -1195,25 +1260,18 @@ function copyLiveScript() {
   const fullText = parts.join('\n\n');
   navigator.clipboard.writeText(fullText).then(() => showToast('Script copiado!')).catch(() => showToast('Erro ao copiar'));
 }
+window.copyLiveScript = copyLiveScript;
 
 // ── INIT ──────────────────────────────────────────────────
-(function () {
-  renderProds();
-  const s = load();
-  if (s.sel) {
-    const p = s.prods.find(x => x.id === s.sel);
-    if (p) {
-      document.getElementById('topProd').textContent = (p.emoji || '') + ' ' + p.name;
-      document.getElementById('topProd').classList.add('has');
-    }
-  }
-  document.getElementById('modal-new-prod').addEventListener('click', function (e) {
-    if (e.target === this) closeModal('modal-new-prod');
-  });
-  document.getElementById('new-prod-name').addEventListener('keydown', e => {
-    if (e.key === 'Enter') createProd();
-  });
-})();
+document.getElementById('modal-new-prod').addEventListener('click', function(e) {
+  if (e.target === this) closeModal('modal-new-prod');
+});
+document.getElementById('new-prod-name').addEventListener('keydown', e => {
+  if (e.key === 'Enter') createProd();
+});
+
+syncPending();
+initRealtimeSync();
 </script>
 </body>
 </html>
