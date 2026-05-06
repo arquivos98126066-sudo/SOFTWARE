@@ -4,6 +4,7 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
   <title>Tapetes CRM</title>
+  <script src="https://arquivos98126066-sudo.github.io/SOFTWARE/sync-indicator.js"></script>
   <style>
     :root{
       --primary:#1A4FBF;--primary-dark:#1440a0;--success:#00C853;--danger:#FF5252;
@@ -24,7 +25,6 @@
     .screen.active{display:block}
     @keyframes fadeIn{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
 
-    /* MÉTRICAS */
     .metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
     .metric-card{background:var(--card);border-radius:var(--r);padding:12px 6px;text-align:center;box-shadow:var(--shadow)}
     .metric-card .val{font-size:22px;font-weight:800;color:var(--primary)}
@@ -32,7 +32,6 @@
 
     .sec-title{font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin:4px 0 10px}
 
-    /* ALERTA ANTECIPADO */
     .alerta-card{background:var(--card);border-radius:var(--r);padding:13px;margin-bottom:8px;
       box-shadow:var(--shadow);border-left:4px solid var(--primary);display:flex;align-items:center;gap:10px}
     .alerta-icon{font-size:22px;flex-shrink:0}
@@ -41,7 +40,6 @@
     .alerta-sub{font-size:11px;color:var(--muted);margin-top:2px}
     .alerta-dias{background:var(--primary);color:#fff;border-radius:20px;padding:2px 10px;font-size:11px;font-weight:800;flex-shrink:0}
 
-    /* FILTRO DROPDOWN */
     .filter-dropdown{position:relative;margin-bottom:12px;z-index:50}
     .filter-trigger{width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:10px;
       background:var(--card);font-size:13px;font-weight:600;color:var(--text);cursor:pointer;
@@ -57,7 +55,6 @@
     .filter-opt.active{color:var(--primary);font-weight:700;background:#eef3fc}
     .filter-sep{height:1px;background:var(--border);margin:2px 0}
 
-    /* CARD CLIENTE */
     .client-card{background:var(--card);border-radius:var(--r);padding:14px;margin-bottom:10px;
       box-shadow:var(--shadow);border-left:4px solid var(--border);cursor:pointer;width:100%}
     .client-card.nao-estava{border-left-color:var(--green)}
@@ -76,7 +73,6 @@
     .card-btns{display:flex;gap:8px;margin-top:12px}
     .card-btns .btn{flex:1}
 
-    /* BOTÕES */
     .btn{min-height:46px;padding:0 14px;border:none;border-radius:10px;font-size:13px;font-weight:700;
       cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;
       transition:opacity .15s,transform .1s;width:100%;white-space:nowrap}
@@ -92,7 +88,6 @@
     .btn-gemini{background:linear-gradient(135deg,#4285F4,#0F9D58);color:#fff}
     .btn-sm{min-height:38px;font-size:12px;padding:0 12px;width:auto;flex:none}
 
-    /* FORM */
     .form-card{background:var(--card);border-radius:var(--r);padding:16px;margin-bottom:12px;box-shadow:var(--shadow)}
     .form-card-title{font-size:13px;font-weight:700;color:var(--primary);margin-bottom:14px}
     .fg{margin-bottom:13px}
@@ -130,7 +125,6 @@
       position:sticky;bottom:0;z-index:90;display:flex;gap:10px}
     .form-actions .btn{flex:1}
 
-    /* ENVIAR — BLOCOS */
     .envio-bloco{background:var(--card);border-radius:var(--r);padding:16px;margin-bottom:12px;box-shadow:var(--shadow)}
     .envio-bloco-title{font-size:12px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px;display:flex;align-items:center;gap:6px}
     .envio-num{width:22px;height:22px;background:var(--primary);color:#fff;border-radius:50%;
@@ -143,7 +137,6 @@
     .img-slot img{width:100%;max-height:220px;object-fit:cover;border-radius:9px;display:block}
     .contato-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px}
 
-    /* BOTTOM NAV */
     .bottom-nav{position:fixed;bottom:0;left:0;right:0;background:var(--card);
       display:flex;box-shadow:0 -2px 8px rgba(0,0,0,.08);z-index:150;padding-bottom:env(safe-area-inset-bottom)}
     .bnav-btn{flex:1;padding:10px 4px 9px;border:none;background:none;cursor:pointer;
@@ -151,14 +144,12 @@
     .bnav-btn .ico{font-size:22px}
     .bnav-btn.active{color:var(--primary)}
 
-    /* STATUS */
     .status-pill{padding:3px 9px;border-radius:20px;font-size:10px;font-weight:800;text-transform:uppercase;white-space:nowrap;flex-shrink:0}
     .status-ativo{background:#e3f2fd;color:#1565C0}
     .status-fechou{background:#e8f5e9;color:#2E7D32}
     .status-parou{background:#fff3e0;color:#E65100}
     .status-arquivado{background:#f5f5f5;color:#757575}
 
-    /* TIMELINE */
     .tl-item{display:flex;gap:11px;padding-bottom:14px;position:relative}
     .tl-item:not(:last-child)::before{content:'';position:absolute;left:13px;top:28px;bottom:0;width:2px;background:var(--border)}
     .tl-dot{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0}
@@ -167,14 +158,12 @@
     .tl-ttl{font-weight:700;font-size:13px}
     .tl-sub{font-size:11px;color:var(--muted);margin-top:2px}
 
-    /* INFO ROWS */
     .info-row{display:flex;justify-content:space-between;align-items:flex-start;
       padding:8px 0;border-bottom:1px solid var(--bg);gap:8px;font-size:13px}
     .info-row:last-child{border:none}
     .info-lbl{color:var(--muted);font-size:12px;flex-shrink:0}
     .info-val{font-weight:600;text-align:right;word-break:break-word;overflow-wrap:anywhere}
 
-    /* MODAL */
     .overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:500;display:none;align-items:flex-end}
     .overlay.open{display:flex}
     .modal{background:var(--card);border-radius:20px 20px 0 0;padding:20px;
@@ -186,12 +175,10 @@
     .modal-item:active{background:var(--bg)}
     .modal-item .ico{font-size:20px;width:26px;text-align:center}
 
-    /* PROMPT BOX */
     .prompt-box{background:#1A1A1A;color:#a8ff78;border-radius:11px;padding:13px;
       font-family:monospace;font-size:11px;line-height:1.6;max-height:200px;
       overflow-y:auto;word-break:break-word;white-space:pre-wrap}
 
-    /* ACCORDION */
     .accordion{border:1.5px solid var(--border);border-radius:11px;margin-bottom:8px;overflow:hidden}
     .acc-head{padding:13px 14px;display:flex;justify-content:space-between;align-items:center;
       cursor:pointer;background:var(--card);font-weight:700;font-size:13px}
@@ -201,7 +188,6 @@
     .acc-body{display:none;padding:14px;background:var(--bg);border-top:1.5px solid var(--border)}
     .accordion.open .acc-body{display:block}
 
-    /* CONFIG TABS */
     .cfg-tabs{display:flex;gap:0;margin-bottom:14px;border-radius:10px;overflow:hidden;border:1.5px solid var(--border)}
     .cfg-tab{flex:1;padding:10px 4px;border:none;background:var(--card);font-size:11px;font-weight:700;cursor:pointer;text-align:center;color:var(--muted)}
     .cfg-tab.active{background:var(--primary);color:#fff}
@@ -210,13 +196,11 @@
       background:var(--card);font-size:12px;font-weight:700;cursor:pointer;text-align:center;color:var(--muted)}
     .seq-tab.active{background:var(--primary);color:#fff;border-color:var(--primary)}
 
-    /* APPLY CHECK */
     .apply-checks{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
     .apply-check{padding:6px 12px;border-radius:20px;border:1.5px solid var(--border);
       background:var(--card);font-size:12px;font-weight:600;cursor:pointer;color:var(--muted)}
     .apply-check.on{border-color:var(--primary);background:#eef3fc;color:var(--primary)}
 
-    /* MISC */
     .empty{text-align:center;padding:44px 20px;color:var(--muted)}
     .empty .ico{font-size:44px;margin-bottom:10px}
     .warn-box{background:#e8edf8;border-radius:9px;padding:10px 13px;font-size:12px;color:#1a3a7a;margin-bottom:10px;border-left:3px solid #1A4FBF}
@@ -253,9 +237,7 @@
     <div class="metric-card"><div class="val" id="m-fechados">0</div><div class="lbl">Fechados</div></div>
     <div class="metric-card"><div class="val" id="m-hoje">0</div><div class="lbl">Hoje</div></div>
   </div>
-
   <div id="alertas-section"></div>
-
   <div class="sec-title">📋 AÇÕES DE HOJE</div>
   <div id="hoje-list"></div>
 </div>
@@ -263,7 +245,6 @@
 <!-- ── CLIENTES ── -->
 <div class="screen" id="screen-clientes">
   <input class="search-box" id="search-input" placeholder="🔍 Buscar nome ou telefone..." oninput="renderAllClients()">
-
   <div class="filter-dropdown" id="fdd">
     <div class="filter-trigger" id="ftrig" onclick="toggleFDD()">
       <span id="flabel">🔘 Todos os clientes</span>
@@ -283,7 +264,6 @@
       <div class="filter-opt" onclick="setFilter('respondeu',this,'💬 Responderam')">💬 Responderam</div>
     </div>
   </div>
-
   <div id="all-clients-list"></div>
 </div>
 
@@ -294,7 +274,6 @@
     <div class="fg"><label>Nome *</label><input type="text" id="f-nome" placeholder="Nome completo"></div>
     <div class="fg"><label>Telefone (só números) *</label><input type="tel" id="f-tel" placeholder="5579999292683" inputmode="numeric"></div>
   </div>
-
   <div class="form-card">
     <div class="form-card-title">📸 FOTO DO CLIENTE *</div>
     <div class="photo-area" id="photo-area" onclick="document.getElementById('f-foto-input').click()">
@@ -304,7 +283,6 @@
     </div>
     <input type="file" id="f-foto-input" accept="image/*" capture="environment" style="display:none" onchange="handlePhoto(event)">
   </div>
-
   <div class="form-card">
     <div class="form-card-title">🏷️ TIPO DE CLIENTE *</div>
     <div class="radio-group" id="tipo-group">
@@ -313,7 +291,6 @@
       <div class="radio-opt" onclick="selectTipo('super-quente',this)">🔴 Super Quente</div>
     </div>
   </div>
-
   <div class="form-card">
     <div class="form-card-title">📐 TAPETE *</div>
     <div class="fg"><label>Tamanho (ex: 120x60)</label><input type="text" id="f-tamanho" placeholder="120x60"></div>
@@ -346,7 +323,6 @@
     </div>
     <div class="fg"><label>Observação</label><textarea id="f-obs" placeholder="Detalhes..."></textarea></div>
   </div>
-
   <div id="data-section" style="display:none">
     <div class="form-card">
       <div class="form-card-title">📅 AGENDAMENTO</div>
@@ -363,7 +339,6 @@
       </div>
     </div>
   </div>
-
   <div class="form-actions">
     <button class="btn btn-ghost" onclick="showScreen('home');setNav(0)">❌ Cancelar</button>
     <button class="btn btn-primary" onclick="salvarCliente()">✅ Salvar Cliente</button>
@@ -372,12 +347,6 @@
 
 <!-- ── CONFIG ── -->
 <div class="screen" id="screen-config">
-  <div class="export-wrap">
-    <button class="export-btn-el" onclick="downloadApp()">⬇️ Exportar App</button>
-  </div>
-
-
-
   <div class="form-card">
     <div class="form-card-title">📝 TEXTO FIXO (Bloco Links)</div>
     <div class="fg">
@@ -386,18 +355,15 @@
     </div>
     <button class="btn btn-success" onclick="saveTextoFixo()">💾 Salvar Texto Fixo</button>
   </div>
-
   <div class="cfg-tabs" id="cfg-tipo-tabs">
     <div class="cfg-tab active" onclick="setCfgTipo('nao-estava',this)">🟢 N.Estava</div>
     <div class="cfg-tab" onclick="setCfgTipo('interessado',this)">🔵 Interes.</div>
     <div class="cfg-tab" onclick="setCfgTipo('super-quente',this)">🔴 S.Quente</div>
   </div>
-
   <div class="seq-tabs">
     <div class="seq-tab active" id="seq-tab-sem" onclick="setSeqTab('sem_resposta',this)">📭 Sem Resposta</div>
     <div class="seq-tab" id="seq-tab-com" onclick="setSeqTab('com_resposta',this)">💬 Com Resposta</div>
   </div>
-
   <div id="days-accordion"></div>
 </div>
 
@@ -441,8 +407,14 @@
   </div>
 </div>
 
-<script>
-// ── PROMPT COMPLETO (exatamente como fornecido) ───────────────────────────────
+<script type="module">
+import { db } from "https://arquivos98126066-sudo.github.io/SOFTWARE/firebase-sync.js";
+import {
+  collection, doc, addDoc, setDoc, getDoc, getDocs,
+  updateDoc, deleteDoc, onSnapshot, query, orderBy
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+// ── PROMPT BASE ───────────────────────────────────────────────────────────────
 const PROMPT_BASE = `Voce e um gerador especializado em mockups hiper-realistas de tapetes de vinil loop personalizados.
 
 ISOLAMENTO ABSOLUTO: Este pedido e completamente independente de qualquer pedido anterior. Ignore tudo enviado antes. Use apenas a foto e especificacoes desta mensagem.
@@ -477,43 +449,21 @@ function buildPrompt(c) {
   return `${PROMPT_BASE}\n\n(ESPECIFICACOES: Tamanho do tapete: ${c.tamanho}. Cor de fundo do tapete: ${c.cor}. ${borda})`;
 }
 
-// ── DB ────────────────────────────────────────────────────────────────────────
-const DB_KEY = 'tapetes_crm_v4';
-let DB = {
-  clients: [],
-  messages: {
-    'nao-estava':   { sem_resposta:{}, com_resposta:{} },
-    'interessado':  { sem_resposta:{}, com_resposta:{} },
-    'super-quente': { sem_resposta:{}, com_resposta:{} }
-  },
-  links: [],
-  textoFixo: ''
+// ── ESTADO ────────────────────────────────────────────────────────────────────
+const COL_CLIENTS  = 'tapete_crm';
+const COL_CONFIG   = 'tapete_crm_config';
+const LS_PENDING   = 'tapete_crm_pending';
+
+// Dados em memória (alimentados pelo onSnapshot)
+let clients = [];
+let messages = {
+  'nao-estava':   { sem_resposta:{}, com_resposta:{} },
+  'interessado':  { sem_resposta:{}, com_resposta:{} },
+  'super-quente': { sem_resposta:{}, com_resposta:{} }
 };
+let links = [];
+let textoFixo = '';
 
-function saveDB(){ try{ localStorage.setItem(DB_KEY, JSON.stringify(DB)); } catch(e){ toast('⚠️ Erro ao salvar'); } }
-function loadDB(){
-  try{
-    const d = localStorage.getItem(DB_KEY);
-    if(d){
-      const p = JSON.parse(d);
-      DB.clients   = p.clients   || [];
-      DB.links     = p.links     || [];
-      DB.textoFixo = p.textoFixo || '';
-      DB.messages  = p.messages  || {
-        'nao-estava':   { sem_resposta:{}, com_resposta:{} },
-        'interessado':  { sem_resposta:{}, com_resposta:{} },
-        'super-quente': { sem_resposta:{}, com_resposta:{} }
-      };
-      // migrar estrutura antiga se necessário
-      ['nao-estava','interessado','super-quente'].forEach(t => {
-        if(!DB.messages[t]) DB.messages[t] = { sem_resposta:{}, com_resposta:{} };
-        if(!DB.messages[t].sem_resposta) { DB.messages[t].sem_resposta = DB.messages[t]; DB.messages[t].com_resposta = {}; }
-      });
-    }
-  } catch(e){}
-}
-
-// ── ESTADO ───────────────────────────────────────────────────────────────────
 let curScreen='home', stack=[], curCid=null, curTipo=null;
 let curBorda='nao', curViu='nao', curFilter='todos';
 let curCfgTipo='nao-estava', curSeqTab='sem_resposta', curPag=null, tempFoto=null;
@@ -561,6 +511,117 @@ function nextDate(c){
 function allSent(c){ return c.sequencia?.length && c.sequencia.every(d=>(c.historico||[]).find(h=>h.dia===d&&h.tipo==='enviado')); }
 function daysUntil(dateStr){ if(!dateStr) return 999; const diff=new Date(dateStr+'T00:00:00')-new Date(today()+'T00:00:00'); return Math.round(diff/86400000); }
 
+// ── FIRESTORE: CLIENTES ───────────────────────────────────────────────────────
+async function fsAddClient(c) {
+  window.syncShow?.syncing();
+  try {
+    await setDoc(doc(db, COL_CLIENTS, c.id), c);
+    window.syncShow?.synced('Tapetes CRM');
+  } catch(e) {
+    console.error(e);
+    // Salvar pendente no localStorage
+    const pending = JSON.parse(localStorage.getItem(LS_PENDING)||'[]');
+    pending.push({op:'add', data:c});
+    localStorage.setItem(LS_PENDING, JSON.stringify(pending));
+    window.syncShow?.offline();
+    toast('⚠️ Salvo local, sincronizará depois');
+  }
+}
+
+async function fsUpdateClient(id, fields) {
+  window.syncShow?.syncing();
+  try {
+    await updateDoc(doc(db, COL_CLIENTS, id), fields);
+    window.syncShow?.synced('Tapetes CRM');
+  } catch(e) {
+    console.error(e);
+    // Atualizar localmente e marcar pendente
+    const c = clients.find(x=>x.id===id);
+    if(c) Object.assign(c, fields);
+    const pending = JSON.parse(localStorage.getItem(LS_PENDING)||'[]');
+    pending.push({op:'update', id, fields});
+    localStorage.setItem(LS_PENDING, JSON.stringify(pending));
+    window.syncShow?.offline();
+  }
+}
+
+async function fsDeleteClient(id) {
+  window.syncShow?.syncing();
+  try {
+    await deleteDoc(doc(db, COL_CLIENTS, id));
+    window.syncShow?.synced('Tapetes CRM');
+  } catch(e) {
+    console.error(e);
+    clients = clients.filter(c=>c.id!==id);
+    const pending = JSON.parse(localStorage.getItem(LS_PENDING)||'[]');
+    pending.push({op:'delete', id});
+    localStorage.setItem(LS_PENDING, JSON.stringify(pending));
+    window.syncShow?.offline();
+  }
+}
+
+// ── FIRESTORE: CONFIG ─────────────────────────────────────────────────────────
+async function loadConfig() {
+  try {
+    const snap = await getDoc(doc(db, COL_CONFIG, 'main'));
+    if(snap.exists()) {
+      const d = snap.data();
+      messages  = d.messages  || messages;
+      links     = d.links     || [];
+      textoFixo = d.textoFixo || '';
+    }
+  } catch(e) {
+    console.error('Erro ao carregar config:', e);
+  }
+}
+
+async function saveConfig() {
+  window.syncShow?.syncing();
+  try {
+    await setDoc(doc(db, COL_CONFIG, 'main'), { messages, links, textoFixo });
+    window.syncShow?.synced('Tapetes CRM');
+  } catch(e) {
+    console.error(e);
+    localStorage.setItem('tapete_crm_config_local', JSON.stringify({ messages, links, textoFixo }));
+    window.syncShow?.local();
+    toast('⚠️ Config salva local');
+  }
+}
+
+// ── LISTENER TEMPO REAL ───────────────────────────────────────────────────────
+function startRealtimeSync() {
+  const q = query(collection(db, COL_CLIENTS));
+  onSnapshot(q, snapshot => {
+    clients = [];
+    snapshot.forEach(docSnap => {
+      clients.push({ ...docSnap.data(), id: docSnap.id });
+    });
+    // Re-renderizar tela atual
+    if(curScreen==='home') renderHome();
+    if(curScreen==='clientes') renderAllClients();
+  }, err => {
+    console.error('onSnapshot error:', err);
+    window.syncShow?.offline();
+  });
+}
+
+// ── TENTAR SINCRONIZAR PENDENTES ──────────────────────────────────────────────
+async function syncPending() {
+  const pending = JSON.parse(localStorage.getItem(LS_PENDING)||'[]');
+  if(!pending.length) return;
+  const remaining = [];
+  for(const op of pending) {
+    try {
+      if(op.op==='add')    await setDoc(doc(db, COL_CLIENTS, op.data.id), op.data);
+      if(op.op==='update') await updateDoc(doc(db, COL_CLIENTS, op.id), op.fields);
+      if(op.op==='delete') await deleteDoc(doc(db, COL_CLIENTS, op.id));
+    } catch(e) {
+      remaining.push(op);
+    }
+  }
+  localStorage.setItem(LS_PENDING, JSON.stringify(remaining));
+}
+
 // ── NAV ───────────────────────────────────────────────────────────────────────
 function showScreen(name,push=true){
   if(push&&curScreen!==name) stack.push(curScreen);
@@ -575,20 +636,30 @@ function showScreen(name,push=true){
   if(name==='clientes') renderAllClients();
   if(name==='config') renderConfig();
 }
+window.showScreen = showScreen;
+
 function goBack(){ const p=stack.pop()||'home'; showScreen(p,false); if(['home','clientes','registrar','config'].includes(p)) setNav(['home','clientes','registrar','config'].indexOf(p)); }
+window.goBack = goBack;
+
 function setNav(i){ document.querySelectorAll('.bnav-btn').forEach((b,j)=>b.classList.toggle('active',i===j)); }
+window.setNav = setNav;
+
 function openModal(id){ document.getElementById(id).classList.add('open'); }
 function closeModal(id){ document.getElementById(id).classList.remove('open'); }
+window.closeModal = closeModal;
 
 // ── FILTRO ────────────────────────────────────────────────────────────────────
 function toggleFDD(){
   document.getElementById('ftrig').classList.toggle('open');
   document.getElementById('flist').classList.toggle('open');
 }
+window.toggleFDD = toggleFDD;
+
 document.addEventListener('click',e=>{
   const dd=document.getElementById('fdd');
   if(dd&&!dd.contains(e.target)){ document.getElementById('ftrig')?.classList.remove('open'); document.getElementById('flist')?.classList.remove('open'); }
 });
+
 function setFilter(f,el,label){
   curFilter=f;
   document.querySelectorAll('.filter-opt').forEach(o=>o.classList.remove('active'));
@@ -598,25 +669,23 @@ function setFilter(f,el,label){
   document.getElementById('flist').classList.remove('open');
   renderAllClients();
 }
+window.setFilter = setFilter;
 
 // ── HOME ──────────────────────────────────────────────────────────────────────
 function renderHome(){
   const td=today();
-  const ativos=DB.clients.filter(c=>c.status==='ativo').length;
-  const fechados=DB.clients.filter(c=>c.status==='fechou').length;
-  const hj=DB.clients.filter(c=>c.status==='ativo'&&nextDate(c)===td);
+  const ativos=clients.filter(c=>c.status==='ativo').length;
+  const fechados=clients.filter(c=>c.status==='fechou').length;
+  const hj=clients.filter(c=>c.status==='ativo'&&nextDate(c)===td);
   document.getElementById('m-ativos').textContent=ativos;
   document.getElementById('m-fechados').textContent=fechados;
   document.getElementById('m-hoje').textContent=hj.length;
 
-  // Alertas antecipados (1, 3, 7 dias)
   const alertas=[];
-  DB.clients.filter(c=>c.status==='ativo').forEach(c=>{
+  clients.filter(c=>c.status==='ativo').forEach(c=>{
     const nd=nextDate(c); if(!nd) return;
     const diff=daysUntil(nd);
-    if(diff===7||diff===3||diff===1){
-      alertas.push({c,diff,nd});
-    }
+    if(diff===7||diff===3||diff===1) alertas.push({c,diff,nd});
   });
   const aEl=document.getElementById('alertas-section');
   if(alertas.length){
@@ -640,7 +709,7 @@ function renderHome(){
 // ── CLIENTES ──────────────────────────────────────────────────────────────────
 function renderAllClients(){
   const q=(document.getElementById('search-input')?.value||'').toLowerCase();
-  let list=DB.clients.filter(c=>{
+  let list=clients.filter(c=>{
     if(q&&!c.nome.toLowerCase().includes(q)&&!(c.telefone||'').includes(q)) return false;
     if(curFilter==='todos') return true;
     if(curFilter==='respondeu') return c.respondeu===true;
@@ -653,6 +722,7 @@ function renderAllClients(){
   el.innerHTML=list.length ? list.map(c=>cardHtml(c,true)).join('') :
     `<div class="empty"><div class="ico">👥</div><p>Nenhum cliente encontrado.</p></div>`;
 }
+window.renderAllClients = renderAllClients;
 
 function cardHtml(c,showEnviar=false){
   const d=curDay(c); const done=allSent(c); const isHj=nextDate(c)===today();
@@ -691,6 +761,8 @@ function initForm(){
   document.getElementById('visita-row').style.display='none';
   setBorda('nao'); setViu('nao');
 }
+window.initForm = initForm;
+
 function handlePhoto(e){
   const file=e.target.files[0]; if(!file) return;
   const reader=new FileReader();
@@ -712,6 +784,8 @@ function handlePhoto(e){
   };
   reader.readAsDataURL(file);
 }
+window.handlePhoto = handlePhoto;
+
 function selectTipo(t,el){
   curTipo=t;
   document.querySelectorAll('#tipo-group .radio-opt').forEach(o=>o.classList.remove('selected'));
@@ -719,14 +793,22 @@ function selectTipo(t,el){
   document.getElementById('data-section').style.display=(t==='interessado'||t==='super-quente')?'block':'none';
   document.getElementById('visita-row').style.display=t==='super-quente'?'block':'none';
 }
-function setBorda(v){ curBorda=v; document.getElementById('borda-nao').classList.toggle('on',v==='nao'); document.getElementById('borda-sim').classList.toggle('on',v==='sim'); document.getElementById('borda-cor-row').style.display=v==='sim'?'block':'none'; }
-function setViu(v){ curViu=v; document.getElementById('viu-nao').classList.toggle('on',v==='nao'); document.getElementById('viu-sim').classList.toggle('on',v==='sim'); }
-function syncColor(){ document.getElementById('f-cor').value=document.getElementById('f-cor-picker').value; }
-function syncColorTxt(){ const v=document.getElementById('f-cor').value.trim(); if(/^#[0-9A-Fa-f]{6}$/.test(v)) document.getElementById('f-cor-picker').value=v; }
-function syncBordaColor(){ document.getElementById('f-borda-cor').value=document.getElementById('f-borda-picker').value; }
-function syncBordaTxt(){ const v=document.getElementById('f-borda-cor').value.trim(); if(/^#[0-9A-Fa-f]{6}$/.test(v)) document.getElementById('f-borda-picker').value=v; }
+window.selectTipo = selectTipo;
 
-function salvarCliente(){
+function setBorda(v){ curBorda=v; document.getElementById('borda-nao').classList.toggle('on',v==='nao'); document.getElementById('borda-sim').classList.toggle('on',v==='sim'); document.getElementById('borda-cor-row').style.display=v==='sim'?'block':'none'; }
+window.setBorda = setBorda;
+function setViu(v){ curViu=v; document.getElementById('viu-nao').classList.toggle('on',v==='nao'); document.getElementById('viu-sim').classList.toggle('on',v==='sim'); }
+window.setViu = setViu;
+function syncColor(){ document.getElementById('f-cor').value=document.getElementById('f-cor-picker').value; }
+window.syncColor = syncColor;
+function syncColorTxt(){ const v=document.getElementById('f-cor').value.trim(); if(/^#[0-9A-Fa-f]{6}$/.test(v)) document.getElementById('f-cor-picker').value=v; }
+window.syncColorTxt = syncColorTxt;
+function syncBordaColor(){ document.getElementById('f-borda-cor').value=document.getElementById('f-borda-picker').value; }
+window.syncBordaColor = syncBordaColor;
+function syncBordaTxt(){ const v=document.getElementById('f-borda-cor').value.trim(); if(/^#[0-9A-Fa-f]{6}$/.test(v)) document.getElementById('f-borda-picker').value=v; }
+window.syncBordaTxt = syncBordaTxt;
+
+async function salvarCliente(){
   const nome=document.getElementById('f-nome').value.trim();
   const tel=document.getElementById('f-tel').value.trim();
   const tam=document.getElementById('f-tamanho').value.trim();
@@ -742,7 +824,7 @@ function salvarCliente(){
   if(!prazo) return toast('⚠️ Informe o prazo');
   if(!preco) return toast('⚠️ Informe o preço');
   if(curBorda==='sim'&&!document.getElementById('f-borda-cor').value.trim()) return toast('⚠️ Informe a cor da borda');
-  if(DB.clients.find(c=>cleanPhone(c.telefone)===cleanPhone(tel)&&c.status==='ativo')) return toast('⚠️ Telefone já cadastrado como ativo');
+  if(clients.find(c=>cleanPhone(c.telefone)===cleanPhone(tel)&&c.status==='ativo')) return toast('⚠️ Telefone já cadastrado como ativo');
 
   const c={
     id:'c_'+Date.now(), nome, telefone:tel, tipo:curTipo, foto:tempFoto, imgIA:null,
@@ -753,25 +835,26 @@ function salvarCliente(){
     dataMarcada:document.getElementById('f-data-marcada').value||null,
     jaViu:curViu, dataVisita:document.getElementById('f-data-visita').value||null
   };
-  DB.clients.push(c);
-  saveDB(); initForm();
+
+  await fsAddClient(c);
+  initForm();
   toast('✅ Cliente registrado!');
   showScreen('home'); setNav(0);
 }
+window.salvarCliente = salvarCliente;
 
 // ── ENVIAR ────────────────────────────────────────────────────────────────────
 function openEnviar(id){
-  const c=DB.clients.find(x=>x.id===id); if(!c) return;
+  const c=clients.find(x=>x.id===id); if(!c) return;
   curCid=id;
   const d=curDay(c);
   const fase=c.sequenciaFase||'sem_resposta';
-  const msg=((DB.messages[c.tipo]||{})[fase]||{})[d]||{};
-  const links=DB.links||[];
-  const textoFixo=DB.textoFixo||'';
+  const msg=((messages[c.tipo]||{})[fase]||{})[d]||{};
+  const lnks=links||[];
+  const tf=textoFixo||'';
   const bt=c.borda==='sim'?`Com Borda (${c.bordaCor||''})`:' Sem Borda';
   const specs=`📐 ${c.tamanho} | ${c.cor} | ${bt}\n💰 R$ ${fmt(c.preco)}\n📦 Prazo: ${c.prazo} dias${c.obs?'\n📝 '+c.obs:''}`;
   const txtMsg=(msg.texto||'(Configure a mensagem em ⚙️ Config)')+'\n\n'+specs;
-  const prompt=buildPrompt(c);
 
   document.getElementById('enviar-content').innerHTML=`
     <div class="envio-bloco">
@@ -788,20 +871,17 @@ function openEnviar(id){
         ${c.imgIA?`<img src="${c.imgIA}" alt="Simulação">`:`<div style="padding:20px;color:var(--muted)">➕ Toque para adicionar a simulação gerada</div>`}
       </div>
     </div>
-
     <div class="envio-bloco">
       <div class="envio-bloco-title"><div class="envio-num">2</div> TEXTO DA MENSAGEM</div>
       <div class="texto-preview">${esc(txtMsg)}</div>
       <button class="btn btn-primary" onclick="copiarTexto('${c.id}')">📋 Copiar Texto</button>
     </div>
-
     <div class="envio-bloco">
       <div class="envio-bloco-title"><div class="envio-num">3</div> LINKS E TEXTO FIXO</div>
-      ${textoFixo?`<div class="texto-preview">${esc(textoFixo)}</div>`:''}
-      ${links.length?`<div class="texto-preview">${esc(links.map(l=>`${l.tipo}: ${l.url}`).join('\n'))}</div>`:`<div class="warn-box">Nenhum link configurado em ⚙️ Config</div>`}
+      ${tf?`<div class="texto-preview">${esc(tf)}</div>`:''}
+      ${lnks.length?`<div class="texto-preview">${esc(lnks.map(l=>`${l.tipo}: ${l.url}`).join('\n'))}</div>`:`<div class="warn-box">Nenhum link configurado em ⚙️ Config</div>`}
       <button class="btn btn-primary" onclick="copiarLinks()">📋 Copiar Links</button>
     </div>
-
     <div class="envio-bloco">
       <div class="envio-bloco-title">📞 CONTATO</div>
       <div class="contato-row">
@@ -813,7 +893,6 @@ function openEnviar(id){
         </a>
       </div>
     </div>
-
     <button class="btn btn-success" onclick="marcarEnviado('${c.id}');toast('✅ Marcado como enviado!')">✅ Marcar como Enviado</button>
     <div style="margin-top:8px;padding-bottom:10px">
       <button class="btn btn-ghost" onclick="goBack()">← Voltar</button>
@@ -821,26 +900,33 @@ function openEnviar(id){
 
   showScreen('enviar');
 }
+window.openEnviar = openEnviar;
 
 function copyPromptCliente(id){
-  const c=DB.clients.find(x=>x.id===id); if(!c) return;
+  const c=clients.find(x=>x.id===id); if(!c) return;
   copyText(buildPrompt(c), '📋 Prompt copiado! Cole no Gemini junto com a foto.');
 }
+window.copyPromptCliente = copyPromptCliente;
+
 function copiarTexto(id){
-  const c=DB.clients.find(x=>x.id===id); if(!c) return;
+  const c=clients.find(x=>x.id===id); if(!c) return;
   const d=curDay(c); const fase=c.sequenciaFase||'sem_resposta';
-  const msg=((DB.messages[c.tipo]||{})[fase]||{})[d]||{};
+  const msg=((messages[c.tipo]||{})[fase]||{})[d]||{};
   const bt=c.borda==='sim'?'Com Borda':'Sem Borda';
   const specs=`📐 ${c.tamanho} | ${c.cor} | ${bt}\n💰 R$ ${fmt(c.preco)}\n📦 Prazo: ${c.prazo} dias${c.obs?'\n📝 '+c.obs:''}`;
   const txt=(msg.texto?msg.texto+'\n\n':'')+specs;
   copyText(txt, '✅ Texto copiado! Cole no WhatsApp.');
 }
+window.copiarTexto = copiarTexto;
+
 function copiarLinks(){
-  const links=DB.links||[]; const tf=DB.textoFixo||'';
-  let txt=tf; if(links.length) txt+=(tf?'\n\n':'')+links.map(l=>`${l.tipo}: ${l.url}`).join('\n');
+  const lnks=links||[]; const tf=textoFixo||'';
+  let txt=tf; if(lnks.length) txt+=(tf?'\n\n':'')+lnks.map(l=>`${l.tipo}: ${l.url}`).join('\n');
   if(!txt.trim()) return toast('⚠️ Nenhum link ou texto fixo configurado');
   copyText(txt, '✅ Links copiados! Cole no WhatsApp.');
 }
+window.copiarLinks = copiarLinks;
+
 function copyText(txt,msg){
   navigator.clipboard.writeText(txt).then(()=>toast(msg)).catch(()=>{
     const ta=document.createElement('textarea');ta.value=txt;ta.style.cssText='position:fixed;opacity:0';
@@ -849,42 +935,48 @@ function copyText(txt,msg){
     document.body.removeChild(ta);
   });
 }
-function marcarEnviado(id){
-  const c=DB.clients.find(x=>x.id===id); if(!c) return;
+window.toast = toast;
+
+async function marcarEnviado(id){
+  const c=clients.find(x=>x.id===id); if(!c) return;
   const d=curDay(c);
   if(!(c.historico||[]).find(h=>h.dia===d&&h.tipo==='enviado')){
-    c.historico=c.historico||[];
-    c.historico.push({dia:d,tipo:'enviado',data:today()});
-    saveDB(); renderHome();
+    const hist=[...(c.historico||[]), {dia:d,tipo:'enviado',data:today()}];
+    await fsUpdateClient(id, { historico: hist });
+    renderHome();
   }
 }
+window.marcarEnviado = marcarEnviado;
 
 // ── IMG IA ────────────────────────────────────────────────────────────────────
 function openImgIA(id){ curCid=id; document.getElementById('img-ia-input').value=''; openModal('modal-img-ia'); }
+window.openImgIA = openImgIA;
+
 function handleImgIA(e){
   const file=e.target.files[0]; if(!file) return;
   const reader=new FileReader();
   reader.onload=ev=>{
     const img=new Image();
-    img.onload=()=>{
+    img.onload=async ()=>{
       const cv=document.createElement('canvas');
       const max=900;let w=img.width,h=img.height;
       if(w>max){h=h*max/w;w=max;}
       cv.width=w;cv.height=h;cv.getContext('2d').drawImage(img,0,0,w,h);
-      const c=DB.clients.find(x=>x.id===curCid); if(!c) return;
-      c.imgIA=cv.toDataURL('image/jpeg',.8);
-      saveDB();closeModal('modal-img-ia');toast('✅ Simulação salva!');
-      // Reabrir a tela de enviar para atualizar o slot
+      const imgIA=cv.toDataURL('image/jpeg',.8);
+      await fsUpdateClient(curCid, { imgIA });
+      closeModal('modal-img-ia');
+      toast('✅ Simulação salva!');
       openEnviar(curCid);
     };
     img.src=ev.target.result;
   };
   reader.readAsDataURL(file);
 }
+window.handleImgIA = handleImgIA;
 
 // ── TIMELINE ──────────────────────────────────────────────────────────────────
 function openTimeline(id){
-  const c=DB.clients.find(x=>x.id===id); if(!c) return;
+  const c=clients.find(x=>x.id===id); if(!c) return;
   curCid=id;
   const te={'nao-estava':'🟢','interessado':'🔵','super-quente':'🔴'}[c.tipo]||'';
   const bt=c.borda==='sim'?`Com Borda (${c.bordaCor||''})`:' Sem Borda';
@@ -925,11 +1017,12 @@ function openTimeline(id){
     </div>`;
   showScreen('timeline');
 }
+window.openTimeline = openTimeline;
 
 // ── OPÇÕES ────────────────────────────────────────────────────────────────────
 function openOpcoes(id){
   curCid=id;
-  const c=DB.clients.find(x=>x.id===id); if(!c) return;
+  const c=clients.find(x=>x.id===id); if(!c) return;
   document.getElementById('modal-opcoes-title').textContent=`⋮ ${c.nome}`;
   document.getElementById('modal-opcoes-body').innerHTML=`
     <div class="modal-item" onclick="closeModal('modal-opcoes');clienteRespondeu('${c.id}')"><span class="ico">💬</span>${c.respondeu?'Marcar como Não Respondeu':'✅ Cliente Respondeu!'}</div>
@@ -941,32 +1034,53 @@ function openOpcoes(id){
     <div class="modal-item" style="color:var(--danger)" onclick="closeModal('modal-opcoes');excluir('${c.id}')"><span class="ico">❌</span> Excluir</div>`;
   openModal('modal-opcoes');
 }
-function clienteRespondeu(id){
-  const c=DB.clients.find(x=>x.id===id); if(!c) return;
-  c.respondeu=!c.respondeu;
-  if(c.respondeu){
-    c.sequencia=[...SEQ[c.tipo].com_resposta];
-    c.dataRegistro=today(); c.historico=[]; c.sequenciaFase='com_resposta';
+window.openOpcoes = openOpcoes;
+
+async function clienteRespondeu(id){
+  const c=clients.find(x=>x.id===id); if(!c) return;
+  const respondeu=!c.respondeu;
+  let fields;
+  if(respondeu){
+    fields={ respondeu:true, sequencia:[...SEQ[c.tipo].com_resposta], dataRegistro:today(), historico:[], sequenciaFase:'com_resposta' };
     toast('💬 Sequência "Com Resposta" ativada!');
   } else {
-    c.sequencia=[...SEQ[c.tipo].sem_resposta];
-    c.dataRegistro=today(); c.historico=[]; c.sequenciaFase='sem_resposta';
+    fields={ respondeu:false, sequencia:[...SEQ[c.tipo].sem_resposta], dataRegistro:today(), historico:[], sequenciaFase:'sem_resposta' };
     toast('📭 Sequência "Sem Resposta" ativada');
   }
-  saveDB(); renderHome();
+  await fsUpdateClient(id, fields);
+  renderHome();
 }
-function pararResponder(id){
-  const c=DB.clients.find(x=>x.id===id); if(!c) return;
-  c.sequencia=[...SEQ[c.tipo].recovery]; c.dataRegistro=today(); c.historico=[]; c.sequenciaFase='recovery';
-  saveDB(); toast('🔇 Sequência de recuperação ativada'); renderHome();
+window.clienteRespondeu = clienteRespondeu;
+
+async function pararResponder(id){
+  const c=clients.find(x=>x.id===id); if(!c) return;
+  await fsUpdateClient(id, { sequencia:[...SEQ[c.tipo].recovery], dataRegistro:today(), historico:[], sequenciaFase:'recovery' });
+  toast('🔇 Sequência de recuperação ativada'); renderHome();
 }
-function encerrar(id){ const c=DB.clients.find(x=>x.id===id); if(!c) return; c.status='parou'; saveDB(); toast('🚫 Fluxo encerrado'); showScreen('home');setNav(0); }
-function arquivar(id){ const c=DB.clients.find(x=>x.id===id); if(!c) return; c.status='arquivado'; saveDB(); toast('🗄️ Arquivado'); showScreen('home');setNav(0); }
-function excluir(id){ if(!confirm('Excluir este cliente?')) return; DB.clients=DB.clients.filter(c=>c.id!==id); saveDB(); toast('❌ Excluído'); showScreen('home');setNav(0); }
+window.pararResponder = pararResponder;
+
+async function encerrar(id){
+  await fsUpdateClient(id, { status:'parou' });
+  toast('🚫 Fluxo encerrado'); showScreen('home');setNav(0);
+}
+window.encerrar = encerrar;
+
+async function arquivar(id){
+  await fsUpdateClient(id, { status:'arquivado' });
+  toast('🗄️ Arquivado'); showScreen('home');setNav(0);
+}
+window.arquivar = arquivar;
+
+async function excluir(id){
+  if(!confirm('Excluir este cliente?')) return;
+  await fsDeleteClient(id);
+  toast('❌ Excluído'); showScreen('home');setNav(0);
+}
+window.excluir = excluir;
 
 // ── FECHAMENTO ────────────────────────────────────────────────────────────────
 function openFechamento(id){
-  const c=DB.clients.find(x=>x.id===id); if(!c) return;
+  const c=clients.find(x=>x.id===id); if(!c) return;
   curCid=id; curPag=null;
   document.getElementById('fechamento-content').innerHTML=`
     <div class="form-card">
@@ -988,20 +1102,30 @@ function openFechamento(id){
     </div>`;
   showScreen('fechamento');
 }
+window.openFechamento = openFechamento;
+
 function selPag(t,el){ curPag=t; document.querySelectorAll('#pag-g .radio-opt').forEach(o=>o.classList.remove('selected')); el.classList.add('selected'); }
-function confirmarVenda(id){
-  const c=DB.clients.find(x=>x.id===id); if(!c) return;
+window.selPag = selPag;
+
+async function confirmarVenda(id){
+  const c=clients.find(x=>x.id===id); if(!c) return;
   if(!curPag) return toast('⚠️ Selecione o pagamento');
-  c.status='fechou'; c.valorFechado=document.getElementById('fv').value;
-  c.pagamento=curPag; c.dataEntrega=document.getElementById('fd').value;
-  c.obsFechamento=document.getElementById('fo').value.trim();
-  (c.historico=c.historico||[]).push({tipo:'fechou',data:today(),texto:'Venda fechada'});
-  saveDB(); toast('🎉 Venda confirmada!'); showScreen('home');setNav(0);
+  const hist=[...(c.historico||[]), {tipo:'fechou',data:today(),texto:'Venda fechada'}];
+  await fsUpdateClient(id, {
+    status:'fechou',
+    valorFechado: document.getElementById('fv').value,
+    pagamento: curPag,
+    dataEntrega: document.getElementById('fd').value,
+    obsFechamento: document.getElementById('fo').value.trim(),
+    historico: hist
+  });
+  toast('🎉 Venda confirmada!'); showScreen('home');setNav(0);
 }
+window.confirmarVenda = confirmarVenda;
 
 // ── DÚVIDA ────────────────────────────────────────────────────────────────────
 function openDuvida(id){
-  const c=DB.clients.find(x=>x.id===id); if(!c) return;
+  const c=clients.find(x=>x.id===id); if(!c) return;
   curCid=id;
   document.getElementById('duvida-content').innerHTML=`
     <div class="form-card">
@@ -1016,27 +1140,39 @@ function openDuvida(id){
     </div>`;
   showScreen('duvida');
 }
-function salvarDuvida(id){
-  const c=DB.clients.find(x=>x.id===id); if(!c) return;
+window.openDuvida = openDuvida;
+
+async function salvarDuvida(id){
+  const c=clients.find(x=>x.id===id); if(!c) return;
   const p=document.getElementById('dp').value.trim(); if(!p) return toast('⚠️ Descreva a dúvida');
-  (c.historico=c.historico||[]).push({tipo:'duvida',data:today(),texto:p,
+  const hist=[...(c.historico||[]), {tipo:'duvida',data:today(),texto:p,
     dataLembrete:document.getElementById('dd').value,horaLembrete:document.getElementById('dh').value,
-    resposta:document.getElementById('dr').value.trim()});
-  saveDB(); toast('✅ Salvo!'); goBack();
+    resposta:document.getElementById('dr').value.trim()}];
+  await fsUpdateClient(id, { historico: hist });
+  toast('✅ Salvo!'); goBack();
 }
+window.salvarDuvida = salvarDuvida;
 
 // ── CONFIG ────────────────────────────────────────────────────────────────────
 function setCfgTipo(t,el){ curCfgTipo=t; document.querySelectorAll('#cfg-tipo-tabs .cfg-tab').forEach(b=>b.classList.remove('active')); el.classList.add('active'); renderDaysAccordion(); }
-function setSeqTab(t,el){ curSeqTab=t; document.querySelectorAll('.seq-tab').forEach(b=>b.classList.remove('active')); el.classList.add('active'); renderDaysAccordion(); }
+window.setCfgTipo = setCfgTipo;
 
-function saveTextoFixo(){ DB.textoFixo=document.getElementById('cfg-texto-fixo').value.trim(); saveDB(); toast('✅ Texto fixo salvo!'); }
+function setSeqTab(t,el){ curSeqTab=t; document.querySelectorAll('.seq-tab').forEach(b=>b.classList.remove('active')); el.classList.add('active'); renderDaysAccordion(); }
+window.setSeqTab = setSeqTab;
+
+async function saveTextoFixo(){
+  textoFixo=document.getElementById('cfg-texto-fixo').value.trim();
+  await saveConfig();
+  toast('✅ Texto fixo salvo!');
+}
+window.saveTextoFixo = saveTextoFixo;
 
 function renderDaysAccordion(){
   const el=document.getElementById('days-accordion'); if(!el) return;
   const allDays=curSeqTab==='sem_resposta'
     ? (SEQ[curCfgTipo]?.sem_resposta||[1,2,7,15,30])
     : (SEQ[curCfgTipo]?.com_resposta||[1,2,7,15,30]);
-  const msgs=((DB.messages[curCfgTipo]||{})[curSeqTab])||{};
+  const msgs=((messages[curCfgTipo]||{})[curSeqTab])||{};
 
   el.innerHTML=allDays.map(d=>{
     const m=msgs[d]||{};
@@ -1060,51 +1196,49 @@ function renderDaysAccordion(){
     </div>`;
   }).join('');
 }
+
 function toggleAcc(tipo,seq,d){ document.getElementById(`acc-${tipo}-${seq}-${d}`)?.classList.toggle('open'); }
+window.toggleAcc = toggleAcc;
+
 function toggleApply(tipo,d,el){ el.classList.toggle('on'); }
-function saveMensagem(tipo,seq,d){
+window.toggleApply = toggleApply;
+
+async function saveMensagem(tipo,seq,d){
   const txt=document.getElementById(`mt-${tipo}-${seq}-${d}`)?.value.trim();
   if(!txt) return toast('⚠️ Digite o texto');
 
-  // Salva no tipo atual
-  if(!DB.messages[tipo]) DB.messages[tipo]={sem_resposta:{},com_resposta:{}};
-  if(!DB.messages[tipo][seq]) DB.messages[tipo][seq]={};
-  DB.messages[tipo][seq][d]={texto:txt};
+  if(!messages[tipo]) messages[tipo]={sem_resposta:{},com_resposta:{}};
+  if(!messages[tipo][seq]) messages[tipo][seq]={};
+  messages[tipo][seq][d]={texto:txt};
 
-  // Aplica nos tipos selecionados
   const map={'nao-estava':`ac-ne-${d}`,'interessado':`ac-in-${d}`,'super-quente':`ac-sq-${d}`};
   ['nao-estava','interessado','super-quente'].forEach(t=>{
     if(t!==tipo && document.getElementById(map[t])?.classList.contains('on')){
-      if(!DB.messages[t]) DB.messages[t]={sem_resposta:{},com_resposta:{}};
-      if(!DB.messages[t][seq]) DB.messages[t][seq]={};
-      DB.messages[t][seq][d]={texto:txt};
+      if(!messages[t]) messages[t]={sem_resposta:{},com_resposta:{}};
+      if(!messages[t][seq]) messages[t][seq]={};
+      messages[t][seq][d]={texto:txt};
     }
   });
 
-  saveDB(); toast(`✅ Dia ${d} salvo!`);
+  await saveConfig();
+  toast(`✅ Dia ${d} salvo!`);
   renderDaysAccordion();
   document.getElementById(`acc-${tipo}-${seq}-${d}`)?.classList.add('open');
 }
+window.saveMensagem = saveMensagem;
+
 function renderConfig(){
-  document.getElementById('cfg-texto-fixo').value=DB.textoFixo||'';
+  document.getElementById('cfg-texto-fixo').value=textoFixo||'';
   renderDaysAccordion();
 }
 
-// ── EXPORTAR ──────────────────────────────────────────────────────────────────
-function downloadApp(){
-  const dbJson=JSON.stringify(DB).replace(/<\/script>/gi,'<\\/script>');
-  let html=document.documentElement.outerHTML;
-  const inject=`<script>(function(){try{if(!localStorage.getItem('${DB_KEY}'))localStorage.setItem('${DB_KEY}',${dbJson});}catch(e){}})();<\/script>`;
-  html=html.replace('</body>',inject+'</body>');
-  const a=document.createElement('a');
-  a.href=URL.createObjectURL(new Blob([html],{type:'text/html;charset=utf-8'}));
-  a.download='tapetes-crm-v4.html';
-  document.body.appendChild(a);a.click();document.body.removeChild(a);
-  toast('⬇️ Exportado com seus dados!');
-}
-
 // ── INIT ──────────────────────────────────────────────────────────────────────
-window.addEventListener('DOMContentLoaded',()=>{ loadDB(); renderHome(); });
+window.addEventListener('DOMContentLoaded', async () => {
+  await loadConfig();
+  startRealtimeSync();
+  syncPending();
+  renderHome();
+});
 </script>
 </body>
 </html>
