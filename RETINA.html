@@ -1,0 +1,1398 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
+  <title>Painel IA — Prompt Generator</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:       #ffffff;
+      --card:     #f4f7ff;
+      --card2:    #eaf0ff;
+      --red:      #e0141f;
+      --red-dark: #b8101a;
+      --blue:     #1a3a6b;
+      --blue2:    #2d5be3;
+      --txt:      #111111;
+      --muted:    #555555;
+      --bdr:      rgba(0,0,0,0.08);
+      --bdr2:     rgba(0,0,0,0.15);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--txt);
+      font-size: 14px;
+      line-height: 1.6;
+      height: 100%;
+      overflow: hidden;
+    }
+    .app { display: flex; height: 100vh; height: 100svh; height: 100dvh; overflow: hidden; }
+
+    /* SIDEBAR */
+    .sidebar {
+      width: 272px; min-width: 272px;
+      background: var(--blue);
+      display: flex; flex-direction: column;
+      overflow-y: auto; overflow-x: hidden;
+      transition: transform 0.3s ease;
+      z-index: 100;
+    }
+    .sidebar::-webkit-scrollbar { width: 3px; }
+    .sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 2px; }
+    .logo {
+      display: flex; align-items: center; gap: 12px;
+      padding: 20px 16px 16px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    .logo-icon {
+      width: 38px; height: 38px;
+      background: var(--red); border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 19px; flex-shrink: 0;
+    }
+    .logo-title { font-size: 15px; font-weight: 800; color: #fff; letter-spacing: -0.3px; }
+    .logo-sub { font-size: 11px; color: rgba(255,255,255,0.45); margin-top: 1px; font-weight: 400; }
+    .nav-section { padding: 4px 0; }
+    .nav-section-header {
+      display: flex; align-items: center; gap: 9px;
+      padding: 9px 16px; cursor: pointer;
+      font-size: 10px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 1px;
+      color: rgba(255,255,255,0.38);
+      transition: color 0.2s; user-select: none;
+    }
+    .nav-section-header:hover { color: rgba(255,255,255,0.65); }
+    .nav-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+    .nav-dot.red   { background: var(--red); }
+    .nav-dot.blue2 { background: #60a5fa; }
+    .nav-dot.green { background: #34d399; }
+    .nav-arrow { margin-left: auto; font-size: 9px; transition: transform 0.25s; }
+    .nav-arrow.rotated { transform: rotate(-90deg); }
+    .nav-items { overflow: hidden; transition: max-height 0.3s ease; max-height: 300px; }
+    .nav-items.collapsed { max-height: 0; }
+    .nav-item {
+      padding: 9px 16px 9px 32px;
+      cursor: pointer; font-size: 13px; font-weight: 500;
+      color: rgba(255,255,255,0.5);
+      border-left: 3px solid transparent;
+      transition: all 0.18s;
+    }
+    .nav-item:hover { color: #fff; background: rgba(255,255,255,0.07); }
+    .nav-item.active-red   { border-left-color: var(--red);  color: #fff; background: rgba(224,20,31,0.15); }
+    .nav-item.active-blue2 { border-left-color: #60a5fa;     color: #fff; background: rgba(96,165,250,0.12); }
+    .nav-item.active-green { border-left-color: #34d399;     color: #fff; background: rgba(52,211,153,0.12); }
+    .historico-btn {
+      margin: 8px 12px 14px;
+      padding: 10px 14px;
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 10px; cursor: pointer;
+      font-size: 12px; font-weight: 600;
+      color: rgba(255,255,255,0.5);
+      text-align: center; transition: all 0.2s;
+      font-family: 'Inter', sans-serif;
+    }
+    .historico-btn:hover { background: rgba(255,255,255,0.13); color: #fff; }
+
+    /* MAIN */
+    .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; min-width: 0; }
+
+    /* TOPBAR */
+    .topbar {
+      height: 58px; min-height: 58px;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 14px;
+      border-bottom: 1px solid var(--bdr);
+      background: #fff; gap: 10px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+    }
+    .topbar-left { display: flex; align-items: center; gap: 9px; min-width: 0; }
+    .menu-btn {
+      display: none;
+      background: none; border: 1px solid var(--bdr2);
+      color: var(--txt); font-size: 17px; cursor: pointer;
+      padding: 5px 9px; border-radius: 8px;
+      transition: all 0.2s; flex-shrink: 0;
+    }
+    .menu-btn:hover { background: var(--card); }
+    .topbar-info { display: flex; align-items: center; gap: 8px; min-width: 0; }
+    .topbar-title {
+      font-size: 14px; font-weight: 700; color: var(--txt);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .topbar-badge {
+      font-size: 10px; font-weight: 700;
+      padding: 2px 8px; border-radius: 20px;
+      text-transform: uppercase; letter-spacing: 0.5px;
+      white-space: nowrap; flex-shrink: 0;
+    }
+    .topbar-badge.red   { background: rgba(224,20,31,0.09);  color: var(--red);   border: 1px solid rgba(224,20,31,0.2); }
+    .topbar-badge.blue2 { background: rgba(45,91,227,0.09);  color: var(--blue2); border: 1px solid rgba(45,91,227,0.2); }
+    .topbar-badge.green { background: rgba(16,185,129,0.09); color: #059669;      border: 1px solid rgba(16,185,129,0.2); }
+    .progress-bar { display: flex; align-items: center; gap: 7px; flex-shrink: 0; }
+    .progress-fill-wrapper {
+      width: 90px; height: 5px;
+      background: var(--card); border-radius: 3px;
+      overflow: hidden; border: 1px solid var(--bdr);
+    }
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--red), #ff5f5f);
+      border-radius: 3px; transition: width 0.4s ease; width: 0%;
+    }
+    .progress-text { font-size: 11px; font-weight: 700; color: var(--muted); min-width: 28px; }
+    .hidden { display: none !important; }
+
+    /* CHAT */
+    .chat-area {
+      flex: 1; min-height: 0; overflow-y: auto;
+      padding: 18px 14px;
+      display: flex; flex-direction: column; gap: 11px;
+      -webkit-overflow-scrolling: touch;
+    }
+    .chat-area::-webkit-scrollbar { width: 4px; }
+    .chat-area::-webkit-scrollbar-thumb { background: var(--bdr2); border-radius: 2px; }
+
+    /* WELCOME */
+    .welcome-msg { text-align: center; padding: 48px 20px; max-width: 400px; margin: 0 auto; }
+    .welcome-icon {
+      width: 60px; height: 60px;
+      background: linear-gradient(135deg, var(--blue), var(--blue2));
+      border-radius: 16px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 28px; margin: 0 auto 18px;
+      box-shadow: 0 8px 24px rgba(26,58,107,0.18);
+    }
+    .welcome-msg h2 { font-size: 19px; font-weight: 800; color: var(--txt); margin-bottom: 10px; }
+    .welcome-msg p { color: var(--muted); font-size: 13px; line-height: 1.7; }
+    .welcome-features { display: flex; justify-content: center; gap: 7px; margin-top: 18px; flex-wrap: wrap; }
+    .welcome-features span {
+      font-size: 11px; font-weight: 600; color: var(--blue2);
+      background: var(--card2); border: 1px solid rgba(45,91,227,0.15);
+      padding: 4px 10px; border-radius: 20px;
+    }
+
+    /* MESSAGES */
+    .msg { display: flex; gap: 9px; max-width: 88%; animation: fadeUp 0.25s ease; }
+    @keyframes fadeUp { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
+    .msg.sistema { align-self: flex-start; }
+    .msg.usuario { align-self: flex-end; flex-direction: row-reverse; }
+    .msg-avatar {
+      width: 30px; height: 30px; border-radius: 9px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; flex-shrink: 0;
+      background: var(--blue); border: 1px solid var(--blue);
+    }
+    .msg.usuario .msg-avatar { background: var(--card); border-color: var(--bdr2); }
+    .msg-bubble {
+      background: var(--card); border: 1px solid var(--bdr);
+      border-radius: 13px; border-top-left-radius: 4px;
+      padding: 10px 13px; font-size: 13.5px; line-height: 1.65; color: var(--txt);
+    }
+    .msg.usuario .msg-bubble {
+      background: var(--blue); border-color: var(--blue);
+      color: #fff; border-radius: 13px; border-top-right-radius: 4px;
+    }
+
+    /* PROMPT BOX */
+    .prompt-box {
+      background: #fff; border: 1.5px solid var(--bdr2);
+      border-radius: 13px; overflow: hidden;
+      animation: fadeUp 0.25s ease;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.07);
+    }
+    .prompt-box-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 11px 13px; background: var(--blue);
+      flex-wrap: wrap; gap: 7px;
+    }
+    .prompt-box-title { font-size: 11px; font-weight: 700; color: #fff; text-transform: uppercase; letter-spacing: 0.5px; }
+    .prompt-box-actions { display: flex; gap: 7px; flex-wrap: wrap; }
+    .btn-copiar {
+      display: flex; align-items: center; gap: 5px;
+      padding: 6px 13px; background: var(--red);
+      border: none; border-radius: 7px; color: #fff;
+      font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 700;
+      cursor: pointer; transition: all 0.2s;
+    }
+    .btn-copiar:hover { background: var(--red-dark); transform: translateY(-1px); }
+    .btn-claude {
+      display: flex; align-items: center; gap: 5px;
+      padding: 6px 13px;
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.3);
+      border-radius: 7px; color: #fff;
+      font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 700;
+      cursor: pointer; transition: all 0.2s; text-decoration: none;
+    }
+    .btn-claude:hover { background: rgba(255,255,255,0.25); transform: translateY(-1px); }
+    .btn-novo {
+      padding: 6px 11px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.18);
+      border-radius: 7px; color: rgba(255,255,255,0.65);
+      font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 600;
+      cursor: pointer; transition: all 0.2s;
+    }
+    .btn-novo:hover { color: #fff; background: rgba(255,255,255,0.16); }
+    .prompt-box-content {
+      padding: 14px; font-family: 'Inter', monospace;
+      font-size: 12.5px; line-height: 1.75; color: var(--txt);
+      white-space: pre-wrap; word-break: break-word;
+      max-height: 220px; overflow-y: auto; background: var(--card);
+    }
+    .prompt-box-content::-webkit-scrollbar { width: 3px; }
+    .prompt-box-content::-webkit-scrollbar-thumb { background: var(--bdr2); border-radius: 2px; }
+
+
+
+    /* INPUT AREA */
+    .input-area {
+      padding: 8px 13px 12px;
+      border-top: 1px solid var(--bdr);
+      background: #fff;
+      box-shadow: 0 -2px 8px rgba(0,0,0,0.04);
+    }
+    .input-question { display: none; }
+    .input-wrapper { display: flex; gap: 8px; align-items: flex-end; }
+    textarea#user-input {
+      flex: 1; background: var(--card);
+      border: 1.5px solid var(--bdr2); border-radius: 11px;
+      color: var(--txt); font-family: 'Inter', sans-serif;
+      font-size: 14px; padding: 10px 13px;
+      resize: none; min-height: 44px; max-height: 110px;
+      outline: none; transition: border-color 0.2s;
+      line-height: 1.5; -webkit-appearance: none;
+    }
+    textarea#user-input:focus { border-color: var(--blue2); background: #fff; }
+    textarea#user-input::placeholder { color: #aaa; }
+    textarea#user-input:disabled { opacity: 0.45; cursor: not-allowed; }
+    .send-btn {
+      padding: 0 16px; background: var(--red);
+      border: none; border-radius: 11px; color: #fff;
+      font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 800;
+      cursor: pointer; white-space: nowrap;
+      transition: all 0.2s; height: 44px; flex-shrink: 0;
+    }
+    .send-btn:hover:not(:disabled) { background: var(--red-dark); }
+    .send-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+    .input-hint { font-size: 11px; color: #aaa; margin-top: 5px; text-align: right; }
+
+    /* TOAST */
+    .toast {
+      position: fixed; bottom: 90px; left: 50%;
+      transform: translateX(-50%) translateY(14px);
+      background: var(--blue); color: #fff;
+      font-size: 13px; font-weight: 600;
+      padding: 10px 18px; border-radius: 30px;
+      opacity: 0; transition: all 0.3s;
+      pointer-events: none; z-index: 1000;
+      white-space: nowrap;
+      box-shadow: 0 4px 14px rgba(26,58,107,0.28);
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    /* MODAL */
+    .modal-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.42);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 200; backdrop-filter: blur(3px); padding: 14px;
+    }
+    .modal {
+      background: #fff; border: 1px solid var(--bdr2);
+      border-radius: 16px; width: 100%; max-width: 500px;
+      max-height: 78vh; display: flex; flex-direction: column;
+      overflow: hidden; animation: fadeUp 0.2s ease;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.14);
+    }
+    .modal-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 18px; border-bottom: 1px solid var(--bdr);
+      background: var(--blue);
+    }
+    .modal-header h3 { font-size: 14px; font-weight: 700; color: #fff; }
+    .modal-header button {
+      background: rgba(255,255,255,0.14); border: none; color: #fff;
+      font-size: 15px; cursor: pointer; padding: 3px 8px;
+      border-radius: 6px; transition: background 0.2s;
+    }
+    .modal-header button:hover { background: rgba(255,255,255,0.24); }
+    .modal-body { overflow-y: auto; padding: 12px; flex: 1; }
+    .historico-item {
+      padding: 11px 13px; background: var(--card);
+      border: 1px solid var(--bdr); border-radius: 10px;
+      cursor: pointer; margin-bottom: 7px; transition: border-color 0.2s;
+    }
+    .historico-item:hover { border-color: var(--blue2); }
+    .historico-item-header { display: flex; justify-content: space-between; margin-bottom: 4px; gap: 8px; }
+    .historico-item-nome { font-size: 13px; font-weight: 700; color: var(--txt); }
+    .historico-item-data { font-size: 11px; color: var(--muted); }
+    .historico-item-preview { font-size: 12px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+    /* PROMPT OVERLAY - aparece fixo na tela */
+    .prompt-overlay {
+      position: fixed;
+      top: 58px; left: 0; right: 0; bottom: 0;
+      background: #fff;
+      z-index: 50;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .prompt-overlay.hidden { display: none; }
+    .prompt-overlay-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 14px;
+      font-family: 'Inter', monospace;
+      font-size: 12.5px;
+      line-height: 1.75;
+      color: var(--txt);
+      white-space: pre-wrap;
+      word-break: break-word;
+      background: var(--card);
+    }
+    .prompt-overlay-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 11px 13px;
+      background: var(--blue);
+      flex-wrap: wrap;
+      gap: 7px;
+      flex-shrink: 0;
+    }
+    .prompt-overlay-title {
+      font-size: 11px; font-weight: 700;
+      color: #fff; text-transform: uppercase; letter-spacing: 0.5px;
+    }
+    .prompt-overlay-actions { display: flex; gap: 7px; flex-wrap: wrap; }
+
+    /* overlay mobile */
+    .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.38); z-index: 99; }
+    .sidebar-overlay.show { display: block; }
+
+    /* MOBILE */
+    @media (max-width: 768px) {
+      .sidebar { position: fixed; left: 0; top: 0; bottom: 0; transform: translateX(-100%); box-shadow: 4px 0 20px rgba(0,0,0,0.18); }
+      .sidebar.open { transform: translateX(0); }
+      .menu-btn { display: flex !important; }
+      .msg { max-width: 96%; }
+      .progress-fill-wrapper { width: 65px; }
+      .prompt-box-actions { width: 100%; }
+      .btn-copiar, .btn-claude { flex: 1; justify-content: center; }
+    }
+
+  </style>
+</head>
+<body>
+<div class="app">
+
+  <div class="sidebar-overlay" id="sidebar-overlay" onclick="fecharSidebar()"></div>
+
+  <aside class="sidebar" id="sidebar">
+    <div class="logo">
+      <div class="logo-icon">🧠</div>
+      <div>
+        <div class="logo-title">Painel IA</div>
+        <div class="logo-sub">Prompt Generator</div>
+      </div>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-section-header" onclick="toggleBloco('conteudo')">
+        <span class="nav-dot red"></span><span>Conteúdo</span><span class="nav-arrow" id="arrow-conteudo">▼</span>
+      </div>
+      <div class="nav-items" id="bloco-conteudo">
+        <div class="nav-item" onclick="selecionarModulo('retina',this)">📸 RETINA — 6 Conteúdos</div>
+        <div class="nav-item" onclick="selecionarModulo('plano30',this)">📅 Plano 30 Dias</div>
+        <div class="nav-item" onclick="selecionarModulo('reels',this)">🎬 Calendário de Reels</div>
+      </div>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-section-header" onclick="toggleBloco('anuncios')">
+        <span class="nav-dot blue2"></span><span>Anúncios</span><span class="nav-arrow" id="arrow-anuncios">▼</span>
+      </div>
+      <div class="nav-items" id="bloco-anuncios">
+        <div class="nav-item" onclick="selecionarModulo('metaads',this)">📱 Meta Ads — 4 Anúncios</div>
+        <div class="nav-item" onclick="selecionarModulo('googleads',this)">🔍 Google Ads</div>
+        <div class="nav-item" onclick="selecionarModulo('persona',this)">🎯 Mapeamento de Persona</div>
+      </div>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-section-header" onclick="toggleBloco('vendas')">
+        <span class="nav-dot green"></span><span>Vendas</span><span class="nav-arrow" id="arrow-vendas">▼</span>
+      </div>
+      <div class="nav-items" id="bloco-vendas">
+        <div class="nav-item" onclick="selecionarModulo('direct',this)">💬 Venda no Direct</div>
+        <div class="nav-item" onclick="selecionarModulo('spin',this)">🔄 SPIN Selling</div>
+        <div class="nav-item" onclick="selecionarModulo('vendaconteudo',this)">📣 Venda pelo Conteúdo</div>
+      </div>
+    </div>
+
+    <div class="historico-btn" onclick="abrirHistorico()">🕐 Histórico de Prompts</div>
+  </aside>
+
+  <main class="main">
+    <div class="topbar">
+      <div class="topbar-left">
+        <button class="menu-btn" onclick="toggleSidebar()">☰</button>
+        <div class="topbar-info">
+          <span class="topbar-title" id="topbar-title">Selecione um módulo</span>
+          <span class="topbar-badge hidden" id="topbar-badge"></span>
+        </div>
+      </div>
+      <div class="progress-bar hidden" id="progress-bar">
+        <div class="progress-fill-wrapper"><div class="progress-fill" id="progress-fill"></div></div>
+        <span class="progress-text" id="progress-text">0/0</span>
+      </div>
+    </div>
+
+    <div class="chat-area" id="chat-area">
+      <div class="welcome-msg">
+        <div class="welcome-icon">🧠</div>
+        <h2>Painel IA — Prompt Generator</h2>
+        <p>Selecione um módulo na sidebar para começar.<br>Responda as perguntas e receba um prompt completo para colar no Claude.</p>
+        <div class="welcome-features">
+          <span>✅ 100% Offline</span>
+          <span>✅ Prompts Completos</span>
+          <span>✅ Abre no Claude</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="input-area">
+      <div class="input-question" id="input-question"></div>
+      <div class="input-wrapper">
+        <textarea id="user-input" placeholder="Selecione um módulo para começar..." disabled onkeydown="onKey(event)" oninput="onInput()"></textarea>
+        <button class="send-btn" id="send-btn" onclick="enviar()" disabled>Enviar</button>
+      </div>
+      <div class="input-hint" id="input-hint">Enter para enviar · Shift+Enter para nova linha</div>
+    </div>
+  </main>
+</div>
+
+<!-- PROMPT OVERLAY -->
+<div class="prompt-overlay hidden" id="prompt-overlay">
+  <div class="prompt-overlay-header">
+    <div class="prompt-overlay-title">✅ Prompt Pronto — Cole no Claude</div>
+    <div class="prompt-overlay-actions">
+      <button class="btn-copiar" onclick="copiarOverlay(this)">📋 Copiar</button>
+      <a class="btn-claude" href="https://claude.ai" target="_blank" rel="noopener">🤖 Abrir Claude</a>
+      <button class="btn-novo" onclick="fecharOverlay()">🔄 Novo</button>
+    </div>
+  </div>
+  <div class="prompt-overlay-body" id="prompt-overlay-content"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<div class="modal-overlay hidden" id="modal-historico" onclick="if(event.target===this)fecharHistorico()">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>🕐 Histórico de Prompts</h3>
+      <button onclick="fecharHistorico()">✕</button>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+  </div>
+</div>
+
+<script>
+const MODULOS = {
+  retina: {
+    nome:'RETINA — 6 Conteúdos', icone:'📸', cor:'red', cat:'Conteúdo',
+    perguntas:[
+      { id:'nome',    txt:'👤 Qual é o nome de quem vai criar os conteúdos?', ph:'Ex: João Silva', min:2 },
+      { id:'nicho',   txt:'🎯 Qual é o nicho de mercado?', ph:'Ex: Produto de cabelo para queda', min:5 },
+      { id:'publico', txt:'👥 Descreva o público-alvo: quem é, o que quer, o que teme e seus sonhos. Quanto mais detalhe melhor.', ph:'Ex: Jovens 18-30 anos, cansados de ver o cabelo caindo, se sentem inferiores...', min:30 }
+    ],
+    prompt:(r)=>`CRIADOR: ${r.nome}
+NICHO: ${r.nicho}
+PÚBLICO: ${r.publico}
+
+---
+
+Você é um especialista mundial em marketing de conteúdo para Instagram, psicologia do consumidor e copywriting persuasivo.
+
+Antes de criar qualquer coisa, pesquise em fontes confiáveis da internet e vídeos as melhores estratégias de conteúdo para esse nicho e público específico. Use esse conhecimento junto com sua inteligência para entregar o melhor resultado possível.
+
+Com base no criador, nicho e público acima, analise profundamente as dores, medos e sonhos desse público. Depois entregue os 6 conteúdos RETINA completos, organizados, com títulos claros, separadores visuais e formatação limpa. Nada de texto corrido ou poluído.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+R — RELACIONAMENTO
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Formato: Reels 60-90 segundos
+Objetivo: história pessoal conectada ao medo do público
+Entregue:
+- Roteiro com tempo marcado:
+  [0-3s] Gancho visual + fala
+  [3-15s] História pessoal real
+  [15-45s] Conexão com a dor do público
+  [45-60s] Virada emocional
+  [60-90s] CTA poderoso
+- Legenda completa com emojis e CTA
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+E — ENGAJAMENTO
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Formato: Carrossel 5-7 slides
+Objetivo: pergunta provocadora que gera comentários e salvamentos
+Entregue:
+- Texto completo de cada slide
+- Legenda com pergunta provocadora e CTA de comentário
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+T — TRANSFORMAÇÃO
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Formato: Reels ou Carrossel
+Objetivo: mostrar o antes e depois real do público
+Entregue:
+- Roteiro com tempo marcado ou slides completos
+- Legenda com CTA de identificação
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+I — INTERAÇÃO 1x1
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Formato: Stories sequencial
+Objetivo: criar conversa direta e personalizada com o seguidor
+Entregue:
+- Sequência de 5-8 stories completos
+- Enquetes, caixinha de perguntas e reações
+- CTA para direct ao final
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+N — NÍVEIS DE CONSCIÊNCIA
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Formato: Reels
+Objetivo: venda indireta mostrando sinais de que a pessoa já precisa do produto
+Entregue:
+- Roteiro com tempo marcado:
+  [0-3s] Gancho de identificação
+  [3-15s] Sinais e situações reais do público
+  [15-45s] Aprofundamento da dor sem forçar
+  [45-60s] Solução indireta e suave
+  [60-90s] CTA suave para direct
+- Legenda pronta
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+A — AUTORIDADE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Formato: Reels profissional
+Objetivo: expor um erro caro e comum do nicho posicionando como especialista
+Entregue:
+- Roteiro com tempo marcado:
+  [0-3s] Gancho chocante sobre o erro
+  [3-15s] Apresentação do erro comum
+  [15-45s] Consequências reais do erro
+  [45-60s] A solução correta
+  [60-90s] CTA de autoridade
+- Legenda pronta
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+BÔNUS OBRIGATÓRIO
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+- 5 headlines fortes para imagens e thumbnails
+- Estratégia de frequência semanal (quantos Reels, Carrosséis e Stories por semana e em quais dias)`
+  },
+
+  plano30: {
+    nome:'Plano 30 Dias', icone:'📅', cor:'red', cat:'Conteúdo',
+    perguntas:[
+      { id:'nicho',    txt:'🎯 Qual é o nicho de mercado?', ph:'Ex: Coach de emagrecimento', min:5 },
+      { id:'produto',  txt:'📦 Qual é o produto ou serviço principal que você vende?', ph:'Ex: Programa de 12 semanas online', min:10 },
+      { id:'objetivo', txt:'🏆 Qual é o objetivo principal do mês: crescer seguidores, gerar leads ou converter vendas?', ph:'Ex: Converter vendas e chegar em 5k seguidores', min:10 },
+      { id:'dias',     txt:'📅 Quantos dias por semana você consegue postar?', ph:'Ex: 5 dias por semana (Seg a Sex)', min:3 }
+    ],
+    prompt:(r)=>`NICHO: ${r.nicho}
+PRODUTO/SERVIÇO: ${r.produto}
+OBJETIVO DO MÊS: ${r.objetivo}
+DIAS POR SEMANA PARA POSTAR: ${r.dias}
+
+---
+
+Você é estrategista de conteúdo e marketing digital especializado em planos de 30 dias com resultado real.
+
+Antes de criar qualquer coisa, pesquise em fontes confiáveis da internet as melhores estratégias de conteúdo para esse nicho e objetivo. Use esse conhecimento junto com sua inteligência para entregar o melhor resultado possível.
+
+Monte o calendário completo de 30 dias organizado, com títulos claros, separadores visuais e formatação limpa. Nada de texto corrido ou poluído.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+SEMANA 1 — ATRAIR ATENÇÃO
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Objetivo: alcançar pessoas novas
+Foco: Reels de gancho forte, carrosséis educativos e stories com enquetes
+
+Para cada dia entregue:
+- Tipo de conteúdo (Reels, Carrossel, Stories ou Prova Social)
+- Tema específico do conteúdo
+- Hook de abertura para os primeiros 3 segundos
+- CTA final
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+SEMANA 2 — GERAR AUTORIDADE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Objetivo: posicionar como especialista
+Foco: comparativos, bastidores e provas sociais
+
+Para cada dia entregue:
+- Tipo de conteúdo
+- Tema específico
+- Hook de abertura
+- CTA final
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+SEMANA 3 — GERAR LEADS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Objetivo: fazer o seguidor pedir atendimento
+Foco: CTAs diretos, caixas de perguntas e simulações
+
+Para cada dia entregue:
+- Tipo de conteúdo
+- Tema específico
+- Hook de abertura
+- CTA final
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+SEMANA 4 — CONVERTER VENDAS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Objetivo: fechar vendas com quem já está quente
+Foco: urgência e oferta direta
+
+Para cada dia entregue:
+- Tipo de conteúdo
+- Tema específico
+- Hook de abertura
+- CTA final
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+BÔNUS OBRIGATÓRIO
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+- Sequência de stories diários (5 a 10 por dia)
+- CTAs que mais geram leads para esse nicho
+- Meta diária de interações
+- Cronograma de horários ideais para postar`
+  },
+
+  reels: {
+    nome:'Calendário de Reels', icone:'🎬', cor:'red', cat:'Conteúdo',
+    perguntas:[
+      { id:'nicho',   txt:'🎯 Qual é o nicho de mercado?', ph:'Ex: Finanças pessoais para casais', min:5 },
+      { id:'produto', txt:'📦 Qual é o produto ou serviço que você vende?', ph:'Ex: Consultoria financeira para casais', min:10 },
+      { id:'tom',     txt:'🎙️ Como é o seu tom de voz: formal, informal, técnico ou descontraído?', ph:'Ex: Informal e descontraído, como um amigo', min:10 }
+    ],
+    prompt:(r)=>`NICHO: ${r.nicho}
+PRODUTO/SERVIÇO: ${r.produto}
+TOM DE VOZ: ${r.tom}
+
+---
+
+Você é o maior especialista em Reels do Brasil. Domina storytelling visual, algoritmo e psicologia de audiências.
+
+Antes de criar qualquer coisa, pesquise em fontes confiáveis da internet os melhores ganchos, temas e estratégias de Reels para esse nicho. Use esse conhecimento junto com sua inteligência para entregar o melhor resultado possível.
+
+Crie 30 roteiros completos prontos para gravar, organizados, com títulos claros, separadores visuais e formatação limpa. Nada de texto corrido ou poluído.
+
+Para cada Reels entregue:
+- Número do dia e tema
+- Roteiro completo palavra por palavra — escreva exatamente o que a pessoa deve falar na câmera
+- CTA final já embutido no roteiro
+
+Regras para todos os roteiros:
+- Primeiros 3 segundos: gancho que para o scroll imediatamente
+- Desenvolvimento em blocos curtos, uma ideia por vez
+- Tom: ${r.tom}
+- CTA direto no final: direct, comentário ou WhatsApp
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+DISTRIBUIÇÃO DOS 30 ROTEIROS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+- 10 de autoridade e dica prática
+- 8 de prova social e entrega emocional
+- 7 de venda direta e oferta
+- 5 de humor e engajamento nichado
+
+Entregue os 30 roteiros numerados de 1 a 30. Prontos para gravar.`
+  },
+
+  metaads: {
+    nome:'Meta Ads — 4 Anúncios', icone:'📱', cor:'blue2', cat:'Anúncios',
+    perguntas:[
+      { id:'marca',   txt:'🏢 Qual é o nome da marca ou negócio?', ph:'Ex: Studio Cabelo & Cia', min:2 },
+      { id:'produto', txt:'📦 O que está sendo anunciado? Quanto mais detalhe melhor.', ph:'Ex: Tratamento capilar para queda, 3 sessões, resultado em 30 dias...', min:20 },
+      { id:'destino', txt:'📲 Para onde a pessoa vai depois de clicar: WhatsApp, página/site ou os dois?', ph:'Ex: WhatsApp', min:3 },
+      { id:'persona', txt:'👥 Descreva a persona: quem é, o que quer, o que teme e o que já tentou.', ph:'Ex: Mulheres 25-40, sofrendo com queda de cabelo, já tentaram shampoos...', min:30 }
+    ],
+    prompt:(r)=>`MARCA/NEGÓCIO: ${r.marca}
+PRODUTO/SERVIÇO: ${r.produto}
+DESTINO DO CLIQUE: ${r.destino}
+PERSONA: ${r.persona}
+
+---
+
+Você é copywriter de resposta direta especializado em Meta Ads (Facebook e Instagram) com histórico de anúncios acima da média do mercado.
+
+Antes de criar qualquer coisa, pesquise em fontes confiáveis da internet as melhores estratégias de anúncios para esse nicho e persona. Use esse conhecimento junto com sua inteligência para entregar o melhor resultado possível.
+
+Crie os 4 anúncios completos, organizados, com títulos claros, separadores visuais e formatação limpa. Nada de texto corrido ou poluído.
+
+Para cada anúncio entregue:
+- Gancho (máximo 2 linhas — para parar o scroll)
+- Corpo do texto completo (desenvolvimento que conecta dor, solução e desejo)
+- CTA adaptado ao destino: ${r.destino}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ANÚNCIO 1 — GANCHO PERGUNTA
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Use uma pergunta que provoca o leitor sobre uma dor, crença ou situação que ele vive hoje.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ANÚNCIO 2 — GANCHO HISTÓRIA
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Comece com uma situação que o público reconhece na própria vida. Construa identificação antes de apresentar a solução.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ANÚNCIO 3 — GANCHO CONTRA-INTUITIVO
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Quebre uma crença comum do público. Diga algo que parece errado à primeira vista mas faz sentido quando explicado.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ANÚNCIO 4 — GANCHO SEGMENTADO
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Fale diretamente com um perfil específico da persona usando cidade, situação de vida ou característica marcante.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+BÔNUS OBRIGATÓRIO
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+- 10 ganchos para vídeo (divididos entre pergunta, história, contra-intuitivo e segmentado)
+- 10 ganchos para imagem (no estilo de headlines clássicas de copywriting)`
+  },
+
+  googleads: {
+    nome:'Google Ads', icone:'🔍', cor:'blue2', cat:'Anúncios',
+    perguntas:[
+      { id:'marca',   txt:'🏢 Qual é o nome da marca ou negócio?', ph:'Ex: Clínica Capilar São Paulo', min:2 },
+      { id:'produto', txt:'📦 Qual é o produto ou serviço anunciado?', ph:'Ex: Tratamento para queda de cabelo', min:10 },
+      { id:'cidade',  txt:'📍 Qual é a cidade ou região de atendimento?', ph:'Ex: São Paulo — SP', min:3 },
+      { id:'destino', txt:'📲 Para onde a pessoa vai depois de clicar: site, página de vendas ou WhatsApp?', ph:'Ex: WhatsApp', min:3 },
+      { id:'persona', txt:'👥 Descreva a persona: quem é, o que busca e o que teme.', ph:'Ex: Homens 30-50 anos, buscam tratamento para calvície...', min:20 }
+    ],
+    prompt:(r)=>`MARCA/NEGÓCIO: ${r.marca}
+PRODUTO/SERVIÇO: ${r.produto}
+CIDADE/REGIÃO: ${r.cidade}
+DESTINO DO CLIQUE: ${r.destino}
+PERSONA: ${r.persona}
+
+---
+
+Você é especialista certificado em Google Ads com foco em campanhas de alta intenção de compra no Brasil.
+
+Antes de criar qualquer coisa, pesquise em fontes confiáveis da internet as melhores palavras-chave e estratégias de Google Ads para esse nicho e região. Use esse conhecimento junto com sua inteligência para entregar o melhor resultado possível.
+
+Monte a campanha completa, organizada, com títulos claros, separadores visuais e formatação limpa.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PARTE 1 — PALAVRAS-CHAVE POSITIVAS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+- 20 palavras-chave de alta intenção de compra (pronta para comprar, com variações usando ${r.cidade})
+- 10 palavras-chave de interesse no produto (pesquisando, ainda não decidida)
+Apresente cada lista numerada e separada.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PARTE 2 — PALAVRAS-CHAVE NEGATIVAS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+- 10 palavras-chave negativas para bloquear cliques irrelevantes
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PARTE 3 — SELEÇÃO ESTRATÉGICA
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Indique quais 5 a 8 palavras você escolheria para começar e explique brevemente o motivo de cada escolha.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PARTE 4 — CORRESPONDÊNCIA DE PALAVRAS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Formate as palavras selecionadas em:
+- Correspondência de Frase: "palavra-chave"
+- Correspondência Exata: [palavra-chave]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PARTE 5 — TÍTULOS DO ANÚNCIO
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Crie 20 títulos respeitando obrigatoriamente o limite de 30 caracteres cada (incluindo espaços). Conte os caracteres antes de entregar.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PARTE 6 — DESCRIÇÕES DO ANÚNCIO
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Crie 8 descrições respeitando obrigatoriamente o limite de 90 caracteres cada (incluindo espaços). Cada descrição com um ângulo diferente: benefício, prova social, urgência, facilidade, localização, confiança, CTA direto e diferencial.`
+  },
+
+  persona: {
+    nome:'Mapeamento de Persona', icone:'🎯', cor:'blue2', cat:'Anúncios',
+    perguntas:[
+      { id:'nicho', txt:'🏢 Qual é o nicho de mercado? (Ex: automóveis, emagrecimento, finanças, imóveis...)', ph:'Ex: Produtos para queda de cabelo', min:5 }
+    ],
+    prompt:(r)=>`NICHO: ${r.nicho}
+
+---
+
+Você é especialista em pesquisa de mercado e psicologia do consumidor.
+
+Antes de criar qualquer coisa, pesquise em fontes confiáveis da internet o comportamento, dores e desejos do consumidor desse nicho. Use esse conhecimento junto com sua inteligência para entregar o melhor resultado possível.
+
+Entregue o mapeamento completo, organizado, com títulos claros, separadores visuais e formatação limpa. Nada de texto corrido ou poluído.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+A — DADOS DEMOGRÁFICOS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Crie um perfil fictício com nome, idade, ocupação, estado civil, localização e breve descrição do estilo de vida.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+B — PROBLEMA PRINCIPAL
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Descreva em 2 parágrafos qual é o problema central que essa persona enfrenta e por que ele ainda não foi resolvido.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+C — 5 EMOÇÕES EM TORNO DO PROBLEMA
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Liste as 5 emoções que essa pessoa sente quando pensa no problema. Seja específico — sem palavras genéricas.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+D — 5 MAIORES MEDOS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Os medos concretos e reais relacionados ao problema. O que ela teme que aconteça se não resolver?
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+E — IMPACTO NOS RELACIONAMENTOS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Como esses medos impactam a vida familiar, social e profissional dessa pessoa?
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+F — 5 FRASES QUE ELA OUVE E DETESTA
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Frases reais que pessoas ao redor dizem e que machucam ou irritam essa persona.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+G — O QUE JÁ TENTOU NO PASSADO
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Liste o que ela já fez para tentar resolver o problema e por que não funcionou.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+H — 5 FRASES SOBRE O PASSADO
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Frases curtas no estilo dela falando sobre tentativas frustradas anteriores.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+I — O QUE ELA NÃO QUER FAZER
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+O que ela evita fazer mesmo que seja uma possível solução? Por que resiste?
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+J — 5 FRASES SOBRE O QUE NÃO QUER
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Frases reais no estilo dela expressando essa resistência.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+K — O QUE QUER QUE MUDE NOS RELACIONAMENTOS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Se resolver o problema, o que melhora nas relações com família, amigos e colegas?
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+L — QUEM ELA CULPA
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Quem ou o que ela responsabiliza pelo problema que enfrenta hoje?
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+M — 5 MAIORES OBJEÇÕES PARA COMPRAR AGORA
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+O que ela diz para si mesma para adiar a decisão de compra?
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+N — COMO TRABALHAR ESSA PERSONA NO CONTEÚDO
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Explique como encorajar os sonhos dela, justificar erros passados, aliviar medos, confirmar suspeitas e apontar culpados de forma que ela se sinta compreendida.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+O — 5 NÍVEIS DE CONSCIÊNCIA (Eugene Schwartz)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+1. Totalmente inconsciente
+2. Consciente do problema
+3. Consciente da solução
+4. Consciente do produto
+5. Totalmente consciente e pronta para comprar
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+P — SUBMERCADOS DO NICHO
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Liste os principais sub-nichos com breve descrição de cada perfil.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Q — OPORTUNIDADES DE MERCADO
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Quais são as brechas, lacunas ou serviços que ainda não estão sendo bem atendidos nesse nicho?
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+R — DORES PROFUNDAS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+5 dores que vão além do problema superficial — o que realmente machuca por dentro?
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+S — PENSAMENTOS RECORRENTES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+5 pensamentos que passam pela cabeça dela com frequência sobre a situação que vive.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+T — SEGREDOS QUE ESCONDE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+5 coisas que essa persona não conta nem para os mais próximos.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+U — 5 GATILHOS QUE MAIS A MOVEM
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Quais os 5 gatilhos emocionais que, quando acionados, fazem ela agir imediatamente?
+
+Ao final pergunte se eu quero transformar esse estudo em copy de vendas, anúncios, conteúdo para redes sociais ou perguntas de SPIN Selling.`
+  },
+
+  direct: {
+    nome:'Venda no Direct', icone:'💬', cor:'green', cat:'Vendas',
+    perguntas:[
+      { id:'nicho',   txt:'🎯 Qual é o nicho e o produto ou serviço que você vende?', ph:'Ex: Tratamento capilar — 3 sessões R$ 497', min:10 },
+      { id:'canal',   txt:'📲 Você atende pelo direct do Instagram, WhatsApp ou pelos dois?', ph:'Ex: WhatsApp', min:3 },
+      { id:'publico', txt:'👥 Como é o seu público: quem é, o que quer e quais são as principais objeções que ele usa?', ph:'Ex: Mulheres 25-40, querem parar a queda, objeções: tá caro, vou pensar...', min:20 },
+      { id:'tom',     txt:'🎙️ Como é o seu tom de voz: mais informal e próximo ou mais formal e técnico?', ph:'Ex: Informal e próximo, como uma conversa entre amigos', min:10 }
+    ],
+    prompt:(r)=>`NICHO/PRODUTO: ${r.nicho}
+CANAL DE ATENDIMENTO: ${r.canal}
+PÚBLICO E OBJEÇÕES: ${r.publico}
+TOM DE VOZ: ${r.tom}
+
+---
+
+Você é especialista em vendas pelo Instagram e WhatsApp. Domina rapport, psicologia de vendas e fechamento de alto valor.
+
+Antes de criar qualquer coisa, pesquise em fontes confiáveis da internet as melhores técnicas de venda pelo direct para esse nicho. Use esse conhecimento junto com sua inteligência para entregar o melhor resultado possível.
+
+Entregue o script completo adaptado ao canal: ${r.canal}. Organizado, com títulos claros, separadores visuais e formatação limpa. Nada de texto corrido ou poluído.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+BLOCO 1 — PRIMEIRA MENSAGEM
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Scripts para 3 entradas diferentes:
+- Lead comentou palavra-chave (ex: QUERO, INFO)
+- Lead respondeu um story
+- Lead chamou por conta própria sem contexto
+Cada script: curto, acolhedor, máximo 2 perguntas naturais.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+BLOCO 2 — ENTENDER O PERFIL
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Mensagem para aprofundar o perfil do lead. Máximo 2 perguntas por mensagem. Tom de conversa, não de formulário.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+BLOCO 3 — GERAR AUTORIDADE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Mensagem que posiciona como especialista antes de apresentar qualquer oferta. Não cite preço aqui.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+BLOCO 4 — APRESENTAR A OFERTA
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Script para apresentar o produto de forma clara. Estrutura: descrição + condição + próximo passo. Termine com pergunta aberta.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+BLOCO 5 — CRIAR URGÊNCIA
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Mensagem que gera senso de oportunidade sem pressionar nem mentir. Use escassez ou prazo real quando possível.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+BLOCO 6 — FECHAMENTO SUAVE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Script de fechamento que convida à ação sem forçar. Entregue também 6 frases curtas de fechamento prontas.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+BLOCO 7 — RESPOSTAS PARA OBJEÇÕES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Para cada situação entregue uma resposta que mantenha a conversa viva:
+- Lead sumiu sem responder
+- "Tô só olhando"
+- "Sem dinheiro agora"
+- "Vou pensar"
+- "Tá caro"
+- "Deixa pra semana que vem"
+- "Tenho algo na troca"
+- "Preciso falar com minha esposa/marido"
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+BLOCO 8 — FOLLOW-UP
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+3 mensagens de follow-up com timing exato:
+- 24h depois do silêncio: ângulo de novidade
+- 3 dias depois: ângulo de escassez
+- 7 dias depois: ângulo de lembrança afetiva
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+BLOCO 9 — ERROS QUE DESTROEM A VENDA
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+5 erros mais comuns no atendimento pelo ${r.canal} e como evitar cada um.`
+  },
+
+  spin: {
+    nome:'SPIN Selling', icone:'🔄', cor:'green', cat:'Vendas',
+    perguntas:[
+      { id:'nicho',   txt:'🎯 Qual é o nicho e o produto ou serviço que você vende?', ph:'Ex: Software para clínicas — R$ 497/mês', min:10 },
+      { id:'canal',   txt:'📲 Você aplica esse roteiro pelo direct, WhatsApp, ligação ou reunião presencial?', ph:'Ex: Reunião presencial e WhatsApp', min:5 },
+      { id:'cliente', txt:'👥 Descreva o perfil do seu cliente: quem é, o que quer, o que teme e as objeções que costuma usar.', ph:'Ex: Donos de clínicas, querem organizar o negócio, objeções: não tenho tempo...', min:20 }
+    ],
+    prompt:(r)=>`NICHO/PRODUTO: ${r.nicho}
+CANAL DE APLICAÇÃO: ${r.canal}
+PERFIL DO CLIENTE: ${r.cliente}
+
+---
+
+Você é expert em SPIN Selling (Neil Rackham) com vasta experiência em vendas consultivas B2B e B2C de alto valor no Brasil.
+
+Antes de criar qualquer coisa, pesquise em fontes confiáveis da internet as melhores aplicações do SPIN Selling para esse nicho e perfil de cliente. Use esse conhecimento junto com sua inteligência para entregar o melhor resultado possível.
+
+Entregue o roteiro completo adaptado ao canal: ${r.canal}. Organizado, com títulos claros, separadores visuais e formatação limpa.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+BLOCO 1 — PERGUNTAS DE SITUAÇÃO (S)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+6 perguntas que mapeiam o contexto atual do cliente. Tom de conversa natural, não interrogatório.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+BLOCO 2 — PERGUNTAS DE PROBLEMA (P)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+6 perguntas que revelam a dor que o cliente ainda não nomeou claramente. Fazer ele falar por conta própria.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+BLOCO 3 — PERGUNTAS DE IMPLICAÇÃO (I)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+6 perguntas que ampliam a percepção do custo de não resolver o problema. O cliente precisa sentir o peso antes de querer a solução.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+BLOCO 4 — PERGUNTAS DE NECESSIDADE (N)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+6 perguntas que fazem o cliente enxergar e verbalizar o valor da solução. Quem fala o benefício em voz alta compra mais fácil.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+BLOCO 5 — RESPOSTAS PARA OBJEÇÕES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+8 objeções mais comuns desse perfil. Para cada uma entregue:
+- A objeção exata como ele fala
+- Resposta ideal que valida e redireciona
+- Pergunta de retomada para continuar o SPIN
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+BLOCO 6 — SEQUÊNCIA RECOMENDADA
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Roteiro de como conduzir a conversa do início ao fechamento usando os 4 blocos. Indique quando usar cada bloco e como fazer a transição entre eles. Adapte para o canal: ${r.canal}.`
+  },
+
+  vendaconteudo: {
+    nome:'Venda pelo Conteúdo', icone:'📣', cor:'green', cat:'Vendas',
+    perguntas:[
+      { id:'nicho',    txt:'🎯 Qual é o nicho e o produto ou serviço que você vende?', ph:'Ex: Curso de tráfego pago — R$ 997', min:10 },
+      { id:'meta',     txt:'💰 Qual é a sua meta de vendas no mês?', ph:'Ex: R$ 10.000 no mês', min:5 },
+      { id:'horas',    txt:'⏰ Quantas horas por dia você consegue dedicar ao Instagram?', ph:'Ex: 2 horas por dia', min:3 },
+      { id:'situacao', txt:'📊 Você já tem seguidores ou está começando do zero? Me conte a situação atual.', ph:'Ex: 2.000 seguidores, bom engajamento, vendi 3x antes...', min:20 }
+    ],
+    prompt:(r)=>`NICHO/PRODUTO: ${r.nicho}
+META DE VENDAS DO MÊS: ${r.meta}
+HORAS POR DIA DISPONÍVEIS: ${r.horas}
+SITUAÇÃO ATUAL: ${r.situacao}
+
+---
+
+Você é estrategista de vendas pelo conteúdo digital. Cria sistemas onde o conteúdo funciona como vendedor automático 24h por dia.
+
+Antes de criar qualquer coisa, pesquise em fontes confiáveis da internet as melhores estratégias de venda pelo conteúdo para esse nicho. Use esse conhecimento junto com sua inteligência para entregar o melhor resultado possível.
+
+Entregue o plano completo, organizado, com títulos claros, separadores visuais e formatação limpa. Nada de texto corrido ou poluído.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+BLOCO 1 — FUNIL DE VENDA PELO CONTEÚDO
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Como o conteúdo vai funcionar como funil em 3 etapas:
+- Topo: conteúdo que atrai pessoas novas
+- Meio: conteúdo que aquece e gera confiança
+- Fundo: conteúdo que converte e gera direct
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+BLOCO 2 — PLANO AGRESSIVO DE VENDAS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Com base na meta de ${r.meta}, calcule:
+- Leads por dia necessários
+- Conversas por semana
+- Propostas por semana
+- Taxa de conversão necessária para bater a meta
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+BLOCO 3 — ROTINA DIÁRIA POR HORÁRIO
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Agenda completa com horário por horário adaptada para ${r.horas} de dedicação:
+- O que postar e quando
+- Quando responder directs
+- Quando interagir em outros perfis
+- Quando fazer follow-up
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+BLOCO 4 — META SEMANAL
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Números para perseguir toda semana:
+- Leads gerados
+- Conversas abertas no direct ou WhatsApp
+- Propostas feitas
+- Vendas fechadas
+Como monitorar e o que fazer se estiver abaixo da meta na quinta-feira.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+BLOCO 5 — TIPOS DE CONTEÚDO QUE MAIS VENDEM
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+5 formatos que mais geram direct e vendas para esse nicho — com exemplo de tema para cada um.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+BLOCO 6 — CTAs QUE GERAM LEAD
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+10 chamadas para ação prontas para usar no final de cada conteúdo — para gerar direct no Instagram e mensagem no WhatsApp.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+BLOCO 7 — ERROS QUE TRAVAM AS VENDAS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+5 erros mais comuns de quem tenta vender pelo conteúdo e como corrigir cada um.`
+  }
+};
+
+// ESTADO
+let S = { modulo:null, q:0, total:0, respostas:{}, ativo:false };
+
+document.addEventListener('DOMContentLoaded', () => {
+  ['conteudo','anuncios','vendas'].forEach(toggleBloco);
+});
+
+function toggleBloco(id) {
+  document.getElementById(`bloco-${id}`).classList.toggle('collapsed');
+  document.getElementById(`arrow-${id}`).classList.toggle('rotated');
+}
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('sidebar-overlay').classList.toggle('show');
+}
+function fecharSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebar-overlay').classList.remove('show');
+}
+
+function selecionarModulo(id, el) {
+  const m = MODULOS[id]; if(!m) return;
+  fecharSidebar();
+  document.querySelectorAll('.nav-item').forEach(e => e.classList.remove('active-red','active-blue2','active-green'));
+  if(el) el.classList.add(`active-${m.cor}`);
+  else document.querySelectorAll('.nav-item').forEach(item => {
+    if(item.getAttribute('onclick') && item.getAttribute('onclick').includes(`'${id}'`))
+      item.classList.add(`active-${m.cor}`);
+  });
+  document.getElementById('topbar-title').textContent = m.nome;
+  const b = document.getElementById('topbar-badge');
+  b.textContent = m.cat; b.className = `topbar-badge ${m.cor}`; b.classList.remove('hidden');
+  S = { modulo:id, q:0, total:m.perguntas.length, respostas:{}, ativo:true };
+  limparChat(); ativarInput();
+  setTimeout(()=>{
+    addSys(`${m.icone} <strong>${m.nome}</strong> ativado!<br><br>Vou fazer <strong>${m.perguntas.length} pergunta${m.perguntas.length>1?'s':''}</strong>. Responda com o máximo de detalhes para um resultado melhor!`);
+    setTimeout(pergunta, 500);
+  }, 200);
+}
+
+function pergunta() {
+  const p = MODULOS[S.modulo].perguntas[S.q];
+  atualizarProgress();
+  addSys(`<span style="color:var(--muted);font-size:11px;font-weight:600">[${S.q+1}/${S.total}]</span><br><br>${p.txt}`);
+  const inp = document.getElementById('user-input');
+  inp.placeholder = p.ph;
+  const iq = document.getElementById('input-question');
+  iq.textContent = '';
+  iq.classList.remove('show');
+  document.getElementById('send-btn').disabled = true;
+  document.getElementById('input-hint').textContent = 'Enter para enviar · Shift+Enter para nova linha';
+  setTimeout(()=>inp.focus(), 80);
+}
+
+function enviar() {
+  const inp = document.getElementById('user-input');
+  const val = inp.value.trim();
+  if(!val || !S.ativo) return;
+  const p = MODULOS[S.modulo].perguntas[S.q];
+  if(val.length < (p.min||2)) { toast(`⚠️ Resposta muito curta — mínimo ${p.min} caracteres`,'erro'); return; }
+  addUser(val);
+  S.respostas[p.id] = val;
+  inp.value=''; inp.style.height='auto';
+  document.getElementById('send-btn').disabled = true;
+  salvarLocal();
+  S.q++;
+  if(S.q < S.total) setTimeout(pergunta, 400);
+  else setTimeout(gerarPrompt, 600);
+}
+
+function gerarPrompt() {
+  addSys('⚙️ Gerando seu prompt completo e personalizado...');
+  setTimeout(()=>{
+    const m = MODULOS[S.modulo];
+    const prompt = m.prompt(S.respostas);
+    salvarHistorico(m.nome, prompt);
+    setTimeout(()=>{
+      addPromptBox(prompt);
+      desativarInput(); esconderProgress();
+    }, 600);
+  }, 800);
+}
+
+function limparChat() { document.getElementById('chat-area').innerHTML=''; }
+function scroll() {
+  const c = document.getElementById('chat-area');
+  requestAnimationFrame(() => {
+    c.scrollTop = c.scrollHeight;
+    setTimeout(() => { c.scrollTop = c.scrollHeight; }, 100);
+    setTimeout(() => { c.scrollTop = c.scrollHeight; }, 300);
+  });
+}
+
+// Rola para última mensagem quando teclado abre
+document.getElementById('user-input').addEventListener('focus', () => {
+  setTimeout(()=>{ const c=document.getElementById('chat-area'); c.scrollTop=c.scrollHeight; }, 300);
+});
+
+function addMsg(classe, avatar, html) {
+  const c=document.getElementById('chat-area');
+  const d=document.createElement('div');
+  d.className=`msg ${classe}`;
+  d.innerHTML=`<div class="msg-avatar">${avatar}</div><div class="msg-bubble">${html}</div>`;
+  c.appendChild(d); scroll();
+}
+function addSys(html) { addMsg('sistema','🧠',html); }
+function addUser(txt) { addMsg('usuario','👤',txt.replace(/</g,'&lt;').replace(/\n/g,'<br>')); }
+
+function addPromptBox(prompt) {
+  // Guarda o prompt para copiar
+  window._currentPrompt = prompt;
+  // Mostra no overlay fixo
+  const esc = prompt.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  document.getElementById('prompt-overlay-content').innerHTML = esc;
+  document.getElementById('prompt-overlay').classList.remove('hidden');
+  // Também adiciona no chat para histórico
+  const c = document.getElementById('chat-area');
+  const d = document.createElement('div');
+  d.className = 'prompt-box';
+  d.innerHTML = '<div style="padding:12px;color:var(--muted);font-size:13px;text-align:center">✅ Prompt gerado — veja acima</div>';
+  c.appendChild(d);
+}
+
+function fecharOverlay() {
+  document.getElementById('prompt-overlay').classList.add('hidden');
+  reiniciar();
+}
+
+function copiarOverlay(btn) {
+  const txt = window._currentPrompt || document.getElementById('prompt-overlay-content').innerText;
+  navigator.clipboard.writeText(txt).then(()=>{
+    btn.textContent='✅ Copiado!';
+    toast('✅ Copiado! Agora clique em Abrir Claude e cole lá.');
+    setTimeout(()=>btn.textContent='📋 Copiar', 3000);
+  }).catch(()=>{
+    const ta=document.createElement('textarea');
+    ta.value=txt; ta.style.cssText='position:fixed;opacity:0';
+    document.body.appendChild(ta); ta.select();
+    document.execCommand('copy'); document.body.removeChild(ta);
+    btn.textContent='✅ Copiado!';
+    toast('✅ Copiado! Agora clique em Abrir Claude e cole lá.');
+    setTimeout(()=>btn.textContent='📋 Copiar', 3000);
+  });
+}
+
+
+
+function ativarInput() {
+  const i=document.getElementById('user-input'),b=document.getElementById('send-btn');
+  i.disabled=false; b.disabled=true;
+}
+function desativarInput() {
+  const i=document.getElementById('user-input'),b=document.getElementById('send-btn');
+  i.disabled=true; b.disabled=true;
+  i.placeholder='Prompt gerado! Copie acima e cole no Claude.';
+  document.getElementById('input-hint').textContent='✅ Selecione outro módulo para gerar um novo prompt.';
+}
+function onInput() {
+  const i=document.getElementById('user-input');
+  i.style.height='auto'; i.style.height=Math.min(i.scrollHeight,110)+'px';
+  document.getElementById('send-btn').disabled=i.value.trim().length<2;
+}
+function onKey(e) {
+  if(e.key==='Enter'&&!e.shiftKey){ e.preventDefault(); if(!document.getElementById('send-btn').disabled) enviar(); }
+}
+
+function atualizarProgress() {
+  document.getElementById('progress-bar').classList.remove('hidden');
+  document.getElementById('progress-fill').style.width=(S.q/S.total*100)+'%';
+  document.getElementById('progress-text').textContent=`${S.q+1}/${S.total}`;
+}
+function esconderProgress() { document.getElementById('progress-bar').classList.add('hidden'); }
+
+function copiar(btn) {
+  const txt=document.getElementById('prompt-content').innerText;
+  navigator.clipboard.writeText(txt).then(()=>{
+    btn.textContent='✅ Copiado!';
+    toast('✅ Copiado! Agora clique em Abrir Claude e cole lá.');
+    setTimeout(()=>btn.textContent='📋 Copiar',3000);
+  }).catch(()=>{
+    const ta=document.createElement('textarea');
+    ta.value=txt; ta.style.cssText='position:fixed;opacity:0';
+    document.body.appendChild(ta); ta.select();
+    document.execCommand('copy'); document.body.removeChild(ta);
+    btn.textContent='✅ Copiado!';
+    toast('✅ Copiado! Agora clique em Abrir Claude e cole lá.');
+    setTimeout(()=>btn.textContent='📋 Copiar',3000);
+  });
+}
+
+function toast(msg,tipo='ok') {
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.style.background=tipo==='erro'?'#e0141f':'#1a3a6b';
+  t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),3500);
+}
+
+function reiniciar() { if(S.modulo) selecionarModulo(S.modulo); }
+
+function db() { try{ return JSON.parse(localStorage.getItem('painel_ia')||'{}'); }catch{ return {}; } }
+function saveDb(d) { try{ localStorage.setItem('painel_ia',JSON.stringify(d)); }catch{} }
+function salvarLocal() { const d=db(); d.estado={modulo:S.modulo,respostas:S.respostas,q:S.q}; saveDb(d); }
+function salvarHistorico(nome,prompt) {
+  const d=db(); if(!d.hist) d.hist=[];
+  d.hist.unshift({nome,prompt,data:new Date().toISOString()});
+  if(d.hist.length>20) d.hist=d.hist.slice(0,20);
+  saveDb(d);
+}
+function abrirHistorico() {
+  const h=db().hist||[];
+  const body=document.getElementById('modal-body');
+  body.innerHTML=h.length===0
+    ?'<p style="text-align:center;color:var(--muted);padding:24px;font-size:13px">Nenhum prompt gerado ainda.</p>'
+    :h.map((item,i)=>`<div class="historico-item" onclick="verHist(${i})">
+        <div class="historico-item-header"><span class="historico-item-nome">${item.nome}</span><span class="historico-item-data">${new Date(item.data).toLocaleDateString('pt-BR')}</span></div>
+        <div class="historico-item-preview">${item.prompt.substring(0,110)}...</div>
+      </div>`).join('');
+  document.getElementById('modal-historico').classList.remove('hidden');
+}
+function verHist(i) {
+  const item=db().hist[i]; if(!item) return;
+  fecharHistorico(); limparChat(); desativarInput();
+  addSys(`📂 <strong>${item.nome}</strong> — ${new Date(item.data).toLocaleDateString('pt-BR')}`);
+  addPromptBox(item.prompt);
+}
+function fecharHistorico() { document.getElementById('modal-historico').classList.add('hidden'); }
+</script>
+</body>
+</html>
