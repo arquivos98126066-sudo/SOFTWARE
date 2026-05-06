@@ -1,0 +1,1110 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+  <title>Tapetes CRM</title>
+  <style>
+    :root{
+      --primary:#1A4FBF;--primary-dark:#1440a0;--success:#00C853;--danger:#FF5252;
+      --bg:#EEF3FC;--card:#fff;--text:#0D1B3E;--muted:#4A6080;
+      --green:#4CAF50;--blue:#1A4FBF;--red:#FF5252;--border:#C3D3EE;
+      --shadow:0 2px 10px rgba(26,79,191,.10);--r:12px;
+    }
+    *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+    html,body{width:100%;max-width:100vw;overflow-x:hidden;background:var(--bg)}
+    body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:var(--text);font-size:14px;min-height:100vh}
+
+    .nav{background:var(--card);padding:14px 16px;display:flex;align-items:center;gap:8px;
+         box-shadow:var(--shadow);position:sticky;top:0;z-index:100;width:100%}
+    .nav-back{background:none;border:none;font-size:22px;cursor:pointer;padding:0 6px;flex-shrink:0;line-height:1}
+    .nav-title{font-size:17px;font-weight:700;color:var(--primary);flex:1}
+
+    .screen{display:none;padding:14px 14px 100px;width:100%;overflow-x:hidden;animation:fadeIn .18s}
+    .screen.active{display:block}
+    @keyframes fadeIn{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+
+    /* MÉTRICAS */
+    .metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
+    .metric-card{background:var(--card);border-radius:var(--r);padding:12px 6px;text-align:center;box-shadow:var(--shadow)}
+    .metric-card .val{font-size:22px;font-weight:800;color:var(--primary)}
+    .metric-card .lbl{font-size:10px;color:var(--muted);margin-top:2px}
+
+    .sec-title{font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin:4px 0 10px}
+
+    /* ALERTA ANTECIPADO */
+    .alerta-card{background:var(--card);border-radius:var(--r);padding:13px;margin-bottom:8px;
+      box-shadow:var(--shadow);border-left:4px solid var(--primary);display:flex;align-items:center;gap:10px}
+    .alerta-icon{font-size:22px;flex-shrink:0}
+    .alerta-info{flex:1;min-width:0}
+    .alerta-titulo{font-size:13px;font-weight:700}
+    .alerta-sub{font-size:11px;color:var(--muted);margin-top:2px}
+    .alerta-dias{background:var(--primary);color:#fff;border-radius:20px;padding:2px 10px;font-size:11px;font-weight:800;flex-shrink:0}
+
+    /* FILTRO DROPDOWN */
+    .filter-dropdown{position:relative;margin-bottom:12px;z-index:50}
+    .filter-trigger{width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:10px;
+      background:var(--card);font-size:13px;font-weight:600;color:var(--text);cursor:pointer;
+      display:flex;align-items:center;justify-content:space-between;box-shadow:var(--shadow)}
+    .filter-trigger .arr{font-size:11px;color:var(--muted);transition:transform .2s}
+    .filter-trigger.open .arr{transform:rotate(180deg)}
+    .filter-list{position:absolute;top:calc(100% + 4px);left:0;right:0;background:var(--card);
+      border:1.5px solid var(--border);border-radius:10px;box-shadow:0 4px 20px rgba(0,0,0,.15);
+      z-index:200;overflow:hidden;display:none}
+    .filter-list.open{display:block}
+    .filter-opt{padding:12px 14px;font-size:13px;font-weight:500;cursor:pointer}
+    .filter-opt:active{background:var(--bg)}
+    .filter-opt.active{color:var(--primary);font-weight:700;background:#eef3fc}
+    .filter-sep{height:1px;background:var(--border);margin:2px 0}
+
+    /* CARD CLIENTE */
+    .client-card{background:var(--card);border-radius:var(--r);padding:14px;margin-bottom:10px;
+      box-shadow:var(--shadow);border-left:4px solid var(--border);cursor:pointer;width:100%}
+    .client-card.nao-estava{border-left-color:var(--green)}
+    .client-card.interessado{border-left-color:var(--blue)}
+    .client-card.super-quente{border-left-color:var(--red)}
+    .card-row{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+    .card-name{font-size:15px;font-weight:700}
+    .card-sub{font-size:12px;color:var(--muted);margin-top:3px}
+    .card-meta{display:flex;align-items:center;gap:6px;margin-top:8px;flex-wrap:wrap}
+    .badge{font-size:11px;padding:2px 9px;border-radius:20px;font-weight:700;color:#fff;white-space:nowrap}
+    .badge.nao-estava{background:var(--green)}
+    .badge.interessado{background:var(--blue)}
+    .badge.super-quente{background:var(--red)}
+    .card-price{font-size:12px;font-weight:600;color:var(--muted)}
+    .card-date{font-size:11px;color:var(--muted)}
+    .card-btns{display:flex;gap:8px;margin-top:12px}
+    .card-btns .btn{flex:1}
+
+    /* BOTÕES */
+    .btn{min-height:46px;padding:0 14px;border:none;border-radius:10px;font-size:13px;font-weight:700;
+      cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;
+      transition:opacity .15s,transform .1s;width:100%;white-space:nowrap}
+    .btn:active{opacity:.8;transform:scale(.98)}
+    .btn-primary{background:var(--primary);color:#fff}
+    .btn-ghost{background:var(--bg);color:var(--text)}
+    .btn-success{background:var(--success);color:#fff}
+    .btn-danger{background:var(--danger);color:#fff}
+    .btn-outline{background:none;border:2px solid var(--primary);color:var(--primary)}
+    .btn-dark{background:#263238;color:#fff}
+    .btn-whatsapp{background:#25D366;color:#fff}
+    .btn-call{background:#2196F3;color:#fff}
+    .btn-gemini{background:linear-gradient(135deg,#4285F4,#0F9D58);color:#fff}
+    .btn-sm{min-height:38px;font-size:12px;padding:0 12px;width:auto;flex:none}
+
+    /* FORM */
+    .form-card{background:var(--card);border-radius:var(--r);padding:16px;margin-bottom:12px;box-shadow:var(--shadow)}
+    .form-card-title{font-size:13px;font-weight:700;color:var(--primary);margin-bottom:14px}
+    .fg{margin-bottom:13px}
+    .fg:last-child{margin-bottom:0}
+    .fg label{display:block;font-size:11px;font-weight:700;color:var(--muted);margin-bottom:5px;text-transform:uppercase;letter-spacing:.4px}
+    input[type=text],input[type=tel],input[type=number],input[type=date],input[type=time],textarea,select{
+      width:100%;padding:12px 13px;border:1.5px solid var(--border);border-radius:9px;
+      font-size:15px;font-family:inherit;background:var(--bg);color:var(--text);outline:none;
+      transition:border-color .2s;-webkit-appearance:none}
+    input:focus,textarea:focus,select:focus{border-color:var(--primary);background:#fff}
+    textarea{resize:none;min-height:78px}
+    .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+
+    .radio-group{display:flex;flex-direction:column;gap:8px}
+    .radio-opt{display:flex;align-items:center;gap:10px;padding:11px 13px;
+      border:1.5px solid var(--border);border-radius:10px;cursor:pointer;font-size:14px;font-weight:500}
+    .radio-opt.selected{border-color:var(--primary);background:#eef3fc;font-weight:700}
+
+    .toggle-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+    .toggle-btn{min-height:44px;border:1.5px solid var(--border);border-radius:10px;
+      background:var(--bg);font-size:13px;font-weight:600;cursor:pointer;width:100%}
+    .toggle-btn.on{border-color:var(--primary);background:#eef3fc;color:var(--primary)}
+
+    .color-row{display:flex;gap:8px;align-items:center}
+    .color-swatch{width:44px;height:44px;border:none;padding:2px;cursor:pointer;border-radius:9px;flex-shrink:0}
+    .color-row input[type=text]{flex:1;min-width:0}
+
+    .photo-area{border:2px dashed var(--border);border-radius:11px;padding:22px 16px;
+      text-align:center;cursor:pointer;background:var(--bg)}
+    .photo-area.has-photo{border-color:var(--success);border-style:solid;background:#f0fff4}
+    .photo-preview{width:100%;max-height:200px;object-fit:cover;border-radius:9px;margin-top:10px}
+    .photo-warn{color:var(--danger);font-size:11px;margin-top:5px;font-weight:600}
+
+    .form-actions{background:var(--card);padding:12px 14px;border-top:1px solid var(--border);
+      position:sticky;bottom:0;z-index:90;display:flex;gap:10px}
+    .form-actions .btn{flex:1}
+
+    /* ENVIAR — BLOCOS */
+    .envio-bloco{background:var(--card);border-radius:var(--r);padding:16px;margin-bottom:12px;box-shadow:var(--shadow)}
+    .envio-bloco-title{font-size:12px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px;display:flex;align-items:center;gap:6px}
+    .envio-num{width:22px;height:22px;background:var(--primary);color:#fff;border-radius:50%;
+      display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;flex-shrink:0}
+    .texto-preview{font-size:13px;line-height:1.7;white-space:pre-wrap;word-break:break-word;
+      overflow-wrap:anywhere;background:var(--bg);border-radius:9px;padding:12px;margin-bottom:10px}
+    .img-slot{border:2px dashed var(--border);border-radius:11px;padding:20px;text-align:center;
+      cursor:pointer;background:var(--bg);margin-bottom:10px}
+    .img-slot.has-img{border-color:var(--success);border-style:solid;padding:0;overflow:hidden}
+    .img-slot img{width:100%;max-height:220px;object-fit:cover;border-radius:9px;display:block}
+    .contato-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px}
+
+    /* BOTTOM NAV */
+    .bottom-nav{position:fixed;bottom:0;left:0;right:0;background:var(--card);
+      display:flex;box-shadow:0 -2px 8px rgba(0,0,0,.08);z-index:150;padding-bottom:env(safe-area-inset-bottom)}
+    .bnav-btn{flex:1;padding:10px 4px 9px;border:none;background:none;cursor:pointer;
+      font-size:10px;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:3px;min-width:0}
+    .bnav-btn .ico{font-size:22px}
+    .bnav-btn.active{color:var(--primary)}
+
+    /* STATUS */
+    .status-pill{padding:3px 9px;border-radius:20px;font-size:10px;font-weight:800;text-transform:uppercase;white-space:nowrap;flex-shrink:0}
+    .status-ativo{background:#e3f2fd;color:#1565C0}
+    .status-fechou{background:#e8f5e9;color:#2E7D32}
+    .status-parou{background:#fff3e0;color:#E65100}
+    .status-arquivado{background:#f5f5f5;color:#757575}
+
+    /* TIMELINE */
+    .tl-item{display:flex;gap:11px;padding-bottom:14px;position:relative}
+    .tl-item:not(:last-child)::before{content:'';position:absolute;left:13px;top:28px;bottom:0;width:2px;background:var(--border)}
+    .tl-dot{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0}
+    .tl-dot.sent{background:#e8f5e9}
+    .tl-dot.pending{background:#fff8e1}
+    .tl-ttl{font-weight:700;font-size:13px}
+    .tl-sub{font-size:11px;color:var(--muted);margin-top:2px}
+
+    /* INFO ROWS */
+    .info-row{display:flex;justify-content:space-between;align-items:flex-start;
+      padding:8px 0;border-bottom:1px solid var(--bg);gap:8px;font-size:13px}
+    .info-row:last-child{border:none}
+    .info-lbl{color:var(--muted);font-size:12px;flex-shrink:0}
+    .info-val{font-weight:600;text-align:right;word-break:break-word;overflow-wrap:anywhere}
+
+    /* MODAL */
+    .overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:500;display:none;align-items:flex-end}
+    .overlay.open{display:flex}
+    .modal{background:var(--card);border-radius:20px 20px 0 0;padding:20px;
+      width:100%;max-height:88vh;overflow-y:auto;overflow-x:hidden;animation:up .22s}
+    @keyframes up{from{transform:translateY(100%)}to{transform:none}}
+    .modal-title{font-size:16px;font-weight:700;margin-bottom:14px}
+    .modal-item{display:flex;align-items:center;gap:12px;padding:13px;
+      border:1px solid var(--border);border-radius:11px;cursor:pointer;font-size:14px;font-weight:500;margin-bottom:8px}
+    .modal-item:active{background:var(--bg)}
+    .modal-item .ico{font-size:20px;width:26px;text-align:center}
+
+    /* PROMPT BOX */
+    .prompt-box{background:#1A1A1A;color:#a8ff78;border-radius:11px;padding:13px;
+      font-family:monospace;font-size:11px;line-height:1.6;max-height:200px;
+      overflow-y:auto;word-break:break-word;white-space:pre-wrap}
+
+    /* ACCORDION */
+    .accordion{border:1.5px solid var(--border);border-radius:11px;margin-bottom:8px;overflow:hidden}
+    .acc-head{padding:13px 14px;display:flex;justify-content:space-between;align-items:center;
+      cursor:pointer;background:var(--card);font-weight:700;font-size:13px}
+    .acc-head:active{background:var(--bg)}
+    .acc-arrow{font-size:12px;color:var(--muted);transition:transform .2s}
+    .accordion.open .acc-arrow{transform:rotate(180deg)}
+    .acc-body{display:none;padding:14px;background:var(--bg);border-top:1.5px solid var(--border)}
+    .accordion.open .acc-body{display:block}
+
+    /* CONFIG TABS */
+    .cfg-tabs{display:flex;gap:0;margin-bottom:14px;border-radius:10px;overflow:hidden;border:1.5px solid var(--border)}
+    .cfg-tab{flex:1;padding:10px 4px;border:none;background:var(--card);font-size:11px;font-weight:700;cursor:pointer;text-align:center;color:var(--muted)}
+    .cfg-tab.active{background:var(--primary);color:#fff}
+    .seq-tabs{display:flex;gap:8px;margin-bottom:12px}
+    .seq-tab{flex:1;padding:9px 4px;border-radius:9px;border:1.5px solid var(--border);
+      background:var(--card);font-size:12px;font-weight:700;cursor:pointer;text-align:center;color:var(--muted)}
+    .seq-tab.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+
+    /* APPLY CHECK */
+    .apply-checks{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+    .apply-check{padding:6px 12px;border-radius:20px;border:1.5px solid var(--border);
+      background:var(--card);font-size:12px;font-weight:600;cursor:pointer;color:var(--muted)}
+    .apply-check.on{border-color:var(--primary);background:#eef3fc;color:var(--primary)}
+
+    /* MISC */
+    .empty{text-align:center;padding:44px 20px;color:var(--muted)}
+    .empty .ico{font-size:44px;margin-bottom:10px}
+    .warn-box{background:#e8edf8;border-radius:9px;padding:10px 13px;font-size:12px;color:#1a3a7a;margin-bottom:10px;border-left:3px solid #1A4FBF}
+    .info-box{background:#e3f2fd;border-radius:9px;padding:10px 13px;font-size:12px;color:#1565C0;margin-bottom:10px}
+    .success-box{background:#e8f5e9;border-radius:9px;padding:10px 13px;font-size:12px;color:#2E7D32;margin-bottom:10px}
+    .search-box{width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:24px;
+      font-size:14px;background:var(--card);outline:none;margin-bottom:12px;display:block}
+    .search-box:focus{border-color:var(--primary)}
+    .link-row{display:flex;gap:8px;align-items:center;margin-bottom:8px}
+    .link-row select{width:110px;flex-shrink:0}
+    .link-row input{flex:1;min-width:0}
+    .link-row .rm{background:none;border:none;font-size:20px;cursor:pointer;color:var(--danger);flex-shrink:0;padding:0 2px}
+    .export-wrap{display:flex;justify-content:flex-end;margin-bottom:16px;margin-top:-4px}
+    .export-btn-el{background:#263238;color:#fff;border:none;border-radius:22px;padding:10px 18px;font-size:12px;font-weight:700;cursor:pointer;box-shadow:var(--shadow)}
+    .divider{height:1px;background:var(--border);margin:12px 0}
+  </style>
+</head>
+<body>
+
+<div id="toast" style="position:fixed;top:68px;left:50%;transform:translateX(-50%);
+  background:#1A1A1A;color:#fff;padding:9px 20px;border-radius:22px;font-size:13px;font-weight:600;
+  z-index:9999;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap;max-width:92vw;text-align:center"></div>
+
+<div class="nav">
+  <button class="nav-back" id="navBack" style="display:none" onclick="goBack()">←</button>
+  <span class="nav-title" id="navTitle">📱 TAPETES CRM</span>
+  <span style="width:32px"></span>
+</div>
+
+<!-- ── HOME ── -->
+<div class="screen active" id="screen-home">
+  <div class="metrics">
+    <div class="metric-card"><div class="val" id="m-ativos">0</div><div class="lbl">Ativos</div></div>
+    <div class="metric-card"><div class="val" id="m-fechados">0</div><div class="lbl">Fechados</div></div>
+    <div class="metric-card"><div class="val" id="m-hoje">0</div><div class="lbl">Hoje</div></div>
+  </div>
+
+  <div id="alertas-section"></div>
+
+  <div class="sec-title">📋 AÇÕES DE HOJE</div>
+  <div id="hoje-list"></div>
+</div>
+
+<!-- ── CLIENTES ── -->
+<div class="screen" id="screen-clientes">
+  <input class="search-box" id="search-input" placeholder="🔍 Buscar nome ou telefone..." oninput="renderAllClients()">
+
+  <div class="filter-dropdown" id="fdd">
+    <div class="filter-trigger" id="ftrig" onclick="toggleFDD()">
+      <span id="flabel">🔘 Todos os clientes</span>
+      <span class="arr">▼</span>
+    </div>
+    <div class="filter-list" id="flist">
+      <div class="filter-opt active" onclick="setFilter('todos',this,'🔘 Todos')">🔘 Todos</div>
+      <div class="filter-opt" onclick="setFilter('ativo',this,'🔵 Ativos')">🔵 Ativos</div>
+      <div class="filter-opt" onclick="setFilter('fechou',this,'✅ Fechados')">✅ Fechados</div>
+      <div class="filter-opt" onclick="setFilter('parou',this,'🔇 Pararam')">🔇 Pararam</div>
+      <div class="filter-opt" onclick="setFilter('arquivado',this,'🗄️ Arquivados')">🗄️ Arquivados</div>
+      <div class="filter-sep"></div>
+      <div class="filter-opt" onclick="setFilter('nao-estava',this,'🟢 Não Estava Lá')">🟢 Não Estava Lá</div>
+      <div class="filter-opt" onclick="setFilter('interessado',this,'🔵 Interessados')">🔵 Interessados</div>
+      <div class="filter-opt" onclick="setFilter('super-quente',this,'🔴 Super Quentes')">🔴 Super Quentes</div>
+      <div class="filter-sep"></div>
+      <div class="filter-opt" onclick="setFilter('respondeu',this,'💬 Responderam')">💬 Responderam</div>
+    </div>
+  </div>
+
+  <div id="all-clients-list"></div>
+</div>
+
+<!-- ── REGISTRAR ── -->
+<div class="screen" id="screen-registrar">
+  <div class="form-card">
+    <div class="form-card-title">👤 DADOS DO CLIENTE</div>
+    <div class="fg"><label>Nome *</label><input type="text" id="f-nome" placeholder="Nome completo"></div>
+    <div class="fg"><label>Telefone (só números) *</label><input type="tel" id="f-tel" placeholder="5579999292683" inputmode="numeric"></div>
+  </div>
+
+  <div class="form-card">
+    <div class="form-card-title">📸 FOTO DO CLIENTE *</div>
+    <div class="photo-area" id="photo-area" onclick="document.getElementById('f-foto-input').click()">
+      <div id="photo-ph">📷 Toque para bater foto</div>
+      <div class="photo-warn" id="photo-warn">⚠️ Obrigatória para salvar</div>
+      <img id="photo-img" class="photo-preview" style="display:none" alt="Foto">
+    </div>
+    <input type="file" id="f-foto-input" accept="image/*" capture="environment" style="display:none" onchange="handlePhoto(event)">
+  </div>
+
+  <div class="form-card">
+    <div class="form-card-title">🏷️ TIPO DE CLIENTE *</div>
+    <div class="radio-group" id="tipo-group">
+      <div class="radio-opt" onclick="selectTipo('nao-estava',this)">🟢 Não Estava Lá</div>
+      <div class="radio-opt" onclick="selectTipo('interessado',this)">🔵 Interessado</div>
+      <div class="radio-opt" onclick="selectTipo('super-quente',this)">🔴 Super Quente</div>
+    </div>
+  </div>
+
+  <div class="form-card">
+    <div class="form-card-title">📐 TAPETE *</div>
+    <div class="fg"><label>Tamanho (ex: 120x60)</label><input type="text" id="f-tamanho" placeholder="120x60"></div>
+    <div class="fg">
+      <label>Cor de Fundo *</label>
+      <div class="color-row">
+        <input type="color" class="color-swatch" id="f-cor-picker" value="#4caf50" oninput="syncColor()">
+        <input type="text" id="f-cor" placeholder="Nome ou código" oninput="syncColorTxt()">
+      </div>
+    </div>
+    <div class="fg">
+      <label>Borda *</label>
+      <div class="toggle-row">
+        <button type="button" class="toggle-btn on" id="borda-nao" onclick="setBorda('nao')">❌ Sem Borda</button>
+        <button type="button" class="toggle-btn" id="borda-sim" onclick="setBorda('sim')">✅ Com Borda</button>
+      </div>
+    </div>
+    <div id="borda-cor-row" style="display:none">
+      <div class="fg" style="margin-top:10px">
+        <label>Cor da Borda</label>
+        <div class="color-row">
+          <input type="color" class="color-swatch" id="f-borda-picker" value="#000000" oninput="syncBordaColor()">
+          <input type="text" id="f-borda-cor" placeholder="Nome ou código" oninput="syncBordaTxt()">
+        </div>
+      </div>
+    </div>
+    <div class="row2">
+      <div class="fg"><label>Prazo (dias)</label><input type="number" id="f-prazo" placeholder="15" min="1"></div>
+      <div class="fg"><label>Preço (R$)</label><input type="number" id="f-preco" placeholder="500" step="0.01"></div>
+    </div>
+    <div class="fg"><label>Observação</label><textarea id="f-obs" placeholder="Detalhes..."></textarea></div>
+  </div>
+
+  <div id="data-section" style="display:none">
+    <div class="form-card">
+      <div class="form-card-title">📅 AGENDAMENTO</div>
+      <div class="fg"><label>Data para contato</label><input type="date" id="f-data-marcada"></div>
+      <div class="fg">
+        <label>Já viu simulação?</label>
+        <div class="toggle-row">
+          <button type="button" class="toggle-btn on" id="viu-nao" onclick="setViu('nao')">Não viu</button>
+          <button type="button" class="toggle-btn" id="viu-sim" onclick="setViu('sim')">Já viu</button>
+        </div>
+      </div>
+      <div id="visita-row" style="display:none">
+        <div class="fg" style="margin-top:10px"><label>Data de Visita</label><input type="date" id="f-data-visita"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-actions">
+    <button class="btn btn-ghost" onclick="showScreen('home');setNav(0)">❌ Cancelar</button>
+    <button class="btn btn-primary" onclick="salvarCliente()">✅ Salvar Cliente</button>
+  </div>
+</div>
+
+<!-- ── CONFIG ── -->
+<div class="screen" id="screen-config">
+  <div class="export-wrap">
+    <button class="export-btn-el" onclick="downloadApp()">⬇️ Exportar App</button>
+  </div>
+
+
+
+  <div class="form-card">
+    <div class="form-card-title">📝 TEXTO FIXO (Bloco Links)</div>
+    <div class="fg">
+      <label>Texto que sempre acompanha os links</label>
+      <textarea id="cfg-texto-fixo" placeholder="Ex: Conheça nossos tapetes personalizados! Acesse nosso catálogo..."></textarea>
+    </div>
+    <button class="btn btn-success" onclick="saveTextoFixo()">💾 Salvar Texto Fixo</button>
+  </div>
+
+  <div class="cfg-tabs" id="cfg-tipo-tabs">
+    <div class="cfg-tab active" onclick="setCfgTipo('nao-estava',this)">🟢 N.Estava</div>
+    <div class="cfg-tab" onclick="setCfgTipo('interessado',this)">🔵 Interes.</div>
+    <div class="cfg-tab" onclick="setCfgTipo('super-quente',this)">🔴 S.Quente</div>
+  </div>
+
+  <div class="seq-tabs">
+    <div class="seq-tab active" id="seq-tab-sem" onclick="setSeqTab('sem_resposta',this)">📭 Sem Resposta</div>
+    <div class="seq-tab" id="seq-tab-com" onclick="setSeqTab('com_resposta',this)">💬 Com Resposta</div>
+  </div>
+
+  <div id="days-accordion"></div>
+</div>
+
+<!-- ── ENVIAR ── -->
+<div class="screen" id="screen-enviar"><div id="enviar-content"></div></div>
+
+<!-- ── TIMELINE ── -->
+<div class="screen" id="screen-timeline"><div id="timeline-content"></div></div>
+
+<!-- ── FECHAMENTO ── -->
+<div class="screen" id="screen-fechamento"><div id="fechamento-content"></div></div>
+
+<!-- ── DÚVIDA ── -->
+<div class="screen" id="screen-duvida"><div id="duvida-content"></div></div>
+
+<!-- ── BOTTOM NAV ── -->
+<div class="bottom-nav">
+  <button class="bnav-btn active" id="bnav-0" onclick="showScreen('home');setNav(0)"><span class="ico">🏠</span>HOJE</button>
+  <button class="bnav-btn" id="bnav-1" onclick="showScreen('clientes');setNav(1)"><span class="ico">👥</span>CLIENTES</button>
+  <button class="bnav-btn" id="bnav-2" onclick="showScreen('registrar');setNav(2);initForm()"><span class="ico">➕</span>REGISTRAR</button>
+  <button class="bnav-btn" id="bnav-3" onclick="showScreen('config');setNav(3)"><span class="ico">⚙️</span>CONFIG</button>
+</div>
+
+<!-- MODAL OPÇÕES -->
+<div class="overlay" id="modal-opcoes" onclick="closeModal('modal-opcoes')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-title" id="modal-opcoes-title">⋮ Opções</div>
+    <div id="modal-opcoes-body"></div>
+    <button class="btn btn-ghost" style="margin-top:6px" onclick="closeModal('modal-opcoes')">Fechar</button>
+  </div>
+</div>
+
+<!-- MODAL IMG IA -->
+<div class="overlay" id="modal-img-ia" onclick="closeModal('modal-img-ia')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-title">🖼️ Adicionar Simulação</div>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:14px">Escolha a imagem gerada no Gemini:</p>
+    <input type="file" id="img-ia-input" accept="image/*" style="display:none" onchange="handleImgIA(event)">
+    <button class="btn btn-primary" onclick="document.getElementById('img-ia-input').click()">📂 Escolher Imagem</button>
+    <button class="btn btn-ghost" style="margin-top:8px" onclick="closeModal('modal-img-ia')">Cancelar</button>
+  </div>
+</div>
+
+<script>
+// ── PROMPT COMPLETO (exatamente como fornecido) ───────────────────────────────
+const PROMPT_BASE = `Voce e um gerador especializado em mockups hiper-realistas de tapetes de vinil loop personalizados.
+
+ISOLAMENTO ABSOLUTO: Este pedido e completamente independente de qualquer pedido anterior. Ignore tudo enviado antes. Use apenas a foto e especificacoes desta mensagem.
+
+REGRA ABSOLUTA 1 - ANGULO FIXO IMUTAVEL: O angulo da camera e SEMPRE identico independente do tamanho do tapete. A camera fica posicionada acima e levemente a frente do tapete, com inclinacao de aproximadamente 35 graus. O tapete aparece deitado horizontalmente no chao visto levemente de cima e levemente de frente ao mesmo tempo. O canto superior do tapete aparece mais distante e o canto inferior mais proximo da camera. A lona azul aparece em cima do tapete ao fundo e embaixo do tapete na frente. Este angulo nao muda para nenhum tamanho de tapete. Seja 70x40, 120x60, 150x80 ou qualquer outro tamanho, o angulo e SEMPRE este mesmo.
+
+REGRA ABSOLUTA 2 - TAPETE SEMPRE COMPLETO: O tapete INTEIRO deve aparecer na imagem sem nenhum corte. A camera se afasta o quanto for necessario para mostrar o tapete completo. O tapete ocupa entre 55 e 70 porcento da imagem. Lona azul visivel em todos os quatro lados ao redor. NUNCA qualquer parte do tapete e cortada.
+
+REGRA ABSOLUTA 3 - ORIENTACAO HORIZONTAL: O tapete SEMPRE deitado com o lado maior na horizontal. NUNCA vertical. NUNCA em pe.
+
+REGRA ABSOLUTA 4 - LOGO HORIZONTAL E NITIDA: A logo SEMPRE horizontal e legivel. NUNCA rotacionada ou inclinada. Contraste FORTE e nitidez maxima. Todos os elementos da logo claramente visiveis e legiveis. Letras com contraste forte sobre o fundo onde estao. A logo e o elemento mais chamativo do tapete.
+
+REGRA ABSOLUTA 5 - PROPORCAO EXATA INDEPENDENTE DO ANGULO: O tapete deve ter a proporcao EXATA do tamanho informado em relacao a largura e altura. Se 120x60 a largura e o dobro da altura. Se 70x40 a largura e 1.75 vezes a altura. A proporcao correta deve ser mantida mesmo com a perspectiva do angulo. O tamanho do tapete nao influencia o angulo da camera, apenas o quanto a camera se afasta.
+
+ETAPA 1 - LOGO: Identifique a logo principal. Preserve TODOS os elementos: texto, ovals, circulos, simbolos, fundos coloridos. Reproduza completa e fiel com cores nitidas e contrastantes.
+
+INTEGRACAO NO VINIL: A logo e FABRICADA dentro das fibras do vinil. Textura rugosa lacada visivel dentro de cada elemento da logo. Nada impresso ou colado. Tudo fibra de vinil texturizada como tapetes reais fabricados.
+
+MATERIAL: Vinil loop lacado, fibras entrelacadas, base borracha, acabamento fosco e rugoso, textura industrial grossa em todo o tapete.
+
+BORDA SEM BORDA: Cor absolutamente uniforme sem nenhuma faixa nas extremidades.
+BORDA COM BORDA: Faixa de 4 a 5 porcento da menor dimensao, mesmo material vinil loop, so a cor muda. Proporcional e elegante.
+
+FUNDO: Lona plastica azul com dobras naturais ao redor com espaco visivel em todos os lados.
+
+OBJETIVO: Tapete completo sem cortes, logo nitida e chamativa, angulo lateral fixo de showroom, produto real que encante o cliente. O resultado deve ser identico ao mesmo angulo independente do tamanho informado.`;
+
+function buildPrompt(c) {
+  const borda = c.borda === 'sim'
+    ? `Com borda. Cor da borda: ${c.bordaCor || 'Preta'}.`
+    : 'Sem borda.';
+  return `${PROMPT_BASE}\n\n(ESPECIFICACOES: Tamanho do tapete: ${c.tamanho}. Cor de fundo do tapete: ${c.cor}. ${borda})`;
+}
+
+// ── DB ────────────────────────────────────────────────────────────────────────
+const DB_KEY = 'tapetes_crm_v4';
+let DB = {
+  clients: [],
+  messages: {
+    'nao-estava':   { sem_resposta:{}, com_resposta:{} },
+    'interessado':  { sem_resposta:{}, com_resposta:{} },
+    'super-quente': { sem_resposta:{}, com_resposta:{} }
+  },
+  links: [],
+  textoFixo: ''
+};
+
+function saveDB(){ try{ localStorage.setItem(DB_KEY, JSON.stringify(DB)); } catch(e){ toast('⚠️ Erro ao salvar'); } }
+function loadDB(){
+  try{
+    const d = localStorage.getItem(DB_KEY);
+    if(d){
+      const p = JSON.parse(d);
+      DB.clients   = p.clients   || [];
+      DB.links     = p.links     || [];
+      DB.textoFixo = p.textoFixo || '';
+      DB.messages  = p.messages  || {
+        'nao-estava':   { sem_resposta:{}, com_resposta:{} },
+        'interessado':  { sem_resposta:{}, com_resposta:{} },
+        'super-quente': { sem_resposta:{}, com_resposta:{} }
+      };
+      // migrar estrutura antiga se necessário
+      ['nao-estava','interessado','super-quente'].forEach(t => {
+        if(!DB.messages[t]) DB.messages[t] = { sem_resposta:{}, com_resposta:{} };
+        if(!DB.messages[t].sem_resposta) { DB.messages[t].sem_resposta = DB.messages[t]; DB.messages[t].com_resposta = {}; }
+      });
+    }
+  } catch(e){}
+}
+
+// ── ESTADO ───────────────────────────────────────────────────────────────────
+let curScreen='home', stack=[], curCid=null, curTipo=null;
+let curBorda='nao', curViu='nao', curFilter='todos';
+let curCfgTipo='nao-estava', curSeqTab='sem_resposta', curPag=null, tempFoto=null;
+
+// ── SEQUÊNCIAS ────────────────────────────────────────────────────────────────
+const SEQ = {
+  'nao-estava':   { sem_resposta:[1,2,7,15,30,60,90,180,360], com_resposta:[1,2,7,15,30], recovery:[1,2,7] },
+  'interessado':  { sem_resposta:[1,2,7,15,30],               com_resposta:[1,2,7,15,30], recovery:[1,2,7] },
+  'super-quente': { sem_resposta:[1,2,7,15,30],               com_resposta:[1,2,7,15,30], recovery:[1,2,7] }
+};
+const DAY_NAMES = {1:'Primeiro Contato',2:'Acompanhamento',7:'Insistência Suave',15:'Última Tentativa',
+  30:'Recomeço',60:'Retorno 60d',90:'Retorno 90d',180:'Retorno 180d',360:'Retorno 360d'};
+
+// ── UTILS ─────────────────────────────────────────────────────────────────────
+function toast(msg,dur=2600){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.style.opacity='1';
+  clearTimeout(t._t); t._t=setTimeout(()=>t.style.opacity='0',dur);
+}
+function esc(s){ return String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+function fmt(v){ const n=parseFloat(v||0); return isNaN(n)?'0,00':n.toFixed(2).replace('.',','); }
+function today(){ return new Date().toISOString().split('T')[0]; }
+function typeName(t){ return {'nao-estava':'Não Estava Lá','interessado':'Interessado','super-quente':'Super Quente'}[t]||t; }
+function fmtDate(d){ return d ? new Date(d+'T00:00:00').toLocaleDateString('pt-BR') : '—'; }
+function cleanPhone(p){ return p.replace(/\D/g,''); }
+function waLink(p){ return `https://wa.me/${cleanPhone(p)}`; }
+function telLink(p){ const clean=cleanPhone(p); return `tel:0${clean.length>10?clean.substring(2):clean}`; }
+
+function curDay(c){
+  if(!c.sequencia?.length) return 1;
+  for(const d of c.sequencia){ if(!(c.historico||[]).find(h=>h.dia===d&&h.tipo==='enviado')) return d; }
+  return c.sequencia[c.sequencia.length-1];
+}
+function nextDate(c){
+  if(!c.sequencia?.length||!c.dataRegistro) return null;
+  const base=new Date(c.dataRegistro+'T00:00:00');
+  for(const d of c.sequencia){
+    if(!(c.historico||[]).find(h=>h.dia===d&&h.tipo==='enviado')){
+      const dt=new Date(base); dt.setDate(dt.getDate()+d-1);
+      return dt.toISOString().split('T')[0];
+    }
+  }
+  return null;
+}
+function allSent(c){ return c.sequencia?.length && c.sequencia.every(d=>(c.historico||[]).find(h=>h.dia===d&&h.tipo==='enviado')); }
+function daysUntil(dateStr){ if(!dateStr) return 999; const diff=new Date(dateStr+'T00:00:00')-new Date(today()+'T00:00:00'); return Math.round(diff/86400000); }
+
+// ── NAV ───────────────────────────────────────────────────────────────────────
+function showScreen(name,push=true){
+  if(push&&curScreen!==name) stack.push(curScreen);
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('screen-'+name)?.classList.add('active');
+  curScreen=name;
+  const titles={home:'📱 TAPETES CRM',clientes:'👥 CLIENTES',registrar:'📝 REGISTRAR',config:'⚙️ CONFIG',
+    enviar:'📤 Enviar',timeline:'📋 Histórico',fechamento:'🎉 Fechar Venda',duvida:'💬 Dúvida'};
+  document.getElementById('navTitle').textContent=titles[name]||'CRM';
+  document.getElementById('navBack').style.display=['home','clientes','registrar','config'].includes(name)?'none':'block';
+  if(name==='home') renderHome();
+  if(name==='clientes') renderAllClients();
+  if(name==='config') renderConfig();
+}
+function goBack(){ const p=stack.pop()||'home'; showScreen(p,false); if(['home','clientes','registrar','config'].includes(p)) setNav(['home','clientes','registrar','config'].indexOf(p)); }
+function setNav(i){ document.querySelectorAll('.bnav-btn').forEach((b,j)=>b.classList.toggle('active',i===j)); }
+function openModal(id){ document.getElementById(id).classList.add('open'); }
+function closeModal(id){ document.getElementById(id).classList.remove('open'); }
+
+// ── FILTRO ────────────────────────────────────────────────────────────────────
+function toggleFDD(){
+  document.getElementById('ftrig').classList.toggle('open');
+  document.getElementById('flist').classList.toggle('open');
+}
+document.addEventListener('click',e=>{
+  const dd=document.getElementById('fdd');
+  if(dd&&!dd.contains(e.target)){ document.getElementById('ftrig')?.classList.remove('open'); document.getElementById('flist')?.classList.remove('open'); }
+});
+function setFilter(f,el,label){
+  curFilter=f;
+  document.querySelectorAll('.filter-opt').forEach(o=>o.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('flabel').textContent=label;
+  document.getElementById('ftrig').classList.remove('open');
+  document.getElementById('flist').classList.remove('open');
+  renderAllClients();
+}
+
+// ── HOME ──────────────────────────────────────────────────────────────────────
+function renderHome(){
+  const td=today();
+  const ativos=DB.clients.filter(c=>c.status==='ativo').length;
+  const fechados=DB.clients.filter(c=>c.status==='fechou').length;
+  const hj=DB.clients.filter(c=>c.status==='ativo'&&nextDate(c)===td);
+  document.getElementById('m-ativos').textContent=ativos;
+  document.getElementById('m-fechados').textContent=fechados;
+  document.getElementById('m-hoje').textContent=hj.length;
+
+  // Alertas antecipados (1, 3, 7 dias)
+  const alertas=[];
+  DB.clients.filter(c=>c.status==='ativo').forEach(c=>{
+    const nd=nextDate(c); if(!nd) return;
+    const diff=daysUntil(nd);
+    if(diff===7||diff===3||diff===1){
+      alertas.push({c,diff,nd});
+    }
+  });
+  const aEl=document.getElementById('alertas-section');
+  if(alertas.length){
+    aEl.innerHTML=`<div class="sec-title">⏰ PRÓXIMAS AÇÕES</div>`+
+      alertas.sort((a,b)=>a.diff-b.diff).map(({c,diff})=>`
+        <div class="alerta-card" onclick="openTimeline('${c.id}')">
+          <div class="alerta-icon">${diff===1?'🔴':diff===3?'🟠':'🟡'}</div>
+          <div class="alerta-info">
+            <div class="alerta-titulo">${esc(c.nome)}</div>
+            <div class="alerta-sub">Dia ${curDay(c)} da sequência · ${fmtDate(nextDate(c))}</div>
+          </div>
+          <div class="alerta-dias">${diff}d</div>
+        </div>`).join('');
+  } else { aEl.innerHTML=''; }
+
+  const el=document.getElementById('hoje-list');
+  el.innerHTML=hj.length ? hj.map(c=>cardHtml(c,true)).join('') :
+    `<div class="empty"><div class="ico">🎉</div><p>Nenhuma ação para hoje!</p></div>`;
+}
+
+// ── CLIENTES ──────────────────────────────────────────────────────────────────
+function renderAllClients(){
+  const q=(document.getElementById('search-input')?.value||'').toLowerCase();
+  let list=DB.clients.filter(c=>{
+    if(q&&!c.nome.toLowerCase().includes(q)&&!(c.telefone||'').includes(q)) return false;
+    if(curFilter==='todos') return true;
+    if(curFilter==='respondeu') return c.respondeu===true;
+    if(['ativo','fechou','parou','arquivado'].includes(curFilter)) return c.status===curFilter;
+    if(['nao-estava','interessado','super-quente'].includes(curFilter)) return c.tipo===curFilter;
+    return true;
+  });
+  const el=document.getElementById('all-clients-list');
+  if(!el) return;
+  el.innerHTML=list.length ? list.map(c=>cardHtml(c,true)).join('') :
+    `<div class="empty"><div class="ico">👥</div><p>Nenhum cliente encontrado.</p></div>`;
+}
+
+function cardHtml(c,showEnviar=false){
+  const d=curDay(c); const done=allSent(c); const isHj=nextDate(c)===today();
+  return `<div class="client-card ${c.tipo}" onclick="openTimeline('${c.id}')">
+    <div class="card-row">
+      <div>
+        <div class="card-name">${esc(c.nome)}</div>
+        <div class="card-sub">${done?'✅ Sequência completa':`Dia ${d}${isHj?' 🔔':''}`}${c.respondeu?' · 💬':''}</div>
+      </div>
+      <span class="status-pill status-${c.status}">${esc(c.status)}</span>
+    </div>
+    <div class="card-meta">
+      <span class="badge ${c.tipo}">${esc(typeName(c.tipo))}</span>
+      <span class="card-price">R$ ${fmt(c.preco)}</span>
+      <span class="card-date">📅 ${fmtDate(c.dataRegistro)}</span>
+    </div>
+    <div class="card-btns" onclick="event.stopPropagation()">
+      ${showEnviar&&!done?`<button class="btn btn-primary" onclick="openEnviar('${c.id}')">📤 Enviar</button>`:''}
+      <button class="btn btn-ghost" onclick="openOpcoes('${c.id}')">⋮ Opções</button>
+    </div>
+  </div>`;
+}
+
+// ── FORM ──────────────────────────────────────────────────────────────────────
+function initForm(){
+  curTipo=null; curBorda='nao'; curViu='nao'; tempFoto=null;
+  ['f-nome','f-tel','f-tamanho','f-cor','f-prazo','f-preco','f-obs','f-borda-cor','f-data-marcada','f-data-visita']
+    .forEach(id=>{ const e=document.getElementById(id); if(e) e.value=''; });
+  document.getElementById('photo-img').style.display='none';
+  document.getElementById('photo-ph').style.display='block';
+  document.getElementById('photo-warn').style.display='block';
+  document.getElementById('photo-area').classList.remove('has-photo');
+  document.getElementById('f-foto-input').value='';
+  document.querySelectorAll('#tipo-group .radio-opt').forEach(o=>o.classList.remove('selected'));
+  document.getElementById('data-section').style.display='none';
+  document.getElementById('visita-row').style.display='none';
+  setBorda('nao'); setViu('nao');
+}
+function handlePhoto(e){
+  const file=e.target.files[0]; if(!file) return;
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    const img=new Image();
+    img.onload=()=>{
+      const cv=document.createElement('canvas');
+      const max=800; let w=img.width,h=img.height;
+      if(w>h&&w>max){h=h*max/w;w=max;}else if(h>max){w=w*max/h;h=max;}
+      cv.width=w;cv.height=h;cv.getContext('2d').drawImage(img,0,0,w,h);
+      tempFoto=cv.toDataURL('image/jpeg',.75);
+      document.getElementById('photo-img').src=tempFoto;
+      document.getElementById('photo-img').style.display='block';
+      document.getElementById('photo-ph').style.display='none';
+      document.getElementById('photo-warn').style.display='none';
+      document.getElementById('photo-area').classList.add('has-photo');
+    };
+    img.src=ev.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+function selectTipo(t,el){
+  curTipo=t;
+  document.querySelectorAll('#tipo-group .radio-opt').forEach(o=>o.classList.remove('selected'));
+  el.classList.add('selected');
+  document.getElementById('data-section').style.display=(t==='interessado'||t==='super-quente')?'block':'none';
+  document.getElementById('visita-row').style.display=t==='super-quente'?'block':'none';
+}
+function setBorda(v){ curBorda=v; document.getElementById('borda-nao').classList.toggle('on',v==='nao'); document.getElementById('borda-sim').classList.toggle('on',v==='sim'); document.getElementById('borda-cor-row').style.display=v==='sim'?'block':'none'; }
+function setViu(v){ curViu=v; document.getElementById('viu-nao').classList.toggle('on',v==='nao'); document.getElementById('viu-sim').classList.toggle('on',v==='sim'); }
+function syncColor(){ document.getElementById('f-cor').value=document.getElementById('f-cor-picker').value; }
+function syncColorTxt(){ const v=document.getElementById('f-cor').value.trim(); if(/^#[0-9A-Fa-f]{6}$/.test(v)) document.getElementById('f-cor-picker').value=v; }
+function syncBordaColor(){ document.getElementById('f-borda-cor').value=document.getElementById('f-borda-picker').value; }
+function syncBordaTxt(){ const v=document.getElementById('f-borda-cor').value.trim(); if(/^#[0-9A-Fa-f]{6}$/.test(v)) document.getElementById('f-borda-picker').value=v; }
+
+function salvarCliente(){
+  const nome=document.getElementById('f-nome').value.trim();
+  const tel=document.getElementById('f-tel').value.trim();
+  const tam=document.getElementById('f-tamanho').value.trim();
+  const cor=document.getElementById('f-cor').value.trim();
+  const prazo=document.getElementById('f-prazo').value.trim();
+  const preco=document.getElementById('f-preco').value.trim();
+  if(!nome) return toast('⚠️ Informe o nome');
+  if(!tel)  return toast('⚠️ Informe o telefone');
+  if(!tempFoto) return toast('⚠️ Foto obrigatória');
+  if(!curTipo)  return toast('⚠️ Selecione o tipo');
+  if(!tam)  return toast('⚠️ Informe o tamanho');
+  if(!cor)  return toast('⚠️ Informe a cor');
+  if(!prazo) return toast('⚠️ Informe o prazo');
+  if(!preco) return toast('⚠️ Informe o preço');
+  if(curBorda==='sim'&&!document.getElementById('f-borda-cor').value.trim()) return toast('⚠️ Informe a cor da borda');
+  if(DB.clients.find(c=>cleanPhone(c.telefone)===cleanPhone(tel)&&c.status==='ativo')) return toast('⚠️ Telefone já cadastrado como ativo');
+
+  const c={
+    id:'c_'+Date.now(), nome, telefone:tel, tipo:curTipo, foto:tempFoto, imgIA:null,
+    tamanho:tam, cor, borda:curBorda, bordaCor:document.getElementById('f-borda-cor').value.trim(),
+    prazo, preco, obs:document.getElementById('f-obs').value.trim(),
+    status:'ativo', dataRegistro:today(), respondeu:false,
+    sequencia:[...SEQ[curTipo].sem_resposta], sequenciaFase:'sem_resposta', historico:[],
+    dataMarcada:document.getElementById('f-data-marcada').value||null,
+    jaViu:curViu, dataVisita:document.getElementById('f-data-visita').value||null
+  };
+  DB.clients.push(c);
+  saveDB(); initForm();
+  toast('✅ Cliente registrado!');
+  showScreen('home'); setNav(0);
+}
+
+// ── ENVIAR ────────────────────────────────────────────────────────────────────
+function openEnviar(id){
+  const c=DB.clients.find(x=>x.id===id); if(!c) return;
+  curCid=id;
+  const d=curDay(c);
+  const fase=c.sequenciaFase||'sem_resposta';
+  const msg=((DB.messages[c.tipo]||{})[fase]||{})[d]||{};
+  const links=DB.links||[];
+  const textoFixo=DB.textoFixo||'';
+  const bt=c.borda==='sim'?`Com Borda (${c.bordaCor||''})`:' Sem Borda';
+  const specs=`📐 ${c.tamanho} | ${c.cor} | ${bt}\n💰 R$ ${fmt(c.preco)}\n📦 Prazo: ${c.prazo} dias${c.obs?'\n📝 '+c.obs:''}`;
+  const txtMsg=(msg.texto||'(Configure a mensagem em ⚙️ Config)')+'\n\n'+specs;
+  const prompt=buildPrompt(c);
+
+  document.getElementById('enviar-content').innerHTML=`
+    <div class="envio-bloco">
+      <div class="envio-bloco-title"><div class="envio-num">1</div> GERAR SIMULAÇÃO DO TAPETE</div>
+      ${c.foto?`<img src="${c.foto}" style="width:100%;border-radius:9px;max-height:180px;object-fit:cover;margin-bottom:12px" alt="Foto cliente">`:''}
+      <div style="font-size:12px;color:var(--muted);margin-bottom:8px">1. Copie o prompt abaixo · 2. Abra o Gemini · 3. Cole o prompt + envie a foto do cliente · 4. Volte e salve a simulação aqui</div>
+      <div style="display:flex;gap:8px;margin-bottom:10px">
+        <button class="btn btn-dark" onclick="copyPromptCliente('${c.id}')">📋 Copiar Prompt</button>
+        <button class="btn btn-gemini" onclick="window.open('https://gemini.google.com','_blank')">🤖 Abrir Gemini</button>
+      </div>
+      <div class="divider"></div>
+      <div style="font-size:12px;font-weight:700;color:var(--muted);margin-bottom:8px;margin-top:10px">SIMULAÇÃO GERADA</div>
+      <div class="img-slot ${c.imgIA?'has-img':''}" id="img-slot-enviar" onclick="openImgIA('${c.id}')">
+        ${c.imgIA?`<img src="${c.imgIA}" alt="Simulação">`:`<div style="padding:20px;color:var(--muted)">➕ Toque para adicionar a simulação gerada</div>`}
+      </div>
+    </div>
+
+    <div class="envio-bloco">
+      <div class="envio-bloco-title"><div class="envio-num">2</div> TEXTO DA MENSAGEM</div>
+      <div class="texto-preview">${esc(txtMsg)}</div>
+      <button class="btn btn-primary" onclick="copiarTexto('${c.id}')">📋 Copiar Texto</button>
+    </div>
+
+    <div class="envio-bloco">
+      <div class="envio-bloco-title"><div class="envio-num">3</div> LINKS E TEXTO FIXO</div>
+      ${textoFixo?`<div class="texto-preview">${esc(textoFixo)}</div>`:''}
+      ${links.length?`<div class="texto-preview">${esc(links.map(l=>`${l.tipo}: ${l.url}`).join('\n'))}</div>`:`<div class="warn-box">Nenhum link configurado em ⚙️ Config</div>`}
+      <button class="btn btn-primary" onclick="copiarLinks()">📋 Copiar Links</button>
+    </div>
+
+    <div class="envio-bloco">
+      <div class="envio-bloco-title">📞 CONTATO</div>
+      <div class="contato-row">
+        <a href="${waLink(c.telefone)}" target="_blank" style="text-decoration:none">
+          <button class="btn btn-whatsapp">💬 WhatsApp</button>
+        </a>
+        <a href="${telLink(c.telefone)}" style="text-decoration:none">
+          <button class="btn btn-call">📞 Ligar</button>
+        </a>
+      </div>
+    </div>
+
+    <button class="btn btn-success" onclick="marcarEnviado('${c.id}');toast('✅ Marcado como enviado!')">✅ Marcar como Enviado</button>
+    <div style="margin-top:8px;padding-bottom:10px">
+      <button class="btn btn-ghost" onclick="goBack()">← Voltar</button>
+    </div>`;
+
+  showScreen('enviar');
+}
+
+function copyPromptCliente(id){
+  const c=DB.clients.find(x=>x.id===id); if(!c) return;
+  copyText(buildPrompt(c), '📋 Prompt copiado! Cole no Gemini junto com a foto.');
+}
+function copiarTexto(id){
+  const c=DB.clients.find(x=>x.id===id); if(!c) return;
+  const d=curDay(c); const fase=c.sequenciaFase||'sem_resposta';
+  const msg=((DB.messages[c.tipo]||{})[fase]||{})[d]||{};
+  const bt=c.borda==='sim'?'Com Borda':'Sem Borda';
+  const specs=`📐 ${c.tamanho} | ${c.cor} | ${bt}\n💰 R$ ${fmt(c.preco)}\n📦 Prazo: ${c.prazo} dias${c.obs?'\n📝 '+c.obs:''}`;
+  const txt=(msg.texto?msg.texto+'\n\n':'')+specs;
+  copyText(txt, '✅ Texto copiado! Cole no WhatsApp.');
+}
+function copiarLinks(){
+  const links=DB.links||[]; const tf=DB.textoFixo||'';
+  let txt=tf; if(links.length) txt+=(tf?'\n\n':'')+links.map(l=>`${l.tipo}: ${l.url}`).join('\n');
+  if(!txt.trim()) return toast('⚠️ Nenhum link ou texto fixo configurado');
+  copyText(txt, '✅ Links copiados! Cole no WhatsApp.');
+}
+function copyText(txt,msg){
+  navigator.clipboard.writeText(txt).then(()=>toast(msg)).catch(()=>{
+    const ta=document.createElement('textarea');ta.value=txt;ta.style.cssText='position:fixed;opacity:0';
+    document.body.appendChild(ta);ta.focus();ta.select();
+    try{document.execCommand('copy');toast(msg);}catch{toast('⚠️ Copie manualmente');}
+    document.body.removeChild(ta);
+  });
+}
+function marcarEnviado(id){
+  const c=DB.clients.find(x=>x.id===id); if(!c) return;
+  const d=curDay(c);
+  if(!(c.historico||[]).find(h=>h.dia===d&&h.tipo==='enviado')){
+    c.historico=c.historico||[];
+    c.historico.push({dia:d,tipo:'enviado',data:today()});
+    saveDB(); renderHome();
+  }
+}
+
+// ── IMG IA ────────────────────────────────────────────────────────────────────
+function openImgIA(id){ curCid=id; document.getElementById('img-ia-input').value=''; openModal('modal-img-ia'); }
+function handleImgIA(e){
+  const file=e.target.files[0]; if(!file) return;
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    const img=new Image();
+    img.onload=()=>{
+      const cv=document.createElement('canvas');
+      const max=900;let w=img.width,h=img.height;
+      if(w>max){h=h*max/w;w=max;}
+      cv.width=w;cv.height=h;cv.getContext('2d').drawImage(img,0,0,w,h);
+      const c=DB.clients.find(x=>x.id===curCid); if(!c) return;
+      c.imgIA=cv.toDataURL('image/jpeg',.8);
+      saveDB();closeModal('modal-img-ia');toast('✅ Simulação salva!');
+      // Reabrir a tela de enviar para atualizar o slot
+      openEnviar(curCid);
+    };
+    img.src=ev.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+// ── TIMELINE ──────────────────────────────────────────────────────────────────
+function openTimeline(id){
+  const c=DB.clients.find(x=>x.id===id); if(!c) return;
+  curCid=id;
+  const te={'nao-estava':'🟢','interessado':'🔵','super-quente':'🔴'}[c.tipo]||'';
+  const bt=c.borda==='sim'?`Com Borda (${c.bordaCor||''})`:' Sem Borda';
+  let tl='';
+  (c.sequencia||[]).forEach(d=>{
+    const sent=(c.historico||[]).find(h=>h.dia===d&&h.tipo==='enviado');
+    const base=new Date(c.dataRegistro+'T00:00:00');
+    base.setDate(base.getDate()+d-1);
+    tl+=`<div class="tl-item">
+      <div class="tl-dot ${sent?'sent':'pending'}">${sent?'✅':'⏳'}</div>
+      <div><div class="tl-ttl">Dia ${d} — ${sent?'Enviado':'Pendente'}</div>
+      <div class="tl-sub">${sent?'em '+fmtDate(sent.data):fmtDate(base.toISOString().split('T')[0])}</div></div>
+    </div>`;
+  });
+
+  document.getElementById('timeline-content').innerHTML=`
+    <div class="form-card">
+      <div class="form-card-title">${te} ${esc(c.nome)} <span class="status-pill status-${c.status}" style="margin-left:8px">${esc(c.status)}</span>${c.respondeu?'<span style="margin-left:6px;font-size:12px">💬 Respondeu</span>':''}</div>
+      <div class="info-row"><span class="info-lbl">Cadastrado em</span><span class="info-val">${fmtDate(c.dataRegistro)}</span></div>
+      <div class="info-row"><span class="info-lbl">Tipo</span><span class="info-val">${esc(typeName(c.tipo))}</span></div>
+      <div class="info-row"><span class="info-lbl">Tapete</span><span class="info-val">${esc(c.tamanho)} · ${esc(c.cor)} · ${esc(bt)}</span></div>
+      <div class="info-row"><span class="info-lbl">Preço</span><span class="info-val">R$ ${fmt(c.preco)}</span></div>
+      <div class="info-row"><span class="info-lbl">Prazo</span><span class="info-val">${esc(String(c.prazo))} dias</span></div>
+      ${c.obs?`<div class="info-row"><span class="info-lbl">Obs</span><span class="info-val">${esc(c.obs)}</span></div>`:''}
+      <div class="info-row"><span class="info-lbl">Telefone</span><span class="info-val">${esc(c.telefone)}</span></div>
+    </div>
+    <div class="form-card" style="display:flex;gap:8px">
+      <a href="${waLink(c.telefone)}" target="_blank" style="flex:1;text-decoration:none"><button class="btn btn-whatsapp">💬 WhatsApp</button></a>
+      <a href="${telLink(c.telefone)}" style="flex:1;text-decoration:none"><button class="btn btn-call">📞 Ligar</button></a>
+    </div>
+    ${c.foto?`<div class="form-card"><div class="form-card-title">📸 Foto do Cliente</div><img src="${c.foto}" style="width:100%;border-radius:9px;max-height:200px;object-fit:cover" alt="Foto"></div>`:''}
+    ${c.imgIA?`<div class="form-card"><div class="form-card-title">🖼️ Simulação do Tapete</div><img src="${c.imgIA}" style="width:100%;border-radius:9px;max-height:220px;object-fit:cover" alt="Simulação"></div>`:''}
+    <div class="form-card"><div class="form-card-title">📅 Sequência</div>${tl}</div>
+    <div style="display:flex;flex-direction:column;gap:8px;padding-bottom:12px">
+      <button class="btn btn-primary" onclick="openEnviar('${c.id}')">📤 Preparar Envio</button>
+      <button class="btn btn-outline" onclick="openImgIA('${c.id}')">🖼️ Adicionar/Trocar Simulação</button>
+      <button class="btn btn-ghost" onclick="openOpcoes('${c.id}')">⋮ Mais Opções</button>
+    </div>`;
+  showScreen('timeline');
+}
+
+// ── OPÇÕES ────────────────────────────────────────────────────────────────────
+function openOpcoes(id){
+  curCid=id;
+  const c=DB.clients.find(x=>x.id===id); if(!c) return;
+  document.getElementById('modal-opcoes-title').textContent=`⋮ ${c.nome}`;
+  document.getElementById('modal-opcoes-body').innerHTML=`
+    <div class="modal-item" onclick="closeModal('modal-opcoes');clienteRespondeu('${c.id}')"><span class="ico">💬</span>${c.respondeu?'Marcar como Não Respondeu':'✅ Cliente Respondeu!'}</div>
+    <div class="modal-item" onclick="closeModal('modal-opcoes');openDuvida('${c.id}')"><span class="ico">❓</span> Registrar Dúvida</div>
+    <div class="modal-item" onclick="closeModal('modal-opcoes');openFechamento('${c.id}')"><span class="ico">🎉</span> Fechou a Venda</div>
+    <div class="modal-item" onclick="closeModal('modal-opcoes');pararResponder('${c.id}')"><span class="ico">🔇</span> Parou de Responder</div>
+    <div class="modal-item" onclick="closeModal('modal-opcoes');encerrar('${c.id}')"><span class="ico">🚫</span> Encerrar Fluxo</div>
+    <div class="modal-item" onclick="closeModal('modal-opcoes');arquivar('${c.id}')"><span class="ico">🗄️</span> Arquivar</div>
+    <div class="modal-item" style="color:var(--danger)" onclick="closeModal('modal-opcoes');excluir('${c.id}')"><span class="ico">❌</span> Excluir</div>`;
+  openModal('modal-opcoes');
+}
+function clienteRespondeu(id){
+  const c=DB.clients.find(x=>x.id===id); if(!c) return;
+  c.respondeu=!c.respondeu;
+  if(c.respondeu){
+    c.sequencia=[...SEQ[c.tipo].com_resposta];
+    c.dataRegistro=today(); c.historico=[]; c.sequenciaFase='com_resposta';
+    toast('💬 Sequência "Com Resposta" ativada!');
+  } else {
+    c.sequencia=[...SEQ[c.tipo].sem_resposta];
+    c.dataRegistro=today(); c.historico=[]; c.sequenciaFase='sem_resposta';
+    toast('📭 Sequência "Sem Resposta" ativada');
+  }
+  saveDB(); renderHome();
+}
+function pararResponder(id){
+  const c=DB.clients.find(x=>x.id===id); if(!c) return;
+  c.sequencia=[...SEQ[c.tipo].recovery]; c.dataRegistro=today(); c.historico=[]; c.sequenciaFase='recovery';
+  saveDB(); toast('🔇 Sequência de recuperação ativada'); renderHome();
+}
+function encerrar(id){ const c=DB.clients.find(x=>x.id===id); if(!c) return; c.status='parou'; saveDB(); toast('🚫 Fluxo encerrado'); showScreen('home');setNav(0); }
+function arquivar(id){ const c=DB.clients.find(x=>x.id===id); if(!c) return; c.status='arquivado'; saveDB(); toast('🗄️ Arquivado'); showScreen('home');setNav(0); }
+function excluir(id){ if(!confirm('Excluir este cliente?')) return; DB.clients=DB.clients.filter(c=>c.id!==id); saveDB(); toast('❌ Excluído'); showScreen('home');setNav(0); }
+
+// ── FECHAMENTO ────────────────────────────────────────────────────────────────
+function openFechamento(id){
+  const c=DB.clients.find(x=>x.id===id); if(!c) return;
+  curCid=id; curPag=null;
+  document.getElementById('fechamento-content').innerHTML=`
+    <div class="form-card">
+      <div class="form-card-title">🎉 ${esc(c.nome)}</div>
+      <div class="fg"><label>Valor (R$)</label><input type="number" id="fv" value="${esc(String(c.preco))}" step="0.01"></div>
+      <div class="fg"><label>Pagamento</label>
+        <div class="radio-group" id="pag-g">
+          <div class="radio-opt" onclick="selPag('avista',this)">💵 À Vista</div>
+          <div class="radio-opt" onclick="selPag('parcelado',this)">💳 Parcelado</div>
+          <div class="radio-opt" onclick="selPag('pix',this)">📱 PIX</div>
+        </div>
+      </div>
+      <div class="fg"><label>Data de Entrega</label><input type="date" id="fd"></div>
+      <div class="fg"><label>Observação</label><textarea id="fo" placeholder="Ex: 50% pago, restante na entrega"></textarea></div>
+    </div>
+    <div class="form-actions">
+      <button class="btn btn-ghost" onclick="goBack()">❌ Cancelar</button>
+      <button class="btn btn-success" onclick="confirmarVenda('${c.id}')">✅ Confirmar</button>
+    </div>`;
+  showScreen('fechamento');
+}
+function selPag(t,el){ curPag=t; document.querySelectorAll('#pag-g .radio-opt').forEach(o=>o.classList.remove('selected')); el.classList.add('selected'); }
+function confirmarVenda(id){
+  const c=DB.clients.find(x=>x.id===id); if(!c) return;
+  if(!curPag) return toast('⚠️ Selecione o pagamento');
+  c.status='fechou'; c.valorFechado=document.getElementById('fv').value;
+  c.pagamento=curPag; c.dataEntrega=document.getElementById('fd').value;
+  c.obsFechamento=document.getElementById('fo').value.trim();
+  (c.historico=c.historico||[]).push({tipo:'fechou',data:today(),texto:'Venda fechada'});
+  saveDB(); toast('🎉 Venda confirmada!'); showScreen('home');setNav(0);
+}
+
+// ── DÚVIDA ────────────────────────────────────────────────────────────────────
+function openDuvida(id){
+  const c=DB.clients.find(x=>x.id===id); if(!c) return;
+  curCid=id;
+  document.getElementById('duvida-content').innerHTML=`
+    <div class="form-card">
+      <div class="form-card-title">❓ ${esc(c.nome)}</div>
+      <div class="fg"><label>O que perguntou?</label><textarea id="dp" placeholder="Descreva..."></textarea></div>
+      <div class="fg"><label>Quando responder?</label><div class="row2"><input type="date" id="dd"><input type="time" id="dh"></div></div>
+      <div class="fg"><label>Resposta pronta (opcional)</label><textarea id="dr" placeholder="Escreva para copiar na hora certa..."></textarea></div>
+    </div>
+    <div class="form-actions">
+      <button class="btn btn-ghost" onclick="goBack()">❌ Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarDuvida('${c.id}')">✅ Salvar</button>
+    </div>`;
+  showScreen('duvida');
+}
+function salvarDuvida(id){
+  const c=DB.clients.find(x=>x.id===id); if(!c) return;
+  const p=document.getElementById('dp').value.trim(); if(!p) return toast('⚠️ Descreva a dúvida');
+  (c.historico=c.historico||[]).push({tipo:'duvida',data:today(),texto:p,
+    dataLembrete:document.getElementById('dd').value,horaLembrete:document.getElementById('dh').value,
+    resposta:document.getElementById('dr').value.trim()});
+  saveDB(); toast('✅ Salvo!'); goBack();
+}
+
+// ── CONFIG ────────────────────────────────────────────────────────────────────
+function setCfgTipo(t,el){ curCfgTipo=t; document.querySelectorAll('#cfg-tipo-tabs .cfg-tab').forEach(b=>b.classList.remove('active')); el.classList.add('active'); renderDaysAccordion(); }
+function setSeqTab(t,el){ curSeqTab=t; document.querySelectorAll('.seq-tab').forEach(b=>b.classList.remove('active')); el.classList.add('active'); renderDaysAccordion(); }
+
+function saveTextoFixo(){ DB.textoFixo=document.getElementById('cfg-texto-fixo').value.trim(); saveDB(); toast('✅ Texto fixo salvo!'); }
+
+function renderDaysAccordion(){
+  const el=document.getElementById('days-accordion'); if(!el) return;
+  const allDays=curSeqTab==='sem_resposta'
+    ? (SEQ[curCfgTipo]?.sem_resposta||[1,2,7,15,30])
+    : (SEQ[curCfgTipo]?.com_resposta||[1,2,7,15,30]);
+  const msgs=((DB.messages[curCfgTipo]||{})[curSeqTab])||{};
+
+  el.innerHTML=allDays.map(d=>{
+    const m=msgs[d]||{};
+    return `<div class="accordion" id="acc-${curCfgTipo}-${curSeqTab}-${d}">
+      <div class="acc-head" onclick="toggleAcc('${curCfgTipo}','${curSeqTab}',${d})">
+        <span>${m.texto?'✅':'○'} Dia ${d} — ${DAY_NAMES[d]||''}</span>
+        <span class="acc-arrow">▼</span>
+      </div>
+      <div class="acc-body">
+        <div class="fg"><label>Texto da mensagem</label>
+          <textarea id="mt-${curCfgTipo}-${curSeqTab}-${d}" placeholder="Digite o texto...">${esc(m.texto||'')}</textarea></div>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:8px">Aplicar também em:</div>
+        <div class="apply-checks">
+          <div class="apply-check" id="ac-ne-${d}" onclick="toggleApply('nao-estava',${d},this)">🟢 N.Estava</div>
+          <div class="apply-check" id="ac-in-${d}" onclick="toggleApply('interessado',${d},this)">🔵 Interes.</div>
+          <div class="apply-check" id="ac-sq-${d}" onclick="toggleApply('super-quente',${d},this)">🔴 S.Quente</div>
+        </div>
+        <div class="info-box">🔧 Specs do tapete adicionadas automaticamente</div>
+        <button class="btn btn-primary" onclick="saveMensagem('${curCfgTipo}','${curSeqTab}',${d})">💾 Salvar</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+function toggleAcc(tipo,seq,d){ document.getElementById(`acc-${tipo}-${seq}-${d}`)?.classList.toggle('open'); }
+function toggleApply(tipo,d,el){ el.classList.toggle('on'); }
+function saveMensagem(tipo,seq,d){
+  const txt=document.getElementById(`mt-${tipo}-${seq}-${d}`)?.value.trim();
+  if(!txt) return toast('⚠️ Digite o texto');
+
+  // Salva no tipo atual
+  if(!DB.messages[tipo]) DB.messages[tipo]={sem_resposta:{},com_resposta:{}};
+  if(!DB.messages[tipo][seq]) DB.messages[tipo][seq]={};
+  DB.messages[tipo][seq][d]={texto:txt};
+
+  // Aplica nos tipos selecionados
+  const map={'nao-estava':`ac-ne-${d}`,'interessado':`ac-in-${d}`,'super-quente':`ac-sq-${d}`};
+  ['nao-estava','interessado','super-quente'].forEach(t=>{
+    if(t!==tipo && document.getElementById(map[t])?.classList.contains('on')){
+      if(!DB.messages[t]) DB.messages[t]={sem_resposta:{},com_resposta:{}};
+      if(!DB.messages[t][seq]) DB.messages[t][seq]={};
+      DB.messages[t][seq][d]={texto:txt};
+    }
+  });
+
+  saveDB(); toast(`✅ Dia ${d} salvo!`);
+  renderDaysAccordion();
+  document.getElementById(`acc-${tipo}-${seq}-${d}`)?.classList.add('open');
+}
+function renderConfig(){
+  document.getElementById('cfg-texto-fixo').value=DB.textoFixo||'';
+  renderDaysAccordion();
+}
+
+// ── EXPORTAR ──────────────────────────────────────────────────────────────────
+function downloadApp(){
+  const dbJson=JSON.stringify(DB).replace(/<\/script>/gi,'<\\/script>');
+  let html=document.documentElement.outerHTML;
+  const inject=`<script>(function(){try{if(!localStorage.getItem('${DB_KEY}'))localStorage.setItem('${DB_KEY}',${dbJson});}catch(e){}})();<\/script>`;
+  html=html.replace('</body>',inject+'</body>');
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([html],{type:'text/html;charset=utf-8'}));
+  a.download='tapetes-crm-v4.html';
+  document.body.appendChild(a);a.click();document.body.removeChild(a);
+  toast('⬇️ Exportado com seus dados!');
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded',()=>{ loadDB(); renderHome(); });
+</script>
+</body>
+</html>
