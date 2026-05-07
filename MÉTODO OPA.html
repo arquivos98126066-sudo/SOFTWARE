@@ -795,7 +795,10 @@ function criarBlocoUI(b){
     }
   });
   const bk=blocosTemp.find(x=>x.id===b.id);
-  if(bk&&bk.acoes.length) bk.acoes.forEach(a=>addAcaoBlocoUI(b.id,a));
+  if(bk&&bk.acoes.length) {
+    const container = card.querySelector('#balist-'+b.id);
+    bk.acoes.forEach(a=>addAcaoBlocoUI(b.id,a,false,container));
+  }
   return card;
 }
 
@@ -839,21 +842,28 @@ window.addAcaoBloco = function(blocoId){
   b.acoes.push(a); salvarBlocos(); addAcaoBlocoUI(blocoId,a,true); checkBtns();
 };
 
-function addAcaoBlocoUI(blocoId,acao,foco=false){
-  const lista=document.getElementById('balist-'+blocoId); if(!lista)return;
-  const row=document.createElement('div'); row.className='bloco-acao-row'; row.dataset.aid=acao.id;
-  row.innerHTML=`<input type="text" placeholder="Descreva a ação..." value="${acao.nome}" maxlength="200" style="flex:1;height:38px;font-size:13px"><button class="rm-btn" onclick="remAcaoBloco('${blocoId}','${acao.id}')">×</button>`;
-  // ── FIX: atualiza memória no input (sem salvar/rerender) e salva só no blur ──
-  row.querySelector('input').addEventListener('input',e=>{
-    const b=blocosTemp.find(x=>x.id===blocoId); const a=b&&b.acoes.find(x=>x.id===acao.id);
-    if(a){a.nome=e.target.value;}
+// ── Função ajustada para aceitar container opcional ──
+function addAcaoBlocoUI(blocoId, acao, foco = false, container = null) {
+  const lista = container || document.getElementById('balist-' + blocoId);
+  if (!lista) return;
+
+  const row = document.createElement('div');
+  row.className = 'bloco-acao-row';
+  row.dataset.aid = acao.id;
+  row.innerHTML = `<input type="text" placeholder="Descreva a ação..." value="${acao.nome}" maxlength="200" style="flex:1;height:38px;font-size:13px"><button class="rm-btn" onclick="remAcaoBloco('${blocoId}','${acao.id}')">×</button>`;
+
+  row.querySelector('input').addEventListener('input', e => {
+    const b = blocosTemp.find(x => x.id === blocoId);
+    const a = b && b.acoes.find(x => x.id === acao.id);
+    if (a) { a.nome = e.target.value; }
   });
-  row.querySelector('input').addEventListener('blur',e=>{
-    const b=blocosTemp.find(x=>x.id===blocoId); const a=b&&b.acoes.find(x=>x.id===acao.id);
-    if(a){a.nome=e.target.value; salvarBlocos(); checkBtns();}
+  row.querySelector('input').addEventListener('blur', e => {
+    const b = blocosTemp.find(x => x.id === blocoId);
+    const a = b && b.acoes.find(x => x.id === acao.id);
+    if (a) { a.nome = e.target.value; salvarBlocos(); checkBtns(); }
   });
   lista.appendChild(row);
-  if(foco)setTimeout(()=>row.querySelector('input').focus(),50);
+  if (foco) setTimeout(() => row.querySelector('input').focus(), 50);
 }
 
 window.remAcaoBloco = function(blocoId,acaoId){
