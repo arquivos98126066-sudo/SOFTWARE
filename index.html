@@ -33,7 +33,6 @@
     padding: 0 0 60px;
   }
 
-  /* LOCK SCREEN */
   #lock-screen {
     display: none;
     position: fixed;
@@ -96,7 +95,6 @@
     75% { transform: translateX(8px); }
   }
 
-  /* APP CONTENT */
   #app-content { display: none; }
   #app-content.show { display: block; }
 
@@ -209,7 +207,6 @@
 </head>
 <body>
 
-<!-- TELA DE SENHA -->
 <div id="lock-screen">
   <div class="lock-icon">🔒</div>
   <div class="lock-title">Acesso restrito</div>
@@ -219,7 +216,6 @@
   <button class="lock-btn" onclick="checkPassword()">Entrar</button>
 </div>
 
-<!-- CONTEÚDO DO APP -->
 <div id="app-content">
 
   <div class="header">
@@ -240,19 +236,19 @@
       <span class="card-desc">Catálogo</span>
       <span class="card-arrow">→</span>
     </a>
-    <a class="card c-pink" href="PRÉ-VENDA.html">
+    <a class="card c-pink" href="PRE-VENDA.html">
       <span class="card-icon">💬</span>
       <span class="card-name">Pré-Venda</span>
       <span class="card-desc">Atendimento</span>
       <span class="card-arrow">→</span>
     </a>
-    <a class="card c-amber" href="MEU%20CRM.html">
+    <a class="card c-amber" href="MEU-CRM.html">
       <span class="card-icon">👥</span>
       <span class="card-name">Meu CRM</span>
       <span class="card-desc">Gestão de clientes</span>
       <span class="card-arrow">→</span>
     </a>
-    <a class="card c-blue" href="MÉTODO%20OPA.html">
+    <a class="card c-blue" href="METODO-OPA.html">
       <span class="card-icon">🎯</span>
       <span class="card-name">Método OPA</span>
       <span class="card-desc">Processo de vendas</span>
@@ -318,16 +314,15 @@
     if (e.key === 'Enter') checkPassword();
   });
 
-  // Verifica se já autenticou antes
   if (localStorage.getItem(CHAVE) === '1') {
     document.getElementById('app-content').classList.add('show');
   } else {
     document.getElementById('lock-screen').classList.add('show');
   }
 
-  // PWA
+  // PWA - corrigido: sem /SOFTWARE/
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/SOFTWARE/service-worker.js')
+    navigator.serviceWorker.register('/service-worker.js')
       .then(reg => console.log('SW registrado:', reg.scope))
       .catch(err => console.warn('SW erro:', err));
   }
