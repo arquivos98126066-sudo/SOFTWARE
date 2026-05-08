@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Estudo</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0f0f0f;
+    --surface: #181818;
+    --surface2: #222222;
+    --border: #2a2a2a;
+    --accent: #c8f568;
+    --accent2: #68f5c8;
+    --text: #e8e8e0;
+    --muted: #666;
+    --danger: #f56868;
+    --radius: 12px;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* TOAST */
+  #toast {
+    position: fixed;
+    top: 20px; left: 50%;
+    transform: translateX(-50%) translateY(-80px);
+    background: var(--accent);
+    color: #0f0f0f;
+    padding: 10px 22px;
+    border-radius: 99px;
+    font-size: 13px; font-weight: 500;
+    z-index: 9999;
+    transition: transform 0.3s cubic-bezier(.34,1.56,.64,1);
+    white-space: nowrap; pointer-events: none;
+  }
+  #toast.show { transform: translateX(-50%) translateY(0); }
+
+  /* HEADER */
+  header {
+    padding: 24px 20px 0;
+    display: flex; align-items: center; justify-content: space-between;
+    max-width: 600px; margin: 0 auto;
+  }
+  .logo {
+    font-family: 'DM Serif Display', serif;
+    font-size: 22px; font-weight: 700;
+    letter-spacing: 3px;
+    color: var(--accent);
+    text-transform: uppercase;
+  }
+  .trash-btn {
+    background: none; border: 1px solid var(--border);
+    color: var(--muted); border-radius: 8px;
+    padding: 7px 12px; font-family: 'DM Mono', monospace;
+    font-size: 12px; cursor: pointer;
+    display: flex; align-items: center; gap: 6px;
+    transition: border-color 0.2s, color 0.2s;
+    position: relative;
+  }
+  .trash-btn:hover { border-color: var(--danger); color: var(--danger); }
+  .trash-btn svg { width: 14px; height: 14px; }
+  .trash-count {
+    background: var(--danger); color: #fff;
+    border-radius: 99px; font-size: 10px;
+    padding: 1px 6px; font-weight: 700;
+    display: none;
+  }
+  .trash-count.show { display: inline; }
+
+  /* PROGRESS GLOBAL */
+  .global-progress {
+    max-width: 600px; margin: 20px auto 0; padding: 0 20px;
+  }
+  .progress-label {
+    display: flex; justify-content: space-between;
+    font-size: 11px; color: var(--muted);
+    margin-bottom: 6px; letter-spacing: 0.05em; text-transform: uppercase;
+  }
+  .progress-label .pct { color: var(--accent); font-weight: 500; }
+  .progress-bar-wrap { height: 4px; background: var(--border); border-radius: 99px; overflow: hidden; }
+  .progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    border-radius: 99px;
+    transition: width 0.5s cubic-bezier(.4,0,.2,1);
+  }
+
+  /* MAIN */
+  main { max-width: 600px; margin: 0 auto; padding: 20px 20px 100px; }
+
+  /* ADD PASTA BTN */
+  .add-folder-btn {
+    width: 100%;
+    background: var(--surface);
+    border: 1.5px dashed var(--border);
+    color: var(--muted); border-radius: var(--radius);
+    padding: 14px; font-family: 'DM Mono', monospace;
+    font-size: 13px; cursor: pointer;
+    display: flex; align-items: center; gap: 8px;
+    transition: border-color 0.2s, color 0.2s;
+    margin-bottom: 16px;
+  }
+  .add-folder-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .add-folder-btn svg { width: 16px; height: 16px; flex-shrink: 0; }
+
+  /* FOLDER */
+  .folder {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); margin-bottom: 12px;
+    overflow: hidden; transition: border-color 0.2s;
+  }
+  .folder:hover { border-color: #333; }
+  .folder-header {
+    padding: 14px 16px;
+    display: flex; align-items: center; gap: 8px;
+    cursor: pointer; user-select: none;
+  }
+  .folder-icon { font-size: 16px; flex-shrink: 0; }
+  .folder-name {
+    font-size: 14px; font-weight: 500; flex: 1;
+    color: var(--text); white-space: nowrap;
+    overflow: hidden; text-overflow: ellipsis;
+  }
+  .folder-stats { font-size: 11px; color: var(--muted); flex-shrink: 0; }
+  .folder-stats .done { color: var(--accent); }
+  .folder-chevron {
+    width: 16px; height: 16px; color: var(--muted);
+    transition: transform 0.2s; flex-shrink: 0;
+  }
+  .folder.open .folder-chevron { transform: rotate(90deg); }
+  .folder-progress { height: 2px; background: var(--border); margin: 0 16px; }
+  .folder-progress-fill { height: 100%; background: var(--accent); transition: width 0.4s; }
+  .folder-body { display: none; padding: 8px 12px 12px; }
+  .folder.open .folder-body { display: block; }
+
+  /* ICON BTNS */
+  .icon-btn {
+    background: none; border: none; color: var(--muted);
+    cursor: pointer; padding: 4px; border-radius: 4px;
+    display: flex; align-items: center;
+    transition: color 0.15s; flex-shrink: 0;
+  }
+  .icon-btn.edit:hover { color: var(--accent2); }
+  .icon-btn.danger:hover { color: var(--danger); }
+  .icon-btn svg { width: 14px; height: 14px; }
+
+  /* INLINE EDIT */
+  .folder-inline-edit {
+    background: var(--surface2); border: 1px solid var(--accent);
+    border-radius: 6px; color: var(--text);
+    font-family: 'DM Mono', monospace; font-size: 13px;
+    padding: 4px 8px; outline: none; flex: 1; min-width: 0;
+  }
+  .chapter-inline-edit {
+    background: var(--bg); border: 1px solid var(--accent2);
+    border-radius: 6px; color: var(--text);
+    font-family: 'DM Mono', monospace; font-size: 12px;
+    padding: 3px 8px; outline: none; flex: 1; min-width: 0;
+  }
+
+  /* ADD FILES */
+  .add-files-area {
+    border: 1.5px dashed var(--border); border-radius: 8px;
+    padding: 14px; text-align: center; cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+    margin-bottom: 10px; position: relative; display: block;
+  }
+  .add-files-area:hover { border-color: var(--accent2); background: #1a1a1a; }
+  .add-files-area input[type=file] {
+    position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%;
+  }
+  .add-files-area p { font-size: 12px; color: var(--muted); }
+  .add-files-area p span { color: var(--accent2); }
+
+  /* CHAPTER LIST */
+  .chapter-list { display: flex; flex-direction: column; gap: 6px; }
+  .chapter-item {
+    display: flex; align-items: center; gap: 8px;
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 8px; padding: 10px 12px;
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+    position: relative; overflow: hidden;
+  }
+  .chapter-item:hover { border-color: var(--accent2); background: #252525; }
+  .chapter-item.copying { border-color: var(--accent); }
+  .chapter-num { font-size: 10px; color: var(--muted); min-width: 24px; text-align: right; flex-shrink: 0; }
+  .chapter-name { font-size: 13px; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--text); }
+  .chapter-edit-btn {
+    background: none; border: none; color: var(--muted);
+    cursor: pointer; padding: 3px; display: flex; align-items: center;
+    flex-shrink: 0; transition: color 0.15s;
+  }
+  .chapter-edit-btn:hover { color: var(--accent2); }
+  .chapter-edit-btn svg { width: 12px; height: 12px; }
+  .chapter-copy-icon { color: var(--muted); flex-shrink: 0; display: flex; align-items: center; }
+  .done-btn {
+    background: none; border: 1px solid var(--border);
+    color: var(--muted); font-family: 'DM Mono', monospace;
+    font-size: 11px; padding: 4px 10px; border-radius: 99px;
+    cursor: pointer; white-space: nowrap;
+    transition: border-color 0.15s, color 0.15s; flex-shrink: 0;
+  }
+  .done-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .del-chapter-btn {
+    background: none; border: none; color: var(--muted);
+    cursor: pointer; padding: 3px; display: flex; align-items: center;
+    flex-shrink: 0; transition: color 0.15s;
+  }
+  .del-chapter-btn:hover { color: var(--danger); }
+  .del-chapter-btn svg { width: 13px; height: 13px; }
+
+  /* EMPTY */
+  .empty-msg { text-align: center; color: var(--muted); font-size: 12px; padding: 20px 0; }
+
+  /* MODAL NOVA PASTA */
+  .modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.7); backdrop-filter: blur(4px);
+    z-index: 100; display: flex; align-items: flex-end; justify-content: center;
+    opacity: 0; pointer-events: none; transition: opacity 0.2s;
+  }
+  .modal-overlay.show { opacity: 1; pointer-events: all; }
+  .modal {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius) var(--radius) 0 0;
+    padding: 24px 20px 36px; width: 100%; max-width: 600px;
+    transform: translateY(40px);
+    transition: transform 0.3s cubic-bezier(.34,1.56,.64,1);
+  }
+  .modal-overlay.show .modal { transform: translateY(0); }
+  .modal h3 { font-family: 'DM Serif Display', serif; font-size: 20px; margin-bottom: 16px; color: var(--text); }
+  .modal input {
+    width: 100%; background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 8px; padding: 12px 14px; color: var(--text);
+    font-family: 'DM Mono', monospace; font-size: 14px; outline: none;
+    transition: border-color 0.2s; margin-bottom: 12px;
+  }
+  .modal input:focus { border-color: var(--accent); }
+  .modal .hint { font-size: 11px; color: var(--muted); margin-bottom: 16px; line-height: 1.5; }
+  .modal .hint span { color: var(--accent); }
+  .modal-actions { display: flex; gap: 8px; }
+  .btn-primary {
+    flex: 1; background: var(--accent); color: #0f0f0f; border: none;
+    border-radius: 8px; padding: 12px; font-family: 'DM Mono', monospace;
+    font-size: 13px; font-weight: 500; cursor: pointer; transition: opacity 0.15s;
+  }
+  .btn-primary:hover { opacity: 0.85; }
+  .btn-cancel {
+    background: none; border: 1px solid var(--border); color: var(--muted);
+    border-radius: 8px; padding: 12px 20px; font-family: 'DM Mono', monospace;
+    font-size: 13px; cursor: pointer; transition: border-color 0.15s, color 0.15s;
+  }
+  .btn-cancel:hover { border-color: var(--danger); color: var(--danger); }
+
+  /* LIXEIRA DRAWER */
+  .trash-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.7); backdrop-filter: blur(4px);
+    z-index: 200; display: flex; align-items: flex-end; justify-content: center;
+    opacity: 0; pointer-events: none; transition: opacity 0.2s;
+  }
+  .trash-overlay.show { opacity: 1; pointer-events: all; }
+  .trash-drawer {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius) var(--radius) 0 0;
+    width: 100%; max-width: 600px;
+    max-height: 75vh; display: flex; flex-direction: column;
+    transform: translateY(40px);
+    transition: transform 0.3s cubic-bezier(.34,1.56,.64,1);
+  }
+  .trash-overlay.show .trash-drawer { transform: translateY(0); }
+  .trash-drawer-header {
+    padding: 20px 20px 14px;
+    display: flex; align-items: center; justify-content: space-between;
+    border-bottom: 1px solid var(--border); flex-shrink: 0;
+  }
+  .trash-drawer-header h3 {
+    font-family: 'DM Serif Display', serif; font-size: 18px; color: var(--text);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .trash-drawer-header h3 svg { width: 18px; height: 18px; color: var(--danger); }
+  .close-trash-btn {
+    background: none; border: none; color: var(--muted);
+    font-family: 'DM Mono', monospace; font-size: 13px;
+    cursor: pointer; padding: 6px 12px; border-radius: 8px;
+    border: 1px solid var(--border);
+    transition: border-color 0.15s, color 0.15s;
+  }
+  .close-trash-btn:hover { border-color: var(--text); color: var(--text); }
+  .trash-list {
+    overflow-y: auto; padding: 12px 16px 24px;
+    display: flex; flex-direction: column; gap: 8px;
+  }
+  .trash-item {
+    display: flex; align-items: center; gap: 10px;
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 8px; padding: 10px 12px;
+  }
+  .trash-item-info { flex: 1; min-width: 0; }
+  .trash-item-name {
+    font-size: 13px; color: var(--text);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .trash-item-folder { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .restore-btn {
+    background: none; border: 1px solid var(--border);
+    color: var(--accent2); font-family: 'DM Mono', monospace;
+    font-size: 11px; padding: 5px 12px; border-radius: 99px;
+    cursor: pointer; white-space: nowrap; flex-shrink: 0;
+    transition: border-color 0.15s, background 0.15s;
+  }
+  .restore-btn:hover { border-color: var(--accent2); background: rgba(104,245,200,0.08); }
+  .perm-del-btn {
+    background: none; border: none; color: var(--muted);
+    cursor: pointer; padding: 4px; display: flex; align-items: center;
+    flex-shrink: 0; transition: color 0.15s;
+  }
+  .perm-del-btn:hover { color: var(--danger); }
+  .perm-del-btn svg { width: 14px; height: 14px; }
+  .trash-empty { text-align: center; color: var(--muted); font-size: 12px; padding: 30px 0; }
+
+  /* RIPPLE */
+  @keyframes ripple { from { transform: scale(0); opacity: 0.4; } to { transform: scale(3); opacity: 0; } }
+  .ripple-el {
+    position: absolute; width: 60px; height: 60px; border-radius: 50%;
+    background: var(--accent); pointer-events: none;
+    animation: ripple 0.5s ease-out forwards;
+  }
+
+  /* ALL DONE */
+  .all-done { text-align: center; padding: 30px 0; }
+  .all-done .emoji { font-size: 40px; margin-bottom: 8px; }
+  .all-done p { font-size: 13px; color: var(--muted); }
+  .all-done strong { color: var(--accent); }
+</style>
+</head>
+<body>
+
+<div id="toast"></div>
+
+<!-- MODAL NOVA PASTA -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <h3>Nova pasta</h3>
+    <input type="text" id="folderNameInput" placeholder="ex: (1) Biologia, (2) História..." maxlength="60">
+    <p class="hint">Use <span>(número)</span> no início para definir a prioridade.<br>Ex: <span>(1)</span> fica antes de <span>(2)</span>.</p>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal()">Cancelar</button>
+      <button class="btn-primary" onclick="createFolder()">Criar pasta</button>
+    </div>
+  </div>
+</div>
+
+<!-- LIXEIRA DRAWER -->
+<div class="trash-overlay" id="trashOverlay">
+  <div class="trash-drawer">
+    <div class="trash-drawer-header">
+      <h3>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+          <path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/>
+        </svg>
+        Lixeira
+      </h3>
+      <button class="close-trash-btn" onclick="closeTrash()">Fechar</button>
+    </div>
+    <div class="trash-list" id="trashList"></div>
+  </div>
+</div>
+
+<header>
+  <div class="logo">ESTUDO</div>
+  <button class="trash-btn" onclick="openTrash()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+      <path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/>
+    </svg>
+    Lixeira
+    <span class="trash-count" id="trashCount">0</span>
+  </button>
+</header>
+
+<div class="global-progress">
+  <div class="progress-label">
+    <span>PROGRESSO GERAL</span>
+    <span class="pct" id="globalPct">0%</span>
+  </div>
+  <div class="progress-bar-wrap">
+    <div class="progress-bar-fill" id="globalBar" style="width:0%"></div>
+  </div>
+</div>
+
+<main>
+  <button class="add-folder-btn" onclick="openModal()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
+      <line x1="12" y1="11" x2="12" y2="17"/><line x1="9" y1="14" x2="15" y2="14"/>
+    </svg>
+    Adicionar pasta
+  </button>
+  <div id="folderList"></div>
+</main>
+
+<script>
+// ── STATE ──────────────────────────────────────────────
+let state = { folders: [], trash: [] };
+
+function save() { localStorage.setItem('estudo_v3', JSON.stringify(state)); }
+function load() {
+  try {
+    const raw = localStorage.getItem('estudo_v3');
+    if (raw) state = JSON.parse(raw);
+    if (!state.trash) state.trash = [];
+  } catch(e) { state = { folders: [], trash: [] }; }
+}
+
+// ── HELPERS ───────────────────────────────────────────
+function extractOrder(name) {
+  const m = name.match(/^\((\d+)\)/);
+  return m ? parseInt(m[1]) : 9999;
+}
+function sortFolders() {
+  state.folders.sort((a, b) => extractOrder(a.name) - extractOrder(b.name));
+}
+function sortChapters(chapters) {
+  return [...chapters].sort((a, b) => {
+    const numA = parseInt((a.name.match(/\d+/) || ['0'])[0]);
+    const numB = parseInt((b.name.match(/\d+/) || ['0'])[0]);
+    if (numA !== numB) return numA - numB;
+    return a.name.localeCompare(b.name);
+  });
+}
+function globalStats() {
+  let total = 0, done = 0;
+  state.folders.forEach(f => {
+    total += f.chapters.length;
+    done += f.chapters.filter(c => c.done).length;
+  });
+  return { total, done };
+}
+
+// ── TOAST ─────────────────────────────────────────────
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 1800);
+}
+
+// ── MODAL PASTA ───────────────────────────────────────
+function openModal() {
+  document.getElementById('modalOverlay').classList.add('show');
+  setTimeout(() => document.getElementById('folderNameInput').focus(), 300);
+}
+function closeModal() {
+  document.getElementById('modalOverlay').classList.remove('show');
+  document.getElementById('folderNameInput').value = '';
+}
+document.getElementById('modalOverlay').addEventListener('click', e => {
+  if (e.target === document.getElementById('modalOverlay')) closeModal();
+});
+document.getElementById('folderNameInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') createFolder();
+});
+function createFolder() {
+  const name = document.getElementById('folderNameInput').value.trim();
+  if (!name) return;
+  state.folders.push({ id: Date.now(), name, open: true, chapters: [] });
+  sortFolders(); save(); closeModal(); render();
+}
+
+// ── LIXEIRA ───────────────────────────────────────────
+function openTrash() {
+  renderTrash();
+  document.getElementById('trashOverlay').classList.add('show');
+}
+function closeTrash() {
+  document.getElementById('trashOverlay').classList.remove('show');
+}
+document.getElementById('trashOverlay').addEventListener('click', e => {
+  if (e.target === document.getElementById('trashOverlay')) closeTrash();
+});
+
+function renderTrash() {
+  const list = document.getElementById('trashList');
+  if (state.trash.length === 0) {
+    list.innerHTML = '<div class="trash-empty">🗑️ Lixeira vazia</div>';
+    return;
+  }
+  list.innerHTML = state.trash.map((item, idx) => `
+    <div class="trash-item">
+      <div class="trash-item-info">
+        <div class="trash-item-name">${item.chapterName.replace(/\.[^.]+$/, '')}</div>
+        <div class="trash-item-folder">📁 ${item.folderName}</div>
+      </div>
+      <button class="restore-btn" onclick="restoreChapter(${idx})">↩ Recuperar</button>
+      <button class="perm-del-btn" onclick="permDelete(${idx})" title="Excluir permanentemente">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+  `).join('');
+
+  const cnt = document.getElementById('trashCount');
+  cnt.textContent = state.trash.length;
+  cnt.classList.toggle('show', state.trash.length > 0);
+}
+
+function restoreChapter(idx) {
+  const item = state.trash[idx];
+  const folder = state.folders.find(f => f.id === item.folderId);
+  if (folder) {
+    folder.chapters.push({
+      id: item.chapterId,
+      name: item.chapterName,
+      content: item.content,
+      done: false
+    });
+    folder.chapters = sortChapters(folder.chapters);
+    state.trash.splice(idx, 1);
+    save(); render(); renderTrash();
+    showToast('↩ Capítulo recuperado!');
+  } else {
+    state.folders.push({
+      id: item.folderId,
+      name: item.folderName,
+      open: true,
+      chapters: [{
+        id: item.chapterId,
+        name: item.chapterName,
+        content: item.content,
+        done: false
+      }]
+    });
+    sortFolders();
+    state.trash.splice(idx, 1);
+    save(); render(); renderTrash();
+    showToast('↩ Capítulo e pasta recuperados!');
+  }
+}
+
+function permDelete(idx) {
+  state.trash.splice(idx, 1);
+  save(); renderTrash();
+  showToast('🗑️ Excluído permanentemente');
+}
+
+// ── EDITAR PASTA ──────────────────────────────────────
+function editFolderName(fid) {
+  const folder = state.folders.find(f => f.id === fid);
+  if (!folder) return;
+  const nameEl = document.querySelector(`.folder[data-id="${fid}"] .folder-name`);
+  if (!nameEl) return;
+  const input = document.createElement('input');
+  input.className = 'folder-inline-edit';
+  input.value = folder.name;
+  nameEl.replaceWith(input);
+  input.focus(); input.select();
+  function confirm() {
+    const val = input.value.trim();
+    if (val) folder.name = val;
+    sortFolders(); save(); render();
+  }
+  input.addEventListener('blur', confirm);
+  input.addEventListener('keydown', e => {
+    if (e.key === 'Enter') input.blur();
+    if (e.key === 'Escape') render();
+    e.stopPropagation();
+  });
+  input.addEventListener('click', e => e.stopPropagation());
+}
+
+// ── EDITAR CAPÍTULO ───────────────────────────────────
+function editChapterName(fid, cid) {
+  const folder = state.folders.find(f => f.id === fid);
+  if (!folder) return;
+  const ch = folder.chapters.find(c => String(c.id) === String(cid));
+  if (!ch) return;
+  const nameEl = document.querySelector(`[data-cid="${cid}"] .chapter-name`);
+  if (!nameEl) return;
+  const input = document.createElement('input');
+  input.className = 'chapter-inline-edit';
+  input.value = ch.name.replace(/\.[^.]+$/, '');
+  nameEl.replaceWith(input);
+  input.focus(); input.select();
+  function confirm() {
+    const val = input.value.trim();
+    if (val) ch.name = val;
+    save(); render();
+  }
+  input.addEventListener('blur', confirm);
+  input.addEventListener('keydown', e => {
+    if (e.key === 'Enter') input.blur();
+    if (e.key === 'Escape') render();
+    e.stopPropagation();
+  });
+  input.addEventListener('click', e => e.stopPropagation());
+}
+
+// ── EXCLUIR CAPÍTULO → LIXEIRA ────────────────────────
+function deleteChapter(fid, cid) {
+  const folder = state.folders.find(f => f.id === fid);
+  if (!folder) return;
+  const idx = folder.chapters.findIndex(c => String(c.id) === String(cid));
+  if (idx === -1) return;
+  const ch = folder.chapters[idx];
+  state.trash.unshift({
+    chapterId: ch.id,
+    chapterName: ch.name,
+    content: ch.content,
+    folderId: folder.id,
+    folderName: folder.name
+  });
+  folder.chapters.splice(idx, 1);
+  save(); render();
+  const cnt = document.getElementById('trashCount');
+  cnt.textContent = state.trash.length;
+  cnt.classList.toggle('show', state.trash.length > 0);
+  showToast('🗑️ Movido para a lixeira');
+}
+
+// ── COPY ──────────────────────────────────────────────
+async function copyChapter(fid, cid, el) {
+  const folder = state.folders.find(f => f.id === fid);
+  if (!folder) return;
+  const chapter = folder.chapters.find(c => String(c.id) === String(cid));
+  if (!chapter) return;
+  try {
+    await navigator.clipboard.writeText(chapter.content);
+  } catch(e) {
+    const ta = document.createElement('textarea');
+    ta.value = chapter.content;
+    ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select();
+    document.execCommand('copy'); ta.remove();
+  }
+  showToast('✓ Copiado!');
+  const r = document.createElement('div');
+  r.className = 'ripple-el';
+  r.style.left = (el.offsetWidth / 2 - 30) + 'px';
+  r.style.top = (el.offsetHeight / 2 - 30) + 'px';
+  el.appendChild(r);
+  setTimeout(() => r.remove(), 600);
+  el.classList.add('copying');
+  setTimeout(() => el.classList.remove('copying'), 400);
+}
+
+// ── MARK DONE ─────────────────────────────────────────
+function markDone(fid, cid) {
+  const folder = state.folders.find(f => f.id === fid);
+  if (!folder) return;
+  const ch = folder.chapters.find(c => String(c.id) === String(cid));
+  if (ch) { ch.done = true; save(); render(); }
+}
+
+// ── DELETE FOLDER ─────────────────────────────────────
+function deleteFolder(fid) {
+  if (!confirm('Remover esta pasta e todos os capítulos?')) return;
+  state.folders = state.folders.filter(f => f.id !== fid);
+  save(); render();
+}
+
+// ── FILES INPUT ───────────────────────────────────────
+function handleFiles(fid, files) {
+  const folder = state.folders.find(f => f.id === fid);
+  if (!folder) return;
+  const arr = Array.from(files);
+  let loaded = 0;
+  arr.forEach(file => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      const existing = folder.chapters.find(c => c.name === file.name);
+      if (!existing) {
+        folder.chapters.push({
+          id: Date.now() + '_' + Math.random(),
+          name: file.name, content: e.target.result, done: false
+        });
+      }
+      loaded++;
+      if (loaded === arr.length) {
+        folder.chapters = sortChapters(folder.chapters);
+        save(); render();
+        showToast('✓ ' + arr.length + ' arquivo(s) adicionado(s)');
+      }
+    };
+    reader.readAsText(file);
+  });
+}
+
+// ── TOGGLE ────────────────────────────────────────────
+function toggleFolder(fid) {
+  const folder = state.folders.find(f => f.id === fid);
+  if (folder) { folder.open = !folder.open; save(); render(); }
+}
+
+// ── SVG ICONS ─────────────────────────────────────────
+const EDIT_SVG   = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>`;
+const TRASH_SVG  = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>`;
+const COPY_SVG   = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>`;
+const CHEV_SVG   = `<svg class="folder-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>`;
+
+// ── RENDER ────────────────────────────────────────────
+function render() {
+  const { total, done } = globalStats();
+  const pct = total > 0 ? Math.round((done / total) * 100) : 0;
+  document.getElementById('globalPct').textContent = pct + '%';
+  document.getElementById('globalBar').style.width = pct + '%';
+
+  const cnt = document.getElementById('trashCount');
+  cnt.textContent = state.trash.length;
+  cnt.classList.toggle('show', state.trash.length > 0);
+
+  const list = document.getElementById('folderList');
+  list.innerHTML = '';
+
+  if (state.folders.length === 0) {
+    list.innerHTML = '<div class="empty-msg">Nenhuma pasta ainda.<br>Crie uma para começar.</div>';
+    return;
+  }
+
+  state.folders.forEach(folder => {
+    const pending = folder.chapters.filter(c => !c.done);
+    const doneCount = folder.chapters.filter(c => c.done).length;
+    const tot = folder.chapters.length;
+    const fpct = tot > 0 ? Math.round((doneCount / tot) * 100) : 0;
+
+    const div = document.createElement('div');
+    div.className = 'folder' + (folder.open ? ' open' : '');
+    div.dataset.id = folder.id;
+
+    let chaptersHTML = '';
+    if (pending.length === 0 && tot > 0) {
+      chaptersHTML = `<div class="all-done"><div class="emoji">🎉</div><p>Todos os <strong>${tot}</strong> capítulos concluídos!</p></div>`;
+    } else if (pending.length === 0) {
+      chaptersHTML = `<div class="empty-msg">Nenhum arquivo ainda.<br>Adicione acima.</div>`;
+    } else {
+      chaptersHTML = pending.map((ch, i) => `
+        <div class="chapter-item" onclick="copyChapter(${folder.id}, '${ch.id}', this)" data-fid="${folder.id}" data-cid="${ch.id}">
+          <span class="chapter-num">${(i+1).toString().padStart(2,'0')}</span>
+          <span class="chapter-name">${ch.name.replace(/\.[^.]+$/, '')}</span>
+          <button class="chapter-edit-btn" onclick="event.stopPropagation(); editChapterName(${folder.id}, '${ch.id}')" title="Renomear">${EDIT_SVG}</button>
+          <span class="chapter-copy-icon">${COPY_SVG}</span>
+          <button class="done-btn" onclick="event.stopPropagation(); markDone(${folder.id}, '${ch.id}')">lido ✓</button>
+          <button class="del-chapter-btn" onclick="event.stopPropagation(); deleteChapter(${folder.id}, '${ch.id}')" title="Mover para lixeira">${TRASH_SVG}</button>
+        </div>
+      `).join('');
+    }
+
+    div.innerHTML = `
+      <div class="folder-header" onclick="toggleFolder(${folder.id})">
+        <span class="folder-icon">📁</span>
+        <span class="folder-name">${folder.name}</span>
+        <span class="folder-stats"><span class="done">${doneCount}</span>/${tot}</span>
+        <button class="icon-btn edit" onclick="event.stopPropagation(); editFolderName(${folder.id})" title="Renomear">${EDIT_SVG}</button>
+        <button class="icon-btn danger" onclick="event.stopPropagation(); deleteFolder(${folder.id})" title="Remover pasta">${TRASH_SVG}</button>
+        ${CHEV_SVG}
+      </div>
+      <div class="folder-progress">
+        <div class="folder-progress-fill" style="width:${fpct}%"></div>
+      </div>
+      <div class="folder-body">
+        <label class="add-files-area">
+          <input type="file" multiple accept="*/*" onchange="handleFiles(${folder.id}, this.files)">
+          <p>📎 Soltar arquivos aqui ou <span>clique para selecionar</span></p>
+        </label>
+        <div class="chapter-list">${chaptersHTML}</div>
+      </div>
+    `;
+
+    list.appendChild(div);
+  });
+}
+
+// ── INIT ──────────────────────────────────────────────
+load();
+render();
+</script>
+</body>
+</html>
