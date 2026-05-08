@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>Meus Apps</title>
+<script src="https://arquivos98126066-sudo.github.io/SOFTWARE/sync-indicator.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -928,7 +929,6 @@ body.img-active .ck-wrap{z-index:9100 !important;}
     <button class="fm-tb-btn" onclick="fmCmd('insertOrderedList')" title="Numerada">1.</button>
     <button class="fm-tb-btn" onclick="fmCmd('formatBlock','blockquote')" title="Citação">"</button>
     <button class="fm-tb-btn" onclick="fmInsertCode()" title="Código">&lt;/&gt;</button>
-
   </div>
   <div class="fm-editor-body">
     <div class="fm-editable" id="fmEditable" contenteditable="true" data-placeholder="Escreva ou cole seu conteúdo aqui..."></div>
@@ -1009,7 +1009,101 @@ body.img-active .ck-wrap{z-index:9100 !important;}
   </div>
 </div>
 
-<script>
+<!-- PAINEL ANYDESK -->
+<div class="ad-overlay" id="adOverlay">
+  <div class="ad-header">
+    <button class="fm-back" onclick="closeAdPanel()">←</button>
+    <span class="ad-title">⚡ Atalhos AnyDesk</span>
+    <button onclick="adSetTab('historico')" style="background:var(--glass);border:none;border-radius:8px;color:var(--muted2);font-size:0.68rem;padding:0.3rem 0.7rem;cursor:pointer;font-family:'Outfit',sans-serif;white-space:nowrap;">🕐 Histórico</button>
+  </div>
+  <div class="ad-tabs">
+    <button class="ad-tab active" onclick="adSetTab('atalhos')">📋 Atalhos</button>
+    <button class="ad-tab" onclick="adSetTab('pastas')">📁 Pastas</button>
+    <button class="ad-tab" onclick="adSetTab('projetos')">🗂️ Projetos</button>
+    <button class="ad-tab" onclick="adSetTab('notas')">📝 Notas</button>
+  </div>
+  <div class="ad-body">
+
+    <div class="ad-section active" id="ad-atalhos">
+      <div class="ad-add-form">
+        <div class="ad-add-form-title">+ Novo atalho de texto</div>
+        <input class="ad-inp" id="adAtalhoLabel" placeholder="Nome (ex: Abrir Projetos)">
+        <input class="ad-inp" id="adAtalhoTexto" placeholder="Texto a copiar (ex: cd C:\Projetos)">
+        <button class="ad-btn" onclick="adAddAtalho()">Adicionar</button>
+      </div>
+      <div id="adAtalhoList"></div>
+    </div>
+
+    <div class="ad-section" id="ad-pastas">
+      <div class="ad-add-form">
+        <div class="ad-add-form-title">+ Nova pasta favorita</div>
+        <input class="ad-inp" id="adPastaLabel" placeholder="Nome (ex: Clientes)">
+        <input class="ad-inp" id="adPastaPath" placeholder="Caminho (ex: C:\Users\João\Clientes)">
+        <button class="ad-btn" onclick="adAddPasta()">Adicionar</button>
+      </div>
+      <div id="adPastaList"></div>
+    </div>
+
+    <div class="ad-section" id="ad-projetos">
+      <div class="ad-add-form">
+        <div class="ad-add-form-title">+ Novo projeto</div>
+        <input class="ad-inp" id="adProjNome" placeholder="Nome do projeto (ex: Site do Marcos)">
+        <input class="ad-inp" id="adProjPasta" placeholder="Pasta (ex: C:\Projetos\SiteMarcos)">
+        <input class="ad-inp" id="adProjCmd" placeholder="Comando extra (ex: npm start) — opcional">
+        <button class="ad-btn" onclick="adAddProj()">Adicionar</button>
+      </div>
+      <div id="adProjList"></div>
+    </div>
+
+    <div class="ad-section" id="ad-notas">
+      <p style="font-size:0.72rem;color:var(--muted);margin-bottom:10px;">Escreva confortavelmente aqui e copie pra colar no AnyDesk.</p>
+      <textarea class="ad-textarea" id="adNotaTexto" placeholder="Digite aqui..."></textarea>
+      <button class="ad-btn" onclick="adCopyNota()">📋 Copiar tudo</button>
+      <button class="ad-btn-outline" onclick="adSalvarNota()">💾 Salvar no histórico</button>
+    </div>
+
+    <div class="ad-section" id="ad-historico">
+      <p style="font-size:0.72rem;color:var(--muted);margin-bottom:10px;">Toque em qualquer item para copiar novamente.</p>
+      <button class="ad-btn-outline" onclick="adClearHist()">🗑️ Limpar histórico</button>
+      <div style="margin-top:10px;" id="adHistList"></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- TOAST FEEDBACK -->
+<div class="ad-feedback" id="adFeedback">✓ Copiado!</div>
+
+<!-- ═══════════════════════════════════════════════════════ SCRIPTS ═══ -->
+<script type="module">
+// ── Firebase (mesmo do Sistema Tapetes) ──────────────────────────────
+import { db } from "https://arquivos98126066-sudo.github.io/SOFTWARE/firebase-sync.js";
+import {
+  collection, addDoc, getDocs, updateDoc, deleteDoc, doc,
+  onSnapshot, query, orderBy, writeBatch, setDoc, getDoc
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+// ── Coleções Firestore ────────────────────────────────────────────────
+// launcher_apps     → lista de atalhos
+// launcher_ck       → lista de tarefas
+// launcher_fm       → sistema de arquivos (documento único)
+// launcher_ad       → dados AnyDesk (documento único)
+// launcher_trash    → lixeira (documento único)
+
+// ── Helper: salvar documento único ───────────────────────────────────
+async function fsSetDoc(colId, docId, data) {
+  if (window.syncShow) window.syncShow.syncing();
+  try {
+    await setDoc(doc(db, colId, docId), data);
+    if (window.syncShow) window.syncShow.synced('Apps');
+  } catch(e) {
+    if (window.syncShow) window.syncShow.offline();
+    // fallback localStorage
+    try { localStorage.setItem(colId+'_'+docId, JSON.stringify(data)); } catch(_) {}
+  }
+}
+
+// ── Apps ─────────────────────────────────────────────────────────────
 const EMOJIS=['🌐','📱','💼','🎮','📧','🎵','📺','🛒','💰','📚','🔧','🎯','🚀','⚡','🔥','💡'];
 let selEmoji=EMOJIS[0];
 let dragSrc=null;
@@ -1025,42 +1119,26 @@ const DEFAULT=[
   {name:'Netflix',url:'https://netflix.com',emoji:'🎬'},
 ];
 
-// ── Persistência robusta ──────────────────────────────────────────────
-// Tenta localStorage → sessionStorage → cookie, nessa ordem
-function loadApps(){
-  // 1) localStorage
-  try{
-    const v=localStorage.getItem('launcher_apps');
-    if(v){const p=JSON.parse(v);if(Array.isArray(p)&&p.length)return p;}
-  }catch(e){}
-  // 2) sessionStorage
-  try{
-    const v=sessionStorage.getItem('launcher_apps');
-    if(v){const p=JSON.parse(v);if(Array.isArray(p)&&p.length)return p;}
-  }catch(e){}
-  // 3) cookie
-  try{
-    const m=document.cookie.match(/(?:^|; )launcher_apps=([^;]*)/);
-    if(m){const p=JSON.parse(decodeURIComponent(m[1]));if(Array.isArray(p)&&p.length)return p;}
-  }catch(e){}
-  return null;
-}
+let apps = [];
+let appsLoaded = false;
 
-function save(){
-  const data=JSON.stringify(apps);
-  // 1) localStorage
-  try{localStorage.setItem('launcher_apps',data);}catch(e){}
-  // 2) sessionStorage
-  try{sessionStorage.setItem('launcher_apps',data);}catch(e){}
-  // 3) cookie (expira em 1 ano)
-  try{
-    const exp=new Date();exp.setFullYear(exp.getFullYear()+1);
-    document.cookie='launcher_apps='+encodeURIComponent(data)+';expires='+exp.toUTCString()+';path=/';
-  }catch(e){}
-}
+// Carrega apps do Firestore em tempo real
+onSnapshot(doc(db,'launcher_apps','data'), (snap) => {
+  if (snap.exists()) {
+    const data = snap.data();
+    apps = data.list || [];
+  } else {
+    // primeiro acesso — usa defaults e salva
+    apps = [...DEFAULT];
+    fsSetDoc('launcher_apps','data',{list:apps});
+  }
+  appsLoaded = true;
+  render();
+});
 
-let apps=loadApps();
-if(!apps){apps=[...DEFAULT];save();}
+function saveApps() {
+  fsSetDoc('launcher_apps','data',{list:apps});
+}
 
 function faviconUrl(url){
   try{
@@ -1089,8 +1167,8 @@ function exitEdit(){
   editMode=false;
   document.body.classList.remove('editing');
 }
+window.exitEdit = exitEdit;
 
-// Sai do modo edição automaticamente ao voltar pra página
 document.addEventListener('visibilitychange',()=>{
   if(document.visibilityState==='visible') exitEdit();
 });
@@ -1099,20 +1177,16 @@ window.addEventListener('focus',()=>exitEdit());
 function render(){
   const grid=document.getElementById('grid');
   grid.innerHTML='';
-
   if(!apps.length){
     grid.innerHTML='<div class="empty"><div class="empty-icon">📱</div><p>Nenhum atalho ainda.<br>Toque em "Adicionar" para começar.</p></div>';
     return;
   }
-
   apps.forEach((a,i)=>{
     const el=document.createElement('div');
     el.className='app';
     el.dataset.i=i;
     el.draggable=true;
-
     const fav=faviconUrl(a.url);
-
     el.innerHTML=`
       <div class="del-badge" data-i="${i}">✕</div>
       <div class="app-icon">
@@ -1124,33 +1198,25 @@ function render(){
       </div>
       <div class="app-name">${a.name}</div>
     `;
-
-    // long press → edit mode
     el.addEventListener('pointerdown',()=>{
       longPressTimer=setTimeout(()=>enterEdit(),500);
     });
     el.addEventListener('pointerup',()=>clearTimeout(longPressTimer));
     el.addEventListener('pointermove',()=>clearTimeout(longPressTimer));
-
-    // tap to open — usa nome fixo pra reutilizar a aba no Chrome
     el.addEventListener('click',e=>{
       if(e.target.closest('.del-badge'))return;
       if(editMode)return;
       if(a.type==='deep'){
-        window.location.href=a.url; // deep link abre app direto
+        window.location.href=a.url;
       } else {
         const tabName='app_'+a.name.replace(/\s+/g,'_').toLowerCase();
         window.open(a.url, tabName);
       }
     });
-
-    // delete
     el.querySelector('.del-badge').addEventListener('click',e=>{
       e.stopPropagation();
-      apps.splice(i,1);save();render();
+      apps.splice(i,1);saveApps();render();
     });
-
-    // drag desktop
     el.addEventListener('dragstart',()=>{dragSrc=i;el.classList.add('dragging');});
     el.addEventListener('dragend',()=>document.querySelectorAll('.app').forEach(x=>x.classList.remove('dragging','drag-over')));
     el.addEventListener('dragover',e=>{e.preventDefault();if(dragSrc!==null&&dragSrc!==i)el.classList.add('drag-over');});
@@ -1160,12 +1226,11 @@ function render(){
       if(dragSrc!==null&&dragSrc!==i){
         const tmp=apps.splice(dragSrc,1)[0];
         apps.splice(i,0,tmp);
-        save();render();
+        saveApps();render();
       }
       dragSrc=null;
     });
-
-    // touch drag — só horizontal para não travar scroll
+    // touch drag
     let tx,ty,tClone=null,tIdx=i,tMoved=false;
     el.addEventListener('touchstart',e=>{
       const t=e.touches[0];tx=t.clientX;ty=t.clientY;tMoved=false;
@@ -1200,7 +1265,7 @@ function render(){
         const tgt=under&&under.closest('.app[data-i]');
         if(tgt){
           const ti=parseInt(tgt.dataset.i);
-          if(ti!==tIdx){const tmp=apps.splice(tIdx,1)[0];apps.splice(ti,0,tmp);save();}
+          if(ti!==tIdx){const tmp=apps.splice(tIdx,1)[0];apps.splice(ti,0,tmp);saveApps();}
         }
         tClone.remove();tClone=null;
         el.style.opacity='';
@@ -1208,12 +1273,11 @@ function render(){
         render();
       }
     });
-
     grid.appendChild(el);
   });
 }
 
-// MODAL
+// MODAL APPS
 let appType='site';
 function setType(t){
   appType=t;
@@ -1222,21 +1286,19 @@ function setType(t){
   document.getElementById('field-url').style.display=t==='site'?'':'none';
   document.getElementById('field-deep').style.display=t==='deep'?'':'none';
 }
-function openModal(){
-  appType='site';
-  setType('site');
-  selEmoji=EMOJIS[0];
-  initEmojis();
+window.setType = setType;
+window.openModal = function(){
+  appType='site';setType('site');selEmoji=EMOJIS[0];initEmojis();
   document.getElementById('overlay').classList.add('open');
   setTimeout(()=>document.getElementById('inp-name').focus(),300);
-}
-function closeModal(){
+};
+window.closeModal = function(){
   document.getElementById('overlay').classList.remove('open');
   document.getElementById('inp-name').value='';
   document.getElementById('inp-url').value='';
   document.getElementById('inp-deep').value='';
-}
-function saveApp(){
+};
+window.saveApp = function(){
   const name=document.getElementById('inp-name').value.trim();
   if(!name){alert('Digite um nome');return;}
   let url='';
@@ -1249,43 +1311,36 @@ function saveApp(){
     if(!url){alert('Digite o deep link do app');return;}
   }
   apps.push({name,url,emoji:selEmoji,type:appType});
-  save();render();closeModal();
-}
+  saveApps();render();window.closeModal();
+};
 document.getElementById('overlay').addEventListener('click',e=>{
-  if(e.target===document.getElementById('overlay'))closeModal();
+  if(e.target===document.getElementById('overlay'))window.closeModal();
 });
 document.addEventListener('keydown',e=>{
-  if(e.key==='Escape')closeModal();
-  if(e.key==='Enter'&&document.getElementById('overlay').classList.contains('open'))saveApp();
+  if(e.key==='Escape')window.closeModal();
+  if(e.key==='Enter'&&document.getElementById('overlay').classList.contains('open'))window.saveApp();
 });
 
-// TRANSCRIBER — começa fechado
+// ── TRANSCRIBER ───────────────────────────────────────────────────────
 let recog=null,listening=false,panelOpen=false;
 
-function toggleCk(){
+window.toggleCk = function(){
   const ck=document.getElementById('ckPanel');
   const tp=document.getElementById('tPanel');
   const ckOpen=!ck.classList.contains('hidden');
-  ck.classList.add('hidden');
-  tp.classList.add('hidden');
-  panelOpen=false;
+  ck.classList.add('hidden');tp.classList.add('hidden');panelOpen=false;
   if(!ckOpen) ck.classList.remove('hidden');
-}
-
-function togglePanel(){
+};
+window.togglePanel = function(){
   const ck=document.getElementById('ckPanel');
   const tp=document.getElementById('tPanel');
   const tpOpen=!tp.classList.contains('hidden');
-  ck.classList.add('hidden');
-  tp.classList.add('hidden');
-  panelOpen=false;
+  ck.classList.add('hidden');tp.classList.add('hidden');panelOpen=false;
   if(!tpOpen){tp.classList.remove('hidden');panelOpen=true;}
-}
+};
+window.toggleMic2 = function(){window.togglePanel();};
+window.toggleMic = function(){listening?stopMic():startMic();};
 
-// alias pro botão do mic fab
-function toggleMic2(){togglePanel();}
-
-function toggleMic(){listening?stopMic():startMic();}
 function startMic(){
   const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
   if(!SR){alert('Use o Chrome para reconhecimento de voz.');return;}
@@ -1293,251 +1348,162 @@ function startMic(){
   document.getElementById('rdot').classList.add('on');
   const b=document.getElementById('micBtn');
   b.textContent='⏸️ Pausar';b.style.background='linear-gradient(135deg,#ef4444,#f97316)';
-
   function newSession(){
     if(!listening)return;
-    recog=new SR();
-    recog.lang='pt-BR';
-    recog.continuous=false;
-    recog.interimResults=true;
-    recog.maxAlternatives=1;
-    let sessionFinal=''; // controla o que já foi commitado nessa sessão
+    recog=new SR();recog.lang='pt-BR';recog.continuous=false;recog.interimResults=true;recog.maxAlternatives=1;
+    let sessionFinal='';
     recog.onresult=e=>{
       const el=document.getElementById('tText');
-      const old=el.querySelector('.interim');
-      if(old)old.remove();
-
-      let interim='';
-      let newFinal='';
+      const old=el.querySelector('.interim');if(old)old.remove();
+      let interim='',newFinal='';
       for(let i=e.resultIndex;i<e.results.length;i++){
         if(e.results[i].isFinal) newFinal+=e.results[i][0].transcript+' ';
         else interim=e.results[i][0].transcript;
       }
-
-      // só adiciona se é texto novo (evita duplicação)
-      if(newFinal && newFinal!==sessionFinal){
+      if(newFinal&&newFinal!==sessionFinal){
         sessionFinal=newFinal;
         const current=el.innerText||'';
         const needsSpace=current.length>0&&!/[\s\n]$/.test(current);
         const txt=document.createTextNode((needsSpace?' ':'')+newFinal);
         el.appendChild(txt);
-        const range=document.createRange();
-        const sel=window.getSelection();
-        range.selectNodeContents(el);
-        range.collapse(false);
-        sel.removeAllRanges();
-        sel.addRange(range);
+        const range=document.createRange();const sel=window.getSelection();
+        range.selectNodeContents(el);range.collapse(false);sel.removeAllRanges();sel.addRange(range);
         el.scrollTop=el.scrollHeight;
       }
-
       if(interim){
-        const span=document.createElement('span');
-        span.className='interim';
-        span.textContent=interim;
-        el.appendChild(span);
-        el.scrollTop=el.scrollHeight;
+        const span=document.createElement('span');span.className='interim';span.textContent=interim;
+        el.appendChild(span);el.scrollTop=el.scrollHeight;
       }
     };
     recog.onerror=e=>{if(e.error!=='aborted'&&e.error!=='no-speech')stopMic();};
     recog.onend=()=>{
-      const old=document.getElementById('tText').querySelector('.interim');
-      if(old)old.remove();
-      setTimeout(newSession,30); // reinício mais rápido
+      const old=document.getElementById('tText').querySelector('.interim');if(old)old.remove();
+      setTimeout(newSession,30);
     };
     recog.start();
   }
   newSession();
 }
 function stopMic(){
-  listening=false;
-  if(recog)recog.abort();
+  listening=false;if(recog)recog.abort();
   document.getElementById('rdot').classList.remove('on');
-  const b=document.getElementById('micBtn');
-  b.textContent='🎙️ Falar';b.style.background='';
-  // remove interim que sobrou
-  const old=document.getElementById('tText').querySelector('.interim');
-  if(old)old.remove();
+  const b=document.getElementById('micBtn');b.textContent='🎙️ Falar';b.style.background='';
+  const old=document.getElementById('tText').querySelector('.interim');if(old)old.remove();
 }
-function clearText(){document.getElementById('tText').innerHTML='';}
-
-// paste no transcritor: preserva texto puro
-function copyText(){
-  const el=document.getElementById('tText');
-  const txt=el.innerText.trim();
-  if(!txt)return;
-  // tenta copiar com formatação (rich)
+window.clearText = function(){document.getElementById('tText').innerHTML='';};
+window.copyText = function(){
+  const el=document.getElementById('tText');const txt=el.innerText.trim();if(!txt)return;
   try{
     const blob=new Blob([el.innerHTML],{type:'text/html'});
     const blobText=new Blob([txt],{type:'text/plain'});
-    navigator.clipboard.write([new ClipboardItem({'text/html':blob,'text/plain':blobText})]).catch(()=>{
-      navigator.clipboard.writeText(txt);
-    });
-  }catch(e){
-    navigator.clipboard.writeText(txt);
-  }
-  const b=event.target.closest('button');
-  const orig=b.textContent;b.textContent='✓ Copiado!';
+    navigator.clipboard.write([new ClipboardItem({'text/html':blob,'text/plain':blobText})]).catch(()=>navigator.clipboard.writeText(txt));
+  }catch(e){navigator.clipboard.writeText(txt);}
+  const b=event.target.closest('button');const orig=b.textContent;b.textContent='✓ Copiado!';
   setTimeout(()=>b.textContent=orig,1500);
-}
-// campo livre - sem interferência
-
-// paste no transcritor: preserva texto puro com espaçamentos, sem HTML externo
+};
 document.getElementById('tText').addEventListener('paste',e=>{
-  e.preventDefault();
-  const text=e.clipboardData.getData('text/plain');
-  if(!text)return;
-  // insere como texto puro mantendo quebras de linha
+  e.preventDefault();const text=e.clipboardData.getData('text/plain');if(!text)return;
   document.execCommand('insertText',false,text);
 });
 
-// ── GALERIA — imagem como fundo da página ──────────────────────────────
-function openGallery(){
-  document.getElementById('galleryInput').click();
-}
-
-function handleImageSelect(event){
-  const file=event.target.files[0];
-  if(!file)return;
+// Galeria / wallpaper
+window.openGallery = function(){document.getElementById('galleryInput').click();};
+window.handleImageSelect = function(event){
+  const file=event.target.files[0];if(!file)return;
   const reader=new FileReader();
   reader.onload=e=>{
     const wp=document.getElementById('imgWallpaper');
-    wp.style.backgroundImage=`url('${e.target.result}')`;
-    wp._dataUrl=e.target.result;
-    wp.classList.add('active');
-    document.body.classList.add('img-active');
+    wp.style.backgroundImage=`url('${e.target.result}')`;wp._dataUrl=e.target.result;
+    wp.classList.add('active');document.body.classList.add('img-active');
     document.getElementById('removeImgBtn').style.display='flex';
     document.getElementById('copyImgBtn').disabled=false;
   };
-  reader.readAsDataURL(file);
-  event.target.value='';
-}
-
-function removeWallpaper(){
+  reader.readAsDataURL(file);event.target.value='';
+};
+window.removeWallpaper = function(){
   const wp=document.getElementById('imgWallpaper');
-  wp.classList.remove('active');
-  wp.style.backgroundImage='';
-  wp._dataUrl=null;
+  wp.classList.remove('active');wp.style.backgroundImage='';wp._dataUrl=null;
   document.body.classList.remove('img-active');
   document.getElementById('removeImgBtn').style.display='none';
   document.getElementById('copyImgBtn').disabled=true;
-}
-
-async function copyImage(){
-  const wp=document.getElementById('imgWallpaper');
-  if(!wp._dataUrl)return;
+};
+window.copyImage = async function(){
+  const wp=document.getElementById('imgWallpaper');if(!wp._dataUrl)return;
   const b=document.getElementById('copyImgBtn');
   try{
-    const img=new Image();
-    img.src=wp._dataUrl;
-    await new Promise(r=>img.onload=r);
-    const canvas=document.createElement('canvas');
-    canvas.width=img.naturalWidth;canvas.height=img.naturalHeight;
+    const img=new Image();img.src=wp._dataUrl;await new Promise(r=>img.onload=r);
+    const canvas=document.createElement('canvas');canvas.width=img.naturalWidth;canvas.height=img.naturalHeight;
     canvas.getContext('2d').drawImage(img,0,0);
     canvas.toBlob(async blob=>{
       try{
         await navigator.clipboard.write([new ClipboardItem({'image/png':blob})]);
-        const orig=b.textContent;b.textContent='✓ Copiada!';
-        setTimeout(()=>b.textContent=orig,1500);
+        const orig=b.textContent;b.textContent='✓ Copiada!';setTimeout(()=>b.textContent=orig,1500);
       }catch(e){
-        // fallback: abre imagem em nova aba para o usuário salvar manualmente
-        const url=URL.createObjectURL(blob);
-        const a=document.createElement('a');
-        a.href=url;a.download='imagem.png';a.click();
-        URL.revokeObjectURL(url);
+        const url=URL.createObjectURL(blob);const a=document.createElement('a');
+        a.href=url;a.download='imagem.png';a.click();URL.revokeObjectURL(url);
       }
     },'image/png');
-  }catch(e){
-    const orig=b.textContent;b.textContent='❌ Erro';
-    setTimeout(()=>b.textContent=orig,1500);
-  }
-}
+  }catch(e){const orig=b.textContent;b.textContent='❌ Erro';setTimeout(()=>b.textContent=orig,1500);}
+};
 
-// ── CHECKLIST ──────────────────────────────────────────────────────────
+// ── CHECKLIST (Firebase) ──────────────────────────────────────────────
 const CK_EMOJIS=['📁','✅','⭐','🔥','💡','📌','🎯','📝','🛒','💼','🎮','📚','🔧','⚡','🚀','💰'];
 let ckItems=[];
 let ckEditIdx=null;
 let ckSelEmoji=CK_EMOJIS[0];
-let ckLongTimer=null;
 
-function loadCk(){
-  try{const v=localStorage.getItem('launcher_ck');if(v)return JSON.parse(v);}catch(e){}
-  try{const v=sessionStorage.getItem('launcher_ck');if(v)return JSON.parse(v);}catch(e){}
-  return [];
-}
 function saveCk(){
-  const d=JSON.stringify(ckItems);
-  try{localStorage.setItem('launcher_ck',d);}catch(e){}
-  try{sessionStorage.setItem('launcher_ck',d);}catch(e){}
+  fsSetDoc('launcher_ck','data',{list:ckItems});
 }
+
+onSnapshot(doc(db,'launcher_ck','data'), (snap) => {
+  ckItems = snap.exists() ? (snap.data().list || []) : [];
+  renderCk();
+});
 
 function renderCk(){
-  const list=document.getElementById('ckList');
-  list.innerHTML='';
+  const list=document.getElementById('ckList');list.innerHTML='';
   ckItems.forEach((item,i)=>{
-    const el=document.createElement('div');
-    el.className='ck-item'+(item.done?' done':'');
+    const el=document.createElement('div');el.className='ck-item'+(item.done?' done':'');
     el.innerHTML=`<div class="ck-emoji">${item.emoji||'📁'}</div>
       <div class="ck-name">${item.name}</div>
       <div class="ck-check">${item.done?'✓':''}</div>`;
-
-    // toque simples → marcar/desmarcar | duplo toque → editar
     let lastTap=0;
     el.addEventListener('click',()=>{
       const now=Date.now();
-      if(now-lastTap<350){
-        openCkModal(i); // duplo toque = editar
-      } else {
-        ckItems[i].done=!ckItems[i].done; // simples = check
-        saveCk();renderCk();
-      }
+      if(now-lastTap<350){openCkModal(i);}
+      else{ckItems[i].done=!ckItems[i].done;saveCk();renderCk();}
       lastTap=now;
     });
-
     list.appendChild(el);
   });
 }
 
-function openCkModal(idx){
-  ckEditIdx=idx;
-  ckSelEmoji=idx!==null?ckItems[idx].emoji:CK_EMOJIS[0];
+window.openCkModal = function(idx){
+  ckEditIdx=idx;ckSelEmoji=idx!==null?ckItems[idx].emoji:CK_EMOJIS[0];
   document.getElementById('ckModalTitle').textContent=idx!==null?'✏️ Editar tarefa':'➕ Nova tarefa';
   document.getElementById('ck-inp-name').value=idx!==null?ckItems[idx].name:'';
-  const row=document.getElementById('ckEmojiRow');
-  row.innerHTML='';
+  const row=document.getElementById('ckEmojiRow');row.innerHTML='';
   CK_EMOJIS.forEach(e=>{
-    const d=document.createElement('div');
-    d.className='epick'+(e===ckSelEmoji?' sel':'');
-    d.textContent=e;
+    const d=document.createElement('div');d.className='epick'+(e===ckSelEmoji?' sel':'');d.textContent=e;
     d.onclick=()=>{ckSelEmoji=e;row.querySelectorAll('.epick').forEach(x=>x.classList.remove('sel'));d.classList.add('sel');};
     row.appendChild(d);
   });
   document.getElementById('ckOverlay').classList.add('open');
   setTimeout(()=>document.getElementById('ck-inp-name').focus(),300);
-}
-function closeCkModal(){
-  document.getElementById('ckOverlay').classList.remove('open');
-}
-function saveCkItem(){
-  const name=document.getElementById('ck-inp-name').value.trim();
-  if(!name){alert('Digite um nome');return;}
-  if(ckEditIdx!==null){
-    ckItems[ckEditIdx].name=name;
-    ckItems[ckEditIdx].emoji=ckSelEmoji;
-  } else {
-    ckItems.push({name,emoji:ckSelEmoji,done:false});
-  }
-  saveCk();renderCk();closeCkModal();
-}
+};
+window.closeCkModal = function(){document.getElementById('ckOverlay').classList.remove('open');};
+window.saveCkItem = function(){
+  const name=document.getElementById('ck-inp-name').value.trim();if(!name){alert('Digite um nome');return;}
+  if(ckEditIdx!==null){ckItems[ckEditIdx].name=name;ckItems[ckEditIdx].emoji=ckSelEmoji;}
+  else{ckItems.push({name,emoji:ckSelEmoji,done:false});}
+  saveCk();renderCk();window.closeCkModal();
+};
 document.getElementById('ckOverlay').addEventListener('click',e=>{
-  if(e.target===document.getElementById('ckOverlay'))closeCkModal();
+  if(e.target===document.getElementById('ckOverlay'))window.closeCkModal();
 });
 
-ckItems=loadCk();
-renderCk();
-
-render();
-
-// ── GERENCIADOR DE ARQUIVOS ─────────────────────────────────────────────
+// ── GERENCIADOR DE ARQUIVOS (Firebase) ───────────────────────────────
 let fmFs={root:{type:'folder',name:'Arquivos',children:{}}};
 let fmPath=[];
 let fmNewType='folder';
@@ -1545,77 +1511,61 @@ let fmSelMode=false;
 let fmSelected=new Set();
 let fmViewingKey=null;
 let fmEditorKey=null;
-let fmTrash=[]; // [{key, item, path, deletedAt}]
+let fmTrash=[];
 
-// ── CONFIRMAÇÃO PERSONALIZADA ──
+// Carrega FM do Firestore
+onSnapshot(doc(db,'launcher_fm','data'), (snap) => {
+  fmFs = snap.exists() ? (snap.data().fs || fmFs) : fmFs;
+});
+onSnapshot(doc(db,'launcher_trash','data'), (snap) => {
+  fmTrash = snap.exists() ? (snap.data().list || []) : [];
+});
+
+function fmSave(){
+  fsSetDoc('launcher_fm','data',{fs:fmFs});
+}
+function fmSaveTrash(){
+  fsSetDoc('launcher_trash','data',{list:fmTrash});
+}
+
+// ── CONFIRMAÇÃO ──
 let fmConfirmCb=null;
-function fmConfirm(msg,okLabel,cb){
+window.fmConfirm = function(msg,okLabel,cb){
   document.getElementById('fmConfirmMsg').innerHTML=msg;
   document.getElementById('fmConfirmOk').textContent=okLabel||'Excluir';
-  fmConfirmCb=cb;
-  document.getElementById('fmConfirmOverlay').classList.add('open');
-}
-function fmConfirmCancel(){
-  document.getElementById('fmConfirmOverlay').classList.remove('open');
-  fmConfirmCb=null;
-}
+  fmConfirmCb=cb;document.getElementById('fmConfirmOverlay').classList.add('open');
+};
+window.fmConfirmCancel = function(){
+  document.getElementById('fmConfirmOverlay').classList.remove('open');fmConfirmCb=null;
+};
 document.getElementById('fmConfirmOk').addEventListener('click',()=>{
   document.getElementById('fmConfirmOverlay').classList.remove('open');
   if(fmConfirmCb){fmConfirmCb();fmConfirmCb=null;}
 });
 
-function fmLoadTrash(){
-  try{const v=localStorage.getItem('launcher_trash');if(v)return JSON.parse(v);}catch(e){}
-  return [];
-}
-function fmSaveTrash(){
-  try{localStorage.setItem('launcher_trash',JSON.stringify(fmTrash));}catch(e){}
-}
-
-function fmLoad(){
-  try{const v=localStorage.getItem('launcher_fm');if(v)return JSON.parse(v);}catch(e){}
-  return {root:{type:'folder',name:'Arquivos',children:{}}};
-}
-function fmSave(){
-  try{localStorage.setItem('launcher_fm',JSON.stringify(fmFs));}catch(e){}
-}
 function fmCurrentFolder(){
-  let node=fmFs.root;
-  for(const p of fmPath) node=node.children[p];
-  return node;
+  let node=fmFs.root;for(const p of fmPath)node=node.children[p];return node;
 }
-function fmPathLabel(){
-  return ['📁 Arquivos',...fmPath].join(' › ');
-}
+function fmPathLabel(){return ['📁 Arquivos',...fmPath].join(' › ');}
 
-function openFm(){
-  fmFs=fmLoad();fmPath=[];fmSelMode=false;fmSelected.clear();
-  fmTrash=fmLoadTrash();
-  renderFm();
+window.openFm = function(){
+  fmPath=[];fmSelMode=false;fmSelected.clear();renderFm();
   document.getElementById('fmOverlay').classList.add('open');
-}
+};
 function closeFm(){document.getElementById('fmOverlay').classList.remove('open');}
-function fmGoBack(){
-  if(fmPath.length===0){closeFm();return;}
-  fmPath.pop();fmSelected.clear();renderFm();
-}
+window.fmGoBack = function(){if(fmPath.length===0){closeFm();return;}fmPath.pop();fmSelected.clear();renderFm();};
 
-// ── MODO SELEÇÃO MÚLTIPLA ──
-function fmToggleSelMode(){
-  fmSelMode=!fmSelMode;
-  fmSelected.clear();
+window.fmToggleSelMode = function(){
+  fmSelMode=!fmSelMode;fmSelected.clear();
   const bar=document.getElementById('fmSelBar');
-  if(fmSelMode) bar.classList.add('show');
-  else bar.classList.remove('show');
+  if(fmSelMode)bar.classList.add('show');else bar.classList.remove('show');
   renderFm();
-}
-function fmUpdateSelBar(){
-  document.getElementById('fmSelCount').textContent=fmSelected.size+' selecionado(s)';
-}
-function fmSelDeleteAll(){
+};
+function fmUpdateSelBar(){document.getElementById('fmSelCount').textContent=fmSelected.size+' selecionado(s)';}
+window.fmSelDeleteAll = function(){
   if(!fmSelected.size)return;
   const count=fmSelected.size;
-  fmConfirm(`Mover <strong>${count} item(s)</strong> para a lixeira?`,'Mover para lixeira',()=>{
+  window.fmConfirm(`Mover <strong>${count} item(s)</strong> para a lixeira?`,'Mover para lixeira',()=>{
     const folder=fmCurrentFolder();
     fmSelected.forEach(k=>{
       fmTrash.push({key:k,item:JSON.parse(JSON.stringify(folder.children[k])),path:[...fmPath],deletedAt:Date.now()});
@@ -1623,124 +1573,86 @@ function fmSelDeleteAll(){
     });
     fmSelected.clear();fmSave();fmSaveTrash();renderFm();
   });
-}
-function fmSelCopyAll(){
+};
+window.fmSelCopyAll = function(){
   if(!fmSelected.size)return;
-  const folder=fmCurrentFolder();
-  const texts=[];
+  const folder=fmCurrentFolder();const texts=[];
   fmSelected.forEach(k=>{
     const item=folder.children[k];
     if(item.type!=='image'&&item.type!=='folder'){
-      // conteúdo rich text: extrair texto limpo
-      const div=document.createElement('div');
-      div.innerHTML=item.content||'';
+      const div=document.createElement('div');div.innerHTML=item.content||'';
       texts.push('=== '+k+' ===\n'+(div.innerText||div.textContent||''));
     }
   });
-  if(texts.length) navigator.clipboard.writeText(texts.join('\n\n'));
-}
+  if(texts.length)navigator.clipboard.writeText(texts.join('\n\n'));
+};
 
 function renderFm(){
   const folder=fmCurrentFolder();
   document.getElementById('fmPath').textContent=fmPathLabel();
   document.getElementById('fmBack').textContent=fmPath.length===0?'✕':'←';
-  const list=document.getElementById('fmList');
-  list.innerHTML='';
+  const list=document.getElementById('fmList');list.innerHTML='';
   const keys=Object.keys(folder.children||{});
   if(!keys.length){
-    list.innerHTML='<div class="fm-empty">📂 Pasta vazia<br><small>Toque em "+ Novo" para adicionar</small></div>';
-    return;
+    list.innerHTML='<div class="fm-empty">📂 Pasta vazia<br><small>Toque em "+ Novo" para adicionar</small></div>';return;
   }
   const sorted=[...keys].sort((a,b)=>{
-    const ta=folder.children[a].type==='folder'?0:1;
-    const tb=folder.children[b].type==='folder'?0:1;
+    const ta=folder.children[a].type==='folder'?0:1;const tb=folder.children[b].type==='folder'?0:1;
     return ta-tb||a.localeCompare(b);
   });
   sorted.forEach(key=>{
-    const item=folder.children[key];
-    const isFolder=item.type==='folder';
+    const item=folder.children[key];const isFolder=item.type==='folder';
     const el=document.createElement('div');
     el.className='fm-item'+(fmSelected.has(key)?' selected':'');
     const icon=isFolder?'📁':item.type==='image'?'🖼️':item.type==='html'?'🌐':item.type==='md'?'📝':item.type==='pdf'?'📕':'📄';
-
     if(fmSelMode){
       const meta=isFolder?`${Object.keys(item.children||{}).length} item(s)`:'';
-      el.innerHTML=`
-        <div class="fm-item-check">${fmSelected.has(key)?'✓':''}</div>
+      el.innerHTML=`<div class="fm-item-check">${fmSelected.has(key)?'✓':''}</div>
         <div class="fm-item-icon">${icon}</div>
-        <div class="fm-item-info">
-          <div class="fm-item-name">${key}</div>
-          <div class="fm-item-meta">${meta}</div>
-        </div>`;
+        <div class="fm-item-info"><div class="fm-item-name">${key}</div><div class="fm-item-meta">${meta}</div></div>`;
       el.addEventListener('click',()=>{
-        if(fmSelected.has(key)) fmSelected.delete(key);
-        else fmSelected.add(key);
+        if(fmSelected.has(key))fmSelected.delete(key);else fmSelected.add(key);
         fmUpdateSelBar();renderFm();
       });
     } else if(isFolder){
       const meta=`${Object.keys(item.children||{}).length} item(s)`;
-      el.innerHTML=`
-        <div class="fm-item-icon">${icon}</div>
-        <div class="fm-item-info">
-          <div class="fm-item-name">${key}</div>
-          <div class="fm-item-meta">${meta}</div>
-        </div>
+      el.innerHTML=`<div class="fm-item-icon">${icon}</div>
+        <div class="fm-item-info"><div class="fm-item-name">${key}</div><div class="fm-item-meta">${meta}</div></div>
         <div style="display:flex;gap:4px;flex-shrink:0;">
-          <button class="fm-item-del" onclick="event.stopPropagation();fmDelete('${key}')">✕</button>
-        </div>`;
-      el.addEventListener('click',e=>{
-        if(e.target.closest('.fm-item-del'))return;
-        fmPath.push(key);renderFm();
-      });
+          <button class="fm-item-del" onclick="event.stopPropagation();fmDelete('${key}')">✕</button></div>`;
+      el.addEventListener('click',e=>{if(e.target.closest('.fm-item-del'))return;fmPath.push(key);renderFm();});
     } else {
       const meta=item.type==='image'?'imagem':item.type==='pdf'?'PDF':(item.content?.length||0)+' chars';
-      el.innerHTML=`
-        <div class="fm-item-icon">${icon}</div>
-        <div class="fm-item-info">
-          <div class="fm-item-name">${key}</div>
-          <div class="fm-item-meta">${meta}</div>
-        </div>
+      el.innerHTML=`<div class="fm-item-icon">${icon}</div>
+        <div class="fm-item-info"><div class="fm-item-name">${key}</div><div class="fm-item-meta">${meta}</div></div>
         <div style="display:flex;gap:4px;flex-shrink:0;">
           <button class="fm-item-btn" title="Ver" onclick="event.stopPropagation();fmView('${key}')">👁️</button>
           <button class="fm-item-btn" title="Copiar" onclick="event.stopPropagation();fmCopyItem('${key}',this)">📋</button>
-          <button class="fm-item-del" onclick="event.stopPropagation();fmDelete('${key}')">✕</button>
-        </div>`;
+          <button class="fm-item-del" onclick="event.stopPropagation();fmDelete('${key}')">✕</button></div>`;
       el.addEventListener('click',e=>{
         if(e.target.closest('.fm-item-btn')||e.target.closest('.fm-item-del'))return;
-        if(item.type==='image'||item.type==='pdf'){fmView(key);}
-        else{fmOpenEditor(key);}
+        if(item.type==='image'||item.type==='pdf'){fmView(key);}else{fmOpenEditor(key);}
       });
     }
     list.appendChild(el);
   });
 }
 
-function fmDelete(key){
-  fmConfirm(`Mover <strong>"${key}"</strong> para a lixeira?`,'Mover para lixeira',()=>{
+window.fmDelete = function(key){
+  window.fmConfirm(`Mover <strong>"${key}"</strong> para a lixeira?`,'Mover para lixeira',()=>{
     const folder=fmCurrentFolder();
     fmTrash.push({key,item:JSON.parse(JSON.stringify(folder.children[key])),path:[...fmPath],deletedAt:Date.now()});
-    delete folder.children[key];
-    fmSave();fmSaveTrash();renderFm();
+    delete folder.children[key];fmSave();fmSaveTrash();renderFm();
   });
-}
+};
 
-// ── COPIAR ITEM ──
-function fmCopyItem(key,btn){
-  const item=fmCurrentFolder().children[key];
-  const orig=btn?btn.textContent:'';
-  if(item.type==='image'){
-    // baixar imagem
-    const a=document.createElement('a');a.href=item.content;
-    a.download=key;a.click();
-    if(btn){btn.textContent='✓';setTimeout(()=>btn.textContent=orig,1200);}
-  } else if(item.type==='pdf'){
-    const a=document.createElement('a');a.href=item.content;
-    a.download=key;a.click();
+window.fmCopyItem = function(key,btn){
+  const item=fmCurrentFolder().children[key];const orig=btn?btn.textContent:'';
+  if(item.type==='image'||item.type==='pdf'){
+    const a=document.createElement('a');a.href=item.content;a.download=key;a.click();
     if(btn){btn.textContent='✓';setTimeout(()=>btn.textContent=orig,1200);}
   } else {
-    // texto/html/md: copia conteúdo com formatação se tiver
-    const content=item.content||'';
-    const hasHTML=/<[a-z][\s\S]*>/i.test(content);
+    const content=item.content||'';const hasHTML=/<[a-z][\s\S]*>/i.test(content);
     if(hasHTML){
       try{
         const blob=new Blob([content],{type:'text/html'});
@@ -1749,36 +1661,22 @@ function fmCopyItem(key,btn){
         const blobTxt=new Blob([plain],{type:'text/plain'});
         navigator.clipboard.write([new ClipboardItem({'text/html':blob,'text/plain':blobTxt})]).catch(()=>navigator.clipboard.writeText(plain));
       }catch(e){navigator.clipboard.writeText(content);}
-    } else {
-      navigator.clipboard.writeText(content);
-    }
+    } else {navigator.clipboard.writeText(content);}
     if(btn){btn.textContent='✓';setTimeout(()=>btn.textContent=orig,1200);}
   }
-}
+};
 
-// ── LIXEIRA ──
-function openFmTrash(){
-  renderFmTrash();
-  document.getElementById('fmTrashOverlay').classList.add('open');
-}
-function closeFmTrash(){
-  document.getElementById('fmTrashOverlay').classList.remove('open');
-}
+// Lixeira
+window.openFmTrash = function(){renderFmTrash();document.getElementById('fmTrashOverlay').classList.add('open');};
+window.closeFmTrash = function(){document.getElementById('fmTrashOverlay').classList.remove('open');};
 function renderFmTrash(){
-  const list=document.getElementById('fmTrashList');
-  list.innerHTML='';
-  if(!fmTrash.length){
-    list.innerHTML='<div class="fm-empty">🗑️ Lixeira vazia</div>';return;
-  }
-  // mais recentes primeiro
+  const list=document.getElementById('fmTrashList');list.innerHTML='';
+  if(!fmTrash.length){list.innerHTML='<div class="fm-empty">🗑️ Lixeira vazia</div>';return;}
   [...fmTrash].reverse().forEach((entry,ri)=>{
-    const i=fmTrash.length-1-ri;
-    const el=document.createElement('div');
-    el.className='fm-trash-item';
+    const i=fmTrash.length-1-ri;const el=document.createElement('div');el.className='fm-trash-item';
     const icon=entry.item.type==='folder'?'📁':entry.item.type==='image'?'🖼️':entry.item.type==='html'?'🌐':entry.item.type==='pdf'?'📕':entry.item.type==='md'?'📝':'📄';
     const date=new Date(entry.deletedAt).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});
-    el.innerHTML=`
-      <div style="font-size:1.1rem;flex-shrink:0;">${icon}</div>
+    el.innerHTML=`<div style="font-size:1.1rem;flex-shrink:0;">${icon}</div>
       <div style="flex:1;overflow:hidden;">
         <div class="fm-trash-name">${entry.key}</div>
         <div class="fm-trash-meta">Excluído ${date} · ${entry.path.length?entry.path.join(' › '):'raiz'}</div>
@@ -1788,133 +1686,84 @@ function renderFmTrash(){
     list.appendChild(el);
   });
 }
-function fmRestore(i){
-  const entry=fmTrash[i];
-  // navegar até a pasta original (criar se não existir)
-  let node=fmFs.root;
-  for(const p of entry.path){
-    if(!node.children[p]) node.children[p]={type:'folder',name:p,children:{}};
-    node=node.children[p];
-  }
+window.fmRestore = function(i){
+  const entry=fmTrash[i];let node=fmFs.root;
+  for(const p of entry.path){if(!node.children[p])node.children[p]={type:'folder',name:p,children:{}};node=node.children[p];}
   let name=entry.key;let c=1;while(node.children[name]){name=entry.key+'_'+c++;}
-  node.children[name]=entry.item;
-  fmTrash.splice(i,1);
-  fmSave();fmSaveTrash();renderFmTrash();renderFm();
-}
-function fmTrashDeleteForever(i){
-  fmConfirm(`Excluir <strong>"${fmTrash[i].key}"</strong> permanentemente?<br><small>Essa ação não pode ser desfeita.</small>`,'Excluir para sempre',()=>{
+  node.children[name]=entry.item;fmTrash.splice(i,1);fmSave();fmSaveTrash();renderFmTrash();renderFm();
+};
+window.fmTrashDeleteForever = function(i){
+  window.fmConfirm(`Excluir <strong>"${fmTrash[i].key}"</strong> permanentemente?<br><small>Essa ação não pode ser desfeita.</small>`,'Excluir para sempre',()=>{
     fmTrash.splice(i,1);fmSaveTrash();renderFmTrash();
   });
-}
-function fmEmptyTrash(){
+};
+window.fmEmptyTrash = function(){
   if(!fmTrash.length)return;
-  fmConfirm(`Esvaziar a lixeira? <strong>${fmTrash.length} item(s)</strong> serão perdidos para sempre.`,'Esvaziar',()=>{
+  window.fmConfirm(`Esvaziar a lixeira? <strong>${fmTrash.length} item(s)</strong> serão perdidos para sempre.`,'Esvaziar',()=>{
     fmTrash=[];fmSaveTrash();renderFmTrash();
   });
-}
+};
 
-// ── VER ──
-function fmView(key){
-  fmViewingKey=key;
-  const item=fmCurrentFolder().children[key];
+// Viewer
+window.fmView = function(key){
+  fmViewingKey=key;const item=fmCurrentFolder().children[key];
   document.getElementById('fmViewerTitle').textContent=key;
-  // mostrar/ocultar botão editar
   const editBtn=document.getElementById('fmViewerEditBtn');
   editBtn.style.display=(item.type==='image'||item.type==='folder')?'none':'';
-  const body=document.getElementById('fmViewerBody');
-  body.innerHTML='';body.style.padding='1rem';
+  const body=document.getElementById('fmViewerBody');body.innerHTML='';body.style.padding='1rem';
   if(item.type==='image'){
-    const img=document.createElement('img');
-    img.src=item.content;img.className='fm-viewer-img';
-    body.appendChild(img);
+    const img=document.createElement('img');img.src=item.content;img.className='fm-viewer-img';body.appendChild(img);
   } else if(item.type==='html'){
     const iframe=document.createElement('iframe');
     iframe.style.cssText='width:100%;height:100%;border:none;border-radius:12px;background:#fff;';
-    body.style.padding='0';
-    body.appendChild(iframe);
-    iframe.srcdoc=item.content;
+    body.style.padding='0';body.appendChild(iframe);iframe.srcdoc=item.content;
   } else {
-    // rich text / txt / md — renderiza HTML se tiver tags, senão pre-wrap
-    const div=document.createElement('div');
-    div.className='fm-viewer-rich';
+    const div=document.createElement('div');div.className='fm-viewer-rich';
     const hasHTML=/<[a-z][\s\S]*>/i.test(item.content||'');
-    if(hasHTML){
-      div.innerHTML=item.content||'';
-    } else {
-      // texto puro → converte quebras de linha
-      div.style.whiteSpace='pre-wrap';
-      div.textContent=item.content||'';
-    }
+    if(hasHTML){div.innerHTML=item.content||'';}
+    else{div.style.whiteSpace='pre-wrap';div.textContent=item.content||'';}
     body.appendChild(div);
   }
   document.getElementById('fmViewer').classList.add('open');
-}
-function closeFmViewer(){
+};
+window.closeFmViewer = function(){
   document.getElementById('fmViewer').classList.remove('open');
-  document.getElementById('fmViewerBody').innerHTML='';
-  fmViewingKey=null;
-}
-function fmEditFromViewer(){
-  const key=fmViewingKey;
-  closeFmViewer();
-  if(key) fmOpenEditor(key);
-}
+  document.getElementById('fmViewerBody').innerHTML='';fmViewingKey=null;
+};
+window.fmEditFromViewer = function(){const key=fmViewingKey;window.closeFmViewer();if(key)fmOpenEditor(key);};
 
-// ── EDITOR RICH TEXT ──
+// Editor
 function fmOpenEditor(key){
-  fmEditorKey=key;
-  const item=fmCurrentFolder().children[key];
+  fmEditorKey=key;const item=fmCurrentFolder().children[key];
   document.getElementById('fmEditorTitle').textContent='✏️ '+key;
-  const editable=document.getElementById('fmEditable');
-  editable.innerHTML=item.content||'';
-  // mostrar/ocultar toolbar conforme tipo
+  const editable=document.getElementById('fmEditable');editable.innerHTML=item.content||'';
   document.getElementById('fmToolbar').style.display=(item.type==='html'||item.type==='txt'||item.type==='md')?'flex':'none';
   document.getElementById('fmEditor').classList.add('open');
   setTimeout(()=>editable.focus(),200);
 }
-function closeFmEditor(){
-  document.getElementById('fmEditor').classList.remove('open');
-  document.getElementById('fmEditable').innerHTML='';
-  fmEditorKey=null;
-}
-function saveFmEditorContent(){
+window.closeFmEditor = function(){document.getElementById('fmEditor').classList.remove('open');document.getElementById('fmEditable').innerHTML='';fmEditorKey=null;};
+window.saveFmEditorContent = function(){
   if(!fmEditorKey)return;
   const item=fmCurrentFolder().children[fmEditorKey];
-  const editable=document.getElementById('fmEditable');
-  item.content=editable.innerHTML;
+  item.content=document.getElementById('fmEditable').innerHTML;
   fmSave();
-  // feedback
-  const btn=document.querySelector('.fm-editor-save');
-  const orig=btn.textContent;btn.textContent='✓ Salvo!';
+  const btn=document.querySelector('.fm-editor-save');const orig=btn.textContent;btn.textContent='✓ Salvo!';
   setTimeout(()=>btn.textContent=orig,1200);
-}
-function fmCmd(cmd,val){
-  document.getElementById('fmEditable').focus();
-  document.execCommand(cmd,false,val||null);
-}
-function fmInsertCode(){
-  document.getElementById('fmEditable').focus();
-  document.execCommand('insertHTML',false,'<code>código</code>');
-}
+};
+window.fmCmd = function(cmd,val){document.getElementById('fmEditable').focus();document.execCommand(cmd,false,val||null);};
+window.fmInsertCode = function(){document.getElementById('fmEditable').focus();document.execCommand('insertHTML',false,'<code>código</code>');};
 
-// ── MODAL CRIAR ──
+// Modal criar
 let fmPendingFiles=[];
-
-function openFmModal(){
-  fmEditorKey=null;fmPendingFiles=[];
-  setFmType('upload');
-  document.getElementById('fmInpName').value='';
-  document.getElementById('fmInpContent').value='';
-  document.getElementById('fmInpFolderName').value='';
-  document.getElementById('fmUploadPreview').innerHTML='';
+window.openFmModal = function(){
+  fmEditorKey=null;fmPendingFiles=[];setFmType('upload');
+  document.getElementById('fmInpName').value='';document.getElementById('fmInpContent').value='';
+  document.getElementById('fmInpFolderName').value='';document.getElementById('fmUploadPreview').innerHTML='';
   document.getElementById('fmModalTitle').textContent='➕ Novo item';
   document.getElementById('fmModalOverlay').classList.add('open');
-}
-function closeFmModal(){
-  document.getElementById('fmModalOverlay').classList.remove('open');
-  fmPendingFiles=[];
-}
-function setFmType(t){
+};
+window.closeFmModal = function(){document.getElementById('fmModalOverlay').classList.remove('open');fmPendingFiles=[];};
+window.setFmType = function(t){
   fmNewType=t;
   document.getElementById('fmTypeUpload').classList.toggle('active',t==='upload');
   document.getElementById('fmTypeTxt').classList.toggle('active',t==='txt');
@@ -1923,71 +1772,44 @@ function setFmType(t){
   document.getElementById('fmInpContentWrap').style.display=t==='txt'?'':'none';
   document.getElementById('fmInpFolderWrap').style.display=t==='folder'?'':'none';
   document.getElementById('fmSaveBtn').textContent=t==='upload'?'Subir':'Salvar';
-}
-function fmHandleDrop(e){
-  e.preventDefault();
-  document.getElementById('fmDropZone').style.borderColor='';
-  fmHandleUpload(e.dataTransfer.files);
-}
-function fmHandleUpload(files){
+};
+window.fmHandleDrop = function(e){
+  e.preventDefault();document.getElementById('fmDropZone').style.borderColor='';fmHandleUpload(e.dataTransfer.files);
+};
+window.fmHandleUpload = function(files){
   if(!files||!files.length)return;
-  fmPendingFiles=[];
-  const preview=document.getElementById('fmUploadPreview');
+  fmPendingFiles=[];const preview=document.getElementById('fmUploadPreview');
   preview.innerHTML='<div style="color:var(--accent);margin-bottom:4px;">'+files.length+' arquivo(s):</div>';
   Array.from(files).forEach(f=>{
-    const div=document.createElement('div');
-    div.style.cssText='padding:3px 0;border-bottom:1px solid var(--border);font-size:0.7rem;';
-    div.textContent='📄 '+f.name+' ('+fmHumanSize(f.size)+')';
-    preview.appendChild(div);
-    fmPendingFiles.push(f);
+    const div=document.createElement('div');div.style.cssText='padding:3px 0;border-bottom:1px solid var(--border);font-size:0.7rem;';
+    div.textContent='📄 '+f.name+' ('+fmHumanSize(f.size)+')';preview.appendChild(div);fmPendingFiles.push(f);
   });
-}
-function fmHumanSize(bytes){
-  if(bytes<1024)return bytes+'B';
-  if(bytes<1024*1024)return (bytes/1024).toFixed(1)+'KB';
-  return (bytes/1024/1024).toFixed(1)+'MB';
-}
-function fmGenName(hint){
-  const now=new Date();
-  const pad=n=>String(n).padStart(2,'0');
-  return hint||`${now.getFullYear()}${pad(now.getMonth()+1)}${pad(now.getDate())}-${pad(now.getHours())}${pad(now.getMinutes())}`;
-}
-function fmSafeKey(folder,name){
-  let k=name;let c=1;while(folder.children[k]){k=name.replace(/(\.[^.]+)?$/,'_'+c+'$1');c++;}return k;
-}
-function fmDetectType(filename){
-  const ext=(filename.split('.').pop()||'').toLowerCase();
-  if(['png','jpg','jpeg','gif','webp','svg'].includes(ext))return 'image';
-  if(ext==='html'||ext==='htm')return 'html';
-  if(ext==='md')return 'md';
-  if(ext==='pdf')return 'pdf';
-  return 'txt';
-}
-function saveFmItem(){
+};
+function fmHumanSize(bytes){if(bytes<1024)return bytes+'B';if(bytes<1024*1024)return (bytes/1024).toFixed(1)+'KB';return (bytes/1024/1024).toFixed(1)+'MB';}
+function fmGenName(){const now=new Date();const pad=n=>String(n).padStart(2,'0');return `${now.getFullYear()}${pad(now.getMonth()+1)}${pad(now.getDate())}-${pad(now.getHours())}${pad(now.getMinutes())}`;}
+function fmSafeKey(folder,name){let k=name;let c=1;while(folder.children[k]){k=name.replace(/(\.[^.]+)?$/,'_'+c+'$1');c++;}return k;}
+function fmDetectType(filename){const ext=(filename.split('.').pop()||'').toLowerCase();if(['png','jpg','jpeg','gif','webp','svg'].includes(ext))return 'image';if(ext==='html'||ext==='htm')return 'html';if(ext==='md')return 'md';if(ext==='pdf')return 'pdf';return 'txt';}
+window.saveFmItem = function(){
   const folder=fmCurrentFolder();
   if(fmNewType==='folder'){
-    const name=document.getElementById('fmInpFolderName').value.trim();
-    if(!name){alert('Digite um nome para a pasta');return;}
+    const name=document.getElementById('fmInpFolderName').value.trim();if(!name){alert('Digite um nome para a pasta');return;}
     folder.children[fmSafeKey(folder,name)]={type:'folder',name,children:{}};
-    fmSave();renderFm();closeFmModal();return;
+    fmSave();renderFm();window.closeFmModal();return;
   }
   if(fmNewType==='txt'){
     const rawName=document.getElementById('fmInpName').value.trim();
-    const name=fmSafeKey(folder,(rawName||fmGenName(null))+'.txt');
+    const name=fmSafeKey(folder,(rawName||fmGenName())+'.txt');
     folder.children[name]={type:'txt',content:document.getElementById('fmInpContent').value};
-    fmSave();renderFm();closeFmModal();
-    setTimeout(()=>fmOpenEditor(name),100);return;
+    fmSave();renderFm();window.closeFmModal();setTimeout(()=>fmOpenEditor(name),100);return;
   }
   if(fmNewType==='upload'){
     if(!fmPendingFiles.length){alert('Selecione ao menos um arquivo');return;}
     let done=0,total=fmPendingFiles.length;
     fmPendingFiles.forEach(file=>{
       const type=fmDetectType(file.name);
-      const finish=()=>{done++;if(done===total){fmSave();renderFm();closeFmModal();}};
-      if(type==='image'){
-        const r=new FileReader();r.onload=e=>{folder.children[fmSafeKey(folder,file.name)]={type:'image',content:e.target.result};finish();};r.readAsDataURL(file);
-      } else if(type==='pdf'){
-        const r=new FileReader();r.onload=e=>{folder.children[fmSafeKey(folder,file.name)]={type:'pdf',content:e.target.result};finish();};r.readAsDataURL(file);
+      const finish=()=>{done++;if(done===total){fmSave();renderFm();window.closeFmModal();}};
+      if(type==='image'||type==='pdf'){
+        const r=new FileReader();r.onload=e=>{folder.children[fmSafeKey(folder,file.name)]={type,content:e.target.result};finish();};r.readAsDataURL(file);
       } else {
         const r=new FileReader();
         r.onload=e=>{folder.children[fmSafeKey(folder,file.name)]={type,content:e.target.result||''};finish();};
@@ -1996,237 +1818,114 @@ function saveFmItem(){
       }
     });
   }
-}
-</script>
-<!-- PAINEL ANYDESK -->
-<div class="ad-overlay" id="adOverlay">
-  <div class="ad-header">
-    <button class="fm-back" onclick="closeAdPanel()">←</button>
-    <span class="ad-title">⚡ Atalhos AnyDesk</span>
-    <button onclick="adSetTab('historico')" style="background:var(--glass);border:none;border-radius:8px;color:var(--muted2);font-size:0.68rem;padding:0.3rem 0.7rem;cursor:pointer;font-family:'Outfit',sans-serif;white-space:nowrap;">🕐 Histórico</button>
-  </div>
-  <div class="ad-tabs">
-    <button class="ad-tab active" onclick="adSetTab('atalhos')">📋 Atalhos</button>
-    <button class="ad-tab" onclick="adSetTab('pastas')">📁 Pastas</button>
-    <button class="ad-tab" onclick="adSetTab('projetos')">🗂️ Projetos</button>
-    <button class="ad-tab" onclick="adSetTab('notas')">📝 Notas</button>
-  </div>
-  <div class="ad-body">
+};
 
-    <!-- ABA 1: ATALHOS DE TEXTO -->
-    <div class="ad-section active" id="ad-atalhos">
-      <div class="ad-add-form">
-        <div class="ad-add-form-title">+ Novo atalho de texto</div>
-        <input class="ad-inp" id="adAtalhoLabel" placeholder="Nome (ex: Abrir Projetos)">
-        <input class="ad-inp" id="adAtalhoTexto" placeholder="Texto a copiar (ex: cd C:\Projetos)">
-        <button class="ad-btn" onclick="adAddAtalho()">Adicionar</button>
-      </div>
-      <div id="adAtalhoList"></div>
-    </div>
-
-    <!-- ABA 2: PASTAS -->
-    <div class="ad-section" id="ad-pastas">
-      <div class="ad-add-form">
-        <div class="ad-add-form-title">+ Nova pasta favorita</div>
-        <input class="ad-inp" id="adPastaLabel" placeholder="Nome (ex: Clientes)">
-        <input class="ad-inp" id="adPastaPath" placeholder="Caminho (ex: C:\Users\João\Clientes)">
-        <button class="ad-btn" onclick="adAddPasta()">Adicionar</button>
-      </div>
-      <div id="adPastaList"></div>
-    </div>
-
-    <!-- ABA 3: PROJETOS -->
-    <div class="ad-section" id="ad-projetos">
-      <div class="ad-add-form">
-        <div class="ad-add-form-title">+ Novo projeto</div>
-        <input class="ad-inp" id="adProjNome" placeholder="Nome do projeto (ex: Site do Marcos)">
-        <input class="ad-inp" id="adProjPasta" placeholder="Pasta (ex: C:\Projetos\SiteMarcos)">
-        <input class="ad-inp" id="adProjCmd" placeholder="Comando extra (ex: npm start) — opcional">
-        <button class="ad-btn" onclick="adAddProj()">Adicionar</button>
-      </div>
-      <div id="adProjList"></div>
-    </div>
-
-    <!-- ABA 4: BLOCO DE NOTAS -->
-    <div class="ad-section" id="ad-notas">
-      <p style="font-size:0.72rem;color:var(--muted);margin-bottom:10px;">Escreva confortavelmente aqui e copie pra colar no AnyDesk.</p>
-      <textarea class="ad-textarea" id="adNotaTexto" placeholder="Digite aqui..."></textarea>
-      <button class="ad-btn" onclick="adCopyNota()">📋 Copiar tudo</button>
-      <button class="ad-btn-outline" onclick="adSalvarNota()">💾 Salvar no histórico</button>
-    </div>
-
-    <!-- ABA 5: HISTÓRICO -->
-    <div class="ad-section" id="ad-historico">
-      <p style="font-size:0.72rem;color:var(--muted);margin-bottom:10px;">Toque em qualquer item para copiar novamente.</p>
-      <button class="ad-btn-outline" onclick="adClearHist()">🗑️ Limpar histórico</button>
-      <div style="margin-top:10px;" id="adHistList"></div>
-    </div>
-
-  </div>
-</div>
-
-<!-- TOAST FEEDBACK -->
-<div class="ad-feedback" id="adFeedback">✓ Copiado!</div>
-
-<script>
-// ── PAINEL ANYDESK ──────────────────────────────────────────────────────
+// ── ANYDESK (Firebase) ────────────────────────────────────────────────
 let adData={atalhos:[],pastas:[],projetos:[],historico:[]};
 
-function adLoad(){
-  try{const v=localStorage.getItem('launcher_ad');if(v)return JSON.parse(v);}catch(e){}
-  return {atalhos:[],pastas:[],projetos:[],historico:[]};
-}
+onSnapshot(doc(db,'launcher_ad','data'), (snap) => {
+  adData = snap.exists() ? (snap.data() || adData) : adData;
+  if(!adData.atalhos) adData.atalhos=[];
+  if(!adData.pastas) adData.pastas=[];
+  if(!adData.projetos) adData.projetos=[];
+  if(!adData.historico) adData.historico=[];
+});
+
 function adSave(){
-  try{localStorage.setItem('launcher_ad',JSON.stringify(adData));}catch(e){}
+  fsSetDoc('launcher_ad','data', adData);
 }
 
-// envia item deletado pra lixeira do gerenciador de arquivos
 function adSendToTrash(label,descricao,tipo){
-  // carrega lixeira atual
-  let trash=[];
-  try{const v=localStorage.getItem('launcher_trash');if(v)trash=JSON.parse(v);}catch(e){}
-  trash.unshift({
-    key:'⚡ '+label,
-    item:{type:'txt',content:descricao},
-    path:[],
-    deletedAt:new Date().toISOString(),
-    adMeta:{label,descricao,tipo}
+  fmTrash.unshift({
+    key:'⚡ '+label,item:{type:'txt',content:descricao},
+    path:[],deletedAt:Date.now(),adMeta:{label,descricao,tipo}
   });
-  try{localStorage.setItem('launcher_trash',JSON.stringify(trash));}catch(e){}
-  // atualiza variável global fmTrash se estiver carregada
-  if(typeof fmTrash!=='undefined') fmTrash=trash;
+  fmSaveTrash();
 }
 
-function openAdPanel(){
-  adData=adLoad();
-  adSetTab('atalhos');
-  document.getElementById('adOverlay').classList.add('open');
-}
-function closeAdPanel(){
-  document.getElementById('adOverlay').classList.remove('open');
-}
+window.openAdPanel = function(){
+  adSetTab('atalhos');document.getElementById('adOverlay').classList.add('open');
+};
+window.closeAdPanel = function(){document.getElementById('adOverlay').classList.remove('open');};
 
-function adSetTab(t){
+window.adSetTab = function(t){
   document.querySelectorAll('.ad-tab').forEach((b,i)=>{
-    const tabs=['atalhos','pastas','projetos','notas'];
-    b.classList.toggle('active',tabs[i]===t);
+    const tabs=['atalhos','pastas','projetos','notas'];b.classList.toggle('active',tabs[i]===t);
   });
   document.querySelectorAll('.ad-section').forEach(s=>s.classList.remove('active'));
   document.getElementById('ad-'+t).classList.add('active');
-  if(t==='atalhos')adRenderAtalhos();
-  if(t==='pastas')adRenderPastas();
-  if(t==='projetos')adRenderProjs();
-  if(t==='historico')adRenderHist();
-}
+  if(t==='atalhos')adRenderAtalhos();if(t==='pastas')adRenderPastas();
+  if(t==='projetos')adRenderProjs();if(t==='historico')adRenderHist();
+};
 
 function adToast(msg){
-  const el=document.getElementById('adFeedback');
-  el.textContent=msg||'✓ Copiado!';
-  el.classList.add('show');
-  setTimeout(()=>el.classList.remove('show'),1600);
+  const el=document.getElementById('adFeedback');el.textContent=msg||'✓ Copiado!';
+  el.classList.add('show');setTimeout(()=>el.classList.remove('show'),1600);
 }
 
 function adCopy(text,label){
   navigator.clipboard.writeText(text).then(()=>{
     adToast('✓ Copiado: '+label);
-    // salva no histórico
     adData.historico.unshift({text,label,time:new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})});
     if(adData.historico.length>50)adData.historico.pop();
     adSave();
   }).catch(()=>{
-    // fallback
-    const ta=document.createElement('textarea');
-    ta.value=text;document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove();
-    adToast('✓ Copiado!');
+    const ta=document.createElement('textarea');ta.value=text;document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove();adToast('✓ Copiado!');
   });
 }
+window.adCopy = adCopy;
 
-// ── ATALHOS ──
-function adAddAtalho(){
+window.adAddAtalho = function(){
   const label=document.getElementById('adAtalhoLabel').value.trim();
   const texto=document.getElementById('adAtalhoTexto').value.trim();
   if(!label||!texto){adToast('⚠️ Preencha os campos');return;}
-  adData.atalhos.push({label,texto});
-  adSave();
-  document.getElementById('adAtalhoLabel').value='';
-  document.getElementById('adAtalhoTexto').value='';
+  adData.atalhos.push({label,texto});adSave();
+  document.getElementById('adAtalhoLabel').value='';document.getElementById('adAtalhoTexto').value='';
   adRenderAtalhos();
-}
+};
 function adRenderAtalhos(){
-  const el=document.getElementById('adAtalhoList');
-  el.innerHTML='';
-  if(!adData.atalhos.length){
-    el.innerHTML='<div style="color:var(--muted);font-size:0.75rem;text-align:center;padding:2rem;">Nenhum atalho ainda.<br>Adicione acima.</div>';
-    return;
-  }
+  const el=document.getElementById('adAtalhoList');el.innerHTML='';
+  if(!adData.atalhos.length){el.innerHTML='<div style="color:var(--muted);font-size:0.75rem;text-align:center;padding:2rem;">Nenhum atalho ainda.<br>Adicione acima.</div>';return;}
   adData.atalhos.forEach((a,i)=>{
-    const d=document.createElement('div');
-    d.className='ad-card';
+    const d=document.createElement('div');d.className='ad-card';
     d.innerHTML=`<div class="ad-card-icon">⚡</div>
-      <div class="ad-card-info">
-        <div class="ad-card-label">${a.label}</div>
-        <div class="ad-card-sub">${a.texto}</div>
-      </div>
+      <div class="ad-card-info"><div class="ad-card-label">${a.label}</div><div class="ad-card-sub">${a.texto}</div></div>
       <span class="ad-copy-badge">Copiar</span>
       <button onclick="event.stopPropagation();adSendToTrash('${a.label.replace(/'/g,"\\'")}','${a.texto.replace(/'/g,"\\'")}','atalho');adData.atalhos.splice(${i},1);adSave();adRenderAtalhos();adToast('🗑️ Enviado pra lixeira');" style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.2);border-radius:6px;color:var(--red);font-size:0.65rem;padding:2px 6px;cursor:pointer;white-space:nowrap;">✕</button>`;
-    d.addEventListener('click',()=>adCopy(a.texto,a.label));
-    el.appendChild(d);
+    d.addEventListener('click',()=>adCopy(a.texto,a.label));el.appendChild(d);
   });
 }
+window.adRenderAtalhos = adRenderAtalhos;
 
-// ── PASTAS ──
-function adAddPasta(){
-  const label=document.getElementById('adPastaLabel').value.trim();
-  const path=document.getElementById('adPastaPath').value.trim();
+window.adAddPasta = function(){
+  const label=document.getElementById('adPastaLabel').value.trim();const path=document.getElementById('adPastaPath').value.trim();
   if(!label||!path){adToast('⚠️ Preencha os campos');return;}
-  adData.pastas.push({label,path});
-  adSave();
-  document.getElementById('adPastaLabel').value='';
-  document.getElementById('adPastaPath').value='';
-  adRenderPastas();
-}
+  adData.pastas.push({label,path});adSave();
+  document.getElementById('adPastaLabel').value='';document.getElementById('adPastaPath').value='';adRenderPastas();
+};
 function adRenderPastas(){
-  const el=document.getElementById('adPastaList');
-  el.innerHTML='';
-  if(!adData.pastas.length){
-    el.innerHTML='<div style="color:var(--muted);font-size:0.75rem;text-align:center;padding:2rem;">Nenhuma pasta ainda.<br>Adicione acima.</div>';
-    return;
-  }
+  const el=document.getElementById('adPastaList');el.innerHTML='';
+  if(!adData.pastas.length){el.innerHTML='<div style="color:var(--muted);font-size:0.75rem;text-align:center;padding:2rem;">Nenhuma pasta ainda.<br>Adicione acima.</div>';return;}
   adData.pastas.forEach((p,i)=>{
-    const d=document.createElement('div');
-    d.className='ad-card';
+    const d=document.createElement('div');d.className='ad-card';
     d.innerHTML=`<div class="ad-card-icon">📁</div>
-      <div class="ad-card-info">
-        <div class="ad-card-label">${p.label}</div>
-        <div class="ad-card-sub">${p.path}</div>
-      </div>
+      <div class="ad-card-info"><div class="ad-card-label">${p.label}</div><div class="ad-card-sub">${p.path}</div></div>
       <span class="ad-copy-badge">Copiar</span>
       <button onclick="event.stopPropagation();adSendToTrash('${p.label.replace(/'/g,"\\'")}','${p.path.replace(/'/g,"\\'")}','pasta');adData.pastas.splice(${i},1);adSave();adRenderPastas();adToast('🗑️ Enviado pra lixeira');" style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.2);border-radius:6px;color:var(--red);font-size:0.65rem;padding:2px 6px;cursor:pointer;white-space:nowrap;">✕</button>`;
-    d.addEventListener('click',()=>adCopy(p.path,p.label));
-    el.appendChild(d);
+    d.addEventListener('click',()=>adCopy(p.path,p.label));el.appendChild(d);
   });
 }
+window.adRenderPastas = adRenderPastas;
 
-// ── PROJETOS ──
-function adAddProj(){
-  const nome=document.getElementById('adProjNome').value.trim();
-  const pasta=document.getElementById('adProjPasta').value.trim();
-  const cmd=document.getElementById('adProjCmd').value.trim();
+window.adAddProj = function(){
+  const nome=document.getElementById('adProjNome').value.trim();const pasta=document.getElementById('adProjPasta').value.trim();const cmd=document.getElementById('adProjCmd').value.trim();
   if(!nome||!pasta){adToast('⚠️ Preencha nome e pasta');return;}
-  adData.projetos.push({nome,pasta,cmd});
-  adSave();
-  document.getElementById('adProjNome').value='';
-  document.getElementById('adProjPasta').value='';
-  document.getElementById('adProjCmd').value='';
-  adRenderProjs();
-}
+  adData.projetos.push({nome,pasta,cmd});adSave();
+  document.getElementById('adProjNome').value='';document.getElementById('adProjPasta').value='';document.getElementById('adProjCmd').value='';adRenderProjs();
+};
 function adRenderProjs(){
-  const el=document.getElementById('adProjList');
-  el.innerHTML='';
-  if(!adData.projetos.length){
-    el.innerHTML='<div style="color:var(--muted);font-size:0.75rem;text-align:center;padding:2rem;">Nenhum projeto ainda.<br>Adicione acima.</div>';
-    return;
-  }
+  const el=document.getElementById('adProjList');el.innerHTML='';
+  if(!adData.projetos.length){el.innerHTML='<div style="color:var(--muted);font-size:0.75rem;text-align:center;padding:2rem;">Nenhum projeto ainda.<br>Adicione acima.</div>';return;}
   adData.projetos.forEach((p,i)=>{
     const d=document.createElement('div');
     d.style.cssText='background:var(--glass2);border:1px solid var(--border2);border-radius:16px;padding:0.9rem;margin-bottom:10px;';
@@ -2236,58 +1935,47 @@ function adRenderProjs(){
         <button onclick="adSendToTrash('${p.nome.replace(/'/g,"\\'")}','Pasta: ${p.pasta.replace(/'/g,"\\'")}${p.cmd?' | Cmd: '+p.cmd.replace(/'/g,"\\'"):''}','projeto');adData.projetos.splice(${i},1);adSave();adRenderProjs();adToast('🗑️ Enviado pra lixeira');" style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.2);border-radius:6px;color:var(--red);font-size:0.65rem;padding:2px 8px;cursor:pointer;">✕ Remover</button>
       </div>
       <div class="ad-card" style="margin-bottom:6px;" onclick="adCopy(${JSON.stringify('cd '+p.pasta)},'Abrir pasta')">
-        <div class="ad-card-icon">📁</div>
-        <div class="ad-card-info"><div class="ad-card-label">Abrir pasta</div><div class="ad-card-sub">${p.pasta}</div></div>
-        <span class="ad-copy-badge">Copiar</span>
+        <div class="ad-card-icon">📁</div><div class="ad-card-info"><div class="ad-card-label">Abrir pasta</div><div class="ad-card-sub">${p.pasta}</div></div><span class="ad-copy-badge">Copiar</span>
       </div>
       <div class="ad-card" style="margin-bottom:6px;" onclick="adCopy(${JSON.stringify('code '+p.pasta)},'Abrir VSCode')">
-        <div class="ad-card-icon">💻</div>
-        <div class="ad-card-info"><div class="ad-card-label">Abrir VSCode</div><div class="ad-card-sub">code ${p.pasta}</div></div>
-        <span class="ad-copy-badge">Copiar</span>
+        <div class="ad-card-icon">💻</div><div class="ad-card-info"><div class="ad-card-label">Abrir VSCode</div><div class="ad-card-sub">code ${p.pasta}</div></div><span class="ad-copy-badge">Copiar</span>
       </div>
       ${p.cmd?`<div class="ad-card" onclick="adCopy(${JSON.stringify(p.cmd)},'Executar comando')">
-        <div class="ad-card-icon">▶️</div>
-        <div class="ad-card-info"><div class="ad-card-label">Executar</div><div class="ad-card-sub">${p.cmd}</div></div>
-        <span class="ad-copy-badge">Copiar</span>
+        <div class="ad-card-icon">▶️</div><div class="ad-card-info"><div class="ad-card-label">Executar</div><div class="ad-card-sub">${p.cmd}</div></div><span class="ad-copy-badge">Copiar</span>
       </div>`:''}
     `;
     el.appendChild(d);
   });
 }
+window.adRenderProjs = adRenderProjs;
 
-// ── BLOCO DE NOTAS ──
-function adCopyNota(){
-  const txt=document.getElementById('adNotaTexto').value.trim();
-  if(!txt){adToast('⚠️ Escreva algo primeiro');return;}
-  adCopy(txt,'Nota');
-}
-function adSalvarNota(){
-  const txt=document.getElementById('adNotaTexto').value.trim();
-  if(!txt){adToast('⚠️ Escreva algo primeiro');return;}
+window.adCopyNota = function(){
+  const txt=document.getElementById('adNotaTexto').value.trim();if(!txt){adToast('⚠️ Escreva algo primeiro');return;}adCopy(txt,'Nota');
+};
+window.adSalvarNota = function(){
+  const txt=document.getElementById('adNotaTexto').value.trim();if(!txt){adToast('⚠️ Escreva algo primeiro');return;}
   adData.historico.unshift({text:txt,label:'📝 Nota',time:new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})});
-  if(adData.historico.length>50)adData.historico.pop();
-  adSave();
-  adToast('✓ Salvo no histórico!');
-}
-
-// ── HISTÓRICO ──
+  if(adData.historico.length>50)adData.historico.pop();adSave();adToast('✓ Salvo no histórico!');
+};
 function adRenderHist(){
-  const el=document.getElementById('adHistList');
-  el.innerHTML='';
-  if(!adData.historico.length){
-    el.innerHTML='<div style="color:var(--muted);font-size:0.75rem;text-align:center;padding:2rem;">Histórico vazio.<br>Use os atalhos acima para popular.</div>';
-    return;
-  }
+  const el=document.getElementById('adHistList');el.innerHTML='';
+  if(!adData.historico.length){el.innerHTML='<div style="color:var(--muted);font-size:0.75rem;text-align:center;padding:2rem;">Histórico vazio.</div>';return;}
   adData.historico.forEach((h,i)=>{
-    const d=document.createElement('div');
-    d.className='ad-hist-item';
-    d.innerHTML=`<div class="ad-hist-text">${h.label ? '<b>'+h.label+':</b> ':''} ${h.text}</div><div class="ad-hist-time">${h.time}</div>`;
-    d.addEventListener('click',()=>adCopy(h.text,h.label||'item'));
-    el.appendChild(d);
+    const d=document.createElement('div');d.className='ad-hist-item';
+    d.innerHTML=`<div class="ad-hist-text">${h.label?'<b>'+h.label+':</b> ':''} ${h.text}</div><div class="ad-hist-time">${h.time}</div>`;
+    d.addEventListener('click',()=>adCopy(h.text,h.label||'item'));el.appendChild(d);
   });
 }
-function adClearHist(){
-  adData.historico=[];adSave();adRenderHist();adToast('🗑️ Histórico limpo');
-}
+window.adClearHist = function(){adData.historico=[];adSave();adRenderHist();adToast('🗑️ Histórico limpo');};
+window.adRenderHist = adRenderHist;
+window.adSave = adSave;
+window.adSendToTrash = adSendToTrash;
+
+// ── Init ─────────────────────────────────────────────────────────────
+(function init(){
+  // render inicial enquanto Firestore carrega
+  render();
+})();
 </script>
-</body></html>
+</body>
+</html>
