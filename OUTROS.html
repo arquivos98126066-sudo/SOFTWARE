@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Outros</title>
+<meta name="theme-color" content="#0a0a0f">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500&display=swap');
+
+  :root {
+    --bg: #0a0a0f;
+    --card: #13131a;
+    --border: #222230;
+    --accent: #7c6aff;
+    --accent2: #ff6a8a;
+    --text: #f0f0f8;
+    --muted: #6b6b80;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    padding: 0 0 60px;
+  }
+
+  .header {
+    padding: 48px 24px 32px;
+    text-align: center;
+    position: relative;
+  }
+  .header::after {
+    content: '';
+    display: block;
+    width: 60px;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    margin: 16px auto 0;
+    border-radius: 2px;
+  }
+  .header h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: 32px;
+    font-weight: 800;
+    letter-spacing: -1px;
+    background: linear-gradient(135deg, var(--text), var(--muted));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .header p { color: var(--muted); font-size: 14px; margin-top: 6px; }
+
+  .back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--muted);
+    font-size: 13px;
+    text-decoration: none;
+    margin: 24px 24px 0;
+    padding: 8px 14px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--card);
+    transition: border-color 0.2s;
+  }
+  .back-btn:active { opacity: 0.7; }
+
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    padding: 0 16px;
+    max-width: 500px;
+    margin: 0 auto;
+  }
+
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 22px 16px 18px;
+    text-decoration: none;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.18s, border-color 0.18s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .card:active { transform: scale(0.96); }
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--c1), var(--c2));
+    opacity: 0.8;
+  }
+
+  .card-icon { font-size: 28px; line-height: 1; }
+  .card-name { font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700; color: var(--text); line-height: 1.2; }
+  .card-desc { font-size: 11px; color: var(--muted); line-height: 1.4; }
+  .card-arrow { position: absolute; bottom: 14px; right: 14px; font-size: 16px; color: var(--muted); opacity: 0.5; }
+
+  .c-gold   { --c1: #f59e0b; --c2: #fbbf24; }
+  .c-indigo { --c1: #6366f1; --c2: #818cf8; }
+  .c-rose   { --c1: #f43f5e; --c2: #fb7185; }
+  .c-emerald{ --c1: #10b981; --c2: #34d399; }
+
+  .footer { text-align: center; color: var(--muted); font-size: 11px; margin-top: 40px; padding: 0 24px; }
+</style>
+</head>
+<body>
+
+  <a class="back-btn" href="index.html">← Voltar</a>
+
+  <div class="header">
+    <h1>Outros</h1>
+    <p>Toque para abrir</p>
+  </div>
+
+  <div class="grid">
+    <a class="card c-gold" href="RICO.html">
+      <span class="card-icon">💰</span>
+      <span class="card-name">Rico</span>
+      <span class="card-desc">Finanças e riqueza</span>
+      <span class="card-arrow">→</span>
+    </a>
+    <a class="card c-indigo" href="Workshop.html">
+      <span class="card-icon">🛠️</span>
+      <span class="card-name">Workshop</span>
+      <span class="card-desc">Oficina e projetos</span>
+      <span class="card-arrow">→</span>
+    </a>
+    <a class="card c-rose" href="DOA.html">
+      <span class="card-icon">🤝</span>
+      <span class="card-name">DOA</span>
+      <span class="card-desc">Doações e apoio</span>
+      <span class="card-arrow">→</span>
+    </a>
+    <a class="card c-emerald" href="ESTUDO.html">
+      <span class="card-icon">📚</span>
+      <span class="card-name">Estudo</span>
+      <span class="card-desc">Aprendizado</span>
+      <span class="card-arrow">→</span>
+    </a>
+  </div>
+
+  <div class="footer">
+    <p>arquivos98126066-sudo · SOFTWARE</p>
+  </div>
+
+</body>
+</html>
