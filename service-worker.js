@@ -1,14 +1,20 @@
-const CACHE_NAME = 'meus-apps-v1';
+const CACHE_NAME = 'meus-apps-v2';
 const URLS_TO_CACHE = [
   '/',
+  '/index.html',
   '/ADM.html',
-  '/TAPETE_CRM.html',
+  '/TAPETE-CRM.html',
   '/TAPETES.html',
   '/PRE-VENDA.html',
   '/MEU-CRM.html',
   '/METODO-OPA.html',
   '/RETINA.html',
   '/WEBSITE.html',
+  '/OUTROS.html',
+  '/RICO.html',
+  '/Workshop.html',
+  '/DOA.html',
+  '/ESTUDO.html',
   '/manifest.json',
   '/icon-192.png',
   '/icon-512.png'
