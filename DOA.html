@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Método DOA — Modelo de Negócio</title>
+<script src="https://arquivos98126066-sudo.github.io/SOFTWARE/sync-indicator.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
@@ -653,6 +654,43 @@
   .mc-val { font-size: 13px; font-weight: 500; color: var(--text); }
   .mc-acc { grid-column: 1 / -1; padding-top: 6px; border-top: 0.5px solid var(--border); margin-top: 2px; }
 
+  /* TOAST */
+  #toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: #111110;
+    color: #fff;
+    padding: 10px 22px;
+    border-radius: 30px;
+    font-size: .8rem;
+    font-weight: 700;
+    font-family: 'Inter', sans-serif;
+    z-index: 999;
+    opacity: 0;
+    transition: all .3s;
+    pointer-events: none;
+    white-space: nowrap;
+    max-width: 90vw;
+    text-align: center;
+  }
+  #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  /* CONTRATOS SALVOS */
+  .saved-card {
+    background: var(--surface);
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    margin-bottom: 8px;
+  }
+  .saved-card-title { font-size: 13.5px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
+  .saved-card-row { display: flex; justify-content: space-between; font-size: 12.5px; padding: 3px 0; }
+  .saved-card-key { color: var(--text3); }
+  .saved-card-val { font-weight: 500; color: var(--text2); }
+  .saved-card-footer { margin-top: 10px; display: flex; gap: 6px; flex-wrap: wrap; }
+
   @media (max-width: 500px) {
     .sim-results { grid-template-columns: 1fr; }
     .sig-grid { grid-template-columns: 1fr; }
@@ -661,12 +699,14 @@
   }
 
   @media print {
-    .nav, .btn-row, .drawer, .drawer-overlay { display: none; }
+    .nav, .btn-row, .drawer, .drawer-overlay, #toast, #secao-salvos { display: none; }
     body { background: white; }
   }
 </style>
 </head>
 <body>
+
+<div id="toast"></div>
 
 <div class="drawer-overlay" id="overlay" onclick="closeDrawer()"></div>
 
@@ -681,6 +721,7 @@
   <a href="#simulador" onclick="closeDrawer()"><i class="ti ti-chart-bar"></i> Simulador</a>
   <a href="#script" onclick="closeDrawer()"><i class="ti ti-phone"></i> Script de vendas</a>
   <a href="#contrato" onclick="closeDrawer()"><i class="ti ti-file-text"></i> Contrato</a>
+  <a href="#secao-salvos" onclick="closeDrawer()"><i class="ti ti-database"></i> Contratos Salvos</a>
 </div>
 
 <nav class="nav">
@@ -975,20 +1016,25 @@
 
     <div class="hero" style="margin-bottom:12px;">
       <p class="hero-title"><i class="ti ti-file-text"></i> Contrato de Desenvolvimento e Manutenção de Sistema</p>
-      <p class="hero-sub">Preencha os campos abaixo antes de imprimir ou assinar.</p>
+      <p class="hero-sub">Preencha os campos abaixo e clique em <strong>Salvar contrato</strong> para guardar no Firebase.</p>
     </div>
 
     <div class="contract-fields">
-      <div class="cf"><label>Nome do contratante (cliente)</label><input type="text" placeholder="Nome completo ou razão social"></div>
-      <div class="cf"><label>CPF / CNPJ do contratante</label><input type="text" placeholder="000.000.000-00"></div>
-      <div class="cf"><label>Nome do contratado (você)</label><input type="text" placeholder="Seu nome completo"></div>
-      <div class="cf"><label>CPF / CNPJ do contratado</label><input type="text" placeholder="000.000.000-00"></div>
-      <div class="cf"><label>Descrição do projeto</label><input type="text" placeholder="Ex: Sistema de gestão de agendamentos"></div>
-      <div class="cf"><label>Prazo de entrega</label><input type="text" placeholder="Ex: 30 dias corridos após assinatura"></div>
-      <div class="cf"><label>Valor da implementação (R$)</label><input type="text" placeholder="R$ 0,00"></div>
-      <div class="cf"><label>Valor da mensalidade (R$)</label><input type="text" placeholder="R$ 0,00 / mês"></div>
-      <div class="cf"><label>Início da mensalidade</label><input type="text" placeholder="Após aprovação do sistema"></div>
-      <div class="cf"><label>Local e data</label><input type="text" placeholder="Cidade, DD/MM/AAAA"></div>
+      <div class="cf"><label>Nome do contratante (cliente)</label><input type="text" id="ct_contratante" placeholder="Nome completo ou razão social"></div>
+      <div class="cf"><label>CPF / CNPJ do contratante</label><input type="text" id="ct_cpf_contratante" placeholder="000.000.000-00"></div>
+      <div class="cf"><label>Nome do contratado (você)</label><input type="text" id="ct_contratado" placeholder="Seu nome completo"></div>
+      <div class="cf"><label>CPF / CNPJ do contratado</label><input type="text" id="ct_cpf_contratado" placeholder="000.000.000-00"></div>
+      <div class="cf"><label>Descrição do projeto</label><input type="text" id="ct_projeto" placeholder="Ex: Sistema de gestão de agendamentos"></div>
+      <div class="cf"><label>Prazo de entrega</label><input type="text" id="ct_prazo" placeholder="Ex: 30 dias corridos após assinatura"></div>
+      <div class="cf"><label>Valor da implementação (R$)</label><input type="text" id="ct_valor_impl" placeholder="R$ 0,00"></div>
+      <div class="cf"><label>Valor da mensalidade (R$)</label><input type="text" id="ct_mensalidade" placeholder="R$ 0,00 / mês"></div>
+      <div class="cf"><label>Início da mensalidade</label><input type="text" id="ct_inicio" placeholder="Após aprovação do sistema"></div>
+      <div class="cf"><label>Local e data</label><input type="text" id="ct_local_data" placeholder="Cidade, DD/MM/AAAA"></div>
+    </div>
+
+    <div class="btn-row" style="margin-top:0;margin-bottom:16px;">
+      <button class="btn btn-dark" onclick="salvarContrato()"><i class="ti ti-device-floppy"></i> Salvar contrato</button>
+      <button class="btn" onclick="limparContrato()"><i class="ti ti-trash"></i> Limpar</button>
     </div>
 
     <div class="card">
@@ -1040,6 +1086,16 @@
     </div>
   </div>
 
+  <!-- CONTRATOS SALVOS -->
+  <hr>
+  <div id="secao-salvos">
+    <p class="label">Contratos Salvos</p>
+    <div id="lista-contratos"><div style="font-size:13px;color:var(--text3);padding:12px 0;">Carregando...</div></div>
+    <div style="margin-top:10px;">
+      <button class="btn" style="color:#8b1a1a;border-color:#fee8e8;" onclick="apagarTodosContratos()"><i class="ti ti-trash"></i> Apagar todos</button>
+    </div>
+  </div>
+
   <div class="btn-row">
     <button class="btn btn-dark" onclick="window.print()"><i class="ti ti-printer"></i> Imprimir / Salvar PDF</button>
     <button class="btn" onclick="copyScript()"><i class="ti ti-copy"></i> Copiar script de vendas</button>
@@ -1047,123 +1103,273 @@
 
 </div>
 
-<script>
-  function toggleMonth(header) {
-    const card = header.parentElement;
-    const body = card.querySelector('.month-card-body');
-    const isOpen = card.classList.contains('open');
-    if (isOpen) {
-      card.classList.remove('open');
-      body.style.display = 'none';
-    } else {
-      card.classList.add('open');
-      body.style.display = 'grid';
-    }
+<script type="module">
+import { db } from "https://arquivos98126066-sudo.github.io/SOFTWARE/firebase-sync.js";
+import {
+  collection, addDoc, getDocs, updateDoc, deleteDoc, doc,
+  onSnapshot, query, orderBy, writeBatch
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+// ─── Cache local ─────────────────────────────────────────────────────────────
+var contratosCache = [];
+
+// ─── Toast ───────────────────────────────────────────────────────────────────
+window.toast = function(msg, tipo) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.background = tipo === 'erro' ? '#ef4444' : tipo === 'aviso' ? '#f59e0b' : '#111110';
+  t.classList.add('show');
+  setTimeout(function() { t.classList.remove('show'); }, 2800);
+};
+
+// ─── Salvar pendente (offline) ────────────────────────────────────────────────
+function salvarPendente(colecao, obj) {
+  try {
+    var key = 'pending_' + colecao;
+    var arr = JSON.parse(localStorage.getItem(key) || '[]');
+    arr.push(obj);
+    localStorage.setItem(key, JSON.stringify(arr));
+  } catch(e) {}
+}
+
+// ─── Salvar Contrato ──────────────────────────────────────────────────────────
+window.salvarContrato = async function() {
+  var contratante = document.getElementById('ct_contratante').value.trim();
+  var cpfContratante = document.getElementById('ct_cpf_contratante').value.trim();
+  var contratado = document.getElementById('ct_contratado').value.trim();
+  var cpfContratado = document.getElementById('ct_cpf_contratado').value.trim();
+  var projeto = document.getElementById('ct_projeto').value.trim();
+  var prazo = document.getElementById('ct_prazo').value.trim();
+  var valorImpl = document.getElementById('ct_valor_impl').value.trim();
+  var mensalidade = document.getElementById('ct_mensalidade').value.trim();
+  var inicio = document.getElementById('ct_inicio').value.trim();
+  var localData = document.getElementById('ct_local_data').value.trim();
+
+  if (!contratante || !projeto) {
+    toast('Preencha ao menos o nome do contratante e o projeto', 'aviso');
+    return;
   }
 
-  function toggleDrawer() {
-    const drawer = document.getElementById('drawer');
-    const overlay = document.getElementById('overlay');
-    const hamburger = document.getElementById('hamburger');
-    const isOpen = drawer.classList.contains('open');
-    if (isOpen) {
-      closeDrawer();
-    } else {
-      drawer.classList.add('open');
-      overlay.classList.add('open');
-      hamburger.classList.add('open');
-    }
+  var contrato = {
+    contratante, cpfContratante, contratado, cpfContratado,
+    projeto, prazo, valorImpl, mensalidade, inicio, localData,
+    criadoEm: new Date().toISOString()
+  };
+
+  if (window.syncShow) window.syncShow.syncing();
+  try {
+    var docRef = await addDoc(collection(db, 'doa_contratos'), contrato);
+    contrato.id = docRef.id;
+    contratosCache.push(contrato);
+    if (window.syncShow) window.syncShow.synced('DOA');
+    toast('Contrato salvo!');
+  } catch(e) {
+    salvarPendente('doa_contratos', { ...contrato, pendingSync: true });
+    if (window.syncShow) window.syncShow.local();
+    toast('Salvo localmente (offline)', 'aviso');
   }
+  limparContrato();
+  renderContratos();
+};
 
-  function closeDrawer() {
-    document.getElementById('drawer').classList.remove('open');
-    document.getElementById('overlay').classList.remove('open');
-    document.getElementById('hamburger').classList.remove('open');
+// ─── Limpar formulário ────────────────────────────────────────────────────────
+window.limparContrato = function() {
+  ['ct_contratante','ct_cpf_contratante','ct_contratado','ct_cpf_contratado',
+   'ct_projeto','ct_prazo','ct_valor_impl','ct_mensalidade','ct_inicio','ct_local_data']
+  .forEach(function(id) { document.getElementById(id).value = ''; });
+};
+
+// ─── Render Contratos ─────────────────────────────────────────────────────────
+window.renderContratos = function() {
+  var el = document.getElementById('lista-contratos');
+  if (!contratosCache.length) {
+    el.innerHTML = '<div style="font-size:13px;color:var(--text3);padding:12px 0;">Nenhum contrato salvo ainda.</div>';
+    return;
   }
+  var h = '';
+  contratosCache.slice().reverse().forEach(function(c) {
+    var data = c.criadoEm ? new Date(c.criadoEm).toLocaleDateString('pt-BR') : '---';
+    h += '<div class="saved-card">';
+    h += '<div class="saved-card-title">' + (c.contratante || '---') + '</div>';
+    if (c.projeto) h += '<div class="saved-card-row"><span class="saved-card-key">Projeto</span><span class="saved-card-val">' + c.projeto + '</span></div>';
+    if (c.prazo) h += '<div class="saved-card-row"><span class="saved-card-key">Prazo</span><span class="saved-card-val">' + c.prazo + '</span></div>';
+    if (c.valorImpl) h += '<div class="saved-card-row"><span class="saved-card-key">Implementação</span><span class="saved-card-val">' + c.valorImpl + '</span></div>';
+    if (c.mensalidade) h += '<div class="saved-card-row"><span class="saved-card-key">Mensalidade</span><span class="saved-card-val">' + c.mensalidade + '</span></div>';
+    if (c.localData) h += '<div class="saved-card-row"><span class="saved-card-key">Local / Data</span><span class="saved-card-val">' + c.localData + '</span></div>';
+    h += '<div class="saved-card-row"><span class="saved-card-key">Salvo em</span><span class="saved-card-val">' + data + '</span></div>';
+    h += '<div class="saved-card-footer">';
+    h += '<button class="btn" style="font-size:12px;padding:6px 12px;" onclick="carregarContrato(\'' + c.id + '\')"><i class="ti ti-edit"></i> Carregar</button>';
+    h += '<button class="btn" style="font-size:12px;padding:6px 12px;color:#8b1a1a;border-color:#fee8e8;" onclick="deletarContrato(\'' + c.id + '\')"><i class="ti ti-trash"></i> Excluir</button>';
+    h += '</div></div>';
+  });
+  el.innerHTML = h;
+};
 
-  const fmt = n => 'R$ ' + Math.round(n).toLocaleString('pt-BR');
+// ─── Carregar contrato nos campos ─────────────────────────────────────────────
+window.carregarContrato = function(id) {
+  var c = contratosCache.find(function(x) { return x.id === id; });
+  if (!c) return;
+  document.getElementById('ct_contratante').value = c.contratante || '';
+  document.getElementById('ct_cpf_contratante').value = c.cpfContratante || '';
+  document.getElementById('ct_contratado').value = c.contratado || '';
+  document.getElementById('ct_cpf_contratado').value = c.cpfContratado || '';
+  document.getElementById('ct_projeto').value = c.projeto || '';
+  document.getElementById('ct_prazo').value = c.prazo || '';
+  document.getElementById('ct_valor_impl').value = c.valorImpl || '';
+  document.getElementById('ct_mensalidade').value = c.mensalidade || '';
+  document.getElementById('ct_inicio').value = c.inicio || '';
+  document.getElementById('ct_local_data').value = c.localData || '';
+  document.getElementById('contrato').scrollIntoView({ behavior: 'smooth' });
+  toast('Contrato carregado!');
+};
 
-  function update() {
-    const c = +document.getElementById('s-clients').value;
-    const m = +document.getElementById('s-monthly').value;
-    const e = +document.getElementById('s-extras').value;
-
-    document.getElementById('v-clients').textContent = c;
-    document.getElementById('v-monthly').textContent = fmt(m);
-    document.getElementById('v-extras').textContent = fmt(e);
-    document.getElementById('r-monthly').textContent = fmt(c * m);
-    document.getElementById('r-extras').textContent = fmt(e);
-    document.getElementById('r-total').textContent = fmt(c * m + e);
-
-    const container = document.getElementById('proj-cards');
-    container.innerHTML = '';
-    let acc = 0;
-    const impl = m * 2.5;
-
-    for (let i = 1; i <= 12; i++) {
-      const cl = Math.min(Math.ceil(c * i / 12), c);
-      const men = cl * m;
-      const imp = i <= c ? impl : 0;
-      const ext = i >= 3 ? e : 0;
-      const tot = men + imp + ext;
-      acc += tot;
-
-      const card = document.createElement('div');
-      card.className = 'month-card' + (i === 6 || i === 12 ? ' highlight' : '');
-      card.innerHTML = `
-        <div class="month-card-header" onclick="toggleMonth(this)">
-          <div class="mc-left">
-            <span class="mc-month">Mês ${i}</span>
-            <span class="mc-clients">${cl} cliente${cl !== 1 ? 's' : ''}</span>
-          </div>
-          <div class="mc-right">
-            <span class="mc-total">${fmt(tot)}</span>
-            <span class="mc-chevron">▾</span>
-          </div>
-        </div>
-        <div class="month-card-body">
-          <div class="mc-row"><div class="mc-label">Mensalidades</div><div class="mc-val">${fmt(men)}</div></div>
-          <div class="mc-row"><div class="mc-label">Implementações</div><div class="mc-val">${fmt(imp)}</div></div>
-          <div class="mc-row"><div class="mc-label">Extras</div><div class="mc-val">${fmt(ext)}</div></div>
-          <div class="mc-row"><div class="mc-label">Total do mês</div><div class="mc-val">${fmt(tot)}</div></div>
-          <div class="mc-row mc-acc"><div class="mc-label">Acumulado até aqui</div><div class="mc-val">${fmt(acc)}</div></div>
-        </div>`;
-      container.appendChild(card);
-    }
-    }
+// ─── Deletar contrato ─────────────────────────────────────────────────────────
+window.deletarContrato = async function(id) {
+  if (!confirm('Excluir este contrato?')) return;
+  if (window.syncShow) window.syncShow.syncing();
+  try {
+    await deleteDoc(doc(db, 'doa_contratos', id));
+    contratosCache = contratosCache.filter(function(c) { return c.id !== id; });
+    if (window.syncShow) window.syncShow.synced('DOA');
+  } catch(e) {
+    if (window.syncShow) window.syncShow.offline();
   }
+  renderContratos();
+  toast('Excluído');
+};
 
-  ['s-clients','s-monthly','s-extras'].forEach(id =>
-    document.getElementById(id).addEventListener('input', update)
-  );
-
-  update();
-
-  function copyScript() {
-    const txt = `SCRIPT DE VENDAS — MÉTODO DOA
-
-ABERTURA:
-"Oi, [nome]! Tudo bem? Meu nome é [seu nome], sou especialista em sistemas e automação para negócios. Posso te fazer uma pergunta rápida?"
-
-DIAGNÓSTICO DA DOR:
-"Você já usa algum sistema para gerenciar o seu negócio?"
-Se SIM: "Está satisfeito? Tem alguma coisa que falta ou que queria diferente?"
-Se NÃO: "Tudo no Excel? Isso já te causou algum problema?"
-
-PROPOSTA:
-"Eu desenvolvo sistemas personalizados — feito do zero para o seu negócio. Qualquer mudança, eu faço. E você não paga nada adiantado. Só paga quando o sistema estiver pronto e você aprovar."
-
-FECHAMENTO:
-"Que tal marcar 20 minutos essa semana por videochamada? Sem compromisso nenhum."
-
-OBJEÇÕES:
-"Já tenho sistema" → "Tem alguma funcionalidade que falta?"
-"Quanto custa?" → "A mensalidade fica no mesmo valor ou menos que você já paga hoje."
-"Sem tempo" → "Eu cuido de tudo. Posso mandar resumo no WhatsApp?"
-"Como sei que vai entregar?" → "Você não paga nada antes. O contrato garante isso."`;
-
-    navigator.clipboard.writeText(txt).then(() => alert('Script copiado!'));
+// ─── Apagar todos ─────────────────────────────────────────────────────────────
+window.apagarTodosContratos = async function() {
+  if (!confirm('Apagar TODOS os contratos?')) return;
+  if (window.syncShow) window.syncShow.syncing();
+  try {
+    var batch = writeBatch(db);
+    contratosCache.forEach(function(c) { batch.delete(doc(db, 'doa_contratos', c.id)); });
+    await batch.commit();
+    contratosCache = [];
+    if (window.syncShow) window.syncShow.synced('DOA');
+  } catch(e) {
+    if (window.syncShow) window.syncShow.offline();
   }
+  renderContratos();
+  toast('Apagados');
+};
+
+// ─── onSnapshot — escuta em tempo real ───────────────────────────────────────
+function iniciarListeners() {
+  onSnapshot(query(collection(db, 'doa_contratos'), orderBy('criadoEm', 'desc')), function(snap) {
+    contratosCache = [];
+    snap.forEach(function(d) { contratosCache.push({ id: d.id, ...d.data() }); });
+    renderContratos();
+  });
+}
+
+// ─── INIT ─────────────────────────────────────────────────────────────────────
+iniciarListeners();
+
+// ─── Drawer ──────────────────────────────────────────────────────────────────
+window.toggleDrawer = function() {
+  var drawer = document.getElementById('drawer');
+  var overlay = document.getElementById('overlay');
+  var hamburger = document.getElementById('hamburger');
+  if (drawer.classList.contains('open')) {
+    closeDrawer();
+  } else {
+    drawer.classList.add('open');
+    overlay.classList.add('open');
+    hamburger.classList.add('open');
+  }
+};
+
+window.closeDrawer = function() {
+  document.getElementById('drawer').classList.remove('open');
+  document.getElementById('overlay').classList.remove('open');
+  document.getElementById('hamburger').classList.remove('open');
+};
+
+// ─── Simulador ────────────────────────────────────────────────────────────────
+function toggleMonth(header) {
+  var card = header.parentElement;
+  var body = card.querySelector('.month-card-body');
+  var isOpen = card.classList.contains('open');
+  if (isOpen) {
+    card.classList.remove('open');
+    body.style.display = 'none';
+  } else {
+    card.classList.add('open');
+    body.style.display = 'grid';
+  }
+}
+window.toggleMonth = toggleMonth;
+
+var fmt = function(n) { return 'R$ ' + Math.round(n).toLocaleString('pt-BR'); };
+
+function update() {
+  var c = +document.getElementById('s-clients').value;
+  var m = +document.getElementById('s-monthly').value;
+  var e = +document.getElementById('s-extras').value;
+
+  document.getElementById('v-clients').textContent = c;
+  document.getElementById('v-monthly').textContent = fmt(m);
+  document.getElementById('v-extras').textContent = fmt(e);
+  document.getElementById('r-monthly').textContent = fmt(c * m);
+  document.getElementById('r-extras').textContent = fmt(e);
+  document.getElementById('r-total').textContent = fmt(c * m + e);
+
+  var container = document.getElementById('proj-cards');
+  container.innerHTML = '';
+  var acc = 0;
+  var impl = m * 2.5;
+
+  for (var i = 1; i <= 12; i++) {
+    var cl = Math.min(Math.ceil(c * i / 12), c);
+    var men = cl * m;
+    var imp = i <= c ? impl : 0;
+    var ext = i >= 3 ? e : 0;
+    var tot = men + imp + ext;
+    acc += tot;
+
+    var card = document.createElement('div');
+    card.className = 'month-card' + (i === 6 || i === 12 ? ' highlight' : '');
+    card.innerHTML =
+      '<div class="month-card-header" onclick="toggleMonth(this)">' +
+        '<div class="mc-left">' +
+          '<span class="mc-month">Mês ' + i + '</span>' +
+          '<span class="mc-clients">' + cl + ' cliente' + (cl !== 1 ? 's' : '') + '</span>' +
+        '</div>' +
+        '<div class="mc-right">' +
+          '<span class="mc-total">' + fmt(tot) + '</span>' +
+          '<span class="mc-chevron">▾</span>' +
+        '</div>' +
+      '</div>' +
+      '<div class="month-card-body">' +
+        '<div class="mc-row"><div class="mc-label">Mensalidades</div><div class="mc-val">' + fmt(men) + '</div></div>' +
+        '<div class="mc-row"><div class="mc-label">Implementações</div><div class="mc-val">' + fmt(imp) + '</div></div>' +
+        '<div class="mc-row"><div class="mc-label">Extras</div><div class="mc-val">' + fmt(ext) + '</div></div>' +
+        '<div class="mc-row"><div class="mc-label">Total do mês</div><div class="mc-val">' + fmt(tot) + '</div></div>' +
+        '<div class="mc-row mc-acc"><div class="mc-label">Acumulado até aqui</div><div class="mc-val">' + fmt(acc) + '</div></div>' +
+      '</div>';
+    container.appendChild(card);
+  }
+}
+
+['s-clients','s-monthly','s-extras'].forEach(function(id) {
+  document.getElementById(id).addEventListener('input', update);
+});
+update();
+
+// ─── Copiar script ────────────────────────────────────────────────────────────
+window.copyScript = function() {
+  var txt = 'SCRIPT DE VENDAS — MÉTODO DOA\n\n' +
+    'ABERTURA:\n"Oi, [nome]! Tudo bem? Meu nome é [seu nome], sou especialista em sistemas e automação para negócios. Posso te fazer uma pergunta rápida?"\n\n' +
+    'DIAGNÓSTICO DA DOR:\n"Você já usa algum sistema para gerenciar o seu negócio?"\nSe SIM: "Está satisfeito? Tem alguma coisa que falta ou que queria diferente?"\nSe NÃO: "Tudo no Excel? Isso já te causou algum problema?"\n\n' +
+    'PROPOSTA:\n"Eu desenvolvo sistemas personalizados — feito do zero para o seu negócio. Qualquer mudança, eu faço. E você não paga nada adiantado. Só paga quando o sistema estiver pronto e você aprovar."\n\n' +
+    'FECHAMENTO:\n"Que tal marcar 20 minutos essa semana por videochamada? Sem compromisso nenhum."\n\n' +
+    'OBJEÇÕES:\n"Já tenho sistema" → "Tem alguma funcionalidade que falta?"\n"Quanto custa?" → "A mensalidade fica no mesmo valor ou menos que você já paga hoje."\n"Sem tempo" → "Eu cuido de tudo. Posso mandar resumo no WhatsApp?"\n"Como sei que vai entregar?" → "Você não paga nada antes. O contrato garante isso."';
+
+  navigator.clipboard.writeText(txt).then(function() { toast('Script copiado!'); });
+};
+
 </script>
 </body>
 </html>
