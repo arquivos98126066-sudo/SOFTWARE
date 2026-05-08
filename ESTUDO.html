@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Estudo</title>
+<script src="https://arquivos98126066-sudo.github.io/SOFTWARE/sync-indicator.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -56,6 +57,7 @@
     color: var(--accent);
     text-transform: uppercase;
   }
+  .header-btns { display: flex; gap: 8px; align-items: center; }
   .trash-btn {
     background: none; border: 1px solid var(--border);
     color: var(--muted); border-radius: 8px;
@@ -379,14 +381,16 @@
 
 <header>
   <div class="logo">ESTUDO</div>
-  <button class="trash-btn" onclick="openTrash()">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-      <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
-      <path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/>
-    </svg>
-    Lixeira
-    <span class="trash-count" id="trashCount">0</span>
-  </button>
+  <div class="header-btns">
+    <button class="trash-btn" onclick="openTrash()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+        <path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/>
+      </svg>
+      Lixeira
+      <span class="trash-count" id="trashCount">0</span>
+    </button>
+  </div>
 </header>
 
 <div class="global-progress">
@@ -410,380 +414,447 @@
   <div id="folderList"></div>
 </main>
 
-<script>
-// ── STATE ──────────────────────────────────────────────
-let state = { folders: [], trash: [] };
+<script type="module">
+import { db } from "https://arquivos98126066-sudo.github.io/SOFTWARE/firebase-sync.js";
+import {
+  collection, addDoc, getDocs, updateDoc, deleteDoc, doc,
+  onSnapshot, query, orderBy, writeBatch, getDoc
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-function save() { localStorage.setItem('estudo_v3', JSON.stringify(state)); }
-function load() {
-  try {
-    const raw = localStorage.getItem('estudo_v3');
-    if (raw) state = JSON.parse(raw);
-    if (!state.trash) state.trash = [];
-  } catch(e) { state = { folders: [], trash: [] }; }
-}
+// ── CACHE LOCAL ────────────────────────────────────────
+var pastasCache = [];   // { id, name, open, chapters: [...], criadoEm }
+var lixeiraCache = [];  // { id, chapterId, chapterName, content, folderId, folderName, criadoEm }
 
-// ── HELPERS ───────────────────────────────────────────
+// ── TOAST ──────────────────────────────────────────────
+window.showToast = function(msg) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(function(){ t.classList.remove('show'); }, 1800);
+};
+
+// ── HELPERS ────────────────────────────────────────────
 function extractOrder(name) {
-  const m = name.match(/^\((\d+)\)/);
+  var m = name.match(/^\((\d+)\)/);
   return m ? parseInt(m[1]) : 9999;
 }
 function sortFolders() {
-  state.folders.sort((a, b) => extractOrder(a.name) - extractOrder(b.name));
+  pastasCache.sort(function(a,b){ return extractOrder(a.name) - extractOrder(b.name); });
 }
 function sortChapters(chapters) {
-  return [...chapters].sort((a, b) => {
-    const numA = parseInt((a.name.match(/\d+/) || ['0'])[0]);
-    const numB = parseInt((b.name.match(/\d+/) || ['0'])[0]);
-    if (numA !== numB) return numA - numB;
+  return [...chapters].sort(function(a,b){
+    var numA = parseInt((a.name.match(/\d+/) || ['0'])[0]);
+    var numB = parseInt((b.name.match(/\d+/) || ['0'])[0]);
+    if(numA !== numB) return numA - numB;
     return a.name.localeCompare(b.name);
   });
 }
 function globalStats() {
-  let total = 0, done = 0;
-  state.folders.forEach(f => {
-    total += f.chapters.length;
-    done += f.chapters.filter(c => c.done).length;
+  var total=0, done=0;
+  pastasCache.forEach(function(f){
+    total += (f.chapters||[]).length;
+    done  += (f.chapters||[]).filter(function(c){return c.done;}).length;
   });
-  return { total, done };
+  return {total, done};
 }
 
-// ── TOAST ─────────────────────────────────────────────
-function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 1800);
-}
-
-// ── MODAL PASTA ───────────────────────────────────────
-function openModal() {
+// ── MODAL PASTA ────────────────────────────────────────
+window.openModal = function(){
   document.getElementById('modalOverlay').classList.add('show');
-  setTimeout(() => document.getElementById('folderNameInput').focus(), 300);
-}
-function closeModal() {
+  setTimeout(function(){ document.getElementById('folderNameInput').focus(); }, 300);
+};
+window.closeModal = function(){
   document.getElementById('modalOverlay').classList.remove('show');
   document.getElementById('folderNameInput').value = '';
-}
-document.getElementById('modalOverlay').addEventListener('click', e => {
-  if (e.target === document.getElementById('modalOverlay')) closeModal();
+};
+document.getElementById('modalOverlay').addEventListener('click', function(e){
+  if(e.target === document.getElementById('modalOverlay')) closeModal();
 });
-document.getElementById('folderNameInput').addEventListener('keydown', e => {
-  if (e.key === 'Enter') createFolder();
+document.getElementById('folderNameInput').addEventListener('keydown', function(e){
+  if(e.key === 'Enter') createFolder();
 });
-function createFolder() {
-  const name = document.getElementById('folderNameInput').value.trim();
-  if (!name) return;
-  state.folders.push({ id: Date.now(), name, open: true, chapters: [] });
-  sortFolders(); save(); closeModal(); render();
-}
 
-// ── LIXEIRA ───────────────────────────────────────────
-function openTrash() {
+window.createFolder = async function(){
+  var name = document.getElementById('folderNameInput').value.trim();
+  if(!name) return;
+  var pasta = { name, open: true, chapters: [], criadoEm: new Date().toISOString() };
+  if(window.syncShow) window.syncShow.syncing();
+  try {
+    var ref = await addDoc(collection(db,'estudo_pastas'), pasta);
+    pasta.id = ref.id;
+    pastasCache.push(pasta);
+    sortFolders();
+    if(window.syncShow) window.syncShow.synced('Estudo');
+  } catch(e) {
+    pasta.id = 'local_' + Date.now();
+    pastasCache.push(pasta);
+    sortFolders();
+    if(window.syncShow) window.syncShow.local();
+    showToast('Salvo localmente (offline)');
+  }
+  closeModal(); render();
+};
+
+// ── LIXEIRA ────────────────────────────────────────────
+window.openTrash = function(){
   renderTrash();
   document.getElementById('trashOverlay').classList.add('show');
-}
-function closeTrash() {
+};
+window.closeTrash = function(){
   document.getElementById('trashOverlay').classList.remove('show');
-}
-document.getElementById('trashOverlay').addEventListener('click', e => {
-  if (e.target === document.getElementById('trashOverlay')) closeTrash();
+};
+document.getElementById('trashOverlay').addEventListener('click', function(e){
+  if(e.target === document.getElementById('trashOverlay')) closeTrash();
 });
 
-function renderTrash() {
-  const list = document.getElementById('trashList');
-  if (state.trash.length === 0) {
-    list.innerHTML = '<div class="trash-empty">🗑️ Lixeira vazia</div>';
-    return;
+function renderTrash(){
+  var list = document.getElementById('trashList');
+  if(!lixeiraCache.length){
+    list.innerHTML = '<div class="trash-empty">🗑️ Lixeira vazia</div>'; return;
   }
-  list.innerHTML = state.trash.map((item, idx) => `
-    <div class="trash-item">
-      <div class="trash-item-info">
-        <div class="trash-item-name">${item.chapterName.replace(/\.[^.]+$/, '')}</div>
-        <div class="trash-item-folder">📁 ${item.folderName}</div>
-      </div>
-      <button class="restore-btn" onclick="restoreChapter(${idx})">↩ Recuperar</button>
-      <button class="perm-del-btn" onclick="permDelete(${idx})" title="Excluir permanentemente">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
-        </svg>
-      </button>
-    </div>
-  `).join('');
-
-  const cnt = document.getElementById('trashCount');
-  cnt.textContent = state.trash.length;
-  cnt.classList.toggle('show', state.trash.length > 0);
+  list.innerHTML = lixeiraCache.map(function(item, idx){
+    return '<div class="trash-item">'
+      +'<div class="trash-item-info">'
+      +'<div class="trash-item-name">'+(item.chapterName||'').replace(/\.[^.]+$/,'')+'</div>'
+      +'<div class="trash-item-folder">📁 '+item.folderName+'</div>'
+      +'</div>'
+      +'<button class="restore-btn" onclick="restoreChapter(\''+item.id+'\')">↩ Recuperar</button>'
+      +'<button class="perm-del-btn" onclick="permDelete(\''+item.id+'\')" title="Excluir permanentemente">'
+      +'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>'
+      +'</button></div>';
+  }).join('');
+  updateTrashCount();
 }
 
-function restoreChapter(idx) {
-  const item = state.trash[idx];
-  const folder = state.folders.find(f => f.id === item.folderId);
-  if (folder) {
-    folder.chapters.push({
-      id: item.chapterId,
-      name: item.chapterName,
-      content: item.content,
-      done: false
-    });
-    folder.chapters = sortChapters(folder.chapters);
-    state.trash.splice(idx, 1);
-    save(); render(); renderTrash();
-    showToast('↩ Capítulo recuperado!');
-  } else {
-    state.folders.push({
-      id: item.folderId,
-      name: item.folderName,
-      open: true,
-      chapters: [{
-        id: item.chapterId,
-        name: item.chapterName,
-        content: item.content,
-        done: false
-      }]
-    });
-    sortFolders();
-    state.trash.splice(idx, 1);
-    save(); render(); renderTrash();
-    showToast('↩ Capítulo e pasta recuperados!');
+function updateTrashCount(){
+  var cnt = document.getElementById('trashCount');
+  cnt.textContent = lixeiraCache.length;
+  cnt.classList.toggle('show', lixeiraCache.length > 0);
+}
+
+window.restoreChapter = async function(lixId){
+  var item = lixeiraCache.find(function(x){ return x.id === lixId; });
+  if(!item) return;
+  var folder = pastasCache.find(function(f){ return f.id === item.folderId; });
+  var chapter = { id: item.chapterId, name: item.chapterName, content: item.content, done: false };
+
+  if(window.syncShow) window.syncShow.syncing();
+  try {
+    if(folder) {
+      if(!folder.chapters) folder.chapters = [];
+      folder.chapters.push(chapter);
+      folder.chapters = sortChapters(folder.chapters);
+      await updateDoc(doc(db,'estudo_pastas', folder.id), { chapters: folder.chapters });
+    } else {
+      // Pasta foi deletada: recria
+      var novaPasta = { name: item.folderName, open: true, chapters: [chapter], criadoEm: new Date().toISOString() };
+      var ref = await addDoc(collection(db,'estudo_pastas'), novaPasta);
+      novaPasta.id = ref.id;
+      pastasCache.push(novaPasta);
+      sortFolders();
+    }
+    await deleteDoc(doc(db,'estudo_lixeira', lixId));
+    lixeiraCache = lixeiraCache.filter(function(x){ return x.id !== lixId; });
+    if(window.syncShow) window.syncShow.synced('Estudo');
+    showToast('↩ Recuperado!');
+  } catch(e) {
+    if(window.syncShow) window.syncShow.offline();
+    showToast('Erro ao recuperar');
   }
-}
+  render(); renderTrash();
+};
 
-function permDelete(idx) {
-  state.trash.splice(idx, 1);
-  save(); renderTrash();
-  showToast('🗑️ Excluído permanentemente');
-}
+window.permDelete = async function(lixId){
+  if(window.syncShow) window.syncShow.syncing();
+  try {
+    await deleteDoc(doc(db,'estudo_lixeira', lixId));
+    lixeiraCache = lixeiraCache.filter(function(x){ return x.id !== lixId; });
+    if(window.syncShow) window.syncShow.synced('Estudo');
+  } catch(e) {
+    if(window.syncShow) window.syncShow.offline();
+  }
+  renderTrash(); showToast('🗑️ Excluído permanentemente');
+};
 
-// ── EDITAR PASTA ──────────────────────────────────────
-function editFolderName(fid) {
-  const folder = state.folders.find(f => f.id === fid);
-  if (!folder) return;
-  const nameEl = document.querySelector(`.folder[data-id="${fid}"] .folder-name`);
-  if (!nameEl) return;
-  const input = document.createElement('input');
+// ── EDITAR PASTA ───────────────────────────────────────
+window.editFolderName = function(fid){
+  var folder = pastasCache.find(function(f){ return f.id == fid; });
+  if(!folder) return;
+  var nameEl = document.querySelector('.folder[data-id="'+fid+'"] .folder-name');
+  if(!nameEl) return;
+  var input = document.createElement('input');
   input.className = 'folder-inline-edit';
   input.value = folder.name;
   nameEl.replaceWith(input);
   input.focus(); input.select();
-  function confirm() {
-    const val = input.value.trim();
-    if (val) folder.name = val;
-    sortFolders(); save(); render();
+  function confirm(){
+    var val = input.value.trim();
+    if(val) folder.name = val;
+    sortFolders();
+    if(window.syncShow) window.syncShow.syncing();
+    updateDoc(doc(db,'estudo_pastas',fid), { name: folder.name })
+      .then(function(){ if(window.syncShow) window.syncShow.synced('Estudo'); })
+      .catch(function(){ if(window.syncShow) window.syncShow.offline(); });
+    render();
   }
   input.addEventListener('blur', confirm);
-  input.addEventListener('keydown', e => {
-    if (e.key === 'Enter') input.blur();
-    if (e.key === 'Escape') render();
+  input.addEventListener('keydown', function(e){
+    if(e.key === 'Enter') input.blur();
+    if(e.key === 'Escape') render();
     e.stopPropagation();
   });
-  input.addEventListener('click', e => e.stopPropagation());
-}
+  input.addEventListener('click', function(e){ e.stopPropagation(); });
+};
 
-// ── EDITAR CAPÍTULO ───────────────────────────────────
-function editChapterName(fid, cid) {
-  const folder = state.folders.find(f => f.id === fid);
-  if (!folder) return;
-  const ch = folder.chapters.find(c => String(c.id) === String(cid));
-  if (!ch) return;
-  const nameEl = document.querySelector(`[data-cid="${cid}"] .chapter-name`);
-  if (!nameEl) return;
-  const input = document.createElement('input');
+// ── EDITAR CAPÍTULO ────────────────────────────────────
+window.editChapterName = function(fid, cid){
+  var folder = pastasCache.find(function(f){ return f.id == fid; });
+  if(!folder) return;
+  var ch = (folder.chapters||[]).find(function(c){ return String(c.id) === String(cid); });
+  if(!ch) return;
+  var nameEl = document.querySelector('[data-cid="'+cid+'"] .chapter-name');
+  if(!nameEl) return;
+  var input = document.createElement('input');
   input.className = 'chapter-inline-edit';
   input.value = ch.name.replace(/\.[^.]+$/, '');
   nameEl.replaceWith(input);
   input.focus(); input.select();
-  function confirm() {
-    const val = input.value.trim();
-    if (val) ch.name = val;
-    save(); render();
+  function confirm(){
+    var val = input.value.trim();
+    if(val) ch.name = val;
+    if(window.syncShow) window.syncShow.syncing();
+    updateDoc(doc(db,'estudo_pastas',fid), { chapters: folder.chapters })
+      .then(function(){ if(window.syncShow) window.syncShow.synced('Estudo'); })
+      .catch(function(){ if(window.syncShow) window.syncShow.offline(); });
+    render();
   }
   input.addEventListener('blur', confirm);
-  input.addEventListener('keydown', e => {
-    if (e.key === 'Enter') input.blur();
-    if (e.key === 'Escape') render();
+  input.addEventListener('keydown', function(e){
+    if(e.key === 'Enter') input.blur();
+    if(e.key === 'Escape') render();
     e.stopPropagation();
   });
-  input.addEventListener('click', e => e.stopPropagation());
-}
+  input.addEventListener('click', function(e){ e.stopPropagation(); });
+};
 
-// ── EXCLUIR CAPÍTULO → LIXEIRA ────────────────────────
-function deleteChapter(fid, cid) {
-  const folder = state.folders.find(f => f.id === fid);
-  if (!folder) return;
-  const idx = folder.chapters.findIndex(c => String(c.id) === String(cid));
-  if (idx === -1) return;
-  const ch = folder.chapters[idx];
-  state.trash.unshift({
-    chapterId: ch.id,
-    chapterName: ch.name,
-    content: ch.content,
-    folderId: folder.id,
-    folderName: folder.name
-  });
+// ── EXCLUIR CAPÍTULO → LIXEIRA ─────────────────────────
+window.deleteChapter = async function(fid, cid){
+  var folder = pastasCache.find(function(f){ return f.id == fid; });
+  if(!folder) return;
+  var idx = (folder.chapters||[]).findIndex(function(c){ return String(c.id) === String(cid); });
+  if(idx === -1) return;
+  var ch = folder.chapters[idx];
+  var lixItem = {
+    chapterId: ch.id, chapterName: ch.name, content: ch.content,
+    folderId: folder.id, folderName: folder.name,
+    criadoEm: new Date().toISOString()
+  };
   folder.chapters.splice(idx, 1);
-  save(); render();
-  const cnt = document.getElementById('trashCount');
-  cnt.textContent = state.trash.length;
-  cnt.classList.toggle('show', state.trash.length > 0);
+  if(window.syncShow) window.syncShow.syncing();
+  try {
+    var lixRef = await addDoc(collection(db,'estudo_lixeira'), lixItem);
+    lixItem.id = lixRef.id;
+    lixeiraCache.unshift(lixItem);
+    await updateDoc(doc(db,'estudo_pastas', fid), { chapters: folder.chapters });
+    if(window.syncShow) window.syncShow.synced('Estudo');
+  } catch(e) {
+    lixItem.id = 'local_' + Date.now();
+    lixeiraCache.unshift(lixItem);
+    if(window.syncShow) window.syncShow.offline();
+  }
+  render(); updateTrashCount();
   showToast('🗑️ Movido para a lixeira');
-}
+};
 
-// ── COPY ──────────────────────────────────────────────
-async function copyChapter(fid, cid, el) {
-  const folder = state.folders.find(f => f.id === fid);
-  if (!folder) return;
-  const chapter = folder.chapters.find(c => String(c.id) === String(cid));
-  if (!chapter) return;
+// ── COPIAR CAPÍTULO ────────────────────────────────────
+window.copyChapter = async function(fid, cid, el){
+  var folder = pastasCache.find(function(f){ return f.id == fid; });
+  if(!folder) return;
+  var chapter = (folder.chapters||[]).find(function(c){ return String(c.id) === String(cid); });
+  if(!chapter) return;
   try {
     await navigator.clipboard.writeText(chapter.content);
   } catch(e) {
-    const ta = document.createElement('textarea');
+    var ta = document.createElement('textarea');
     ta.value = chapter.content;
     ta.style.position = 'fixed'; ta.style.opacity = '0';
     document.body.appendChild(ta); ta.select();
     document.execCommand('copy'); ta.remove();
   }
   showToast('✓ Copiado!');
-  const r = document.createElement('div');
+  var r = document.createElement('div');
   r.className = 'ripple-el';
-  r.style.left = (el.offsetWidth / 2 - 30) + 'px';
-  r.style.top = (el.offsetHeight / 2 - 30) + 'px';
+  r.style.left = (el.offsetWidth/2 - 30) + 'px';
+  r.style.top  = (el.offsetHeight/2 - 30) + 'px';
   el.appendChild(r);
-  setTimeout(() => r.remove(), 600);
+  setTimeout(function(){ r.remove(); }, 600);
   el.classList.add('copying');
-  setTimeout(() => el.classList.remove('copying'), 400);
-}
+  setTimeout(function(){ el.classList.remove('copying'); }, 400);
+};
 
-// ── MARK DONE ─────────────────────────────────────────
-function markDone(fid, cid) {
-  const folder = state.folders.find(f => f.id === fid);
-  if (!folder) return;
-  const ch = folder.chapters.find(c => String(c.id) === String(cid));
-  if (ch) { ch.done = true; save(); render(); }
-}
+// ── MARCAR COMO LIDO ───────────────────────────────────
+window.markDone = async function(fid, cid){
+  var folder = pastasCache.find(function(f){ return f.id == fid; });
+  if(!folder) return;
+  var ch = (folder.chapters||[]).find(function(c){ return String(c.id) === String(cid); });
+  if(!ch) return;
+  ch.done = true;
+  if(window.syncShow) window.syncShow.syncing();
+  try {
+    await updateDoc(doc(db,'estudo_pastas', fid), { chapters: folder.chapters });
+    if(window.syncShow) window.syncShow.synced('Estudo');
+  } catch(e) {
+    if(window.syncShow) window.syncShow.offline();
+  }
+  render();
+};
 
-// ── DELETE FOLDER ─────────────────────────────────────
-function deleteFolder(fid) {
-  if (!confirm('Remover esta pasta e todos os capítulos?')) return;
-  state.folders = state.folders.filter(f => f.id !== fid);
-  save(); render();
-}
+// ── DELETAR PASTA ──────────────────────────────────────
+window.deleteFolder = async function(fid){
+  if(!confirm('Remover esta pasta e todos os capítulos?')) return;
+  if(window.syncShow) window.syncShow.syncing();
+  try {
+    await deleteDoc(doc(db,'estudo_pastas', fid));
+    pastasCache = pastasCache.filter(function(f){ return f.id != fid; });
+    if(window.syncShow) window.syncShow.synced('Estudo');
+  } catch(e) {
+    if(window.syncShow) window.syncShow.offline();
+  }
+  render();
+};
 
-// ── FILES INPUT ───────────────────────────────────────
-function handleFiles(fid, files) {
-  const folder = state.folders.find(f => f.id === fid);
-  if (!folder) return;
-  const arr = Array.from(files);
-  let loaded = 0;
-  arr.forEach(file => {
-    const reader = new FileReader();
-    reader.onload = e => {
-      const existing = folder.chapters.find(c => c.name === file.name);
-      if (!existing) {
+// ── TOGGLE PASTA ───────────────────────────────────────
+window.toggleFolder = async function(fid){
+  var folder = pastasCache.find(function(f){ return f.id == fid; });
+  if(!folder) return;
+  folder.open = !folder.open;
+  try {
+    await updateDoc(doc(db,'estudo_pastas', fid), { open: folder.open });
+  } catch(e) {}
+  render();
+};
+
+// ── UPLOAD DE ARQUIVOS ─────────────────────────────────
+window.handleFiles = async function(fid, files){
+  var folder = pastasCache.find(function(f){ return f.id == fid; });
+  if(!folder) return;
+  var arr = Array.from(files);
+  var loaded = 0;
+  arr.forEach(function(file){
+    var reader = new FileReader();
+    reader.onload = async function(e){
+      var existing = (folder.chapters||[]).find(function(c){ return c.name === file.name; });
+      if(!existing){
+        if(!folder.chapters) folder.chapters = [];
         folder.chapters.push({
           id: Date.now() + '_' + Math.random(),
           name: file.name, content: e.target.result, done: false
         });
       }
       loaded++;
-      if (loaded === arr.length) {
+      if(loaded === arr.length){
         folder.chapters = sortChapters(folder.chapters);
-        save(); render();
+        if(window.syncShow) window.syncShow.syncing();
+        try {
+          await updateDoc(doc(db,'estudo_pastas', fid), { chapters: folder.chapters });
+          if(window.syncShow) window.syncShow.synced('Estudo');
+        } catch(err) {
+          if(window.syncShow) window.syncShow.offline();
+        }
+        render();
         showToast('✓ ' + arr.length + ' arquivo(s) adicionado(s)');
       }
     };
     reader.readAsText(file);
   });
-}
+};
 
-// ── TOGGLE ────────────────────────────────────────────
-function toggleFolder(fid) {
-  const folder = state.folders.find(f => f.id === fid);
-  if (folder) { folder.open = !folder.open; save(); render(); }
-}
+// ── SVG ICONS ──────────────────────────────────────────
+var EDIT_SVG  = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>';
+var TRASH_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>';
+var COPY_SVG  = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>';
+var CHEV_SVG  = '<svg class="folder-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>';
 
-// ── SVG ICONS ─────────────────────────────────────────
-const EDIT_SVG   = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>`;
-const TRASH_SVG  = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>`;
-const COPY_SVG   = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>`;
-const CHEV_SVG   = `<svg class="folder-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>`;
-
-// ── RENDER ────────────────────────────────────────────
-function render() {
-  const { total, done } = globalStats();
-  const pct = total > 0 ? Math.round((done / total) * 100) : 0;
+// ── RENDER ─────────────────────────────────────────────
+window.render = function(){
+  var stats = globalStats();
+  var pct = stats.total > 0 ? Math.round((stats.done / stats.total) * 100) : 0;
   document.getElementById('globalPct').textContent = pct + '%';
   document.getElementById('globalBar').style.width = pct + '%';
+  updateTrashCount();
 
-  const cnt = document.getElementById('trashCount');
-  cnt.textContent = state.trash.length;
-  cnt.classList.toggle('show', state.trash.length > 0);
-
-  const list = document.getElementById('folderList');
+  var list = document.getElementById('folderList');
   list.innerHTML = '';
 
-  if (state.folders.length === 0) {
+  if(!pastasCache.length){
     list.innerHTML = '<div class="empty-msg">Nenhuma pasta ainda.<br>Crie uma para começar.</div>';
     return;
   }
 
-  state.folders.forEach(folder => {
-    const pending = folder.chapters.filter(c => !c.done);
-    const doneCount = folder.chapters.filter(c => c.done).length;
-    const tot = folder.chapters.length;
-    const fpct = tot > 0 ? Math.round((doneCount / tot) * 100) : 0;
+  pastasCache.forEach(function(folder){
+    var pending   = (folder.chapters||[]).filter(function(c){ return !c.done; });
+    var doneCount = (folder.chapters||[]).filter(function(c){ return c.done; }).length;
+    var tot  = (folder.chapters||[]).length;
+    var fpct = tot > 0 ? Math.round((doneCount / tot) * 100) : 0;
 
-    const div = document.createElement('div');
+    var div = document.createElement('div');
     div.className = 'folder' + (folder.open ? ' open' : '');
     div.dataset.id = folder.id;
 
-    let chaptersHTML = '';
-    if (pending.length === 0 && tot > 0) {
-      chaptersHTML = `<div class="all-done"><div class="emoji">🎉</div><p>Todos os <strong>${tot}</strong> capítulos concluídos!</p></div>`;
-    } else if (pending.length === 0) {
-      chaptersHTML = `<div class="empty-msg">Nenhum arquivo ainda.<br>Adicione acima.</div>`;
+    var chaptersHTML = '';
+    if(pending.length === 0 && tot > 0){
+      chaptersHTML = '<div class="all-done"><div class="emoji">🎉</div><p>Todos os <strong>'+tot+'</strong> capítulos concluídos!</p></div>';
+    } else if(pending.length === 0){
+      chaptersHTML = '<div class="empty-msg">Nenhum arquivo ainda.<br>Adicione acima.</div>';
     } else {
-      chaptersHTML = pending.map((ch, i) => `
-        <div class="chapter-item" onclick="copyChapter(${folder.id}, '${ch.id}', this)" data-fid="${folder.id}" data-cid="${ch.id}">
-          <span class="chapter-num">${(i+1).toString().padStart(2,'0')}</span>
-          <span class="chapter-name">${ch.name.replace(/\.[^.]+$/, '')}</span>
-          <button class="chapter-edit-btn" onclick="event.stopPropagation(); editChapterName(${folder.id}, '${ch.id}')" title="Renomear">${EDIT_SVG}</button>
-          <span class="chapter-copy-icon">${COPY_SVG}</span>
-          <button class="done-btn" onclick="event.stopPropagation(); markDone(${folder.id}, '${ch.id}')">lido ✓</button>
-          <button class="del-chapter-btn" onclick="event.stopPropagation(); deleteChapter(${folder.id}, '${ch.id}')" title="Mover para lixeira">${TRASH_SVG}</button>
-        </div>
-      `).join('');
+      chaptersHTML = pending.map(function(ch, i){
+        return '<div class="chapter-item" onclick="copyChapter(\''+folder.id+'\', \''+ch.id+'\', this)" data-fid="'+folder.id+'" data-cid="'+ch.id+'">'
+          +'<span class="chapter-num">'+(i+1).toString().padStart(2,'0')+'</span>'
+          +'<span class="chapter-name">'+ch.name.replace(/\.[^.]+$/,'')+'</span>'
+          +'<button class="chapter-edit-btn" onclick="event.stopPropagation(); editChapterName(\''+folder.id+'\', \''+ch.id+'\')" title="Renomear">'+EDIT_SVG+'</button>'
+          +'<span class="chapter-copy-icon">'+COPY_SVG+'</span>'
+          +'<button class="done-btn" onclick="event.stopPropagation(); markDone(\''+folder.id+'\', \''+ch.id+'\')">lido ✓</button>'
+          +'<button class="del-chapter-btn" onclick="event.stopPropagation(); deleteChapter(\''+folder.id+'\', \''+ch.id+'\')" title="Mover para lixeira">'+TRASH_SVG+'</button>'
+          +'</div>';
+      }).join('');
     }
 
-    div.innerHTML = `
-      <div class="folder-header" onclick="toggleFolder(${folder.id})">
-        <span class="folder-icon">📁</span>
-        <span class="folder-name">${folder.name}</span>
-        <span class="folder-stats"><span class="done">${doneCount}</span>/${tot}</span>
-        <button class="icon-btn edit" onclick="event.stopPropagation(); editFolderName(${folder.id})" title="Renomear">${EDIT_SVG}</button>
-        <button class="icon-btn danger" onclick="event.stopPropagation(); deleteFolder(${folder.id})" title="Remover pasta">${TRASH_SVG}</button>
-        ${CHEV_SVG}
-      </div>
-      <div class="folder-progress">
-        <div class="folder-progress-fill" style="width:${fpct}%"></div>
-      </div>
-      <div class="folder-body">
-        <label class="add-files-area">
-          <input type="file" multiple accept="*/*" onchange="handleFiles(${folder.id}, this.files)">
-          <p>📎 Soltar arquivos aqui ou <span>clique para selecionar</span></p>
-        </label>
-        <div class="chapter-list">${chaptersHTML}</div>
-      </div>
-    `;
+    div.innerHTML = '<div class="folder-header" onclick="toggleFolder(\''+folder.id+'\')"><span class="folder-icon">📁</span>'
+      +'<span class="folder-name">'+folder.name+'</span>'
+      +'<span class="folder-stats"><span class="done">'+doneCount+'</span>/'+tot+'</span>'
+      +'<button class="icon-btn edit" onclick="event.stopPropagation(); editFolderName(\''+folder.id+'\')" title="Renomear">'+EDIT_SVG+'</button>'
+      +'<button class="icon-btn danger" onclick="event.stopPropagation(); deleteFolder(\''+folder.id+'\')" title="Remover pasta">'+TRASH_SVG+'</button>'
+      +CHEV_SVG+'</div>'
+      +'<div class="folder-progress"><div class="folder-progress-fill" style="width:'+fpct+'%"></div></div>'
+      +'<div class="folder-body">'
+      +'<label class="add-files-area"><input type="file" multiple accept="*/*" onchange="handleFiles(\''+folder.id+'\', this.files)"><p>📎 Soltar arquivos aqui ou <span>clique para selecionar</span></p></label>'
+      +'<div class="chapter-list">'+chaptersHTML+'</div>'
+      +'</div>';
 
     list.appendChild(div);
   });
+};
+
+// ── onSnapshot — escuta em tempo real ──────────────────
+function iniciarListeners(){
+  onSnapshot(query(collection(db,'estudo_pastas'), orderBy('criadoEm','asc')), function(snap){
+    pastasCache = [];
+    snap.forEach(function(d){ pastasCache.push({ id: d.id, ...d.data() }); });
+    render();
+  });
+
+  onSnapshot(query(collection(db,'estudo_lixeira'), orderBy('criadoEm','desc')), function(snap){
+    lixeiraCache = [];
+    snap.forEach(function(d){ lixeiraCache.push({ id: d.id, ...d.data() }); });
+    updateTrashCount();
+  });
 }
 
-// ── INIT ──────────────────────────────────────────────
-load();
-render();
+// ── INIT ───────────────────────────────────────────────
+(function init(){
+  render(); // render vazio enquanto carrega
+  iniciarListeners();
+})();
 </script>
 </body>
 </html>
