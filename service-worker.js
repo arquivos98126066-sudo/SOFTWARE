@@ -1,23 +1,23 @@
-const CACHE_NAME = 'meus-apps-v2';
+const CACHE_NAME = 'meus-apps-v3';
 const URLS_TO_CACHE = [
-  '/',
-  '/index.html',
-  '/ADM.html',
-  '/TAPETE-CRM.html',
-  '/TAPETES.html',
-  '/PRE-VENDA.html',
-  '/MEU-CRM.html',
-  '/METODO-OPA.html',
-  '/RETINA.html',
-  '/WEBSITE.html',
-  '/OUTROS.html',
-  '/RICO.html',
-  '/Workshop.html',
-  '/DOA.html',
-  '/ESTUDO.html',
-  '/manifest.json',
-  '/icon-192.png',
-  '/icon-512.png'
+  '/SOFTWARE/',
+  '/SOFTWARE/index.html',
+  '/SOFTWARE/ADM.html',
+  '/SOFTWARE/TAPETE-CRM.html',
+  '/SOFTWARE/TAPETES.html',
+  '/SOFTWARE/PRE-VENDA.html',
+  '/SOFTWARE/MEU-CRM.html',
+  '/SOFTWARE/METODO-OPA.html',
+  '/SOFTWARE/RETINA.html',
+  '/SOFTWARE/WEBSITE.html',
+  '/SOFTWARE/OUTROS.html',
+  '/SOFTWARE/RICO.html',
+  '/SOFTWARE/Workshop.html',
+  '/SOFTWARE/DOA.html',
+  '/SOFTWARE/ESTUDO.html',
+  '/SOFTWARE/manifest.json',
+  '/SOFTWARE/icon-192.png',
+  '/SOFTWARE/icon-512.png'
 ];
 
 self.addEventListener('install', event => {
