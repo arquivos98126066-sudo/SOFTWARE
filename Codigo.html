@@ -204,7 +204,7 @@
 
   /* ── GITHUB ── */
   .gh-row{display:flex;flex-direction:column;gap:4px}
-  .gh-files-list{max-height:180px;overflow-y:auto;border:1px solid var(--border);border-radius:7px;background:var(--bg)}
+  .gh-files-list{max-height:320px;overflow-y:auto;border:1px solid var(--border);border-radius:7px;background:var(--bg)}
   .gh-file-item{padding:8px 12px;font-size:12px;cursor:pointer;border-bottom:1px solid var(--border);transition:background 0.15s}
   .gh-file-item:last-child{border-bottom:none}
   .gh-file-item:hover{background:var(--surface2)}
@@ -482,10 +482,15 @@
       </div>
       <div style="display:flex;gap:8px;flex-wrap:wrap">
         <button class="mbtn primary" onclick="ghListarArquivos()" style="flex:1">📂 Listar Arquivos</button>
-        <button class="mbtn secondary" onclick="ghCarregarPastaCompleta()" style="flex:1;white-space:nowrap">📁 Carregar tudo na Sidebar</button>
+        <button class="mbtn secondary" onclick="ghCarregarPastaCompleta()" style="flex:1;white-space:nowrap">📁 Carregar tudo</button>
       </div>
       <div id="gh-status" class="gh-status"></div>
       <div id="gh-files" class="gh-files-list" style="display:none"></div>
+      <div id="gh-sel-bar" style="display:none;gap:6px;flex-wrap:wrap;margin-top:4px">
+        <button class="mbtn secondary" onclick="ghSelecionarTodos()" style="flex:1;font-size:11px">☑ Todos</button>
+        <button class="mbtn secondary" onclick="ghDeselecionarTodos()" style="flex:1;font-size:11px">☐ Nenhum</button>
+        <button class="mbtn primary" onclick="ghCarregarSelecionados()" style="flex:1;font-size:11px">⬇ Carregar selecionados</button>
+      </div>
       <div class="gh-row" style="margin-top:4px">
         <div class="mlabel">📄 Caminho do arquivo (ex: index.html)</div>
         <div style="display:flex;gap:6px">
@@ -1878,6 +1883,47 @@ function ghSelecionarRepo(valor) {
   document.getElementById('gh-files').style.display = 'none';
 }
 
+function ghSelecionarTodos() {
+  document.querySelectorAll('.gh-check').forEach(c => c.checked = true);
+}
+function ghDeselecionarTodos() {
+  document.querySelectorAll('.gh-check').forEach(c => c.checked = false);
+}
+async function ghCarregarSelecionados() {
+  const selecionados = [...document.querySelectorAll('.gh-check:checked')].map(c => c.dataset.path);
+  if (!selecionados.length) { toast('⚠️ Selecione ao menos 1 arquivo!'); return; }
+  const token = document.getElementById('gh-token').value.trim();
+  const repo = document.getElementById('gh-repo').value.trim();
+  const branch = document.getElementById('gh-branch').value.trim() || 'main';
+  fecharModal('modal-github');
+  toast('⏳ Carregando ' + selecionados.length + ' arquivo(s)...');
+  const novos = [];
+  for (const path of selecionados) {
+    try {
+      const r = await fetch(
+        'https://api.github.com/repos/' + repo + '/contents/' + path + '?ref=' + branch,
+        { headers: { 'Authorization': 'token ' + token, 'Accept': 'application/vnd.github.v3+json' } }
+      );
+      if (r.ok) {
+        const d = await r.json();
+        const fileContent = atob(d.content.replace(/\n/g, ''));
+        const nome = path.split('/').pop();
+        novos.push({ path, name: nome, content: fileContent, modificado: false, origem: 'gh', sha: d.sha });
+      }
+    } catch(_) {}
+  }
+  if (!novos.length) { toast('❌ Nenhum arquivo carregado.'); return; }
+  const nomeGrupo = repo.split('/').pop() + ' (seleção)';
+  const gid = criarGrupo(nomeGrupo, novos, 'gh');
+  ghArquivos = pastasGrupos.filter(g => g.origem === 'gh').flatMap(g => g.arquivos);
+  if (!sidebarOpen) toggleSidebar();
+  renderizarSidebar();
+  const grp = pastasGrupos.find(x => x.id === gid);
+  if (grp && grp.arquivos.length > 0) {
+    setTimeout(() => { abrirArquivoGrupo(grp.id, 0); }, 100);
+  }
+  toast('🐙 ' + novos.length + ' arquivo(s) carregados na sidebar!');
+}
 async function ghListarArquivos() {
   ghSalvarCredenciais();
   const token = document.getElementById('gh-token').value.trim();
@@ -1901,9 +1947,13 @@ async function ghListarArquivos() {
     if (!editableFiles.length) { status.textContent = 'Nenhum arquivo editável encontrado.'; status.style.color='var(--warn)'; return; }
     filesDiv.style.display = 'block';
     filesDiv.innerHTML = editableFiles.map(f =>
-      `<div class="gh-file-item" onclick="ghCarregarArquivo('${escAttr(f.path)}')">${escHTML(f.path)}</div>`
+      `<div class="gh-file-item" style="display:flex;align-items:center;gap:8px;">
+        <input type="checkbox" class="gh-check" data-path="${escAttr(f.path)}" style="accent-color:var(--accent);width:14px;height:14px;flex-shrink:0;cursor:pointer">
+        <span onclick="ghCarregarArquivo('${escAttr(f.path)}')" style="flex:1;cursor:pointer">${escHTML(f.path)}</span>
+      </div>`
     ).join('');
-    status.textContent = `✅ ${editableFiles.length} arquivo(s). Clique para carregar.`;
+    document.getElementById('gh-sel-bar').style.display = 'flex';
+    status.textContent = `✅ ${editableFiles.length} arquivo(s). Clique no nome para abrir ou marque para carregar.`;
     status.style.color = 'var(--success)';
   } catch(e) { status.textContent = '❌ ' + e.message; status.style.color = 'var(--danger)'; }
 }
