@@ -1327,73 +1327,63 @@ async function ghCarregarPastaCompleta() {
   ghSalvarCredenciais();
   const token = document.getElementById('gh-token').value.trim();
   const repo = document.getElementById('gh-repo').value.trim();
-  const branch = document.getElementById('gh-branch').value.trim() || 'main';
-  const status = document.getElementById('gh-status');
+  const branch = (document.getElementById('gh-branch').value.trim()) || 'main';
 
-  if (!token || !repo) { status.textContent = '⚠️ Preencha token e repositório.'; status.style.color='var(--warn)'; return; }
+  if (!token || !repo) { toast('\u26a0\ufe0f Preencha token e reposit\u00f3rio.'); return; }
 
-  status.textContent = '⏳ Buscando estrutura do repositório...';
-  status.style.color = 'var(--muted)';
+  // Fecha modal PRIMEIRO - sem mais depend\u00eancia do DOM do modal
+  fecharModal('modal-github');
+  toast('\u23f3 Conectando ao GitHub...');
 
   try {
-    const url = `https://api.github.com/repos/${repo}/git/trees/${branch}?recursive=1`;
-    const resp = await fetch(url, { headers: { 'Authorization': `token ${token}`, 'Accept': 'application/vnd.github.v3+json' } });
-    if (!resp.ok) throw new Error(`Erro ${resp.status}`);
+    const resp = await fetch(
+      'https://api.github.com/repos/' + repo + '/git/trees/' + branch + '?recursive=1',
+      { headers: { 'Authorization': 'token ' + token, 'Accept': 'application/vnd.github.v3+json' } }
+    );
+    if (!resp.ok) { toast('\u274c Erro ' + resp.status); return; }
     const data = await resp.json();
 
-    const arquivosEditaveis = (data.tree || []).filter(f => f.type === 'blob' && EXTENSOES_EDITAVEIS.test(f.path));
-    if (!arquivosEditaveis.length) { status.textContent = '⚠️ Nenhum arquivo editável encontrado.'; status.style.color='var(--warn)'; return; }
+    const lista = (data.tree || []).filter(function(f) { return f.type === 'blob' && EXTENSOES_EDITAVEIS.test(f.path); });
+    if (!lista.length) { toast('\u26a0\ufe0f Nenhum arquivo edit\u00e1vel encontrado.'); return; }
 
-    status.textContent = `⏳ Carregando ${arquivosEditaveis.length} arquivo(s)...`;
+    toast('\u23f3 Carregando ' + lista.length + ' arquivo(s)...');
 
-    ghArquivos = [];
-    let carregados = 0;
-    const total = arquivosEditaveis.length;
-
-    for (const f of arquivosEditaveis) {
+    const novosArquivos = [];
+    let n = 0;
+    for (const f of lista) {
       try {
-        const r = await fetch(`https://api.github.com/repos/${repo}/contents/${f.path}?ref=${branch}`, {
-          headers: { 'Authorization': `token ${token}`, 'Accept': 'application/vnd.github.v3+json' }
-        });
+        const r = await fetch(
+          'https://api.github.com/repos/' + repo + '/contents/' + f.path + '?ref=' + branch,
+          { headers: { 'Authorization': 'token ' + token, 'Accept': 'application/vnd.github.v3+json' } }
+        );
         if (r.ok) {
           const d = await r.json();
-          const content = atob(d.content.replace(/\n/g, ''));
-          const nomeArr = f.path.split('/');
-          ghArquivos.push({ path: f.path, name: nomeArr[nomeArr.length-1], content, modificado: false, origem: 'gh', sha: d.sha });
+          const fileContent = atob(d.content.replace(/\n/g, ''));
+          const nome = f.path.split('/').pop();
+          novosArquivos.push({ path: f.path, name: nome, content: fileContent, modificado: false, origem: 'gh', sha: d.sha });
         }
       } catch(_) {}
-      carregados++;
-      if (carregados % 5 === 0) status.textContent = `⏳ ${carregados}/${total} carregados...`;
+      n++;
+      if (n % 5 === 0) toast('\u23f3 ' + n + '/' + lista.length + ' carregados...');
     }
 
-    const nomeGrupoGH = `${repo} (${branch})`;
-    const grupoGHId = criarGrupo(nomeGrupoGH, ghArquivos, 'gh');
-    ghArquivos = pastasGrupos.filter(g => g.origem === 'gh').flatMap(g => g.arquivos);
-    const totalGH = ghArquivos.length;
+    const nomeGrupo = repo.split('/').pop() + ' (' + branch + ')';
+    const gid = criarGrupo(nomeGrupo, novosArquivos, 'gh');
+    ghArquivos = pastasGrupos.filter(function(g) { return g.origem === 'gh'; }).flatMap(function(g) { return g.arquivos; });
 
-    fecharModal('modal-github');
-    setTimeout(() => {
-      if (!sidebarOpen) toggleSidebar();
-      renderizarSidebar();
-      const grupoGH = pastasGrupos.find(g => g.id === grupoGHId);
-      if (grupoGH && grupoGH.arquivos.length > 0) {
-        requestAnimationFrame(() => {
-          requestAnimationFrame(() => {
-            abrirArquivoGrupo(grupoGH.id, 0);
-          });
-        });
-      }
-      toast(`🐙 ${totalGH} arquivo(s) do GitHub na sidebar!`);
-    }, 150);
+    if (!sidebarOpen) toggleSidebar();
+    renderizarSidebar();
+
+    const grp = pastasGrupos.find(function(x) { return x.id === gid; });
+    if (grp && grp.arquivos.length > 0) {
+      setTimeout(function() { abrirArquivoGrupo(grp.id, 0); }, 100);
+    }
+
+    toast('\U0001f419 ' + novosArquivos.length + ' arquivo(s) do GitHub carregados!');
   } catch(e) {
-    status.textContent = '❌ ' + e.message;
-    status.style.color = 'var(--danger)';
+    toast('\u274c Erro: ' + e.message);
   }
 }
-
-// ═══════════════════════════════════════
-// GITHUB — ENVIAR MODIFICADOS / TUDO
-// ═══════════════════════════════════════
 async function ghEnviarModificados() {
   // Sincroniza arquivo ativo
   if (arquivoAtivoOrigem === 'gh' && arquivoAtivoIdx >= 0) {
