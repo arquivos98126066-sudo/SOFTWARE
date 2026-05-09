@@ -5,8 +5,9 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
+<script src="https://arquivos98126066-sudo.github.io/SOFTWARE/sync-indicator.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Editor de Código</title>
+<title>Editor de Código v23</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
@@ -204,7 +205,7 @@
 
   /* ── GITHUB ── */
   .gh-row{display:flex;flex-direction:column;gap:4px}
-  .gh-files-list{max-height:320px;overflow-y:auto;border:1px solid var(--border);border-radius:7px;background:var(--bg)}
+  .gh-files-list{max-height:180px;overflow-y:auto;border:1px solid var(--border);border-radius:7px;background:var(--bg)}
   .gh-file-item{padding:8px 12px;font-size:12px;cursor:pointer;border-bottom:1px solid var(--border);transition:background 0.15s}
   .gh-file-item:last-child{border-bottom:none}
   .gh-file-item:hover{background:var(--surface2)}
@@ -482,10 +483,10 @@
       </div>
       <div style="display:flex;gap:8px;flex-wrap:wrap">
         <button class="mbtn primary" onclick="ghListarArquivos()" style="flex:1">📂 Listar Arquivos</button>
+        <button class="mbtn secondary" onclick="ghCarregarPastaCompleta()" style="flex:1;white-space:nowrap">📁 Carregar tudo na Sidebar</button>
       </div>
       <div id="gh-status" class="gh-status"></div>
       <div id="gh-files" class="gh-files-list" style="display:none"></div>
-
       <div class="gh-row" style="margin-top:4px">
         <div class="mlabel">📄 Caminho do arquivo (ex: index.html)</div>
         <div style="display:flex;gap:6px">
@@ -522,7 +523,7 @@
   </div>
 </div>
 
-<script>
+<script type="module">
 // ═══════════════════════════════════════
 // CORE
 // ═══════════════════════════════════════
@@ -1186,21 +1187,6 @@ function toggleSidebar() {
   document.getElementById('sidebar').classList.toggle('collapsed', !sidebarOpen);
 }
 
-// Fecha sidebar ao tocar/clicar fora
-function fecharSidebarSeForaDela(e) {
-  if (!sidebarOpen) return;
-  const sidebar = document.getElementById('sidebar');
-  const toggleBtn = document.getElementById('btn-sidebar-toggle');
-  // Ignora cliques dentro da sidebar ou no botão toggle
-  if (sidebar.contains(e.target) || toggleBtn.contains(e.target)) return;
-  // Ignora cliques em modais abertos
-  if (e.target.closest('.modal-overlay') || e.target.closest('#ctx-menu') || e.target.closest('#num-popup')) return;
-  sidebarOpen = false;
-  sidebar.classList.add('collapsed');
-}
-document.addEventListener('click', fecharSidebarSeForaDela);
-document.addEventListener('touchend', fecharSidebarSeForaDela, { passive: true });
-
 // ═══════════════════════════════════════
 // UPLOAD DE ARQUIVO HTML
 // ═══════════════════════════════════════
@@ -1342,65 +1328,67 @@ async function ghCarregarPastaCompleta() {
   ghSalvarCredenciais();
   const token = document.getElementById('gh-token').value.trim();
   const repo = document.getElementById('gh-repo').value.trim();
-  const branch = (document.getElementById('gh-branch').value.trim()) || 'main';
+  const branch = document.getElementById('gh-branch').value.trim() || 'main';
+  const status = document.getElementById('gh-status');
 
-  if (!token || !repo) { toast('\u26a0\ufe0f Preencha token e reposit\u00f3rio.'); return; }
+  if (!token || !repo) { status.textContent = '⚠️ Preencha token e repositório.'; status.style.color='var(--warn)'; return; }
 
-  // Fecha modal PRIMEIRO - sem mais depend\u00eancia do DOM do modal
-  fecharModal('modal-github');
-  toast('\u23f3 Conectando ao GitHub...');
+  status.textContent = '⏳ Buscando estrutura do repositório...';
+  status.style.color = 'var(--muted)';
 
   try {
-    const resp = await fetch(
-      'https://api.github.com/repos/' + repo + '/git/trees/' + branch + '?recursive=1',
-      { headers: { 'Authorization': 'token ' + token, 'Accept': 'application/vnd.github.v3+json' } }
-    );
-    if (!resp.ok) { toast('\u274c Erro ' + resp.status); return; }
+    const url = `https://api.github.com/repos/${repo}/git/trees/${branch}?recursive=1`;
+    const resp = await fetch(url, { headers: { 'Authorization': `token ${token}`, 'Accept': 'application/vnd.github.v3+json' } });
+    if (!resp.ok) throw new Error(`Erro ${resp.status}`);
     const data = await resp.json();
 
-    const lista = (data.tree || []).filter(function(f) { return f.type === 'blob' && EXTENSOES_EDITAVEIS.test(f.path); });
-    if (!lista.length) { toast('\u26a0\ufe0f Nenhum arquivo edit\u00e1vel encontrado.'); return; }
+    const arquivosEditaveis = (data.tree || []).filter(f => f.type === 'blob' && EXTENSOES_EDITAVEIS.test(f.path));
+    if (!arquivosEditaveis.length) { status.textContent = '⚠️ Nenhum arquivo editável encontrado.'; status.style.color='var(--warn)'; return; }
 
-    toast('\u23f3 Carregando ' + lista.length + ' arquivo(s)...');
+    status.textContent = `⏳ Carregando ${arquivosEditaveis.length} arquivo(s)...`;
 
-    const novosArquivos = [];
-    let n = 0;
-    for (const f of lista) {
+    ghArquivos = [];
+    let carregados = 0;
+    const total = arquivosEditaveis.length;
+
+    for (const f of arquivosEditaveis) {
       try {
-        const r = await fetch(
-          'https://api.github.com/repos/' + repo + '/contents/' + f.path + '?ref=' + branch,
-          { headers: { 'Authorization': 'token ' + token, 'Accept': 'application/vnd.github.v3+json' } }
-        );
+        const r = await fetch(`https://api.github.com/repos/${repo}/contents/${f.path}?ref=${branch}`, {
+          headers: { 'Authorization': `token ${token}`, 'Accept': 'application/vnd.github.v3+json' }
+        });
         if (r.ok) {
           const d = await r.json();
-          const _b64 = d.content.replace(/\n/g, '');
-          const _bytes = Uint8Array.from(atob(_b64), c => c.charCodeAt(0));
-          const fileContent = new TextDecoder('utf-8').decode(_bytes);
-          const nome = f.path.split('/').pop();
-          novosArquivos.push({ path: f.path, name: nome, content: fileContent, modificado: false, origem: 'gh', sha: d.sha });
+          const content = atob(d.content.replace(/\n/g, ''));
+          const nomeArr = f.path.split('/');
+          ghArquivos.push({ path: f.path, name: nomeArr[nomeArr.length-1], content, modificado: false, origem: 'gh', sha: d.sha });
         }
       } catch(_) {}
-      n++;
-      if (n % 5 === 0) toast('\u23f3 ' + n + '/' + lista.length + ' carregados...');
+      carregados++;
+      if (carregados % 5 === 0) status.textContent = `⏳ ${carregados}/${total} carregados...`;
     }
 
-    const nomeGrupo = repo.split('/').pop() + ' (' + branch + ')';
-    const gid = criarGrupo(nomeGrupo, novosArquivos, 'gh');
-    ghArquivos = pastasGrupos.filter(function(g) { return g.origem === 'gh'; }).flatMap(function(g) { return g.arquivos; });
+    status.textContent = `✅ ${ghArquivos.length} arquivo(s) carregados na sidebar!`;
+    status.style.color = 'var(--success)';
 
-    if (!sidebarOpen) toggleSidebar();
+    const nomeGrupoGH = `${repo} (${branch})`;
+    const grupoGHId = criarGrupo(nomeGrupoGH, ghArquivos, 'gh');
+    ghArquivos = pastasGrupos.filter(g => g.origem === 'gh').flatMap(g => g.arquivos);
+
+    fecharModal('modal-github');
     renderizarSidebar();
-
-    const grp = pastasGrupos.find(function(x) { return x.id === gid; });
-    if (grp && grp.arquivos.length > 0) {
-      setTimeout(function() { abrirArquivoGrupo(grp.id, 0); }, 100);
-    }
-
-    toast('\U0001f419 ' + novosArquivos.length + ' arquivo(s) do GitHub carregados!');
+    const grupoGH = pastasGrupos.find(g => g.id === grupoGHId);
+    if (grupoGH && grupoGH.arquivos.length > 0) abrirArquivoGrupo(grupoGH.id, 0);
+    if (!sidebarOpen) toggleSidebar();
+    toast(`🐙 ${grupoGH ? grupoGH.arquivos.length : 0} arquivo(s) do GitHub na sidebar!`);
   } catch(e) {
-    toast('\u274c Erro: ' + e.message);
+    status.textContent = '❌ ' + e.message;
+    status.style.color = 'var(--danger)';
   }
 }
+
+// ═══════════════════════════════════════
+// GITHUB — ENVIAR MODIFICADOS / TUDO
+// ═══════════════════════════════════════
 async function ghEnviarModificados() {
   // Sincroniza arquivo ativo
   if (arquivoAtivoOrigem === 'gh' && arquivoAtivoIdx >= 0) {
@@ -1424,15 +1412,15 @@ async function ghEnviarLista(lista) {
   const token = localStorage.getItem('gh_token') || '';
   const repo = localStorage.getItem('gh_repo') || '';
   const branch = localStorage.getItem('gh_branch') || 'main';
-  let statusEl = document.getElementById('sb-gh-status');
-  const setStatus = (txt, cor) => { if (statusEl) { statusEl.textContent = txt; if (cor) statusEl.style.color = cor; } };
+  const statusEl = document.getElementById('sb-gh-status');
 
   if (!token || !repo) { toast('⚠️ Configure GitHub primeiro (🐙 GitHub)'); return; }
 
   const headers = { 'Authorization': `token ${token}`, 'Accept': 'application/vnd.github.v3+json', 'Content-Type': 'application/json' };
   let enviados = 0, erros = 0;
 
-  setStatus(`⏳ 0/${lista.length}...`, 'var(--muted)');
+  statusEl.textContent = `⏳ 0/${lista.length}...`;
+  statusEl.style.color = 'var(--muted)';
 
   for (const f of lista) {
     try {
@@ -1462,15 +1450,17 @@ async function ghEnviarLista(lista) {
       erros++;
       console.warn('Erro ao enviar:', f.path, e.message);
     }
-    setStatus(`⏳ ${enviados + erros}/${lista.length}...`);
+    statusEl.textContent = `⏳ ${enviados + erros}/${lista.length}...`;
   }
 
   renderizarSidebar();
   if (erros === 0) {
-    setStatus(`✅ ${enviados} enviado(s)!`, 'var(--success)');
+    statusEl.textContent = `✅ ${enviados} enviado(s)!`;
+    statusEl.style.color = 'var(--success)';
     toast(`🐙 ${enviados} arquivo(s) enviado(s)!`);
   } else {
-    setStatus(`⚠️ ${enviados} ok, ${erros} erro(s)`, 'var(--warn)');
+    statusEl.textContent = `⚠️ ${enviados} ok, ${erros} erro(s)`;
+    statusEl.style.color = 'var(--warn)';
     toast(`⚠️ ${enviados}/${lista.length} enviados`);
   }
 }
@@ -1895,49 +1885,6 @@ function ghSelecionarRepo(valor) {
   document.getElementById('gh-files').style.display = 'none';
 }
 
-function ghSelecionarTodos() {
-  document.querySelectorAll('.gh-check').forEach(c => c.checked = true);
-}
-function ghDeselecionarTodos() {
-  document.querySelectorAll('.gh-check').forEach(c => c.checked = false);
-}
-async function ghCarregarSelecionados() {
-  const selecionados = [...document.querySelectorAll('.gh-check:checked')].map(c => c.dataset.path);
-  if (!selecionados.length) { toast('⚠️ Selecione ao menos 1 arquivo!'); return; }
-  const token = document.getElementById('gh-token').value.trim();
-  const repo = document.getElementById('gh-repo').value.trim();
-  const branch = document.getElementById('gh-branch').value.trim() || 'main';
-  fecharModal('modal-github');
-  toast('⏳ Carregando ' + selecionados.length + ' arquivo(s)...');
-  const novos = [];
-  for (const path of selecionados) {
-    try {
-      const r = await fetch(
-        'https://api.github.com/repos/' + repo + '/contents/' + path + '?ref=' + branch,
-        { headers: { 'Authorization': 'token ' + token, 'Accept': 'application/vnd.github.v3+json' } }
-      );
-      if (r.ok) {
-        const d = await r.json();
-        const _b64 = d.content.replace(/\n/g, '');
-          const _bytes = Uint8Array.from(atob(_b64), c => c.charCodeAt(0));
-          const fileContent = new TextDecoder('utf-8').decode(_bytes);
-        const nome = path.split('/').pop();
-        novos.push({ path, name: nome, content: fileContent, modificado: false, origem: 'gh', sha: d.sha });
-      }
-    } catch(_) {}
-  }
-  if (!novos.length) { toast('❌ Nenhum arquivo carregado.'); return; }
-  const nomeGrupo = repo.split('/').pop() + ' (seleção)';
-  const gid = criarGrupo(nomeGrupo, novos, 'gh');
-  ghArquivos = pastasGrupos.filter(g => g.origem === 'gh').flatMap(g => g.arquivos);
-  if (!sidebarOpen) toggleSidebar();
-  renderizarSidebar();
-  const grp = pastasGrupos.find(x => x.id === gid);
-  if (grp && grp.arquivos.length > 0) {
-    setTimeout(() => { abrirArquivoGrupo(grp.id, 0); }, 100);
-  }
-  toast('🐙 ' + novos.length + ' arquivo(s) carregados na sidebar!');
-}
 async function ghListarArquivos() {
   ghSalvarCredenciais();
   const token = document.getElementById('gh-token').value.trim();
@@ -1961,19 +1908,11 @@ async function ghListarArquivos() {
     if (!editableFiles.length) { status.textContent = 'Nenhum arquivo editável encontrado.'; status.style.color='var(--warn)'; return; }
     filesDiv.style.display = 'block';
     filesDiv.innerHTML = editableFiles.map(f =>
-      `<div class="gh-file-item" onclick="ghSelecionarArquivo('${escAttr(f.path)}')">${escHTML(f.path)}</div>`
+      `<div class="gh-file-item" onclick="ghCarregarArquivo('${escAttr(f.path)}')">${escHTML(f.path)}</div>`
     ).join('');
-    status.textContent = `✅ ${editableFiles.length} arquivo(s) — toque para selecionar.`;
+    status.textContent = `✅ ${editableFiles.length} arquivo(s). Clique para carregar.`;
     status.style.color = 'var(--success)';
   } catch(e) { status.textContent = '❌ ' + e.message; status.style.color = 'var(--danger)'; }
-}
-
-function ghSelecionarArquivo(path) {
-  // Só preenche o campo — não carrega ainda
-  document.getElementById('gh-filename').value = path;
-  // Destaca item selecionado
-  document.querySelectorAll('.gh-file-item').forEach(el => el.classList.remove('pasta-active'));
-  event.currentTarget.classList.add('pasta-active');
 }
 
 async function ghCarregarPorCaminho() {
@@ -1994,9 +1933,7 @@ async function ghCarregarArquivo(path) {
     const resp = await fetch(url, { headers: { 'Authorization': `token ${token}`, 'Accept': 'application/vnd.github.v3+json' } });
     if (!resp.ok) throw new Error(`Erro ${resp.status}`);
     const data = await resp.json();
-    const _b64c = data.content.replace(/\n/g, '');
-    const _bytesc = Uint8Array.from(atob(_b64c), c => c.charCodeAt(0));
-    const conteudo = new TextDecoder('utf-8').decode(_bytesc);
+    const conteudo = atob(data.content.replace(/\n/g, ''));
     ghSha = data.sha;
 
     // Adiciona na sidebar GitHub
@@ -2040,9 +1977,7 @@ async function ghEnviarArquivo() {
   if (!path) { status.textContent = '⚠️ Informe o caminho.'; status.style.color='var(--warn)'; return; }
   const conteudo = editor.value;
   if (!conteudo.trim()) { toast('⚠️ Editor vazio!'); return; }
-  const _enc = new TextEncoder();
-    const _encBytes = _enc.encode(conteudo);
-    const base64 = btoa(String.fromCharCode(..._encBytes));
+  const base64 = btoa(unescape(encodeURIComponent(conteudo)));
   const body = { message: `Update ${path} via Editor Web`, content: base64, branch };
   if (ghSha) body.sha = ghSha;
   status.textContent = '⏳ Enviando...'; status.style.color = 'var(--muted)';
@@ -2055,15 +1990,15 @@ async function ghEnviarArquivo() {
     if (!resp.ok) { const err = await resp.json(); throw new Error(err.message || `Erro ${resp.status}`); }
     const data = await resp.json();
     ghSha = data.content ? data.content.sha : null;
-    // Atualiza na lista só se o arquivo existir no array
-    if (arquivoAtivoOrigem === 'gh' && arquivoAtivoIdx >= 0 && ghArquivos[arquivoAtivoIdx]) {
+    // Atualiza na lista
+    if (arquivoAtivoOrigem === 'gh' && arquivoAtivoIdx >= 0) {
       ghArquivos[arquivoAtivoIdx].modificado = false;
       ghArquivos[arquivoAtivoIdx].sha = ghSha;
+      atualizarDotSidebar('gh', arquivoAtivoIdx);
       renderizarSidebar();
     }
-    status.textContent = '✅ "' + path + '" enviado!';
-    status.style.color = 'var(--success)';
-    toast('🐙 Enviado: ' + path);
+    status.textContent = `✅ "${path}" enviado!`; status.style.color = 'var(--success)';
+    toast(`🐙 Enviado: ${path}`);
   } catch(e) { status.textContent = '❌ ' + e.message; status.style.color = 'var(--danger)'; }
 }
 
@@ -2267,7 +2202,7 @@ document.addEventListener('keydown', (e) => {
 });
 
 // ═══════════════════════════════════════
-// PERSISTÊNCIA — localStorage
+// PERSISTÊNCIA — Firebase + localStorage
 // ═══════════════════════════════════════
 const LS_CODE   = 'editor_codigo';
 const LS_UNDO   = 'editor_undo';
@@ -2276,6 +2211,118 @@ const LS_GRUPOS = 'editor_grupos';
 const LS_ATIVO  = 'editor_ativo';
 const LS_PROX   = 'editor_proximoid';
 let timerSave = null;
+let timerFirebase = null;
+
+// ── Firebase setup ──
+let _db = null, _setDoc = null, _getDoc = null, _doc = null, _collection = null;
+(async () => {
+  try {
+    const fbMod = await import('https://arquivos98126066-sudo.github.io/SOFTWARE/firebase-sync.js');
+    _db = fbMod.db;
+    const fs = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js');
+    _setDoc = fs.setDoc; _getDoc = fs.getDoc;
+    _doc = fs.doc; _collection = fs.collection;
+  } catch(e) { console.warn('Firebase não disponível:', e); }
+})();
+
+function _fbDocRef() {
+  if (!_db || !_doc || !_collection) return null;
+  try { return _doc(_collection(_db, 'editor_codigo'), 'principal'); } catch(e) { return null; }
+}
+
+async function salvarNoFirebase() {
+  const ref = _fbDocRef();
+  if (!ref) return;
+  try {
+    // Sincroniza arquivo ativo antes de salvar
+    if (arquivoAtivoGrupoId !== null && arquivoAtivoLocalIdx >= 0) {
+      const gAtivo = pastasGrupos.find(g => g.id === arquivoAtivoGrupoId);
+      if (gAtivo && gAtivo.arquivos[arquivoAtivoLocalIdx]) {
+        gAtivo.arquivos[arquivoAtivoLocalIdx].content = editor.value;
+      }
+    }
+    const gruposParaSalvar = pastasGrupos
+      .filter(g => g.origem === 'local')
+      .map(g => ({
+        id: g.id, label: g.label, collapsed: g.collapsed, origem: g.origem,
+        arquivos: g.arquivos.map(f => ({
+          path: f.path, name: f.name, content: f.content || '',
+          modificado: f.modificado || false, origem: f.origem
+        }))
+      }));
+    const tamanho = calcularTamanhoStorage();
+    const payload = {
+      codigo: editor.value,
+      ativo: JSON.stringify({ grupoId: arquivoAtivoGrupoId, localIdx: arquivoAtivoLocalIdx }),
+      proximoGrupoId: String(proximoGrupoId),
+      ts: Date.now()
+    };
+    // Grupos só se couberem (< 900KB em JSON)
+    const gruposJson = JSON.stringify(gruposParaSalvar);
+    if (new Blob([gruposJson]).size < 900 * 1024) payload.grupos = gruposJson;
+    await _setDoc(ref, payload, { merge: true });
+    if (window.showSyncSuccess) window.showSyncSuccess();
+  } catch(e) {
+    console.warn('Erro Firebase save:', e);
+    if (window.showSyncError) window.showSyncError();
+  }
+}
+
+async function carregarDoFirebase() {
+  const ref = _fbDocRef();
+  if (!ref) return false;
+  try {
+    const snap = await _getDoc(ref);
+    if (!snap.exists()) return false;
+    const d = snap.data();
+    // Restaura grupos
+    if (d.grupos) {
+      try {
+        const gRaw = JSON.parse(d.grupos);
+        if (Array.isArray(gRaw) && gRaw.length > 0) {
+          pastasGrupos = gRaw;
+          localStorage.setItem(LS_GRUPOS, d.grupos);
+        }
+      } catch(e) {}
+    }
+    // Restaura proximoGrupoId
+    if (d.proximoGrupoId) {
+      proximoGrupoId = parseInt(d.proximoGrupoId) || 1;
+      localStorage.setItem(LS_PROX, d.proximoGrupoId);
+    }
+    // Restaura arquivo ativo
+    if (d.ativo) {
+      try {
+        const ativo = JSON.parse(d.ativo);
+        arquivoAtivoGrupoId = ativo.grupoId;
+        arquivoAtivoLocalIdx = ativo.localIdx;
+        if (arquivoAtivoGrupoId !== null && arquivoAtivoLocalIdx >= 0) {
+          const gAtivo = pastasGrupos.find(g => g.id === arquivoAtivoGrupoId);
+          if (gAtivo && gAtivo.arquivos[arquivoAtivoLocalIdx]) {
+            const f = gAtivo.arquivos[arquivoAtivoLocalIdx];
+            arquivoAtivoOrigem = f.origem;
+            arquivoAtivoNome = f.name;
+          }
+        }
+        localStorage.setItem(LS_ATIVO, d.ativo);
+      } catch(e) {}
+    }
+    // Restaura código
+    if (d.codigo !== undefined) {
+      editor.value = d.codigo;
+      localStorage.setItem(LS_CODE, d.codigo);
+    }
+    return true;
+  } catch(e) {
+    console.warn('Erro Firebase load:', e);
+    return false;
+  }
+}
+
+function agendarSalvamentoFirebase() {
+  clearTimeout(timerFirebase);
+  timerFirebase = setTimeout(salvarNoFirebase, 1500);
+}
 
 function recolherTudo() {
   pastasGrupos.forEach(g => g.collapsed = true);
@@ -2346,6 +2393,7 @@ function salvarNoStorage() {
 function agendarSave() {
   clearTimeout(timerSave);
   timerSave = setTimeout(salvarNoStorage, 600);
+  agendarSalvamentoFirebase();
 }
 
 function restaurarDoStorage() {
@@ -2395,6 +2443,7 @@ window.addEventListener('visibilitychange', () => {
 // ═══════════════════════════════════════
 // INIT
 // ═══════════════════════════════════════
+// Carrega localStorage imediatamente (sync), depois Firebase sobrescreve se tiver dado mais recente
 restaurarDoStorage();
 if (undoStack.length === 0) undoStack.push({ value: editor.value, modo: 'init' });
 
@@ -2425,6 +2474,51 @@ if (window.innerWidth <= 600) {
   sidebarOpen = false;
   document.getElementById('sidebar').classList.add('collapsed');
 }
+
+// Carrega Firebase em paralelo (sem bloquear UI)
+// Se Firebase tiver dados, sobrescreve silenciosamente
+(async () => {
+  // Aguarda Firebase inicializar (módulo carrega async)
+  await new Promise(r => setTimeout(r, 800));
+  const ok = await carregarDoFirebase();
+  if (ok) {
+    // Reinicia UI com dados do Firebase
+    if (undoStack.length === 0) undoStack.push({ value: editor.value, modo: 'init' });
+    atualizarHL();
+    atualizarBotoesHistorico();
+    renderizarSidebar();
+    if (arquivoAtivoGrupoId !== null && arquivoAtivoLocalIdx >= 0) {
+      const gAtivo = pastasGrupos.find(g => g.id === arquivoAtivoGrupoId);
+      if (gAtivo && gAtivo.arquivos[arquivoAtivoLocalIdx]) {
+        const f = gAtivo.arquivos[arquivoAtivoLocalIdx];
+        document.getElementById('status-arquivo').textContent = '📄 ' + f.path;
+        document.getElementById('gh-filename').value = f.path;
+      }
+    }
+    if (editor.value) {
+      const mod = document.getElementById('status-mod');
+      mod.textContent = '● salvo';
+      mod.className = 'status-ok';
+    }
+  }
+})();
+
+// ── Exposição global (necessário para onclick inline em script type="module") ──
+Object.assign(window, {
+  desfazer, refazer, toggleSidebar, triggerUpload, triggerUploadPasta,
+  carregarArquivo, carregarPasta, exportarHTML, copiarCodigo,
+  mudarAba, abrirPreview, fecharPreview, recarregarPreview,
+  toggleFR, fecharFR, executarSubstituicao,
+  corrigirEstrutura, abrirVersions, salvarVersao, restaurarVersao,
+  abrirDiff, gerarDiff, toggleSplit,
+  abrirPatch, aplicarPatch,
+  abrirGitHub, fecharModal, ghBuscarRepos, ghSelecionarRepo,
+  ghListarArquivos, ghCarregarPorCaminho, ghEnviarArquivo,
+  ghCarregarPastaCompleta, ghEnviarModificados, ghEnviarTudoSidebar,
+  confirmarRename, ctxRenomear, ctxExcluir,
+  recolherTudo, expandirTudo, limparEditor, contarLinhas,
+  ajustarNum, fecharNumPopup, baixarTudo, baixarModificados
+});
 </script>
 </body>
 </html>
