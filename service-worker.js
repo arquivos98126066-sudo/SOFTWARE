@@ -1,4 +1,4 @@
-const CACHE_NAME = 'meus-apps-v5';
+const CACHE_NAME = 'meus-apps-v6';
 const URLS_TO_CACHE = [
   '/SOFTWARE/',
   '/SOFTWARE/index.html',
@@ -16,7 +16,6 @@ const URLS_TO_CACHE = [
   '/SOFTWARE/DOA.html',
   '/SOFTWARE/ESTUDO.html',
   '/SOFTWARE/Code.html',
-  '/SOFTWARE/Codigo.html',
   '/SOFTWARE/manifest.json',
   '/SOFTWARE/icon-192.png',
   '/SOFTWARE/icon-512.png'
