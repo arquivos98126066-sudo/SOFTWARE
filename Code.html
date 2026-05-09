@@ -28,7 +28,7 @@
   .header-left{display:flex;align-items:center;gap:8px}
   .header-title{font-family:'Syne',sans-serif;font-size:14px;font-weight:800;background:linear-gradient(90deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;white-space:nowrap}
   .header-actions{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;align-items:center}
-  .header-row2{display:flex;justify-content:flex-end;padding:0 2px}
+  .header-row2{display:flex;gap:6px;align-items:center}
   .hbtn{background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:7px;padding:5px 9px;font-size:10px;font-weight:700;cursor:pointer;font-family:'JetBrains Mono',monospace;transition:all 0.15s;white-space:nowrap}
   .hbtn:active{transform:scale(0.95)}
   .hbtn.undo{color:var(--muted)}
@@ -240,6 +240,21 @@
     #sidebar-overlay{display:none !important}
   }
 
+  /* ── BOTÃO VOLTAR DESKTOP ── */
+  #btn-voltar-desktop{display:none}
+  @media (min-width:601px){
+    #btn-voltar-desktop{
+      display:flex;align-items:center;gap:6px;
+      position:fixed;bottom:20px;left:20px;z-index:500;
+      background:var(--surface2);border:1px solid var(--border);
+      color:var(--muted);border-radius:10px;padding:8px 16px;
+      font-size:12px;font-weight:700;cursor:pointer;
+      font-family:'JetBrains Mono',monospace;
+      transition:all 0.2s;box-shadow:0 4px 16px rgba(0,0,0,0.3);
+    }
+    #btn-voltar-desktop:hover{color:var(--text);border-color:var(--accent);background:rgba(124,106,255,0.1)}
+  }
+
   /* ── GITHUB MODAL ── */
   .gh-row{display:flex;flex-direction:column;gap:4px}
   .gh-tree{background:var(--bg);border:1px solid var(--border);border-radius:8px;max-height:260px;overflow-y:auto;padding:4px 0}
@@ -278,8 +293,6 @@
       <div class="header-title">⌨ EDITOR</div>
     </div>
     <div class="header-actions">
-      <button class="hbtn undo" id="btn-undo" onclick="desfazer()" title="Desfazer">↺ Desfazer</button>
-      <button class="hbtn redo" id="btn-redo" onclick="refazer()" title="Refazer">↻ Refazer</button>
       <button class="hbtn upload" onclick="triggerUpload()" title="Carregar arquivo HTML">⬆ HTML</button>
       <button class="hbtn upload" onclick="triggerUploadPasta()" title="Carregar pasta inteira" style="color:#c084fc;border-color:#c084fc">📁 Pasta</button>
       <button class="hbtn export" onclick="exportarHTML()" title="Exportar arquivo HTML">⬇ Export</button>
@@ -287,7 +300,9 @@
     </div>
   </div>
   <div class="header-row2">
-    <button class="hbtn" id="btn-gh-header" onclick="abrirGitHub()" title="Abrir / conectar GitHub" style="color:#a78bff;border-color:rgba(167,139,255,.5);width:100%">🐙 GitHub</button>
+    <button class="hbtn undo" id="btn-undo" onclick="desfazer()" title="Desfazer">↺ Desfazer</button>
+    <button class="hbtn redo" id="btn-redo" onclick="refazer()" title="Refazer">↻ Refazer</button>
+    <button class="hbtn" id="btn-gh-header" onclick="abrirGitHub()" title="Abrir / conectar GitHub" style="color:#a78bff;border-color:rgba(167,139,255,.5)">🐙 GitHub</button>
   </div>
 </div>
 <input type="file" id="file-input" accept=".html,.htm" style="display:none" onchange="carregarArquivo(event)">
@@ -398,6 +413,9 @@
   <button onclick="ajustarNum(1)">+</button>
   <button class="num-close" onclick="fecharNumPopup()">✕</button>
 </div>
+
+<!-- BOTÃO VOLTAR DESKTOP -->
+<button id="btn-voltar-desktop" onclick="history.back()">← Voltar</button>
 
 <!-- TOAST -->
 <div id="toast"></div>
@@ -1854,8 +1872,24 @@ function recarregarPreview() {
 // ═══════════════════════════════════════
 function abrirModal(id) { document.getElementById(id).classList.remove('hidden'); }
 function fecharModal(id) { document.getElementById(id).classList.add('hidden'); }
+
+// Listeners touch + click nos botões ✕ e Fechar/Cancelar dos modais
+document.querySelectorAll('.modal-close, .modal-overlay .mbtn.secondary').forEach(btn => {
+  const handler = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const modal = btn.closest('.modal-overlay');
+    if (modal) modal.classList.add('hidden');
+  };
+  btn.addEventListener('click', handler);
+  btn.addEventListener('touchend', handler, { passive: false });
+});
+
+// Fechar clicando fora do modal
 document.querySelectorAll('.modal-overlay').forEach(o => {
-  o.addEventListener('click', (e) => { if (e.target === o) o.classList.add('hidden'); });
+  const handler = (e) => { if (e.target === o) o.classList.add('hidden'); };
+  o.addEventListener('click', handler);
+  o.addEventListener('touchend', (e) => { if (e.target === o) { e.preventDefault(); o.classList.add('hidden'); } }, { passive: false });
 });
 
 // ═══════════════════════════════════════
