@@ -5,7 +5,6 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<script src="https://arquivos98126066-sudo.github.io/SOFTWARE/sync-indicator.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Editor de Código</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
@@ -523,7 +522,7 @@
   </div>
 </div>
 
-<script type="module">
+<script>
 // ═══════════════════════════════════════
 // CORE
 // ═══════════════════════════════════════
@@ -1367,19 +1366,25 @@ async function ghCarregarPastaCompleta() {
       if (carregados % 5 === 0) status.textContent = `⏳ ${carregados}/${total} carregados...`;
     }
 
-    status.textContent = `✅ ${ghArquivos.length} arquivo(s) carregados na sidebar!`;
-    status.style.color = 'var(--success)';
-
     const nomeGrupoGH = `${repo} (${branch})`;
     const grupoGHId = criarGrupo(nomeGrupoGH, ghArquivos, 'gh');
     ghArquivos = pastasGrupos.filter(g => g.origem === 'gh').flatMap(g => g.arquivos);
+    const totalGH = ghArquivos.length;
 
     fecharModal('modal-github');
-    renderizarSidebar();
-    const grupoGH = pastasGrupos.find(g => g.id === grupoGHId);
-    if (grupoGH && grupoGH.arquivos.length > 0) abrirArquivoGrupo(grupoGH.id, 0);
-    if (!sidebarOpen) toggleSidebar();
-    toast(`🐙 ${grupoGH ? grupoGH.arquivos.length : 0} arquivo(s) do GitHub na sidebar!`);
+    setTimeout(() => {
+      if (!sidebarOpen) toggleSidebar();
+      renderizarSidebar();
+      const grupoGH = pastasGrupos.find(g => g.id === grupoGHId);
+      if (grupoGH && grupoGH.arquivos.length > 0) {
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            abrirArquivoGrupo(grupoGH.id, 0);
+          });
+        });
+      }
+      toast(`🐙 ${totalGH} arquivo(s) do GitHub na sidebar!`);
+    }, 150);
   } catch(e) {
     status.textContent = '❌ ' + e.message;
     status.style.color = 'var(--danger)';
@@ -1412,15 +1417,15 @@ async function ghEnviarLista(lista) {
   const token = localStorage.getItem('gh_token') || '';
   const repo = localStorage.getItem('gh_repo') || '';
   const branch = localStorage.getItem('gh_branch') || 'main';
-  const statusEl = document.getElementById('sb-gh-status');
+  let statusEl = document.getElementById('sb-gh-status');
+  const setStatus = (txt, cor) => { if (statusEl) { statusEl.textContent = txt; if (cor) statusEl.style.color = cor; } };
 
   if (!token || !repo) { toast('⚠️ Configure GitHub primeiro (🐙 GitHub)'); return; }
 
   const headers = { 'Authorization': `token ${token}`, 'Accept': 'application/vnd.github.v3+json', 'Content-Type': 'application/json' };
   let enviados = 0, erros = 0;
 
-  statusEl.textContent = `⏳ 0/${lista.length}...`;
-  statusEl.style.color = 'var(--muted)';
+  setStatus(`⏳ 0/${lista.length}...`, 'var(--muted)');
 
   for (const f of lista) {
     try {
@@ -1450,17 +1455,15 @@ async function ghEnviarLista(lista) {
       erros++;
       console.warn('Erro ao enviar:', f.path, e.message);
     }
-    statusEl.textContent = `⏳ ${enviados + erros}/${lista.length}...`;
+    setStatus(`⏳ ${enviados + erros}/${lista.length}...`);
   }
 
   renderizarSidebar();
   if (erros === 0) {
-    statusEl.textContent = `✅ ${enviados} enviado(s)!`;
-    statusEl.style.color = 'var(--success)';
+    setStatus(`✅ ${enviados} enviado(s)!`, 'var(--success)');
     toast(`🐙 ${enviados} arquivo(s) enviado(s)!`);
   } else {
-    statusEl.textContent = `⚠️ ${enviados} ok, ${erros} erro(s)`;
-    statusEl.style.color = 'var(--warn)';
+    setStatus(`⚠️ ${enviados} ok, ${erros} erro(s)`, 'var(--warn)');
     toast(`⚠️ ${enviados}/${lista.length} enviados`);
   }
 }
@@ -2202,7 +2205,7 @@ document.addEventListener('keydown', (e) => {
 });
 
 // ═══════════════════════════════════════
-// PERSISTÊNCIA — Firebase + localStorage
+// PERSISTÊNCIA — localStorage
 // ═══════════════════════════════════════
 const LS_CODE   = 'editor_codigo';
 const LS_UNDO   = 'editor_undo';
@@ -2211,118 +2214,6 @@ const LS_GRUPOS = 'editor_grupos';
 const LS_ATIVO  = 'editor_ativo';
 const LS_PROX   = 'editor_proximoid';
 let timerSave = null;
-let timerFirebase = null;
-
-// ── Firebase setup ──
-let _db = null, _setDoc = null, _getDoc = null, _doc = null, _collection = null;
-(async () => {
-  try {
-    const fbMod = await import('https://arquivos98126066-sudo.github.io/SOFTWARE/firebase-sync.js');
-    _db = fbMod.db;
-    const fs = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js');
-    _setDoc = fs.setDoc; _getDoc = fs.getDoc;
-    _doc = fs.doc; _collection = fs.collection;
-  } catch(e) { console.warn('Firebase não disponível:', e); }
-})();
-
-function _fbDocRef() {
-  if (!_db || !_doc || !_collection) return null;
-  try { return _doc(_collection(_db, 'editor_codigo'), 'principal'); } catch(e) { return null; }
-}
-
-async function salvarNoFirebase() {
-  const ref = _fbDocRef();
-  if (!ref) return;
-  try {
-    // Sincroniza arquivo ativo antes de salvar
-    if (arquivoAtivoGrupoId !== null && arquivoAtivoLocalIdx >= 0) {
-      const gAtivo = pastasGrupos.find(g => g.id === arquivoAtivoGrupoId);
-      if (gAtivo && gAtivo.arquivos[arquivoAtivoLocalIdx]) {
-        gAtivo.arquivos[arquivoAtivoLocalIdx].content = editor.value;
-      }
-    }
-    const gruposParaSalvar = pastasGrupos
-      .filter(g => g.origem === 'local')
-      .map(g => ({
-        id: g.id, label: g.label, collapsed: g.collapsed, origem: g.origem,
-        arquivos: g.arquivos.map(f => ({
-          path: f.path, name: f.name, content: f.content || '',
-          modificado: f.modificado || false, origem: f.origem
-        }))
-      }));
-    const tamanho = calcularTamanhoStorage();
-    const payload = {
-      codigo: editor.value,
-      ativo: JSON.stringify({ grupoId: arquivoAtivoGrupoId, localIdx: arquivoAtivoLocalIdx }),
-      proximoGrupoId: String(proximoGrupoId),
-      ts: Date.now()
-    };
-    // Grupos só se couberem (< 900KB em JSON)
-    const gruposJson = JSON.stringify(gruposParaSalvar);
-    if (new Blob([gruposJson]).size < 900 * 1024) payload.grupos = gruposJson;
-    await _setDoc(ref, payload, { merge: true });
-    if (window.showSyncSuccess) window.showSyncSuccess();
-  } catch(e) {
-    console.warn('Erro Firebase save:', e);
-    if (window.showSyncError) window.showSyncError();
-  }
-}
-
-async function carregarDoFirebase() {
-  const ref = _fbDocRef();
-  if (!ref) return false;
-  try {
-    const snap = await _getDoc(ref);
-    if (!snap.exists()) return false;
-    const d = snap.data();
-    // Restaura grupos
-    if (d.grupos) {
-      try {
-        const gRaw = JSON.parse(d.grupos);
-        if (Array.isArray(gRaw) && gRaw.length > 0) {
-          pastasGrupos = gRaw;
-          localStorage.setItem(LS_GRUPOS, d.grupos);
-        }
-      } catch(e) {}
-    }
-    // Restaura proximoGrupoId
-    if (d.proximoGrupoId) {
-      proximoGrupoId = parseInt(d.proximoGrupoId) || 1;
-      localStorage.setItem(LS_PROX, d.proximoGrupoId);
-    }
-    // Restaura arquivo ativo
-    if (d.ativo) {
-      try {
-        const ativo = JSON.parse(d.ativo);
-        arquivoAtivoGrupoId = ativo.grupoId;
-        arquivoAtivoLocalIdx = ativo.localIdx;
-        if (arquivoAtivoGrupoId !== null && arquivoAtivoLocalIdx >= 0) {
-          const gAtivo = pastasGrupos.find(g => g.id === arquivoAtivoGrupoId);
-          if (gAtivo && gAtivo.arquivos[arquivoAtivoLocalIdx]) {
-            const f = gAtivo.arquivos[arquivoAtivoLocalIdx];
-            arquivoAtivoOrigem = f.origem;
-            arquivoAtivoNome = f.name;
-          }
-        }
-        localStorage.setItem(LS_ATIVO, d.ativo);
-      } catch(e) {}
-    }
-    // Restaura código
-    if (d.codigo !== undefined) {
-      editor.value = d.codigo;
-      localStorage.setItem(LS_CODE, d.codigo);
-    }
-    return true;
-  } catch(e) {
-    console.warn('Erro Firebase load:', e);
-    return false;
-  }
-}
-
-function agendarSalvamentoFirebase() {
-  clearTimeout(timerFirebase);
-  timerFirebase = setTimeout(salvarNoFirebase, 1500);
-}
 
 function recolherTudo() {
   pastasGrupos.forEach(g => g.collapsed = true);
@@ -2393,7 +2284,6 @@ function salvarNoStorage() {
 function agendarSave() {
   clearTimeout(timerSave);
   timerSave = setTimeout(salvarNoStorage, 600);
-  agendarSalvamentoFirebase();
 }
 
 function restaurarDoStorage() {
@@ -2443,7 +2333,6 @@ window.addEventListener('visibilitychange', () => {
 // ═══════════════════════════════════════
 // INIT
 // ═══════════════════════════════════════
-// Carrega localStorage imediatamente (sync), depois Firebase sobrescreve se tiver dado mais recente
 restaurarDoStorage();
 if (undoStack.length === 0) undoStack.push({ value: editor.value, modo: 'init' });
 
@@ -2474,51 +2363,6 @@ if (window.innerWidth <= 600) {
   sidebarOpen = false;
   document.getElementById('sidebar').classList.add('collapsed');
 }
-
-// Carrega Firebase em paralelo (sem bloquear UI)
-// Se Firebase tiver dados, sobrescreve silenciosamente
-(async () => {
-  // Aguarda Firebase inicializar (módulo carrega async)
-  await new Promise(r => setTimeout(r, 800));
-  const ok = await carregarDoFirebase();
-  if (ok) {
-    // Reinicia UI com dados do Firebase
-    if (undoStack.length === 0) undoStack.push({ value: editor.value, modo: 'init' });
-    atualizarHL();
-    atualizarBotoesHistorico();
-    renderizarSidebar();
-    if (arquivoAtivoGrupoId !== null && arquivoAtivoLocalIdx >= 0) {
-      const gAtivo = pastasGrupos.find(g => g.id === arquivoAtivoGrupoId);
-      if (gAtivo && gAtivo.arquivos[arquivoAtivoLocalIdx]) {
-        const f = gAtivo.arquivos[arquivoAtivoLocalIdx];
-        document.getElementById('status-arquivo').textContent = '📄 ' + f.path;
-        document.getElementById('gh-filename').value = f.path;
-      }
-    }
-    if (editor.value) {
-      const mod = document.getElementById('status-mod');
-      mod.textContent = '● salvo';
-      mod.className = 'status-ok';
-    }
-  }
-})();
-
-// ── Exposição global (necessário para onclick inline em script type="module") ──
-Object.assign(window, {
-  desfazer, refazer, toggleSidebar, triggerUpload, triggerUploadPasta,
-  carregarArquivo, carregarPasta, exportarHTML, copiarCodigo,
-  mudarAba, abrirPreview, fecharPreview, recarregarPreview,
-  toggleFR, fecharFR, executarSubstituicao,
-  corrigirEstrutura, abrirVersions, salvarVersao, restaurarVersao,
-  abrirDiff, gerarDiff, toggleSplit,
-  abrirPatch, aplicarPatch,
-  abrirGitHub, fecharModal, ghBuscarRepos, ghSelecionarRepo,
-  ghListarArquivos, ghCarregarPorCaminho, ghEnviarArquivo,
-  ghCarregarPastaCompleta, ghEnviarModificados, ghEnviarTudoSidebar,
-  confirmarRename, ctxRenomear, ctxExcluir,
-  recolherTudo, expandirTudo, limparEditor, contarLinhas,
-  ajustarNum, fecharNumPopup, baixarTudo, baixarModificados
-});
 </script>
 </body>
 </html>
