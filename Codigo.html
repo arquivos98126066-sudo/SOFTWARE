@@ -203,6 +203,14 @@
   #num-popup .num-val{font-size:13px;font-weight:700;min-width:50px;text-align:center;color:var(--accent2)}
   #num-popup .num-close{color:var(--muted);font-size:12px;cursor:pointer;padding:2px 6px;background:none;border:none}
 
+  /* ── GITHUB ── */
+  .gh-row{display:flex;flex-direction:column;gap:4px}
+  .gh-files-list{max-height:180px;overflow-y:auto;border:1px solid var(--border);border-radius:7px;background:var(--bg)}
+  .gh-file-item{padding:8px 12px;font-size:12px;cursor:pointer;border-bottom:1px solid var(--border);transition:background 0.15s}
+  .gh-file-item:last-child{border-bottom:none}
+  .gh-file-item:hover{background:var(--surface2)}
+  .gh-file-item.pasta-active{background:rgba(124,106,255,0.15);color:var(--accent)}
+  .gh-status{font-size:11px;color:var(--muted);min-height:18px}
   select.minput{appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23666680' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:28px}
 
   /* ── PATCH ── */
@@ -230,43 +238,10 @@
   .rename-warn-box{background:rgba(240,165,0,0.1);border:1px solid var(--warn);border-radius:8px;padding:12px;font-size:11px;line-height:1.7;color:var(--text)}
   .rename-warn-box .warn-title{color:var(--warn);font-weight:700;margin-bottom:6px}
   .rename-warn-box .warn-ref{color:var(--warn);font-family:'JetBrains Mono',monospace}
-
-  /* ── SIDEBAR OVERLAY (fecha ao clicar fora) ── */
-  #sidebar-overlay{position:fixed;inset:0;z-index:4;display:none}
-  #sidebar-overlay.show{display:block}
-  @media (min-width:601px){
-    #sidebar-overlay{display:none !important}
-  }
-
-  /* ── GITHUB MODAL ── */
-  .gh-row{display:flex;flex-direction:column;gap:4px}
-  .gh-tree{background:var(--bg);border:1px solid var(--border);border-radius:8px;max-height:260px;overflow-y:auto;padding:4px 0}
-  .gh-tree::-webkit-scrollbar{width:3px}
-  .gh-tree::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
-  .gh-tree-item{display:flex;align-items:center;gap:8px;padding:7px 12px;cursor:pointer;font-size:11px;transition:background 0.1s;border-bottom:1px solid transparent}
-  .gh-tree-item:hover{background:var(--surface2)}
-  .gh-tree-item.selected{background:rgba(124,106,255,0.15);color:var(--accent)}
-  .gh-tree-item.dir{color:var(--accent2)}
-  .gh-tree-item .gh-back{color:var(--warn)}
-  .gh-tree-empty{padding:20px;text-align:center;color:var(--muted);font-size:11px}
-  .gh-loading{padding:16px;text-align:center;color:var(--muted);font-size:11px}
-  .gh-status{font-size:10px;padding:4px 8px;border-radius:6px;font-weight:700}
-  .gh-status.ok{background:rgba(0,200,150,.15);color:var(--success);border:1px solid rgba(0,200,150,.3)}
-  .gh-status.err{background:rgba(255,77,109,.1);color:var(--danger);border:1px solid rgba(255,77,109,.3)}
-  .gh-status.info{background:rgba(124,106,255,.1);color:var(--accent);border:1px solid rgba(124,106,255,.3)}
-  .gh-commit-btn{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border:none;border-radius:8px;padding:9px 18px;font-size:12px;font-weight:800;cursor:pointer;font-family:'Syne',sans-serif;transition:all 0.15s;width:100%}
-  .gh-commit-btn:active{transform:scale(0.97)}
-  .gh-commit-btn:disabled{opacity:0.4;cursor:not-allowed}
-  .sb-gh-btn{background:rgba(124,106,255,.12);border:1px solid rgba(124,106,255,.35);color:var(--accent);border-radius:6px;padding:6px 8px;font-size:10px;font-weight:700;cursor:pointer;font-family:'JetBrains Mono',monospace;transition:all 0.15s;width:100%;text-align:left;white-space:nowrap;margin-bottom:0}
-  .sb-gh-btn:hover{background:rgba(124,106,255,.22)}
-  .gh-path-bar{font-size:10px;color:var(--muted);padding:4px 8px;background:var(--surface2);border-radius:6px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:flex;align-items:center;gap:4px}
-  .gh-connected-file{font-size:10px;color:var(--accent2);padding:3px 8px;border-radius:5px;background:rgba(0,229,192,.08);border:1px solid rgba(0,229,192,.2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .rename-warn-box .warn-gh{background:rgba(124,106,255,0.1);border:1px solid var(--accent);border-radius:6px;padding:8px;margin-top:8px;color:var(--accent);font-size:10px}
 </style>
 </head>
 <body>
-
-<!-- SIDEBAR OVERLAY (fecha ao clicar fora em mobile) -->
-<div id="sidebar-overlay"></div>
 
 <!-- HEADER -->
 <div class="header">
@@ -317,9 +292,9 @@
   <button class="tbtn" onclick="abrirDiff()">Δ Diff</button>
   <button class="tbtn" id="btn-split" onclick="toggleSplit()">⧉ Split</button>
   <button class="tbtn" onclick="abrirPatch()">🩹 Patch</button>
+  <button class="tbtn" onclick="abrirGitHub()">🐙 GitHub</button>
   <button class="tbtn" onclick="limparEditor()">🗑 Limpar</button>
   <button class="tbtn" onclick="contarLinhas()">📊 Info</button>
-  <button class="tbtn" id="btn-gh-commit" onclick="abrirGitHubCommit()" style="display:none;color:#7c6aff;border-color:rgba(124,106,255,.4)">🐙 Commit</button>
 </div>
 
 <!-- MAIN AREA -->
@@ -331,12 +306,13 @@
       <span class="sidebar-title" id="sidebar-title">Arquivos</span>
       <div class="sidebar-actions">
         <button class="sb-icon-btn" onclick="triggerUploadPasta()" title="Carregar pasta">📁</button>
+        <button class="sb-icon-btn" onclick="abrirGitHub()" title="GitHub">🐙</button>
       </div>
     </div>
     <div class="sidebar-files" id="sidebar-files">
       <div class="sidebar-empty" id="sidebar-empty">
         Nenhum arquivo carregado.<br><br>
-        Use <b>📁 Pasta</b> para começar.
+        Use <b>📁 Pasta</b> ou <b>🐙 GitHub</b> para começar.
       </div>
     </div>
     <div class="sidebar-footer" id="sidebar-footer" style="display:none">
@@ -344,9 +320,10 @@
         <button class="sb-dl-btn green" onclick="baixarTudo()">⬇ Baixar tudo (.zip)</button>
         <button class="sb-dl-btn teal" onclick="baixarModificados()">⬇ Baixar modificados</button>
       </div>
-      <button class="sb-gh-btn" onclick="abrirGitHub()">🐙 GitHub: Selecionar Repo</button>
-      <div id="sb-gh-file-info" style="display:none">
-        <div class="gh-connected-file" id="sb-gh-file-label">Nenhum arquivo selecionado</div>
+      <div id="sb-gh-btns" style="display:none;flex-direction:column;gap:5px">
+        <button class="sb-dl-btn blue" onclick="ghEnviarModificados()">⬆ Enviar modificados</button>
+        <button class="sb-dl-btn green" onclick="ghEnviarTudoSidebar()">⬆ Enviar tudo</button>
+        <div id="sb-gh-status" class="gh-status" style="font-size:10px;padding:2px 0"></div>
       </div>
     </div>
   </div>
@@ -476,6 +453,55 @@
   </div>
 </div>
 
+<!-- GITHUB MODAL -->
+<div class="modal-overlay hidden" id="modal-github">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">🐙 Integração GitHub</span>
+      <button class="modal-close" onclick="fecharModal('modal-github')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="gh-row">
+        <div class="mlabel">🔑 Token GitHub (salvo localmente)</div>
+        <div style="display:flex;gap:6px">
+          <input class="minput" id="gh-token" type="password" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" style="flex:1">
+          <button class="mbtn primary" onclick="ghBuscarRepos()" style="white-space:nowrap">🔍 Repos</button>
+        </div>
+      </div>
+      <div class="gh-row" id="gh-repo-row">
+        <div class="mlabel">📁 Repositório</div>
+        <div style="display:flex;gap:6px;align-items:center">
+          <select class="minput" id="gh-repo-select" style="flex:1;cursor:pointer;display:none" onchange="ghSelecionarRepo(this.value)">
+            <option value="">— selecione —</option>
+          </select>
+          <input class="minput" id="gh-repo" placeholder="usuario/repositorio" style="flex:1">
+        </div>
+      </div>
+      <div class="gh-row">
+        <div class="mlabel">🌿 Branch (padrão: main)</div>
+        <input class="minput" id="gh-branch" placeholder="main" value="main">
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="mbtn primary" onclick="ghListarArquivos()" style="flex:1">📂 Listar Arquivos</button>
+        <button class="mbtn secondary" onclick="ghCarregarPastaCompleta()" style="flex:1;white-space:nowrap">📁 Carregar tudo na Sidebar</button>
+      </div>
+      <div id="gh-status" class="gh-status"></div>
+      <div id="gh-files" class="gh-files-list" style="display:none"></div>
+      <div class="gh-row" style="margin-top:4px">
+        <div class="mlabel">📄 Caminho do arquivo (ex: index.html)</div>
+        <div style="display:flex;gap:6px">
+          <input class="minput" id="gh-filename" placeholder="index.html" style="flex:1">
+          <button class="mbtn primary" onclick="ghCarregarPorCaminho()" style="white-space:nowrap">⬇ Carregar</button>
+        </div>
+        <button class="mbtn success" onclick="ghEnviarArquivo()" style="margin-top:6px;width:100%">⬆ Enviar para GitHub</button>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="mbtn secondary" onclick="fecharModal('modal-github')">Fechar</button>
+    </div>
+  </div>
+</div>
+
 <!-- RENAME MODAL -->
 <div class="modal-overlay hidden" id="modal-rename">
   <div class="modal" style="max-width:460px">
@@ -493,67 +519,6 @@
     <div class="modal-footer">
       <button class="mbtn secondary" onclick="fecharModal('modal-rename')">Cancelar</button>
       <button class="mbtn primary" onclick="confirmarRename()">✔ Confirmar</button>
-    </div>
-  </div>
-</div>
-
-<!-- GITHUB MODAL -->
-<div class="modal-overlay hidden" id="modal-github">
-  <div class="modal" style="max-width:500px">
-    <div class="modal-header">
-      <span class="modal-title">🐙 GitHub — Selecionar Arquivo</span>
-      <button class="modal-close" onclick="fecharModal('modal-github')">✕</button>
-    </div>
-    <div class="modal-body">
-      <div class="gh-row">
-        <div class="mlabel">Token de Acesso (Personal Access Token):</div>
-        <input class="minput" id="gh-token" type="password" placeholder="ghp_xxxxxxxxxxxx" autocomplete="off">
-      </div>
-      <div class="gh-row">
-        <div class="mlabel">Repositório (usuário/repo):</div>
-        <div style="display:flex;gap:6px">
-          <input class="minput" id="gh-repo" placeholder="usuario/meu-repo" style="flex:1">
-          <button class="mbtn primary" id="gh-load-btn" onclick="ghCarregarRaiz()">Carregar</button>
-        </div>
-      </div>
-      <div id="gh-path-bar" class="gh-path-bar" style="display:none">📁 <span id="gh-path-text">/</span></div>
-      <div class="gh-row">
-        <div class="mlabel">Arquivos e pastas:</div>
-        <div class="gh-tree" id="gh-tree">
-          <div class="gh-tree-empty">Digite o repositório e clique em Carregar</div>
-        </div>
-      </div>
-      <div id="gh-status-area" style="display:none">
-        <div class="gh-status info" id="gh-status-msg"></div>
-      </div>
-    </div>
-    <div class="modal-footer">
-      <button class="mbtn secondary" onclick="fecharModal('modal-github')">Fechar</button>
-      <button class="mbtn success" id="gh-open-btn" onclick="ghAbrirArquivoSelecionado()" disabled>📂 Abrir no Editor</button>
-    </div>
-  </div>
-</div>
-
-<!-- GITHUB COMMIT MODAL -->
-<div class="modal-overlay hidden" id="modal-gh-commit">
-  <div class="modal" style="max-width:440px">
-    <div class="modal-header">
-      <span class="modal-title">🐙 Enviar para o GitHub</span>
-      <button class="modal-close" onclick="fecharModal('modal-gh-commit')">✕</button>
-    </div>
-    <div class="modal-body">
-      <div id="gh-commit-file-info" style="font-size:11px;color:var(--accent2);margin-bottom:4px"></div>
-      <div class="gh-row">
-        <div class="mlabel">Mensagem do commit:</div>
-        <input class="minput" id="gh-commit-msg" placeholder="Atualizar arquivo via editor" value="Atualizar via editor">
-      </div>
-      <div id="gh-commit-status" style="display:none;margin-top:4px">
-        <div class="gh-status" id="gh-commit-status-msg"></div>
-      </div>
-    </div>
-    <div class="modal-footer">
-      <button class="mbtn secondary" onclick="fecharModal('modal-gh-commit')">Cancelar</button>
-      <button class="gh-commit-btn" id="gh-commit-btn" onclick="ghEnviarCommit()">⬆ Commit & Push</button>
     </div>
   </div>
 </div>
@@ -763,6 +728,7 @@ function renderizarSidebar() {
   const empty = document.getElementById('sidebar-empty');
   const footer = document.getElementById('sidebar-footer');
   const localBtns = document.getElementById('sb-local-btns');
+  const ghBtns = document.getElementById('sb-gh-btns');
 
   // Sempre ressincroniza listas planas a partir da fonte de verdade
   pastaArquivos = pastasGrupos.filter(g => g.origem === 'local').flatMap(g => g.arquivos);
@@ -774,14 +740,14 @@ function renderizarSidebar() {
     container.innerHTML = '';
     container.appendChild(empty);
     empty.style.display = '';
-    footer.style.display = 'flex';
-    localBtns.style.display = 'none';
+    footer.style.display = 'none';
     return;
   }
 
   empty.style.display = 'none';
   footer.style.display = 'flex';
   localBtns.style.display = pastasGrupos.some(g => g.origem === 'local') ? 'flex' : 'none';
+  ghBtns.style.display = pastasGrupos.some(g => g.origem === 'gh') ? 'flex' : 'none';
 
   let html = '';
 
@@ -967,6 +933,9 @@ function abrirArquivoSidebar(origem, idx) {
   // Status arquivo
   document.getElementById('status-arquivo').textContent = `📄 ${f.path}`;
 
+  // Atualiza gh-filename
+  document.getElementById('gh-filename').value = f.path;
+
   renderizarSidebar();
   salvarNoStorage(); // persiste troca de arquivo ativo
   toast(`📄 "${f.name}" aberto`);
@@ -1004,6 +973,7 @@ function abrirArquivoGrupo(grupoId, localIdx) {
   atualizarBotoesHistorico();
 
   document.getElementById('status-arquivo').textContent = `📄 ${f.path}`;
+  document.getElementById('gh-filename').value = f.path;
 
   renderizarSidebar();
   toast(`📄 "${f.name}" aberto`);
@@ -1082,6 +1052,9 @@ function ctxRenomear() {
       html += `<li><span class="warn-ref">${escHTML(a.atributo)}="${escHTML(a.valor)}"</span> em <b>${escHTML(a.arquivo)}</b> (linha ${a.linha})</li>`;
     });
     html += `</ul>`;
+    if (ctxOrigem === 'gh') {
+      html += `<div class="warn-gh">💡 No GitHub: o arquivo antigo <b>permanece no repositório</b> com o nome velho e precisará ser deletado manualmente. Um novo arquivo com o nome novo será criado no commit.</div>`;
+    }
     html += `</div>`;
     document.getElementById('rename-warn').innerHTML = html;
     document.getElementById('rename-warn').style.display = '';
@@ -1154,6 +1127,13 @@ function confirmarRename() {
   fecharModal('modal-rename');
   renderizarSidebar();
   toast(`✏️ Renomeado: "${nomeAntigo}" → "${novoNome}"`);
+
+  if (ctxOrigem === 'gh') {
+    toast(`🐙 Arquivo marcado como modificado — será salvo com novo nome no próximo envio`);
+    f.modificado = true;
+    f._renomearDe = pathAntigo; // Guarda nome antigo para criar o novo arquivo
+    atualizarDotSidebar('gh', ctxIdx);
+  }
 }
 
 function ctxExcluir() {
@@ -1200,22 +1180,12 @@ function ctxExcluir() {
 }
 
 // ═══════════════════════════════════════
-// SIDEBAR TOGGLE (com overlay mobile)
+// SIDEBAR TOGGLE
 // ═══════════════════════════════════════
 function toggleSidebar() {
   sidebarOpen = !sidebarOpen;
   document.getElementById('sidebar').classList.toggle('collapsed', !sidebarOpen);
-  // Overlay só em mobile
-  const overlay = document.getElementById('sidebar-overlay');
-  if (window.innerWidth <= 600) {
-    overlay.classList.toggle('show', sidebarOpen);
-  }
 }
-
-// Fecha sidebar ao clicar no overlay
-document.getElementById('sidebar-overlay').addEventListener('click', () => {
-  if (sidebarOpen) toggleSidebar();
-});
 
 // ═══════════════════════════════════════
 // UPLOAD DE ARQUIVO HTML
@@ -1239,7 +1209,7 @@ function carregarArquivo(e) {
     atualizarBotoesHistorico();
     toast(`📂 "${file.name}" carregado!`);
   };
-  reader.readAsText(file, 'UTF-8');
+  reader.readAsText(file);
   e.target.value = '';
 }
 
@@ -1307,7 +1277,7 @@ function carregarPasta(e) {
       }
     };
     reader.onerror = () => { lidos++; if (lidos === total) renderizarSidebar(); };
-    reader.readAsText(file, 'UTF-8');
+    reader.readAsText(file);
   });
 }
 
@@ -1349,6 +1319,150 @@ async function baixarModificados() {
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
   toast(`⬇ ZIP com ${mods.length} arquivo(s) modificado(s)!`);
+}
+
+// ═══════════════════════════════════════
+// GITHUB — CARREGAR PASTA COMPLETA NA SIDEBAR
+// ═══════════════════════════════════════
+async function ghCarregarPastaCompleta() {
+  ghSalvarCredenciais();
+  const token = document.getElementById('gh-token').value.trim();
+  const repo = document.getElementById('gh-repo').value.trim();
+  const branch = document.getElementById('gh-branch').value.trim() || 'main';
+  const status = document.getElementById('gh-status');
+
+  if (!token || !repo) { status.textContent = '⚠️ Preencha token e repositório.'; status.style.color='var(--warn)'; return; }
+
+  status.textContent = '⏳ Buscando estrutura do repositório...';
+  status.style.color = 'var(--muted)';
+
+  try {
+    const url = `https://api.github.com/repos/${repo}/git/trees/${branch}?recursive=1`;
+    const resp = await fetch(url, { headers: { 'Authorization': `token ${token}`, 'Accept': 'application/vnd.github.v3+json' } });
+    if (!resp.ok) throw new Error(`Erro ${resp.status}`);
+    const data = await resp.json();
+
+    const arquivosEditaveis = (data.tree || []).filter(f => f.type === 'blob' && EXTENSOES_EDITAVEIS.test(f.path));
+    if (!arquivosEditaveis.length) { status.textContent = '⚠️ Nenhum arquivo editável encontrado.'; status.style.color='var(--warn)'; return; }
+
+    status.textContent = `⏳ Carregando ${arquivosEditaveis.length} arquivo(s)...`;
+
+    ghArquivos = [];
+    let carregados = 0;
+    const total = arquivosEditaveis.length;
+
+    for (const f of arquivosEditaveis) {
+      try {
+        const r = await fetch(`https://api.github.com/repos/${repo}/contents/${f.path}?ref=${branch}`, {
+          headers: { 'Authorization': `token ${token}`, 'Accept': 'application/vnd.github.v3+json' }
+        });
+        if (r.ok) {
+          const d = await r.json();
+          const content = atob(d.content.replace(/\n/g, ''));
+          const nomeArr = f.path.split('/');
+          ghArquivos.push({ path: f.path, name: nomeArr[nomeArr.length-1], content, modificado: false, origem: 'gh', sha: d.sha });
+        }
+      } catch(_) {}
+      carregados++;
+      if (carregados % 5 === 0) status.textContent = `⏳ ${carregados}/${total} carregados...`;
+    }
+
+    status.textContent = `✅ ${ghArquivos.length} arquivo(s) carregados na sidebar!`;
+    status.style.color = 'var(--success)';
+
+    const nomeGrupoGH = `${repo} (${branch})`;
+    const grupoGHId = criarGrupo(nomeGrupoGH, ghArquivos, 'gh');
+    ghArquivos = pastasGrupos.filter(g => g.origem === 'gh').flatMap(g => g.arquivos);
+
+    fecharModal('modal-github');
+    renderizarSidebar();
+    const grupoGH = pastasGrupos.find(g => g.id === grupoGHId);
+    if (grupoGH && grupoGH.arquivos.length > 0) abrirArquivoGrupo(grupoGH.id, 0);
+    if (!sidebarOpen) toggleSidebar();
+    toast(`🐙 ${grupoGH ? grupoGH.arquivos.length : 0} arquivo(s) do GitHub na sidebar!`);
+  } catch(e) {
+    status.textContent = '❌ ' + e.message;
+    status.style.color = 'var(--danger)';
+  }
+}
+
+// ═══════════════════════════════════════
+// GITHUB — ENVIAR MODIFICADOS / TUDO
+// ═══════════════════════════════════════
+async function ghEnviarModificados() {
+  // Sincroniza arquivo ativo
+  if (arquivoAtivoOrigem === 'gh' && arquivoAtivoIdx >= 0) {
+    ghArquivos[arquivoAtivoIdx].content = editor.value;
+    ghArquivos[arquivoAtivoIdx].modificado = true;
+  }
+  const mods = ghArquivos.filter(f => f.modificado);
+  if (!mods.length) { toast('⚠️ Nenhum arquivo modificado!'); return; }
+  await ghEnviarLista(mods);
+}
+
+async function ghEnviarTudoSidebar() {
+  if (arquivoAtivoOrigem === 'gh' && arquivoAtivoIdx >= 0) {
+    ghArquivos[arquivoAtivoIdx].content = editor.value;
+  }
+  if (!ghArquivos.length) { toast('⚠️ Nenhum arquivo GitHub carregado!'); return; }
+  await ghEnviarLista(ghArquivos);
+}
+
+async function ghEnviarLista(lista) {
+  const token = localStorage.getItem('gh_token') || '';
+  const repo = localStorage.getItem('gh_repo') || '';
+  const branch = localStorage.getItem('gh_branch') || 'main';
+  const statusEl = document.getElementById('sb-gh-status');
+
+  if (!token || !repo) { toast('⚠️ Configure GitHub primeiro (🐙 GitHub)'); return; }
+
+  const headers = { 'Authorization': `token ${token}`, 'Accept': 'application/vnd.github.v3+json', 'Content-Type': 'application/json' };
+  let enviados = 0, erros = 0;
+
+  statusEl.textContent = `⏳ 0/${lista.length}...`;
+  statusEl.style.color = 'var(--muted)';
+
+  for (const f of lista) {
+    try {
+      // Se renomeado, cria arquivo com novo nome (arquivo antigo permanece no GitHub)
+      let sha = f.sha || null;
+      if (!sha) {
+        try {
+          const c = await fetch(`https://api.github.com/repos/${repo}/contents/${f.path}?ref=${branch}`, { headers });
+          if (c.ok) { const d = await c.json(); sha = d.sha; }
+        } catch(_) {}
+      }
+      const base64 = btoa(unescape(encodeURIComponent(f.content || '')));
+      const body = { message: `Update ${f.path} via Editor Web`, content: base64, branch };
+      if (sha) body.sha = sha;
+      const resp = await fetch(`https://api.github.com/repos/${repo}/contents/${f.path}`, {
+        method: 'PUT', headers, body: JSON.stringify(body)
+      });
+      if (!resp.ok) { const err = await resp.json(); throw new Error(err.message); }
+      const d = await resp.json();
+      if (d.content) {
+        f.sha = d.content.sha;
+        f.modificado = false;
+        atualizarDotSidebar('gh', ghArquivos.indexOf(f));
+      }
+      enviados++;
+    } catch(e) {
+      erros++;
+      console.warn('Erro ao enviar:', f.path, e.message);
+    }
+    statusEl.textContent = `⏳ ${enviados + erros}/${lista.length}...`;
+  }
+
+  renderizarSidebar();
+  if (erros === 0) {
+    statusEl.textContent = `✅ ${enviados} enviado(s)!`;
+    statusEl.style.color = 'var(--success)';
+    toast(`🐙 ${enviados} arquivo(s) enviado(s)!`);
+  } else {
+    statusEl.textContent = `⚠️ ${enviados} ok, ${erros} erro(s)`;
+    statusEl.style.color = 'var(--warn)';
+    toast(`⚠️ ${enviados}/${lista.length} enviados`);
+  }
 }
 
 // ═══════════════════════════════════════
@@ -1699,6 +1813,193 @@ function aplicarPatch() {
   if (splitAtivo) atualizarSplitPreview();
   fecharModal('modal-patch');
   toast(`🩹 Patch aplicado! (linhas ${linhaInicio + 1}–${linhaFim})`);
+}
+
+// ═══════════════════════════════════════
+// GITHUB MODAL
+// ═══════════════════════════════════════
+let ghSha = null;
+
+function ghSalvarCredenciais() {
+  const token = document.getElementById('gh-token').value.trim();
+  const repo = document.getElementById('gh-repo').value.trim();
+  const branch = document.getElementById('gh-branch').value.trim() || 'main';
+  if (token) localStorage.setItem('gh_token', token);
+  if (repo) localStorage.setItem('gh_repo', repo);
+  if (branch) localStorage.setItem('gh_branch', branch);
+}
+
+function abrirGitHub() {
+  const token = localStorage.getItem('gh_token') || '';
+  const repo = localStorage.getItem('gh_repo') || '';
+  const branch = localStorage.getItem('gh_branch') || 'main';
+  document.getElementById('gh-token').value = token;
+  document.getElementById('gh-repo').value = repo;
+  document.getElementById('gh-branch').value = branch;
+  document.getElementById('gh-status').textContent = '';
+  document.getElementById('gh-files').style.display = 'none';
+  const sel = document.getElementById('gh-repo-select');
+  sel.style.display = 'none';
+  document.getElementById('gh-repo').style.display = '';
+  abrirModal('modal-github');
+}
+
+async function ghBuscarRepos() {
+  const token = document.getElementById('gh-token').value.trim();
+  const status = document.getElementById('gh-status');
+  const sel = document.getElementById('gh-repo-select');
+  const inp = document.getElementById('gh-repo');
+  if (!token) { status.textContent = '⚠️ Insira o token GitHub primeiro.'; status.style.color='var(--warn)'; return; }
+  status.textContent = '⏳ Buscando repositórios...';
+  status.style.color = 'var(--muted)';
+  try {
+    let repos = [], page = 1;
+    while (true) {
+      const resp = await fetch(`https://api.github.com/user/repos?per_page=100&page=${page}&sort=updated`, {
+        headers: { 'Authorization': `token ${token}`, 'Accept': 'application/vnd.github.v3+json' }
+      });
+      if (!resp.ok) throw new Error(`Erro ${resp.status}`);
+      const data = await resp.json();
+      if (!data.length) break;
+      repos = repos.concat(data);
+      if (data.length < 100) break;
+      page++;
+    }
+    if (!repos.length) { status.textContent = 'Nenhum repositório encontrado.'; status.style.color='var(--warn)'; return; }
+    localStorage.setItem('gh_token', token);
+    const repoAtual = inp.value.trim();
+    sel.innerHTML = '<option value="">— selecione um repositório —</option>' +
+      repos.map(r => `<option value="${escHTML(r.full_name)}" ${r.full_name === repoAtual ? 'selected' : ''}>${escHTML(r.full_name)}</option>`).join('');
+    sel.style.display = ''; inp.style.display = 'none';
+    status.textContent = `✅ ${repos.length} repositório(s).`;
+    status.style.color = 'var(--success)';
+  } catch(e) { status.textContent = '❌ ' + e.message; status.style.color = 'var(--danger)'; }
+}
+
+function ghSelecionarRepo(valor) {
+  if (!valor) return;
+  document.getElementById('gh-repo').value = valor;
+  localStorage.setItem('gh_repo', valor);
+  document.getElementById('gh-status').textContent = `📁 ${valor}`;
+  document.getElementById('gh-status').style.color = 'var(--accent2)';
+  document.getElementById('gh-files').style.display = 'none';
+}
+
+async function ghListarArquivos() {
+  ghSalvarCredenciais();
+  const token = document.getElementById('gh-token').value.trim();
+  const sel = document.getElementById('gh-repo-select');
+  const repoInput = document.getElementById('gh-repo');
+  if (sel.style.display !== 'none' && sel.value) repoInput.value = sel.value;
+  const repo = repoInput.value.trim();
+  const branch = document.getElementById('gh-branch').value.trim() || 'main';
+  const status = document.getElementById('gh-status');
+  const filesDiv = document.getElementById('gh-files');
+  if (!token) { status.textContent = '⚠️ Insira o token.'; status.style.color='var(--warn)'; return; }
+  if (!repo) { status.textContent = '⚠️ Insira o repositório.'; status.style.color='var(--warn)'; return; }
+  status.textContent = '⏳ Carregando lista...'; status.style.color = 'var(--muted)';
+  filesDiv.style.display = 'none';
+  try {
+    const url = `https://api.github.com/repos/${repo}/git/trees/${branch}?recursive=1`;
+    const resp = await fetch(url, { headers: { 'Authorization': `token ${token}`, 'Accept': 'application/vnd.github.v3+json' } });
+    if (!resp.ok) throw new Error(`Erro ${resp.status}`);
+    const data = await resp.json();
+    const editableFiles = (data.tree || []).filter(f => f.type === 'blob' && EXTENSOES_EDITAVEIS.test(f.path));
+    if (!editableFiles.length) { status.textContent = 'Nenhum arquivo editável encontrado.'; status.style.color='var(--warn)'; return; }
+    filesDiv.style.display = 'block';
+    filesDiv.innerHTML = editableFiles.map(f =>
+      `<div class="gh-file-item" onclick="ghCarregarArquivo('${escAttr(f.path)}')">${escHTML(f.path)}</div>`
+    ).join('');
+    status.textContent = `✅ ${editableFiles.length} arquivo(s). Clique para carregar.`;
+    status.style.color = 'var(--success)';
+  } catch(e) { status.textContent = '❌ ' + e.message; status.style.color = 'var(--danger)'; }
+}
+
+async function ghCarregarPorCaminho() {
+  ghSalvarCredenciais();
+  const path = document.getElementById('gh-filename').value.trim();
+  if (!path) { document.getElementById('gh-status').textContent = '⚠️ Informe o caminho.'; document.getElementById('gh-status').style.color = 'var(--warn)'; return; }
+  await ghCarregarArquivo(path);
+}
+
+async function ghCarregarArquivo(path) {
+  const token = document.getElementById('gh-token').value.trim();
+  const repo = document.getElementById('gh-repo').value.trim();
+  const branch = document.getElementById('gh-branch').value.trim() || 'main';
+  const status = document.getElementById('gh-status');
+  status.textContent = `⏳ Carregando ${path}...`;
+  try {
+    const url = `https://api.github.com/repos/${repo}/contents/${path}?ref=${branch}`;
+    const resp = await fetch(url, { headers: { 'Authorization': `token ${token}`, 'Accept': 'application/vnd.github.v3+json' } });
+    if (!resp.ok) throw new Error(`Erro ${resp.status}`);
+    const data = await resp.json();
+    const conteudo = atob(data.content.replace(/\n/g, ''));
+    ghSha = data.sha;
+
+    // Adiciona na sidebar GitHub
+    const nomeArr = path.split('/');
+    const nome = nomeArr[nomeArr.length - 1];
+    const existente = ghArquivos.findIndex(f => f.path === path);
+    if (existente >= 0) {
+      ghArquivos[existente].content = conteudo;
+      ghArquivos[existente].sha = data.sha;
+    } else {
+      ghArquivos.push({ path, name: nome, content: conteudo, modificado: false, origem: 'gh', sha: data.sha });
+    }
+
+    // Abre no editor
+    undoStack.push({ value: editor.value, modo: 'before-gh-load' });
+    editor.value = conteudo;
+    undoStack.push({ value: conteudo, modo: 'gh-load' });
+    redoStack.length = 0;
+    lastActionType = null;
+    arquivoAtivoIdx = existente >= 0 ? existente : ghArquivos.length - 1;
+    arquivoAtivoOrigem = 'gh';
+    arquivoAtivoNome = nome;
+    atualizarHL();
+    atualizarBotoesHistorico();
+    document.getElementById('gh-filename').value = path;
+    document.getElementById('status-arquivo').textContent = `📄 ${path}`;
+    renderizarSidebar();
+    fecharModal('modal-github');
+    if (!sidebarOpen) toggleSidebar();
+    toast(`🐙 "${nome}" carregado!`);
+  } catch(e) { status.textContent = '❌ ' + e.message; status.style.color = 'var(--danger)'; }
+}
+
+async function ghEnviarArquivo() {
+  ghSalvarCredenciais();
+  const token = document.getElementById('gh-token').value.trim();
+  const repo = document.getElementById('gh-repo').value.trim();
+  const branch = document.getElementById('gh-branch').value.trim() || 'main';
+  const path = document.getElementById('gh-filename').value.trim();
+  const status = document.getElementById('gh-status');
+  if (!path) { status.textContent = '⚠️ Informe o caminho.'; status.style.color='var(--warn)'; return; }
+  const conteudo = editor.value;
+  if (!conteudo.trim()) { toast('⚠️ Editor vazio!'); return; }
+  const base64 = btoa(unescape(encodeURIComponent(conteudo)));
+  const body = { message: `Update ${path} via Editor Web`, content: base64, branch };
+  if (ghSha) body.sha = ghSha;
+  status.textContent = '⏳ Enviando...'; status.style.color = 'var(--muted)';
+  try {
+    const resp = await fetch(`https://api.github.com/repos/${repo}/contents/${path}`, {
+      method: 'PUT',
+      headers: { 'Authorization': `token ${token}`, 'Accept': 'application/vnd.github.v3+json', 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+    if (!resp.ok) { const err = await resp.json(); throw new Error(err.message || `Erro ${resp.status}`); }
+    const data = await resp.json();
+    ghSha = data.content ? data.content.sha : null;
+    // Atualiza na lista
+    if (arquivoAtivoOrigem === 'gh' && arquivoAtivoIdx >= 0) {
+      ghArquivos[arquivoAtivoIdx].modificado = false;
+      ghArquivos[arquivoAtivoIdx].sha = ghSha;
+      atualizarDotSidebar('gh', arquivoAtivoIdx);
+      renderizarSidebar();
+    }
+    status.textContent = `✅ "${path}" enviado!`; status.style.color = 'var(--success)';
+    toast(`🐙 Enviado: ${path}`);
+  } catch(e) { status.textContent = '❌ ' + e.message; status.style.color = 'var(--danger)'; }
 }
 
 // ═══════════════════════════════════════
@@ -2133,262 +2434,6 @@ function restaurarDoStorage() {
   } catch(e) {}
 }
 
-// ═══════════════════════════════════════
-// GITHUB API
-// ═══════════════════════════════════════
-let ghToken = '';
-let ghRepo = '';
-let ghCurrentPath = '';
-let ghSelectedFile = null; // { path, sha, name }
-let ghActiveFile = null;   // arquivo atualmente aberto no editor via GitHub direto
-
-function ghSalvarCredenciais() {
-  try {
-    const t = document.getElementById('gh-token').value.trim();
-    const r = document.getElementById('gh-repo').value.trim();
-    if (t) localStorage.setItem('gh_token', t);
-    if (r) localStorage.setItem('gh_repo', r);
-  } catch(e) {}
-}
-
-function ghCarregarCredenciais() {
-  try {
-    const t = localStorage.getItem('gh_token');
-    const r = localStorage.getItem('gh_repo');
-    if (t) { document.getElementById('gh-token').value = t; ghToken = t; }
-    if (r) { document.getElementById('gh-repo').value = r; ghRepo = r; }
-  } catch(e) {}
-}
-
-function abrirGitHub() {
-  ghCarregarCredenciais();
-  ghSelectedFile = null;
-  document.getElementById('gh-open-btn').disabled = true;
-  document.getElementById('gh-status-area').style.display = 'none';
-  document.getElementById('gh-tree').innerHTML = '<div class="gh-tree-empty">Digite o repositório e clique em Carregar</div>';
-  document.getElementById('gh-path-bar').style.display = 'none';
-  ghCurrentPath = '';
-  abrirModal('modal-github');
-}
-
-function abrirGitHubCommit() {
-  if (!ghActiveFile) { toast('⚠️ Nenhum arquivo do GitHub aberto!'); return; }
-  document.getElementById('gh-commit-file-info').textContent = `📄 ${ghActiveFile.path} em ${ghActiveFile.repo}`;
-  document.getElementById('gh-commit-msg').value = `Atualizar ${ghActiveFile.name} via editor`;
-  document.getElementById('gh-commit-status').style.display = 'none';
-  abrirModal('modal-gh-commit');
-}
-
-async function ghFetch(endpoint) {
-  const token = document.getElementById('gh-token').value.trim();
-  const repo = document.getElementById('gh-repo').value.trim();
-  if (!token || !repo) { ghShowStatus('⚠️ Preencha o token e o repositório!', 'err'); return null; }
-  ghToken = token; ghRepo = repo;
-  ghSalvarCredenciais();
-
-  const url = `https://api.github.com/repos/${repo}${endpoint}`;
-  try {
-    const res = await fetch(url, {
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Accept': 'application/vnd.github.v3+json',
-        'X-GitHub-Api-Version': '2022-11-28'
-      }
-    });
-    if (!res.ok) {
-      const err = await res.json().catch(() => ({}));
-      ghShowStatus(`❌ Erro ${res.status}: ${err.message || 'Sem acesso'}`, 'err');
-      return null;
-    }
-    return await res.json();
-  } catch(e) {
-    ghShowStatus('❌ Erro de rede. Verifique sua conexão.', 'err');
-    return null;
-  }
-}
-
-async function ghCarregarRaiz() {
-  ghCurrentPath = '';
-  await ghListarPasta('');
-}
-
-async function ghListarPasta(path) {
-  const tree = document.getElementById('gh-tree');
-  tree.innerHTML = '<div class="gh-loading">⏳ Carregando...</div>';
-  document.getElementById('gh-status-area').style.display = 'none';
-  document.getElementById('gh-open-btn').disabled = true;
-  ghSelectedFile = null;
-
-  const endpoint = path ? `/contents/${path}` : '/contents';
-  const data = await ghFetch(endpoint);
-  if (!data) { tree.innerHTML = '<div class="gh-tree-empty">Erro ao carregar.</div>'; return; }
-
-  ghCurrentPath = path;
-  const pathBar = document.getElementById('gh-path-bar');
-  const pathText = document.getElementById('gh-path-text');
-  pathBar.style.display = 'flex';
-  pathText.textContent = path ? `/${path}` : '/';
-
-  const items = Array.isArray(data) ? data : [data];
-  items.sort((a, b) => {
-    if (a.type === 'dir' && b.type !== 'dir') return -1;
-    if (a.type !== 'dir' && b.type === 'dir') return 1;
-    return a.name.localeCompare(b.name);
-  });
-
-  let html = '';
-
-  // Botão voltar
-  if (path) {
-    const parentPath = path.includes('/') ? path.substring(0, path.lastIndexOf('/')) : '';
-    html += `<div class="gh-tree-item gh-back" data-action="back" data-path="${escAttr(parentPath)}">
-      ← Voltar
-    </div>`;
-  }
-
-  items.forEach(item => {
-    const icon = item.type === 'dir' ? '📁' : '📄';
-    const cls = item.type === 'dir' ? 'dir' : '';
-    html += `<div class="gh-tree-item ${cls}"
-      data-action="${item.type === 'dir' ? 'dir' : 'file'}"
-      data-path="${escAttr(item.path)}"
-      data-name="${escAttr(item.name)}"
-      data-sha="${escAttr(item.sha || '')}"
-      data-type="${item.type}">
-      ${icon} ${escHTML(item.name)}
-    </div>`;
-  });
-
-  if (!items.length) html = '<div class="gh-tree-empty">Pasta vazia</div>';
-
-  tree.innerHTML = html;
-
-  // Listeners
-  tree.querySelectorAll('.gh-tree-item').forEach(el => {
-    el.addEventListener('click', async () => {
-      const action = el.dataset.action;
-      const path2 = el.dataset.path;
-      if (action === 'back') { await ghListarPasta(path2); return; }
-      if (action === 'dir') { await ghListarPasta(path2); return; }
-      // Arquivo selecionado
-      tree.querySelectorAll('.gh-tree-item').forEach(i => i.classList.remove('selected'));
-      el.classList.add('selected');
-      ghSelectedFile = { path: path2, sha: el.dataset.sha, name: el.dataset.name };
-      document.getElementById('gh-open-btn').disabled = false;
-      ghShowStatus(`✅ Selecionado: ${el.dataset.name}`, 'ok');
-    });
-  });
-}
-
-async function ghAbrirArquivoSelecionado() {
-  if (!ghSelectedFile) { toast('⚠️ Selecione um arquivo!'); return; }
-  ghShowStatus('⏳ Carregando arquivo...', 'info');
-
-  const repo = document.getElementById('gh-repo').value.trim();
-  const data = await ghFetch(`/contents/${ghSelectedFile.path}`);
-  if (!data || !data.content) { ghShowStatus('❌ Não foi possível carregar o conteúdo.', 'err'); return; }
-
-  try {
-    const conteudo = atob(data.content.replace(/\n/g, ''));
-    const decoded = new TextDecoder('utf-8').decode(Uint8Array.from([...conteudo].map(c => c.charCodeAt(0))));
-    undoStack.push({ value: editor.value, modo: 'before-gh-open' });
-    editor.value = decoded;
-    undoStack.push({ value: decoded, modo: 'gh-open' });
-    redoStack.length = 0; lastActionType = null;
-    arquivoAtivoNome = ghSelectedFile.name;
-    atualizarHL(); atualizarBotoesHistorico();
-    document.getElementById('status-arquivo').textContent = `🐙 ${repo}/${ghSelectedFile.path}`;
-
-    // Salva referência para commit
-    ghActiveFile = {
-      path: ghSelectedFile.path,
-      sha: data.sha,
-      name: ghSelectedFile.name,
-      repo: repo,
-      token: document.getElementById('gh-token').value.trim()
-    };
-
-    // Mostra botão commit na toolbar
-    document.getElementById('btn-gh-commit').style.display = '';
-    // Mostra info na sidebar footer
-    document.getElementById('sb-gh-file-info').style.display = '';
-    document.getElementById('sb-gh-file-label').textContent = `🐙 ${ghSelectedFile.name}`;
-
-    fecharModal('modal-github');
-    toast(`🐙 "${ghSelectedFile.name}" carregado do GitHub!`);
-    if (!sidebarOpen) toggleSidebar();
-  } catch(e) {
-    ghShowStatus('❌ Erro ao decodificar o arquivo.', 'err');
-  }
-}
-
-async function ghEnviarCommit() {
-  if (!ghActiveFile) { toast('⚠️ Nenhum arquivo do GitHub ativo!'); return; }
-  const msg = document.getElementById('gh-commit-msg').value.trim() || 'Atualizar via editor';
-  const btn = document.getElementById('gh-commit-btn');
-  btn.disabled = true; btn.textContent = '⏳ Enviando...';
-
-  const conteudo = editor.value;
-  const base64 = btoa(unescape(encodeURIComponent(conteudo)));
-
-  const url = `https://api.github.com/repos/${ghActiveFile.repo}/contents/${ghActiveFile.path}`;
-  try {
-    const res = await fetch(url, {
-      method: 'PUT',
-      headers: {
-        'Authorization': `Bearer ${ghActiveFile.token}`,
-        'Accept': 'application/vnd.github.v3+json',
-        'Content-Type': 'application/json',
-        'X-GitHub-Api-Version': '2022-11-28'
-      },
-      body: JSON.stringify({
-        message: msg,
-        content: base64,
-        sha: ghActiveFile.sha
-      })
-    });
-
-    const resData = await res.json();
-    if (res.ok) {
-      // Atualiza sha para próximo commit
-      ghActiveFile.sha = resData.content?.sha || ghActiveFile.sha;
-      ghCommitStatus('✅ Commit enviado com sucesso!', 'ok');
-      toast('🐙 Commit enviado!');
-      btn.textContent = '✅ Enviado!';
-      setTimeout(() => { btn.disabled = false; btn.textContent = '⬆ Commit & Push'; fecharModal('modal-gh-commit'); }, 1800);
-    } else {
-      ghCommitStatus(`❌ Erro: ${resData.message || res.status}`, 'err');
-      btn.disabled = false; btn.textContent = '⬆ Commit & Push';
-    }
-  } catch(e) {
-    ghCommitStatus('❌ Erro de rede.', 'err');
-    btn.disabled = false; btn.textContent = '⬆ Commit & Push';
-  }
-}
-
-function ghShowStatus(msg, tipo) {
-  const area = document.getElementById('gh-status-area');
-  const el = document.getElementById('gh-status-msg');
-  area.style.display = '';
-  el.textContent = msg;
-  el.className = `gh-status ${tipo}`;
-}
-
-function ghCommitStatus(msg, tipo) {
-  const area = document.getElementById('gh-commit-status');
-  const el = document.getElementById('gh-commit-status-msg');
-  area.style.display = '';
-  el.textContent = msg;
-  el.className = `gh-status ${tipo}`;
-}
-
-window.abrirGitHub = abrirGitHub;
-window.abrirGitHubCommit = abrirGitHubCommit;
-window.ghCarregarRaiz = ghCarregarRaiz;
-window.ghAbrirArquivoSelecionado = ghAbrirArquivoSelecionado;
-window.ghEnviarCommit = ghEnviarCommit;
-
-// ═══════════════════════════════════════
 window.addEventListener('beforeunload', salvarNoStorage);
 window.addEventListener('pagehide', salvarNoStorage);
 window.addEventListener('visibilitychange', () => {
@@ -2413,6 +2458,7 @@ if (arquivoAtivoGrupoId !== null && arquivoAtivoLocalIdx >= 0) {
   if (gAtivo && gAtivo.arquivos[arquivoAtivoLocalIdx]) {
     const f = gAtivo.arquivos[arquivoAtivoLocalIdx];
     document.getElementById('status-arquivo').textContent = '📄 ' + f.path;
+    document.getElementById('gh-filename').value = f.path;
     if (!sidebarOpen) toggleSidebar();
   }
 }
@@ -2446,6 +2492,7 @@ if (window.innerWidth <= 600) {
       if (gAtivo && gAtivo.arquivos[arquivoAtivoLocalIdx]) {
         const f = gAtivo.arquivos[arquivoAtivoLocalIdx];
         document.getElementById('status-arquivo').textContent = '📄 ' + f.path;
+        document.getElementById('gh-filename').value = f.path;
       }
     }
     if (editor.value) {
@@ -2465,11 +2512,13 @@ Object.assign(window, {
   corrigirEstrutura, abrirVersions, salvarVersao, restaurarVersao,
   abrirDiff, gerarDiff, toggleSplit,
   abrirPatch, aplicarPatch,
+  abrirGitHub, fecharModal, ghBuscarRepos, ghSelecionarRepo,
+  ghListarArquivos, ghCarregarPorCaminho, ghEnviarArquivo,
+  ghCarregarPastaCompleta, ghEnviarModificados, ghEnviarTudoSidebar,
   confirmarRename, ctxRenomear, ctxExcluir,
   recolherTudo, expandirTudo, limparEditor, contarLinhas,
-  ajustarNum, fecharNumPopup, baixarTudo, baixarModificados,
-  abrirGitHub, abrirGitHubCommit, ghCarregarRaiz, ghAbrirArquivoSelecionado, ghEnviarCommit
+  ajustarNum, fecharNumPopup, baixarTudo, baixarModificados
 });
 </script>
 </body>
-</html>
+      </html>
