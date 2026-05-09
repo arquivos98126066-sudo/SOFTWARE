@@ -281,6 +281,7 @@
     <button class="hbtn upload" onclick="triggerUploadPasta()" title="Carregar pasta inteira" style="color:#c084fc;border-color:#c084fc">📁 Pasta</button>
     <button class="hbtn export" onclick="exportarHTML()" title="Exportar arquivo HTML">⬇ Export</button>
     <button class="hbtn copy" onclick="copiarCodigo()">⎘ Copiar</button>
+    <button class="hbtn" id="btn-gh-header" onclick="abrirGitHub()" title="Abrir / conectar GitHub" style="color:#a78bff;border-color:rgba(167,139,255,.5)">🐙 GitHub</button>
   </div>
 </div>
 <input type="file" id="file-input" accept=".html,.htm" style="display:none" onchange="carregarArquivo(event)">
@@ -319,7 +320,7 @@
   <button class="tbtn" onclick="abrirPatch()">🩹 Patch</button>
   <button class="tbtn" onclick="limparEditor()">🗑 Limpar</button>
   <button class="tbtn" onclick="contarLinhas()">📊 Info</button>
-  <button class="tbtn" id="btn-gh-commit" onclick="abrirGitHubCommit()" style="display:none;color:#7c6aff;border-color:rgba(124,106,255,.4)">🐙 Commit</button>
+  <button class="tbtn" id="btn-gh-commit" onclick="abrirGitHubCommit()" style="color:#7c6aff;border-color:rgba(124,106,255,.4);opacity:0.4;cursor:not-allowed" disabled title="Abra um arquivo do GitHub primeiro">🐙 Commit</button>
 </div>
 
 <!-- MAIN AREA -->
@@ -2308,8 +2309,15 @@ async function ghAbrirArquivoSelecionado() {
       token: document.getElementById('gh-token').value.trim()
     };
 
-    // Mostra botão commit na toolbar
-    document.getElementById('btn-gh-commit').style.display = '';
+    // Ativa botão commit na toolbar
+    const btnCommit = document.getElementById('btn-gh-commit');
+    btnCommit.disabled = false;
+    btnCommit.style.opacity = '1';
+    btnCommit.style.cursor = 'pointer';
+    btnCommit.title = 'Enviar commit para o GitHub';
+    // Atualiza botão do header para indicar conexão ativa
+    const btnGhHeader = document.getElementById('btn-gh-header');
+    if (btnGhHeader) { btnGhHeader.style.color = '#00e5c0'; btnGhHeader.style.borderColor = 'rgba(0,229,192,.5)'; btnGhHeader.textContent = '🐙 Conectado'; }
     // Mostra info na sidebar footer
     document.getElementById('sb-gh-file-info').style.display = '';
     document.getElementById('sb-gh-file-label').textContent = `🐙 ${ghSelectedFile.name}`;
