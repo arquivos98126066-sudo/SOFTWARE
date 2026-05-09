@@ -2047,15 +2047,15 @@ async function ghEnviarArquivo() {
     if (!resp.ok) { const err = await resp.json(); throw new Error(err.message || `Erro ${resp.status}`); }
     const data = await resp.json();
     ghSha = data.content ? data.content.sha : null;
-    // Atualiza na lista
-    if (arquivoAtivoOrigem === 'gh' && arquivoAtivoIdx >= 0) {
+    // Atualiza na lista só se o arquivo existir no array
+    if (arquivoAtivoOrigem === 'gh' && arquivoAtivoIdx >= 0 && ghArquivos[arquivoAtivoIdx]) {
       ghArquivos[arquivoAtivoIdx].modificado = false;
       ghArquivos[arquivoAtivoIdx].sha = ghSha;
-      atualizarDotSidebar('gh', arquivoAtivoIdx);
       renderizarSidebar();
     }
-    status.textContent = `✅ "${path}" enviado!`; status.style.color = 'var(--success)';
-    toast(`🐙 Enviado: ${path}`);
+    status.textContent = '✅ "' + path + '" enviado!';
+    status.style.color = 'var(--success)';
+    toast('🐙 Enviado: ' + path);
   } catch(e) { status.textContent = '❌ ' + e.message; status.style.color = 'var(--danger)'; }
 }
 
