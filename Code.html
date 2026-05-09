@@ -80,7 +80,7 @@
   .sidebar-files::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
   .sidebar-empty{padding:20px 12px;font-size:11px;color:var(--muted);text-align:center;line-height:1.6}
   .sidebar-section{padding:4px 10px 2px;font-size:9px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;display:flex;align-items:center;gap:5px;white-space:nowrap}
-  .sidebar-footer{padding:8px;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:5px;flex-shrink:0}
+  .sidebar-footer{padding:8px;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:5px;flex-shrink:0;overflow-y:auto;max-height:160px}
   .sb-dl-btn{background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:6px 8px;font-size:10px;font-weight:700;cursor:pointer;font-family:'JetBrains Mono',monospace;transition:all 0.15s;width:100%;text-align:left;white-space:nowrap}
   .sb-dl-btn:hover{border-color:var(--accent)}
   .sb-dl-btn.green{color:var(--success);border-color:rgba(0,200,150,.3)}
@@ -190,6 +190,8 @@
   .v-name{flex:1;font-size:12px;font-weight:700}
   .v-meta{font-size:10px;color:var(--muted)}
   .v-restore{background:var(--accent);color:white;border:none;border-radius:5px;padding:4px 10px;font-size:10px;font-weight:700;cursor:pointer;font-family:'JetBrains Mono',monospace}
+  .v-delete{background:transparent;color:var(--danger);border:1px solid rgba(255,77,109,.3);border-radius:5px;padding:4px 8px;font-size:10px;font-weight:700;cursor:pointer;font-family:'JetBrains Mono',monospace;transition:all 0.15s}
+  .v-delete:hover{background:rgba(255,77,109,.15)}
 
   /* ── DIFF ── */
   .diff-container{background:var(--bg);border:1px solid var(--border);border-radius:7px;padding:10px;overflow:auto;max-height:50dvh;font-family:'JetBrains Mono',monospace;font-size:12px;line-height:1.7}
@@ -583,7 +585,7 @@
   </div>
 </div>
 
-<script type="module">
+<script>
 // ═══════════════════════════════════════
 // CORE
 // ═══════════════════════════════════════
@@ -1476,8 +1478,18 @@ function renderizarVersoes() {
         <div class="v-meta">${v.ts} · ${v.content.length} chars</div>
       </div>
       <button class="v-restore" onclick="restaurarVersao(${i})">↩ Restaurar</button>
+      <button class="v-delete" onclick="excluirVersao(${i})" title="Excluir versão">🗑</button>
     </div>`
   ).join('');
+}
+
+function excluirVersao(idx) {
+  const v = versoes[idx];
+  if (!v) return;
+  if (!confirm(`Excluir versão "${v.name}"?`)) return;
+  versoes.splice(idx, 1);
+  renderizarVersoes();
+  toast(`🗑 Versão "${v.name}" excluída!`);
 }
 
 function restaurarVersao(idx) {
@@ -1953,28 +1965,55 @@ const LS_PROX   = 'editor_proximoid';
 let timerSave = null;
 let timerFirebase = null;
 
-// ── Firebase setup ──
-let _db = null, _setDoc = null, _getDoc = null, _doc = null, _collection = null;
-(async () => {
-  try {
-    const fbMod = await import('https://arquivos98126066-sudo.github.io/SOFTWARE/firebase-sync.js');
-    _db = fbMod.db;
-    const fs = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js');
-    _setDoc = fs.setDoc; _getDoc = fs.getDoc;
-    _doc = fs.doc; _collection = fs.collection;
-  } catch(e) { console.warn('Firebase não disponível:', e); }
-})();
+// ── Firebase setup (lazy load via script tag) ──
+let _db = null;
+
+function _initFirebaseCompat() {
+  return new Promise((resolve) => {
+    if (typeof firebase !== 'undefined' && firebase.firestore) {
+      try { _db = firebase.firestore(); } catch(e) {}
+      resolve();
+      return;
+    }
+    // Carrega scripts compat dinamicamente
+    const scripts = [
+      'https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js',
+      'https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js',
+      'https://arquivos98126066-sudo.github.io/SOFTWARE/firebase-init.js'
+    ];
+    let loaded = 0;
+    scripts.forEach((src, i) => {
+      const s = document.createElement('script');
+      s.src = src;
+      s.onload = () => {
+        loaded++;
+        if (loaded === scripts.length) {
+          setTimeout(() => {
+            try {
+              if (typeof firebase !== 'undefined' && firebase.firestore) {
+                _db = firebase.firestore();
+              }
+            } catch(e) { console.warn('Firebase init erro:', e); }
+            resolve();
+          }, 300);
+        }
+      };
+      s.onerror = () => { loaded++; if (loaded === scripts.length) resolve(); };
+      document.head.appendChild(s);
+    });
+  });
+}
 
 function _fbDocRef() {
-  if (!_db || !_doc || !_collection) return null;
-  try { return _doc(_collection(_db, 'editor_codigo'), 'principal'); } catch(e) { return null; }
+  if (!_db) return null;
+  try { return _db.collection('editor_codigo').doc('principal'); } catch(e) { return null; }
 }
 
 async function salvarNoFirebase() {
+  if (!_db) await _initFirebaseCompat();
   const ref = _fbDocRef();
   if (!ref) return;
   try {
-    // Sincroniza arquivo ativo antes de salvar
     if (arquivoAtivoGrupoId !== null && arquivoAtivoLocalIdx >= 0) {
       const gAtivo = pastasGrupos.find(g => g.id === arquivoAtivoGrupoId);
       if (gAtivo && gAtivo.arquivos[arquivoAtivoLocalIdx]) {
@@ -1990,17 +2029,15 @@ async function salvarNoFirebase() {
           modificado: f.modificado || false, origem: f.origem
         }))
       }));
-    const tamanho = calcularTamanhoStorage();
     const payload = {
       codigo: editor.value,
       ativo: JSON.stringify({ grupoId: arquivoAtivoGrupoId, localIdx: arquivoAtivoLocalIdx }),
       proximoGrupoId: String(proximoGrupoId),
       ts: Date.now()
     };
-    // Grupos só se couberem (< 900KB em JSON)
     const gruposJson = JSON.stringify(gruposParaSalvar);
     if (new Blob([gruposJson]).size < 900 * 1024) payload.grupos = gruposJson;
-    await _setDoc(ref, payload, { merge: true });
+    await ref.set(payload, { merge: true });
     if (window.showSyncSuccess) window.showSyncSuccess();
   } catch(e) {
     console.warn('Erro Firebase save:', e);
@@ -2009,19 +2046,16 @@ async function salvarNoFirebase() {
 }
 
 async function carregarDoFirebase() {
+  if (!_db) await _initFirebaseCompat();
   const ref = _fbDocRef();
   if (!ref) return false;
   try {
-    const snap = await _getDoc(ref);
-    if (!snap.exists()) return false;
+    const snap = await ref.get();
+    if (!snap.exists) return false;
     const d = snap.data();
-
-    // Só sobrescreve se o Firebase tiver dado mais recente que o localStorage
     const tsFirebase = d.ts || 0;
     const tsLocal = parseInt(localStorage.getItem('editor_ts') || '0');
-    if (tsFirebase <= tsLocal) return false; // localStorage é mais recente, não sobrescreve
-
-    // Restaura grupos
+    if (tsFirebase <= tsLocal) return false;
     if (d.grupos) {
       try {
         const gRaw = JSON.parse(d.grupos);
@@ -2031,12 +2065,10 @@ async function carregarDoFirebase() {
         }
       } catch(e) {}
     }
-    // Restaura proximoGrupoId
     if (d.proximoGrupoId) {
       proximoGrupoId = parseInt(d.proximoGrupoId) || 1;
       localStorage.setItem(LS_PROX, d.proximoGrupoId);
     }
-    // Restaura arquivo ativo
     if (d.ativo) {
       try {
         const ativo = JSON.parse(d.ativo);
@@ -2053,7 +2085,6 @@ async function carregarDoFirebase() {
         localStorage.setItem(LS_ATIVO, d.ativo);
       } catch(e) {}
     }
-    // Restaura código
     if (d.codigo !== undefined) {
       editor.value = d.codigo;
       localStorage.setItem(LS_CODE, d.codigo);
@@ -2486,10 +2517,8 @@ if (window.innerWidth <= 600) {
 }
 
 // Carrega Firebase em paralelo (sem bloquear UI)
-// Se Firebase tiver dados, sobrescreve silenciosamente
 (async () => {
-  // Aguarda Firebase inicializar (módulo carrega async)
-  await new Promise(r => setTimeout(r, 800));
+  await _initFirebaseCompat();
   const ok = await carregarDoFirebase();
   if (ok) {
     // Reinicia UI com dados do Firebase
@@ -2518,7 +2547,7 @@ Object.assign(window, {
   carregarArquivo, carregarPasta, exportarHTML, copiarCodigo,
   mudarAba, abrirPreview, fecharPreview, recarregarPreview,
   toggleFR, fecharFR, executarSubstituicao,
-  corrigirEstrutura, abrirVersions, salvarVersao, restaurarVersao,
+  corrigirEstrutura, abrirVersions, salvarVersao, restaurarVersao, excluirVersao,
   abrirDiff, gerarDiff, toggleSplit,
   abrirPatch, aplicarPatch,
   confirmarRename, ctxRenomear, ctxExcluir,
