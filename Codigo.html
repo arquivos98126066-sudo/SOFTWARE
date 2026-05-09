@@ -482,15 +482,10 @@
       </div>
       <div style="display:flex;gap:8px;flex-wrap:wrap">
         <button class="mbtn primary" onclick="ghListarArquivos()" style="flex:1">📂 Listar Arquivos</button>
-        <button class="mbtn secondary" onclick="ghCarregarPastaCompleta()" style="flex:1;white-space:nowrap">📁 Carregar tudo</button>
       </div>
       <div id="gh-status" class="gh-status"></div>
       <div id="gh-files" class="gh-files-list" style="display:none"></div>
-      <div id="gh-sel-bar" style="display:none;gap:6px;flex-wrap:wrap;margin-top:4px">
-        <button class="mbtn secondary" onclick="ghSelecionarTodos()" style="flex:1;font-size:11px">☑ Todos</button>
-        <button class="mbtn secondary" onclick="ghDeselecionarTodos()" style="flex:1;font-size:11px">☐ Nenhum</button>
-        <button class="mbtn primary" onclick="ghCarregarSelecionados()" style="flex:1;font-size:11px">⬇ Carregar selecionados</button>
-      </div>
+
       <div class="gh-row" style="margin-top:4px">
         <div class="mlabel">📄 Caminho do arquivo (ex: index.html)</div>
         <div style="display:flex;gap:6px">
@@ -1947,13 +1942,9 @@ async function ghListarArquivos() {
     if (!editableFiles.length) { status.textContent = 'Nenhum arquivo editável encontrado.'; status.style.color='var(--warn)'; return; }
     filesDiv.style.display = 'block';
     filesDiv.innerHTML = editableFiles.map(f =>
-      `<div class="gh-file-item" style="display:flex;align-items:center;gap:8px;">
-        <input type="checkbox" class="gh-check" data-path="${escAttr(f.path)}" style="accent-color:var(--accent);width:14px;height:14px;flex-shrink:0;cursor:pointer">
-        <span onclick="ghCarregarArquivo('${escAttr(f.path)}')" style="flex:1;cursor:pointer">${escHTML(f.path)}</span>
-      </div>`
+      `<div class="gh-file-item" onclick="ghCarregarArquivo('${escAttr(f.path)}')">${escHTML(f.path)}</div>`
     ).join('');
-    document.getElementById('gh-sel-bar').style.display = 'flex';
-    status.textContent = `✅ ${editableFiles.length} arquivo(s). Clique no nome para abrir ou marque para carregar.`;
+    status.textContent = `✅ ${editableFiles.length} arquivo(s) — toque para abrir no editor.`;
     status.style.color = 'var(--success)';
   } catch(e) { status.textContent = '❌ ' + e.message; status.style.color = 'var(--danger)'; }
 }
