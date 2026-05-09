@@ -1373,7 +1373,9 @@ async function ghCarregarPastaCompleta() {
         );
         if (r.ok) {
           const d = await r.json();
-          const fileContent = atob(d.content.replace(/\n/g, ''));
+          const _b64 = d.content.replace(/\n/g, '');
+          const _bytes = Uint8Array.from(atob(_b64), c => c.charCodeAt(0));
+          const fileContent = new TextDecoder('utf-8').decode(_bytes);
           const nome = f.path.split('/').pop();
           novosArquivos.push({ path: f.path, name: nome, content: fileContent, modificado: false, origem: 'gh', sha: d.sha });
         }
@@ -1916,7 +1918,9 @@ async function ghCarregarSelecionados() {
       );
       if (r.ok) {
         const d = await r.json();
-        const fileContent = atob(d.content.replace(/\n/g, ''));
+        const _b64 = d.content.replace(/\n/g, '');
+          const _bytes = Uint8Array.from(atob(_b64), c => c.charCodeAt(0));
+          const fileContent = new TextDecoder('utf-8').decode(_bytes);
         const nome = path.split('/').pop();
         novos.push({ path, name: nome, content: fileContent, modificado: false, origem: 'gh', sha: d.sha });
       }
@@ -1990,7 +1994,9 @@ async function ghCarregarArquivo(path) {
     const resp = await fetch(url, { headers: { 'Authorization': `token ${token}`, 'Accept': 'application/vnd.github.v3+json' } });
     if (!resp.ok) throw new Error(`Erro ${resp.status}`);
     const data = await resp.json();
-    const conteudo = atob(data.content.replace(/\n/g, ''));
+    const _b64c = data.content.replace(/\n/g, '');
+    const _bytesc = Uint8Array.from(atob(_b64c), c => c.charCodeAt(0));
+    const conteudo = new TextDecoder('utf-8').decode(_bytesc);
     ghSha = data.sha;
 
     // Adiciona na sidebar GitHub
@@ -2034,7 +2040,9 @@ async function ghEnviarArquivo() {
   if (!path) { status.textContent = '⚠️ Informe o caminho.'; status.style.color='var(--warn)'; return; }
   const conteudo = editor.value;
   if (!conteudo.trim()) { toast('⚠️ Editor vazio!'); return; }
-  const base64 = btoa(unescape(encodeURIComponent(conteudo)));
+  const _enc = new TextEncoder();
+    const _encBytes = _enc.encode(conteudo);
+    const base64 = btoa(String.fromCharCode(..._encBytes));
   const body = { message: `Update ${path} via Editor Web`, content: base64, branch };
   if (ghSha) body.sha = ghSha;
   status.textContent = '⏳ Enviando...'; status.style.color = 'var(--muted)';
