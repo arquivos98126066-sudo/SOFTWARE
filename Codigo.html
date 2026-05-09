@@ -1186,6 +1186,17 @@ function toggleSidebar() {
   document.getElementById('sidebar').classList.toggle('collapsed', !sidebarOpen);
 }
 
+// Fecha sidebar ao clicar fora (mobile)
+document.addEventListener('click', function(e) {
+  if (!sidebarOpen) return;
+  const sidebar = document.getElementById('sidebar');
+  const toggleBtn = document.getElementById('btn-sidebar-toggle');
+  if (!sidebar.contains(e.target) && e.target !== toggleBtn && !toggleBtn.contains(e.target)) {
+    sidebarOpen = false;
+    sidebar.classList.add('collapsed');
+  }
+});
+
 // ═══════════════════════════════════════
 // UPLOAD DE ARQUIVO HTML
 // ═══════════════════════════════════════
@@ -1942,11 +1953,19 @@ async function ghListarArquivos() {
     if (!editableFiles.length) { status.textContent = 'Nenhum arquivo editável encontrado.'; status.style.color='var(--warn)'; return; }
     filesDiv.style.display = 'block';
     filesDiv.innerHTML = editableFiles.map(f =>
-      `<div class="gh-file-item" onclick="ghCarregarArquivo('${escAttr(f.path)}')">${escHTML(f.path)}</div>`
+      `<div class="gh-file-item" onclick="ghSelecionarArquivo('${escAttr(f.path)}')">${escHTML(f.path)}</div>`
     ).join('');
-    status.textContent = `✅ ${editableFiles.length} arquivo(s) — toque para abrir no editor.`;
+    status.textContent = `✅ ${editableFiles.length} arquivo(s) — toque para selecionar.`;
     status.style.color = 'var(--success)';
   } catch(e) { status.textContent = '❌ ' + e.message; status.style.color = 'var(--danger)'; }
+}
+
+function ghSelecionarArquivo(path) {
+  // Só preenche o campo — não carrega ainda
+  document.getElementById('gh-filename').value = path;
+  // Destaca item selecionado
+  document.querySelectorAll('.gh-file-item').forEach(el => el.classList.remove('pasta-active'));
+  event.currentTarget.classList.add('pasta-active');
 }
 
 async function ghCarregarPorCaminho() {
