@@ -23,10 +23,12 @@
   body{background:var(--bg);color:var(--text);font-family:'JetBrains Mono',monospace;height:100dvh;display:flex;flex-direction:column;overflow:hidden}
 
   /* ── HEADER ── */
-  .header{background:var(--surface);border-bottom:1px solid var(--border);padding:8px 10px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;gap:6px;z-index:10}
+  .header{background:var(--surface);border-bottom:1px solid var(--border);padding:8px 10px;display:flex;flex-direction:column;gap:6px;flex-shrink:0;z-index:10}
+  .header-row1{display:flex;align-items:center;justify-content:space-between;gap:8px}
   .header-left{display:flex;align-items:center;gap:8px}
   .header-title{font-family:'Syne',sans-serif;font-size:14px;font-weight:800;background:linear-gradient(90deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;white-space:nowrap}
-  .header-actions{display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end}
+  .header-actions{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;align-items:center}
+  .header-row2{display:flex;justify-content:flex-end;padding:0 2px}
   .hbtn{background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:7px;padding:5px 9px;font-size:10px;font-weight:700;cursor:pointer;font-family:'JetBrains Mono',monospace;transition:all 0.15s;white-space:nowrap}
   .hbtn:active{transform:scale(0.95)}
   .hbtn.undo{color:var(--muted)}
@@ -270,18 +272,22 @@
 
 <!-- HEADER -->
 <div class="header">
-  <div class="header-left">
-    <button class="hbtn sidebar-toggle" id="btn-sidebar-toggle" onclick="toggleSidebar()" title="Alternar sidebar">☰</button>
-    <div class="header-title">⌨ EDITOR</div>
+  <div class="header-row1">
+    <div class="header-left">
+      <button class="hbtn sidebar-toggle" id="btn-sidebar-toggle" onclick="toggleSidebar()" title="Alternar sidebar">☰</button>
+      <div class="header-title">⌨ EDITOR</div>
+    </div>
+    <div class="header-actions">
+      <button class="hbtn undo" id="btn-undo" onclick="desfazer()" title="Desfazer">↺ Desfazer</button>
+      <button class="hbtn redo" id="btn-redo" onclick="refazer()" title="Refazer">↻ Refazer</button>
+      <button class="hbtn upload" onclick="triggerUpload()" title="Carregar arquivo HTML">⬆ HTML</button>
+      <button class="hbtn upload" onclick="triggerUploadPasta()" title="Carregar pasta inteira" style="color:#c084fc;border-color:#c084fc">📁 Pasta</button>
+      <button class="hbtn export" onclick="exportarHTML()" title="Exportar arquivo HTML">⬇ Export</button>
+      <button class="hbtn copy" onclick="copiarCodigo()">⎘ Copiar</button>
+    </div>
   </div>
-  <div class="header-actions">
-    <button class="hbtn undo" id="btn-undo" onclick="desfazer()" title="Desfazer">↺ Desfazer</button>
-    <button class="hbtn redo" id="btn-redo" onclick="refazer()" title="Refazer">↻ Refazer</button>
-    <button class="hbtn upload" onclick="triggerUpload()" title="Carregar arquivo HTML">⬆ HTML</button>
-    <button class="hbtn upload" onclick="triggerUploadPasta()" title="Carregar pasta inteira" style="color:#c084fc;border-color:#c084fc">📁 Pasta</button>
-    <button class="hbtn export" onclick="exportarHTML()" title="Exportar arquivo HTML">⬇ Export</button>
-    <button class="hbtn copy" onclick="copiarCodigo()">⎘ Copiar</button>
-    <button class="hbtn" id="btn-gh-header" onclick="abrirGitHub()" title="Abrir / conectar GitHub" style="color:#a78bff;border-color:rgba(167,139,255,.5)">🐙 GitHub</button>
+  <div class="header-row2">
+    <button class="hbtn" id="btn-gh-header" onclick="abrirGitHub()" title="Abrir / conectar GitHub" style="color:#a78bff;border-color:rgba(167,139,255,.5);width:100%">🐙 GitHub</button>
   </div>
 </div>
 <input type="file" id="file-input" accept=".html,.htm" style="display:none" onchange="carregarArquivo(event)">
@@ -1975,6 +1981,12 @@ async function carregarDoFirebase() {
     const snap = await _getDoc(ref);
     if (!snap.exists()) return false;
     const d = snap.data();
+
+    // Só sobrescreve se o Firebase tiver dado mais recente que o localStorage
+    const tsFirebase = d.ts || 0;
+    const tsLocal = parseInt(localStorage.getItem('editor_ts') || '0');
+    if (tsFirebase <= tsLocal) return false; // localStorage é mais recente, não sobrescreve
+
     // Restaura grupos
     if (d.grupos) {
       try {
@@ -2012,6 +2024,7 @@ async function carregarDoFirebase() {
       editor.value = d.codigo;
       localStorage.setItem(LS_CODE, d.codigo);
     }
+    localStorage.setItem('editor_ts', String(tsFirebase));
     return true;
   } catch(e) {
     console.warn('Erro Firebase load:', e);
@@ -2056,6 +2069,7 @@ function salvarNoStorage() {
     }
 
     localStorage.setItem(LS_CODE, editor.value);
+    localStorage.setItem('editor_ts', String(Date.now()));
 
     // Salva grupos locais (GitHub não persiste por segurança)
     const gruposParaSalvar = pastasGrupos
