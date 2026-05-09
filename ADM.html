@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+<!DOCTYPE html> ...
 <html lang="pt-br">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>Administração</title>
+<title>AdministraÃ§Ã£o</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <script src="https://arquivos98126066-sudo.github.io/SOFTWARE/sync-indicator.js"></script>
@@ -134,38 +134,38 @@ hr.hr{border:none;border-top:1px solid var(--brd2);margin:10px 0}
 
 <div class="drawer" id="drawer">
   <div class="drawer-head">
-    <div class="drawer-logo">💼 ADMINISTRAÇÃO</div>
+    <div class="drawer-logo">ð¼ ADMINISTRAÃÃO</div>
     <div class="drawer-sub" id="drawerSaldo">Saldo: R$ 0,00</div>
   </div>
-  <div class="drawer-item on" id="di0" onclick="irPara(0)"><span class="dic">📥</span> REGISTRAR</div>
-  <div class="drawer-item" id="di1" onclick="irPara(1)"><span class="dic">💶</span> ADM</div>
-  <div class="drawer-item" id="di2" onclick="irPara(2)"><span class="dic">🗂️</span> HISTÓRICO</div>
-  <div class="drawer-item" id="di3" onclick="irPara(3)"><span class="dic">📊</span> RELATÓRIO</div>
+  <div class="drawer-item on" id="di0" onclick="irPara(0)"><span class="dic">ð¥</span> REGISTRAR</div>
+  <div class="drawer-item" id="di1" onclick="irPara(1)"><span class="dic">ð¶</span> ADM</div>
+  <div class="drawer-item" id="di2" onclick="irPara(2)"><span class="dic">ðï¸</span> HISTÃRICO</div>
+  <div class="drawer-item" id="di3" onclick="irPara(3)"><span class="dic">ð</span> RELATÃRIO</div>
   <div class="drawer-footer" id="drawerData"></div>
 </div>
 
 <div class="hdr">
   <div class="hdr-top">
-    <div class="hdr-title" id="hdrTitle">📥 Registrar</div>
-    <button class="menu-btn" onclick="abrirMenu()">☰ Menu</button>
+    <div class="hdr-title" id="hdrTitle">ð¥ Registrar</div>
+    <button class="menu-btn" onclick="abrirMenu()">â° Menu</button>
   </div>
   <div class="hdr-saldo" id="hdrSaldo">Saldo: R$ 0,00</div>
 </div>
 
-<!-- ════════ ABA 0 — REGISTRAR ════════ -->
+<!-- ââââââââ ABA 0 â REGISTRAR ââââââââ -->
 <div id="p0" class="pnl on">
 
   <div class="card card-bl vd">
     <div class="card-b" style="padding:14px 16px;">
-      <div style="font-size:.65rem;font-weight:900;letter-spacing:.14em;text-transform:uppercase;color:var(--vd);margin-bottom:10px;">✨ Analisar com IA</div>
+      <div style="font-size:.65rem;font-weight:900;letter-spacing:.14em;text-transform:uppercase;color:var(--vd);margin-bottom:10px;">â¨ Analisar com IA</div>
       <div style="margin-bottom:10px;">
         <label class="lbl-inp">Data</label>
         <input type="date" id="iaData" style="margin:0;">
       </div>
       <textarea id="iaCampo" style="width:100%;min-height:200px;border:2px solid var(--brd);border-radius:12px;background:#fafafa;font-family:'Nunito',sans-serif;font-size:.88rem;font-weight:600;color:var(--txt);padding:12px;resize:none;outline:none;line-height:1.7;transition:border .2s;" placeholder="Cole aqui o texto"></textarea>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px;">
-        <button id="btnCopiarAbrir" class="btn btn-az" style="font-size:.8rem;">✨ Copiar &amp; Abrir</button>
-        <button id="btnRegistrarIA" class="btn btn-vd" style="font-size:.8rem;">✅ Registrar</button>
+        <button id="btnCopiarAbrir" class="btn btn-az" style="font-size:.8rem;">â¨ Copiar &amp; Abrir</button>
+        <button id="btnRegistrarIA" class="btn btn-vd" style="font-size:.8rem;">â Registrar</button>
       </div>
       <div id="iaFeedback" style="display:none;margin-top:10px;border-radius:10px;padding:10px 12px;background:var(--vd2);border:1px solid #a8d5b5;">
         <div style="font-size:.78rem;font-weight:900;color:var(--vd);" id="iaFeedbackTxt"></div>
@@ -174,7 +174,7 @@ hr.hr{border:none;border-top:1px solid var(--brd2);margin:10px 0}
   </div>
 
   <div class="card">
-    <div class="card-t">Lançamento rápido</div>
+    <div class="card-t">LanÃ§amento rÃ¡pido</div>
     <div class="card-b">
       <div class="igroup">
         <label class="lbl-inp">Data</label>
@@ -183,42 +183,42 @@ hr.hr{border:none;border-top:1px solid var(--brd2);margin:10px 0}
       <div class="igroup">
         <label class="lbl-inp">Tipo</label>
         <select id="lTipo" onchange="onTipoChange()">
-          <option value="entrada">📈 Entrada</option>
-          <option value="tapete_entrada">🧻 Entrada Tapete</option>
-          <option value="outras_entrada">🔖 Outras entradas</option>
+          <option value="entrada">ð Entrada</option>
+          <option value="tapete_entrada">ð§» Entrada Tapete</option>
+          <option value="outras_entrada">ð Outras entradas</option>
         </select>
       </div>
       <div class="igroup" id="grupoCat" style="display:none;">
-        <label class="lbl-inp">Descrição</label>
-        <input type="text" id="lCat" placeholder="Ex: Devolução, presente...">
+        <label class="lbl-inp">DescriÃ§Ã£o</label>
+        <input type="text" id="lCat" placeholder="Ex: DevoluÃ§Ã£o, presente...">
       </div>
       <div class="igroup">
         <label class="lbl-inp">Valor (R$)</label>
         <input type="text" id="lValor" placeholder="Ex: 200,00" inputmode="decimal">
       </div>
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
-        <button class="mot-btn" id="motBtn">＋</button>
+        <button class="mot-btn" id="motBtn">ï¼</button>
         <span style="font-size:.72rem;color:var(--txt2);font-weight:700;">Por que essa entrada?</span>
       </div>
       <div class="mot-area" id="motArea">
         <textarea id="lMotivacao" placeholder="Ex: Venda de tapete, renda extra..."></textarea>
       </div>
-      <button class="btn btn-vd" id="btnRegistrarLanc">✔️ Registrar lançamento</button>
+      <button class="btn btn-vd" id="btnRegistrarLanc">âï¸ Registrar lanÃ§amento</button>
     </div>
   </div>
 
 </div>
 
-<!-- ════════ ABA 1 — ADM ════════ -->
+<!-- ââââââââ ABA 1 â ADM ââââââââ -->
 <div id="p1" class="pnl">
 
   <div class="card" style="border:1px solid #e0e0e0;">
     <div class="card-b" style="padding:20px;">
-      <div style="font-size:.65rem;font-weight:900;letter-spacing:.18em;text-transform:uppercase;color:#555;margin-bottom:6px;">Saldo disponível</div>
+      <div style="font-size:.65rem;font-weight:900;letter-spacing:.18em;text-transform:uppercase;color:#555;margin-bottom:6px;">Saldo disponÃ­vel</div>
       <div class="saldo-g pos" id="admSaldo">R$ 0,00</div>
       <div style="display:flex;justify-content:flex-end;align-items:center;margin-top:10px;padding-top:10px;border-top:1px solid var(--brd2);">
         <div style="text-align:right;">
-          <div style="font-size:.6rem;color:#777;font-weight:800;text-transform:uppercase;letter-spacing:.1em;">Dívidas</div>
+          <div style="font-size:.6rem;color:#777;font-weight:800;text-transform:uppercase;letter-spacing:.1em;">DÃ­vidas</div>
           <div style="font-size:1.1rem;font-weight:900;color:var(--vm);font-family:'Courier New',monospace;" id="admDivTotal">R$ 0,00</div>
         </div>
       </div>
@@ -230,11 +230,11 @@ hr.hr{border:none;border-top:1px solid var(--brd2);margin:10px 0}
       <div style="background:linear-gradient(135deg,#e8f0fe,#dbeafe);border-radius:14px;padding:14px 16px;margin-bottom:12px;border-left:5px solid var(--az);">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
           <div style="display:flex;align-items:center;gap:8px;flex:1;">
-            <span style="font-size:1rem;">🔖</span>
-            <div id="outrasNomeDisplay" style="font-size:.75rem;font-weight:900;color:#111;text-transform:uppercase;letter-spacing:.15em;cursor:pointer;" onclick="editarNomeOutras()" title="Toque para renomear">Outras Entradas ✏️</div>
+            <span style="font-size:1rem;">ð</span>
+            <div id="outrasNomeDisplay" style="font-size:.75rem;font-weight:900;color:#111;text-transform:uppercase;letter-spacing:.15em;cursor:pointer;" onclick="editarNomeOutras()" title="Toque para renomear">Outras Entradas âï¸</div>
           </div>
           <div style="text-align:right;">
-            <div style="font-size:.6rem;color:var(--txt2);font-weight:700;text-transform:uppercase;letter-spacing:.1em;">Disponível</div>
+            <div style="font-size:.6rem;color:var(--txt2);font-weight:700;text-transform:uppercase;letter-spacing:.1em;">DisponÃ­vel</div>
             <div style="font-size:1.25rem;font-weight:900;font-family:'Courier New',monospace;color:var(--az);" id="admOutras">R$ 0,00</div>
           </div>
         </div>
@@ -244,13 +244,13 @@ hr.hr{border:none;border-top:1px solid var(--brd2);margin:10px 0}
         <label class="lbl-inp">Nome deste saldo</label>
         <div style="display:flex;gap:6px;">
           <input type="text" id="outrasNomeInput" placeholder="Ex: Reserva pessoal" style="margin:0;">
-          <button class="btn btn-az btn-sm" onclick="salvarNomeOutras()">✔</button>
+          <button class="btn btn-az btn-sm" onclick="salvarNomeOutras()">â</button>
         </div>
       </div>
       <div style="font-size:.65rem;font-weight:800;color:var(--txt2);text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px;">Retirar deste saldo</div>
       <div class="qf-linha">
         <input type="text" id="qfOutras" placeholder="Valor a retirar (R$)" inputmode="decimal" style="margin:0;">
-        <button class="btn btn-vm btn-sm" id="btnQfOutras">➖ Retirar</button>
+        <button class="btn btn-vm btn-sm" id="btnQfOutras">â Retirar</button>
       </div>
     </div>
   </div>
@@ -260,11 +260,11 @@ hr.hr{border:none;border-top:1px solid var(--brd2);margin:10px 0}
       <div style="background:var(--bg2);border-radius:14px;padding:14px 16px;margin-bottom:12px;border-left:5px solid #2563eb;">
         <div style="display:flex;justify-content:space-between;align-items:center;">
           <div>
-            <div style="font-size:.75rem;font-weight:900;color:#111;text-transform:uppercase;letter-spacing:.15em;">🧻 Tapete</div>
+            <div style="font-size:.75rem;font-weight:900;color:#111;text-transform:uppercase;letter-spacing:.15em;">ð§» Tapete</div>
             <div style="font-size:.78rem;color:var(--vm);font-weight:700;margin-top:4px;" id="tapeteGastoAdm">Gasto: R$ 0,00</div>
           </div>
           <div style="text-align:right;">
-            <div style="font-size:.6rem;color:var(--txt2);font-weight:700;text-transform:uppercase;letter-spacing:.1em;">Disponível</div>
+            <div style="font-size:.6rem;color:var(--txt2);font-weight:700;text-transform:uppercase;letter-spacing:.1em;">DisponÃ­vel</div>
             <div style="font-size:1.25rem;font-weight:900;font-family:'Courier New',monospace;color:#059669;" id="admTapete">R$ 0,00</div>
           </div>
         </div>
@@ -273,27 +273,27 @@ hr.hr{border:none;border-top:1px solid var(--brd2);margin:10px 0}
       <div style="font-size:.65rem;font-weight:800;color:var(--txt2);text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px;">Quebrar fluxo</div>
       <div class="qf-linha">
         <input type="text" id="qfTapete" placeholder="Valor a retirar (R$)" inputmode="decimal" style="margin:0;">
-        <button class="btn btn-vm btn-sm" id="btnQfTapete">➖ Retirar</button>
+        <button class="btn btn-vm btn-sm" id="btnQfTapete">â Retirar</button>
       </div>
     </div>
   </div>
 
   <div class="card">
-    <div class="card-t">Distribuição 50 / 30 / 10 / 10</div>
+    <div class="card-t">DistribuiÃ§Ã£o 50 / 30 / 10 / 10</div>
     <div class="card-b">
 
       <div class="dist-item">
         <div class="dist-top">
           <div style="display:flex;align-items:center;gap:8px;">
             <div style="width:10px;height:10px;border-radius:50%;background:var(--vd3);flex-shrink:0;"></div>
-            <span class="dist-nome">🏠 Despesas</span><span class="dist-pct">50%</span>
+            <span class="dist-nome">ð  Despesas</span><span class="dist-pct">50%</span>
           </div>
           <div class="dist-val" id="vDespesa">R$ 0,00</div>
         </div>
         <div class="divida-tag" id="dDespesa" style="display:none;"></div>
         <div class="qf-linha" style="margin-top:8px;">
           <input type="text" id="qfDespesa" placeholder="Retirar R$" inputmode="decimal" style="margin:0;font-size:.8rem;">
-          <button class="btn btn-vm btn-xs" onclick="retirarDist('despesas',document.getElementById('qfDespesa'))">➖</button>
+          <button class="btn btn-vm btn-xs" onclick="retirarDist('despesas',document.getElementById('qfDespesa'))">â</button>
         </div>
       </div>
 
@@ -301,14 +301,14 @@ hr.hr{border:none;border-top:1px solid var(--brd2);margin:10px 0}
         <div class="dist-top">
           <div style="display:flex;align-items:center;gap:8px;">
             <div style="width:10px;height:10px;border-radius:50%;background:var(--az);flex-shrink:0;"></div>
-            <span class="dist-nome">💼 Negócio</span><span class="dist-pct">30%</span>
+            <span class="dist-nome">ð¼ NegÃ³cio</span><span class="dist-pct">30%</span>
           </div>
           <div class="dist-val" id="vNegocio">R$ 0,00</div>
         </div>
         <div class="divida-tag" id="dNegocio" style="display:none;"></div>
         <div class="qf-linha" style="margin-top:8px;">
           <input type="text" id="qfNegocio" placeholder="Retirar R$" inputmode="decimal" style="margin:0;font-size:.8rem;">
-          <button class="btn btn-vm btn-xs" onclick="retirarDist('negocio',document.getElementById('qfNegocio'))">➖</button>
+          <button class="btn btn-vm btn-xs" onclick="retirarDist('negocio',document.getElementById('qfNegocio'))">â</button>
         </div>
       </div>
 
@@ -316,14 +316,14 @@ hr.hr{border:none;border-top:1px solid var(--brd2);margin:10px 0}
         <div class="dist-top">
           <div style="display:flex;align-items:center;gap:8px;">
             <div style="width:10px;height:10px;border-radius:50%;background:var(--am);flex-shrink:0;"></div>
-            <span class="dist-nome">📈 Investimento</span><span class="dist-pct">10%</span>
+            <span class="dist-nome">ð Investimento</span><span class="dist-pct">10%</span>
           </div>
           <div class="dist-val" id="vInvest">R$ 0,00</div>
         </div>
         <div class="divida-tag" id="dInvest" style="display:none;"></div>
         <div class="qf-linha" style="margin-top:8px;">
           <input type="text" id="qfInvest" placeholder="Retirar R$" inputmode="decimal" style="margin:0;font-size:.8rem;">
-          <button class="btn btn-vm btn-xs" onclick="retirarDist('invest',document.getElementById('qfInvest'))">➖</button>
+          <button class="btn btn-vm btn-xs" onclick="retirarDist('invest',document.getElementById('qfInvest'))">â</button>
         </div>
       </div>
 
@@ -331,14 +331,14 @@ hr.hr{border:none;border-top:1px solid var(--brd2);margin:10px 0}
         <div class="dist-top">
           <div style="display:flex;align-items:center;gap:8px;">
             <div style="width:10px;height:10px;border-radius:50%;background:#e879f9;flex-shrink:0;"></div>
-            <span class="dist-nome">🎉 Diversão</span><span class="dist-pct">10%</span>
+            <span class="dist-nome">ð DiversÃ£o</span><span class="dist-pct">10%</span>
           </div>
           <div class="dist-val" id="vDiversao">R$ 0,00</div>
         </div>
         <div class="divida-tag" id="dDiversao" style="display:none;"></div>
         <div class="qf-linha" style="margin-top:8px;">
           <input type="text" id="qfDiversao" placeholder="Retirar R$" inputmode="decimal" style="margin:0;font-size:.8rem;">
-          <button class="btn btn-vm btn-xs" onclick="retirarDist('diversao',document.getElementById('qfDiversao'))">➖</button>
+          <button class="btn btn-vm btn-xs" onclick="retirarDist('diversao',document.getElementById('qfDiversao'))">â</button>
         </div>
       </div>
 
@@ -346,13 +346,13 @@ hr.hr{border:none;border-top:1px solid var(--brd2);margin:10px 0}
   </div>
 
   <div class="card" id="cardPagarDiv" style="display:none;">
-    <div class="card-t" style="color:var(--vm);">⚠️ Pagar dívidas</div>
+    <div class="card-t" style="color:var(--vm);">â ï¸ Pagar dÃ­vidas</div>
     <div class="card-b" id="listaPagarDiv"></div>
   </div>
 
 </div>
 
-<!-- ════════ ABA 2 — HISTÓRICO ════════ -->
+<!-- ââââââââ ABA 2 â HISTÃRICO ââââââââ -->
 <div id="p2" class="pnl">
   <div class="card">
     <div class="card-b">
@@ -360,7 +360,7 @@ hr.hr{border:none;border-top:1px solid var(--brd2);margin:10px 0}
         <button id="fhTodos" class="fbtn on" onclick="filtroHist('todos')">Todos</button>
         <button id="fhHoje" class="fbtn" onclick="filtroHist('hoje')">Hoje</button>
         <button id="fhSemana" class="fbtn" onclick="filtroHist('semana')">Semana</button>
-        <button id="fhMes" class="fbtn" onclick="filtroHist('mes')">Mês</button>
+        <button id="fhMes" class="fbtn" onclick="filtroHist('mes')">MÃªs</button>
       </div>
       <div class="row2" style="margin-bottom:8px;">
         <input type="date" id="hInicio" onchange="filtroHist('custom')">
@@ -375,24 +375,24 @@ hr.hr{border:none;border-top:1px solid var(--brd2);margin:10px 0}
   <div class="card">
     <div class="card-b">
       <div class="backup-row">
-        <button class="btn btn-out btn-sm" id="btnBackup">📤 Backup</button>
-        <button class="btn btn-out btn-sm" id="btnImportar">📥 Importar</button>
-        <button class="btn btn-vm btn-sm" id="btnReset">🗑️ Reset</button>
+        <button class="btn btn-out btn-sm" id="btnBackup">ð¤ Backup</button>
+        <button class="btn btn-out btn-sm" id="btnImportar">ð¥ Importar</button>
+        <button class="btn btn-vm btn-sm" id="btnReset">ðï¸ Reset</button>
       </div>
       <div id="importArea" style="display:none;margin-top:10px;">
         <textarea id="importTexto" placeholder="Cole o backup aqui..." style="min-height:70px;font-size:.75rem;margin-bottom:6px;"></textarea>
-        <button class="btn btn-az" id="btnImportarDados">📥 Importar dados</button>
+        <button class="btn btn-az" id="btnImportarDados">ð¥ Importar dados</button>
       </div>
     </div>
   </div>
 </div>
 
-<!-- ════════ ABA 3 — RELATÓRIO ════════ -->
+<!-- ââââââââ ABA 3 â RELATÃRIO ââââââââ -->
 <div id="p3" class="pnl">
   <div class="card">
     <div class="card-b">
       <div class="filtros">
-        <button class="fbtn on" id="frMes" onclick="filtroRel('mes')">Mês atual</button>
+        <button class="fbtn on" id="frMes" onclick="filtroRel('mes')">MÃªs atual</button>
         <button id="frSemana" class="fbtn" onclick="filtroRel('semana')">Semana</button>
         <button id="frTodos" class="fbtn" onclick="filtroRel('todos')">Tudo</button>
       </div>
@@ -405,32 +405,32 @@ hr.hr{border:none;border-top:1px solid var(--brd2);margin:10px 0}
   <div id="relConteudo"></div>
 </div>
 
-<!-- MODAL PAGAR DÍVIDA -->
+<!-- MODAL PAGAR DÃVIDA -->
 <div class="moverlay" id="mPagarDiv">
   <div class="mbox">
     <div class="mbox-t">
-      <span>💳 Pagar dívida</span>
-      <button class="mclose" onclick="fecharModal('mPagarDiv')">✕</button>
+      <span>ð³ Pagar dÃ­vida</span>
+      <button class="mclose" onclick="fecharModal('mPagarDiv')">â</button>
     </div>
     <p style="font-size:.8rem;color:var(--txt2);font-weight:700;margin-bottom:12px;">Escolha qual categoria pagar:</p>
     <div id="mPagarOpcoes"></div>
     <div id="mPagarForm" style="display:none;margin-top:12px;">
       <label class="lbl-inp">Valor a pagar (R$)</label>
       <input type="text" id="mPagarValor" placeholder="Ex: 50,00" inputmode="decimal">
-      <button class="btn btn-vd" style="margin-top:10px;" id="btnConfirmarPagar">✅ Confirmar pagamento</button>
+      <button class="btn btn-vd" style="margin-top:10px;" id="btnConfirmarPagar">â Confirmar pagamento</button>
     </div>
   </div>
 </div>
 
-<!-- MODAL POR QUÊ -->
+<!-- MODAL POR QUÃ -->
 <div class="moverlay" id="mPorque">
   <div class="mbox">
     <div class="mbox-t">
-      <span>💭 Por quê?</span>
-      <button class="mclose" onclick="fecharModal('mPorque')">✕</button>
+      <span>ð­ Por quÃª?</span>
+      <button class="mclose" onclick="fecharModal('mPorque')">â</button>
     </div>
     <textarea id="porqueTexto" rows="3" placeholder="Por que fez esse gasto?" style="width:100%;border-radius:10px;border:1.5px solid var(--brd);padding:8px 10px;font-size:.82rem;resize:none;box-sizing:border-box;"></textarea>
-    <button class="btn btn-vd" id="btnSalvarMotivo" style="margin-top:10px;">✅ Salvar</button>
+    <button class="btn btn-vd" id="btnSalvarMotivo" style="margin-top:10px;">â Salvar</button>
   </div>
 </div>
 
@@ -536,7 +536,7 @@ function hoje() { var d = new Date(); return d.getFullYear() + '-' + String(d.ge
 function fmtBR(iso) { if (!iso) return ''; var p = iso.split('-'); var ms = ['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez']; return parseInt(p[2]) + ' de ' + ms[parseInt(p[1]) - 1] + ' de ' + p[0]; }
 function fmtDataCurta(iso) { if (!iso) return ''; var p = iso.split('-'); var ms = ['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez']; return parseInt(p[2]) + '/' + ms[parseInt(p[1]) - 1]; }
 
-// ===== CÁLCULOS =====
+// ===== CÃLCULOS =====
 function calcSaldo() {
   var d = gd(); var total = 0;
   d.lancamentos.forEach(function(l) {
@@ -581,10 +581,10 @@ function calcDividas() {
 
 // ===== CATEGORIA ADM =====
 var _catMap = {
-  despesas: ['mercado','aliment','comida','feira','supermercado','padaria','açougue','farmácia','remédio','saúde','aluguel','energia','água','luz','gás','internet','telefone','ônibus','transporte','passagem','combustível','gasolina','roupa','calçado','escola','mensalidade','conta','boleto','taxa','imposto','hygiene','higiene','limpeza','pet'],
-  negocio: ['negócio','negocio','trabalho','material','ferramenta','equipamento','produto','estoque','fornecedor','serviço','servico','marketing','propaganda','curso','treinamento','capacitação'],
-  invest: ['investimento','poupança','reserva','aplicação','cdb','tesouro','ação','fundo'],
-  diversao: ['lanche','restaurante','cinema','show','viagem','lazer','entretenimento','festa','bar','pizza','hamburguer','hamburger','sorvete','açaí','açai','jogo','streaming','netflix','spotify']
+  despesas: ['mercado','aliment','comida','feira','supermercado','padaria','aÃ§ougue','farmÃ¡cia','remÃ©dio','saÃºde','aluguel','energia','Ã¡gua','luz','gÃ¡s','internet','telefone','Ã´nibus','transporte','passagem','combustÃ­vel','gasolina','roupa','calÃ§ado','escola','mensalidade','conta','boleto','taxa','imposto','hygiene','higiene','limpeza','pet'],
+  negocio: ['negÃ³cio','negocio','trabalho','material','ferramenta','equipamento','produto','estoque','fornecedor','serviÃ§o','servico','marketing','propaganda','curso','treinamento','capacitaÃ§Ã£o'],
+  invest: ['investimento','poupanÃ§a','reserva','aplicaÃ§Ã£o','cdb','tesouro','aÃ§Ã£o','fundo'],
+  diversao: ['lanche','restaurante','cinema','show','viagem','lazer','entretenimento','festa','bar','pizza','hamburguer','hamburger','sorvete','aÃ§aÃ­','aÃ§ai','jogo','streaming','netflix','spotify']
 };
 function inferirCatDist(cat) {
   var c = cat.toLowerCase();
@@ -612,11 +612,11 @@ function renderADM() {
   document.getElementById('admOutras').textContent = fmtVal(outrasDisp);
   document.getElementById('admOutras').style.color = outrasDisp >= 0 ? 'var(--az)' : 'var(--vm)';
   var nomeAtual = gd().adm.outrasNome || 'Outras Entradas';
-  document.getElementById('outrasNomeDisplay').textContent = nomeAtual + ' ✏️';
+  document.getElementById('outrasNomeDisplay').textContent = nomeAtual + ' âï¸';
 
   var tapDiv = document.getElementById('tapeteDivida');
   if (gd().adm.tapeteRetirada > 0) {
-    tapDiv.innerHTML = '<div style="font-size:.65rem;color:var(--vm);font-weight:800;margin-top:4px;">⚠️ Retirada fora do fluxo: ' + fmtVal(gd().adm.tapeteRetirada) + '</div>';
+    tapDiv.innerHTML = '<div style="font-size:.65rem;color:var(--vm);font-weight:800;margin-top:4px;">â ï¸ Retirada fora do fluxo: ' + fmtVal(gd().adm.tapeteRetirada) + '</div>';
   } else { tapDiv.innerHTML = ''; }
 
   var cats = [
@@ -630,7 +630,7 @@ function renderADM() {
     document.getElementById(c.vId).textContent = fmtVal(disp);
     document.getElementById(c.vId).style.color = disp < 0 ? 'var(--vm)' : 'var(--txt)';
     var dEl = document.getElementById(c.dId);
-    if (c.div > 0) { dEl.style.display = 'flex'; dEl.textContent = '⚠️ Dívida: ' + fmtVal(c.div); }
+    if (c.div > 0) { dEl.style.display = 'flex'; dEl.textContent = 'â ï¸ DÃ­vida: ' + fmtVal(c.div); }
     else { dEl.style.display = 'none'; }
   });
 
@@ -638,7 +638,7 @@ function renderADM() {
   document.getElementById('cardPagarDiv').style.display = temDiv ? 'block' : 'none';
   if (temDiv) {
     var html = '';
-    var nomes = { despesas: '🏠 Despesas', negocio: '💼 Negócio', invest: '📈 Investimento', diversao: '🎉 Diversão', tapete: '🧻 Tapete' };
+    var nomes = { despesas: 'ð  Despesas', negocio: 'ð¼ NegÃ³cio', invest: 'ð Investimento', diversao: 'ð DiversÃ£o', tapete: 'ð§» Tapete' };
     for (var k in divs) {
       if (divs[k] > 0) {
         html += '<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--brd2);">';
@@ -654,13 +654,13 @@ function renderADM() {
   atualizarHeader();
 }
 
-// ===== RETIRAR DISTRIBUIÇÃO =====
+// ===== RETIRAR DISTRIBUIÃÃO =====
 window.retirarDist = async function(cat, inputEl) {
   var val = fmtNum(inputEl.value);
   if (!val || val <= 0) { toast('Informe o valor', 'aviso'); return; }
   _cache.adm.retiradas[cat] = (_cache.adm.retiradas[cat] || 0) + val;
-  var nomes = { despesas: 'Despesas', negocio: 'Negócio', invest: 'Investimento', diversao: 'Diversão' };
-  _cache.lancamentos.push({ id: Date.now(), tipo: 'saida', categoria: 'Retirada ' + nomes[cat], valor: val, data: hoje(), motivacao: 'Retirada da distribuição ' + nomes[cat], catDist: cat });
+  var nomes = { despesas: 'Despesas', negocio: 'NegÃ³cio', invest: 'Investimento', diversao: 'DiversÃ£o' };
+  _cache.lancamentos.push({ id: Date.now(), tipo: 'saida', categoria: 'Retirada ' + nomes[cat], valor: val, data: hoje(), motivacao: 'Retirada da distribuiÃ§Ã£o ' + nomes[cat], catDist: cat });
   await salvar();
   inputEl.value = '';
   renderADM();
@@ -681,13 +681,13 @@ document.getElementById('btnQfTapete').onclick = async function() {
   toast('Retirado do tapete');
 };
 
-// ===== OUTRAS ENTRADAS — RETIRAR =====
+// ===== OUTRAS ENTRADAS â RETIRAR =====
 document.getElementById('btnQfOutras').onclick = async function() {
   var val = fmtNum(document.getElementById('qfOutras').value);
   if (!val || val <= 0) { toast('Informe o valor', 'aviso'); return; }
   var nome = gd().adm.outrasNome || 'Outras Entradas';
   _cache.adm.outrasRetirada = (_cache.adm.outrasRetirada || 0) + val;
-  _cache.lancamentos.push({ id: Date.now(), tipo: 'outras_retirada', categoria: 'Retirada — ' + nome, valor: val, data: hoje(), motivacao: 'Retirada de ' + nome });
+  _cache.lancamentos.push({ id: Date.now(), tipo: 'outras_retirada', categoria: 'Retirada â ' + nome, valor: val, data: hoje(), motivacao: 'Retirada de ' + nome });
   await salvar();
   document.getElementById('qfOutras').value = '';
   renderADM();
@@ -708,15 +708,15 @@ window.salvarNomeOutras = async function() {
   await salvar();
   document.getElementById('editarNomeOutrasArea').style.display = 'none';
   renderADM();
-  toast('✅ Nome atualizado!');
+  toast('â Nome atualizado!');
 };
 
-// ===== PAGAR DÍVIDA =====
+// ===== PAGAR DÃVIDA =====
 var _pagarCat = null;
 window._abrirPagarDiv = function(cat, divVal) {
   _pagarCat = cat;
-  var nomes = { despesas: '🏠 Despesas', negocio: '💼 Negócio', invest: '📈 Investimento', diversao: '🎉 Diversão', tapete: '🧻 Tapete' };
-  document.getElementById('mPagarOpcoes').innerHTML = '<div style="background:var(--vm2);border-radius:10px;padding:10px 12px;margin-bottom:10px;font-size:.82rem;font-weight:800;color:var(--vm);">Pagando dívida de: ' + nomes[cat] + '<br>Dívida atual: ' + fmtVal(divVal) + '</div>';
+  var nomes = { despesas: 'ð  Despesas', negocio: 'ð¼ NegÃ³cio', invest: 'ð Investimento', diversao: 'ð DiversÃ£o', tapete: 'ð§» Tapete' };
+  document.getElementById('mPagarOpcoes').innerHTML = '<div style="background:var(--vm2);border-radius:10px;padding:10px 12px;margin-bottom:10px;font-size:.82rem;font-weight:800;color:var(--vm);">Pagando dÃ­vida de: ' + nomes[cat] + '<br>DÃ­vida atual: ' + fmtVal(divVal) + '</div>';
   document.getElementById('mPagarValor').value = '';
   document.getElementById('mPagarForm').style.display = 'block';
   abrirModal('mPagarDiv');
@@ -727,26 +727,26 @@ document.getElementById('btnConfirmarPagar').onclick = async function() {
   var outrasDisp = calcOutrasDisp();
   if (val > outrasDisp) { toast('Saldo de "' + (_cache.adm.outrasNome || 'Outras Entradas') + '" insuficiente (' + fmtVal(outrasDisp) + ')', 'aviso'); return; }
   var ret = _cache.adm.retiradas;
-  var nomes = { despesas: 'Despesas', negocio: 'Negócio', invest: 'Investimento', diversao: 'Diversão' };
+  var nomes = { despesas: 'Despesas', negocio: 'NegÃ³cio', invest: 'Investimento', diversao: 'DiversÃ£o' };
   var nomeOutras = _cache.adm.outrasNome || 'Outras Entradas';
   ret[_pagarCat] = Math.max(0, (ret[_pagarCat] || 0) - val);
   _cache.adm.outrasRetirada = (_cache.adm.outrasRetirada || 0) + val;
-  _cache.lancamentos.push({ id: Date.now(), tipo: 'entrada', categoria: 'Quitação — ' + nomes[_pagarCat], valor: val, data: hoje(), motivacao: 'Pagamento de dívida de ' + nomes[_pagarCat] + ' via ' + nomeOutras, catDist: _pagarCat, quitacao: true });
-  _cache.lancamentos.push({ id: Date.now() + 1, tipo: 'outras_retirada', categoria: 'Pagamento dívida — ' + nomes[_pagarCat], valor: val, data: hoje(), motivacao: 'Saiu de ' + nomeOutras + ' para quitar dívida de ' + nomes[_pagarCat] });
+  _cache.lancamentos.push({ id: Date.now(), tipo: 'entrada', categoria: 'QuitaÃ§Ã£o â ' + nomes[_pagarCat], valor: val, data: hoje(), motivacao: 'Pagamento de dÃ­vida de ' + nomes[_pagarCat] + ' via ' + nomeOutras, catDist: _pagarCat, quitacao: true });
+  _cache.lancamentos.push({ id: Date.now() + 1, tipo: 'outras_retirada', categoria: 'Pagamento dÃ­vida â ' + nomes[_pagarCat], valor: val, data: hoje(), motivacao: 'Saiu de ' + nomeOutras + ' para quitar dÃ­vida de ' + nomes[_pagarCat] });
   await salvar();
   fecharModal('mPagarDiv');
   renderADM();
   renderHistorico();
   atualizarHeader();
-  toast('✅ Dívida de ' + nomes[_pagarCat] + ' quitada! Saldo +' + fmtVal(val));
+  toast('â DÃ­vida de ' + nomes[_pagarCat] + ' quitada! Saldo +' + fmtVal(val));
 };
 
-// ===== LANÇAMENTO RÁPIDO =====
+// ===== LANÃAMENTO RÃPIDO =====
 document.getElementById('motBtn').onclick = function() {
   var area = document.getElementById('motArea');
   area.classList.toggle('open');
   this.classList.toggle('tem', area.classList.contains('open'));
-  this.textContent = area.classList.contains('open') ? '−' : '＋';
+  this.textContent = area.classList.contains('open') ? 'â' : 'ï¼';
 };
 
 window.onTipoChange = function() {
@@ -764,8 +764,8 @@ document.getElementById('btnRegistrarLanc').onclick = async function() {
   if (!val || val <= 0) { toast('Informe o valor', 'aviso'); return; }
   if (!data) { toast('Informe a data', 'aviso'); return; }
   var categoria = tipo === 'entrada' ? 'Saldo' : tipo === 'tapete_entrada' ? 'Tapete' : tipo === 'outras_entrada' ? cat : cat;
-  var tipoLabel = tipo === 'entrada' ? 'Entrada no saldo' : tipo === 'tapete_entrada' ? 'Entrada no tapete' : tipo === 'outras_entrada' ? 'Outras entradas: ' + categoria : 'Entrada — categoria: ' + categoria;
-  if (!confirm('Confirmar lançamento?\n' + tipoLabel + '\nValor: ' + fmtVal(val))) return;
+  var tipoLabel = tipo === 'entrada' ? 'Entrada no saldo' : tipo === 'tapete_entrada' ? 'Entrada no tapete' : tipo === 'outras_entrada' ? 'Outras entradas: ' + categoria : 'Entrada â categoria: ' + categoria;
+  if (!confirm('Confirmar lanÃ§amento?\n' + tipoLabel + '\nValor: ' + fmtVal(val))) return;
   _cache.lancamentos.push({ id: Date.now(), tipo: tipo, categoria: categoria, valor: val, data: data, motivacao: mot });
   await salvar();
   document.getElementById('lCat').value = '';
@@ -773,24 +773,24 @@ document.getElementById('btnRegistrarLanc').onclick = async function() {
   document.getElementById('lMotivacao').value = '';
   document.getElementById('motArea').classList.remove('open');
   document.getElementById('motBtn').classList.remove('tem');
-  document.getElementById('motBtn').textContent = '＋';
+  document.getElementById('motBtn').textContent = 'ï¼';
   renderADM(); renderHistorico(); atualizarHeader();
-  toast('✅ Lançamento registrado!');
+  toast('â LanÃ§amento registrado!');
 };
 
-// ===== IA — COPIAR & ABRIR =====
-var _PROMPT_IA = 'Você é um organizador financeiro pessoal. Analise o texto e extraia TODOS os gastos. Retorne APENAS JSON válido (sem texto, sem markdown):\n{"data":"YYYY-MM-DD","saidas":[{"categoria":"Nome","catDist":"despesas","valor":0.00,"descricao":"itens","motivacao":""}],"tapete_gastos":[{"categoria":"Nome","valor":0.00,"descricao":"itens","motivacao":""}],"tapete_entradas":[]}\n\nREGRAS DE SINTAXE (prioridade máxima):\n1. Tudo entre () = gasto do TAPETE → vai para tapete_gastos. Pode estar dentro ou fora de []\n2. Tudo entre [] = saída do SALDO → vai para saidas. Se tiver () dentro, o () vai para tapete_gastos\n3. catDist é definido pelo marcador de categoria:\n   - Se tiver "despesa>" ou "despesas>" antes do conteúdo → catDist="despesas"\n   - Se tiver "negocio>" ou "negócio>" → catDist="negocio"\n   - Se tiver "invest>" ou "investimento>" → catDist="invest"\n   - Se tiver "diversao>" ou "diversão>" → catDist="diversao"\n   - Sem marcador → infere pelo conteúdo\n4. O marcador categoria>..< pode estar dentro do [] ou solto no texto\n\nEXEMPLOS:\n- "[despesa> nota fiscal com ovos arroz <]" → saida catDist=despesas\n- "[negocio> 20 reais de tomate <]" → saida catDist=negocio\n- "[ovos arroz feijão 60,59]" → saida, infere catDist=despesas pelo conteúdo\n- "(ônibus 30, lanche 10)" → tapete_gastos\n- "[despesa> mercado 50 (ônibus 30) <]" → saida R$50 despesas + tapete_gasto R$30\n\nREGRAS DE CATEGORIA (nome amigável):\n- Ovos, farinha, óleo, arroz, feijão, mortadela, pão, leite = "Supermercado"\n- Açougue, carnes = "Açougue"\n- Farmácia, remédio = "Farmácia"\n- Ônibus, passagem = "Transporte"\n- Combustível, gasolina = "Combustível"\n- Restaurante, lanche, pizza, hamburguer, açaí = "Alimentação"\n- Aluguel = "Aluguel"\n- Energia, água, internet, telefone = nome da conta\n\nATENÇÃO: IGNORE códigos de barras, chaves de acesso, protocolos, CPF, números de série — NÃO são valores. tapete_entradas fica [] salvo se houver [valor_numerico] explícito.\n\nTEXTO:\n';
+// ===== IA â COPIAR & ABRIR =====
+var _PROMPT_IA = 'VocÃª Ã© um organizador financeiro pessoal. Analise o texto e extraia TODOS os gastos. Retorne APENAS JSON vÃ¡lido (sem texto, sem markdown):\n{"data":"YYYY-MM-DD","saidas":[{"categoria":"Nome","catDist":"despesas","valor":0.00,"descricao":"itens","motivacao":""}],"tapete_gastos":[{"categoria":"Nome","valor":0.00,"descricao":"itens","motivacao":""}],"tapete_entradas":[]}\n\nREGRAS DE SINTAXE (prioridade mÃ¡xima):\n1. Tudo entre () = gasto do TAPETE â vai para tapete_gastos. Pode estar dentro ou fora de []\n2. Tudo entre [] = saÃ­da do SALDO â vai para saidas. Se tiver () dentro, o () vai para tapete_gastos\n3. catDist Ã© definido pelo marcador de categoria:\n   - Se tiver "despesa>" ou "despesas>" antes do conteÃºdo â catDist="despesas"\n   - Se tiver "negocio>" ou "negÃ³cio>" â catDist="negocio"\n   - Se tiver "invest>" ou "investimento>" â catDist="invest"\n   - Se tiver "diversao>" ou "diversÃ£o>" â catDist="diversao"\n   - Sem marcador â infere pelo conteÃºdo\n4. O marcador categoria>..< pode estar dentro do [] ou solto no texto\n\nEXEMPLOS:\n- "[despesa> nota fiscal com ovos arroz <]" â saida catDist=despesas\n- "[negocio> 20 reais de tomate <]" â saida catDist=negocio\n- "[ovos arroz feijÃ£o 60,59]" â saida, infere catDist=despesas pelo conteÃºdo\n- "(Ã´nibus 30, lanche 10)" â tapete_gastos\n- "[despesa> mercado 50 (Ã´nibus 30) <]" â saida R$50 despesas + tapete_gasto R$30\n\nREGRAS DE CATEGORIA (nome amigÃ¡vel):\n- Ovos, farinha, Ã³leo, arroz, feijÃ£o, mortadela, pÃ£o, leite = "Supermercado"\n- AÃ§ougue, carnes = "AÃ§ougue"\n- FarmÃ¡cia, remÃ©dio = "FarmÃ¡cia"\n- Ãnibus, passagem = "Transporte"\n- CombustÃ­vel, gasolina = "CombustÃ­vel"\n- Restaurante, lanche, pizza, hamburguer, aÃ§aÃ­ = "AlimentaÃ§Ã£o"\n- Aluguel = "Aluguel"\n- Energia, Ã¡gua, internet, telefone = nome da conta\n\nATENÃÃO: IGNORE cÃ³digos de barras, chaves de acesso, protocolos, CPF, nÃºmeros de sÃ©rie â NÃO sÃ£o valores. tapete_entradas fica [] salvo se houver [valor_numerico] explÃ­cito.\n\nTEXTO:\n';
 
 document.getElementById('btnCopiarAbrir').onclick = function() {
   var txt = document.getElementById('iaCampo').value.trim();
   var data = document.getElementById('iaData').value;
   if (!txt) { toast('Cole o texto primeiro', 'aviso'); return; }
-  var prompt = _PROMPT_IA + 'Data de referência: ' + data + '\n\n' + txt;
+  var prompt = _PROMPT_IA + 'Data de referÃªncia: ' + data + '\n\n' + txt;
   if (navigator.clipboard && navigator.clipboard.writeText) {
     navigator.clipboard.writeText(prompt).then(function() {
       document.getElementById('iaCampo').value = '';
       window.open('https://claude.ai', '_blank');
-      toast('✅ Copiado! Cole no Claude.');
+      toast('â Copiado! Cole no Claude.');
     }).catch(function() { _copiarFallback(prompt); });
   } else { _copiarFallback(prompt); }
 };
@@ -798,13 +798,13 @@ function _copiarFallback(txt) {
   var ta = document.createElement('textarea');
   ta.value = txt; ta.style.position = 'fixed'; ta.style.opacity = '0';
   document.body.appendChild(ta); ta.select();
-  try { document.execCommand('copy'); document.getElementById('iaCampo').value = ''; toast('✅ Copiado! Abra o Claude manualmente.'); }
+  try { document.execCommand('copy'); document.getElementById('iaCampo').value = ''; toast('â Copiado! Abra o Claude manualmente.'); }
   catch (e) { toast('Erro ao copiar', 'erro'); }
   document.body.removeChild(ta);
   setTimeout(function() { window.open('https://claude.ai', '_blank'); }, 500);
 }
 
-// ===== IA — REGISTRAR =====
+// ===== IA â REGISTRAR =====
 document.getElementById('btnRegistrarIA').onclick = async function() {
   var txt = document.getElementById('iaCampo').value.trim();
   var data = document.getElementById('iaData').value || hoje();
@@ -812,7 +812,7 @@ document.getElementById('btnRegistrarIA').onclick = async function() {
   var json = null;
   var match = txt.match(/\{[\s\S]*\}/);
   if (match) { try { json = JSON.parse(match[0]); } catch (e) { json = null; } }
-  if (!json) { toast('JSON inválido. Copie a resposta do Claude aqui.', 'erro'); return; }
+  if (!json) { toast('JSON invÃ¡lido. Copie a resposta do Claude aqui.', 'erro'); return; }
   var data_uso = json.data || data;
   var count = 0;
   if (json.saidas && json.saidas.length) {
@@ -843,13 +843,13 @@ document.getElementById('btnRegistrarIA').onclick = async function() {
   document.getElementById('iaCampo').value = '';
   var fb = document.getElementById('iaFeedback');
   fb.style.display = 'block';
-  document.getElementById('iaFeedbackTxt').textContent = '✅ ' + count + ' lançamento(s) registrado(s) em ' + fmtBR(data_uso);
+  document.getElementById('iaFeedbackTxt').textContent = 'â ' + count + ' lanÃ§amento(s) registrado(s) em ' + fmtBR(data_uso);
   setTimeout(function() { fb.style.display = 'none'; }, 4000);
   renderADM(); renderHistorico(); atualizarHeader();
-  toast('✅ ' + count + ' lançamentos registrados!');
+  toast('â ' + count + ' lanÃ§amentos registrados!');
 };
 
-// ===== HISTÓRICO =====
+// ===== HISTÃRICO =====
 var _filtroHist = 'todos';
 window.filtroHist = function(f) {
   _filtroHist = f;
@@ -894,28 +894,28 @@ function renderHistorico() {
     var isOutras = g.tipo === 'outras_entrada' || g.tipo === 'outras_retirada';
     var headClass = isTapete ? 'tapete' : isOutras ? 'outras' : (isPos ? '' : 'saida');
     var icClass = isTapete ? 'tapete' : isOutras ? 'outras' : (isPos ? '' : 'saida');
-    var ic = isTapete ? '🧻' : isOutras ? '🔖' : (isPos ? '🏷️' : '🛒');
+    var ic = isTapete ? 'ð§»' : isOutras ? 'ð' : (isPos ? 'ð·ï¸' : 'ð');
     html += '<div class="hcat-card">';
     html += '<div class="hcat-head ' + headClass + '" onclick="toggleCat(\'hcat_' + _esc(k) + '\')">';
     html += '<div class="hcat-ic ' + icClass + '">' + ic + '</div>';
-    html += '<div class="hcat-info"><div class="hcat-nome">' + _esc2(k) + '</div><div class="hcat-sub">' + g.itens.length + ' lançamento' + (g.itens.length > 1 ? 's' : '') + '</div></div>';
+    html += '<div class="hcat-info"><div class="hcat-nome">' + _esc2(k) + '</div><div class="hcat-sub">' + g.itens.length + ' lanÃ§amento' + (g.itens.length > 1 ? 's' : '') + '</div></div>';
     html += '<div class="hcat-val ' + (isPos ? 'pos' : 'neg') + '">' + (isPos ? '+ ' : ' - ') + fmtVal(Math.abs(g.total)) + '</div>';
     html += '</div>';
     html += '<div class="hcat-body" id="hcat_' + _esc(k) + '">';
     g.itens.forEach(function(l) {
       html += '<div class="hlanc">';
       html += '<div class="hlanc-top">';
-      html += '<div><span class="hlanc-badge ' + (l.tipo === 'entrada' || l.tipo === 'tapete_entrada' || l.tipo === 'outras_entrada' ? 'badge-e' : 'badge-s') + '">' + (l.tipo === 'entrada' ? 'Entrada' : l.tipo === 'tapete_entrada' ? 'Tapete' : l.tipo === 'outras_entrada' ? 'Outras Ent.' : l.tipo === 'outras_retirada' ? 'Outras Ret.' : 'Saída') + '</span><span style="font-size:.72rem;color:var(--txt2);font-weight:700;">' + l.data + '</span></div>';
+      html += '<div><span class="hlanc-badge ' + (l.tipo === 'entrada' || l.tipo === 'tapete_entrada' || l.tipo === 'outras_entrada' ? 'badge-e' : 'badge-s') + '">' + (l.tipo === 'entrada' ? 'Entrada' : l.tipo === 'tapete_entrada' ? 'Tapete' : l.tipo === 'outras_entrada' ? 'Outras Ent.' : l.tipo === 'outras_retirada' ? 'Outras Ret.' : 'SaÃ­da') + '</span><span style="font-size:.72rem;color:var(--txt2);font-weight:700;">' + l.data + '</span></div>';
       html += '<span class="hlanc-val" style="color:' + (l.tipo === 'entrada' || l.tipo === 'tapete_entrada' || l.tipo === 'outras_entrada' ? 'var(--vd)' : 'var(--vm)') + ';">' + (l.tipo === 'entrada' || l.tipo === 'tapete_entrada' || l.tipo === 'outras_entrada' ? '+ ' : ' - ') + fmtVal(l.valor) + '</span>';
       html += '</div>';
-      if (l.descricao && l.descricao.trim()) { html += '<div class="hlanc-desc">📋 ' + _esc2(l.descricao) + '</div>'; }
-      if (l.motivacao && l.motivacao.trim()) { html += '<div class="hlanc-mot">📝 ' + _esc2(l.motivacao) + '</div>'; }
-      else { html += '<div class="hlanc-mot-placeholder" onclick="abrirPorque(\'' + l.id + '\')">📝 adicionar por quê</div>'; }
+      if (l.descricao && l.descricao.trim()) { html += '<div class="hlanc-desc">ð ' + _esc2(l.descricao) + '</div>'; }
+      if (l.motivacao && l.motivacao.trim()) { html += '<div class="hlanc-mot">ð ' + _esc2(l.motivacao) + '</div>'; }
+      else { html += '<div class="hlanc-mot-placeholder" onclick="abrirPorque(\'' + l.id + '\')">ð adicionar por quÃª</div>'; }
       html += '</div>';
     });
     html += '</div></div>';
   });
-  if (!keys.length) html = '<div class="empty"><span class="ic">📭</span>Nenhum lançamento encontrado</div>';
+  if (!keys.length) html = '<div class="empty"><span class="ic">ð­</span>Nenhum lanÃ§amento encontrado</div>';
   document.getElementById('listaHistorico').innerHTML = html;
   var entTotal = 0, saiTotal = 0;
   lancs.forEach(function(l) {
@@ -924,27 +924,27 @@ function renderHistorico() {
   });
   var saldoPer = entTotal - saiTotal;
   document.getElementById('resumoHist').innerHTML =
-    '<div style="font-size:.65rem;font-weight:900;letter-spacing:.14em;text-transform:uppercase;color:var(--txt2);margin-bottom:10px;">Resumo do período</div>' +
+    '<div style="font-size:.65rem;font-weight:900;letter-spacing:.14em;text-transform:uppercase;color:var(--txt2);margin-bottom:10px;">Resumo do perÃ­odo</div>' +
     '<div class="rel-row"><span>Entradas</span><span style="color:var(--vd);font-weight:900;font-family:\'Courier New\',monospace;">' + fmtVal(entTotal) + '</span></div>' +
-    '<div class="rel-row"><span>Saídas</span><span style="color:var(--vm);font-weight:900;font-family:\'Courier New\',monospace;">' + fmtVal(saiTotal) + '</span></div>' +
-    '<div class="rel-row total"><span>Saldo do período</span><span style="color:' + (saldoPer >= 0 ? 'var(--vd)' : 'var(--vm)') + ';font-family:\'Courier New\',monospace;">' + fmtVal(saldoPer) + '</span></div>';
+    '<div class="rel-row"><span>SaÃ­das</span><span style="color:var(--vm);font-weight:900;font-family:\'Courier New\',monospace;">' + fmtVal(saiTotal) + '</span></div>' +
+    '<div class="rel-row total"><span>Saldo do perÃ­odo</span><span style="color:' + (saldoPer >= 0 ? 'var(--vd)' : 'var(--vm)') + ';font-family:\'Courier New\',monospace;">' + fmtVal(saldoPer) + '</span></div>';
 }
 
 window.toggleCat = function(id) { var el = document.getElementById(id); if (el) el.classList.toggle('open'); };
 function _esc(s) { return String(s).replace(/[^a-zA-Z0-9]/g, '_'); }
 function _esc2(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
 
-// ===== POR QUÊ =====
+// ===== POR QUÃ =====
 window.abrirPorque = function(id) { _porqueEditId = id; document.getElementById('porqueTexto').value = ''; abrirModal('mPorque'); };
 document.getElementById('btnSalvarMotivo').onclick = async function() {
   var txt = document.getElementById('porqueTexto').value.trim();
   if (!txt) { toast('Digite o motivo', 'aviso'); return; }
   var l = _cache.lancamentos.find(function(x) { return String(x.id) === String(_porqueEditId); });
-  if (l) { l.motivacao = txt; await salvar(); renderHistorico(); toast('✅ Salvo!'); }
+  if (l) { l.motivacao = txt; await salvar(); renderHistorico(); toast('â Salvo!'); }
   fecharModal('mPorque');
 };
 
-// ===== RELATÓRIO =====
+// ===== RELATÃRIO =====
 var _filtroRel = 'mes';
 window.filtroRel = function(f) {
   _filtroRel = f;
@@ -982,12 +982,12 @@ function renderRelatorio() {
   var dist = calcDist();
   var ret = d.adm.retiradas;
   var html = '';
-  html += '<div class="card" style="margin-bottom:4px;"><div class="card-t">Resumo do período</div><div class="card-b">';
+  html += '<div class="card" style="margin-bottom:4px;"><div class="card-t">Resumo do perÃ­odo</div><div class="card-b">';
   html += '<div class="ngrid">';
   html += '<div class="ncard vd"><div class="num">' + fmtVal(entTotal) + '</div><div class="lbl">Entradas</div></div>';
-  html += '<div class="ncard vm"><div class="num">' + fmtVal(saiTotal) + '</div><div class="lbl">Saídas</div></div>';
+  html += '<div class="ncard vm"><div class="num">' + fmtVal(saiTotal) + '</div><div class="lbl">SaÃ­das</div></div>';
   html += '</div>';
-  html += '<div class="ncard ' + (saldoPer >= 0 ? 'vd' : 'vm') + '" style="margin-top:8px;"><div class="num">' + fmtVal(saldoPer) + '</div><div class="lbl">Saldo período</div></div>';
+  html += '<div class="ncard ' + (saldoPer >= 0 ? 'vd' : 'vm') + '" style="margin-top:8px;"><div class="num">' + fmtVal(saldoPer) + '</div><div class="lbl">Saldo perÃ­odo</div></div>';
   html += '</div></div>';
   var entKeys = Object.keys(catEnt).sort(function(a, b) { return catEnt[b] - catEnt[a]; });
   if (entKeys.length) {
@@ -997,13 +997,13 @@ function renderRelatorio() {
   }
   var saiKeys = Object.keys(catSai).sort(function(a, b) { return catSai[b] - catSai[a]; });
   if (saiKeys.length) {
-    html += '<div class="card" style="margin-bottom:4px;"><div class="card-t">Saídas por categoria</div><div class="card-b">';
+    html += '<div class="card" style="margin-bottom:4px;"><div class="card-t">SaÃ­das por categoria</div><div class="card-b">';
     saiKeys.forEach(function(k) { html += '<div class="rel-row"><span>' + _esc2(k) + '</span><span style="font-family:\'Courier New\',monospace;font-weight:900;color:var(--vm);"> - ' + fmtVal(catSai[k]) + '</span></div>'; });
     html += '</div></div>';
   }
   html += '<div style="height:8px;"></div>';
-  html += '<div class="card"><div class="card-t">Distribuição ADM atual</div><div class="card-b">';
-  var nomes = { despesas: '🏠 Despesas 50%', negocio: '💼 Negócio 30%', invest: '📈 Investimento 10%', diversao: '🎉 Diversão 10%' };
+  html += '<div class="card"><div class="card-t">DistribuiÃ§Ã£o ADM atual</div><div class="card-b">';
+  var nomes = { despesas: 'ð  Despesas 50%', negocio: 'ð¼ NegÃ³cio 30%', invest: 'ð Investimento 10%', diversao: 'ð DiversÃ£o 10%' };
   for (var k in nomes) {
     var disp = dist[k] - (ret[k] || 0);
     html += '<div class="rel-row"><span>' + nomes[k] + '</span><span style="font-family:\'Courier New\',monospace;font-weight:900;color:' + (disp >= 0 ? 'var(--txt)' : 'var(--vm)') + ';">' + fmtVal(disp) + '</span></div>';
@@ -1016,7 +1016,7 @@ function renderRelatorio() {
 document.getElementById('btnBackup').onclick = function() {
   var json = JSON.stringify(gd(), null, 2);
   if (navigator.clipboard && navigator.clipboard.writeText) {
-    navigator.clipboard.writeText(json).then(function() { toast('✅ Backup copiado!'); }).catch(function() { _copiarFallback(json); });
+    navigator.clipboard.writeText(json).then(function() { toast('â Backup copiado!'); }).catch(function() { _copiarFallback(json); });
   } else { _copiarFallback(json); }
 };
 document.getElementById('btnImportar').onclick = function() {
@@ -1027,17 +1027,17 @@ document.getElementById('btnImportarDados').onclick = async function() {
   var txt = document.getElementById('importTexto').value.trim();
   try {
     var d = JSON.parse(txt);
-    if (!d.lancamentos) throw new Error('inválido');
+    if (!d.lancamentos) throw new Error('invÃ¡lido');
     if (!confirm('Substituir todos os dados pelo backup?')) return;
     _cache = d;
     await salvar();
     renderADM(); renderHistorico(); renderRelatorio(); atualizarHeader();
     document.getElementById('importArea').style.display = 'none';
-    toast('✅ Dados importados!');
-  } catch (e) { toast('JSON inválido', 'erro'); }
+    toast('â Dados importados!');
+  } catch (e) { toast('JSON invÃ¡lido', 'erro'); }
 };
 document.getElementById('btnReset').onclick = async function() {
-  if (!confirm('Apagar TODOS os dados? Isso não pode ser desfeito.')) return;
+  if (!confirm('Apagar TODOS os dados? Isso nÃ£o pode ser desfeito.')) return;
   _cache = { lancamentos: [], adm: { retiradas: { despesas: 0, negocio: 0, invest: 0, diversao: 0 }, tapeteRetirada: 0, outrasRetirada: 0, outrasNome: 'Outras Entradas' } };
   await salvar();
   renderADM(); renderHistorico(); renderRelatorio(); atualizarHeader();
@@ -1057,7 +1057,7 @@ function fecharModal(id) { document.getElementById(id).classList.remove('open');
 window.fecharModal = fecharModal;
 
 // ===== NAV =====
-var abaNomes = ['📥 REGISTRAR', '💶 ADM', '🗂️ HISTÓRICO', '📊 RELATÓRIO'];
+var abaNomes = ['ð¥ REGISTRAR', 'ð¶ ADM', 'ðï¸ HISTÃRICO', 'ð RELATÃRIO'];
 window.irPara = function(idx) {
   for (var i = 0; i < 4; i++) {
     document.getElementById('p' + i).classList.toggle('on', i === idx);
@@ -1076,7 +1076,7 @@ window.fecharMenu = function() { document.getElementById('drawer').classList.rem
 async function init() {
   document.getElementById('iaData').value = hoje();
   document.getElementById('lData').value = hoje();
-  document.getElementById('drawerData').textContent = '📅 ' + fmtBR(hoje());
+  document.getElementById('drawerData').textContent = 'ð ' + fmtBR(hoje());
   await carregarDados();
   iniciarListeners();
   renderADM();
