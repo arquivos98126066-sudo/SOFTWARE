@@ -1186,16 +1186,20 @@ function toggleSidebar() {
   document.getElementById('sidebar').classList.toggle('collapsed', !sidebarOpen);
 }
 
-// Fecha sidebar ao clicar fora (mobile)
-document.addEventListener('click', function(e) {
+// Fecha sidebar ao tocar/clicar fora
+function fecharSidebarSeForaDela(e) {
   if (!sidebarOpen) return;
   const sidebar = document.getElementById('sidebar');
   const toggleBtn = document.getElementById('btn-sidebar-toggle');
-  if (!sidebar.contains(e.target) && e.target !== toggleBtn && !toggleBtn.contains(e.target)) {
-    sidebarOpen = false;
-    sidebar.classList.add('collapsed');
-  }
-});
+  // Ignora cliques dentro da sidebar ou no botão toggle
+  if (sidebar.contains(e.target) || toggleBtn.contains(e.target)) return;
+  // Ignora cliques em modais abertos
+  if (e.target.closest('.modal-overlay') || e.target.closest('#ctx-menu') || e.target.closest('#num-popup')) return;
+  sidebarOpen = false;
+  sidebar.classList.add('collapsed');
+}
+document.addEventListener('click', fecharSidebarSeForaDela);
+document.addEventListener('touchend', fecharSidebarSeForaDela, { passive: true });
 
 // ═══════════════════════════════════════
 // UPLOAD DE ARQUIVO HTML
