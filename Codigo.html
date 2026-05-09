@@ -1209,7 +1209,7 @@ function carregarArquivo(e) {
     atualizarBotoesHistorico();
     toast(`📂 "${file.name}" carregado!`);
   };
-  reader.readAsText(file, 'UTF-8');
+  reader.readAsText(file);
   e.target.value = '';
 }
 
@@ -1277,7 +1277,7 @@ function carregarPasta(e) {
       }
     };
     reader.onerror = () => { lidos++; if (lidos === total) renderizarSidebar(); };
-    reader.readAsText(file, 'UTF-8');
+    reader.readAsText(file);
   });
 }
 
