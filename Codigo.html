@@ -7,7 +7,7 @@
 <meta http-equiv="Expires" content="0">
 <script src="https://arquivos98126066-sudo.github.io/SOFTWARE/sync-indicator.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Editor de Código v23</title>
+<title>Editor de Código</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
@@ -1209,7 +1209,7 @@ function carregarArquivo(e) {
     atualizarBotoesHistorico();
     toast(`📂 "${file.name}" carregado!`);
   };
-  reader.readAsText(file);
+  reader.readAsText(file, 'UTF-8');
   e.target.value = '';
 }
 
@@ -1277,7 +1277,7 @@ function carregarPasta(e) {
       }
     };
     reader.onerror = () => { lidos++; if (lidos === total) renderizarSidebar(); };
-    reader.readAsText(file);
+    reader.readAsText(file, 'UTF-8');
   });
 }
 
