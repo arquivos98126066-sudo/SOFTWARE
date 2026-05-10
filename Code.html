@@ -68,19 +68,19 @@
   .main-area{flex:1;display:flex;overflow:hidden;position:relative}
 
   /* ── SIDEBAR ── */
-  .sidebar{width:var(--sidebar-w);background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;overflow:hidden;transition:width 0.22s cubic-bezier(.4,0,.2,1);z-index:5}
+  .sidebar{width:var(--sidebar-w);background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;overflow:hidden;transition:width 0.22s cubic-bezier(.4,0,.2,1);z-index:5;height:100%}
   .sidebar.collapsed{width:0;border-right:none}
   .sidebar-header{padding:8px 10px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;gap:4px}
   .sidebar-title{font-family:'Syne',sans-serif;font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;white-space:nowrap}
   .sidebar-actions{display:flex;gap:4px}
   .sb-icon-btn{background:none;border:none;color:var(--muted);cursor:pointer;padding:3px 5px;border-radius:5px;font-size:12px;transition:all 0.15s;white-space:nowrap}
   .sb-icon-btn:hover{color:var(--text);background:var(--surface2)}
-  .sidebar-files{flex:1;overflow-y:auto;padding:4px 0}
+  .sidebar-files{flex:1;overflow-y:auto;padding:4px 0;min-height:0}
   .sidebar-files::-webkit-scrollbar{width:3px}
   .sidebar-files::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
   .sidebar-empty{padding:20px 12px;font-size:11px;color:var(--muted);text-align:center;line-height:1.6}
   .sidebar-section{padding:4px 10px 2px;font-size:9px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;display:flex;align-items:center;gap:5px;white-space:nowrap}
-  .sidebar-footer{padding:8px;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:5px;flex-shrink:0;overflow-y:auto;max-height:160px}
+  .sidebar-footer{padding:8px;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:5px;flex-shrink:0;background:var(--surface)}
   .sb-dl-btn{background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:6px 8px;font-size:10px;font-weight:700;cursor:pointer;font-family:'JetBrains Mono',monospace;transition:all 0.15s;width:100%;text-align:left;white-space:nowrap}
   .sb-dl-btn:hover{border-color:var(--accent)}
   .sb-dl-btn.green{color:var(--success);border-color:rgba(0,200,150,.3)}
@@ -1866,7 +1866,15 @@ function abrirPreview() {
   const iframe = document.getElementById('preview-iframe');
   if (!codigo.trim()) {
     iframe.srcdoc = '<div style="font-family:sans-serif;color:#999;text-align:center;padding:80px 20px;font-size:15px;">Cole um código HTML no editor primeiro.</div>';
-  } else { iframe.srcdoc = __injectWidget(codigo); }
+  } else if (/type="module"|firebase-sync|firebase-firestore|highlight\.js.*highlight\.min/i.test(codigo)) {
+    iframe.srcdoc = `<div style="font-family:sans-serif;background:#0d0d14;color:#e8e8f0;text-align:center;padding:60px 24px;font-size:14px;height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;">
+      <div style="font-size:40px">⚠️</div>
+      <div style="font-weight:700;font-size:16px;color:#7c6aff">Preview não disponível</div>
+      <div style="color:#666680;font-size:13px;max-width:280px;line-height:1.6">Este arquivo usa scripts externos que não funcionam dentro do preview.<br><br>Use o botão <b style="color:#00e5c0">⬇ Export</b> para baixar e abrir no browser.</div>
+    </div>`;
+  } else {
+    iframe.srcdoc = __injectWidget(codigo);
+  }
   document.getElementById('preview-fullscreen').classList.add('show');
 }
 function fecharPreview() {
