@@ -296,7 +296,10 @@
   <div class="header-row1">
     <div class="header-left">
       <button class="hbtn sidebar-toggle" id="btn-sidebar-toggle" onclick="toggleSidebar()" title="Alternar sidebar">☰</button>
-      <div class="header-title">⌨ EDITOR</div>
+      <div style="display:flex;flex-direction:column;gap:1px">
+        <div id="gh-file-breadcrumb" style="display:none;font-size:9px;font-weight:700;color:var(--accent2);font-family:'JetBrains Mono',monospace;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:160px;opacity:0.85"></div>
+        <div class="header-title">⌨ EDITOR</div>
+      </div>
     </div>
     <div class="header-actions">
       <button class="hbtn upload" onclick="triggerUpload()" title="Carregar arquivo HTML">⬆ HTML</button>
@@ -871,13 +874,22 @@ function renderizarSidebar() {
   container.querySelectorAll('.sf-item').forEach(item => {
     const gid = parseInt(item.dataset.grupo);
     const idx = parseInt(item.dataset.idx);
-    const handler = (e) => {
+    let _touched = false;
+    item.addEventListener('touchend', (e) => {
       if (e.target.closest('button')) return;
-      if (e.type === 'touchend') e.preventDefault();
+      e.preventDefault();
+      _touched = true;
+      container.querySelectorAll('.sf-item').forEach(i => i.classList.remove('active'));
+      item.classList.add('active');
       abrirArquivoGrupo(gid, idx);
-    };
-    item.addEventListener('click', handler);
-    item.addEventListener('touchend', handler, { passive: false });
+    }, { passive: false });
+    item.addEventListener('click', (e) => {
+      if (e.target.closest('button')) return;
+      if (_touched) { _touched = false; return; }
+      container.querySelectorAll('.sf-item').forEach(i => i.classList.remove('active'));
+      item.classList.add('active');
+      abrirArquivoGrupo(gid, idx);
+    });
   });
 
   // Botões menu (⋯)
@@ -2424,6 +2436,9 @@ async function ghAbrirArquivoSelecionado() {
     // Mostra info na sidebar footer
     document.getElementById('sb-gh-file-info').style.display = '';
     document.getElementById('sb-gh-file-label').textContent = `🐙 ${ghSelectedFile.name}`;
+    // Breadcrumb acima do título EDITOR
+    const bc = document.getElementById('gh-file-breadcrumb');
+    if (bc) { bc.textContent = ghSelectedFile.name; bc.style.display = 'block'; }
 
     fecharModal('modal-github');
     toast(`🐙 "${ghSelectedFile.name}" carregado do GitHub!`);
@@ -2532,6 +2547,8 @@ if (arquivoAtivoGrupoId !== null && arquivoAtivoLocalIdx >= 0) {
       if (btnGhHeader) { btnGhHeader.style.color = '#00e5c0'; btnGhHeader.style.borderColor = 'rgba(0,229,192,.5)'; btnGhHeader.textContent = '🐙 Conectado'; }
       document.getElementById('sb-gh-file-info').style.display = '';
       document.getElementById('sb-gh-file-label').textContent = `🐙 ${f.name}`;
+      const bc = document.getElementById('gh-file-breadcrumb');
+      if (bc) { bc.textContent = f.name; bc.style.display = 'block'; }
     } else {
       document.getElementById('status-arquivo').textContent = '📄 ' + f.path;
     }
