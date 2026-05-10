@@ -566,65 +566,405 @@ body.img-active .ck-wrap{z-index:9100 !important;}
 .fm-viewer-title{flex:1;font-size:0.8rem;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .fm-viewer-body{flex:1;overflow:auto;padding:1rem;}
 .fm-viewer-text{font-size:0.82rem;line-height:1.75;color:var(--text);white-space:pre-wrap;word-break:break-word;}
-.fm-viewer-rich{font-size:0.85rem;line-height:1.8;color:var(--text);word-break:break-word;}
+.fm-viewer-rich{font-size:0.9rem;line-height:1.4;color:var(--text);word-break:break-word;}
 .fm-viewer-rich b,.fm-viewer-rich strong{font-weight:700;color:#fff;}
 .fm-viewer-rich i,.fm-viewer-rich em{font-style:italic;color:var(--muted2);}
-.fm-viewer-rich ul{padding-left:1.2rem;margin:0.4rem 0;}
-.fm-viewer-rich li{margin:0.2rem 0;}
+.fm-viewer-rich ul{padding-left:1.2rem;margin:0.15rem 0;}
+.fm-viewer-rich ol{padding-left:1.2rem;margin:0.15rem 0;list-style-type:decimal;}
+.fm-viewer-rich li{margin:0.1rem 0;}
+.fm-viewer-rich p{margin:0.1rem 0;}
+.fm-viewer-rich h1{font-size:1.15rem;font-weight:700;margin:0.55rem 0 0.18rem;}
+.fm-viewer-rich h2{font-size:1.05rem;font-weight:700;margin:0.45rem 0 0.14rem;}
+.fm-viewer-rich h3{font-size:0.95rem;font-weight:600;margin:0.35rem 0 0.1rem;}
 .fm-viewer-img{max-width:100%;max-height:80vh;object-fit:contain;display:block;margin:auto;}
 
 /* EDITOR RICH TEXT */
 .fm-editor{
   display:none;position:fixed;inset:0;z-index:9500;
-  background:#0a0a12;flex-direction:column;
+  background:#fff;flex-direction:column;
 }
 .fm-editor.open{display:flex;}
-.fm-editor-header{
-  padding:0.6rem 0.8rem;background:rgba(10,10,18,0.95);
-  border-bottom:1px solid var(--border2);
-  display:flex;align-items:center;gap:8px;flex-shrink:0;
-}
-.fm-editor-title{flex:1;font-size:0.75rem;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--muted2);}
-.fm-editor-save{
-  background:linear-gradient(135deg,var(--accent),var(--accent2));
-  border:none;border-radius:50px;color:#fff;
-  font-family:'Outfit',sans-serif;font-size:0.7rem;font-weight:600;
-  padding:0.3rem 0.9rem;cursor:pointer;white-space:nowrap;
-}
 .fm-toolbar{
-  display:flex;gap:4px;flex-wrap:wrap;padding:0.5rem 0.6rem;
-  border-bottom:1px solid var(--border);background:rgba(10,10,18,0.7);
+  display:flex;flex-direction:column;
+  border-bottom:1px solid #e5e7eb;background:#f9fafb;
   flex-shrink:0;
 }
+/* Linha de controle */
+.fm-tb-ctrl{
+  display:flex;align-items:center;gap:5px;
+  padding:0.4rem 0.5rem;
+  border-bottom:1px solid #e5e7eb;
+}
+.fm-tb-ctrl-btn{
+  width:30px;height:30px;border-radius:8px;
+  border:1px solid #d1d5db;background:#fff;
+  color:#374151;font-size:0.85rem;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;transition:all 0.15s;
+}
+.fm-tb-ctrl-btn:active{background:#f3f4f6;}
+.fm-tb-ctrl-btn.fm-tb-save{
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  border:none;color:#fff;
+}
+.fm-tb-filename{
+  flex:1;font-size:0.72rem;font-weight:600;
+  color:#374151;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  padding:0 2px;
+}
+.fm-tb-toggle{
+  padding:0.25rem 0.7rem;border-radius:20px;
+  border:1px solid var(--accent);
+  background:rgba(124,109,250,0.08);
+  color:var(--accent);font-size:0.68rem;font-weight:600;
+  cursor:pointer;font-family:'Outfit',sans-serif;
+  white-space:nowrap;flex-shrink:0;transition:all 0.15s;
+}
+.fm-tb-toggle:active{background:rgba(124,109,250,0.2);}
+/* Linha fixa superior da toolbar */
+.fm-tb-row-fixed{
+  display:flex;align-items:center;gap:4px;
+  padding:0.38rem 0.5rem;
+  border-bottom:1px solid #e5e7eb;
+  width:100%;overflow-x:auto;scrollbar-width:none;
+}
+.fm-tb-row-fixed::-webkit-scrollbar{display:none;}
+/* Botões linha 1: tamanho levemente maior, altura confortável */
+.fm-tb-btn.fm-tbr1{
+  height:30px;min-width:26px;padding:0.2rem 0.35rem;font-size:0.78rem;flex-shrink:0;
+}
+/* Linha 2 dos painéis */
+.fm-tb-panel{display:none;padding:0.3rem 0.5rem;gap:4px;align-items:center;width:100%;overflow-x:auto;scrollbar-width:none;}
+.fm-tb-panel::-webkit-scrollbar{display:none;}
+.fm-tb-panel.open{display:flex;}
 .fm-tb-btn{
-  padding:0.3rem 0.6rem;border-radius:8px;
-  border:1px solid var(--border2);background:var(--glass);
-  color:var(--text);font-size:0.78rem;cursor:pointer;
+  padding:0.3rem 0.5rem;border-radius:8px;
+  border:1px solid #d1d5db;background:#fff;
+  color:#374151;font-size:0.8rem;cursor:pointer;
   display:flex;align-items:center;justify-content:center;
   min-width:32px;height:30px;font-family:'Outfit',sans-serif;
-  transition:all 0.15s;
+  transition:all 0.15s;white-space:nowrap;flex-shrink:0;
 }
-.fm-tb-btn:active,.fm-tb-btn.active{background:rgba(124,109,250,0.2);border-color:var(--accent);}
-.fm-editor-body{
-  flex:1;overflow:auto;padding:0.8rem 1rem;
+.fm-tb-btn:active,.fm-tb-btn.active{background:rgba(124,109,250,0.1);border-color:var(--accent);color:var(--accent);}
+.fm-tb-sep{width:1px;height:22px;background:#d1d5db;flex-shrink:0;margin:0 3px;}
+.fm-tb-select{
+  height:30px;border-radius:8px;border:1px solid #d1d5db;
+  background:#fff;color:#374151;
+  font-family:'Outfit',sans-serif;font-size:0.72rem;
+  padding:0 6px;cursor:pointer;flex:1;min-width:0;max-width:130px;
+  -webkit-appearance:none;-moz-appearance:none;appearance:none;
 }
+.fm-tb-color{
+  width:30px;height:30px;border-radius:8px;border:1px solid #d1d5db;
+  padding:2px;cursor:pointer;background:#fff;flex-shrink:0;
+}
+/* Temas */
+.fm-theme-row{
+  display:flex;align-items:center;gap:8px;
+  padding:0.28rem 0.5rem 0.32rem;
+  border-top:1px solid #e5e7eb;
+  flex-wrap:wrap;
+}
+.fm-theme-label{font-size:0.6rem;color:#6b7280;white-space:nowrap;font-family:'Outfit',sans-serif;flex-shrink:0;}
+.fm-theme-dots-group{display:flex;gap:5px;align-items:center;flex-shrink:0;}
+.fm-theme-dot{
+  width:20px;height:20px;border-radius:50%;
+  border:2px solid transparent;cursor:pointer;
+  transition:transform 0.15s,border-color 0.15s;flex-shrink:0;
+}
+.fm-theme-dot:active,.fm-theme-dot.active{transform:scale(1.25);border-color:var(--accent);}
+.fm-theme-sep{width:1px;height:18px;background:#d1d5db;margin:0 4px;flex-shrink:0;}
+/* Separador decorativo entre grupos de botões */
+.fm-tb-vsep{
+  width:3px;height:22px;border-radius:2px;
+  background:linear-gradient(180deg,var(--accent),var(--accent2));
+  flex-shrink:0;margin:0 4px;opacity:0.4;
+}
+/* Ícone CSS de troca de painel */
+.fm-tb-switch{min-width:32px;position:relative;}
+.fm-switch-icon{
+  display:block;width:16px;height:12px;position:relative;
+}
+.fm-switch-icon::before,.fm-switch-icon::after{
+  content:'';position:absolute;left:0;height:2px;border-radius:1px;background:#7c6dfa;
+}
+.fm-switch-icon::before{top:1px;width:100%;}
+.fm-switch-icon::after{bottom:1px;width:60%;left:40%;}
+.fm-switch-icon-rev::before{width:60%;left:0;}
+.fm-switch-icon-rev::after{width:100%;left:0;}
+/* Autosave badge inline */
+.fm-autosave-badge{
+  font-size:0.58rem;color:#16a34a;
+  opacity:0;transition:opacity 0.4s;
+  pointer-events:none;font-family:'Outfit',sans-serif;
+  white-space:nowrap;flex-shrink:0;
+}
+.fm-autosave-badge.show{opacity:1;}
+/* Botão salvar gradiente */
+.fm-tb-save-btn{
+  background:linear-gradient(135deg,var(--accent),var(--accent2)) !important;
+  border:none !important;color:#fff !important;
+}
+.fm-editor-body{flex:1;overflow:auto;padding:0;scrollbar-width:none;}
+.fm-editor-body::-webkit-scrollbar{display:none;}
+
+
+/* ── EDITOR TEXTO/MD — fundo branco ── */
 .fm-editable{
   min-height:100%;outline:none;
-  font-size:0.85rem;line-height:1.8;color:var(--text);
-  word-break:break-word;caret-color:var(--accent);
+  font-size:0.9rem;line-height:1.4;
+  color:#1a1a2e;background:#ffffff;
+  word-break:break-word;caret-color:#7c6dfa;
+  padding:0.8rem 1rem;
+  font-family:'Outfit',sans-serif;
 }
-.fm-editable:empty::before{content:attr(data-placeholder);color:var(--muted);font-style:italic;}
-.fm-editable b,.fm-editable strong{font-weight:700;color:#fff;}
-.fm-editable i,.fm-editable em{font-style:italic;}
+.fm-editable:empty::before{content:attr(data-placeholder);color:#aaa;font-style:italic;}
+.fm-editable b,.fm-editable strong{font-weight:700;color:#111;}
+.fm-editable i,.fm-editable em{font-style:italic;color:#333;}
 .fm-editable u{text-decoration:underline;}
-.fm-editable s{text-decoration:line-through;}
-.fm-editable ul{padding-left:1.2rem;}
-.fm-editable ol{padding-left:1.2rem;}
-.fm-editable code{background:rgba(255,255,255,0.08);padding:0.1em 0.4em;border-radius:4px;font-family:monospace;font-size:0.82rem;}
-.fm-editable blockquote{border-left:3px solid var(--accent);padding-left:0.8rem;color:var(--muted2);margin:0.5rem 0;}
-.fm-editable h1{font-size:1.2rem;font-weight:700;margin:0.5rem 0;}
-.fm-editable h2{font-size:1rem;font-weight:600;margin:0.4rem 0;}
-.fm-editable a{color:var(--accent);text-decoration:underline;}
+.fm-editable s{text-decoration:line-through;color:#888;}
+.fm-editable ul{padding-left:1.4rem;margin:0.15rem 0;}
+.fm-editable ol{padding-left:1.4rem;margin:0.15rem 0;list-style-type:decimal;}
+.fm-editable li{margin:0.1rem 0;}
+.fm-editable p{margin:0.1rem 0;}
+.fm-editable br{display:block;content:'';margin-top:0;}
+/* Limita qualquer elemento filho que venha com font-size grande ao colar */
+.fm-editable *{max-font-size:1.2rem;}
+/* Títulos — tamanho máximo controlado, igual ao modo leitura */
+.fm-editable h1{font-size:1.15rem;font-weight:700;color:#111;margin:0.55rem 0 0.18rem;border-bottom:1px solid #e0e0e0;padding-bottom:0.12rem;}
+.fm-editable h2{font-size:1.05rem;font-weight:700;color:#222;margin:0.45rem 0 0.14rem;}
+.fm-editable h3{font-size:0.95rem;font-weight:600;color:#333;margin:0.35rem 0 0.1rem;}
+.fm-editable code{background:#f0f0f0;color:#d63384;padding:0.1em 0.4em;border-radius:4px;font-family:monospace;font-size:0.82rem;}
+.fm-editable blockquote{border-left:3px solid #7c6dfa;padding-left:0.8rem;color:#555;margin:0.2rem 0;font-style:italic;}
+.fm-editable a{color:#2d8cff;text-decoration:underline;font-weight:normal;}
+.fm-editable hr{border:none;border-top:1px solid #ddd;margin:0.35rem 0;}
+.fm-editable table{border-collapse:collapse;width:100%;font-size:0.82rem;}
+.fm-editable td,.fm-editable th{border:1px solid #ddd;padding:0.3rem 0.5rem;color:#222;}
+.fm-editable th{background:#f5f5f5;font-weight:700;}
+
+/* ── EDITOR HTML — syntax highlight escuro ── */
+.fm-code-editor{
+  min-height:100%;outline:none;
+  font-family:'Courier New',Courier,monospace;
+  font-size:0.8rem;line-height:1.7;
+  background:#0d1117;color:#c9d1d9;
+  padding:1rem;
+  white-space:pre-wrap;word-break:break-all;
+  caret-color:#58a6ff;
+}
+.fm-code-editor:empty::before{content:'Cole ou digite seu HTML aqui...';color:#555;font-style:italic;}
+
+/* ── MODO LEITURA ── */
+.fm-read-mode{
+  display:none;position:fixed;inset:0;z-index:9600;
+  background:#fff;flex-direction:column;
+  font-family:'Outfit',sans-serif;
+}
+.fm-read-mode.open{display:flex;}
+.fm-read-header{
+  padding:0.7rem 1rem;
+  background:rgba(255,255,255,0.95);
+  border-bottom:1px solid #e5e7eb;
+  display:flex;align-items:center;gap:8px;flex-shrink:0;
+  backdrop-filter:blur(10px);
+  position:sticky;top:0;z-index:10;
+}
+.fm-read-title{
+  flex:1;font-size:0.82rem;font-weight:600;
+  color:#374151;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.fm-read-edit-btn{
+  background:rgba(124,109,250,0.1);border:1px solid rgba(124,109,250,0.3);
+  color:#7c6dfa;border-radius:8px;padding:0.3rem 0.75rem;
+  font-size:0.72rem;cursor:pointer;font-family:'Outfit',sans-serif;
+  font-weight:600;white-space:nowrap;display:flex;align-items:center;gap:4px;
+  transition:all 0.15s;
+}
+.fm-read-edit-btn:active{transform:scale(0.95);}
+.fm-read-body{
+  flex:1;overflow-y:auto;
+  padding:1.5rem 1.4rem 3rem;
+  max-width:720px;width:100%;margin:0 auto;
+}
+.fm-read-content{
+  font-size:0.9rem;line-height:1.4;color:#1a1a2e;
+  word-break:break-word;
+}
+.fm-read-content b,.fm-read-content strong{font-weight:700;color:#111;}
+.fm-read-content i,.fm-read-content em{font-style:italic;color:#444;}
+.fm-read-content u{text-decoration:underline;}
+.fm-read-content s{text-decoration:line-through;color:#888;}
+.fm-read-content ul{padding-left:1.4rem;margin:0.15rem 0;}
+.fm-read-content ol{padding-left:1.4rem;margin:0.15rem 0;list-style-type:decimal;}
+.fm-read-content li{margin:0.1rem 0;}
+.fm-read-content p{margin:0.1rem 0;}
+.fm-read-content h1{font-size:1.15rem;font-weight:700;color:#111;margin:0.55rem 0 0.18rem;border-bottom:2px solid #e5e7eb;padding-bottom:0.12rem;}
+.fm-read-content h2{font-size:1.05rem;font-weight:700;color:#222;margin:0.45rem 0 0.14rem;}
+.fm-read-content h3{font-size:0.95rem;font-weight:600;color:#333;margin:0.35rem 0 0.1rem;}
+.fm-read-content code{background:#f3f4f6;color:#d63384;padding:0.1em 0.4em;border-radius:4px;font-family:monospace;font-size:0.85rem;}
+.fm-read-content blockquote{border-left:4px solid #7c6dfa;padding-left:1rem;color:#555;margin:0.3rem 0;font-style:italic;background:#f9f9ff;border-radius:0 8px 8px 0;padding:0.6rem 1rem;}
+.fm-read-content a{color:#7c6dfa;text-decoration:underline;font-weight:500;}
+.fm-read-content hr{border:none;border-top:2px solid #e5e7eb;margin:0.4rem 0;}
+.fm-read-content table{border-collapse:collapse;width:100%;font-size:0.9rem;margin:0.3rem 0;}
+.fm-read-content td,.fm-read-content th{border:1px solid #e5e7eb;padding:0.5rem 0.8rem;color:#222;}
+.fm-read-content th{background:#f5f5f5;font-weight:700;}
+.fm-read-content img{max-width:100%;border-radius:8px;margin:0.3rem 0;}
+
+/* ── BARRA DE CONTROLES DO MODO LEITURA ── */
+.fm-read-controls{
+  display:flex;align-items:center;gap:8px;
+  padding:0.4rem 1rem;
+  background:#f9fafb;
+  border-bottom:1px solid #e5e7eb;
+  flex-shrink:0;
+}
+.fm-read-font-sel{
+  height:26px;border-radius:7px;border:1px solid #d1d5db;
+  background:#fff;color:#374151;
+  font-family:'Outfit',sans-serif;font-size:0.68rem;
+  padding:0 6px;cursor:pointer;flex:1;min-width:0;max-width:140px;
+  -webkit-appearance:none;-moz-appearance:none;appearance:none;
+}
+.fm-read-zoom-btns{display:flex;gap:4px;margin-left:auto;}
+.fm-read-zoom-btn{
+  padding:0.2rem 0.55rem;border-radius:7px;
+  border:1px solid #d1d5db;background:#fff;
+  color:#374151;font-size:0.72rem;font-weight:600;
+  cursor:pointer;font-family:'Outfit',sans-serif;
+  transition:all 0.15s;
+}
+.fm-read-zoom-btn:active{background:#e5e7eb;}
+
+/* ── CHECKLIST NO EDITOR ── */
+.fm-check-item{
+  display:flex;align-items:flex-start;gap:8px;
+  margin:0.2rem 0;padding:0.15rem 0;
+  cursor:default;
+}
+.fm-check-box{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:16px;height:16px;min-width:16px;border-radius:4px;
+  border:1.5px solid #7c6dfa;background:#fff;
+  cursor:pointer;font-size:0.65rem;
+  transition:all 0.15s;margin-top:1px;
+  -webkit-user-select:none;user-select:none;
+}
+.fm-check-item.checked .fm-check-box{
+  background:#7c6dfa;border-color:#7c6dfa;color:#fff;
+}
+.fm-check-item.checked .fm-check-label{
+  text-decoration:line-through;color:#aaa;
+}
+.fm-check-label{flex:1;outline:none;min-width:0;}
+
+/* ── BLOCO COPIÁVEL ── */
+.fm-copy-block{
+  position:relative;
+  background:#f0f0f8;
+  border:1px solid #d0cff0;
+  border-radius:8px;
+  padding:0.5rem 0.7rem;
+  margin:0.3rem 0;
+  font-family:'Courier New',monospace;
+  font-size:0.82rem;
+  color:#2d2d5e;
+  white-space:pre-wrap;
+  word-break:break-all;
+}
+.fm-copy-block-btn{
+  position:absolute;
+  top:5px;right:6px;
+  background:#7c6dfa;
+  border:none;border-radius:6px;
+  color:#fff;font-size:0.6rem;font-weight:600;
+  padding:2px 8px;cursor:pointer;
+  font-family:'Outfit',sans-serif;
+  opacity:0.85;transition:opacity 0.15s;
+  white-space:nowrap;
+}
+.fm-copy-block-btn:active{opacity:1;}
+/* mesmo estilo no modo leitura */
+.fm-read-content .fm-copy-block{background:#f0f0f8;border-color:#d0cff0;}
+
+
+/* ── IMAGENS REDIMENSIONÁVEIS NO EDITOR ── */
+.fm-editable img{
+  max-width:100%;border-radius:6px;
+  cursor:default;display:inline-block;
+  position:relative;
+}
+.fm-img-wrapper{
+  display:inline-block;position:relative;
+  line-height:0;max-width:100%;
+  vertical-align:middle;
+}
+.fm-img-wrapper img{
+  display:block;max-width:100%;border-radius:6px;
+}
+.fm-img-wrapper.selected img{
+  outline:2px solid #7c6dfa;
+  outline-offset:2px;
+}
+.fm-img-resize-handle{
+  position:absolute;bottom:-5px;right:-5px;
+  width:14px;height:14px;background:#7c6dfa;border-radius:50%;
+  cursor:se-resize;z-index:5;
+  box-shadow:0 0 0 2px #fff;
+  display:none;
+}
+.fm-img-wrapper.selected .fm-img-resize-handle{display:block;}
+
+/* Autosave badge */
+/* Back button override inside white editor */
+.fm-editor .fm-back{
+  background:#f3f4f6;border-color:#d1d5db;color:#374151;
+}
+
+/* ── BUSCA no FM ── */
+.fm-search-bar{
+  display:none;padding:0.5rem 0.8rem 0.4rem;
+  background:rgba(10,10,18,0.98);
+  border-bottom:1px solid var(--border2);
+  flex-shrink:0;gap:6px;flex-direction:column;
+}
+.fm-search-bar.open{display:flex;}
+.fm-search-row{display:flex;gap:6px;align-items:center;}
+.fm-search-inp{
+  flex:1;background:rgba(255,255,255,0.07);
+  border:1px solid var(--border2);border-radius:10px;
+  padding:0.45rem 0.7rem;color:var(--text);
+  font-family:'Outfit',sans-serif;font-size:0.8rem;outline:none;
+}
+.fm-search-inp:focus{border-color:var(--accent);}
+.fm-search-inp::placeholder{color:var(--muted);}
+.fm-search-close{
+  background:transparent;border:none;color:var(--muted2);
+  font-size:1rem;cursor:pointer;padding:0.2rem 0.4rem;
+}
+.fm-filter-row{display:flex;gap:5px;flex-wrap:wrap;}
+.fm-filter-chip{
+  padding:0.22rem 0.6rem;border-radius:50px;
+  border:1px solid var(--border2);background:transparent;
+  color:var(--muted2);font-family:'Outfit',sans-serif;
+  font-size:0.65rem;cursor:pointer;transition:all 0.15s;white-space:nowrap;
+}
+.fm-filter-chip.active{background:rgba(124,109,250,0.2);border-color:var(--accent);color:var(--text);}
+.fm-search-toggle-content{
+  font-size:0.62rem;color:var(--muted2);
+  display:flex;align-items:center;gap:5px;cursor:pointer;
+  padding:0.1rem 0;width:fit-content;
+}
+.fm-search-toggle-content input{accent-color:var(--accent);}
+
+/* Upload tipo chips */
+.fm-upload-type-sel{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:0.8rem;}
+.fm-upload-chip{
+  padding:0.3rem 0.7rem;border-radius:50px;
+  border:1px solid var(--border2);background:transparent;
+  color:var(--muted2);font-family:'Outfit',sans-serif;
+  font-size:0.68rem;cursor:pointer;transition:all 0.15s;white-space:nowrap;
+}
+.fm-upload-chip.active{background:rgba(124,109,250,0.15);border-color:var(--accent);color:var(--text);}
 
 /* SELEÇÃO MÚLTIPLA */
 .fm-sel-bar{
@@ -659,6 +999,79 @@ body.img-active .ck-wrap{z-index:9100 !important;}
   font-size:0.7rem;cursor:pointer;font-family:'Outfit',sans-serif;
 }
 
+/* ── BARRA DE ORDENAÇÃO ── */
+.fm-sort-bar{
+  display:flex;align-items:center;gap:5px;
+  padding:0.35rem 0.8rem;
+  background:rgba(10,10,18,0.9);
+  border-bottom:1px solid var(--border);
+  flex-shrink:0;overflow-x:auto;
+  scrollbar-width:none;
+}
+.fm-sort-bar::-webkit-scrollbar{display:none;}
+.fm-sort-chip{
+  padding:0.2rem 0.55rem;border-radius:50px;
+  border:1px solid var(--border2);background:transparent;
+  color:var(--muted2);font-family:'Outfit',sans-serif;
+  font-size:0.62rem;cursor:pointer;transition:all 0.15s;white-space:nowrap;flex-shrink:0;
+}
+.fm-sort-chip.active{background:rgba(124,109,250,0.2);border-color:var(--accent);color:var(--text);}
+
+/* ── MENU RÁPIDO DO ITEM (👁️ clicado) ── */
+.fm-item-qmenu{
+  position:fixed;z-index:9800;
+  background:#111118;border:1px solid var(--border2);
+  border-radius:16px;padding:0.5rem;
+  min-width:170px;
+  box-shadow:0 12px 40px rgba(0,0,0,0.8);
+  animation:popIn 0.15s cubic-bezier(.34,1.56,.64,1);
+}
+.fm-item-qmenu-btn{
+  display:flex;align-items:center;gap:8px;
+  width:100%;padding:0.55rem 0.75rem;
+  border:none;background:transparent;
+  color:var(--text);font-family:'Outfit',sans-serif;
+  font-size:0.78rem;cursor:pointer;border-radius:10px;
+  transition:background 0.12s;text-align:left;
+}
+.fm-item-qmenu-btn:active{background:var(--glass2);}
+.fm-item-qmenu-sep{height:1px;background:var(--border);margin:3px 0;}
+
+/* ── BUSCA DENTRO DO ARQUIVO ── */
+.fm-infile-search{
+  display:none;position:fixed;inset:0;z-index:9700;
+  background:#0a0a12;flex-direction:column;
+}
+.fm-infile-search.open{display:flex;}
+.fm-infile-header{
+  padding:0.8rem 1rem;background:rgba(10,10,18,0.95);
+  border-bottom:1px solid var(--border2);
+  display:flex;align-items:center;gap:8px;flex-shrink:0;
+}
+.fm-infile-inp{
+  flex:1;background:rgba(255,255,255,0.07);
+  border:1px solid var(--border2);border-radius:10px;
+  padding:0.45rem 0.8rem;color:var(--text);
+  font-family:'Outfit',sans-serif;font-size:0.85rem;outline:none;
+}
+.fm-infile-inp:focus{border-color:var(--accent);}
+.fm-infile-count{font-size:0.68rem;color:var(--muted2);white-space:nowrap;}
+.fm-infile-results{flex:1;overflow-y:auto;padding:0.6rem;}
+.fm-infile-item{
+  padding:0.7rem 0.9rem;border-radius:12px;
+  border:1px solid var(--border);background:var(--glass);
+  margin-bottom:6px;cursor:pointer;transition:background 0.15s;
+}
+.fm-infile-item:active{background:var(--glass2);}
+.fm-infile-snippet{font-size:0.75rem;line-height:1.6;color:var(--text);}
+.fm-infile-snippet mark{background:#facc15;color:#000;border-radius:3px;padding:0 2px;}
+.fm-infile-line{font-size:0.6rem;color:var(--muted);margin-top:3px;}
+
+/* drag reorder */
+.fm-item.drag-reorder{opacity:0.4;border:1px dashed var(--accent);}
+.fm-item.drag-over-top{border-top:2px solid var(--accent);}
+.fm-item.drag-over-bot{border-bottom:2px solid var(--accent);}
+
 /* ── PAINEL ANYDESK ── */
 .ad-overlay{
   display:none;position:fixed;inset:0;z-index:9600;
@@ -675,7 +1088,7 @@ body.img-active .ck-wrap{z-index:9100 !important;}
   background:linear-gradient(120deg,#7c6dfa,#c96dfa);
   -webkit-background-clip:text;-webkit-text-fill-color:transparent;}
 .ad-body{flex:1;overflow-y:auto;padding:0.8rem;}
-.ad-tabs{display:flex;gap:6px;padding:0.8rem 0.8rem 0.8rem;flex-wrap:wrap;flex-shrink:0;}
+.ad-tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;padding:0.6rem 0.8rem;flex-shrink:0;}
 .ad-tab{
   padding:0.4rem 0.9rem;border-radius:50px;
   border:1px solid var(--border2);background:transparent;
@@ -866,18 +1279,62 @@ body.img-active .ck-wrap{z-index:9100 !important;}
   <div class="fm-header">
     <button class="fm-back" id="fmBack" onclick="fmGoBack()">←</button>
     <span class="fm-path" id="fmPath">📁 Arquivos</span>
+    <button onclick="fmToggleSearch()" style="background:var(--glass);border:1px solid var(--border2);border-radius:8px;color:var(--muted2);font-size:0.75rem;padding:0.3rem 0.55rem;cursor:pointer;" title="Buscar">🔍</button>
     <button class="fm-sel-toggle" onclick="fmToggleSelMode()" style="background:var(--glass);border:1px solid var(--border2);border-radius:8px;color:var(--muted2);font-size:0.65rem;padding:0.3rem 0.6rem;cursor:pointer;font-family:'Outfit',sans-serif;white-space:nowrap;">☑ Sel</button>
     <button onclick="openFmTrash()" style="background:var(--glass);border:1px solid var(--border2);border-radius:8px;color:var(--muted2);font-size:0.7rem;padding:0.3rem 0.55rem;cursor:pointer;" title="Lixeira">🗑️</button>
     <button onclick="openAdPanel()" style="background:var(--glass);border:1px solid var(--border2);border-radius:8px;color:var(--muted2);font-size:0.7rem;padding:0.3rem 0.55rem;cursor:pointer;" title="Atalhos AnyDesk">⚡</button>
     <button class="fm-add-btn" onclick="openFmModal()">+ Novo</button>
   </div>
+
+  <!-- BARRA DE BUSCA AVANÇADA -->
+  <div class="fm-search-bar" id="fmSearchBar">
+    <div class="fm-search-row">
+      <input class="fm-search-inp" id="fmSearchInp" placeholder="Buscar por nome ou conteúdo..." oninput="fmDoSearch()">
+      <button class="fm-search-close" onclick="fmCloseSearch()">✕</button>
+    </div>
+    <div class="fm-filter-row" id="fmFilterRow">
+      <button class="fm-filter-chip active" data-filter="todos" onclick="fmSetFilter('todos',this)">Todos</button>
+      <button class="fm-filter-chip" data-filter="folder" onclick="fmSetFilter('folder',this)">📁 Pasta</button>
+      <button class="fm-filter-chip" data-filter="txt" onclick="fmSetFilter('txt',this)">📄 Texto</button>
+      <button class="fm-filter-chip" data-filter="md" onclick="fmSetFilter('md',this)">📝 MD</button>
+      <button class="fm-filter-chip" data-filter="html" onclick="fmSetFilter('html',this)">🌐 HTML</button>
+      <button class="fm-filter-chip" data-filter="image" onclick="fmSetFilter('image',this)">🖼️ Imagem</button>
+    </div>
+    <label class="fm-search-toggle-content">
+      <input type="checkbox" id="fmSearchInside" onchange="fmDoSearch()">
+      Buscar dentro dos arquivos
+    </label>
+  </div>
+
   <div class="fm-sel-bar" id="fmSelBar">
     <span class="fm-sel-count" id="fmSelCount">0 selecionados</span>
     <button class="fm-sel-btn" onclick="fmSelCopyAll()">📋 Copiar</button>
     <button class="fm-sel-btn danger" onclick="fmSelDeleteAll()">🗑️ Apagar</button>
     <button class="fm-sel-btn" onclick="fmToggleSelMode()">✕</button>
   </div>
+  <!-- BARRA DE ORDENAÇÃO -->
+  <div class="fm-sort-bar" id="fmSortBar">
+    <button class="fm-sort-chip active" data-sort="manual" onclick="fmSetSort('manual',this)">↕ Manual</button>
+    <button class="fm-sort-chip" data-sort="az" onclick="fmSetSort('az',this)">A→Z</button>
+    <button class="fm-sort-chip" data-sort="za" onclick="fmSetSort('za',this)">Z→A</button>
+    <button class="fm-sort-chip" data-sort="newer" onclick="fmSetSort('newer',this)">🕐 Recente</button>
+    <button class="fm-sort-chip" data-sort="older" onclick="fmSetSort('older',this)">🕐 Antigo</button>
+    <button class="fm-sort-chip" data-sort="modrecent" onclick="fmSetSort('modrecent',this)">✏️ Mod. recente</button>
+    <button class="fm-sort-chip" data-sort="modold" onclick="fmSetSort('modold',this)">✏️ Mod. antigo</button>
+  </div>
   <div class="fm-list" id="fmList"></div>
+</div>
+
+<!-- BUSCA DENTRO DO ARQUIVO -->
+<div class="fm-infile-search" id="fmInfileSearch">
+  <div class="fm-infile-header">
+    <button class="fm-back" onclick="closeFmInfileSearch()">←</button>
+    <input class="fm-infile-inp" id="fmInfileInp" placeholder="Pesquisar dentro do arquivo..." oninput="fmDoInfileSearch()">
+    <span class="fm-infile-count" id="fmInfileCount"></span>
+  </div>
+  <div class="fm-infile-results" id="fmInfileResults">
+    <div style="text-align:center;padding:2rem;color:var(--muted);font-size:0.8rem;">Digite para pesquisar dentro do arquivo</div>
+  </div>
 </div>
 
 <!-- LIXEIRA -->
@@ -913,25 +1370,90 @@ body.img-active .ck-wrap{z-index:9100 !important;}
 
 <!-- EDITOR RICH TEXT -->
 <div class="fm-editor" id="fmEditor">
-  <div class="fm-editor-header">
-    <button class="fm-back" onclick="closeFmEditor()">←</button>
-    <span class="fm-editor-title" id="fmEditorTitle">Editando...</span>
-    <button class="fm-editor-save" onclick="saveFmEditorContent()">💾 Salvar</button>
-  </div>
   <div class="fm-toolbar" id="fmToolbar">
-    <button class="fm-tb-btn" onclick="fmCmd('bold')" title="Negrito"><b>B</b></button>
-    <button class="fm-tb-btn" onclick="fmCmd('italic')" title="Itálico"><i>I</i></button>
-    <button class="fm-tb-btn" onclick="fmCmd('underline')" title="Sublinhado"><u>U</u></button>
-    <button class="fm-tb-btn" onclick="fmCmd('strikeThrough')" title="Riscado"><s>S</s></button>
-    <button class="fm-tb-btn" style="font-size:0.65rem" onclick="fmCmd('formatBlock','h1')">H1</button>
-    <button class="fm-tb-btn" style="font-size:0.65rem" onclick="fmCmd('formatBlock','h2')">H2</button>
-    <button class="fm-tb-btn" onclick="fmCmd('insertUnorderedList')" title="Lista">≡</button>
-    <button class="fm-tb-btn" onclick="fmCmd('insertOrderedList')" title="Numerada">1.</button>
-    <button class="fm-tb-btn" onclick="fmCmd('formatBlock','blockquote')" title="Citação">"</button>
-    <button class="fm-tb-btn" onclick="fmInsertCode()" title="Código">&lt;/&gt;</button>
+    <!-- Painel 1: Formato -->
+    <!-- Linha 1: fixo topo -->
+    <div class="fm-tb-row-fixed">
+      <button class="fm-tb-btn fm-tbr1" onclick="closeFmEditor()" title="Voltar">←</button>
+      <button class="fm-tb-btn fm-tbr1" onclick="fmUndo()" title="Desfazer">↩</button>
+      <button class="fm-tb-btn fm-tbr1" onclick="fmRedo()" title="Refazer">↪</button>
+      <div class="fm-tb-sep"></div>
+      <button class="fm-tb-btn fm-tbr1" onclick="fmCmd('bold')" title="Negrito"><b>B</b></button>
+      <button class="fm-tb-btn fm-tbr1" onclick="fmCmd('italic')" title="Itálico"><i>I</i></button>
+      <button class="fm-tb-btn fm-tbr1" onclick="fmCmd('underline')" title="Sublinhado"><u>U</u></button>
+      <div class="fm-tb-sep"></div>
+      <button class="fm-tb-btn fm-tbr1" onclick="fmCmd('insertUnorderedList')" title="Lista">•≡</button>
+      <button class="fm-tb-btn fm-tbr1" onclick="fmCmd('insertOrderedList')" title="Numerada">1.</button>
+      <button class="fm-tb-btn fm-tbr1" onclick="fmInsertCheckItem()" title="Checklist" style="color:#7c6dfa;border-color:rgba(124,109,250,0.4);">☑</button>
+      <span class="fm-autosave-badge" id="fmAutosaveBadge">✓</span>
+      <button class="fm-tb-btn fm-tbr1" onclick="fmEnterReadMode()" title="Visualizar" style="color:#16a34a;border-color:rgba(22,163,74,0.3);flex-shrink:0;">👁</button>
+      <button class="fm-tb-btn fm-tbr1 fm-tb-save-btn" onclick="saveFmEditorContent()" title="Salvar" style="flex-shrink:0;">&#128190;</button>
+      <button class="fm-tb-btn fm-tbr1" onclick="fmCopyAll()" title="Copiar" style="border-color:var(--accent);color:var(--accent);flex-shrink:0;">&#128203;</button>
+    </div>
+    <!-- Linha 2: painel trocável -->
+    <div class="fm-tb-panel open" id="fmPanel1">
+      <button class="fm-tb-btn fm-tb-switch" onclick="fmSwitchTab(2)" title="Inserir"><span class="fm-switch-icon"></span></button>
+      <div class="fm-tb-sep"></div>
+      <button class="fm-tb-btn" onclick="fmRemoveFormat()" title="Limpar" style="color:#ef4444;border-color:rgba(239,68,68,0.3);">✕F</button>
+      <button class="fm-tb-btn" onclick="fmCmd('strikeThrough')" title="Riscado"><s>S</s></button>
+      <div class="fm-tb-sep"></div>
+      <button class="fm-tb-btn" onclick="fmCmd('justifyLeft')" title="Esquerda">⬅</button>
+      <button class="fm-tb-btn" onclick="fmCmd('justifyCenter')" title="Centro">↔</button>
+      <button class="fm-tb-btn" onclick="fmCmd('justifyRight')" title="Direita">➡</button>
+      <div class="fm-tb-sep"></div>
+      <button class="fm-tb-btn" onclick="fmChangeFontSize(1)" title="Aumentar">A+</button>
+      <button class="fm-tb-btn" onclick="fmChangeFontSize(-1)" title="Diminuir">A−</button>
+    </div>
+    <!-- Painel 2: Inserir (linha 2) -->
+    <div class="fm-tb-panel" id="fmPanel2">
+      <button class="fm-tb-btn fm-tb-switch" onclick="fmSwitchTab(1)" title="Formato"><span class="fm-switch-icon fm-switch-icon-rev"></span></button>
+      <div class="fm-tb-sep"></div>
+      <select class="fm-tb-select" id="fmFontSelect" onchange="fmChangeFont(this.value)" title="Fonte">
+        <option value="">Fonte...</option>
+        <option value="Outfit">Outfit</option>
+        <option value="Inter">Inter</option>
+        <option value="Montserrat">Montserrat</option>
+        <option value="Roboto">Roboto</option>
+        <option value="Open Sans">Open Sans</option>
+        <option value="Lato">Lato</option>
+        <option value="Poppins">Poppins</option>
+        <option value="Nunito">Nunito</option>
+        <option value="Raleway">Raleway</option>
+        <option value="Georgia">Georgia</option>
+      </select>
+      <div class="fm-tb-sep"></div>
+      <label title="Cor da letra" style="display:flex;align-items:center;gap:2px;font-size:0.65rem;color:#6b7280;flex-shrink:0;">A<input type="color" class="fm-tb-color" onchange="fmCmd('foreColor',this.value)" value="#1a1a2e"></label>
+      <label title="Cor fundo texto" style="display:flex;align-items:center;gap:2px;font-size:0.65rem;color:#6b7280;flex-shrink:0;">▨<input type="color" class="fm-tb-color" onchange="fmCmd('hiliteColor',this.value)" value="#ffffff"></label>
+      <div class="fm-tb-sep"></div>
+      <button class="fm-tb-btn" onclick="fmInsertLink()" title="Link">&#128279;</button>
+      <button class="fm-tb-btn" onclick="fmInsertCode()" title="Código">&lt;/&gt;</button>
+      <button class="fm-tb-btn" onclick="fmInsertImage()" title="Imagem" style="color:#16a34a;border-color:rgba(22,163,74,0.3);">&#128444;</button>
+    </div>
+    <!-- Temas — só aparece no painel 1 -->
+    <div class="fm-theme-row" id="fmThemeRow">
+      <span class="fm-theme-label" style="margin-left:4px;">Texto:</span>
+      <div class="fm-theme-dots-group">
+        <div class="fm-theme-dot active" style="background:#ffffff;border-color:#d1d5db;" onclick="fmSetEditorTheme('#ffffff','#1a1a2e')" title="Branco"></div>
+        <div class="fm-theme-dot" style="background:#fefce8;" onclick="fmSetEditorTheme('#fefce8','#1a1a2e')" title="Creme"></div>
+        <div class="fm-theme-dot" style="background:#f0f9ff;" onclick="fmSetEditorTheme('#f0f9ff','#0c4a6e')" title="Azul"></div>
+        <div class="fm-theme-dot" style="background:#f0fdf4;" onclick="fmSetEditorTheme('#f0fdf4','#14532d')" title="Verde"></div>
+        <div class="fm-theme-dot" style="background:#1a1a2e;border-color:#555;" onclick="fmSetEditorTheme('#1a1a2e','#f0f0fa')" title="Escuro"></div>
+        <div class="fm-theme-dot" style="background:#0f172a;border-color:#555;" onclick="fmSetEditorTheme('#0f172a','#e2e8f0')" title="Preto"></div>
+      </div>
+      <div class="fm-theme-sep"></div>
+      <span class="fm-theme-label" style="margin-left:6px;">Barra:</span>
+      <div class="fm-theme-dots-group">
+        <div class="fm-theme-dot active" style="background:#f9fafb;border-color:#d1d5db;" onclick="fmSetToolbarTheme('#f9fafb')" title="Cinza"></div>
+        <div class="fm-theme-dot" style="background:#fff;border-color:#d1d5db;" onclick="fmSetToolbarTheme('#ffffff')" title="Branco"></div>
+        <div class="fm-theme-dot" style="background:#1e1b4b;" onclick="fmSetToolbarTheme('#1e1b4b')" title="Roxo"></div>
+        <div class="fm-theme-dot" style="background:#0f172a;" onclick="fmSetToolbarTheme('#0f172a')" title="Preto"></div>
+        <div class="fm-theme-dot" style="background:#14532d;" onclick="fmSetToolbarTheme('#14532d')" title="Verde"></div>
+      </div>
+    </div>
   </div>
-  <div class="fm-editor-body">
+  <div class="fm-editor-body" id="fmEditorBody">
     <div class="fm-editable" id="fmEditable" contenteditable="true" data-placeholder="Escreva ou cole seu conteúdo aqui..."></div>
+    <textarea class="fm-code-editor" id="fmCodeEditor" placeholder="Cole ou digite seu HTML aqui..." style="display:none;width:100%;height:100%;border:none;resize:none;"></textarea>
   </div>
 </div>
 
@@ -940,37 +1462,48 @@ body.img-active .ck-wrap{z-index:9100 !important;}
   <div class="fm-modal">
     <h2 id="fmModalTitle">➕ Novo item</h2>
     <div class="fm-type-sel">
-      <button class="fm-type-btn" id="fmTypeUpload" onclick="setFmType('upload')">📤 Subir arquivo</button>
+      <button class="fm-type-btn" id="fmTypeUpload" onclick="setFmType('upload')">📤 Subir</button>
       <button class="fm-type-btn active" id="fmTypeTxt" onclick="setFmType('txt')">📝 Texto</button>
+      <button class="fm-type-btn" id="fmTypeMd" onclick="setFmType('md')">📄 MD</button>
+      <button class="fm-type-btn" id="fmTypeHtml" onclick="setFmType('html')">🌐 HTML</button>
       <button class="fm-type-btn" id="fmTypeFolder" onclick="setFmType('folder')">📁 Pasta</button>
     </div>
 
-    <!-- Upload -->
+    <!-- Upload com filtros de tipo -->
     <div id="fmInpUploadWrap" style="display:none;">
+      <div class="fm-upload-type-sel" id="fmUploadTypeChips">
+        <button class="fm-upload-chip active" data-accept=".txt,.md,.html,.htm,.csv,.json,.xml,.rtf" onclick="fmSetUploadType(this)">📄 Texto (todos)</button>
+        <button class="fm-upload-chip" data-accept=".txt" onclick="fmSetUploadType(this)">.TXT</button>
+        <button class="fm-upload-chip" data-accept=".md" onclick="fmSetUploadType(this)">.MD</button>
+        <button class="fm-upload-chip" data-accept=".html,.htm" onclick="fmSetUploadType(this)">.HTML</button>
+        <button class="fm-upload-chip" data-accept="image/*" onclick="fmSetUploadType(this)">🖼️ Imagem</button>
+        <button class="fm-upload-chip" data-accept=".pdf" onclick="fmSetUploadType(this)">📕 PDF</button>
+        <button class="fm-upload-chip" data-accept="*" onclick="fmSetUploadType(this)">📦 Qualquer</button>
+      </div>
       <div id="fmDropZone" style="
         border:2px dashed var(--border2);border-radius:16px;
-        padding:1.5rem 1rem;text-align:center;cursor:pointer;
+        padding:1.4rem 1rem;text-align:center;cursor:pointer;
         color:var(--muted2);font-size:0.8rem;line-height:1.8;
         background:var(--glass);transition:border-color 0.2s;margin-bottom:0.8rem;"
         onclick="document.getElementById('fmInpUpload').click()"
         ondragover="event.preventDefault();this.style.borderColor='var(--accent)'"
         ondragleave="this.style.borderColor=''"
         ondrop="fmHandleDrop(event)">
-        📤<br>Toque para selecionar arquivos<br>
-        <span style="font-size:0.68rem;color:var(--muted)">HTML, imagens, PDF, texto, qualquer arquivo — vários de uma vez</span>
+        📤<br>Toque para selecionar<br>
+        <span style="font-size:0.65rem;color:var(--muted)" id="fmDropZoneHint">Texto, HTML, MD, imagens, PDF...</span>
       </div>
-      <input type="file" id="fmInpUpload" multiple style="display:none" onchange="fmHandleUpload(this.files)">
+      <input type="file" id="fmInpUpload" multiple accept=".txt,.md,.html,.htm,.csv,.json,.xml,.rtf" style="display:none" onchange="fmHandleUpload(this.files)">
       <div id="fmUploadPreview" style="font-size:0.72rem;color:var(--muted2);"></div>
     </div>
 
-    <!-- Texto -->
+    <!-- Texto/MD/HTML: campo nome + conteúdo -->
     <div id="fmInpContentWrap">
       <div class="field">
         <label>Nome <span style="color:var(--muted);font-size:0.6rem;">(opcional)</span></label>
         <input id="fmInpName" type="text" placeholder="Deixe vazio para gerar automaticamente..." autocomplete="off">
       </div>
       <div class="field">
-        <label>Conteúdo</label>
+        <label id="fmInpContentLabel">Conteúdo</label>
         <textarea id="fmInpContent" rows="5" style="width:100%;background:rgba(255,255,255,0.06);border:1px solid var(--border2);border-radius:14px;padding:0.7rem 1rem;color:var(--text);font-family:'Outfit',sans-serif;font-size:0.85rem;outline:none;resize:vertical;" placeholder="Digite ou cole o texto..."></textarea>
       </div>
     </div>
@@ -1014,13 +1547,13 @@ body.img-active .ck-wrap{z-index:9100 !important;}
   <div class="ad-header">
     <button class="fm-back" onclick="closeAdPanel()">←</button>
     <span class="ad-title">⚡ Atalhos AnyDesk</span>
-    <button onclick="adSetTab('historico')" style="background:var(--glass);border:none;border-radius:8px;color:var(--muted2);font-size:0.68rem;padding:0.3rem 0.7rem;cursor:pointer;font-family:'Outfit',sans-serif;white-space:nowrap;">🕐 Histórico</button>
   </div>
   <div class="ad-tabs">
     <button class="ad-tab active" onclick="adSetTab('atalhos')">📋 Atalhos</button>
     <button class="ad-tab" onclick="adSetTab('pastas')">📁 Pastas</button>
     <button class="ad-tab" onclick="adSetTab('projetos')">🗂️ Projetos</button>
     <button class="ad-tab" onclick="adSetTab('notas')">📝 Notas</button>
+    <button class="ad-tab" onclick="adSetTab('historico')">🕐 Histórico</button>
   </div>
   <div class="ad-body">
 
@@ -1071,26 +1604,53 @@ body.img-active .ck-wrap{z-index:9100 !important;}
   </div>
 </div>
 
+<!-- MODO LEITURA -->
+<div class="fm-read-mode" id="fmReadMode">
+  <div class="fm-read-header">
+    <button class="fm-back" onclick="fmExitReadMode()">←</button>
+    <span class="fm-read-title" id="fmReadTitle"></span>
+    <button class="fm-read-edit-btn" onclick="fmExitReadMode()">✏️ Editar</button>
+  </div>
+  <!-- Barra de visualização: fonte + zoom -->
+  <div class="fm-read-controls" id="fmReadControls">
+    <select class="fm-read-font-sel" id="fmReadFontSelect" onchange="fmReadChangeFont(this.value)" title="Fonte">
+      <option value="">Fonte...</option>
+      <option value="Outfit">Outfit</option>
+      <option value="Inter">Inter</option>
+      <option value="Montserrat">Montserrat</option>
+      <option value="Roboto">Roboto</option>
+      <option value="Open Sans">Open Sans</option>
+      <option value="Lato">Lato</option>
+      <option value="Poppins">Poppins</option>
+      <option value="Nunito">Nunito</option>
+      <option value="Raleway">Raleway</option>
+      <option value="Georgia">Georgia</option>
+    </select>
+    <div class="fm-read-zoom-btns">
+      <button class="fm-read-zoom-btn" onclick="fmReadZoom(-1)" title="Diminuir texto">A−</button>
+      <button class="fm-read-zoom-btn" onclick="fmReadZoom(1)" title="Aumentar texto">A+</button>
+    </div>
+  </div>
+  <div class="fm-read-body">
+    <div class="fm-read-content" id="fmReadContent"></div>
+  </div>
+</div>
+
+<!-- Input imagem oculto para inserção no editor -->
+<input type="file" id="fmImgInsertInput" accept="image/*" style="display:none" onchange="fmHandleImageInsert(event)">
+
 <!-- TOAST FEEDBACK -->
 <div class="ad-feedback" id="adFeedback">✓ Copiado!</div>
 
 <!-- ═══════════════════════════════════════════════════════ SCRIPTS ═══ -->
 <script type="module">
-// ── Firebase (mesmo do Sistema Tapetes) ──────────────────────────────
+// ── Firebase ─────────────────────────────────────────────────────────
 import { db } from "https://arquivos98126066-sudo.github.io/SOFTWARE/firebase-sync.js";
 import {
   collection, addDoc, getDocs, updateDoc, deleteDoc, doc,
   onSnapshot, query, orderBy, writeBatch, setDoc, getDoc
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-// ── Coleções Firestore ────────────────────────────────────────────────
-// launcher_apps     → lista de atalhos
-// launcher_ck       → lista de tarefas
-// launcher_fm       → sistema de arquivos (documento único)
-// launcher_ad       → dados AnyDesk (documento único)
-// launcher_trash    → lixeira (documento único)
-
-// ── Helper: salvar documento único ───────────────────────────────────
 async function fsSetDoc(colId, docId, data) {
   if (window.syncShow) window.syncShow.syncing();
   try {
@@ -1098,8 +1658,30 @@ async function fsSetDoc(colId, docId, data) {
     if (window.syncShow) window.syncShow.synced('Apps');
   } catch(e) {
     if (window.syncShow) window.syncShow.offline();
-    // fallback localStorage
     try { localStorage.setItem(colId+'_'+docId, JSON.stringify(data)); } catch(_) {}
+  }
+}
+
+// ── Abrir link no Chrome (Android) ───────────────────────────────────
+// Usa Chrome Custom Tabs Intent para forçar abertura no Chrome
+function openInChrome(url) {
+  try {
+    // Garante que a URL tem esquema
+    if (!url.startsWith('http://') && !url.startsWith('https://')) {
+      url = 'https://' + url;
+    }
+    // Intent Android para forçar Chrome
+    const encoded = encodeURIComponent(url);
+    const intentUrl =
+      'intent://' + url.replace(/^https?:\/\//, '') +
+      '#Intent;scheme=' + (url.startsWith('https') ? 'https' : 'http') +
+      ';package=com.android.chrome' +
+      ';S.browser_fallback_url=' + encoded +
+      ';end';
+    window.location.href = intentUrl;
+  } catch(e) {
+    // fallback: abre normalmente
+    window.open(url, '_blank');
   }
 }
 
@@ -1109,26 +1691,22 @@ let selEmoji=EMOJIS[0];
 let dragSrc=null;
 let editMode=false;
 let longPressTimer=null;
+const LONG_PRESS_MS = 650;   // tempo mínimo para ativar edição
+const MOVE_THRESHOLD = 8;    // pixels — se mover mais que isso, cancela
 
+// ── Apenas Claude pré-pronto ──────────────────────────────────────────
 const DEFAULT=[
-  {name:'Claude',url:'https://claude.ai',emoji:'🤖'},
-  {name:'Gmail',url:'https://mail.google.com',emoji:'📧'},
-  {name:'YouTube',url:'https://youtube.com',emoji:'📺'},
-  {name:'WhatsApp',url:'https://web.whatsapp.com',emoji:'💬'},
-  {name:'Instagram',url:'https://instagram.com',emoji:'📸'},
-  {name:'Netflix',url:'https://netflix.com',emoji:'🎬'},
+  {name:'Claude', url:'https://claude.ai', emoji:'🤖', type:'site'},
 ];
 
 let apps = [];
 let appsLoaded = false;
 
-// Carrega apps do Firestore em tempo real
 onSnapshot(doc(db,'launcher_apps','data'), (snap) => {
   if (snap.exists()) {
     const data = snap.data();
     apps = data.list || [];
   } else {
-    // primeiro acesso — usa defaults e salva
     apps = [...DEFAULT];
     fsSetDoc('launcher_apps','data',{list:apps});
   }
@@ -1160,8 +1738,10 @@ function initEmojis(){
 }
 
 function enterEdit(){
+  if(editMode) return;
   editMode=true;
   document.body.classList.add('editing');
+  if(navigator.vibrate) navigator.vibrate(50);
 }
 function exitEdit(){
   editMode=false;
@@ -1169,10 +1749,8 @@ function exitEdit(){
 }
 window.exitEdit = exitEdit;
 
-document.addEventListener('visibilitychange',()=>{
-  if(document.visibilityState==='visible') exitEdit();
-});
-window.addEventListener('focus',()=>exitEdit());
+// Sai do modo edição se perder foco ou minimizar
+document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='hidden') exitEdit(); });
 
 function render(){
   const grid=document.getElementById('grid');
@@ -1181,6 +1759,12 @@ function render(){
     grid.innerHTML='<div class="empty"><div class="empty-icon">📱</div><p>Nenhum atalho ainda.<br>Toque em "Adicionar" para começar.</p></div>';
     return;
   }
+
+  // Toque no fundo do grid (fora dos ícones) → sai do modo edição
+  grid.addEventListener('click', e=>{
+    if(editMode && !e.target.closest('.app')) exitEdit();
+  }, {once:false});
+
   apps.forEach((a,i)=>{
     const el=document.createElement('div');
     el.className='app';
@@ -1198,50 +1782,77 @@ function render(){
       </div>
       <div class="app-name">${a.name}</div>
     `;
-    el.addEventListener('pointerdown',()=>{
-      longPressTimer=setTimeout(()=>enterEdit(),500);
+
+    // ── LONG PRESS com cancelamento por movimento ─────────────────────
+    let lpTimer=null, lpStartX=0, lpStartY=0, lpFired=false;
+
+    function lpStart(x,y){
+      lpStartX=x; lpStartY=y; lpFired=false;
+      lpTimer=setTimeout(()=>{ lpFired=true; enterEdit(); }, LONG_PRESS_MS);
+    }
+    function lpCancel(){
+      clearTimeout(lpTimer); lpTimer=null;
+    }
+    function lpMove(x,y){
+      if(Math.abs(x-lpStartX)>MOVE_THRESHOLD || Math.abs(y-lpStartY)>MOVE_THRESHOLD) lpCancel();
+    }
+
+    // Pointer events para mouse/stylus/desktop
+    el.addEventListener('pointerdown', e=>{
+      if(e.pointerType==='touch') return; // touch é tratado abaixo
+      lpStart(e.clientX, e.clientY);
     });
-    el.addEventListener('pointerup',()=>clearTimeout(longPressTimer));
-    el.addEventListener('pointermove',()=>clearTimeout(longPressTimer));
-    el.addEventListener('click',e=>{
-      if(e.target.closest('.del-badge'))return;
-      if(editMode)return;
+    el.addEventListener('pointerup',   ()=>lpCancel());
+    el.addEventListener('pointermove', e=>lpMove(e.clientX, e.clientY));
+    el.addEventListener('pointercancel',()=>lpCancel());
+
+    // Click (abre o app se não estiver em modo edição e lixeirinha não foi clicada)
+    el.addEventListener('click', e=>{
+      if(e.target.closest('.del-badge')) return;
+      if(editMode) return;
+      if(lpFired) return; // long press acabou de ativar, ignora o click
       if(a.type==='deep'){
-        window.location.href=a.url;
+        window.location.href = a.url;
       } else {
-        const tabName='app_'+a.name.replace(/\s+/g,'_').toLowerCase();
-        window.open(a.url, tabName);
+        openInChrome(a.url);
       }
     });
-    el.querySelector('.del-badge').addEventListener('click',e=>{
+
+    // Lixeirinha
+    el.querySelector('.del-badge').addEventListener('click', e=>{
       e.stopPropagation();
-      apps.splice(i,1);saveApps();render();
+      apps.splice(i,1); saveApps(); render();
     });
+
+    // Drag desktop
     el.addEventListener('dragstart',()=>{dragSrc=i;el.classList.add('dragging');});
     el.addEventListener('dragend',()=>document.querySelectorAll('.app').forEach(x=>x.classList.remove('dragging','drag-over')));
     el.addEventListener('dragover',e=>{e.preventDefault();if(dragSrc!==null&&dragSrc!==i)el.classList.add('drag-over');});
     el.addEventListener('dragleave',()=>el.classList.remove('drag-over'));
     el.addEventListener('drop',e=>{
       e.preventDefault();
-      if(dragSrc!==null&&dragSrc!==i){
-        const tmp=apps.splice(dragSrc,1)[0];
-        apps.splice(i,0,tmp);
-        saveApps();render();
-      }
+      if(dragSrc!==null&&dragSrc!==i){const tmp=apps.splice(dragSrc,1)[0];apps.splice(i,0,tmp);saveApps();render();}
       dragSrc=null;
     });
-    // touch drag
-    let tx,ty,tClone=null,tIdx=i,tMoved=false;
+
+    // ── TOUCH DRAG (só funciona se já estiver em editMode) ────────────
+    let tx=0,ty=0,tClone=null,tIdx=i;
     el.addEventListener('touchstart',e=>{
-      const t=e.touches[0];tx=t.clientX;ty=t.clientY;tMoved=false;
-      longPressTimer=setTimeout(()=>enterEdit(),500);
-    },{passive:true});
-    el.addEventListener('touchmove',e=>{
-      clearTimeout(longPressTimer);
       const t=e.touches[0];
-      const dx=Math.abs(t.clientX-tx),dy=Math.abs(t.clientY-ty);
-      if(!tClone&&editMode&&(dx>10||dy>10)){
-        tMoved=true;
+      tx=t.clientX; ty=t.clientY;
+      lpFired=false;
+      // Inicia long press via touch
+      lpStart(tx,ty);
+    },{passive:true});
+
+    el.addEventListener('touchmove',e=>{
+      const t=e.touches[0];
+      lpMove(t.clientX, t.clientY); // cancela long press se mover
+
+      if(!editMode) return; // só arrasta se estiver em modo edição
+
+      const dx=Math.abs(t.clientX-tx), dy=Math.abs(t.clientY-ty);
+      if(!tClone && (dx>MOVE_THRESHOLD||dy>MOVE_THRESHOLD)){
         tClone=el.cloneNode(true);
         tClone.style.cssText=`position:fixed;width:${el.offsetWidth}px;opacity:0.85;pointer-events:none;z-index:999;transform:scale(1.1);transition:none;`;
         document.body.appendChild(tClone);
@@ -1257,22 +1868,22 @@ function render(){
         if(tgt&&tgt!==el)tgt.classList.add('drag-over');
       }
     },{passive:false});
+
     el.addEventListener('touchend',e=>{
-      clearTimeout(longPressTimer);
+      lpCancel();
       if(tClone){
         const t=e.changedTouches[0];
         const under=document.elementFromPoint(t.clientX,t.clientY);
         const tgt=under&&under.closest('.app[data-i]');
-        if(tgt){
-          const ti=parseInt(tgt.dataset.i);
-          if(ti!==tIdx){const tmp=apps.splice(tIdx,1)[0];apps.splice(ti,0,tmp);saveApps();}
-        }
-        tClone.remove();tClone=null;
-        el.style.opacity='';
+        if(tgt){const ti=parseInt(tgt.dataset.i);if(ti!==tIdx){const tmp=apps.splice(tIdx,1)[0];apps.splice(ti,0,tmp);saveApps();}}
+        tClone.remove();tClone=null;el.style.opacity='';
         document.querySelectorAll('.app').forEach(x=>x.classList.remove('drag-over'));
         render();
       }
     });
+
+    el.addEventListener('touchcancel',()=>{ lpCancel(); if(tClone){tClone.remove();tClone=null;el.style.opacity='';} });
+
     grid.appendChild(el);
   });
 }
@@ -1451,10 +2062,9 @@ const CK_EMOJIS=['📁','✅','⭐','🔥','💡','📌','🎯','📝','🛒','�
 let ckItems=[];
 let ckEditIdx=null;
 let ckSelEmoji=CK_EMOJIS[0];
+let ckDragging=false;
 
-function saveCk(){
-  fsSetDoc('launcher_ck','data',{list:ckItems});
-}
+function saveCk(){fsSetDoc('launcher_ck','data',{list:ckItems});}
 
 onSnapshot(doc(db,'launcher_ck','data'), (snap) => {
   ckItems = snap.exists() ? (snap.data().list || []) : [];
@@ -1465,18 +2075,104 @@ function renderCk(){
   const list=document.getElementById('ckList');list.innerHTML='';
   ckItems.forEach((item,i)=>{
     const el=document.createElement('div');el.className='ck-item'+(item.done?' done':'');
-    el.innerHTML=`<div class="ck-emoji">${item.emoji||'📁'}</div>
+    el.innerHTML=`
+      <div class="ck-drag-handle" style="font-size:0.9rem;color:var(--muted);padding:0 4px;flex-shrink:0;touch-action:none;user-select:none;">⠿</div>
+      <div class="ck-emoji">${item.emoji||'📁'}</div>
       <div class="ck-name">${item.name}</div>
       <div class="ck-check">${item.done?'✓':''}</div>`;
+
     let lastTap=0;
-    el.addEventListener('click',()=>{
+    let ckLpTimer=null;
+    let ckLpFired=false;
+
+    el.addEventListener('touchstart', e=>{
+      if(e.target.classList.contains('ck-drag-handle')) return;
+      ckLpFired=false;
+      ckLpTimer=setTimeout(()=>{
+        ckLpFired=true;
+        openCkModal(i);
+      }, 1000);
+    },{passive:true});
+
+    el.addEventListener('touchmove', ()=>{
+      clearTimeout(ckLpTimer);
+    },{passive:true});
+
+    el.addEventListener('touchend', ()=>{
+      clearTimeout(ckLpTimer);
+    },{passive:true});
+
+    el.addEventListener('click', e=>{
+      if(e.target.classList.contains('ck-drag-handle')) return;
+      if(ckDragging) return;
+      if(ckLpFired) return;
       const now=Date.now();
       if(now-lastTap<350){openCkModal(i);}
       else{ckItems[i].done=!ckItems[i].done;saveCk();renderCk();}
       lastTap=now;
     });
+
+    const handle=el.querySelector('.ck-drag-handle');
+    handle.addEventListener('touchstart', e=>{
+      e.preventDefault();
+      e.stopPropagation();
+      ckStartDrag(el, e);
+    },{passive:false});
+
     list.appendChild(el);
   });
+}
+
+function ckStartDrag(dragEl, startEvent){
+  const list=document.getElementById('ckList');
+  const allItems=()=>[...list.querySelectorAll('.ck-item')];
+
+  ckDragging=true;
+  dragEl.style.opacity='0.55';
+  dragEl.style.boxShadow='0 6px 24px rgba(61,220,132,0.35)';
+  dragEl.style.zIndex='10';
+  dragEl.style.position='relative';
+
+  function onMove(e){
+    e.preventDefault();
+    const touch=e.touches[0];
+    const items=allItems();
+    for(let item of items){
+      if(item===dragEl) continue;
+      const rect=item.getBoundingClientRect();
+      const mid=rect.top+rect.height/2;
+      if(touch.clientY<mid){
+        list.insertBefore(dragEl, item);
+        break;
+      } else if(touch.clientY>=mid && item===items[items.length-1]){
+        list.appendChild(dragEl);
+      }
+    }
+  }
+
+  function onEnd(){
+    document.removeEventListener('touchmove',onMove);
+    document.removeEventListener('touchend',onEnd);
+    dragEl.style.opacity='';
+    dragEl.style.boxShadow='';
+    dragEl.style.zIndex='';
+    dragEl.style.position='';
+    // Salva nova ordem
+    const newOrder=allItems().map(el=>{
+      const name=el.querySelector('.ck-name').textContent;
+      const emoji=el.querySelector('.ck-emoji').textContent;
+      const done=el.classList.contains('done');
+      return {name,emoji,done};
+    });
+    ckItems=newOrder;
+    saveCk();
+    // Reseta flag após o ciclo de eventos (evita que o click dispare junto)
+    setTimeout(()=>{ ckDragging=false; },100);
+    renderCk();
+  }
+
+  document.addEventListener('touchmove',onMove,{passive:false});
+  document.addEventListener('touchend',onEnd);
 }
 
 window.openCkModal = function(idx){
@@ -1503,17 +2199,27 @@ document.getElementById('ckOverlay').addEventListener('click',e=>{
   if(e.target===document.getElementById('ckOverlay'))window.closeCkModal();
 });
 
+// Fecha painel de tarefas ao clicar fora
+document.addEventListener('click', e=>{
+  const panel=document.getElementById('ckPanel');
+  const fab=document.querySelector('.ck-fab');
+  if(!panel||panel.classList.contains('hidden')) return;
+  if(!panel.contains(e.target) && (!fab||!fab.contains(e.target))){
+    panel.classList.add('hidden');
+  }
+});
+
 // ── GERENCIADOR DE ARQUIVOS (Firebase) ───────────────────────────────
 let fmFs={root:{type:'folder',name:'Arquivos',children:{}}};
 let fmPath=[];
-let fmNewType='folder';
+let fmNewType='txt';
 let fmSelMode=false;
 let fmSelected=new Set();
 let fmViewingKey=null;
 let fmEditorKey=null;
 let fmTrash=[];
+let fmPendingFiles=[];
 
-// Carrega FM do Firestore
 onSnapshot(doc(db,'launcher_fm','data'), (snap) => {
   fmFs = snap.exists() ? (snap.data().fs || fmFs) : fmFs;
 });
@@ -1521,14 +2227,9 @@ onSnapshot(doc(db,'launcher_trash','data'), (snap) => {
   fmTrash = snap.exists() ? (snap.data().list || []) : [];
 });
 
-function fmSave(){
-  fsSetDoc('launcher_fm','data',{fs:fmFs});
-}
-function fmSaveTrash(){
-  fsSetDoc('launcher_trash','data',{list:fmTrash});
-}
+function fmSave(){fsSetDoc('launcher_fm','data',{fs:fmFs});}
+function fmSaveTrash(){fsSetDoc('launcher_trash','data',{list:fmTrash});}
 
-// ── CONFIRMAÇÃO ──
 let fmConfirmCb=null;
 window.fmConfirm = function(msg,okLabel,cb){
   document.getElementById('fmConfirmMsg').innerHTML=msg;
@@ -1544,7 +2245,14 @@ document.getElementById('fmConfirmOk').addEventListener('click',()=>{
 });
 
 function fmCurrentFolder(){
-  let node=fmFs.root;for(const p of fmPath)node=node.children[p];return node;
+  let node=fmFs.root;
+  for(const p of fmPath){
+    if(!node.children) node.children={};
+    if(!node.children[p]) node.children[p]={type:'folder',name:p,children:{}};
+    node=node.children[p];
+    if(!node.children) node.children={};
+  }
+  return node;
 }
 function fmPathLabel(){return ['📁 Arquivos',...fmPath].join(' › ');}
 
@@ -1587,23 +2295,134 @@ window.fmSelCopyAll = function(){
   if(texts.length)navigator.clipboard.writeText(texts.join('\n\n'));
 };
 
+// ── BUSCA NO FM ───────────────────────────────────────────────────────
+let fmSearchActive = false;
+let fmActiveFilter = 'todos';
+let fmSearchQuery = '';
+let fmSearchInContent = false;
+
+window.fmToggleSearch = function(){
+  fmSearchActive = !fmSearchActive;
+  document.getElementById('fmSearchBar').classList.toggle('open', fmSearchActive);
+  if(fmSearchActive) setTimeout(()=>document.getElementById('fmSearchInp').focus(), 200);
+  else { fmSearchQuery=''; fmActiveFilter='todos'; renderFm(); }
+};
+window.fmCloseSearch = function(){
+  fmSearchActive=false;
+  document.getElementById('fmSearchBar').classList.remove('open');
+  fmSearchQuery=''; fmActiveFilter='todos';
+  renderFm();
+};
+window.fmSetFilter = function(f, btn){
+  fmActiveFilter = f;
+  document.querySelectorAll('.fm-filter-chip').forEach(c=>c.classList.remove('active'));
+  btn.classList.add('active');
+  fmDoSearch();
+};
+window.fmDoSearch = function(){
+  fmSearchQuery = document.getElementById('fmSearchInp').value.trim().toLowerCase();
+  fmSearchInContent = document.getElementById('fmSearchInside').checked;
+  renderFm();
+};
+
+// Busca recursiva em todas as pastas
+function fmSearchAll(node, path, results){
+  Object.entries(node.children||{}).forEach(([key,item])=>{
+    const fullPath = [...path, key];
+    const typeMatch = fmActiveFilter==='todos' || item.type===fmActiveFilter || (fmActiveFilter==='folder'&&item.type==='folder');
+    const nameMatch = !fmSearchQuery || key.toLowerCase().includes(fmSearchQuery);
+    const contentMatch = fmSearchInContent && item.content && item.content.toLowerCase().includes(fmSearchQuery);
+    if(typeMatch && (nameMatch || contentMatch || !fmSearchQuery)){
+      results.push({key, item, path:fullPath.slice(0,-1)});
+    }
+    if(item.type==='folder') fmSearchAll(item, fullPath, results);
+  });
+}
+
+// ── FM RENDER com suporte a busca ────────────────────────────────────
+let fmSortMode = 'manual'; // manual | az | za | newer | older | modrecent | modold
+
+window.fmSetSort = function(mode, btn){
+  fmSortMode = mode;
+  document.querySelectorAll('.fm-sort-chip').forEach(c=>c.classList.remove('active'));
+  btn.classList.add('active');
+  renderFm();
+};
+
+function fmSortKeys(keys, children){
+  if(fmSortMode === 'manual') {
+    // pasta sempre primeiro, depois ordem salva
+    return [...keys].sort((a,b)=>{
+      const ta=children[a].type==='folder'?0:1;
+      const tb=children[b].type==='folder'?0:1;
+      return ta-tb;
+    });
+  }
+  return [...keys].sort((a,b)=>{
+    const ia=children[a], ib=children[b];
+    // pastas sempre primeiro
+    const ta=ia.type==='folder'?0:1, tb=ib.type==='folder'?0:1;
+    if(ta!==tb) return ta-tb;
+    if(fmSortMode==='az') return a.localeCompare(b);
+    if(fmSortMode==='za') return b.localeCompare(a);
+    if(fmSortMode==='newer') return (ib.createdAt||0)-(ia.createdAt||0);
+    if(fmSortMode==='older') return (ia.createdAt||0)-(ib.createdAt||0);
+    if(fmSortMode==='modrecent') return (ib.modifiedAt||ib.createdAt||0)-(ia.modifiedAt||ia.createdAt||0);
+    if(fmSortMode==='modold') return (ia.modifiedAt||ia.createdAt||0)-(ib.modifiedAt||ib.createdAt||0);
+    return 0;
+  });
+}
+
 function renderFm(){
-  const folder=fmCurrentFolder();
-  document.getElementById('fmPath').textContent=fmPathLabel();
-  document.getElementById('fmBack').textContent=fmPath.length===0?'✕':'←';
-  const list=document.getElementById('fmList');list.innerHTML='';
-  const keys=Object.keys(folder.children||{});
+  const folder = fmCurrentFolder();
+  document.getElementById('fmPath').textContent = fmPathLabel();
+  document.getElementById('fmBack').textContent = fmPath.length===0?'✕':'←';
+  const list = document.getElementById('fmList');
+  list.innerHTML = '';
+
+  // Modo busca ativa — busca em toda a árvore
+  if(fmSearchActive && (fmSearchQuery || fmActiveFilter!=='todos')){
+    const results = [];
+    fmSearchAll(fmFs.root, [], results);
+    if(!results.length){
+      list.innerHTML='<div class="fm-empty">🔍 Nenhum resultado encontrado</div>';return;
+    }
+    results.forEach(({key, item, path})=>{
+      const isFolder = item.type==='folder';
+      const el = document.createElement('div');
+      el.className = 'fm-item';
+      const icon = isFolder?'📁':item.type==='image'?'🖼️':item.type==='html'?'🌐':item.type==='md'?'📝':item.type==='pdf'?'📕':'📄';
+      const pathLabel = path.length ? path.join(' › ') : 'raiz';
+      el.innerHTML=`<div class="fm-item-icon">${icon}</div>
+        <div class="fm-item-info">
+          <div class="fm-item-name">${key}</div>
+          <div class="fm-item-meta">📁 ${pathLabel}</div>
+        </div>
+        <div style="display:flex;gap:4px;flex-shrink:0;">
+          ${!isFolder?`<button class="fm-item-btn" onclick="event.stopPropagation();fmQuickMenu(event,'${key}',${JSON.stringify(path)})">👁️</button>
+          <button class="fm-item-btn" onclick="event.stopPropagation();fmCopyFromSearch('${key}',${JSON.stringify(path)},this)">📋</button>`:''}
+        </div>`;
+      el.addEventListener('click', e=>{
+        if(e.target.closest('.fm-item-btn')) return;
+        if(isFolder){ fmPath=[...path,key]; fmCloseSearch(); renderFm(); }
+        else { fmOpenEditorFromPath(key, path); }
+      });
+      list.appendChild(el);
+    });
+    return;
+  }
+
+  // Render normal
+  const keys = Object.keys(folder.children||{});
   if(!keys.length){
     list.innerHTML='<div class="fm-empty">📂 Pasta vazia<br><small>Toque em "+ Novo" para adicionar</small></div>';return;
   }
-  const sorted=[...keys].sort((a,b)=>{
-    const ta=folder.children[a].type==='folder'?0:1;const tb=folder.children[b].type==='folder'?0:1;
-    return ta-tb||a.localeCompare(b);
-  });
-  sorted.forEach(key=>{
+  const sorted = fmSortKeys(keys, folder.children);
+  sorted.forEach((key,idx)=>{
     const item=folder.children[key];const isFolder=item.type==='folder';
     const el=document.createElement('div');
     el.className='fm-item'+(fmSelected.has(key)?' selected':'');
+    el.dataset.key=key;
     const icon=isFolder?'📁':item.type==='image'?'🖼️':item.type==='html'?'🌐':item.type==='md'?'📝':item.type==='pdf'?'📕':'📄';
     if(fmSelMode){
       const meta=isFolder?`${Object.keys(item.children||{}).length} item(s)`:'';
@@ -1616,17 +2435,20 @@ function renderFm(){
       });
     } else if(isFolder){
       const meta=`${Object.keys(item.children||{}).length} item(s)`;
-      el.innerHTML=`<div class="fm-item-icon">${icon}</div>
+      el.innerHTML=`<div class="fm-item-icon" style="cursor:grab;touch-action:none;">⠿</div>
+        <div class="fm-item-icon">${icon}</div>
         <div class="fm-item-info"><div class="fm-item-name">${key}</div><div class="fm-item-meta">${meta}</div></div>
         <div style="display:flex;gap:4px;flex-shrink:0;">
           <button class="fm-item-del" onclick="event.stopPropagation();fmDelete('${key}')">✕</button></div>`;
       el.addEventListener('click',e=>{if(e.target.closest('.fm-item-del'))return;fmPath.push(key);renderFm();});
     } else {
       const meta=item.type==='image'?'imagem':item.type==='pdf'?'PDF':(item.content?.length||0)+' chars';
-      el.innerHTML=`<div class="fm-item-icon">${icon}</div>
-        <div class="fm-item-info"><div class="fm-item-name">${key}</div><div class="fm-item-meta">${meta}</div></div>
+      const dateStr = item.modifiedAt ? new Date(item.modifiedAt).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}) : '';
+      el.innerHTML=`<div class="fm-item-icon" style="cursor:grab;touch-action:none;font-size:0.85rem;color:var(--muted);">⠿</div>
+        <div class="fm-item-icon">${icon}</div>
+        <div class="fm-item-info"><div class="fm-item-name">${key}</div><div class="fm-item-meta">${dateStr||meta}</div></div>
         <div style="display:flex;gap:4px;flex-shrink:0;">
-          <button class="fm-item-btn" title="Ver" onclick="event.stopPropagation();fmView('${key}')">👁️</button>
+          <button class="fm-item-btn" title="Opções" onclick="event.stopPropagation();fmQuickMenu(event,'${key}')">👁️</button>
           <button class="fm-item-btn" title="Copiar" onclick="event.stopPropagation();fmCopyItem('${key}',this)">📋</button>
           <button class="fm-item-del" onclick="event.stopPropagation();fmDelete('${key}')">✕</button></div>`;
       el.addEventListener('click',e=>{
@@ -1634,144 +2456,1083 @@ function renderFm(){
         if(item.type==='image'||item.type==='pdf'){fmView(key);}else{fmOpenEditor(key);}
       });
     }
+    // Drag-reorder (touch + mouse) — só no modo manual
+    if(fmSortMode === 'manual') fmBindDragReorder(el);
     list.appendChild(el);
   });
 }
 
-window.fmDelete = function(key){
-  window.fmConfirm(`Mover <strong>"${key}"</strong> para a lixeira?`,'Mover para lixeira',()=>{
-    const folder=fmCurrentFolder();
-    fmTrash.push({key,item:JSON.parse(JSON.stringify(folder.children[key])),path:[...fmPath],deletedAt:Date.now()});
-    delete folder.children[key];fmSave();fmSaveTrash();renderFm();
-  });
-};
+// ── DRAG REORDER ─────────────────────────────────────────────────────
+let fmDragKey = null;
+let fmDragEl = null;
 
-window.fmCopyItem = function(key,btn){
-  const item=fmCurrentFolder().children[key];const orig=btn?btn.textContent:'';
-  if(item.type==='image'||item.type==='pdf'){
-    const a=document.createElement('a');a.href=item.content;a.download=key;a.click();
-    if(btn){btn.textContent='✓';setTimeout(()=>btn.textContent=orig,1200);}
-  } else {
-    const content=item.content||'';const hasHTML=/<[a-z][\s\S]*>/i.test(content);
-    if(hasHTML){
-      try{
-        const blob=new Blob([content],{type:'text/html'});
-        const div=document.createElement('div');div.innerHTML=content;
-        const plain=div.innerText||div.textContent||'';
-        const blobTxt=new Blob([plain],{type:'text/plain'});
-        navigator.clipboard.write([new ClipboardItem({'text/html':blob,'text/plain':blobTxt})]).catch(()=>navigator.clipboard.writeText(plain));
-      }catch(e){navigator.clipboard.writeText(content);}
-    } else {navigator.clipboard.writeText(content);}
-    if(btn){btn.textContent='✓';setTimeout(()=>btn.textContent=orig,1200);}
+function fmBindDragReorder(el){
+  const handle = el.querySelector('[style*="grab"]') || el;
+  let startY = 0, isDragging = false, touchId = null;
+
+  function onStart(e){
+    // só inicia se tocou no handle ou fez long press
+    const touch = e.touches ? e.touches[0] : e;
+    touchId = e.touches ? e.touches[0].identifier : null;
+    startY = touch.clientY;
+    isDragging = false;
+    // long press para iniciar drag em touch
+    let pressTimer = setTimeout(()=>{
+      isDragging = true;
+      fmDragKey = el.dataset.key;
+      fmDragEl = el;
+      el.classList.add('drag-reorder');
+    }, 400);
+    el.dataset._pressTimer = pressTimer;
+    if(!e.touches){
+      // mouse: inicia imediatamente no handle ⠿
+      if(e.target.style && e.target.style.cursor === 'grab'){
+        isDragging = true;
+        fmDragKey = el.dataset.key;
+        fmDragEl = el;
+        el.classList.add('drag-reorder');
+      }
+    }
   }
-};
-
-// Lixeira
-window.openFmTrash = function(){renderFmTrash();document.getElementById('fmTrashOverlay').classList.add('open');};
-window.closeFmTrash = function(){document.getElementById('fmTrashOverlay').classList.remove('open');};
-function renderFmTrash(){
-  const list=document.getElementById('fmTrashList');list.innerHTML='';
-  if(!fmTrash.length){list.innerHTML='<div class="fm-empty">🗑️ Lixeira vazia</div>';return;}
-  [...fmTrash].reverse().forEach((entry,ri)=>{
-    const i=fmTrash.length-1-ri;const el=document.createElement('div');el.className='fm-trash-item';
-    const icon=entry.item.type==='folder'?'📁':entry.item.type==='image'?'🖼️':entry.item.type==='html'?'🌐':entry.item.type==='pdf'?'📕':entry.item.type==='md'?'📝':'📄';
-    const date=new Date(entry.deletedAt).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});
-    el.innerHTML=`<div style="font-size:1.1rem;flex-shrink:0;">${icon}</div>
-      <div style="flex:1;overflow:hidden;">
-        <div class="fm-trash-name">${entry.key}</div>
-        <div class="fm-trash-meta">Excluído ${date} · ${entry.path.length?entry.path.join(' › '):'raiz'}</div>
-      </div>
-      <button class="fm-restore-btn" onclick="fmRestore(${i})">↩ Restaurar</button>
-      <button class="fm-trash-del-btn" onclick="fmTrashDeleteForever(${i})">✕</button>`;
-    list.appendChild(el);
-  });
+  function onMove(e){
+    if(!isDragging) return;
+    e.preventDefault();
+    const touch = e.touches ? Array.from(e.touches).find(t=>t.identifier===touchId)||e.touches[0] : e;
+    const curY = touch.clientY;
+    // Encontra o elemento sob o cursor
+    const els = document.querySelectorAll('#fmList .fm-item:not(.drag-reorder)');
+    document.querySelectorAll('.fm-item.drag-over-top,.fm-item.drag-over-bot').forEach(x=>{x.classList.remove('drag-over-top','drag-over-bot');});
+    els.forEach(other=>{
+      const rect = other.getBoundingClientRect();
+      const mid = rect.top + rect.height/2;
+      if(curY < mid && curY > rect.top - 10){
+        other.classList.add('drag-over-top');
+      } else if(curY >= mid && curY < rect.bottom + 10){
+        other.classList.add('drag-over-bot');
+      }
+    });
+  }
+  function onEnd(e){
+    clearTimeout(el.dataset._pressTimer);
+    if(!isDragging){ isDragging=false; return; }
+    isDragging = false;
+    el.classList.remove('drag-reorder');
+    document.querySelectorAll('.fm-item.drag-over-top,.fm-item.drag-over-bot').forEach(other=>{
+      const isTop = other.classList.contains('drag-over-top');
+      other.classList.remove('drag-over-top','drag-over-bot');
+      if(!fmDragKey || other.dataset.key === fmDragKey) return;
+      fmReorderItem(fmDragKey, other.dataset.key, isTop);
+    });
+    fmDragKey = null; fmDragEl = null;
+  }
+  el.addEventListener('touchstart', onStart, {passive:true});
+  el.addEventListener('touchmove', onMove, {passive:false});
+  el.addEventListener('touchend', onEnd);
+  el.addEventListener('mousedown', onStart);
+  el.addEventListener('mousemove', onMove);
+  el.addEventListener('mouseup', onEnd);
 }
-window.fmRestore = function(i){
-  const entry=fmTrash[i];let node=fmFs.root;
-  for(const p of entry.path){if(!node.children[p])node.children[p]={type:'folder',name:p,children:{}};node=node.children[p];}
-  let name=entry.key;let c=1;while(node.children[name]){name=entry.key+'_'+c++;}
-  node.children[name]=entry.item;fmTrash.splice(i,1);fmSave();fmSaveTrash();renderFmTrash();renderFm();
+
+function fmReorderItem(fromKey, toKey, insertBefore){
+  const folder = fmCurrentFolder();
+  const children = folder.children;
+  const keys = Object.keys(children);
+  const fromIdx = keys.indexOf(fromKey);
+  const toIdx = keys.indexOf(toKey);
+  if(fromIdx === -1 || toIdx === -1) return;
+  // Reconstrói a ordem
+  const newOrder = keys.filter(k=>k!==fromKey);
+  let insertIdx = newOrder.indexOf(toKey);
+  if(!insertBefore) insertIdx++;
+  newOrder.splice(insertIdx, 0, fromKey);
+  // Reconstrói o objeto na nova ordem
+  const newChildren = {};
+  newOrder.forEach(k=>{ newChildren[k] = children[k]; });
+  folder.children = newChildren;
+  fmSave();
+  renderFm();
+}
+
+// ── MENU RÁPIDO 👁️ ───────────────────────────────────────────────────
+let fmQMenuKey = null;
+let fmQMenuPath = null;
+
+window.fmQuickMenu = function(e, key, path){
+  e.stopPropagation();
+  fmQMenuKey = key;
+  fmQMenuPath = path || [...fmPath];
+  // Remove menu anterior
+  document.querySelectorAll('.fm-item-qmenu').forEach(m=>m.remove());
+  const menu = document.createElement('div');
+  menu.className = 'fm-item-qmenu';
+  menu.innerHTML = `
+    <button class="fm-item-qmenu-btn" onclick="fmQMenuView()">👁️ Visualizar</button>
+    <div class="fm-item-qmenu-sep"></div>
+    <button class="fm-item-qmenu-btn" onclick="fmQMenuSearch()">🔍 Pesquisar no arquivo</button>
+  `;
+  // Posiciona o menu perto do botão
+  const rect = e.target.getBoundingClientRect();
+  menu.style.top = (rect.bottom + 6) + 'px';
+  menu.style.right = (window.innerWidth - rect.right - 10) + 'px';
+  document.body.appendChild(menu);
+  // Fecha ao clicar fora
+  setTimeout(()=>{
+    document.addEventListener('click', function closeMenu(){
+      menu.remove();
+      document.removeEventListener('click', closeMenu);
+    });
+  }, 10);
 };
-window.fmTrashDeleteForever = function(i){
-  window.fmConfirm(`Excluir <strong>"${fmTrash[i].key}"</strong> permanentemente?<br><small>Essa ação não pode ser desfeita.</small>`,'Excluir para sempre',()=>{
-    fmTrash.splice(i,1);fmSaveTrash();renderFmTrash();
-  });
+
+window.fmQMenuView = function(){
+  document.querySelectorAll('.fm-item-qmenu').forEach(m=>m.remove());
+  if(!fmQMenuKey) return;
+  const node = fmGetNodeAt(fmQMenuPath);
+  if(!node) return;
+  const item = node.children[fmQMenuKey];
+  // Abre no modo leitura
+  const savedPath = fmPath;
+  fmPath = [...fmQMenuPath];
+  fmEditorKey = fmQMenuKey;
+  fmEditorCurrentType = item.type || 'txt';
+  document.getElementById('fmReadTitle').textContent = fmQMenuKey;
+  const content = document.getElementById('fmReadContent');
+  const raw = item.content || '';
+  const hasHTML = /<[a-z][\s\S]*>/i.test(raw);
+  content.innerHTML = fmNormalizeContent(hasHTML ? fmDetectLinks(raw) : fmProcessText(raw));
+  content.querySelectorAll('a').forEach(a=>{ if(!a.target) a.target='_blank'; a.style.pointerEvents='auto'; });
+  fmOpenReadMode();
+  fmPath = savedPath;
 };
-window.fmEmptyTrash = function(){
-  if(!fmTrash.length)return;
-  window.fmConfirm(`Esvaziar a lixeira? <strong>${fmTrash.length} item(s)</strong> serão perdidos para sempre.`,'Esvaziar',()=>{
-    fmTrash=[];fmSaveTrash();renderFmTrash();
+
+window.fmQMenuSearch = function(){
+  document.querySelectorAll('.fm-item-qmenu').forEach(m=>m.remove());
+  if(!fmQMenuKey) return;
+  document.getElementById('fmInfileInp').value = '';
+  document.getElementById('fmInfileCount').textContent = '';
+  document.getElementById('fmInfileResults').innerHTML = '<div style="text-align:center;padding:2rem;color:var(--muted);font-size:0.8rem;">Digite para pesquisar dentro do arquivo</div>';
+  document.getElementById('fmInfileSearch').classList.add('open');
+  setTimeout(()=>document.getElementById('fmInfileInp').focus(), 200);
+};
+
+window.closeFmInfileSearch = function(){
+  document.getElementById('fmInfileSearch').classList.remove('open');
+};
+
+window.fmDoInfileSearch = function(){
+  const q = document.getElementById('fmInfileInp').value.trim().toLowerCase();
+  const results = document.getElementById('fmInfileResults');
+  const countEl = document.getElementById('fmInfileCount');
+  if(!q){ results.innerHTML='<div style="text-align:center;padding:2rem;color:var(--muted);font-size:0.8rem;">Digite para pesquisar dentro do arquivo</div>'; countEl.textContent=''; return; }
+  const node = fmGetNodeAt(fmQMenuPath);
+  if(!node){ results.innerHTML='<div class="fm-empty">Arquivo não encontrado</div>'; return; }
+  const item = node.children[fmQMenuKey];
+  if(!item){ results.innerHTML='<div class="fm-empty">Arquivo não encontrado</div>'; return; }
+  // Extrai texto plano
+  const div = document.createElement('div');
+  div.innerHTML = item.content || '';
+  const plainText = div.innerText || div.textContent || '';
+  const lines = plainText.split('\n').filter(l=>l.trim());
+  const matches = lines.filter(l=>l.toLowerCase().includes(q));
+  countEl.textContent = matches.length + ' resultado(s)';
+  if(!matches.length){ results.innerHTML='<div class="fm-empty">🔍 Nenhum resultado encontrado</div>'; return; }
+  results.innerHTML = '';
+  matches.forEach(line=>{
+    const el = document.createElement('div');
+    el.className = 'fm-infile-item';
+    // Destaca o trecho encontrado
+    const escaped = q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+    const highlighted = line.replace(new RegExp(escaped,'gi'), m=>`<mark>${m}</mark>`);
+    el.innerHTML = `<div class="fm-infile-snippet">${highlighted}</div>`;
+    el.addEventListener('click', ()=>{
+      // Abre o arquivo no modo visualização com destaque
+      fmOpenInfileResult(line, q);
+    });
+    results.appendChild(el);
   });
 };
 
-// Viewer
-window.fmView = function(key){
-  fmViewingKey=key;const item=fmCurrentFolder().children[key];
-  document.getElementById('fmViewerTitle').textContent=key;
-  const editBtn=document.getElementById('fmViewerEditBtn');
-  editBtn.style.display=(item.type==='image'||item.type==='folder')?'none':'';
-  const body=document.getElementById('fmViewerBody');body.innerHTML='';body.style.padding='1rem';
-  if(item.type==='image'){
-    const img=document.createElement('img');img.src=item.content;img.className='fm-viewer-img';body.appendChild(img);
-  } else if(item.type==='html'){
-    const iframe=document.createElement('iframe');
-    iframe.style.cssText='width:100%;height:100%;border:none;border-radius:12px;background:#fff;';
-    body.style.padding='0';body.appendChild(iframe);iframe.srcdoc=item.content;
-  } else {
-    const div=document.createElement('div');div.className='fm-viewer-rich';
-    const hasHTML=/<[a-z][\s\S]*>/i.test(item.content||'');
-    if(hasHTML){div.innerHTML=item.content||'';}
-    else{div.style.whiteSpace='pre-wrap';div.textContent=item.content||'';}
-    body.appendChild(div);
-  }
+function fmOpenInfileResult(matchLine, q){
+  const node = fmGetNodeAt(fmQMenuPath);
+  if(!node) return;
+  const item = node.children[fmQMenuKey];
+  if(!item) return;
+  const savedPath = fmPath;
+  fmPath = [...fmQMenuPath];
+  fmEditorKey = fmQMenuKey;
+  fmEditorCurrentType = item.type || 'txt';
+  // Monta conteúdo com destaque
+  const raw = item.content || '';
+  const hasHTML = /<[a-z][\s\S]*>/i.test(raw);
+  let html = hasHTML ? fmDetectLinks(raw) : fmProcessText(raw);
+  // Destaca todas as ocorrências da query
+  const escaped = q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+  html = html.replace(new RegExp('(?![^<]*>)('+escaped+')', 'gi'), '<mark style="background:#facc15;color:#000;border-radius:3px;padding:0 2px;">$1</mark>');
+  document.getElementById('fmReadTitle').textContent = fmQMenuKey;
+  const content = document.getElementById('fmReadContent');
+  content.innerHTML = html;
+  content.querySelectorAll('a').forEach(a=>{ if(!a.target) a.target='_blank'; a.style.pointerEvents='auto'; });
+  document.getElementById('fmInfileSearch').classList.remove('open');
+  fmOpenReadMode();
+  // Scroll até o primeiro destaque
+  setTimeout(()=>{
+    const first = content.querySelector('mark');
+    if(first) first.scrollIntoView({behavior:'smooth', block:'center'});
+    // Destaque some ao clicar
+    content.addEventListener('click', function clearHL(){
+      content.querySelectorAll('mark').forEach(m=>{
+        const txt = document.createTextNode(m.textContent);
+        m.replaceWith(txt);
+      });
+      content.removeEventListener('click', clearHL);
+    }, {once:true});
+  }, 200);
+  fmPath = savedPath;
+}
+
+// Helpers busca
+window.fmViewFromSearch = function(key, path){
+  const node = fmGetNodeAt(path);
+  if(!node) return;
+  const item = node.children[key];
+  fmViewingKey = key;
+  document.getElementById('fmViewerTitle').textContent = key;
+  document.getElementById('fmViewerEditBtn').style.display = (item.type==='image'||item.type==='folder')?'none':'';
+  const body = document.getElementById('fmViewerBody'); body.innerHTML=''; body.style.padding='1rem';
+  if(item.type==='image'){const img=document.createElement('img');img.src=item.content;img.className='fm-viewer-img';body.appendChild(img);}
+  else {const div=document.createElement('div');div.className='fm-viewer-rich';const raw=item.content||'';const hasHTML=/<[a-z][\s\S]*>/i.test(raw);div.innerHTML=fmNormalizeContent(hasHTML?fmDetectLinks(raw):fmProcessText(raw));body.appendChild(div);}
   document.getElementById('fmViewer').classList.add('open');
 };
-window.closeFmViewer = function(){
-  document.getElementById('fmViewer').classList.remove('open');
-  document.getElementById('fmViewerBody').innerHTML='';fmViewingKey=null;
+window.fmCopyFromSearch = function(key, path, btn){
+  const node = fmGetNodeAt(path);
+  if(!node) return;
+  const item = node.children[key];
+  const content = item.content||'';
+  const div=document.createElement('div');div.innerHTML=content;
+  const plain=div.innerText||div.textContent||content;
+  navigator.clipboard.writeText(plain).then(()=>{if(btn){const o=btn.textContent;btn.textContent='✓';setTimeout(()=>btn.textContent=o,1200);}});
 };
-window.fmEditFromViewer = function(){const key=fmViewingKey;window.closeFmViewer();if(key)fmOpenEditor(key);};
-
-// Editor
-function fmOpenEditor(key){
-  fmEditorKey=key;const item=fmCurrentFolder().children[key];
-  document.getElementById('fmEditorTitle').textContent='✏️ '+key;
-  const editable=document.getElementById('fmEditable');editable.innerHTML=item.content||'';
-  document.getElementById('fmToolbar').style.display=(item.type==='html'||item.type==='txt'||item.type==='md')?'flex':'none';
-  document.getElementById('fmEditor').classList.add('open');
-  setTimeout(()=>editable.focus(),200);
+function fmGetNodeAt(path){
+  let node=fmFs.root;
+  for(const p of path){if(!node.children||!node.children[p])return null;node=node.children[p];}
+  return node;
 }
-window.closeFmEditor = function(){document.getElementById('fmEditor').classList.remove('open');document.getElementById('fmEditable').innerHTML='';fmEditorKey=null;};
-window.saveFmEditorContent = function(){
-  if(!fmEditorKey)return;
-  const item=fmCurrentFolder().children[fmEditorKey];
-  item.content=document.getElementById('fmEditable').innerHTML;
-  fmSave();
-  const btn=document.querySelector('.fm-editor-save');const orig=btn.textContent;btn.textContent='✓ Salvo!';
-  setTimeout(()=>btn.textContent=orig,1200);
-};
-window.fmCmd = function(cmd,val){document.getElementById('fmEditable').focus();document.execCommand(cmd,false,val||null);};
-window.fmInsertCode = function(){document.getElementById('fmEditable').focus();document.execCommand('insertHTML',false,'<code>código</code>');};
+function fmOpenEditorFromPath(key, path){
+  const saved = fmPath;
+  fmPath = [...path];
+  fmOpenEditor(key);
+}
 
-// Modal criar
-let fmPendingFiles=[];
+// ── SMART LINK DETECTOR ──────────────────────────────────────────────
+function fmDetectLinks(html){
+  // Mapa de domínios conhecidos → nome bonito + emoji
+  const knownDomains = {
+    'youtube.com':'▶ YouTube','youtu.be':'▶ YouTube',
+    'instagram.com':'📷 Instagram','twitter.com':'🐦 Twitter',
+    'x.com':'🐦 X','facebook.com':'📘 Facebook',
+    'tiktok.com':'🎵 TikTok','linkedin.com':'💼 LinkedIn',
+    'github.com':'💻 GitHub','whatsapp.com':'💬 WhatsApp',
+    'telegram.org':'✈ Telegram','netflix.com':'🎬 Netflix',
+    'spotify.com':'🎧 Spotify','amazon.com':'📦 Amazon',
+    'google.com':'🔍 Google','drive.google.com':'📁 Google Drive',
+    'docs.google.com':'📄 Google Docs','maps.google.com':'🗺 Google Maps',
+    'chat.openai.com':'🤖 ChatGPT','claude.ai':'🤖 Claude',
+  };
+  // Substitui URLs brutas que ainda não estão dentro de <a>
+  return html.replace(/(?<![="])https?:\/\/([^\s<>"]+)/g, (url, rest)=>{
+    try {
+      const u = new URL(url);
+      const domain = u.hostname.replace('www.','');
+      const label = knownDomains[domain] || domain;
+      return `<a href="${url}" target="_blank" style="color:#3b82f6;text-decoration:underline;font-weight:500;">${label}</a>`;
+    } catch(e){ return url; }
+  });
+}
+
+// ── MARKDOWN → HTML CONVERTER ────────────────────────────────────────
+function fmMdToHtml(text){
+  if(!text) return '';
+  // Processa linha a linha para distinguir ol de ul
+  const lines = text.split('\n');
+  let result = [];
+  let inUl = false, inOl = false;
+
+  for(let i = 0; i < lines.length; i++){
+    let line = lines[i];
+    // Títulos
+    if(/^### (.+)$/.test(line)){ closeList(); result.push(line.replace(/^### (.+)$/,'<h3>$1</h3>')); continue; }
+    if(/^## (.+)$/.test(line)){  closeList(); result.push(line.replace(/^## (.+)$/,'<h2>$1</h2>')); continue; }
+    if(/^# (.+)$/.test(line)){   closeList(); result.push(line.replace(/^# (.+)$/,'<h1>$1</h1>')); continue; }
+    // HR
+    if(/^[-*_]{3,}$/.test(line)){ closeList(); result.push('<hr>'); continue; }
+    // Blockquote
+    if(/^> (.+)$/.test(line)){ closeList(); result.push(line.replace(/^> (.+)$/,'<blockquote>$1</blockquote>')); continue; }
+    // Lista não-ordenada (- * +)
+    if(/^[\-\*\+] (.+)$/.test(line)){
+      if(inOl){ result.push('</ol>'); inOl=false; }
+      if(!inUl){ result.push('<ul>'); inUl=true; }
+      result.push('<li>'+line.replace(/^[\-\*\+] /,'')+  '</li>');
+      continue;
+    }
+    // Lista ordenada (1. 2. etc)
+    if(/^\d+\. (.+)$/.test(line)){
+      if(inUl){ result.push('</ul>'); inUl=false; }
+      if(!inOl){ result.push('<ol>'); inOl=true; }
+      result.push('<li>'+line.replace(/^\d+\. /,'')+  '</li>');
+      continue;
+    }
+    // Linha normal — fecha listas abertas
+    closeList();
+    if(line.trim()==='') result.push('<br>');
+    else result.push('<p>'+line+'</p>');
+  }
+  closeList();
+
+  function closeList(){
+    if(inUl){ result.push('</ul>'); inUl=false; }
+    if(inOl){ result.push('</ol>'); inOl=false; }
+  }
+
+  let html = result.join('');
+  // Inline formatting
+  html = html
+    .replace(/\*\*\*(.+?)\*\*\*/g,'<b><i>$1</i></b>')
+    .replace(/\*\*(.+?)\*\*/g,'<b>$1</b>')
+    .replace(/\*(.+?)\*/g,'<i>$1</i>')
+    .replace(/__(.+?)__/g,'<b>$1</b>')
+    .replace(/_(.+?)_/g,'<i>$1</i>')
+    .replace(/~~(.+?)~~/g,'<s>$1</s>')
+    .replace(/`([^`]+)`/g,'<code>$1</code>')
+    .replace(/\[(.+?)\]\((.+?)\)/g,'<a href="$2" target="_blank" style="color:#3b82f6;text-decoration:underline;font-weight:500;">$1</a>');
+  // Detecta links soltos
+  html = fmDetectLinks(html);
+  return html;
+}
+
+function fmHasMarkdown(text){
+  return /(\*\*|__|#{1,3} |^[-*+] |\d+\. |~~|`|\[.+\]\(|^> )/m.test(text);
+}
+
+function fmProcessText(text){
+  if(!text) return '';
+  if(fmHasMarkdown(text)) return fmMdToHtml(text);
+  // Texto simples: preserva quebras e detecta links
+  const withBreaks = text.replace(/\n/g,'<br>');
+  return fmDetectLinks(withBreaks);
+}
+
+// ── NORMALIZAÇÃO DE ESPAÇAMENTO ────────────────────────────────────
+function fmNormalizeContent(html){
+  if(!html) return html;
+  // Remove <br> consecutivos — máximo 1 linha em branco
+  html = html.replace(/(<br\s*\/?>(\s|&nbsp;)*){2,}/gi, '<br>');
+  // Remove parágrafos vazios consecutivos — máximo 1
+  html = html.replace(/(<p[^>]*>\s*(<br\s*\/?>)?\s*<\/p>\s*){2,}/gi, '<p><br></p>');
+  // Limita margin-top/bottom a 6px máximo
+  html = html.replace(/margin-top\s*:\s*(\d+\.?\d*)(px|pt|em|rem)/gi, (m, n, unit)=>{
+    const px = unit==='pt'?parseFloat(n)*1.33:unit==='em'||unit==='rem'?parseFloat(n)*14:parseFloat(n);
+    return 'margin-top:'+(px>6?'3px':''+n+unit);
+  });
+  html = html.replace(/margin-bottom\s*:\s*(\d+\.?\d*)(px|pt|em|rem)/gi, (m, n, unit)=>{
+    const px = unit==='pt'?parseFloat(n)*1.33:unit==='em'||unit==='rem'?parseFloat(n)*14:parseFloat(n);
+    return 'margin-bottom:'+(px>6?'3px':''+n+unit);
+  });
+  // Remove padding excessivo
+  html = html.replace(/padding-top\s*:\s*(\d+\.?\d*)(px|pt|em|rem)/gi, (m, n, unit)=>{
+    const px = unit==='pt'?parseFloat(n)*1.33:unit==='em'||unit==='rem'?parseFloat(n)*14:parseFloat(n);
+    return 'padding-top:'+(px>6?'0px':''+n+unit);
+  });
+  // Remove line-height excessivo (acima de 1.6)
+  html = html.replace(/line-height\s*:\s*(\d+\.?\d*)(;|%|px|em|rem)?/gi, (m, n, unit)=>{
+    const val = parseFloat(n);
+    const isRatio = !unit || unit===';';
+    if(isRatio && val > 1.6) return 'line-height:1.4;';
+    if(!isRatio && val > 24) return 'line-height:1.4;';
+    return m;
+  });
+  // Remove font-size inline — deixa o CSS do editor controlar
+  html = html.replace(/font-size\s*:\s*[^;"]+(;|(?="))/gi, '');
+  return html;
+}
+
+// ── EDITOR ────────────────────────────────────────────────────────────
+let fmEditorCurrentType = 'txt';
+let fmAutosaveTimer = null;
+let fmEditorZoom = 1.0;
+let fmReadZoomLevel = 1.0;
+
+function fmOpenEditor(key){
+  fmEditorKey=key;
+  const item=fmCurrentFolder().children[key];
+  fmEditorCurrentType = item.type || 'txt';
+  // Nome só aparece no modo leitura — não no editor
+
+  const editable = document.getElementById('fmEditable');
+  const codeEditor = document.getElementById('fmCodeEditor');
+  const toolbar = document.getElementById('fmToolbar');
+
+  if(fmEditorCurrentType === 'html'){
+    // HTML: mostra textarea com código
+    editable.style.display = 'none';
+    codeEditor.style.display = 'block';
+    codeEditor.value = item.content || '';
+    toolbar.style.display = 'none';
+    // Autosave no textarea
+    codeEditor.oninput = ()=>{ fmTriggerAutosave(); };
+  } else {
+    // Texto/MD: contenteditable branco
+    editable.style.display = 'block';
+    codeEditor.style.display = 'none';
+    const raw = item.content || '';
+    const hasHTML = /<[a-z][\s\S]*>/i.test(raw);
+    editable.innerHTML = fmNormalizeContent(hasHTML ? fmDetectLinks(raw) : fmProcessText(raw));
+    toolbar.style.display = 'flex';
+    editable.oninput = ()=>{ fmTriggerAutosave(); };
+  }
+
+  document.getElementById('fmEditor').classList.add('open');
+  fmEditorZoom = 1.0;
+  document.getElementById('fmEditable').style.fontSize = '';
+  document.getElementById('fmEditable').style.fontFamily = '';
+  const fontSel = document.getElementById('fmFontSelect');
+  if(fontSel) fontSel.value = '';
+  // Inicializa histórico com o conteúdo carregado
+  fmHistoryInit(document.getElementById('fmEditable').innerHTML);
+  // Ativa redimensionamento quando teclado abre
+  fmInitKeyboardResize();
+  // Reseta aba para Formato
+  fmActiveTab = 1;
+  if(window.fmSwitchTab) window.fmSwitchTab(1);
+  setTimeout(()=>{ fmEditorCurrentType==='html'?codeEditor.focus():editable.focus(); }, 200);
+
+  // Interceptador de paste universal
+  editable.onpaste = function(e){
+    e.preventDefault();
+    const clip = e.clipboardData || window.clipboardData;
+    const htmlData = clip.getData('text/html');
+    const plainData = clip.getData('text/plain');
+    let result = '';
+    if(htmlData && htmlData.trim()){
+      result = fmWrapCopyBlocks(fmNormalizeContent(fmDetectLinks(htmlData)));
+    } else if(plainData){
+      result = fmWrapCopyBlocks(fmNormalizeContent(fmProcessText(plainData)));
+    }
+    document.execCommand('insertHTML', false, result);
+    fmTriggerAutosave();
+  };
+
+  // Captura cola via histórico do Android (bypassa onpaste)
+  // Só age quando é paste de texto puro sem formatação HTML (evita apagar formatação existente)
+  let fmLastContent = editable.innerHTML;
+  editable.addEventListener('input', function(e){
+    if(e.inputType === 'insertFromPaste'){
+      const current = editable.innerHTML;
+      if(current === fmLastContent) return;
+      // Só reprocessa se não há formatação real (bold, listas, links, etc)
+      const tempDiv = document.createElement('div');
+      tempDiv.innerHTML = current;
+      const hasRealFormatting = tempDiv.querySelector('b,strong,i,em,ul,ol,h1,h2,h3,a,code,blockquote,table');
+      if(!hasRealFormatting){
+        const added = editable.innerText || '';
+        if(fmHasMarkdown(added) || /https?:\/\//.test(added)){
+          editable.innerHTML = fmNormalizeContent(fmProcessText(added));
+          const range = document.createRange();
+          const sel = window.getSelection();
+          range.selectNodeContents(editable);
+          range.collapse(false);
+          sel.removeAllRanges();
+          sel.addRange(range);
+        }
+      }
+      fmLastContent = editable.innerHTML;
+    } else {
+      fmLastContent = editable.innerHTML;
+    }
+  });
+}
+
+function fmTriggerAutosave(){
+  // Snapshot imediato para histórico
+  const el = document.getElementById('fmEditable');
+  if(el) fmHistoryPush(el.innerHTML);
+  clearTimeout(fmAutosaveTimer);
+  fmAutosaveTimer = setTimeout(()=>{
+    fmDoSave();
+    const badge = document.getElementById('fmAutosaveBadge');
+    badge.classList.add('show');
+    setTimeout(()=>badge.classList.remove('show'), 2000);
+  }, 1500);
+}
+
+function fmDoSave(){
+  if(!fmEditorKey) return;
+  const item = fmCurrentFolder().children[fmEditorKey];
+  if(!item) return;
+  if(fmEditorCurrentType === 'html'){
+    item.content = document.getElementById('fmCodeEditor').value;
+  } else {
+    item.content = document.getElementById('fmEditable').innerHTML;
+  }
+  item.modifiedAt = Date.now();
+  fmSave();
+}
+
+window.closeFmEditor = function(){
+  clearTimeout(fmAutosaveTimer);
+  fmDoSave();
+  document.getElementById('fmEditor').classList.remove('open');
+  document.getElementById('fmEditable').innerHTML='';
+  document.getElementById('fmCodeEditor').value='';
+  fmEditorKey=null;
+  fmHistory=[];fmHistoryIdx=-1;
+  // Remove listener do teclado
+  if(window._fmVvListener && window.visualViewport){
+    window.visualViewport.removeEventListener('resize', window._fmVvListener);
+    window._fmVvListener = null;
+  }
+  document.getElementById('fmEditor').style.height = '';
+  document.getElementById('fmEditor').style.top = '';
+};
+
+// ── VISUALVIEWPORT: mantém editor visível quando teclado abre ────────
+function fmInitKeyboardResize(){
+  if(!window.visualViewport) return;
+  function onVvResize(){
+    const editor = document.getElementById('fmEditor');
+    if(!editor || !editor.classList.contains('open')) return;
+    const vv = window.visualViewport;
+    editor.style.position = 'fixed';
+    editor.style.top = vv.offsetTop + 'px';
+    editor.style.left = vv.offsetLeft + 'px';
+    editor.style.width = vv.width + 'px';
+    editor.style.height = vv.height + 'px';
+  }
+  window._fmVvListener = onVvResize;
+  window.visualViewport.addEventListener('resize', onVvResize);
+  window.visualViewport.addEventListener('scroll', onVvResize);
+}
+window.saveFmEditorContent = function(){
+  fmDoSave();
+  const badge = document.getElementById('fmAutosaveBadge');
+  if(badge){ badge.classList.add('show'); setTimeout(()=>badge.classList.remove('show'),1500); }
+};
+window.fmCmd = function(cmd,val){
+  document.getElementById('fmEditable').focus();
+  document.execCommand(cmd,false,val||null);
+};
+window.fmInsertCode = function(){
+  const editable = document.getElementById('fmEditable');
+  editable.focus();
+  const sel = window.getSelection();
+  if(sel && !sel.isCollapsed){
+    // Tem texto selecionado: envolve em <code> mantendo o conteúdo
+    const range = sel.getRangeAt(0);
+    const selectedText = range.toString();
+    document.execCommand('insertHTML', false, `<code>${selectedText}</code>`);
+  } else {
+    // Sem seleção: insere placeholder editável
+    document.execCommand('insertHTML', false, '<code>código</code>');
+  }
+};
+window.fmInsertLink = function(){
+  const url = prompt('Cole o link:');
+  if(!url) return;
+  const label = prompt('Nome do link (deixe vazio para usar a URL):') || url;
+  const editable = document.getElementById('fmEditable');
+  editable.focus();
+  const sel = window.getSelection();
+  // Se há texto selecionado, cria link em cima dele
+  if(sel && !sel.isCollapsed){
+    document.execCommand('createLink', false, url);
+  } else {
+    // Insere o nome como texto e transforma em link
+    document.execCommand('insertHTML', false,
+      `<a href="${url}" target="_blank">${label}</a>&#8203;`);
+  }
+};
+// ── REMOVER FORMATO COM CONFIRMAÇÃO ──────────────────────────────────
+window.fmRemoveFormat = function(){
+  const el = document.getElementById('fmEditable');
+  el.focus();
+  const sel = window.getSelection();
+  if(sel && !sel.isCollapsed){
+    document.execCommand('removeFormat');
+    const range = sel.getRangeAt(0);
+    const frag = range.cloneContents();
+    const tmp = document.createElement('div');
+    tmp.appendChild(frag);
+    tmp.querySelectorAll('[style]').forEach(n => n.removeAttribute('style'));
+    tmp.querySelectorAll('font').forEach(n => {
+      const span = document.createElement('span');
+      span.innerHTML = n.innerHTML;
+      n.replaceWith(span);
+    });
+    range.deleteContents();
+    range.insertNode(tmp.firstChild || document.createTextNode(''));
+  } else {
+    // Sem seleção: remove tudo sem confirm (mobile não suporta bem)
+    el.querySelectorAll('[style]').forEach(n => n.removeAttribute('style'));
+    el.querySelectorAll('font').forEach(n => {
+      const span = document.createElement('span');
+      span.innerHTML = n.innerHTML;
+      n.replaceWith(span);
+    });
+    const range = document.createRange();
+    range.selectNodeContents(el);
+    sel.removeAllRanges();
+    sel.addRange(range);
+    document.execCommand('removeFormat');
+    sel.removeAllRanges();
+    fmTriggerAutosave();
+  }
+};
+
+// ── ABAS DA TOOLBAR ──────────────────────────────────────────────────
+let fmActiveTab = 1;
+window.fmSwitchTab = function(tab){
+  fmActiveTab = tab;
+  document.getElementById('fmPanel1').classList.toggle('open', tab===1);
+  document.getElementById('fmPanel2').classList.toggle('open', tab===2);
+  // Temas só no painel 1
+  const themeRow = document.getElementById('fmThemeRow');
+  if(themeRow) themeRow.style.display = tab===1 ? '' : 'none';
+};
+
+// Abre aba automaticamente ao digitar
+function fmEnsureTabOpen(){
+  if(!document.getElementById('fmPanel'+fmActiveTab).classList.contains('open')){
+    window.fmSwitchTab(fmActiveTab);
+  }
+}
+
+// ── TEMAS DO EDITOR ──────────────────────────────────────────────────
+window.fmSetEditorTheme = function(bg, color){
+  const editable = document.getElementById('fmEditable');
+  editable.style.background = bg;
+  editable.style.color = color;
+  editable.style.caretColor = color;
+  // Atualiza dots ativos
+  document.querySelectorAll('.fm-theme-row .fm-theme-dot').forEach((d,i) => {
+    if(i <= 5) d.classList.toggle('active', d.style.background === bg || d.style.backgroundColor === bg);
+  });
+};
+
+window.fmSetToolbarTheme = function(toolbarBg, headerBg){
+  const toolbar = document.getElementById('fmToolbar');
+  const isDark = toolbarBg !== '#f9fafb' && toolbarBg !== '#ffffff';
+  toolbar.style.background = toolbarBg;
+  toolbar.style.borderColor = isDark ? 'rgba(255,255,255,0.1)' : '#e5e7eb';
+  const btnColor = isDark ? '#e5e7eb' : '#374151';
+  const btnBorder = isDark ? 'rgba(255,255,255,0.15)' : '#d1d5db';
+  const btnBg = isDark ? 'rgba(255,255,255,0.07)' : '#fff';
+  document.querySelectorAll('#fmToolbar .fm-tb-btn').forEach(b => {
+    b.style.color = btnColor; b.style.borderColor = btnBorder; b.style.background = btnBg;
+  });
+  document.querySelectorAll('#fmToolbar .fm-tb-select').forEach(s => {
+    s.style.color = btnColor; s.style.borderColor = btnBorder; s.style.background = btnBg;
+  });
+  document.querySelectorAll('#fmToolbar .fm-tb-ctrl-btn:not(.fm-tb-save)').forEach(b => {
+    b.style.color = btnColor; b.style.borderColor = btnBorder; b.style.background = btnBg;
+  });
+  const fname = document.getElementById('fmEditorTitle');
+  if(fname) fname.style.color = isDark ? '#d1d5db' : '#374151';
+  const toggle = document.getElementById('fmPanelToggle');
+  if(toggle){ toggle.style.borderColor = isDark ? 'rgba(196,181,253,0.5)' : ''; toggle.style.background = isDark ? 'rgba(196,181,253,0.1)' : ''; toggle.style.color = isDark ? '#c4b5fd' : ''; }
+  // Temas labels
+  document.querySelectorAll('#fmToolbar .fm-theme-label').forEach(l => l.style.color = isDark ? 'rgba(255,255,255,0.5)' : '#6b7280');
+  document.querySelectorAll('#fmToolbar .fm-theme-sep').forEach(s => s.style.background = isDark ? 'rgba(255,255,255,0.2)' : '#d1d5db');
+};
+window.fmChangeFontSize = function(dir){
+  const el = document.getElementById('fmEditable');
+  el.focus();
+  const sel = window.getSelection();
+  if(!sel || sel.isCollapsed){
+    // Sem seleção: zoom proporcional via font-size no elemento raiz
+    fmEditorZoom = Math.max(0.5, Math.min(3.0, fmEditorZoom + dir * 0.1));
+    el.style.fontSize = (fmEditorZoom * 0.9) + 'rem';
+  } else {
+    // Com seleção: aplica em span direto
+    const sz = parseFloat(window.getComputedStyle(sel.anchorNode.parentElement || el).fontSize) || 14;
+    const newSz = Math.max(8, sz + dir * 2);
+    document.execCommand('fontSize', false, '7');
+    el.querySelectorAll('font[size="7"]').forEach(f => {
+      f.removeAttribute('size');
+      f.style.fontSize = newSz + 'px';
+    });
+  }
+  fmTriggerAutosave();
+};
+
+// ── TROCA DE FONTE NO EDITOR ─────────────────────────────────────────
+window.fmChangeFont = function(font){
+  if(!font) return;
+  const el = document.getElementById('fmEditable');
+  const sel = window.getSelection();
+  if(!sel || sel.isCollapsed || sel.rangeCount === 0){
+    // Sem seleção: muda fonte de todo o editor
+    el.querySelectorAll('*').forEach(e => { if(e.style.fontFamily) e.style.fontFamily = ''; });
+    el.style.fontFamily = font + ', sans-serif';
+  } else {
+    // Com seleção: extrai o conteúdo, envolve em span e reinsere
+    el.focus();
+    const range = sel.getRangeAt(0).cloneRange();
+    const fragment = range.extractContents();
+    const span = document.createElement('span');
+    span.style.fontFamily = font + ', sans-serif';
+    span.appendChild(fragment);
+    range.insertNode(span);
+    // Reseleciona o span inserido
+    const newRange = document.createRange();
+    newRange.selectNodeContents(span);
+    sel.removeAllRanges();
+    sel.addRange(newRange);
+  }
+  fmTriggerAutosave();
+};
+
+// ── ZOOM NO MODO LEITURA ─────────────────────────────────────────────
+window.fmReadZoom = function(dir){
+  fmReadZoomLevel = Math.max(0.5, Math.min(3.0, fmReadZoomLevel + dir * 0.1));
+  document.getElementById('fmReadContent').style.fontSize = (fmReadZoomLevel * 0.9) + 'rem';
+};
+
+// ── TROCA DE FONTE NO MODO LEITURA ───────────────────────────────────
+window.fmReadChangeFont = function(font){
+  if(!font) return;
+  document.getElementById('fmReadContent').style.fontFamily = font + ', sans-serif';
+};
+
+// ── HISTÓRICO MANUAL DE UNDO/REDO ────────────────────────────────────
+let fmHistory = [];
+let fmHistoryIdx = -1;
+const FM_HISTORY_MAX = 100;
+
+function fmHistoryPush(html){
+  // Descarta futuros se estiver no meio do histórico
+  if(fmHistoryIdx < fmHistory.length - 1){
+    fmHistory = fmHistory.slice(0, fmHistoryIdx + 1);
+  }
+  // Não duplica se igual ao último
+  if(fmHistory.length > 0 && fmHistory[fmHistoryIdx] === html) return;
+  fmHistory.push(html);
+  if(fmHistory.length > FM_HISTORY_MAX) fmHistory.shift();
+  fmHistoryIdx = fmHistory.length - 1;
+}
+
+function fmHistoryInit(html){
+  fmHistory = [html];
+  fmHistoryIdx = 0;
+}
+
+window.fmUndo = function(){
+  if(fmHistoryIdx <= 0) return;
+  fmHistoryIdx--;
+  const el = document.getElementById('fmEditable');
+  const body = document.getElementById('fmEditorBody');
+  const scrollTop = body ? body.scrollTop : 0;
+  el.innerHTML = fmHistory[fmHistoryIdx];
+  if(body) body.scrollTop = scrollTop;
+  fmDoSave();
+};
+
+window.fmRedo = function(){
+  if(fmHistoryIdx >= fmHistory.length - 1) return;
+  fmHistoryIdx++;
+  const el = document.getElementById('fmEditable');
+  const body = document.getElementById('fmEditorBody');
+  const scrollTop = body ? body.scrollTop : 0;
+  el.innerHTML = fmHistory[fmHistoryIdx];
+  if(body) body.scrollTop = scrollTop;
+  fmDoSave();
+};
+
+// ── CHECKLIST NO EDITOR ──────────────────────────────────────────────
+function fmMakeCheckItem(content){
+  const wrapper = document.createElement('div');
+  wrapper.className = 'fm-check-item';
+  wrapper.contentEditable = 'false';
+  const box = document.createElement('span');
+  box.className = 'fm-check-box';
+  box.textContent = '';
+  box.addEventListener('click', function(e){
+    e.stopPropagation();
+    const item = box.closest('.fm-check-item');
+    item.classList.toggle('checked');
+    box.textContent = item.classList.contains('checked') ? '✓' : '';
+    fmTriggerAutosave();
+  });
+  const label = document.createElement('span');
+  label.className = 'fm-check-label';
+  label.contentEditable = 'true';
+  // content pode ser string HTML ou Node
+  if(typeof content === 'string'){
+    label.innerHTML = content;
+  } else if(content instanceof Node){
+    label.appendChild(content.cloneNode(true));
+  } else {
+    label.textContent = '';
+  }
+  wrapper.appendChild(box);
+  wrapper.appendChild(label);
+  return wrapper;
+}
+
+// Coleta os itens a converter — respeita <li> dentro de ul/ol
+function fmGetSelectedBlocks(el, range){
+  const blocks = [];
+  function collectBlocks(node){
+    // Se é ul/ol dentro da seleção, pega cada <li> separado
+    if((node.nodeName==='UL'||node.nodeName==='OL') && range.intersectsNode(node)){
+      Array.from(node.children).forEach(li => {
+        if(range.intersectsNode(li)) blocks.push(li);
+      });
+    } else if(range.intersectsNode(node)){
+      blocks.push(node);
+    }
+  }
+  Array.from(el.childNodes).forEach(collectBlocks);
+  return blocks;
+}
+
+// Extrai innerHTML de um bloco preservando formatação
+function fmBlockInnerHTML(block){
+  if(block.nodeName === 'LI'){
+    return block.innerHTML;
+  }
+  return block.innerHTML || block.textContent || '';
+}
+
+window.fmInsertCheckItem = function(){
+  const el = document.getElementById('fmEditable');
+  el.focus();
+  const sel = window.getSelection();
+
+  // ── Caso 1: seleção abrangendo múltiplos blocos ───────────────────
+  if(sel && sel.rangeCount > 0 && !sel.isCollapsed){
+    const range = sel.getRangeAt(0);
+    const selectedBlocks = fmGetSelectedBlocks(el, range);
+
+    if(selectedBlocks.length > 0){
+      const firstBlock = selectedBlocks[0];
+      const isLi = firstBlock.nodeName === 'LI';
+      const refNode = isLi ? firstBlock.closest('ul,ol') : firstBlock;
+
+      // Monta os itens
+      const insertFrag = document.createDocumentFragment();
+      selectedBlocks.forEach(block => {
+        insertFrag.appendChild(fmMakeCheckItem(fmBlockInnerHTML(block)));
+      });
+
+      // Insere ANTES de remover, usando o refNode ainda presente como âncora
+      el.insertBefore(insertFrag, refNode);
+
+      // Remove blocos originais depois
+      const listsToCheck = new Set();
+      selectedBlocks.forEach(block => {
+        if(block.nodeName === 'LI'){
+          listsToCheck.add(block.parentNode);
+          block.remove();
+        } else {
+          block.remove();
+        }
+      });
+      listsToCheck.forEach(list => { if(list && list.children.length === 0) list.remove(); });
+    } else {
+      // Fallback linha a linha
+      const frag = range.cloneContents();
+      const tmp = document.createElement('div');
+      tmp.appendChild(frag);
+      const lines = (tmp.innerHTML || '').split(/<br\s*\/?>/i).map(l => {
+        const d = document.createElement('div'); d.innerHTML = l;
+        return {html: l, text: (d.textContent||'').trim()};
+      }).filter(l => l.text.length > 0);
+      const insertFrag = document.createDocumentFragment();
+      lines.forEach(l => insertFrag.appendChild(fmMakeCheckItem(l.html)));
+      range.deleteContents();
+      range.insertNode(insertFrag);
+    }
+    sel.removeAllRanges();
+
+  // ── Caso 2: cursor numa linha/li com texto ────────────────────────
+  } else if(sel && sel.rangeCount > 0){
+    const range = sel.getRangeAt(0);
+    let node = range.startContainer;
+    if(node.nodeType === Node.TEXT_NODE) node = node.parentNode;
+
+    // Verifica se está dentro de um <li>
+    let li = null;
+    let cur = node;
+    while(cur && cur !== el){
+      if(cur.nodeName === 'LI'){ li = cur; break; }
+      cur = cur.parentNode;
+    }
+
+    if(li){
+      // Está num <li>: converte só esse li
+      const html = li.innerHTML;
+      const list = li.parentNode;
+      const item = fmMakeCheckItem(html);
+      li.remove();
+      // Remove lista se ficou vazia
+      if(list && list.children.length === 0){
+        list.replaceWith(item);
+      } else {
+        // Insere o item antes da lista
+        list.parentNode && list.parentNode.insertBefore(item, list);
+      }
+    } else {
+      // Bloco normal: sobe até filho direto do editable
+      let block = node;
+      while(block && block.parentNode !== el && block !== el){
+        block = block.parentNode;
+      }
+      const hasContent = block && block !== el && (block.innerHTML || block.textContent || '').trim().length > 0;
+
+      if(hasContent){
+        const html = fmBlockInnerHTML(block);
+        const item = fmMakeCheckItem(html);
+        block.replaceWith(item);
+      } else {
+        // Área vazia — insere item em branco
+        const item = fmMakeCheckItem('');
+        if(block && block !== el){
+          block.replaceWith(item);
+        } else {
+          range.collapse(false);
+          range.insertNode(item);
+          range.setStartAfter(item);
+          range.collapse(true);
+          sel.removeAllRanges();
+          sel.addRange(range);
+        }
+        const label = item.querySelector('.fm-check-label');
+        if(label) label.focus();
+      }
+    }
+  } else {
+    const item = fmMakeCheckItem('');
+    el.appendChild(item);
+    const label = item.querySelector('.fm-check-label');
+    if(label) label.focus();
+  }
+  fmTriggerAutosave();
+  fmHistoryPush(el.innerHTML);
+};
+
+// ── BLOCOS COPIÁVEIS AUTO-DETECTADOS ────────────────────────────────
+function fmWrapCopyBlocks(html){
+  // Padrões que indicam conteúdo copiável
+  const CMD_PATTERN = /^(\$\s|cd |npm |npx |pip |git |python |node |yarn |curl |wget |chmod |sudo |apt |brew |docker |cp |mv |rm |mkdir )/i;
+  const PATH_PATTERN = /^(\/[\w\-\.\/]+|[A-Z]:\\[\w\-\\.\/]+|\.\/[\w\-\.\/]+)/;
+
+  // 1. Trata blocos <code> e <pre> já existentes no HTML
+  html = html.replace(/<(pre|code)([^>]*)>([\s\S]*?)<\/(pre|code)>/gi, (match, tag, attrs, content) => {
+    const plain = content.replace(/<[^>]+>/g, '').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&amp;/g,'&');
+    const escaped = plain.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    return `<div class="fm-copy-block" contenteditable="false"><button class="fm-copy-block-btn" onclick="fmCopyBlockText(this)">📋 Copiar</button>${escaped}</div>`;
+  });
+
+  // 2. Trata linhas de texto puro que parecem comandos/caminhos
+  // Divide o html em linhas para analisar cada uma
+  const lines = html.split(/(<br\s*\/?>|<\/p>|<\/div>|<\/li>)/gi);
+  let result = '';
+  let i = 0;
+  while(i < lines.length){
+    const line = lines[i];
+    const stripped = line.replace(/<[^>]+>/g,'').replace(/&nbsp;/g,' ').trim();
+    if(stripped && (CMD_PATTERN.test(stripped) || PATH_PATTERN.test(stripped))){
+      // É uma linha copiável
+      const escaped = stripped.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+      result += `<div class="fm-copy-block" contenteditable="false"><button class="fm-copy-block-btn" onclick="fmCopyBlockText(this)">📋 Copiar</button>${escaped}</div>`;
+      i++;
+      // Pula o separador seguinte se for apenas tag de fechamento
+      if(i < lines.length && /^(<br\s*\/?>|<\/p>|<\/div>|<\/li>)$/i.test(lines[i])) i++;
+    } else {
+      result += line;
+      i++;
+    }
+  }
+  return result;
+}
+
+window.fmCopyBlockText = function(btn){
+  const block = btn.closest('.fm-copy-block');
+  if(!block) return;
+  // Pega texto do bloco excluindo o botão
+  const clone = block.cloneNode(true);
+  clone.querySelectorAll('.fm-copy-block-btn').forEach(b => b.remove());
+  const text = (clone.innerText || clone.textContent || '').trim();
+  navigator.clipboard.writeText(text).then(()=>{
+    const orig = btn.textContent;
+    btn.textContent = '✓ Copiado!';
+    setTimeout(()=>btn.textContent = orig, 1500);
+  });
+};
+// Copiar tudo do editor
+window.fmCopyAll = function(){
+  const item = fmEditorKey ? fmCurrentFolder().children[fmEditorKey] : null;
+  if(!item) return;
+  let text = '';
+  if(fmEditorCurrentType==='html'){
+    text = document.getElementById('fmCodeEditor').value;
+  } else {
+    const el = document.getElementById('fmEditable');
+    // Copia como rich text + plain text
+    try{
+      const blob=new Blob([el.innerHTML],{type:'text/html'});
+      const plain=el.innerText||el.textContent||'';
+      const blobTxt=new Blob([plain],{type:'text/plain'});
+      navigator.clipboard.write([new ClipboardItem({'text/html':blob,'text/plain':blobTxt})]);
+      const btn=document.querySelector('.fm-tb-btn[onclick="fmCopyAll()"]');
+      if(btn){const o=btn.textContent;btn.textContent='✓';setTimeout(()=>btn.textContent=o,1200);}
+      return;
+    }catch(e){ text=el.innerText||el.textContent||''; }
+  }
+  navigator.clipboard.writeText(text).then(()=>{
+    const btn=document.querySelector('.fm-tb-btn[onclick="fmCopyAll()"]');
+    if(btn){const o=btn.textContent;btn.textContent='✓';setTimeout(()=>btn.textContent=o,1200);}
+  });
+};
 window.openFmModal = function(){
-  fmEditorKey=null;fmPendingFiles=[];setFmType('upload');
-  document.getElementById('fmInpName').value='';document.getElementById('fmInpContent').value='';
-  document.getElementById('fmInpFolderName').value='';document.getElementById('fmUploadPreview').innerHTML='';
+  fmEditorKey=null;fmPendingFiles=[];fmNewType='txt';
+  document.getElementById('fmInpName').value='';
+  document.getElementById('fmInpContent').value='';
+  document.getElementById('fmInpFolderName').value='';
+  document.getElementById('fmUploadPreview').innerHTML='';
   document.getElementById('fmModalTitle').textContent='➕ Novo item';
+  document.getElementById('fmInpUploadWrap').style.display='none';
+  document.getElementById('fmInpContentWrap').style.display='';
+  document.getElementById('fmInpFolderWrap').style.display='none';
+  document.getElementById('fmSaveBtn').textContent='Salvar';
   document.getElementById('fmModalOverlay').classList.add('open');
+  setFmType('txt');
 };
 window.closeFmModal = function(){document.getElementById('fmModalOverlay').classList.remove('open');fmPendingFiles=[];};
 window.setFmType = function(t){
   fmNewType=t;
-  document.getElementById('fmTypeUpload').classList.toggle('active',t==='upload');
-  document.getElementById('fmTypeTxt').classList.toggle('active',t==='txt');
-  document.getElementById('fmTypeFolder').classList.toggle('active',t==='folder');
+  ['upload','txt','md','html','folder'].forEach(id=>{
+    const el=document.getElementById('fmType'+id.charAt(0).toUpperCase()+id.slice(1));
+    if(el) el.classList.toggle('active',t===id);
+  });
   document.getElementById('fmInpUploadWrap').style.display=t==='upload'?'':'none';
-  document.getElementById('fmInpContentWrap').style.display=t==='txt'?'':'none';
+  document.getElementById('fmInpContentWrap').style.display=(t==='txt'||t==='md'||t==='html')?'':'none';
   document.getElementById('fmInpFolderWrap').style.display=t==='folder'?'':'none';
   document.getElementById('fmSaveBtn').textContent=t==='upload'?'Subir':'Salvar';
+  // Atualiza placeholder do textarea conforme tipo
+  const ta=document.getElementById('fmInpContent');
+  const lbl=document.getElementById('fmInpContentLabel');
+  if(t==='html'){ta.placeholder='Cole ou digite seu HTML aqui...';lbl.textContent='Código HTML';}
+  else if(t==='md'){ta.placeholder='Digite em Markdown: # Título, **negrito**, etc.';lbl.textContent='Conteúdo Markdown';}
+  else{ta.placeholder='Digite ou cole o texto...';lbl.textContent='Conteúdo';}
+};
+
+// Upload: mudar filtro do input file
+window.fmSetUploadType = function(btn){
+  document.querySelectorAll('.fm-upload-chip').forEach(c=>c.classList.remove('active'));
+  btn.classList.add('active');
+  const accept=btn.dataset.accept;
+  document.getElementById('fmInpUpload').accept=accept==='*'?'':accept;
+  document.getElementById('fmDropZoneHint').textContent=btn.textContent.trim()+' — toque para selecionar';
 };
 window.fmHandleDrop = function(e){
   e.preventDefault();document.getElementById('fmDropZone').style.borderColor='';fmHandleUpload(e.dataTransfer.files);
@@ -1790,16 +3551,21 @@ function fmGenName(){const now=new Date();const pad=n=>String(n).padStart(2,'0')
 function fmSafeKey(folder,name){let k=name;let c=1;while(folder.children[k]){k=name.replace(/(\.[^.]+)?$/,'_'+c+'$1');c++;}return k;}
 function fmDetectType(filename){const ext=(filename.split('.').pop()||'').toLowerCase();if(['png','jpg','jpeg','gif','webp','svg'].includes(ext))return 'image';if(ext==='html'||ext==='htm')return 'html';if(ext==='md')return 'md';if(ext==='pdf')return 'pdf';return 'txt';}
 window.saveFmItem = function(){
+  try {
   const folder=fmCurrentFolder();
+  const now=Date.now();
   if(fmNewType==='folder'){
     const name=document.getElementById('fmInpFolderName').value.trim();if(!name){alert('Digite um nome para a pasta');return;}
-    folder.children[fmSafeKey(folder,name)]={type:'folder',name,children:{}};
+    if(!folder.children) folder.children={};
+    folder.children[fmSafeKey(folder,name)]={type:'folder',name,children:{},createdAt:now,modifiedAt:now};
     fmSave();renderFm();window.closeFmModal();return;
   }
-  if(fmNewType==='txt'){
+  if(fmNewType==='txt'||fmNewType==='md'||fmNewType==='html'){
     const rawName=document.getElementById('fmInpName').value.trim();
-    const name=fmSafeKey(folder,(rawName||fmGenName())+'.txt');
-    folder.children[name]={type:'txt',content:document.getElementById('fmInpContent').value};
+    const ext = fmNewType==='md'?'.md':fmNewType==='html'?'.html':'.txt';
+    if(!folder.children) folder.children={};
+    const name=fmSafeKey(folder,(rawName||fmGenName())+ext);
+    folder.children[name]={type:fmNewType,content:document.getElementById('fmInpContent').value,createdAt:now,modifiedAt:now};
     fmSave();renderFm();window.closeFmModal();setTimeout(()=>fmOpenEditor(name),100);return;
   }
   if(fmNewType==='upload'){
@@ -1809,15 +3575,16 @@ window.saveFmItem = function(){
       const type=fmDetectType(file.name);
       const finish=()=>{done++;if(done===total){fmSave();renderFm();window.closeFmModal();}};
       if(type==='image'||type==='pdf'){
-        const r=new FileReader();r.onload=e=>{folder.children[fmSafeKey(folder,file.name)]={type,content:e.target.result};finish();};r.readAsDataURL(file);
+        const r=new FileReader();r.onload=e=>{if(!folder.children)folder.children={};folder.children[fmSafeKey(folder,file.name)]={type,content:e.target.result,createdAt:now,modifiedAt:now};finish();};r.readAsDataURL(file);
       } else {
         const r=new FileReader();
-        r.onload=e=>{folder.children[fmSafeKey(folder,file.name)]={type,content:e.target.result||''};finish();};
-        r.onerror=()=>{const r2=new FileReader();r2.onload=e=>{folder.children[fmSafeKey(folder,file.name)]={type:'bin',content:e.target.result};finish();};r2.readAsDataURL(file);};
+        r.onload=e=>{if(!folder.children)folder.children={};folder.children[fmSafeKey(folder,file.name)]={type,content:e.target.result||'',createdAt:now,modifiedAt:now};finish();};
+        r.onerror=()=>{const r2=new FileReader();r2.onload=e=>{if(!folder.children)folder.children={};folder.children[fmSafeKey(folder,file.name)]={type:'bin',content:e.target.result,createdAt:now,modifiedAt:now};finish();};r2.readAsDataURL(file);};
         r.readAsText(file,'UTF-8');
       }
     });
   }
+  } catch(err) { alert('Erro ao salvar: '+err.message); }
 };
 
 // ── ANYDESK (Firebase) ────────────────────────────────────────────────
@@ -1831,9 +3598,7 @@ onSnapshot(doc(db,'launcher_ad','data'), (snap) => {
   if(!adData.historico) adData.historico=[];
 });
 
-function adSave(){
-  fsSetDoc('launcher_ad','data', adData);
-}
+function adSave(){fsSetDoc('launcher_ad','data', adData);}
 
 function adSendToTrash(label,descricao,tipo){
   fmTrash.unshift({
@@ -1843,9 +3608,7 @@ function adSendToTrash(label,descricao,tipo){
   fmSaveTrash();
 }
 
-window.openAdPanel = function(){
-  adSetTab('atalhos');document.getElementById('adOverlay').classList.add('open');
-};
+window.openAdPanel = function(){adSetTab('atalhos');document.getElementById('adOverlay').classList.add('open');};
 window.closeAdPanel = function(){document.getElementById('adOverlay').classList.remove('open');};
 
 window.adSetTab = function(t){
@@ -1971,11 +3734,208 @@ window.adRenderHist = adRenderHist;
 window.adSave = adSave;
 window.adSendToTrash = adSendToTrash;
 
-// ── Init ─────────────────────────────────────────────────────────────
-(function init(){
-  // render inicial enquanto Firestore carrega
-  render();
+// ── MODO LEITURA ─────────────────────────────────────────────────────
+window.fmEnterReadMode = function(){
+  if(!fmEditorKey) return;
+  fmDoSave();
+  const item = fmCurrentFolder().children[fmEditorKey];
+  if(!item) return;
+  document.getElementById('fmReadTitle').textContent = fmEditorKey;
+  const content = document.getElementById('fmReadContent');
+  let html = '';
+  if(fmEditorCurrentType === 'html'){
+    html = item.content || '';
+  } else {
+    html = document.getElementById('fmEditable').innerHTML;
+  }
+  // Aplica normalização de espaçamento no modo leitura também
+  content.innerHTML = fmNormalizeContent(html);
+  content.querySelectorAll('a').forEach(a=>{
+    if(!a.target) a.target='_blank';
+    a.style.pointerEvents='auto';
+  });
+  fmOpenReadMode();
+};
+
+window.fmExitReadMode = function(){
+  document.getElementById('fmReadMode').classList.remove('open');
+};
+
+function fmOpenReadMode(){
+  fmReadZoomLevel = 1.0;
+  const content = document.getElementById('fmReadContent');
+  content.style.fontSize = '';
+  content.style.fontFamily = '';
+  const rSel = document.getElementById('fmReadFontSelect');
+  if(rSel) rSel.value = '';
+  document.getElementById('fmReadMode').classList.add('open');
+}
+// ── INSERIR IMAGEM NO CURSOR ─────────────────────────────────────────
+let fmSavedRange = null;
+
+window.fmInsertImage = function(){
+  // Salva a posição do cursor antes de abrir o file picker
+  const sel = window.getSelection();
+  if(sel && sel.rangeCount > 0){
+    fmSavedRange = sel.getRangeAt(0).cloneRange();
+  }
+  document.getElementById('fmImgInsertInput').click();
+};
+
+window.fmHandleImageInsert = function(e){
+  const file = e.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = function(ev){
+    const editable = document.getElementById('fmEditable');
+    editable.focus();
+    // Restaura posição do cursor
+    if(fmSavedRange){
+      const sel = window.getSelection();
+      sel.removeAllRanges();
+      sel.addRange(fmSavedRange);
+      fmSavedRange = null;
+    }
+    // Cria wrapper com handle de resize
+    const wrapper = document.createElement('span');
+    wrapper.className = 'fm-img-wrapper';
+    wrapper.contentEditable = 'false';
+    const img = document.createElement('img');
+    img.src = ev.target.result;
+    img.style.width = '200px';
+    img.style.height = 'auto';
+    img.draggable = false;
+    const handle = document.createElement('span');
+    handle.className = 'fm-img-resize-handle';
+    wrapper.appendChild(img);
+    wrapper.appendChild(handle);
+    // Click para selecionar imagem
+    wrapper.addEventListener('click', function(ev2){
+      ev2.stopPropagation();
+      document.querySelectorAll('.fm-img-wrapper.selected').forEach(w=>w.classList.remove('selected'));
+      wrapper.classList.add('selected');
+    });
+    // Resize por arrastar o handle
+    handle.addEventListener('touchstart', fmStartImgResize, {passive:false});
+    handle.addEventListener('mousedown', fmStartImgResize);
+    // Insere no cursor
+    const sel = window.getSelection();
+    if(sel && sel.rangeCount > 0){
+      const range = sel.getRangeAt(0);
+      range.deleteContents();
+      range.insertNode(wrapper);
+      // Move cursor para depois da imagem
+      range.setStartAfter(wrapper);
+      range.collapse(true);
+      sel.removeAllRanges();
+      sel.addRange(range);
+    } else {
+      editable.appendChild(wrapper);
+    }
+    fmTriggerAutosave();
+  };
+  reader.readAsDataURL(file);
+  // Reseta input
+  e.target.value='';
+};
+
+// ── RESIZE IMAGEM POR DRAG ───────────────────────────────────────────
+function fmStartImgResize(e){
+  e.preventDefault();
+  e.stopPropagation();
+  const handle = e.currentTarget;
+  const wrapper = handle.closest('.fm-img-wrapper');
+  const img = wrapper.querySelector('img');
+  const startX = e.touches ? e.touches[0].clientX : e.clientX;
+  const startY = e.touches ? e.touches[0].clientY : e.clientY;
+  const startW = img.offsetWidth;
+  const startH = img.offsetHeight;
+  const aspect = startH / (startW || 1);
+  wrapper.classList.add('selected');
+
+  function onMove(ev2){
+    const curX = ev2.touches ? ev2.touches[0].clientX : ev2.clientX;
+    const curY = ev2.touches ? ev2.touches[0].clientY : ev2.clientY;
+    // Usa o maior delta para resize mais natural
+    const dx = curX - startX;
+    let newW = Math.max(48, startW + dx);
+    img.style.width = newW + 'px';
+    img.style.height = 'auto'; // preserva aspect ratio (sem perda de qualidade)
+  }
+  function onEnd(){
+    document.removeEventListener('mousemove', onMove);
+    document.removeEventListener('mouseup', onEnd);
+    document.removeEventListener('touchmove', onMove);
+    document.removeEventListener('touchend', onEnd);
+    fmTriggerAutosave();
+  }
+  document.addEventListener('mousemove', onMove);
+  document.addEventListener('mouseup', onEnd);
+  document.addEventListener('touchmove', onMove, {passive:false});
+  document.addEventListener('touchend', onEnd);
+}
+
+// Deselect ao clicar fora das imagens
+document.getElementById('fmEditable').addEventListener('click', function(e){
+  if(!e.target.closest('.fm-img-wrapper')){
+    document.querySelectorAll('.fm-img-wrapper.selected').forEach(w=>w.classList.remove('selected'));
+  }
+});
+
+// ── COMPORTAMENTO DO CURSOR PRÓXIMO AO LINK ──────────────────────────
+// Se cursor está dentro do <a>: digita azul/bold (comportamento normal)
+// Se cursor está fora do <a>: digita texto normal sem herdar estilo do link
+(function(){
+  const editable = document.getElementById('fmEditable');
+
+  function getCursorAnchor(){
+    const sel = window.getSelection();
+    if(!sel || sel.rangeCount === 0) return null;
+    let node = sel.getRangeAt(0).startContainer;
+    while(node && node !== editable){
+      if(node.nodeName === 'A') return node;
+      node = node.parentNode;
+    }
+    return null;
+  }
+
+  editable.addEventListener('keydown', function(e){
+    // Ignora teclas de navegação
+    if(['ArrowLeft','ArrowRight','ArrowUp','ArrowDown',
+        'Shift','Control','Alt','Meta','Tab'].includes(e.key)) return;
+
+    const anchor = getCursorAnchor();
+    if(anchor) return; // dentro do link: deixa o browser agir normalmente
+
+    // Fora do link: garante que não vai herdar estilo do link vizinho
+    // Remove qualquer span/font de cor que o browser injeta ao sair do <a>
+    requestAnimationFrame(()=>{
+      const sel = window.getSelection();
+      if(!sel || sel.rangeCount === 0) return;
+      const range = sel.getRangeAt(0);
+      const node = range.startContainer;
+      if(!node) return;
+      const parent = node.parentNode;
+      if(!parent || parent === editable) return;
+      // Se o pai não for <a> mas ainda tiver cor de link, limpa
+      if(parent.nodeName !== 'A'){
+        if(parent.style){
+          parent.style.color = '';
+          parent.style.textDecoration = '';
+          parent.style.fontWeight = '';
+        }
+        // Remove spans vazios de cor que o Chrome insere
+        if(parent.nodeName === 'SPAN' && parent.getAttribute('style') === ''){
+          const txt = document.createTextNode(parent.textContent);
+          parent.replaceWith(txt);
+        }
+      }
+    });
+  });
 })();
+
+// ── Init ─────────────────────────────────────────────────────────────
+render();
 </script>
 </body>
 </html>
