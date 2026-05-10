@@ -305,9 +305,6 @@
     <button class="hbtn undo" id="btn-undo" onclick="desfazer()" title="Desfazer">↺ Desfazer</button>
     <button class="hbtn redo" id="btn-redo" onclick="refazer()" title="Refazer">↻ Refazer</button>
     <button class="hbtn" id="btn-gh-header" onclick="abrirGitHub()" title="Abrir / conectar GitHub" style="color:#a78bff;border-color:rgba(167,139,255,.5)">🐙 GitHub</button>
-    <div id="sb-gh-file-info" style="display:none;flex:1;overflow:hidden">
-      <div class="gh-connected-file" id="sb-gh-file-label" style="max-width:100%">Nenhum arquivo selecionado</div>
-    </div>
   </div>
 </div>
 <input type="file" id="file-input" accept=".html,.htm" style="display:none" onchange="carregarArquivo(event)">
@@ -370,6 +367,10 @@
       <div id="sb-local-btns" style="display:none;flex-direction:column;gap:5px">
         <button class="sb-dl-btn green" onclick="baixarTudo()">⬇ Baixar tudo (.zip)</button>
         <button class="sb-dl-btn teal" onclick="baixarModificados()">⬇ Baixar modificados</button>
+      </div>
+      <button class="sb-gh-btn" onclick="abrirGitHub()">🐙 GitHub: Selecionar Repo</button>
+      <div id="sb-gh-file-info" style="display:none">
+        <div class="gh-connected-file" id="sb-gh-file-label">Nenhum arquivo selecionado</div>
       </div>
     </div>
   </div>
@@ -1969,7 +1970,6 @@ const LS_REDO   = 'editor_redo';
 const LS_GRUPOS = 'editor_grupos';
 const LS_ATIVO  = 'editor_ativo';
 const LS_PROX   = 'editor_proximoid';
-const LS_GH_ACTIVE = 'editor_gh_active';
 let timerSave = null;
 let timerFirebase = null;
 
@@ -2396,11 +2396,18 @@ async function ghAbrirArquivoSelecionado() {
       token: document.getElementById('gh-token').value.trim()
     };
 
-    // Persiste no localStorage para sobreviver ao recarregar
-    try { localStorage.setItem(LS_GH_ACTIVE, JSON.stringify(ghActiveFile)); } catch(e) {}
-
-    // Ativa UI
-    ghAtivarUI(ghActiveFile);
+    // Ativa botão commit na toolbar
+    const btnCommit = document.getElementById('btn-gh-commit');
+    btnCommit.disabled = false;
+    btnCommit.style.opacity = '1';
+    btnCommit.style.cursor = 'pointer';
+    btnCommit.title = 'Enviar commit para o GitHub';
+    // Atualiza botão do header para indicar conexão ativa
+    const btnGhHeader = document.getElementById('btn-gh-header');
+    if (btnGhHeader) { btnGhHeader.style.color = '#00e5c0'; btnGhHeader.style.borderColor = 'rgba(0,229,192,.5)'; btnGhHeader.textContent = '🐙 Conectado'; }
+    // Mostra info na sidebar footer
+    document.getElementById('sb-gh-file-info').style.display = '';
+    document.getElementById('sb-gh-file-label').textContent = `🐙 ${ghSelectedFile.name}`;
 
     fecharModal('modal-github');
     toast(`🐙 "${ghSelectedFile.name}" carregado do GitHub!`);
@@ -2454,44 +2461,7 @@ async function ghEnviarCommit() {
   }
 }
 
-function ghAtivarUI(arquivo) {
-  if (!arquivo) return;
-  ghActiveFile = arquivo;
-  // Botão commit
-  const btnCommit = document.getElementById('btn-gh-commit');
-  btnCommit.disabled = false;
-  btnCommit.style.opacity = '1';
-  btnCommit.style.cursor = 'pointer';
-  btnCommit.title = 'Enviar commit para o GitHub';
-  // Botão header
-  const btnGhHeader = document.getElementById('btn-gh-header');
-  if (btnGhHeader) {
-    btnGhHeader.style.color = '#00e5c0';
-    btnGhHeader.style.borderColor = 'rgba(0,229,192,.5)';
-    btnGhHeader.textContent = '🐙 Conectado';
-  }
-  // Status arquivo
-  document.getElementById('status-arquivo').textContent = `🐙 ${arquivo.repo}/${arquivo.path}`;
-  // Sidebar info
-  document.getElementById('sb-gh-file-info').style.display = '';
-  document.getElementById('sb-gh-file-label').textContent = `🐙 ${arquivo.name}`;
-}
-
-function ghLimparConexao() {
-  ghActiveFile = null;
-  try { localStorage.removeItem(LS_GH_ACTIVE); } catch(e) {}
-  const btnCommit = document.getElementById('btn-gh-commit');
-  btnCommit.disabled = true;
-  btnCommit.style.opacity = '0.4';
-  btnCommit.style.cursor = 'not-allowed';
-  const btnGhHeader = document.getElementById('btn-gh-header');
-  if (btnGhHeader) {
-    btnGhHeader.style.color = '';
-    btnGhHeader.style.borderColor = '';
-    btnGhHeader.textContent = '🐙 GitHub';
-  }
-  document.getElementById('sb-gh-file-info').style.display = 'none';
-}
+function ghShowStatus(msg, tipo) {
   const area = document.getElementById('gh-status-area');
   const el = document.getElementById('gh-status-msg');
   area.style.display = '';
@@ -2542,21 +2512,6 @@ if (arquivoAtivoGrupoId !== null && arquivoAtivoLocalIdx >= 0) {
   }
 }
 
-// Restaura conexão GitHub se havia uma ativa
-try {
-  const ghRaw = localStorage.getItem(LS_GH_ACTIVE);
-  if (ghRaw) {
-    const ghSalvo = JSON.parse(ghRaw);
-    if (ghSalvo && ghSalvo.path) {
-      // Aguarda DOM estar pronto
-      requestAnimationFrame(() => {
-        ghAtivarUI(ghSalvo);
-        if (!sidebarOpen) toggleSidebar();
-      });
-    }
-  }
-} catch(e) {}
-
 if (editor.value) {
   const mod = document.getElementById('status-mod');
   mod.textContent = '● salvo';
@@ -2606,7 +2561,7 @@ Object.assign(window, {
   confirmarRename, ctxRenomear, ctxExcluir,
   recolherTudo, expandirTudo, limparEditor, contarLinhas,
   ajustarNum, fecharNumPopup, baixarTudo, baixarModificados,
-  abrirGitHub, abrirGitHubCommit, ghCarregarRaiz, ghAbrirArquivoSelecionado, ghEnviarCommit, ghAtivarUI, ghLimparConexao
+  abrirGitHub, abrirGitHubCommit, ghCarregarRaiz, ghAbrirArquivoSelecionado, ghEnviarCommit
 });
 </script>
 </body>
