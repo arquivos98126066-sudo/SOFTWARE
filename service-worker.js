@@ -1,4 +1,4 @@
-const CACHE_NAME = 'meus-apps-v7';
+const CACHE_NAME = 'meus-apps-v8';
 const URLS_TO_CACHE = [
   '/SOFTWARE/',
   '/SOFTWARE/index.html',
@@ -16,6 +16,7 @@ const URLS_TO_CACHE = [
   '/SOFTWARE/DOA.html',
   '/SOFTWARE/ESTUDO.html',
   '/SOFTWARE/Code.html',
+  '/SOFTWARE/firebase-init.js',
   '/SOFTWARE/manifest.json',
   '/SOFTWARE/icon-192.png',
   '/SOFTWARE/icon-512.png'
