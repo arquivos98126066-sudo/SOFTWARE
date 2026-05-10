@@ -128,8 +128,10 @@
   /* ── SPLIT VIEW ── */
   #split-view{width:100%;height:100%;display:none;flex-direction:row}
   #split-view.show{display:flex}
-  #split-editor-wrap{flex:1;display:flex;flex-direction:column;overflow:hidden;border-right:2px solid var(--accent)}
-  #split-preview-wrap{flex:1;display:flex;flex-direction:column;overflow:hidden}
+  #split-editor-wrap{flex:1;display:flex;flex-direction:column;overflow:hidden;border-right:2px solid var(--accent);transition:flex 0.25s cubic-bezier(.4,0,.2,1)}
+  #split-preview-wrap{flex:1;display:flex;flex-direction:column;overflow:hidden;transition:flex 0.25s cubic-bezier(.4,0,.2,1)}
+  #split-view.preview-expanded #split-editor-wrap{flex:0;min-width:0;overflow:hidden;border:none}
+  #split-view.preview-expanded #split-preview-wrap{flex:1}
   .split-label{background:var(--surface);padding:4px 10px;font-size:10px;font-weight:700;color:var(--muted);flex-shrink:0;border-bottom:1px solid var(--border)}
   #split-iframe{flex:1;border:none;background:white;width:100%}
   @media (max-width: 600px) {
@@ -152,10 +154,12 @@
   .preview-reload-btn{background:var(--surface2);border:1px solid var(--border);color:var(--accent2);border-radius:8px;padding:7px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:'JetBrains Mono',monospace}
 
   /* ── STATUS ── */
-  .statusbar{background:var(--surface);border-top:1px solid var(--border);padding:3px 12px;display:flex;justify-content:space-between;align-items:center;flex-shrink:0;gap:8px;flex-wrap:wrap}
-  .statusbar span{font-size:10px;color:var(--muted)}
+  .statusbar{background:var(--surface);border-top:1px solid var(--border);padding:3px 12px;display:flex;align-items:center;flex-shrink:0;gap:8px;flex-wrap:nowrap;overflow:hidden}
+  .statusbar span{font-size:10px;color:var(--muted);white-space:nowrap}
   .status-ok{color:var(--success) !important}
   .status-modified{color:var(--accent) !important}
+  #status-mod{margin-left:auto}
+  #sb-gh-file-info{margin-left:8px;flex-shrink:1;min-width:0;overflow:hidden}
 
   /* ── TOAST ── */
   #toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--surface2);border:1px solid var(--accent);color:var(--text);padding:10px 20px;border-radius:99px;font-size:12px;font-weight:700;z-index:9999;transition:transform 0.3s cubic-bezier(.34,1.56,.64,1);white-space:nowrap;pointer-events:none}
@@ -305,6 +309,10 @@
     <button class="hbtn undo" id="btn-undo" onclick="desfazer()" title="Desfazer">↺ Desfazer</button>
     <button class="hbtn redo" id="btn-redo" onclick="refazer()" title="Refazer">↻ Refazer</button>
     <button class="hbtn" id="btn-gh-header" onclick="abrirGitHub()" title="Abrir / conectar GitHub" style="color:#a78bff;border-color:rgba(167,139,255,.5)">🐙 GitHub</button>
+    <div id="sb-local-btns" style="display:none;gap:4px">
+      <button class="hbtn export" onclick="baixarTudo()">⬇ .zip</button>
+      <button class="hbtn" style="color:var(--accent2);border-color:var(--accent2)" onclick="baixarModificados()">⬇ Mod</button>
+    </div>
   </div>
 </div>
 <input type="file" id="file-input" accept=".html,.htm" style="display:none" onchange="carregarArquivo(event)">
@@ -363,16 +371,7 @@
         Use <b>📁 Pasta</b> para começar.
       </div>
     </div>
-    <div class="sidebar-footer" id="sidebar-footer" style="display:none">
-      <div id="sb-local-btns" style="display:none;flex-direction:column;gap:5px">
-        <button class="sb-dl-btn green" onclick="baixarTudo()">⬇ Baixar tudo (.zip)</button>
-        <button class="sb-dl-btn teal" onclick="baixarModificados()">⬇ Baixar modificados</button>
-      </div>
-      <button class="sb-gh-btn" onclick="abrirGitHub()">🐙 GitHub: Selecionar Repo</button>
-      <div id="sb-gh-file-info" style="display:none">
-        <div class="gh-connected-file" id="sb-gh-file-label">Nenhum arquivo selecionado</div>
-      </div>
-    </div>
+
   </div>
 
   <!-- CONTENT -->
@@ -392,7 +391,10 @@
         <div class="split-label">✏️ EDITOR</div>
       </div>
       <div id="split-preview-wrap">
-        <div class="split-label">👁 PREVIEW AO VIVO</div>
+        <div class="split-label" style="display:flex;align-items:center;justify-content:space-between;padding-right:6px">
+          <span>👁 PREVIEW AO VIVO</span>
+          <button id="btn-split-expand" onclick="toggleSplitExpand()" title="Expandir preview" style="background:none;border:1px solid var(--border);color:var(--accent2);border-radius:5px;padding:2px 7px;font-size:11px;cursor:pointer;font-family:'JetBrains Mono',monospace;font-weight:700;transition:all 0.15s">⤢ Expandir</button>
+        </div>
         <iframe id="split-iframe"></iframe>
       </div>
     </div>
@@ -406,6 +408,9 @@
   <span id="status-mod" class="status-ok">● pronto</span>
   <span id="status-undo-info" style="color:var(--muted)"></span>
   <span id="status-arquivo" style="color:var(--accent2)"></span>
+  <div id="sb-gh-file-info" style="display:none">
+    <div class="gh-connected-file" id="sb-gh-file-label">Nenhum arquivo selecionado</div>
+  </div>
 </div>
 
 <!-- NUMBER ADJUSTER POPUP -->
@@ -788,7 +793,6 @@ function criarGrupo(label, arquivos, origem) {
 function renderizarSidebar() {
   const container = document.getElementById('sidebar-files');
   const empty = document.getElementById('sidebar-empty');
-  const footer = document.getElementById('sidebar-footer');
   const localBtns = document.getElementById('sb-local-btns');
 
   // Sempre ressincroniza listas planas a partir da fonte de verdade
@@ -801,13 +805,11 @@ function renderizarSidebar() {
     container.innerHTML = '';
     container.appendChild(empty);
     empty.style.display = '';
-    footer.style.display = 'flex';
     localBtns.style.display = 'none';
     return;
   }
 
   empty.style.display = 'none';
-  footer.style.display = 'flex';
   localBtns.style.display = pastasGrupos.some(g => g.origem === 'local') ? 'flex' : 'none';
 
   let html = '';
@@ -1649,6 +1651,8 @@ function toggleSplit() {
     atualizarSplitPreview();
   } else {
     splitView.classList.remove('show');
+    splitView.classList.remove('preview-expanded');
+    splitExpandido = false;
     const editorWrap = document.querySelector('.editor-wrap');
     editorView.appendChild(editorWrap);
     editorView.style.display = 'flex';
@@ -1657,6 +1661,24 @@ function toggleSplit() {
     tabPreview.style.opacity = '';
     tabPreview.style.pointerEvents = '';
     atualizarHL();
+  }
+}
+
+let splitExpandido = false;
+function toggleSplitExpand() {
+  splitExpandido = !splitExpandido;
+  const splitView = document.getElementById('split-view');
+  const btn = document.getElementById('btn-split-expand');
+  if (splitExpandido) {
+    splitView.classList.add('preview-expanded');
+    btn.textContent = '⤡ Reduzir';
+    btn.style.color = 'var(--warn)';
+    btn.style.borderColor = 'var(--warn)';
+  } else {
+    splitView.classList.remove('preview-expanded');
+    btn.textContent = '⤢ Expandir';
+    btn.style.color = 'var(--accent2)';
+    btn.style.borderColor = 'var(--border)';
   }
 }
 
@@ -1866,12 +1888,6 @@ function abrirPreview() {
   const iframe = document.getElementById('preview-iframe');
   if (!codigo.trim()) {
     iframe.srcdoc = '<div style="font-family:sans-serif;color:#999;text-align:center;padding:80px 20px;font-size:15px;">Cole um código HTML no editor primeiro.</div>';
-  } else if (/type="module"|firebase-sync|firebase-firestore|highlight\.js.*highlight\.min/i.test(codigo)) {
-    iframe.srcdoc = `<div style="font-family:sans-serif;background:#0d0d14;color:#e8e8f0;text-align:center;padding:60px 24px;font-size:14px;height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;">
-      <div style="font-size:40px">⚠️</div>
-      <div style="font-weight:700;font-size:16px;color:#7c6aff">Preview não disponível</div>
-      <div style="color:#666680;font-size:13px;max-width:280px;line-height:1.6">Este arquivo usa scripts externos que não funcionam dentro do preview.<br><br>Use o botão <b style="color:#00e5c0">⬇ Export</b> para baixar e abrir no browser.</div>
-    </div>`;
   } else {
     iframe.srcdoc = __injectWidget(codigo);
   }
@@ -2144,9 +2160,9 @@ function salvarNoStorage() {
     localStorage.setItem(LS_CODE, editor.value);
     localStorage.setItem('editor_ts', String(Date.now()));
 
-    // Salva grupos locais (GitHub não persiste por segurança)
+    // Salva grupos locais e GitHub (GitHub sem token por segurança)
     const gruposParaSalvar = pastasGrupos
-      .filter(g => g.origem === 'local')
+      .filter(g => g.origem === 'local' || g.origem === 'gh')
       .map(g => ({
         id: g.id,
         label: g.label,
@@ -2507,7 +2523,18 @@ if (arquivoAtivoGrupoId !== null && arquivoAtivoLocalIdx >= 0) {
   const gAtivo = pastasGrupos.find(g => g.id === arquivoAtivoGrupoId);
   if (gAtivo && gAtivo.arquivos[arquivoAtivoLocalIdx]) {
     const f = gAtivo.arquivos[arquivoAtivoLocalIdx];
-    document.getElementById('status-arquivo').textContent = '📄 ' + f.path;
+    if (f.origem === 'gh') {
+      document.getElementById('status-arquivo').textContent = `🐙 ${f.path}`;
+      // Reativa botão commit e indicador de conexão
+      const btnCommit = document.getElementById('btn-gh-commit');
+      btnCommit.disabled = false; btnCommit.style.opacity = '1'; btnCommit.style.cursor = 'pointer';
+      const btnGhHeader = document.getElementById('btn-gh-header');
+      if (btnGhHeader) { btnGhHeader.style.color = '#00e5c0'; btnGhHeader.style.borderColor = 'rgba(0,229,192,.5)'; btnGhHeader.textContent = '🐙 Conectado'; }
+      document.getElementById('sb-gh-file-info').style.display = '';
+      document.getElementById('sb-gh-file-label').textContent = `🐙 ${f.name}`;
+    } else {
+      document.getElementById('status-arquivo').textContent = '📄 ' + f.path;
+    }
     if (!sidebarOpen) toggleSidebar();
   }
 }
@@ -2556,7 +2583,7 @@ Object.assign(window, {
   mudarAba, abrirPreview, fecharPreview, recarregarPreview,
   toggleFR, fecharFR, executarSubstituicao,
   corrigirEstrutura, abrirVersions, salvarVersao, restaurarVersao, excluirVersao,
-  abrirDiff, gerarDiff, toggleSplit,
+  abrirDiff, gerarDiff, toggleSplit, toggleSplitExpand,
   abrirPatch, aplicarPatch,
   confirmarRename, ctxRenomear, ctxExcluir,
   recolherTudo, expandirTudo, limparEditor, contarLinhas,
