@@ -1072,6 +1072,42 @@ body.img-active .ck-wrap{z-index:9100 !important;}
 .fm-item.drag-over-top{border-top:2px solid var(--accent);}
 .fm-item.drag-over-bot{border-bottom:2px solid var(--accent);}
 
+/* PAINEL EDITOR DE LINKS */
+.fm-link-editor{
+  display:none;position:fixed;inset:0;z-index:9450;
+  background:#0a0a12;flex-direction:column;
+}
+.fm-link-editor.open{display:flex;}
+.fm-link-editor-header{
+  padding:0.8rem 1rem;
+  background:rgba(10,10,18,0.97);
+  border-bottom:1px solid var(--border2);
+  display:flex;align-items:center;gap:10px;flex-shrink:0;
+}
+.fm-link-editor-title{
+  flex:1;font-size:0.88rem;font-weight:700;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.fm-link-editor-save{
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  border:none;border-radius:10px;color:#fff;
+  font-family:'Outfit',sans-serif;font-size:0.78rem;font-weight:600;
+  padding:0.4rem 1rem;cursor:pointer;white-space:nowrap;
+  box-shadow:0 2px 10px rgba(124,109,250,0.4);
+}
+.fm-link-editor-body{
+  flex:1;overflow-y:auto;padding:1rem;
+}
+.fm-link-editor-add{
+  width:100%;padding:0.7rem;
+  border:2px dashed rgba(124,109,250,0.3);border-radius:14px;
+  background:rgba(124,109,250,0.05);
+  color:var(--accent);font-family:'Outfit',sans-serif;
+  font-size:0.82rem;font-weight:600;cursor:pointer;
+  margin-top:4px;transition:all 0.2s;
+}
+.fm-link-editor-add:active{background:rgba(124,109,250,0.12);}
+
 /* ── PAINEL ANYDESK ── */
 .ad-overlay{
   display:none;position:fixed;inset:0;z-index:9600;
@@ -1363,7 +1399,11 @@ body.img-active .ck-wrap{z-index:9100 !important;}
   <div class="fm-viewer-header">
     <button class="fm-back" onclick="closeFmViewer()">←</button>
     <span class="fm-viewer-title" id="fmViewerTitle"></span>
-    <button class="fm-viewer-edit-btn" id="fmViewerEditBtn" onclick="fmEditFromViewer()">✏️ Editar</button>
+    <div style="display:flex;gap:6px;align-items:center;">
+      <button class="fm-viewer-edit-btn" id="fmViewerEditBtn" onclick="fmEditFromViewer()">✏️ Editar</button>
+      <button class="fm-viewer-edit-btn" id="fmViewerDownloadBtn" onclick="fmViewerDownload()" style="display:none;">⬇️ Baixar</button>
+      <button class="fm-viewer-edit-btn" id="fmViewerOpenBtn" onclick="fmViewerOpenBrowser()" style="display:none;background:rgba(249,115,22,0.1);border-color:rgba(249,115,22,0.3);color:#f97316;">🌐 Navegador</button>
+    </div>
   </div>
   <div class="fm-viewer-body" id="fmViewerBody"></div>
 </div>
@@ -1467,6 +1507,9 @@ body.img-active .ck-wrap{z-index:9100 !important;}
       <button class="fm-type-btn" id="fmTypeMd" onclick="setFmType('md')">📄 MD</button>
       <button class="fm-type-btn" id="fmTypeHtml" onclick="setFmType('html')">🌐 HTML</button>
       <button class="fm-type-btn" id="fmTypeFolder" onclick="setFmType('folder')">📁 Pasta</button>
+      <button class="fm-type-btn" id="fmTypeLinkImage" onclick="setFmType('link-image')">🖼️ Imagem</button>
+      <button class="fm-type-btn" id="fmTypeLinkVideo" onclick="setFmType('link-video')">🎬 Vídeo</button>
+      <button class="fm-type-btn" id="fmTypeLinkPdf" onclick="setFmType('link-pdf')">📕 PDF</button>
     </div>
 
     <!-- Upload com filtros de tipo -->
@@ -1516,6 +1559,35 @@ body.img-active .ck-wrap{z-index:9100 !important;}
       </div>
     </div>
 
+    <!-- Link Collection — só título na criação -->
+    <div id="fmLinkCollectionWrap" style="display:none;">
+      <div class="field">
+        <label>Título</label>
+        <input id="fmLinkCollectionTitle" type="text" placeholder="Ex: Aulas de Marketing, Fotos do Evento..." autocomplete="off"
+          style="width:100%;background:rgba(255,255,255,0.06);border:1px solid var(--border2);border-radius:14px;padding:0.7rem 1rem;color:var(--text);font-family:'Outfit',sans-serif;font-size:0.9rem;outline:none;">
+      </div>
+      <div style="font-size:0.7rem;color:var(--muted);margin-top:4px;line-height:1.5;">💡 Após salvar, clique em ✏️ para adicionar os links</div>
+      <button
+        onclick="window.open('https://drive.google.com','_blank')"
+        style="margin-top:14px;width:100%;padding:0.6rem 1rem;background:rgba(66,133,244,0.08);border:1px solid rgba(66,133,244,0.18);border-radius:14px;color:rgba(255,255,255,0.35);font-family:'Outfit',sans-serif;font-size:0.72rem;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;transition:background 0.2s,color 0.2s;"
+        onmouseenter="this.style.background='rgba(66,133,244,0.16)';this.style.color='rgba(255,255,255,0.6)'"
+        onmouseleave="this.style.background='rgba(66,133,244,0.08)';this.style.color='rgba(255,255,255,0.35)'"
+        ontouchstart="this.style.background='rgba(66,133,244,0.16)';this.style.color='rgba(255,255,255,0.6)'"
+        ontouchend="this.style.background='rgba(66,133,244,0.08)';this.style.color='rgba(255,255,255,0.35)'"
+      >
+        <svg width="14" height="14" viewBox="0 0 87.3 78" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0;opacity:0.5">
+          <path d="M6.6 66.85l3.85 6.65c.8 1.4 1.95 2.5 3.3 3.3l13.75-23.8H0c0 1.55.4 3.1 1.2 4.5z" fill="#0066da"/>
+          <path d="M43.65 25L29.9 1.2C28.55 2 27.4 3.1 26.6 4.5L1.2 48.4C.4 49.8 0 51.35 0 52.9h27.5z" fill="#00ac47"/>
+          <path d="M73.55 76.8c1.35-.8 2.5-1.9 3.3-3.3l1.6-2.75 7.65-13.25c.8-1.4 1.2-2.95 1.2-4.5H59.8l5.85 11.5z" fill="#ea4335"/>
+          <path d="M43.65 25L57.4 1.2C56.05.4 54.5 0 52.9 0H34.4c-1.6 0-3.15.45-4.5 1.2z" fill="#00832d"/>
+          <path d="M59.8 52.9h27.5c0-1.55-.4-3.1-1.2-4.5L60.7 4.5c-.8-1.4-1.95-2.5-3.3-3.3L43.65 25z" fill="#2684fc"/>
+          <path d="M43.65 25L27.5 52.9h32.3L43.65 25z" fill="#00ac47"/>
+          <path d="M27.5 52.9H0l13.75 23.8c1.35.8 2.9 1.2 4.5 1.2h50.8c1.6 0 3.15-.45 4.5-1.2L59.8 52.9z" fill="#0066da"/>
+        </svg>
+        Abrir Google Drive
+      </button>
+    </div>
+
     <div class="modal-btns">
       <button class="btn-c" onclick="closeFmModal()">Cancelar</button>
       <button class="btn-s" id="fmSaveBtn" onclick="saveFmItem()">Salvar</button>
@@ -1539,6 +1611,20 @@ body.img-active .ck-wrap{z-index:9100 !important;}
       <button class="btn-c" onclick="closeCkModal()">Cancelar</button>
       <button class="btn-s" onclick="saveCkItem()">Salvar</button>
     </div>
+  </div>
+</div>
+
+<!-- PAINEL EDITOR DE LINKS -->
+<div class="fm-link-editor" id="fmLinkEditorPanel">
+  <div class="fm-link-editor-header">
+    <button class="fm-back" onclick="closeFmLinkEditor()">←</button>
+    <span class="fm-link-editor-title" id="fmLinkEditorTitle">✏️ Editar links</span>
+    <button class="fm-link-editor-save" onclick="fmSaveLinkEditor()">✓ Salvar</button>
+  </div>
+  <div class="fm-link-editor-body">
+    <input type="hidden" id="fmLinkEditorKey">
+    <div id="fmLinkEditorEntries"></div>
+    <button class="fm-link-editor-add" onclick="fmAddLinkEditorEntry()">+ Adicionar link</button>
   </div>
 </div>
 
@@ -1609,7 +1695,7 @@ body.img-active .ck-wrap{z-index:9100 !important;}
   <div class="fm-read-header">
     <button class="fm-back" onclick="fmExitReadMode()">←</button>
     <span class="fm-read-title" id="fmReadTitle"></span>
-    <button class="fm-read-edit-btn" onclick="fmExitReadMode()">✏️ Editar</button>
+    <button class="fm-read-edit-btn" onclick="fmExitReadModeToEditor()">✏️ Editar</button>
   </div>
   <!-- Barra de visualização: fonte + zoom -->
   <div class="fm-read-controls" id="fmReadControls">
@@ -2219,6 +2305,7 @@ let fmViewingKey=null;
 let fmEditorKey=null;
 let fmTrash=[];
 let fmPendingFiles=[];
+let fmReadEditorPath=null;
 
 onSnapshot(doc(db,'launcher_fm','data'), (snap) => {
   fmFs = snap.exists() ? (snap.data().fs || fmFs) : fmFs;
@@ -2423,7 +2510,7 @@ function renderFm(){
     const el=document.createElement('div');
     el.className='fm-item'+(fmSelected.has(key)?' selected':'');
     el.dataset.key=key;
-    const icon=isFolder?'📁':item.type==='image'?'🖼️':item.type==='html'?'🌐':item.type==='md'?'📝':item.type==='pdf'?'📕':'📄';
+    const icon=isFolder?'📁':item.type==='image'?'🖼️':item.type==='html'?'🌐':item.type==='md'?'📝':item.type==='pdf'?'📕':item.type==='link-collection'?(item.subtype==='video'?'🎬':item.subtype==='pdf'?'📕':'🖼️'):'📄';
     if(fmSelMode){
       const meta=isFolder?`${Object.keys(item.children||{}).length} item(s)`:'';
       el.innerHTML=`<div class="fm-item-check">${fmSelected.has(key)?'✓':''}</div>
@@ -2442,19 +2529,33 @@ function renderFm(){
           <button class="fm-item-del" onclick="event.stopPropagation();fmDelete('${key}')">✕</button></div>`;
       el.addEventListener('click',e=>{if(e.target.closest('.fm-item-del'))return;fmPath.push(key);renderFm();});
     } else {
-      const meta=item.type==='image'?'imagem':item.type==='pdf'?'PDF':(item.content?.length||0)+' chars';
+      const meta=item.type==='image'?'imagem':item.type==='pdf'?'PDF':item.type==='link-collection'?(item.links?.length||0)+' link(s)':(item.content?.length||0)+' chars';
       const dateStr = item.modifiedAt ? new Date(item.modifiedAt).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}) : '';
-      el.innerHTML=`<div class="fm-item-icon" style="cursor:grab;touch-action:none;font-size:0.85rem;color:var(--muted);">⠿</div>
-        <div class="fm-item-icon">${icon}</div>
-        <div class="fm-item-info"><div class="fm-item-name">${key}</div><div class="fm-item-meta">${dateStr||meta}</div></div>
-        <div style="display:flex;gap:4px;flex-shrink:0;">
-          <button class="fm-item-btn" title="Opções" onclick="event.stopPropagation();fmQuickMenu(event,'${key}')">👁️</button>
-          <button class="fm-item-btn" title="Copiar" onclick="event.stopPropagation();fmCopyItem('${key}',this)">📋</button>
-          <button class="fm-item-del" onclick="event.stopPropagation();fmDelete('${key}')">✕</button></div>`;
-      el.addEventListener('click',e=>{
-        if(e.target.closest('.fm-item-btn')||e.target.closest('.fm-item-del'))return;
-        if(item.type==='image'||item.type==='pdf'){fmView(key);}else{fmOpenEditor(key);}
-      });
+      if(item.type==='link-collection'){
+        el.innerHTML=`<div class="fm-item-icon" style="cursor:grab;touch-action:none;font-size:0.85rem;color:var(--muted);">⠿</div>
+          <div class="fm-item-icon">${icon}</div>
+          <div class="fm-item-info"><div class="fm-item-name">${key}</div><div class="fm-item-meta">${dateStr||meta}</div></div>
+          <div style="display:flex;gap:4px;flex-shrink:0;">
+            <button class="fm-item-btn" title="Visualizar" onclick="event.stopPropagation();fmViewLinkCollection('${key}')">👁️</button>
+            <button class="fm-item-btn" title="Editar links" onclick="event.stopPropagation();fmEditLinkCollection('${key}')" style="border-color:rgba(124,109,250,0.4);color:var(--accent);">✏️</button>
+            <button class="fm-item-del" onclick="event.stopPropagation();fmDelete('${key}')">✕</button></div>`;
+        el.addEventListener('click',e=>{
+          if(e.target.closest('.fm-item-btn')||e.target.closest('.fm-item-del'))return;
+          fmViewLinkCollection(key);
+        });
+      } else {
+        el.innerHTML=`<div class="fm-item-icon" style="cursor:grab;touch-action:none;font-size:0.85rem;color:var(--muted);">⠿</div>
+          <div class="fm-item-icon">${icon}</div>
+          <div class="fm-item-info"><div class="fm-item-name">${key}</div><div class="fm-item-meta">${dateStr||meta}</div></div>
+          <div style="display:flex;gap:4px;flex-shrink:0;">
+            <button class="fm-item-btn" title="Opções" onclick="event.stopPropagation();fmQuickMenu(event,'${key}')">👁️</button>
+            <button class="fm-item-btn" title="Copiar" onclick="event.stopPropagation();fmCopyItem('${key}',this)">📋</button>
+            <button class="fm-item-del" onclick="event.stopPropagation();fmDelete('${key}')">✕</button></div>`;
+        el.addEventListener('click',e=>{
+          if(e.target.closest('.fm-item-btn')||e.target.closest('.fm-item-del'))return;
+          if(item.type==='image'||item.type==='pdf'){fmView(key);}else{fmOpenEditor(key);}
+        });
+      }
     }
     // Drag-reorder (touch + mouse) — só no modo manual
     if(fmSortMode === 'manual') fmBindDragReorder(el);
@@ -2594,6 +2695,7 @@ window.fmQMenuView = function(){
   const savedPath = fmPath;
   fmPath = [...fmQMenuPath];
   fmEditorKey = fmQMenuKey;
+  fmReadEditorPath = [...fmQMenuPath];
   fmEditorCurrentType = item.type || 'txt';
   document.getElementById('fmReadTitle').textContent = fmQMenuKey;
   const content = document.getElementById('fmReadContent');
@@ -2660,6 +2762,7 @@ function fmOpenInfileResult(matchLine, q){
   const savedPath = fmPath;
   fmPath = [...fmQMenuPath];
   fmEditorKey = fmQMenuKey;
+  fmReadEditorPath = [...fmQMenuPath];
   fmEditorCurrentType = item.type || 'txt';
   // Monta conteúdo com destaque
   const raw = item.content || '';
@@ -3503,7 +3606,13 @@ window.openFmModal = function(){
   document.getElementById('fmInpUploadWrap').style.display='none';
   document.getElementById('fmInpContentWrap').style.display='';
   document.getElementById('fmInpFolderWrap').style.display='none';
+  document.getElementById('fmLinkCollectionWrap').style.display='none';
+  document.getElementById('fmLinkCollectionTitle').value='';
+  // fmLinkCollectionEntries não existe no HTML — só fmLinkEditorEntries (painel separado)
+  var lcEntries = document.getElementById('fmLinkCollectionEntries');
+  if(lcEntries) lcEntries.innerHTML='';
   document.getElementById('fmSaveBtn').textContent='Salvar';
+  document.getElementById('fmSaveBtn').onclick=()=>saveFmItem();
   document.getElementById('fmModalOverlay').classList.add('open');
   setFmType('txt');
 };
@@ -3514,9 +3623,16 @@ window.setFmType = function(t){
     const el=document.getElementById('fmType'+id.charAt(0).toUpperCase()+id.slice(1));
     if(el) el.classList.toggle('active',t===id);
   });
+  // Link collection buttons
+  const linkTypes=['link-image','link-video','link-pdf'];
+  document.getElementById('fmTypeLinkImage').classList.toggle('active',t==='link-image');
+  document.getElementById('fmTypeLinkVideo').classList.toggle('active',t==='link-video');
+  document.getElementById('fmTypeLinkPdf').classList.toggle('active',t==='link-pdf');
+  const isLink=linkTypes.includes(t);
   document.getElementById('fmInpUploadWrap').style.display=t==='upload'?'':'none';
   document.getElementById('fmInpContentWrap').style.display=(t==='txt'||t==='md'||t==='html')?'':'none';
   document.getElementById('fmInpFolderWrap').style.display=t==='folder'?'':'none';
+  document.getElementById('fmLinkCollectionWrap').style.display=isLink?'':'none';
   document.getElementById('fmSaveBtn').textContent=t==='upload'?'Subir':'Salvar';
   // Atualiza placeholder do textarea conforme tipo
   const ta=document.getElementById('fmInpContent');
@@ -3554,6 +3670,14 @@ window.saveFmItem = function(){
   try {
   const folder=fmCurrentFolder();
   const now=Date.now();
+  if(fmNewType==='link-image'||fmNewType==='link-video'||fmNewType==='link-pdf'){
+    const title=document.getElementById('fmLinkCollectionTitle').value.trim();
+    if(!title){alert('Digite um título');return;}
+    const subtype=fmNewType.replace('link-','');
+    if(!folder.children)folder.children={};
+    folder.children[fmSafeKey(folder,title)]={type:'link-collection',subtype,name:title,links:[],createdAt:now,modifiedAt:now};
+    fmSave();renderFm();window.closeFmModal();return;
+  }
   if(fmNewType==='folder'){
     const name=document.getElementById('fmInpFolderName').value.trim();if(!name){alert('Digite um nome para a pasta');return;}
     if(!folder.children) folder.children={};
@@ -3761,6 +3885,18 @@ window.fmExitReadMode = function(){
   document.getElementById('fmReadMode').classList.remove('open');
 };
 
+// Fecha o modo leitura e abre o editor no arquivo correto
+window.fmExitReadModeToEditor = function(){
+  document.getElementById('fmReadMode').classList.remove('open');
+  if(!fmEditorKey) return;
+  // fmReadEditorPath guarda o path correto do arquivo aberto no modo leitura
+  if(typeof fmReadEditorPath !== 'undefined' && fmReadEditorPath !== null){
+    fmPath = [...fmReadEditorPath];
+    fmReadEditorPath = null;
+  }
+  fmOpenEditor(fmEditorKey);
+};
+
 function fmOpenReadMode(){
   fmReadZoomLevel = 1.0;
   const content = document.getElementById('fmReadContent');
@@ -3933,6 +4069,503 @@ document.getElementById('fmEditable').addEventListener('click', function(e){
     });
   });
 })();
+
+// ── FUNÇÕES AUSENTES DO GERENCIADOR DE ARQUIVOS ──────────────────────
+
+// Excluir item → manda para lixeira (local + Firebase)
+window.fmDelete = function(key){
+  window.fmConfirm(
+    `Mover <strong>${key}</strong> para a lixeira?`,
+    'Mover para lixeira',
+    ()=>{
+      const folder = fmCurrentFolder();
+      const item = folder.children[key];
+      if(!item) return;
+      // Salva na lixeira
+      fmTrash.unshift({
+        key,
+        item: JSON.parse(JSON.stringify(item)),
+        path: [...fmPath],
+        deletedAt: Date.now()
+      });
+      // Remove da pasta atual
+      delete folder.children[key];
+      // Persiste ambos: arquivo e lixeira
+      fmSave();
+      fmSaveTrash();
+      renderFm();
+    }
+  );
+};
+
+// Copiar conteúdo do arquivo no formato correto conforme o tipo
+window.fmCopyItem = function(key, btn){
+  const folder = fmCurrentFolder();
+  const item = folder.children[key];
+  if(!item) return;
+
+  const confirm = ()=>{
+    if(btn){
+      const orig = btn.textContent;
+      btn.textContent = '✓';
+      setTimeout(()=>{ btn.textContent = orig; }, 1200);
+    }
+  };
+  const fallback = (text)=>{
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    ta.remove();
+    confirm();
+  };
+
+  if(item.type === 'image' || item.type === 'pdf'){
+    // Binários: copia o nome do arquivo
+    navigator.clipboard.writeText(key).then(confirm).catch(()=>fallback(key));
+
+  } else if(item.type === 'html'){
+    // HTML: copia o código bruto — pronto pra colar num editor ou mandar pra edição
+    const raw = item.content || '';
+    navigator.clipboard.writeText(raw).then(confirm).catch(()=>fallback(raw));
+
+  } else if(item.type === 'md'){
+    // Markdown: copia o Markdown original com todos os símbolos (#, **, -, etc.)
+    const raw = item.content || '';
+    navigator.clipboard.writeText(raw).then(confirm).catch(()=>fallback(raw));
+
+  } else {
+    // Texto/rich text (.txt e editor visual):
+    // Copia como rich text + plain text simultaneamente via ClipboardItem
+    // → Cola com formatação (negrito, listas) em plataformas que suportam
+    // → Cola como texto limpo em plataformas simples (bloco de notas, etc.)
+    const htmlContent = item.content || '';
+    const div = document.createElement('div');
+    div.innerHTML = htmlContent;
+    const plainText = div.innerText || div.textContent || '';
+    try {
+      const blobHtml  = new Blob([htmlContent], { type: 'text/html' });
+      const blobPlain = new Blob([plainText],   { type: 'text/plain' });
+      navigator.clipboard.write([
+        new ClipboardItem({ 'text/html': blobHtml, 'text/plain': blobPlain })
+      ]).then(confirm).catch(()=>fallback(plainText));
+    } catch(e){
+      fallback(plainText);
+    }
+  }
+};
+
+// Visualizar imagem/PDF no viewer
+window.fmView = function(key){
+  const folder = fmCurrentFolder();
+  const item = folder.children[key];
+  if(!item) return;
+  fmViewingKey = key;
+  document.getElementById('fmViewerTitle').textContent = key;
+
+  const editBtn     = document.getElementById('fmViewerEditBtn');
+  const downloadBtn = document.getElementById('fmViewerDownloadBtn');
+  const openBtn     = document.getElementById('fmViewerOpenBtn');
+
+  editBtn.style.display     = 'none';
+  downloadBtn.style.display = 'none';
+  openBtn.style.display     = 'none';
+
+  const body = document.getElementById('fmViewerBody');
+  body.innerHTML = '';
+
+  if(item.type === 'image'){
+    // ── VIEWER DE IMAGEM ─────────────────────────────────────────────
+    downloadBtn.style.display = '';
+    body.style.cssText = 'flex:1;overflow:auto;background:#000;display:flex;align-items:center;justify-content:center;padding:0;';
+
+    const img = document.createElement('img');
+    img.src = item.content;
+    img.style.cssText = 'max-width:100%;max-height:100%;object-fit:contain;display:block;touch-action:pinch-zoom;';
+
+    // Double-tap para zoom 2x / voltar
+    let lastTap = 0; let zoomed = false;
+    img.addEventListener('click', ()=>{
+      const now = Date.now();
+      if(now - lastTap < 300){
+        zoomed = !zoomed;
+        img.style.maxWidth  = zoomed ? 'none' : '100%';
+        img.style.maxHeight = zoomed ? 'none' : '100%';
+        img.style.width     = zoomed ? '200%'  : '';
+      }
+      lastTap = now;
+    });
+    body.appendChild(img);
+
+  } else if(item.type === 'pdf'){
+    // ── VIEWER DE PDF ────────────────────────────────────────────────
+    downloadBtn.style.display = '';
+    openBtn.style.display     = '';
+    body.style.cssText = 'flex:1;overflow:hidden;background:#525659;display:flex;flex-direction:column;padding:0;position:relative;';
+
+    const src = item.content.startsWith('data:') ? item.content : 'data:application/pdf;base64,' + item.content;
+
+    // Tenta iframe primeiro (funciona no desktop e Chrome Android recente)
+    const iframe = document.createElement('iframe');
+    iframe.src = src;
+    iframe.style.cssText = 'width:100%;height:100%;border:none;flex:1;';
+    iframe.setAttribute('allowfullscreen', '');
+    body.appendChild(iframe);
+
+    // Após 2.5s verifica se o iframe carregou — se não, mostra aviso
+    setTimeout(()=>{
+      let loaded = false;
+      try { loaded = !!iframe.contentDocument; } catch(e){ loaded = false; }
+      // Se não carregou (blank ou erro), mostra mensagem
+      const iframeEmpty = !loaded || (iframe.contentDocument && iframe.contentDocument.body && iframe.contentDocument.body.innerHTML === '');
+      if(iframeEmpty){
+        const notice = document.createElement('div');
+        notice.style.cssText = 'position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,0.88);color:#fff;text-align:center;padding:1rem 1.2rem;font-size:0.78rem;font-family:Outfit,sans-serif;line-height:1.6;';
+        notice.innerHTML = '📱 Seu navegador não suportou a visualização inline.<br>Toque em <b>🌐 Navegador</b> para abrir ou <b>⬇️ Baixar</b> o PDF.';
+        body.appendChild(notice);
+      }
+    }, 2500);
+
+  } else {
+    // ── VIEWER DE TEXTO (inalterado) ─────────────────────────────────
+    editBtn.style.display = '';
+    body.style.cssText = 'flex:1;overflow:auto;padding:1rem;';
+    const div = document.createElement('div');
+    div.className = 'fm-viewer-rich';
+    const raw = item.content || '';
+    const hasHTML = /<[a-z][\s\S]*>/i.test(raw);
+    div.innerHTML = fmNormalizeContent(hasHTML ? fmDetectLinks(raw) : fmProcessText(raw));
+    body.appendChild(div);
+  }
+
+  document.getElementById('fmViewer').classList.add('open');
+};
+
+// Download do arquivo visualizado
+window.fmViewerDownload = function(){
+  const folder = fmCurrentFolder();
+  const item = folder.children[fmViewingKey];
+  if(!item) return;
+  const a = document.createElement('a');
+  a.href = item.content;
+  a.download = fmViewingKey;
+  a.click();
+};
+
+// Abrir PDF no navegador (leitor nativo do celular)
+window.fmViewerOpenBrowser = function(){
+  const folder = fmCurrentFolder();
+  const item = folder.children[fmViewingKey];
+  if(!item) return;
+  const src = item.content.startsWith('data:') ? item.content : 'data:application/pdf;base64,' + item.content;
+  window.open(src, '_blank');
+};
+
+// Fechar viewer
+window.closeFmViewer = function(){
+  document.getElementById('fmViewer').classList.remove('open');
+  fmViewingKey = null;
+};
+
+// Abrir editor a partir do viewer
+window.fmEditFromViewer = function(){
+  if(!fmViewingKey) return;
+  window.closeFmViewer();
+  fmOpenEditor(fmViewingKey);
+};
+
+// Abrir lixeira
+window.openFmTrash = function(){
+  renderFmTrash();
+  document.getElementById('fmTrashOverlay').classList.add('open');
+};
+
+// Fechar lixeira
+window.closeFmTrash = function(){
+  document.getElementById('fmTrashOverlay').classList.remove('open');
+};
+
+// Renderiza lixeira
+function renderFmTrash(){
+  const list = document.getElementById('fmTrashList');
+  list.innerHTML = '';
+  if(!fmTrash.length){
+    list.innerHTML = '<div class="fm-empty">🗑️ Lixeira vazia</div>';
+    return;
+  }
+  fmTrash.forEach((entry, idx)=>{
+    const el = document.createElement('div');
+    el.className = 'fm-trash-item';
+    const icon = entry.item.type==='folder'?'📁':entry.item.type==='image'?'🖼️':entry.item.type==='html'?'🌐':entry.item.type==='md'?'📝':entry.item.type==='pdf'?'📕':entry.item.type==='link-collection'?(entry.item.subtype==='video'?'🎬':entry.item.subtype==='pdf'?'📕':'🖼️'):'📄';
+    const date = entry.deletedAt ? new Date(entry.deletedAt).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}) : '';
+    el.innerHTML = `
+      <div class="fm-item-icon">${icon}</div>
+      <div style="flex:1;overflow:hidden;">
+        <div class="fm-trash-name">${entry.key}</div>
+        <div class="fm-trash-meta">📁 ${entry.path.length ? entry.path.join(' › ') : 'raiz'} • ${date}</div>
+      </div>
+      <button class="fm-restore-btn">↩ Restaurar</button>
+      <button class="fm-trash-del-btn">✕ Excluir</button>
+    `;
+    // Restaurar: volta o arquivo para a pasta original
+    el.querySelector('.fm-restore-btn').addEventListener('click', e=>{
+      e.stopPropagation();
+      fmRestoreTrashItem(idx);
+    });
+    // Excluir permanentemente (local + Firebase)
+    el.querySelector('.fm-trash-del-btn').addEventListener('click', e=>{
+      e.stopPropagation();
+      window.fmConfirm(
+        `Excluir <strong>${entry.key}</strong> permanentemente? Esta ação não pode ser desfeita.`,
+        'Excluir definitivamente',
+        ()=>{ fmPermanentDelete(idx); }
+      );
+    });
+    list.appendChild(el);
+  });
+}
+window.renderFmTrash = renderFmTrash;
+
+// Restaurar item da lixeira
+function fmRestoreTrashItem(idx){
+  const entry = fmTrash[idx];
+  if(!entry) return;
+  // Reconstrói o caminho na árvore
+  let node = fmFs.root;
+  for(const p of entry.path){
+    if(!node.children) node.children = {};
+    if(!node.children[p]) node.children[p] = {type:'folder',name:p,children:{}};
+    node = node.children[p];
+    if(!node.children) node.children = {};
+  }
+  // Evita colisão de nome
+  let k = entry.key;
+  let c = 1;
+  while(node.children[k]){
+    k = entry.key.replace(/(\.[^.]+)?$/, '_'+c+'$1');
+    c++;
+  }
+  node.children[k] = entry.item;
+  fmTrash.splice(idx, 1);
+  fmSave();
+  fmSaveTrash();
+  renderFmTrash();
+  renderFm();
+}
+
+// Excluir permanentemente da lixeira (remove do Firebase e local)
+function fmPermanentDelete(idx){
+  fmTrash.splice(idx, 1);
+  fmSaveTrash(); // Persiste no Firebase (lixeira)
+  renderFmTrash();
+}
+
+// Esvaziar lixeira completamente
+window.fmEmptyTrash = function(){
+  if(!fmTrash.length) return;
+  window.fmConfirm(
+    `Esvaziar a lixeira? <strong>${fmTrash.length} item(s)</strong> serão excluídos permanentemente.`,
+    'Esvaziar tudo',
+    ()=>{
+      fmTrash = [];
+      fmSaveTrash();
+      renderFmTrash();
+    }
+  );
+};
+
+// ── LINK COLLECTION ──────────────────────────────────────────────────
+
+function _fmMakeLinkEntry(container, name, url) {
+  var div = document.createElement('div');
+  div.className = 'fm-link-entry';
+  div.style.cssText = 'background:var(--glass2);border:1px solid var(--border2);border-radius:14px;padding:0.8rem;margin-bottom:10px;';
+
+  var header = document.createElement('div');
+  header.style.cssText = 'display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;';
+
+  var label = document.createElement('span');
+  label.style.cssText = 'font-size:0.62rem;color:var(--muted2);text-transform:uppercase;letter-spacing:0.8px;';
+  label.textContent = 'Nome';
+
+  var removeBtn = document.createElement('button');
+  removeBtn.textContent = '✕ Remover';
+  removeBtn.style.cssText = 'background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.2);border-radius:8px;color:var(--red);font-size:0.7rem;padding:3px 8px;cursor:pointer;';
+  removeBtn.addEventListener('click', function(){ div.parentNode && div.parentNode.removeChild(div); });
+
+  header.appendChild(label);
+  header.appendChild(removeBtn);
+
+  var nameInput = document.createElement('input');
+  nameInput.className = 'fm-link-entry-name';
+  nameInput.placeholder = 'Ex: Aula 1, Foto da entrada...';
+  nameInput.value = name || '';
+  nameInput.style.cssText = 'width:100%;background:rgba(255,255,255,0.05);border:1px solid var(--border2);border-radius:10px;padding:0.6rem 0.8rem;color:var(--text);font-family:Outfit,sans-serif;font-size:0.85rem;outline:none;margin-bottom:8px;box-sizing:border-box;';
+
+  var urlLabel = document.createElement('div');
+  urlLabel.style.cssText = 'font-size:0.62rem;color:var(--muted2);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:6px;';
+  urlLabel.textContent = 'Link';
+
+  var urlInput = document.createElement('input');
+  urlInput.className = 'fm-link-entry-url';
+  urlInput.placeholder = 'https://drive.google.com/...';
+  urlInput.value = url || '';
+  urlInput.style.cssText = 'width:100%;background:rgba(255,255,255,0.05);border:1px solid var(--border2);border-radius:10px;padding:0.6rem 0.8rem;color:var(--muted2);font-family:Outfit,sans-serif;font-size:0.82rem;outline:none;box-sizing:border-box;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;';
+
+  // Trunca visualmente o link: mostra dominio/... mas guarda URL completa
+  function _urlCollapse(input){
+    var full = input._fullUrl || input.value;
+    if(!full || !full.startsWith('http')) return;
+    input._fullUrl = full;
+    try {
+      var u = new URL(full);
+      input.value = u.hostname.replace('www.','') + '/...';
+      input.style.color = 'var(--muted2)';
+      input._collapsed = true;
+    } catch(e){}
+  }
+  function _urlExpand(input){
+    if(input._fullUrl){ input.value = input._fullUrl; }
+    input.style.color = 'var(--text)';
+    input._collapsed = false;
+  }
+  urlInput.addEventListener('focus', function(){ _urlExpand(this); });
+  urlInput.addEventListener('blur', function(){
+    // Salva o que foi digitado como URL completa
+    if(!this._collapsed) this._fullUrl = this.value;
+    _urlCollapse(this);
+  });
+  urlInput.addEventListener('input', function(){
+    this._fullUrl = this.value;
+    this._collapsed = false;
+    this.style.color = 'var(--text)';
+  });
+  // Ao copiar: copia a URL completa, não o texto truncado
+  urlInput.addEventListener('copy', function(e){
+    if(this._collapsed && this._fullUrl){
+      e.preventDefault();
+      e.clipboardData.setData('text/plain', this._fullUrl);
+    }
+  });
+  // Inicializa já truncado se vier com URL
+  if(url) setTimeout(function(){ _urlCollapse(urlInput); }, 30);
+
+  div.appendChild(header);
+  div.appendChild(nameInput);
+  div.appendChild(urlLabel);
+  div.appendChild(urlInput);
+  container.appendChild(div);
+
+  if(!name) setTimeout(function(){ nameInput.focus(); }, 50);
+}
+
+window.fmAddLinkEntry = function(name, url){
+  var c = document.getElementById('fmLinkEditorEntries');
+  if(c) _fmMakeLinkEntry(c, name||'', url||'');
+};
+
+window.fmAddLinkEditorEntry = function(name, url){
+  var c = document.getElementById('fmLinkEditorEntries');
+  if(c) _fmMakeLinkEntry(c, name||'', url||'');
+};
+
+window.fmSaveLinkEditor = function(){
+  var key = document.getElementById('fmLinkEditorKey').value;
+  var folder = fmCurrentFolder();
+  var item = folder.children[key];
+  if(!item) return;
+  var entries = document.querySelectorAll('#fmLinkEditorEntries .fm-link-entry');
+  var links = [];
+  for(var i=0;i<entries.length;i++){
+    var n = entries[i].querySelector('.fm-link-entry-name').value.trim();
+    var urlEl = entries[i].querySelector('.fm-link-entry-url');
+    // Usa _fullUrl se disponível (quando o campo está truncado visualmente)
+    var u = (urlEl._fullUrl || urlEl.value || '').trim();
+    if(n && u) links.push({name:n, url:u});
+  }
+  item.links = links;
+  item.modifiedAt = Date.now();
+  fmSave();
+  renderFm();
+  document.getElementById('fmLinkEditorPanel').classList.remove('open');
+};
+
+window.closeFmLinkEditor = function(){
+  document.getElementById('fmLinkEditorPanel').classList.remove('open');
+};
+
+window.fmEditLinkCollection = function(key){
+  document.getElementById('fmViewer').classList.remove('open');
+  var folder = fmCurrentFolder();
+  var item = folder.children[key];
+  if(!item) return;
+  var icon = item.subtype==='video' ? '🎬' : item.subtype==='pdf' ? '📕' : '🖼️';
+  document.getElementById('fmLinkEditorTitle').textContent = icon+' '+(item.name||key);
+  document.getElementById('fmLinkEditorKey').value = key;
+  var container = document.getElementById('fmLinkEditorEntries');
+  container.innerHTML = '';
+  var links = item.links || [];
+  for(var i=0;i<links.length;i++) _fmMakeLinkEntry(container, links[i].name, links[i].url);
+  document.getElementById('fmLinkEditorPanel').classList.add('open');
+};
+
+window.fmViewLinkCollection = function(key){
+  var folder = fmCurrentFolder();
+  var item = folder.children[key];
+  if(!item) return;
+  var icon = item.subtype==='video' ? '🎬' : item.subtype==='pdf' ? '📕' : '🖼️';
+  document.getElementById('fmViewerTitle').textContent = item.name||key;
+  var editBtn = document.getElementById('fmViewerEditBtn');
+  document.getElementById('fmViewerDownloadBtn').style.display = 'none';
+  document.getElementById('fmViewerOpenBtn').style.display = 'none';
+  editBtn.style.display = '';
+  editBtn.textContent = '✏️ Editar';
+  editBtn.onclick = function(){ closeFmViewer(); fmEditLinkCollection(key); };
+  var body = document.getElementById('fmViewerBody');
+  body.innerHTML = '';
+  body.style.cssText = 'flex:1;overflow-y:auto;padding:1rem;background:#0a0a12;';
+  if(!item.links || !item.links.length){
+    var empty = document.createElement('div');
+    empty.style.cssText = 'text-align:center;padding:3rem 1rem;color:var(--muted);';
+    var iconDiv = document.createElement('div');
+    iconDiv.style.cssText = 'font-size:2.5rem;margin-bottom:0.8rem;';
+    iconDiv.textContent = icon;
+    var msg = document.createElement('div');
+    msg.style.cssText = 'font-size:0.88rem;margin-bottom:1.2rem;';
+    msg.textContent = 'Nenhum link cadastrado ainda';
+    var addBtn = document.createElement('button');
+    addBtn.textContent = '✏️ Adicionar links';
+    addBtn.style.cssText = 'background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;border-radius:12px;color:#fff;font-family:Outfit,sans-serif;font-size:0.82rem;font-weight:600;padding:0.6rem 1.4rem;cursor:pointer;';
+    addBtn.addEventListener('click', function(){ closeFmViewer(); fmEditLinkCollection(key); });
+    empty.appendChild(iconDiv);
+    empty.appendChild(msg);
+    empty.appendChild(addBtn);
+    body.appendChild(empty);
+  } else {
+    for(var i=0;i<item.links.length;i++){
+      (function(link){
+        var el = document.createElement('div');
+        el.style.cssText = 'background:var(--glass2);border:1px solid var(--border2);border-radius:14px;padding:1rem 1.1rem;margin-bottom:8px;display:flex;align-items:center;gap:12px;cursor:pointer;';
+        var ic = document.createElement('div');
+        ic.style.cssText = 'font-size:1.3rem;flex-shrink:0;';
+        ic.textContent = icon;
+        var nm = document.createElement('div');
+        nm.style.cssText = 'flex:1;font-size:0.85rem;font-weight:600;color:var(--text);';
+        nm.textContent = link.name;
+        var ab = document.createElement('div');
+        ab.style.cssText = 'font-size:0.68rem;color:var(--accent);border:1px solid rgba(124,109,250,0.35);border-radius:8px;padding:4px 12px;flex-shrink:0;';
+        ab.textContent = 'Abrir ↗';
+        el.appendChild(ic); el.appendChild(nm); el.appendChild(ab);
+        el.addEventListener('click', function(){ window.open(link.url,'_blank'); });
+        body.appendChild(el);
+      })(item.links[i]);
+    }
+  }
+  document.getElementById('fmViewer').classList.add('open');
+};
+
+window.fmUpdateLinkCollection = function(){ window.fmSaveLinkEditor(); };
 
 // ── Init ─────────────────────────────────────────────────────────────
 render();
