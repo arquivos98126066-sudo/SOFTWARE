@@ -225,7 +225,7 @@
   z-index:9999;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap;max-width:92vw;text-align:center"></div>
 
 <div class="nav">
-  <button class="nav-back" id="navBack" style="display:none" onclick="goBack()">←</button>
+  <button class="nav-back" id="navBack" style="display:none" onclick="history.back()">←</button>
   <span class="nav-title" id="navTitle">📱 TAPETES CRM</span>
   <span style="width:32px"></span>
 </div>
@@ -340,7 +340,7 @@
     </div>
   </div>
   <div class="form-actions">
-    <button class="btn btn-ghost" onclick="showScreen('home');setNav(0)">❌ Cancelar</button>
+    <button class="btn btn-ghost" onclick="history.back()">❌ Cancelar</button>
     <button class="btn btn-primary" onclick="salvarCliente()">✅ Salvar Cliente</button>
   </div>
 </div>
@@ -623,28 +623,42 @@ async function syncPending() {
 }
 
 // ── NAV ───────────────────────────────────────────────────────────────────────
-function showScreen(name,push=true){
-  if(push&&curScreen!==name) stack.push(curScreen);
+const ROOT_SCREENS = ['home','clientes','registrar','config'];
+
+function showScreen(name, push=true){
+  if(push && curScreen!==name) stack.push(curScreen);
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById('screen-'+name)?.classList.add('active');
   curScreen=name;
   const titles={home:'📱 TAPETES CRM',clientes:'👥 CLIENTES',registrar:'📝 REGISTRAR',config:'⚙️ CONFIG',
     enviar:'📤 Enviar',timeline:'📋 Histórico',fechamento:'🎉 Fechar Venda',duvida:'💬 Dúvida'};
   document.getElementById('navTitle').textContent=titles[name]||'CRM';
-  document.getElementById('navBack').style.display=['home','clientes','registrar','config'].includes(name)?'none':'block';
+  document.getElementById('navBack').style.display=ROOT_SCREENS.includes(name)?'none':'block';
   if(name==='home') renderHome();
   if(name==='clientes') renderAllClients();
   if(name==='config') renderConfig();
+  // Registra no history se não for tela raiz e o push foi solicitado
+  if(push && !ROOT_SCREENS.includes(name)){
+    history.pushState({nav:name}, '');
+  }
 }
 window.showScreen = showScreen;
 
-function goBack(){ const p=stack.pop()||'home'; showScreen(p,false); if(['home','clientes','registrar','config'].includes(p)) setNav(['home','clientes','registrar','config'].indexOf(p)); }
+// goBack interno: navega pela stack sem empurrar history
+function _goBackInterno(){
+  const p=stack.pop()||'home';
+  showScreen(p, false);
+  if(ROOT_SCREENS.includes(p)) setNav(ROOT_SCREENS.indexOf(p));
+}
+
+// goBack público: chamado por botões inline dentro de forms dinâmicos
+function goBack(){ history.back(); }
 window.goBack = goBack;
 
 function setNav(i){ document.querySelectorAll('.bnav-btn').forEach((b,j)=>b.classList.toggle('active',i===j)); }
 window.setNav = setNav;
 
-function openModal(id){ document.getElementById(id).classList.add('open'); }
+function openModal(id){ document.getElementById(id).classList.add('open'); history.pushState({nav:'modal',id}, ''); }
 function closeModal(id){ document.getElementById(id).classList.remove('open'); }
 window.closeModal = closeModal;
 
@@ -1231,6 +1245,35 @@ function renderConfig(){
   document.getElementById('cfg-texto-fixo').value=textoFixo||'';
   renderDaysAccordion();
 }
+
+// ── SISTEMA DE NAVEGAÇÃO HISTORY ──────────────────────────────────────────────
+(function setupNavHistory(){
+  // Base — nunca deixa o botão voltar fechar a aba
+  history.replaceState({_base:true}, '');
+
+  // POPSTATE — do mais profundo para o mais raso
+  window.addEventListener('popstate', function(e){
+    const state = e.state || {};
+
+    // 1. Modals (mais profundos)
+    const modalAberto = document.querySelector('.overlay.open');
+    if(modalAberto){
+      modalAberto.classList.remove('open');
+      return;
+    }
+
+    // 2. Screens secundárias (timeline, enviar, fechamento, duvida)
+    if(!ROOT_SCREENS.includes(curScreen)){
+      _goBackInterno();
+      return;
+    }
+
+    // 3. Raiz: reaplica base para nunca sair da página
+    if(!state._base){
+      history.replaceState({_base:true}, '');
+    }
+  });
+})();
 
 // ── INIT ──────────────────────────────────────────────────────────────────────
 window.addEventListener('DOMContentLoaded', async () => {
