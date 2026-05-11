@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
+<meta charset="UTF-8"/> <script type="module" src="auth-check.js"></script>
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
@@ -1422,11 +1422,11 @@ function completarEstrutura(codigo) {
   const temBody = /<body[\s>]/i.test(codigo);
   const temFimHtml = /<\/html>/i.test(codigo);
   if (!temDoctype && !temHtml) {
-    codigo = `<!DOCTYPE html>\n<html lang="pt-BR">\n<head>\n<meta charset="UTF-8">\n<meta name="viewport" content="width=device-width, initial-scale=1.0">\n<title>Página</title>\n</head>\n<body>\n${codigo}\n</body>\n</html>`;
+    codigo = `<!DOCTYPE html>\n<html lang="pt-BR">\n<head>\n<meta charset="UTF-8"/> <script type="module" src="auth-check.js"></script>\n<meta name="viewport" content="width=device-width, initial-scale=1.0">\n<title>Página</title>\n</head>\n<body>\n${codigo}\n</body>\n</html>`;
   } else {
     if (!temDoctype) codigo = '<!DOCTYPE html>\n' + codigo;
     if (!temHead) {
-      codigo = codigo.replace(/<html[^>]*>/i, (m) => m + '\n<head>\n<meta charset="UTF-8">\n</head>');
+      codigo = codigo.replace(/<html[^>]*>/i, (m) => m + '\n<head>\n<meta charset="UTF-8"/> <script type="module" src="auth-check.js"></script>\n</head>');
     }
     if (!temBody) {
       codigo = codigo.replace(/<\/head>/i, '</head>\n<body>');
