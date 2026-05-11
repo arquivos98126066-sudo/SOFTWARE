@@ -1267,17 +1267,21 @@ function iniciarListeners() {
 // ─── INIT ─────────────────────────────────────────────────────────────────────
 iniciarListeners();
 
-// ─── Drawer ──────────────────────────────────────────────────────────────────
+// ─── Drawer com histórico ────────────────────────────────────────────────────
+
+// PASSO 4 — base do histórico: nunca sai da página
+history.replaceState({ _base: true }, '');
+
 window.toggleDrawer = function() {
   var drawer = document.getElementById('drawer');
-  var overlay = document.getElementById('overlay');
-  var hamburger = document.getElementById('hamburger');
   if (drawer.classList.contains('open')) {
-    closeDrawer();
+    // Fechar via botão: usa history.back() para consistência
+    history.back();
   } else {
+    history.pushState({ nav: 'drawer' }, '');
     drawer.classList.add('open');
-    overlay.classList.add('open');
-    hamburger.classList.add('open');
+    document.getElementById('overlay').classList.add('open');
+    document.getElementById('hamburger').classList.add('open');
   }
 };
 
@@ -1286,6 +1290,26 @@ window.closeDrawer = function() {
   document.getElementById('overlay').classList.remove('open');
   document.getElementById('hamburger').classList.remove('open');
 };
+
+function _closeDrawerDirect() {
+  document.getElementById('drawer').classList.remove('open');
+  document.getElementById('overlay').classList.remove('open');
+  document.getElementById('hamburger').classList.remove('open');
+}
+
+// PASSO 3 — popstate: Drawer → Base
+window.addEventListener('popstate', function(e) {
+  var st = e.state;
+
+  // 1. Drawer aberto? Fecha
+  if (document.getElementById('drawer').classList.contains('open')) {
+    _closeDrawerDirect();
+    return;
+  }
+
+  // 2. Base — reafirma para não sair da página
+  history.replaceState({ _base: true }, '');
+});
 
 // ─── Simulador ────────────────────────────────────────────────────────────────
 function toggleMonth(header) {
