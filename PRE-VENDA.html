@@ -1262,6 +1262,69 @@ function copyLiveScript() {
 }
 window.copyLiveScript = copyLiveScript;
 
+// ── NAVEGAÇÃO COM HISTÓRICO ───────────────────────────────
+// PASSO 4 — base: nunca sai da página
+history.replaceState({ _base: true, page: 'produtos' }, '');
+
+// Rastreia a page atual para pushState
+let _currentPage = 'produtos';
+
+// Sobrescreve goPage para registrar estado no histórico
+const _goPageOrig = goPage;
+window.goPage = function(name) {
+  if (name === _currentPage) return; // já está nessa page
+  history.pushState({ nav: 'page', page: name, prev: _currentPage }, '');
+  _currentPage = name;
+  _goPageOrig(name);
+};
+
+// Sobrescreve openModal para registrar estado no histórico
+const _openModalOrig = openModal;
+window.openModal = function(id) {
+  history.pushState({ nav: 'modal', modalId: id }, '');
+  _openModalOrig(id);
+};
+
+// Sobrescreve closeModal para usar history.back() quando possível
+const _closeModalOrig = closeModal;
+window.closeModal = function(id) {
+  // Verifica se o estado atual é deste modal
+  if (history.state && history.state.nav === 'modal' && history.state.modalId === id) {
+    history.back();
+  } else {
+    _closeModalOrig(id);
+  }
+};
+
+// PASSO 3 — popstate: do mais profundo para o mais raso
+// Ordem: Modal → Page → Base
+window.addEventListener('popstate', function(e) {
+  const st = e.state;
+
+  // 1. Modal aberto? Fecha-o
+  const openModal = document.querySelector('.modal-overlay.open');
+  if (openModal) {
+    _closeModalOrig(openModal.id);
+    return;
+  }
+
+  // 2. Estava numa page diferente? Volta para a page anterior
+  if (st && st.nav === 'page' && st.prev) {
+    _currentPage = st.prev;
+    _goPageOrig(st.prev);
+    return;
+  }
+
+  // 3. Base — reafirma para não sair da página
+  if (st && st._base) {
+    history.replaceState({ _base: true, page: _currentPage }, '');
+    return;
+  }
+
+  // Segurança: se o estado for desconhecido, reafirma base
+  history.replaceState({ _base: true, page: _currentPage }, '');
+});
+
 // ── INIT ──────────────────────────────────────────────────
 document.getElementById('modal-new-prod').addEventListener('click', function(e) {
   if (e.target === this) closeModal('modal-new-prod');
