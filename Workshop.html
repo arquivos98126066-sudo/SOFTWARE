@@ -532,6 +532,37 @@ body.img-active .ck-wrap{z-index:9100 !important;}
 .fm-confirm-btns{display:flex;gap:10px;}
 .fm-confirm-cancel{flex:1;padding:0.65rem;border:1px solid var(--border2);border-radius:12px;background:transparent;color:var(--muted2);font-family:'Outfit',sans-serif;font-size:0.85rem;cursor:pointer;}
 .fm-confirm-ok{flex:1;padding:0.65rem;border:none;border-radius:12px;background:linear-gradient(135deg,#ef4444,#f97316);color:#fff;font-family:'Outfit',sans-serif;font-size:0.85rem;font-weight:600;cursor:pointer;}
+
+/* MOVER ITEM */
+.fm-move-overlay{
+  display:none;position:fixed;inset:0;z-index:9999;
+  background:rgba(0,0,0,0.85);backdrop-filter:blur(8px);
+  align-items:flex-end;justify-content:center;padding:1rem;
+}
+.fm-move-overlay.open{display:flex;}
+.fm-move-box{
+  background:#111118;border:1px solid var(--border2);
+  border-radius:28px 28px 22px 22px;padding:1.5rem;
+  width:100%;max-width:380px;
+  animation:slideUp 0.3s cubic-bezier(.34,1.56,.64,1);
+  max-height:70vh;display:flex;flex-direction:column;
+}
+.fm-move-box h2{font-size:1rem;font-weight:700;margin-bottom:0.4rem;}
+.fm-move-subtitle{font-size:0.7rem;color:var(--muted);margin-bottom:1rem;}
+.fm-move-list{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:6px;margin-bottom:1rem;}
+.fm-move-folder{
+  display:flex;align-items:center;gap:10px;
+  padding:0.65rem 0.9rem;border-radius:14px;
+  border:1px solid var(--border);background:var(--glass);
+  cursor:pointer;transition:all 0.15s;font-size:0.82rem;
+}
+.fm-move-folder:active,.fm-move-folder.sel{
+  background:rgba(249,115,22,0.12);border-color:#f97316;
+}
+.fm-move-folder-path{font-size:0.6rem;color:var(--muted);margin-top:1px;}
+.fm-move-btns{display:flex;gap:10px;flex-shrink:0;}
+.fm-move-cancel{flex:1;padding:0.65rem;border:1px solid var(--border2);border-radius:12px;background:transparent;color:var(--muted2);font-family:'Outfit',sans-serif;font-size:0.85rem;cursor:pointer;}
+.fm-move-ok{flex:2;padding:0.65rem;border:none;border-radius:12px;background:linear-gradient(135deg,#f97316,#facc15);color:#fff;font-family:'Outfit',sans-serif;font-size:0.85rem;font-weight:600;cursor:pointer;}
 .fm-modal-overlay{
   display:none;position:fixed;inset:0;z-index:9300;
   background:rgba(0,0,0,0.85);backdrop-filter:blur(8px);
@@ -1233,7 +1264,10 @@ body.img-active .ck-wrap{z-index:9100 !important;}
 <!-- MODAL -->
 <div class="overlay" id="overlay">
   <div class="modal">
-    <h2>➕ Novo atalho</h2>
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:1rem;">
+      <button onclick="closeModal()" style="background:rgba(255,255,255,0.07);border:1px solid var(--border2);border-radius:10px;color:var(--muted2);font-size:0.85rem;padding:0.3rem 0.8rem;cursor:pointer;font-family:'Outfit',sans-serif;flex-shrink:0;">← Voltar</button>
+      <h2 style="margin-bottom:0;">➕ Novo atalho</h2>
+    </div>
     <div class="type-sel">
       <button class="type-btn active" id="type-site" onclick="setType('site')">🌐 Site</button>
       <button class="type-btn" id="type-deep" onclick="setType('deep')">📲 App do celular</button>
@@ -1345,6 +1379,7 @@ body.img-active .ck-wrap{z-index:9100 !important;}
   <div class="fm-sel-bar" id="fmSelBar">
     <span class="fm-sel-count" id="fmSelCount">0 selecionados</span>
     <button class="fm-sel-btn" onclick="fmSelCopyAll()">📋 Copiar</button>
+    <button class="fm-sel-btn" onclick="fmSelMoveAll()">📦 Mover</button>
     <button class="fm-sel-btn danger" onclick="fmSelDeleteAll()">🗑️ Apagar</button>
     <button class="fm-sel-btn" onclick="fmToggleSelMode()">✕</button>
   </div>
@@ -1388,8 +1423,24 @@ body.img-active .ck-wrap{z-index:9100 !important;}
   <div class="fm-confirm-box">
     <p id="fmConfirmMsg">Tem certeza?</p>
     <div class="fm-confirm-btns">
-      <button class="fm-confirm-cancel" onclick="fmConfirmCancel()">Cancelar</button>
+      <button class="fm-confirm-cancel" onclick="fmConfirmCancel()">← Cancelar</button>
       <button class="fm-confirm-ok" id="fmConfirmOk">Excluir</button>
+    </div>
+  </div>
+</div>
+
+<!-- MOVER ITEM -->
+<div class="fm-move-overlay" id="fmMoveOverlay">
+  <div class="fm-move-box">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:0.6rem;">
+      <button onclick="fmCloseMovePanel()" style="background:var(--glass);border:1px solid var(--border2);border-radius:10px;color:var(--muted2);font-size:0.85rem;padding:0.3rem 0.8rem;cursor:pointer;font-family:'Outfit',sans-serif;flex-shrink:0;">← Voltar</button>
+      <h2 style="margin-bottom:0;">📦 Mover para...</h2>
+    </div>
+    <div class="fm-move-subtitle" id="fmMoveSubtitle">Selecione o destino</div>
+    <div class="fm-move-list" id="fmMoveList"></div>
+    <div class="fm-move-btns">
+      <button class="fm-move-cancel" onclick="fmCloseMovePanel()">Cancelar</button>
+      <button class="fm-move-ok" onclick="fmConfirmMove()">Mover aqui ↗</button>
     </div>
   </div>
 </div>
@@ -1500,7 +1551,10 @@ body.img-active .ck-wrap{z-index:9100 !important;}
 <!-- MODAL CRIAR -->
 <div class="fm-modal-overlay" id="fmModalOverlay">
   <div class="fm-modal">
-    <h2 id="fmModalTitle">➕ Novo item</h2>
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:1rem;">
+      <button onclick="closeFmModal()" style="background:var(--glass);border:1px solid var(--border2);border-radius:10px;color:var(--muted2);font-size:0.85rem;padding:0.3rem 0.8rem;cursor:pointer;font-family:'Outfit',sans-serif;flex-shrink:0;">← Voltar</button>
+      <h2 id="fmModalTitle" style="margin-bottom:0;">➕ Novo item</h2>
+    </div>
     <div class="fm-type-sel">
       <button class="fm-type-btn" id="fmTypeUpload" onclick="setFmType('upload')">📤 Subir</button>
       <button class="fm-type-btn active" id="fmTypeTxt" onclick="setFmType('txt')">📝 Texto</button>
@@ -1598,7 +1652,10 @@ body.img-active .ck-wrap{z-index:9100 !important;}
 <!-- CHECKLIST MODAL -->
 <div class="ck-overlay" id="ckOverlay">
   <div class="ck-modal">
-    <h2 id="ckModalTitle">➕ Nova tarefa</h2>
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:1rem;">
+      <button onclick="closeCkModal()" style="background:rgba(255,255,255,0.07);border:1px solid var(--border2);border-radius:10px;color:var(--muted2);font-size:0.85rem;padding:0.3rem 0.8rem;cursor:pointer;font-family:'Outfit',sans-serif;flex-shrink:0;">← Voltar</button>
+      <h2 id="ckModalTitle" style="margin-bottom:0;">➕ Nova tarefa</h2>
+    </div>
     <div class="field">
       <label>Nome</label>
       <input id="ck-inp-name" type="text" placeholder="Ex: Reunião, Compras..." autocomplete="off">
@@ -2559,6 +2616,8 @@ function renderFm(){
     }
     // Drag-reorder (touch + mouse) — só no modo manual
     if(fmSortMode === 'manual') fmBindDragReorder(el);
+    // Long press → rename (sempre ativo)
+    fmBindLongPressRename(el);
     list.appendChild(el);
   });
 }
@@ -2568,54 +2627,37 @@ let fmDragKey = null;
 let fmDragEl = null;
 
 function fmBindDragReorder(el){
-  const handle = el.querySelector('[style*="grab"]') || el;
-  let startY = 0, isDragging = false, touchId = null;
+  const handle = el.querySelector('[style*="grab"]');
+  if(!handle) return;
+  let isDragging = false, touchId = null;
 
   function onStart(e){
-    // só inicia se tocou no handle ou fez long press
     const touch = e.touches ? e.touches[0] : e;
     touchId = e.touches ? e.touches[0].identifier : null;
-    startY = touch.clientY;
-    isDragging = false;
-    // long press para iniciar drag em touch
-    let pressTimer = setTimeout(()=>{
-      isDragging = true;
-      fmDragKey = el.dataset.key;
-      fmDragEl = el;
-      el.classList.add('drag-reorder');
-    }, 400);
-    el.dataset._pressTimer = pressTimer;
-    if(!e.touches){
-      // mouse: inicia imediatamente no handle ⠿
-      if(e.target.style && e.target.style.cursor === 'grab'){
-        isDragging = true;
-        fmDragKey = el.dataset.key;
-        fmDragEl = el;
-        el.classList.add('drag-reorder');
-      }
-    }
+    isDragging = true;
+    fmDragKey = el.dataset.key;
+    fmDragEl = el;
+    el.classList.add('drag-reorder');
+    e.stopPropagation();
   }
   function onMove(e){
     if(!isDragging) return;
     e.preventDefault();
     const touch = e.touches ? Array.from(e.touches).find(t=>t.identifier===touchId)||e.touches[0] : e;
     const curY = touch.clientY;
-    // Encontra o elemento sob o cursor
     const els = document.querySelectorAll('#fmList .fm-item:not(.drag-reorder)');
     document.querySelectorAll('.fm-item.drag-over-top,.fm-item.drag-over-bot').forEach(x=>{x.classList.remove('drag-over-top','drag-over-bot');});
+    let closest = null, closestDist = Infinity, closestTop = true;
     els.forEach(other=>{
       const rect = other.getBoundingClientRect();
       const mid = rect.top + rect.height/2;
-      if(curY < mid && curY > rect.top - 10){
-        other.classList.add('drag-over-top');
-      } else if(curY >= mid && curY < rect.bottom + 10){
-        other.classList.add('drag-over-bot');
-      }
+      const dist = Math.abs(curY - mid);
+      if(dist < closestDist){ closestDist=dist; closest=other; closestTop=(curY<mid); }
     });
+    if(closest) closest.classList.add(closestTop?'drag-over-top':'drag-over-bot');
   }
   function onEnd(e){
-    clearTimeout(el.dataset._pressTimer);
-    if(!isDragging){ isDragging=false; return; }
+    if(!isDragging) return;
     isDragging = false;
     el.classList.remove('drag-reorder');
     document.querySelectorAll('.fm-item.drag-over-top,.fm-item.drag-over-bot').forEach(other=>{
@@ -2626,12 +2668,87 @@ function fmBindDragReorder(el){
     });
     fmDragKey = null; fmDragEl = null;
   }
-  el.addEventListener('touchstart', onStart, {passive:true});
-  el.addEventListener('touchmove', onMove, {passive:false});
-  el.addEventListener('touchend', onEnd);
-  el.addEventListener('mousedown', onStart);
-  el.addEventListener('mousemove', onMove);
-  el.addEventListener('mouseup', onEnd);
+  handle.addEventListener('touchstart', onStart, {passive:false});
+  handle.addEventListener('touchmove', onMove, {passive:false});
+  handle.addEventListener('touchend', onEnd);
+  handle.addEventListener('mousedown', onStart);
+  document.addEventListener('mousemove', onMove);
+  document.addEventListener('mouseup', onEnd);
+}
+
+// ── LONG PRESS → MENU (RENOMEAR / MOVER) ────────────────────────────
+function fmBindLongPressRename(el){
+  let pressTimer = null, moved = false;
+  el.addEventListener('touchstart', e=>{
+    if(e.target.closest('[style*="grab"]')||e.target.closest('.fm-item-btn')||e.target.closest('.fm-item-del')) return;
+    moved = false;
+    pressTimer = setTimeout(()=>{
+      if(!moved) fmShowLongPressMenu(el.dataset.key, e.touches[0]);
+    }, 700);
+  }, {passive:true});
+  el.addEventListener('touchmove', ()=>{ moved=true; clearTimeout(pressTimer); }, {passive:true});
+  el.addEventListener('touchend', ()=>clearTimeout(pressTimer), {passive:true});
+  el.addEventListener('touchcancel', ()=>clearTimeout(pressTimer), {passive:true});
+}
+
+function fmShowLongPressMenu(key, touch){
+  // Remove qualquer menu anterior
+  document.querySelectorAll('.fm-lp-menu').forEach(m=>m.remove());
+
+  const menu = document.createElement('div');
+  menu.className = 'fm-lp-menu';
+  menu.style.cssText = 'position:fixed;z-index:99999;background:#111118;border:1px solid var(--border2);border-radius:18px;padding:0.5rem;min-width:180px;box-shadow:0 8px 30px rgba(0,0,0,0.7);animation:slideUp 0.2s ease;';
+
+  const btnRename = document.createElement('button');
+  btnRename.style.cssText = 'display:flex;align-items:center;gap:10px;width:100%;padding:0.65rem 0.9rem;border:none;background:transparent;color:var(--text);font-family:Outfit,sans-serif;font-size:0.85rem;border-radius:12px;cursor:pointer;';
+  btnRename.innerHTML = '✏️ <span>Renomear</span>';
+  btnRename.addEventListener('click', ()=>{ menu.remove(); fmRenamePrompt(key); });
+
+  const sep = document.createElement('div');
+  sep.style.cssText = 'height:1px;background:var(--border);margin:0.3rem 0;';
+
+  const btnMove = document.createElement('button');
+  btnMove.style.cssText = 'display:flex;align-items:center;gap:10px;width:100%;padding:0.65rem 0.9rem;border:none;background:transparent;color:var(--text);font-family:Outfit,sans-serif;font-size:0.85rem;border-radius:12px;cursor:pointer;';
+  btnMove.innerHTML = '📦 <span>Mover</span>';
+  btnMove.addEventListener('click', ()=>{ menu.remove(); fmOpenMovePanel(key); });
+
+  menu.appendChild(btnRename);
+  menu.appendChild(sep);
+  menu.appendChild(btnMove);
+
+  // Posiciona perto do toque
+  const x = touch ? touch.clientX : window.innerWidth/2;
+  const y = touch ? touch.clientY : window.innerHeight/2;
+  menu.style.left = Math.min(x, window.innerWidth - 200) + 'px';
+  menu.style.top = Math.min(y + 10, window.innerHeight - 140) + 'px';
+  document.body.appendChild(menu);
+
+  // Fecha ao tocar fora
+  setTimeout(()=>{
+    document.addEventListener('touchstart', function closeMenu(e){
+      if(!menu.contains(e.target)){ menu.remove(); document.removeEventListener('touchstart', closeMenu); }
+    });
+    document.addEventListener('click', function closeMenu2(e){
+      if(!menu.contains(e.target)){ menu.remove(); document.removeEventListener('click', closeMenu2); }
+    });
+  }, 50);
+}
+
+function fmRenamePrompt(oldKey){
+  const folder = fmCurrentFolder();
+  if(!folder.children[oldKey]) return;
+  const newName = prompt('Novo nome:', oldKey);
+  if(!newName || newName.trim()==='' || newName.trim()===oldKey) return;
+  const trimmed = newName.trim();
+  if(folder.children[trimmed]){ alert('Já existe um item com esse nome.'); return; }
+  // Recria preservando ordem
+  const newChildren = {};
+  Object.keys(folder.children).forEach(k=>{
+    newChildren[k===oldKey ? trimmed : k] = folder.children[k];
+  });
+  folder.children = newChildren;
+  fmSave();
+  renderFm();
 }
 
 function fmReorderItem(fromKey, toKey, insertBefore){
@@ -4567,8 +4684,299 @@ window.fmViewLinkCollection = function(key){
 
 window.fmUpdateLinkCollection = function(){ window.fmSaveLinkEditor(); };
 
+// ── MOVER ITEM ───────────────────────────────────────────────────────
+let fmMoveKey = null;
+let fmMoveKeys = null; // para mover múltiplos
+let fmMoveDestPath = null;
+
+// Coleta recursivamente todas as pastas da árvore
+function fmCollectFolders(node, path, results){
+  Object.entries(node.children||{}).forEach(([key,item])=>{
+    if(item.type==='folder'){
+      const fullPath = [...path, key];
+      results.push({ label: key, path: fullPath, pathStr: fullPath.join(' › ') || 'raiz' });
+      fmCollectFolders(item, fullPath, results);
+    }
+  });
+}
+
+function fmOpenMovePanelFor(keys){
+  // keys = array de chaves a mover
+  fmMoveKeys = keys;
+  fmMoveKey = null;
+  fmMoveDestPath = null;
+
+  const label = keys.length === 1 ? keys[0] : keys.length + ' itens selecionados';
+  document.getElementById('fmMoveSubtitle').textContent = '📦 ' + label + ' → selecione o destino';
+
+  const list = document.getElementById('fmMoveList');
+  list.innerHTML = '';
+
+  // Opção: raiz
+  const rootEl = document.createElement('div');
+  rootEl.className = 'fm-move-folder';
+  rootEl.innerHTML = '<span style="font-size:1.1rem;">🏠</span><div><div>Raiz</div><div class="fm-move-folder-path">pasta principal</div></div>';
+  rootEl.addEventListener('click', function(){
+    list.querySelectorAll('.fm-move-folder').forEach(f=>f.classList.remove('sel'));
+    rootEl.classList.add('sel');
+    fmMoveDestPath = [];
+  });
+  list.appendChild(rootEl);
+
+  const folders = [];
+  fmCollectFolders(fmFs.root, [], folders);
+  const originPath = [...fmPath];
+
+  folders.forEach(f=>{
+    if(f.path.join('/')===originPath.join('/')) return;
+    // Não mostra subpastas de itens sendo movidos (se forem pastas)
+    let skip = false;
+    keys.forEach(k=>{
+      const item = fmCurrentFolder().children[k];
+      if(item && item.type==='folder'){
+        const itemFull = [...originPath, k].join('/');
+        if(f.path.join('/').startsWith(itemFull)) skip = true;
+      }
+    });
+    if(skip) return;
+
+    const el = document.createElement('div');
+    el.className = 'fm-move-folder';
+    const depth = f.path.length;
+    const indent = depth > 1 ? '\u00a0'.repeat((depth-1)*3)+'└ ' : '';
+    el.innerHTML = `<span style="font-size:1.1rem;">📁</span><div><div>${indent}${f.label}</div><div class="fm-move-folder-path">${f.pathStr}</div></div>`;
+    el.addEventListener('click', function(){
+      list.querySelectorAll('.fm-move-folder').forEach(x=>x.classList.remove('sel'));
+      el.classList.add('sel');
+      fmMoveDestPath = f.path;
+    });
+    list.appendChild(el);
+  });
+
+  document.getElementById('fmMoveOverlay').classList.add('open');
+}
+
+window.fmOpenMovePanel = function(key){
+  fmOpenMovePanelFor([key]);
+};
+
+window.fmSelMoveAll = function(){
+  if(!fmSelected.size){ return; }
+  fmOpenMovePanelFor([...fmSelected]);
+};
+
+window.fmCloseMovePanel = function(){
+  document.getElementById('fmMoveOverlay').classList.remove('open');
+  fmMoveKey = null;
+  fmMoveKeys = null;
+  fmMoveDestPath = null;
+};
+
+window.fmConfirmMove = function(){
+  const keys = fmMoveKeys;
+  if(!keys || !keys.length){ fmCloseMovePanel(); return; }
+  if(fmMoveDestPath === null){ alert('Selecione um destino primeiro.'); return; }
+
+  const srcFolder = fmCurrentFolder();
+
+  let destFolder = fmFs.root;
+  for(const p of fmMoveDestPath){
+    if(!destFolder.children||!destFolder.children[p]){ alert('Destino inválido.'); return; }
+    destFolder = destFolder.children[p];
+  }
+
+  if(destFolder === srcFolder){ alert('Os itens já estão nessa pasta.'); return; }
+  if(!destFolder.children) destFolder.children = {};
+
+  keys.forEach(key=>{
+    const item = srcFolder.children[key];
+    if(!item) return;
+    let destKey = key;
+    if(destFolder.children[destKey]){
+      let c = 1;
+      while(destFolder.children[destKey+'_'+c]) c++;
+      destKey = destKey+'_'+c;
+    }
+    destFolder.children[destKey] = item;
+    delete srcFolder.children[key];
+  });
+
+  fmSave();
+  // Se estava em modo de seleção, sai dele
+  if(fmSelMode){ fmSelMode=false; fmSelected.clear(); document.getElementById('fmSelBar').classList.remove('show'); }
+  renderFm();
+  fmCloseMovePanel();
+
+  const destLabel = fmMoveDestPath.length ? fmMoveDestPath.join(' › ') : 'Raiz';
+  const toastEl = document.createElement('div');
+  toastEl.style.cssText = 'position:fixed;bottom:100px;left:50%;transform:translateX(-50%);background:#111118;border:1px solid #f97316;border-radius:50px;padding:0.5rem 1.2rem;font-size:0.78rem;color:#facc15;z-index:99999;white-space:nowrap;box-shadow:0 4px 20px rgba(0,0,0,0.5);';
+  toastEl.textContent = '✅ ' + keys.length + ' item(s) movido(s) para: ' + destLabel;
+  document.body.appendChild(toastEl);
+  setTimeout(()=>toastEl.remove(), 2500);
+};
+
 // ── Init ─────────────────────────────────────────────────────────────
 render();
+
+// ── NAVEGAÇÃO: BOTÃO VOLTAR (celular e desktop) ───────────────────────
+// Garante estado base no histórico para nunca fechar a aba ao voltar
+history.replaceState({ _base: true }, '');
+
+function navPush(tag) {
+  history.pushState({ nav: tag }, '');
+}
+
+// Intercepta o botão físico de voltar — verifica do painel mais profundo ao mais raso
+window.addEventListener('popstate', function(e) {
+  // 1. ReadMode (mais profundo — z-index 9600)
+  var fmRM = document.getElementById('fmReadMode');
+  if (fmRM && fmRM.classList.contains('open')) {
+    fmExitReadMode(); return;
+  }
+  // 2. Editor rich text (z-index 9500)
+  var fmED = document.getElementById('fmEditor');
+  if (fmED && fmED.classList.contains('open')) {
+    closeFmEditor(); return;
+  }
+  // 3. Editor de coleção de links (z-index 9400)
+  var fmLE = document.getElementById('fmLinkEditorPanel');
+  if (fmLE && fmLE.classList.contains('open')) {
+    closeFmLinkEditor(); return;
+  }
+  // 4. Viewer (z-index 9000)
+  var fmVI = document.getElementById('fmViewer');
+  if (fmVI && fmVI.classList.contains('open')) {
+    closeFmViewer(); return;
+  }
+  // 5. Busca dentro do arquivo
+  var fmIS = document.getElementById('fmInfileSearch');
+  if (fmIS && fmIS.classList.contains('open')) {
+    closeFmInfileSearch(); return;
+  }
+  // 6. Lixeira
+  var fmTR = document.getElementById('fmTrashOverlay');
+  if (fmTR && fmTR.classList.contains('open')) {
+    closeFmTrash(); return;
+  }
+  // 7. Painel AnyDesk
+  var adOV = document.getElementById('adOverlay');
+  if (adOV && adOV.classList.contains('open')) {
+    closeAdPanel(); return;
+  }
+  // 8. Mover item
+  var fmMO = document.getElementById('fmMoveOverlay');
+  if (fmMO && fmMO.classList.contains('open')) {
+    fmCloseMovePanel(); return;
+  }
+  // 9. Confirmação
+  var fmCO = document.getElementById('fmConfirmOverlay');
+  if (fmCO && fmCO.classList.contains('open')) {
+    fmConfirmCancel(); return;
+  }
+  // 10. Modal novo item no FM
+  var fmMM = document.getElementById('fmModalOverlay');
+  if (fmMM && fmMM.classList.contains('open')) {
+    closeFmModal(); return;
+  }
+  // 11. Gerenciador de arquivos (navega pastas ou fecha)
+  var fmOV = document.getElementById('fmOverlay');
+  if (fmOV && fmOV.classList.contains('open')) {
+    window.fmGoBack(); return;
+  }
+  // 12. Modal adicionar app
+  var ovOV = document.getElementById('overlay');
+  if (ovOV && ovOV.classList.contains('open')) {
+    closeModal(); return;
+  }
+  // 13. Modal checklist
+  var ckOV = document.getElementById('ckOverlay');
+  if (ckOV && ckOV.classList.contains('open')) {
+    closeCkModal(); return;
+  }
+  // Nenhum painel aberto — reinjeta o estado base para nunca sair da página
+  history.replaceState({ _base: true }, '');
+});
+
+// ── PATCH DE TODAS AS FUNÇÕES QUE ABREM PAINÉIS ──────────────────────
+(function patchOpenFunctions(){
+
+  // Gerenciador de arquivos (raiz)
+  var origOpenFm = window.openFm;
+  window.openFm = function(){ navPush('fm'); origOpenFm && origOpenFm.apply(this, arguments); };
+
+  // Modal novo item no FM
+  var origOpenFmModal = window.openFmModal;
+  window.openFmModal = function(){ navPush('fmModal'); origOpenFmModal && origOpenFmModal.apply(this, arguments); };
+
+  // Painel AnyDesk
+  var origOpenAdPanel = window.openAdPanel;
+  window.openAdPanel = function(){ navPush('ad'); origOpenAdPanel && origOpenAdPanel.apply(this, arguments); };
+
+  // Lixeira
+  var origOpenFmTrash = window.openFmTrash;
+  window.openFmTrash = function(){ navPush('trash'); origOpenFmTrash && origOpenFmTrash.apply(this, arguments); };
+
+  // Mover item (chamado via fmOpenMovePanel e também via fmOpenMovePanelFor → fmSelMoveAll)
+  var origFmOpenMovePanel = window.fmOpenMovePanel;
+  window.fmOpenMovePanel = function(){ navPush('move'); origFmOpenMovePanel && origFmOpenMovePanel.apply(this, arguments); };
+
+  // fmSelMoveAll chama fmOpenMovePanelFor diretamente — patch aqui também
+  var origFmSelMoveAll = window.fmSelMoveAll;
+  window.fmSelMoveAll = function(){ navPush('move'); origFmSelMoveAll && origFmSelMoveAll.apply(this, arguments); };
+
+  // Modal adicionar app
+  var origOpenModal = window.openModal;
+  window.openModal = function(){ navPush('modal'); origOpenModal && origOpenModal.apply(this, arguments); };
+
+  // Modal checklist
+  var origOpenCkModal = window.openCkModal;
+  window.openCkModal = function(){ navPush('ckModal'); origOpenCkModal && origOpenCkModal.apply(this, arguments); };
+
+  // Editor rich text (fmOpenEditor + fmOpenEditorFromPath)
+  var origFmOpenEditor = window.fmOpenEditor || fmOpenEditor;
+  var _patchedFmOpenEditor = function(){ navPush('editor'); origFmOpenEditor && origFmOpenEditor.apply(this, arguments); };
+  window.fmOpenEditor = _patchedFmOpenEditor;
+  // fmOpenEditorFromPath chama fmOpenEditor internamente após atribuir ao window — sem patch extra necessário
+
+  // Viewer (fmView, fmViewLinkCollection, fmViewFromSearch)
+  var origFmView = window.fmView;
+  window.fmView = function(){ navPush('viewer'); origFmView && origFmView.apply(this, arguments); };
+
+  var origFmViewLinkCollection = window.fmViewLinkCollection;
+  window.fmViewLinkCollection = function(){ navPush('viewer'); origFmViewLinkCollection && origFmViewLinkCollection.apply(this, arguments); };
+
+  var origFmViewFromSearch = window.fmViewFromSearch;
+  window.fmViewFromSearch = function(){ navPush('viewer'); origFmViewFromSearch && origFmViewFromSearch.apply(this, arguments); };
+
+  // Editor de coleção de links
+  var origFmEditLinkCollection = window.fmEditLinkCollection;
+  window.fmEditLinkCollection = function(){ navPush('linkEditor'); origFmEditLinkCollection && origFmEditLinkCollection.apply(this, arguments); };
+
+  // Busca dentro do arquivo (fmQMenuSearch abre fmInfileSearch)
+  var origFmQMenuSearch = window.fmQMenuSearch;
+  window.fmQMenuSearch = function(){ navPush('infileSearch'); origFmQMenuSearch && origFmQMenuSearch.apply(this, arguments); };
+
+  // Modo leitura (fmEnterReadMode, fmQMenuView e fmOpenInfileResult chamam fmOpenReadMode)
+  // Patcha fmEnterReadMode e fmQMenuView pois são os pontos de entrada externos
+  var origFmEnterReadMode = window.fmEnterReadMode;
+  window.fmEnterReadMode = function(){ navPush('readMode'); origFmEnterReadMode && origFmEnterReadMode.apply(this, arguments); };
+
+  var origFmQMenuView = window.fmQMenuView;
+  window.fmQMenuView = function(){ navPush('readMode'); origFmQMenuView && origFmQMenuView.apply(this, arguments); };
+
+  // Confirmação (fmConfirm abre fmConfirmOverlay)
+  var origFmConfirm = window.fmConfirm;
+  window.fmConfirm = function(){ navPush('confirm'); origFmConfirm && origFmConfirm.apply(this, arguments); };
+
+})();
+
+// Teclado desktop: Alt+Left = voltar 1 passo
+document.addEventListener('keydown', function(e) {
+  if (e.altKey && e.key === 'ArrowLeft') {
+    e.preventDefault();
+    history.back();
+  }
+});
 </script>
 </body>
 </html>
