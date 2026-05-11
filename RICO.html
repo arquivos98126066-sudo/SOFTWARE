@@ -1632,6 +1632,21 @@ async function carregarDados() {
 carregarDados();
 </script>
 
+<!-- ─── Navegação: base history (impede fechar aba ao voltar) ────────────── -->
+<script>
+  // PASSO 4 — base do histórico: nunca sai da página ao pressionar voltar
+  history.replaceState({ _base: true }, '');
+
+  // PASSO 3 — popstate: nenhum painel/modal/overlay presente nesta página.
+  // Handler registrado como segurança — se o browser tentar sair, reanchora.
+  window.addEventListener('popstate', function(e) {
+    if (e.state && e.state._base) {
+      // Já estamos na base — nada a fechar, apenas reafirma o estado
+      history.replaceState({ _base: true }, '');
+    }
+  });
+</script>
+
 <!-- ─── Funções UI (não-module) ──────────────────────────────────────────── -->
 <script>
   function toggleHint(btn) {
