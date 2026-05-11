@@ -339,7 +339,7 @@
     <input class="fr-input" id="fr-trocar" placeholder="Novo texto...">
   </div>
   <div class="fr-row" style="justify-content:flex-end;gap:8px">
-    <button class="fr-btn cancel" onclick="fecharFR()">Cancelar</button>
+    <button class="fr-btn cancel" onclick="fecharFR()">← Voltar</button>
     <button class="fr-btn" onclick="executarSubstituicao()">✔ Substituir</button>
   </div>
 </div>
@@ -366,6 +366,7 @@
       <span class="sidebar-title" id="sidebar-title">Arquivos</span>
       <div class="sidebar-actions">
         <button class="sb-icon-btn" onclick="triggerUploadPasta()" title="Carregar pasta">📁</button>
+        <button class="sb-icon-btn" onclick="toggleSidebar()" title="Fechar sidebar" style="font-size:11px;font-weight:700;">← Fechar</button>
       </div>
     </div>
     <div class="sidebar-files" id="sidebar-files">
@@ -452,6 +453,7 @@
 <div class="modal-overlay hidden" id="modal-versions">
   <div class="modal">
     <div class="modal-header">
+      <button class="fr-btn cancel" style="font-size:11px;padding:5px 12px;" onclick="fecharModal('modal-versions')">← Voltar</button>
       <span class="modal-title">📋 Histórico de Versões</span>
       <button class="modal-close" onclick="fecharModal('modal-versions')">✕</button>
     </div>
@@ -472,6 +474,7 @@
 <div class="modal-overlay hidden" id="modal-diff">
   <div class="modal">
     <div class="modal-header">
+      <button class="fr-btn cancel" style="font-size:11px;padding:5px 12px;" onclick="fecharModal('modal-diff')">← Voltar</button>
       <span class="modal-title">Δ Diff Visual</span>
       <button class="modal-close" onclick="fecharModal('modal-diff')">✕</button>
     </div>
@@ -493,6 +496,7 @@
 <div class="modal-overlay hidden" id="modal-patch">
   <div class="modal">
     <div class="modal-header">
+      <button class="fr-btn cancel" style="font-size:11px;padding:5px 12px;" onclick="fecharModal('modal-patch')">← Voltar</button>
       <span class="modal-title">🩹 Aplicar Patch por Trecho</span>
       <button class="modal-close" onclick="fecharModal('modal-patch')">✕</button>
     </div>
@@ -515,6 +519,7 @@
 <div class="modal-overlay hidden" id="modal-rename">
   <div class="modal" style="max-width:460px">
     <div class="modal-header">
+      <button class="fr-btn cancel" style="font-size:11px;padding:5px 12px;" onclick="fecharModal('modal-rename')">← Voltar</button>
       <span class="modal-title">✏️ Renomear Arquivo</span>
       <button class="modal-close" onclick="fecharModal('modal-rename')">✕</button>
     </div>
@@ -536,6 +541,7 @@
 <div class="modal-overlay hidden" id="modal-github">
   <div class="modal" style="max-width:500px">
     <div class="modal-header">
+      <button class="fr-btn cancel" style="font-size:11px;padding:5px 12px;" onclick="fecharModal('modal-github')">← Voltar</button>
       <span class="modal-title">🐙 GitHub — Selecionar Arquivo</span>
       <button class="modal-close" onclick="fecharModal('modal-github')">✕</button>
     </div>
@@ -573,6 +579,7 @@
 <div class="modal-overlay hidden" id="modal-gh-commit">
   <div class="modal" style="max-width:440px">
     <div class="modal-header">
+      <button class="fr-btn cancel" style="font-size:11px;padding:5px 12px;" onclick="fecharModal('modal-gh-commit')">← Voltar</button>
       <span class="modal-title">🐙 Enviar para o GitHub</span>
       <button class="modal-close" onclick="fecharModal('modal-gh-commit')">✕</button>
     </div>
@@ -2606,6 +2613,61 @@ Object.assign(window, {
   recolherTudo, expandirTudo, limparEditor, contarLinhas,
   ajustarNum, fecharNumPopup, baixarTudo, baixarModificados,
   abrirGitHub, abrirGitHubCommit, ghCarregarRaiz, ghAbrirArquivoSelecionado, ghEnviarCommit
+});
+
+// ═══════════════════════════════════════
+// NAVEGAÇÃO — BOTÃO VOLTAR (celular e desktop)
+// ═══════════════════════════════════════
+history.replaceState({ _base: true }, '');
+
+function _navPush(tag) { history.pushState({ nav: tag }, ''); }
+
+// Patch abrirModal para registrar no histórico
+var _abrirModal_orig = abrirModal;
+window.abrirModal = function(id) { _navPush('modal_' + id); _abrirModal_orig(id); };
+
+// Patch abrirPreview
+var _abrirPreview_orig = abrirPreview;
+window.abrirPreview = function() { _navPush('preview'); _abrirPreview_orig.apply(this, arguments); };
+
+// Patch toggleFR (abre find/replace)
+var _toggleFR_orig = toggleFR;
+window.toggleFR = function() {
+  var aberto = document.getElementById('find-replace').classList.contains('show');
+  if (!aberto) _navPush('findReplace');
+  _toggleFR_orig.apply(this, arguments);
+};
+
+// Patch toggleSidebar (mobile — abre sidebar como overlay)
+var _toggleSidebar_orig = toggleSidebar;
+window.toggleSidebar = function() {
+  var isMobile = window.innerWidth <= 600;
+  var estaAberta = !document.getElementById('sidebar').classList.contains('collapsed');
+  if (isMobile && !estaAberta) _navPush('sidebar');
+  _toggleSidebar_orig.apply(this, arguments);
+};
+
+// Intercepta botão físico de voltar — do mais profundo ao mais raso
+window.addEventListener('popstate', function() {
+  // 1. Preview fullscreen (mais profundo)
+  var pf = document.getElementById('preview-fullscreen');
+  if (pf && pf.classList.contains('show')) { fecharPreview(); return; }
+  // 2. Modais (.modal-overlay) — fecha o mais recente
+  var modais = document.querySelectorAll('.modal-overlay:not(.hidden)');
+  if (modais.length) { modais[modais.length - 1].classList.add('hidden'); return; }
+  // 3. Find/Replace
+  var fr = document.getElementById('find-replace');
+  if (fr && fr.classList.contains('show')) { fecharFR(); return; }
+  // 4. Sidebar (mobile)
+  var sb = document.getElementById('sidebar');
+  if (sb && !sb.classList.contains('collapsed') && window.innerWidth <= 600) { toggleSidebar(); return; }
+  // Nenhum painel aberto — reinjeta estado base
+  history.replaceState({ _base: true }, '');
+});
+
+// Alt+← = voltar 1 passo (desktop sem barra de navegador)
+document.addEventListener('keydown', function(e) {
+  if (e.altKey && e.key === 'ArrowLeft') { e.preventDefault(); history.back(); }
 });
 </script>
 </body>
