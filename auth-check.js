@@ -13,14 +13,14 @@ const firebaseConfig = {
   projectId: "meus-apps-8ca76",
   storageBucket: "meus-apps-8ca76.firebasestorage.app",
   messagingSenderId: "768854372271",
-  appId: "1:768854372271:web:467b541baf3c513f03095a"
+  appId: "1:768854772271:web:467b541baf3c513f03095a"
 };
 
 const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
 const auth = getAuth(app);
 
 onAuthStateChanged(auth, (user) => {
-  if (!user) {
+  if (!user || user.uid !== "UhH3Luc0AYW9URS6OahnSqWTTgw2") {
     window.location.href = 'index.html';
   }
 });
