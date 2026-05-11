@@ -431,6 +431,7 @@ window.mascaraValor = function(el){
 
 // ─── Menu ────────────────────────────────────────────────────────────────────
 window.abrirMenu = function(){
+  history.pushState({ nav: 'drawer' }, '');
   document.getElementById('drawer').classList.add('open');
   document.getElementById('drawerOverlay').classList.add('open');
 };
@@ -438,7 +439,19 @@ window.fecharMenu = function(){
   document.getElementById('drawer').classList.remove('open');
   document.getElementById('drawerOverlay').classList.remove('open');
 };
+function _fecharMenuDirect(){
+  document.getElementById('drawer').classList.remove('open');
+  document.getElementById('drawerOverlay').classList.remove('open');
+}
+// PASSO 4 — base do histórico
+history.replaceState({ _base: true, aba: 't7' }, '');
+var _abaAtual = 't7';
+
 window.irPara = function(tabId, nome, el){
+  if(tabId !== _abaAtual) {
+    history.pushState({ nav: 'aba', aba: tabId, prev: _abaAtual }, '');
+    _abaAtual = tabId;
+  }
   document.querySelectorAll('.tab-content').forEach(function(c){c.classList.remove('active');});
   document.getElementById(tabId).classList.add('active');
   document.querySelectorAll('.drawer-item').forEach(function(i){i.classList.remove('active');});
@@ -751,6 +764,7 @@ window.abrirComp = function(id){
   h+='<div class="irow"><span class="k">Valor vendido</span><span class="v">'+R(p.valor)+'</span></div>';
   document.getElementById('cinfo').innerHTML=h;
   document.getElementById('ccusto').value='';
+  history.pushState({ nav: 'modal', modalId: 'mcomp' }, '');
   document.getElementById('mcomp').classList.add('open');
 };
 window.salvarCusto = async function(){
@@ -767,7 +781,11 @@ window.salvarCusto = async function(){
   } catch(e){if(window.syncShow) window.syncShow.offline();}
   fComp();renderP();renderG();renderC();toast('Custo salvo!');
 };
-window.fComp = function(){document.getElementById('mcomp').classList.remove('open');compId=null;};
+window.fComp = function(){
+  if(history.state && history.state.nav==='modal' && history.state.modalId==='mcomp'){ history.back(); }
+  else{ _fCompDirect(); }
+};
+function _fCompDirect(){document.getElementById('mcomp').classList.remove('open');compId=null;}
 
 // ─── Modal Detalhe ───────────────────────────────────────────────────────────
 var detId=null;
@@ -799,6 +817,7 @@ window.verDet = function(id){
   document.getElementById('dtit').textContent='Detalhes - '+p.nome;
   document.getElementById('dcorp').innerHTML=h;
   renderFotosDet(p);
+  history.pushState({ nav: 'modal', modalId: 'mdet' }, '');
   document.getElementById('mdet').classList.add('open');
 };
 
@@ -858,10 +877,19 @@ window.abrirFotoGrande = function(idx){
   if(!p||!p.fotos) return;
   fotoDetAtual=p.fotos[fotoGrandeIdx]||'';
   document.getElementById('mfoto_img').src=fotoDetAtual;
+  history.pushState({ nav: 'modal', modalId: 'mfoto' }, '');
   document.getElementById('mfoto').classList.add('open');
 };
-window.fFoto = function(){document.getElementById('mfoto').classList.remove('open');};
-window.fDet = function(){document.getElementById('mdet').classList.remove('open');detId=null;};
+window.fFoto = function(){
+  if(history.state && history.state.nav==='modal' && history.state.modalId==='mfoto'){ history.back(); }
+  else{ _fFotoDirect(); }
+};
+function _fFotoDirect(){document.getElementById('mfoto').classList.remove('open');}
+window.fDet = function(){
+  if(history.state && history.state.nav==='modal' && history.state.modalId==='mdet'){ history.back(); }
+  else{ _fDetDirect(); }
+};
+function _fDetDirect(){document.getElementById('mdet').classList.remove('open');detId=null;}
 
 // ─── Copiar foto ─────────────────────────────────────────────────────────────
 window.copiarFotoDet = function(){if(!fotoDetAtual){toast('Nenhuma foto selecionada','aviso');return;}copiarImgBase64(fotoDetAtual);};
@@ -1255,16 +1283,26 @@ window.removerTapeteExtra = function(n){
 var _fotoCtx='p';
 window.abrirEscolhaFoto = function(ctx){
   _fotoCtx=ctx||'p';
+  history.pushState({ nav: 'fotoEscolha' }, '');
   document.getElementById('fotoEscolhaOverlay').style.display='flex';
   document.getElementById('btnEscolhaCam').onclick=function(){fecharEscolhaFoto();document.getElementById(_fotoCtx+'_foto_input').click();};
   document.getElementById('btnEscolhaGal').onclick=function(){fecharEscolhaFoto();document.getElementById(_fotoCtx+'_galeria_input').click();};
 };
-window.fecharEscolhaFoto = function(){document.getElementById('fotoEscolhaOverlay').style.display='none';};
+window.fecharEscolhaFoto = function(){
+  if(history.state && history.state.nav==='fotoEscolha'){ history.back(); }
+  else{ _fecharEscolhaFotoDirect(); }
+};
+function _fecharEscolhaFotoDirect(){document.getElementById('fotoEscolhaOverlay').style.display='none';}
 
 // ─── Fechar modais ao clicar fora ────────────────────────────────────────────
 document.querySelectorAll('.moverlay').forEach(function(m){
   m.addEventListener('click',function(e){
-    if(e.target===m){m.classList.remove('open');if(m.id==='mdet') detId=null;if(m.id==='mcomp') compId=null;}
+    if(e.target===m){
+      if(m.id==='mfoto') window.fFoto();
+      else if(m.id==='mdet') window.fDet();
+      else if(m.id==='mcomp') window.fComp();
+      else m.classList.remove('open');
+    }
   });
 });
 
@@ -1296,6 +1334,45 @@ function iniciarListeners(){
     renderR();renderRC();
   });
 }
+
+// ─── POPSTATE — Passo 3: do mais profundo ao mais raso ───────────────────────
+// Ordem: mfoto → mdet/mcomp → fotoEscolha → drawer → aba → base
+window.addEventListener('popstate', function(e){
+  var st = e.state;
+
+  // 1. mfoto aberto?
+  if(document.getElementById('mfoto').classList.contains('open')){
+    _fFotoDirect(); return;
+  }
+  // 2. mdet ou mcomp aberto?
+  if(document.getElementById('mdet').classList.contains('open')){
+    _fDetDirect(); return;
+  }
+  if(document.getElementById('mcomp').classList.contains('open')){
+    _fCompDirect(); return;
+  }
+  // 3. fotoEscolhaOverlay aberto?
+  if(document.getElementById('fotoEscolhaOverlay').style.display==='flex'){
+    _fecharEscolhaFotoDirect(); return;
+  }
+  // 4. Drawer aberto?
+  if(document.getElementById('drawer').classList.contains('open')){
+    _fecharMenuDirect(); return;
+  }
+  // 5. Voltar para aba anterior
+  if(st && st.nav==='aba' && st.prev){
+    var prevAba = st.prev;
+    _abaAtual = prevAba;
+    document.querySelectorAll('.tab-content').forEach(function(c){c.classList.remove('active');});
+    document.getElementById(prevAba).classList.add('active');
+    document.querySelectorAll('.drawer-item').forEach(function(i){i.classList.remove('active');});
+    var elPrev = document.querySelector('.drawer-item[data-tab="'+prevAba+'"]');
+    if(elPrev) elPrev.classList.add('active');
+    return;
+  }
+  // 6. Base — reafirma para não sair da página
+  history.replaceState({ _base: true, aba: _abaAtual }, '');
+});
 
 // ─── INIT ────────────────────────────────────────────────────────────────────
 (function init(){
