@@ -1737,7 +1737,8 @@ import {
   onSnapshot, query, orderBy, writeBatch, setDoc, getDoc
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-await authReady; async function fsSetDoc(colId, docId, data) {
+await authReady;
+async function fsSetDoc(colId, docId, data) {
   if (window.syncShow) window.syncShow.syncing();
   try {
     await setDoc(doc(db, colId, docId), data);
