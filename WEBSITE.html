@@ -242,20 +242,20 @@ footer{background:#050505;border-top:1px solid var(--border);padding:50px 0 30px
 <header>
   <div class="logo"><span>V4</span> CLESS</div>
   <nav>
-    <a class="active" onclick="show('home',this)">Home</a>
-    <a onclick="show('doe',this)">Automação IA</a>
-    <a onclick="show('lrr',this)">Estratégia de Vendas</a>
-    <a onclick="show('scmao',this)">Tráfego Pago</a>
+    <a class="active" data-page="home" onclick="show('home',this)">Home</a>
+    <a data-page="doe" onclick="show('doe',this)">Automação IA</a>
+    <a data-page="lrr" onclick="show('lrr',this)">Estratégia de Vendas</a>
+    <a data-page="scmao" onclick="show('scmao',this)">Tráfego Pago</a>
   </nav>
   <button class="ham" id="ham" onclick="toggleMob()">
     <span></span><span></span><span></span>
   </button>
 </header>
 <div class="mob-nav" id="mob">
-  <a onclick="show('home',this);closeMob()">Home</a>
-  <a onclick="show('doe',this);closeMob()">Automação IA</a>
-  <a onclick="show('lrr',this);closeMob()">Estratégia de Vendas</a>
-  <a onclick="show('scmao',this);closeMob()">Tráfego Pago</a>
+  <a data-page="home" onclick="show('home',this);closeMob()">Home</a>
+  <a data-page="doe" onclick="show('doe',this);closeMob()">Automação IA</a>
+  <a data-page="lrr" onclick="show('lrr',this);closeMob()">Estratégia de Vendas</a>
+  <a data-page="scmao" onclick="show('scmao',this);closeMob()">Tráfego Pago</a>
 </div>
 
 <!-- WhatsApp Float -->
@@ -995,27 +995,99 @@ footer{background:#050505;border-top:1px solid var(--border);padding:50px 0 30px
 </div>
 
 <script>
-// ─── NAVEGAÇÃO ───
+// ─── NAVEGAÇÃO COM HISTÓRICO ───────────────────────────────
+
+// PASSO 4 — base: nunca sai da página
+history.replaceState({ _base: true, page: 'home' }, '');
+
+// Rastreia page atual
+let _currentPage = 'home';
+
+// ─── SHOW (página SPA) — registra estado no histórico ───
 function show(id, el) {
+  if (id === _currentPage) {
+    // Mesma page: só fecha menu se aberto e vai pro topo
+    closeMob();
+    window.scrollTo({top: 0, behavior: 'smooth'});
+    return;
+  }
+  // Registra o passo no histórico antes de trocar
+  history.pushState({ nav: 'page', page: id, prev: _currentPage }, '');
+  _currentPage = id;
+  _showPage(id, el);
+}
+
+// Função interna que realmente troca a página (sem pushState)
+function _showPage(id, el) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.getElementById('page-' + id).classList.add('active');
   document.querySelectorAll('nav a, .mob-nav a').forEach(a => a.classList.remove('active'));
   if (el) el.classList.add('active');
+  // Destaca o item de nav correspondente por data-page
+  document.querySelectorAll('nav a[data-page], .mob-nav a[data-page]').forEach(a => {
+    if (a.dataset.page === id) a.classList.add('active');
+  });
   window.scrollTo({top: 0, behavior: 'smooth'});
   observeFades();
 }
 
-// ─── MENU MOBILE ───
+// ─── MENU MOBILE — registra estado no histórico ──────────
 function toggleMob() {
-  document.getElementById('mob').classList.toggle('open');
-  document.getElementById('ham').classList.toggle('open');
+  const mob = document.getElementById('mob');
+  const isOpen = mob.classList.contains('open');
+  if (!isOpen) {
+    // Abrindo: empurra estado
+    history.pushState({ nav: 'mob' }, '');
+    mob.classList.add('open');
+    document.getElementById('ham').classList.add('open');
+  } else {
+    // Fechando via botão: usa history.back() para manter consistência
+    history.back();
+  }
 }
+
 function closeMob() {
+  const mob = document.getElementById('mob');
+  if (!mob.classList.contains('open')) return;
+  mob.classList.remove('open');
+  document.getElementById('ham').classList.remove('open');
+}
+
+function _closeMobDirect() {
+  // Fecha sem back() — usado internamente pelo popstate
   document.getElementById('mob').classList.remove('open');
   document.getElementById('ham').classList.remove('open');
 }
 
-// ─── ACCORDION ───
+// ─── POPSTATE — Passo 3: do mais profundo ao mais raso ───
+// Ordem: Menu mobile → Page → Base
+window.addEventListener('popstate', function(e) {
+  const st = e.state;
+
+  // 1. Menu mobile aberto? Fecha primeiro
+  if (document.getElementById('mob').classList.contains('open')) {
+    _closeMobDirect();
+    return;
+  }
+
+  // 2. Voltar para page anterior
+  if (st && st.nav === 'page' && st.prev) {
+    _currentPage = st.prev;
+    _showPage(st.prev, null);
+    return;
+  }
+
+  // 3. Base — reafirma para não sair da página
+  if (st && st._base) {
+    history.replaceState({ _base: true, page: _currentPage }, '');
+    return;
+  }
+
+  // Segurança: estado desconhecido → reafirma base
+  history.replaceState({ _base: true, page: _currentPage }, '');
+});
+
+// ─── ACCORDION ───────────────────────────────────────────
 function tog(btn) {
   const isOpen = btn.classList.contains('open');
   const parent = btn.closest('.acc');
@@ -1029,7 +1101,7 @@ function tog(btn) {
   }
 }
 
-// ─── FADE IN ───
+// ─── FADE IN ─────────────────────────────────────────────
 function observeFades() {
   const els = document.querySelectorAll('.page.active .fade');
   const obs = new IntersectionObserver((entries) => {
