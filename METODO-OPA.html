@@ -350,7 +350,7 @@ input[type=time]{height:40px}
 
   <!-- GERENCIAR BLOCO -->
   <div class="tela" id="t-gerenciar-bloco">
-    <button class="voltar" onclick="irT('t-hoje-main')">← BLOCOS</button>
+    <button class="voltar" onclick="history.back()">← BLOCOS</button>
     <div class="row-between">
       <h1 class="titulo" id="gbloco-nome" style="flex:1"></h1>
       <span id="gbloco-hor" style="font-size:12px;font-weight:600;color:var(--azul)"></span>
@@ -363,7 +363,7 @@ input[type=time]{height:40px}
 
   <!-- PURIFICAÇÃO -->
   <div class="tela" id="t-purificar">
-    <button class="voltar" onclick="irT('t-hoje-main')">← BLOCOS</button>
+    <button class="voltar" onclick="history.back()">← BLOCOS</button>
     <div class="row" style="gap:8px">
       <h1 class="titulo" style="flex:1;font-size:16px;text-transform:uppercase;letter-spacing:0.06em"></h1>
       <div class="info-wrap"><button class="info-btn" onclick="tgInfo('info-purif')">i</button>
@@ -378,7 +378,7 @@ input[type=time]{height:40px}
 
   <!-- PRIORIDADE AÇÕES -->
   <div class="tela" id="t-prioridade">
-    <button class="voltar" onclick="irT('t-purificar')">← PURIFICAR</button>
+    <button class="voltar" onclick="history.back()">← PURIFICAR</button>
     <div class="row" style="gap:8px">
       <h1 class="titulo" style="flex:1;font-size:16px;text-transform:uppercase;letter-spacing:0.06em"></h1>
       <div class="info-wrap"><button class="info-btn" onclick="tgInfo('info-prior')">i</button>
@@ -392,7 +392,7 @@ input[type=time]{height:40px}
 
   <!-- HORÁRIOS (após prioridade) -->
   <div class="tela" id="t-horarios">
-    <button class="voltar" onclick="irT('t-prioridade')">← PRIORIDADES</button>
+    <button class="voltar" onclick="history.back()">← PRIORIDADES</button>
     <div class="row" style="gap:8px">
       <h1 class="titulo" style="flex:1;font-size:16px;text-transform:uppercase;letter-spacing:0.06em">Horários</h1>
       <div class="info-wrap"><button class="info-btn" onclick="tgInfo('info-hor')">i</button>
@@ -406,7 +406,7 @@ input[type=time]{height:40px}
 
   <!-- RELATÓRIO -->
   <div class="tela" id="t-relatorio">
-    <button class="voltar" onclick="irT('t-hoje-main')">← BLOCOS</button>
+    <button class="voltar" onclick="history.back()">← BLOCOS</button>
     <p id="rel-data" class="label-sec" style="color:var(--azul);margin-bottom:6px"></p>
     <h1 class="titulo" style="font-size:16px;text-transform:uppercase;letter-spacing:0.06em">Plano do Dia</h1>
     <div class="flex-col" style="gap:12px;margin-top:16px;flex:1" id="rel-lista"></div><style>#rel-prog,#t-relatorio .divisor{display:none},#rel-pct,.divisor+.row-between{display:none!important}</style>
@@ -421,7 +421,7 @@ input[type=time]{height:40px}
 
   <!-- EXECUÇÃO -->
   <div class="tela" id="t-execucao">
-    <button class="voltar" onclick="voltarParaBlocos()">← BLOCOS</button>
+    <button class="voltar" onclick="history.back()">← BLOCOS</button>
     <div class="row-between">
       <p id="exec-data" class="label-sec" style="color:var(--azul)"></p>
       <span id="exec-clock" style="font-size:13px;font-weight:700;color:var(--texto-sec);position:fixed;top:10px;right:18px;z-index:999;background:var(--bg);padding:2px 8px;border-radius:99px"></span>
@@ -438,7 +438,7 @@ input[type=time]{height:40px}
 
   <!-- REVISÃO -->
   <div class="tela" id="t-revisao">
-    <button class="voltar" onclick="irT('t-execucao')">← MEU DIA</button>
+    <button class="voltar" onclick="history.back()">← MEU DIA</button>
     <h1 class="titulo" style="font-size:16px;text-transform:uppercase;letter-spacing:0.06em"></h1>
     <p style="font-size:13px;color:var(--texto-sec);margin-top:8px">Avalie cada bloco do seu dia.</p>
     <div class="flex-col" style="margin-top:16px;flex:1" id="rev-lista"></div>
@@ -468,7 +468,7 @@ input[type=time]{height:40px}
     <button class="btn btn-sec mt-20" id="btn-novo-hab">+ Novo Hábito</button>
   </div>
   <div class="tela" id="t-hab-detalhe">
-    <button class="voltar" onclick="irTHab('t-habitos-lista')">← HÁBITOS</button>
+    <button class="voltar" onclick="history.back()">← HÁBITOS</button>
     <h1 class="titulo" id="hdet-nome"></h1>
     <p class="label-sec mt-4" id="hdet-data" style="color:var(--azul)"></p>
     <div class="hab-stat-grid mt-16">
@@ -502,7 +502,7 @@ input[type=time]{height:40px}
     </div>
   </div>
   <div class="tela" id="t-dec-prep">
-    <button class="voltar" onclick="irTDec('t-dec-inicio')">← DECISÕES</button>
+    <button class="voltar" onclick="history.back()">← DECISÕES</button>
     <div class="row-between" style="margin-bottom:6px">
       <span id="prep-label" class="label-sec" style="color:var(--azul)">PREPARAÇÃO 1 DE 6</span>
       <span id="prep-pct" style="font-size:13px;font-weight:800;color:var(--azul)">17%</span>
@@ -523,7 +523,7 @@ input[type=time]{height:40px}
     </div>
   </div>
   <div class="tela" id="t-dec-processo">
-    <button class="voltar" onclick="irTDec('t-dec-inicio')">← DECISÕES</button>
+    <button class="voltar" onclick="history.back()">← DECISÕES</button>
     <div class="row-between" style="margin-bottom:6px">
       <span id="dec-label" class="label-sec" style="color:var(--azul)">PASSO 1 DE 10</span>
       <span id="dec-pct" style="font-size:13px;font-weight:800;color:var(--azul)">10%</span>
@@ -544,7 +544,7 @@ input[type=time]{height:40px}
     </div>
   </div>
   <div class="tela" id="t-dec-resultado">
-    <button class="voltar" onclick="irTDec('t-dec-inicio')">← DECISÕES</button>
+    <button class="voltar" onclick="history.back()">← DECISÕES</button>
     <h1 class="titulo" style="font-size:16px;text-transform:uppercase;letter-spacing:0.06em">Sua Decisão</h1>
     <p style="font-size:13px;color:var(--texto-sec);margin-top:6px" id="dec-res-tema"></p>
     <hr class="divisor">
@@ -555,7 +555,7 @@ input[type=time]{height:40px}
     </div>
   </div>
   <div class="tela" id="t-dec-detalhe">
-    <button class="voltar" onclick="irTDec('t-dec-inicio')">← DECISÕES</button>
+    <button class="voltar" onclick="history.back()">← DECISÕES</button>
     <h1 class="titulo" id="dec-det-tema" style="color:var(--texto);margin-bottom:10px"></h1>
     <p class="label-sec mt-4" id="dec-det-data" style="color:var(--azul);margin-bottom:16px"></p>
     <hr class="divisor">
@@ -583,7 +583,7 @@ input[type=time]{height:40px}
     <div class="flex-col" style="gap:10px" id="hist-lista"></div>
   </div>
   <div class="tela" id="t-hist-det">
-    <button class="voltar" onclick="irTHist('t-hist-lista')">← HISTÓRICO</button>
+    <button class="voltar" onclick="history.back()">← HISTÓRICO</button>
     <p id="hdet-data-label" class="label-sec" style="color:var(--azul)"></p>
     <h1 class="titulo mt-4" id="hdet-obj-label"></h1>
     <div class="mt-16">
@@ -666,7 +666,7 @@ function gph(){return gd().planejamentos.find(p=>p.data===hoje())||null}
 function sp(p){md(d=>{const i=d.planejamentos.findIndex(x=>x.id===p.id);if(i>=0)d.planejamentos[i]=p;else d.planejamentos.unshift(p)})}
 function fBR(iso){if(!iso)return'';const[y,m,dd]=iso.split('-');const ms=['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];return`${parseInt(dd)} de ${ms[parseInt(m)-1]} de ${y}`}
 function toast(msg,dur=1800){const t=$('#toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),dur)}
-function abrirModal(html){$('#modal-content').innerHTML=html;$('#modal').classList.add('vis')}
+function abrirModal(html){$('#modal-content').innerHTML=html;$('#modal').classList.add('vis');history.pushState({nav:'modal'},'')}
 function fecharModal(){$('#modal').classList.remove('vis')}
 $('#modal').addEventListener('click',e=>{if(e.target===$('#modal'))fecharModal()})
 
@@ -675,11 +675,17 @@ function navegar(mod){
   $$('.mod').forEach(m=>m.classList.remove('ativo'));$$('.nav-item').forEach(n=>n.classList.remove('ativo'));
   document.getElementById('mod-'+mod).classList.add('ativo');document.querySelector(`[data-mod="${mod}"]`).classList.add('ativo');
   if(mod==='habitos')renderHabitos();if(mod==='historico'){calcZonas();renderHistorico()}if(mod==='decisao')renderDecAnt();if(mod==='planos')renderPlanos();
+  if(mod!=='hoje')history.pushState({nav:mod,tela:'root'},'');
 }
-function irT(id){$('#mod-hoje').querySelectorAll('.tela').forEach(t=>t.classList.remove('ativa'));document.getElementById(id).classList.add('ativa')}
-function irTHab(id){$('#mod-habitos').querySelectorAll('.tela').forEach(t=>t.classList.remove('ativa'));document.getElementById(id).classList.add('ativa')}
-function irTDec(id){$('#mod-decisao').querySelectorAll('.tela').forEach(t=>t.classList.remove('ativa'));document.getElementById(id).classList.add('ativa')}
-function irTHist(id){$('#mod-historico').querySelectorAll('.tela').forEach(t=>t.classList.remove('ativa'));document.getElementById(id).classList.add('ativa')}
+function irT(id){$('#mod-hoje').querySelectorAll('.tela').forEach(t=>t.classList.remove('ativa'));document.getElementById(id).classList.add('ativa');if(id!=='t-hoje-main')history.pushState({nav:'hoje',tela:id},'')}
+function irTHab(id){$('#mod-habitos').querySelectorAll('.tela').forEach(t=>t.classList.remove('ativa'));document.getElementById(id).classList.add('ativa');if(id!=='t-habitos-lista')history.pushState({nav:'habitos',tela:id},'')}
+function irTDec(id){$('#mod-decisao').querySelectorAll('.tela').forEach(t=>t.classList.remove('ativa'));document.getElementById(id).classList.add('ativa');if(id!=='t-dec-inicio')history.pushState({nav:'decisao',tela:id},'')}
+function irTHist(id){$('#mod-historico').querySelectorAll('.tela').forEach(t=>t.classList.remove('ativa'));document.getElementById(id).classList.add('ativa');if(id!=='t-hist-lista')history.pushState({nav:'historico',tela:id},'')}
+// Versões internas sem pushState (para uso no popstate)
+function _irT(id){$('#mod-hoje').querySelectorAll('.tela').forEach(t=>t.classList.remove('ativa'));document.getElementById(id).classList.add('ativa')}
+function _irTHab(id){$('#mod-habitos').querySelectorAll('.tela').forEach(t=>t.classList.remove('ativa'));document.getElementById(id).classList.add('ativa')}
+function _irTDec(id){$('#mod-decisao').querySelectorAll('.tela').forEach(t=>t.classList.remove('ativa'));document.getElementById(id).classList.add('ativa')}
+function _irTHist(id){$('#mod-historico').querySelectorAll('.tela').forEach(t=>t.classList.remove('ativa'));document.getElementById(id).classList.add('ativa')}
 
 // INFO BALÕES
 function tgInfo(id){const el=document.getElementById(id);$$('.info-balao').forEach(b=>{if(b.id!==id)b.classList.remove('vis')});el.classList.toggle('vis')}
@@ -1372,6 +1378,93 @@ function abrirDetHist(id){
   $('#btn-apagar-dia').onclick=()=>{md(d=>{d.planejamentos=d.planejamentos.filter(x=>x.id!==id)});toast('Dia apagado');renderHistorico();irTHist('t-hist-lista')};
   irTHist('t-hist-det');
 }
+
+// ===== SISTEMA DE NAVEGAÇÃO HISTORY =====
+(function setupNavHistory(){
+
+  // Base — nunca deixa o botão voltar fechar a aba
+  history.replaceState({_base:true}, '');
+
+  // voltarParaBlocos sem pushState (só para uso interno do popstate)
+  function _voltarParaBlocos(){
+    var p=gph();
+    if(p&&p.blocos&&p.blocos.length) blocosTemp=JSON.parse(JSON.stringify(p.blocos));
+    _irT('t-hoje-main');
+    renderBlocosUI();
+    checkBtns();
+  }
+
+  // ── POPSTATE — do mais profundo para o mais raso ─────────────────
+  window.addEventListener('popstate',function(e){
+    var state=e.state||{};
+
+    // 1. Modal global (mais profundo)
+    if(document.getElementById('modal').classList.contains('vis')){
+      fecharModal();
+      return;
+    }
+
+    // 2. Sub-telas HOJE
+    var modH=document.getElementById('mod-hoje');
+    if(modH&&modH.classList.contains('ativo')){
+      var tH=modH.querySelector('.tela.ativa');
+      if(tH){
+        var tid=tH.id;
+        if(tid==='t-revisao'){_irT('t-execucao');return;}
+        if(tid==='t-execucao'){_voltarParaBlocos();return;}
+        if(tid==='t-relatorio'){_irT('t-hoje-main');return;}
+        if(tid==='t-horarios'){_irT('t-prioridade');return;}
+        if(tid==='t-prioridade'){_irT('t-purificar');return;}
+        if(tid==='t-purificar'){_irT('t-hoje-main');return;}
+        if(tid==='t-gerenciar-bloco'){_irT('t-hoje-main');return;}
+      }
+    }
+
+    // 3. Sub-telas HÁBITOS
+    var modHab=document.getElementById('mod-habitos');
+    if(modHab&&modHab.classList.contains('ativo')){
+      var tHab=modHab.querySelector('.tela.ativa');
+      if(tHab&&tHab.id==='t-hab-detalhe'){_irTHab('t-habitos-lista');return;}
+    }
+
+    // 4. Sub-telas DECISÃO
+    var modDec=document.getElementById('mod-decisao');
+    if(modDec&&modDec.classList.contains('ativo')){
+      var tDec=modDec.querySelector('.tela.ativa');
+      if(tDec){
+        var did=tDec.id;
+        if(did==='t-dec-detalhe'){_irTDec('t-dec-inicio');return;}
+        if(did==='t-dec-resultado'){_irTDec('t-dec-inicio');return;}
+        if(did==='t-dec-processo'){_irTDec('t-dec-prep');return;}
+        if(did==='t-dec-prep'){_irTDec('t-dec-inicio');return;}
+      }
+    }
+
+    // 5. Sub-telas HISTÓRICO
+    var modHist=document.getElementById('mod-historico');
+    if(modHist&&modHist.classList.contains('ativo')){
+      var tHist=modHist.querySelector('.tela.ativa');
+      if(tHist&&tHist.id==='t-hist-det'){_irTHist('t-hist-lista');return;}
+    }
+
+    // 6. Módulos secundários — volta para HOJE
+    var modsSecundarios=['mod-habitos','mod-decisao','mod-planos','mod-historico'];
+    var mAtivo=document.querySelector('.mod.ativo');
+    if(mAtivo&&modsSecundarios.includes(mAtivo.id)){
+      $$('.mod').forEach(m=>m.classList.remove('ativo'));
+      $$('.nav-item').forEach(n=>n.classList.remove('ativo'));
+      document.getElementById('mod-hoje').classList.add('ativo');
+      document.querySelector('[data-mod="hoje"]').classList.add('ativo');
+      return;
+    }
+
+    // Raiz: reaplica base
+    if(!state._base){
+      history.replaceState({_base:true},'');
+    }
+  });
+
+})();
 
 // ===== INIT =====
 initHoje();
