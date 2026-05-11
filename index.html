@@ -33,6 +33,7 @@
     padding: 0 0 60px;
   }
 
+  /* ===== TELA DE LOGIN ===== */
   #lock-screen {
     display: none;
     position: fixed;
@@ -42,10 +43,11 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 24px;
+    gap: 20px;
     padding: 40px 32px;
   }
   #lock-screen.show { display: flex; }
+
   .lock-icon { font-size: 48px; }
   .lock-title {
     font-family: 'Syne', sans-serif;
@@ -55,6 +57,7 @@
     text-align: center;
   }
   .lock-subtitle { font-size: 13px; color: var(--muted); text-align: center; }
+
   .lock-input {
     width: 100%;
     max-width: 280px;
@@ -66,12 +69,11 @@
     font-family: 'DM Sans', sans-serif;
     font-size: 16px;
     outline: none;
-    text-align: center;
-    letter-spacing: 2px;
     transition: border-color 0.2s;
   }
   .lock-input:focus { border-color: var(--accent); }
   .lock-input.error { border-color: #ef4444; animation: shake 0.3s; }
+
   .lock-btn {
     width: 100%;
     max-width: 280px;
@@ -87,14 +89,21 @@
     transition: opacity 0.2s;
   }
   .lock-btn:active { opacity: 0.8; }
-  .lock-error { font-size: 12px; color: #ef4444; display: none; }
+  .lock-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  .lock-error { font-size: 12px; color: #ef4444; display: none; text-align: center; }
   .lock-error.show { display: block; }
+
+  .lock-loading { font-size: 13px; color: var(--muted); display: none; text-align: center; }
+  .lock-loading.show { display: block; }
+
   @keyframes shake {
     0%,100% { transform: translateX(0); }
     25% { transform: translateX(-8px); }
     75% { transform: translateX(8px); }
   }
 
+  /* ===== CONTEÚDO DO APP ===== */
   #app-content { display: none; }
   #app-content.show { display: block; }
 
@@ -123,6 +132,24 @@
     background-clip: text;
   }
   .header p { color: var(--muted); font-size: 14px; margin-top: 6px; }
+
+  /* Botão sair */
+  .logout-btn {
+    position: fixed;
+    top: 16px;
+    right: 16px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 12px;
+    cursor: pointer;
+    z-index: 100;
+    font-family: 'DM Sans', sans-serif;
+    transition: color 0.2s, border-color 0.2s;
+  }
+  .logout-btn:hover { color: var(--text); border-color: var(--accent); }
 
   .grid {
     display: grid;
@@ -208,16 +235,22 @@
 </head>
 <body>
 
+<!-- TELA DE LOGIN -->
 <div id="lock-screen">
   <div class="lock-icon">🔒</div>
   <div class="lock-title">Acesso restrito</div>
-  <div class="lock-subtitle">Digite a senha para continuar</div>
-  <input class="lock-input" type="password" id="pw-input" placeholder="••••••••" maxlength="30">
-  <div class="lock-error" id="pw-error">Senha incorreta. Tente novamente.</div>
-  <button class="lock-btn" onclick="checkPassword()">Entrar</button>
+  <div class="lock-subtitle">Entre com seu e-mail e senha</div>
+  <input class="lock-input" type="email" id="email-input" placeholder="seu@email.com">
+  <input class="lock-input" type="password" id="pw-input" placeholder="Senha">
+  <div class="lock-error" id="pw-error">E-mail ou senha incorretos.</div>
+  <div class="lock-loading" id="pw-loading">Entrando...</div>
+  <button class="lock-btn" id="login-btn" onclick="fazerLogin()">Entrar</button>
 </div>
 
+<!-- CONTEÚDO DO APP -->
 <div id="app-content">
+
+  <button class="logout-btn" onclick="fazerLogout()">Sair 🚪</button>
 
   <div class="header">
     <h1>Meus Apps</h1>
@@ -226,7 +259,6 @@
 
   <div class="grid">
 
-    <!-- Linha 1 -->
     <a class="card c-purple" href="TAPETE-CRM.html">
       <span class="card-icon">🪴</span>
       <span class="card-name">Tapete CRM</span>
@@ -240,7 +272,6 @@
       <span class="card-arrow">→</span>
     </a>
 
-    <!-- Linha 2 -->
     <a class="card c-pink" href="PRE-VENDA.html">
       <span class="card-icon">💬</span>
       <span class="card-name">Pré-Venda</span>
@@ -254,7 +285,6 @@
       <span class="card-arrow">→</span>
     </a>
 
-    <!-- Linha 3 -->
     <a class="card c-blue" href="METODO-OPA.html">
       <span class="card-icon">🎯</span>
       <span class="card-name">Método OPA</span>
@@ -268,7 +298,6 @@
       <span class="card-arrow">→</span>
     </a>
 
-    <!-- Linha 4 - Outros -->
     <a class="card card-wide c-violet" href="OUTROS.html">
       <span class="card-icon">🗃️</span>
       <div class="card-text">
@@ -278,7 +307,6 @@
       <span class="card-arrow">→</span>
     </a>
 
-    <!-- Linha 5 -->
     <a class="card card-wide c-coral" href="ADM.html">
       <span class="card-icon">⚙️</span>
       <div class="card-text">
@@ -288,7 +316,6 @@
       <span class="card-arrow">→</span>
     </a>
 
-    <!-- Linha 6 -->
     <a class="card card-wide c-red" href="WEBSITE.html">
       <span class="card-icon">🌐</span>
       <div class="card-text">
@@ -312,36 +339,80 @@
 
 </div>
 
-<script>
-  const SENHA = '*#Index*#007*#';
-  const CHAVE = 'app_auth_ok';
+<!-- FIREBASE SDK -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
-  function checkPassword() {
-    const val = document.getElementById('pw-input').value;
-    const input = document.getElementById('pw-input');
-    const error = document.getElementById('pw-error');
-    if (val === SENHA) {
-      localStorage.setItem(CHAVE, '1');
-      document.getElementById('lock-screen').classList.remove('show');
-      document.getElementById('app-content').classList.add('show');
+  const firebaseConfig = {
+    apiKey: "AIzaSyDPJvM-XZWfa8HQ7h8v0Usb1Hf3q8sDqpg",
+    authDomain: "meus-apps-8ca76.firebaseapp.com",
+    projectId: "meus-apps-8ca76",
+    storageBucket: "meus-apps-8ca76.firebasestorage.app",
+    messagingSenderId: "768854372271",
+    appId: "1:768854372271:web:467b541baf3c513f03095a",
+    measurementId: "G-251F3PL3ET"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+
+  // Verifica se já está logado
+  onAuthStateChanged(auth, (user) => {
+    if (user) {
+      mostrarApp();
     } else {
-      input.classList.add('error');
-      error.classList.add('show');
-      setTimeout(() => input.classList.remove('error'), 400);
-      input.value = '';
+      mostrarLogin();
     }
-  }
-
-  document.getElementById('pw-input').addEventListener('keydown', e => {
-    if (e.key === 'Enter') checkPassword();
   });
 
-  if (localStorage.getItem(CHAVE) === '1') {
+  // Função de login — exposta globalmente
+  window.fazerLogin = async function() {
+    const email = document.getElementById('email-input').value;
+    const senha = document.getElementById('pw-input').value;
+    const erro = document.getElementById('pw-error');
+    const loading = document.getElementById('pw-loading');
+    const btn = document.getElementById('login-btn');
+
+    erro.classList.remove('show');
+    loading.classList.add('show');
+    btn.disabled = true;
+
+    try {
+      await signInWithEmailAndPassword(auth, email, senha);
+      // onAuthStateChanged vai chamar mostrarApp() automaticamente
+    } catch (e) {
+      erro.classList.add('show');
+      loading.classList.remove('show');
+      btn.disabled = false;
+      document.getElementById('pw-input').value = '';
+    }
+  };
+
+  // Função de logout — exposta globalmente
+  window.fazerLogout = async function() {
+    await signOut(auth);
+  };
+
+  function mostrarApp() {
+    document.getElementById('lock-screen').classList.remove('show');
     document.getElementById('app-content').classList.add('show');
-  } else {
+  }
+
+  function mostrarLogin() {
+    document.getElementById('app-content').classList.remove('show');
     document.getElementById('lock-screen').classList.add('show');
   }
 
+  // Enter para logar
+  document.getElementById('pw-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter') window.fazerLogin();
+  });
+  document.getElementById('email-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter') document.getElementById('pw-input').focus();
+  });
+
+  // PWA
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/service-worker.js')
       .then(reg => console.log('SW registrado:', reg.scope))
