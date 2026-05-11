@@ -1731,12 +1731,12 @@ body.img-active .ck-wrap{z-index:9100 !important;}
 <!-- ═══════════════════════════════════════════════════════ SCRIPTS ═══ -->
 <script type="module">
 // ── Firebase ─────────────────────────────────────────────────────────
-import { db } from "https://arquivos98126066-sudo.github.io/SOFTWARE/firebase-sync.js";
+import { db, authReady } from "https://arquivos98126066-sudo.github.io/SOFTWARE/firebase-sync.js";
 import {
   collection, addDoc, getDocs, updateDoc, deleteDoc, doc,
   onSnapshot, query, orderBy, writeBatch, setDoc, getDoc
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-
+await authReady;
 async function fsSetDoc(colId, docId, data) {
   if (window.syncShow) window.syncShow.syncing();
   try {
