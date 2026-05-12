@@ -1,13 +1,4 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Página</title>
-</head>
-<body>
 (function() {
-  // Cria o indicador na página
   const indicator = document.createElement('div');
   indicator.id = 'sync-status';
   indicator.style.cssText = `
@@ -44,7 +35,6 @@
     }
   }
 
-  // Funções globais para os apps usarem
   window.syncShow = {
     syncing: () => show('sincronizando...', '#888', false),
     synced: (nome) => show((nome || '') + ' ✓', '#aaa', true),
@@ -52,5 +42,3 @@
     local: () => show('salvo local', '#fa0', false),
   };
 })();
-</body>
-</html>
