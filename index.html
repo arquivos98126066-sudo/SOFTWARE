@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Meus Apps</title>
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="theme-color" content="#0a0a0f">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Meus Apps">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500&display=swap');
+
+  :root {
+    --bg: #0a0a0f;
+    --card: #13131a;
+    --border: #222230;
+    --accent: #7c6aff;
+    --accent2: #ff6a8a;
+    --text: #f0f0f8;
+    --muted: #6b6b80;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    padding: 0 0 60px;
+  }
+
+  /* ===== TELA DE LOGIN ===== */
+  #lock-screen {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: var(--bg);
+    z-index: 9999;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    padding: 40px 32px;
+  }
+  #lock-screen.show { display: flex; }
+
+  .lock-icon { font-size: 48px; }
+  .lock-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--text);
+    text-align: center;
+  }
+  .lock-subtitle { font-size: 13px; color: var(--muted); text-align: center; }
+
+  .lock-input {
+    width: 100%;
+    max-width: 280px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 18px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 16px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .lock-input:focus { border-color: var(--accent); }
+  .lock-input.error { border-color: #ef4444; animation: shake 0.3s; }
+
+  .lock-btn {
+    width: 100%;
+    max-width: 280px;
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    padding: 14px;
+    font-family: 'Syne', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+  .lock-btn:active { opacity: 0.8; }
+  .lock-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  .lock-error { font-size: 12px; color: #ef4444; display: none; text-align: center; }
+  .lock-error.show { display: block; }
+
+  .lock-loading { font-size: 13px; color: var(--muted); display: none; text-align: center; }
+  .lock-loading.show { display: block; }
+
+  @keyframes shake {
+    0%,100% { transform: translateX(0); }
+    25% { transform: translateX(-8px); }
+    75% { transform: translateX(8px); }
+  }
+
+  /* ===== CONTEÚDO DO APP ===== */
+  #app-content { display: none; }
+  #app-content.show { display: block; }
+
+  .header {
+    padding: 48px 24px 32px;
+    text-align: center;
+    position: relative;
+  }
+  .header::after {
+    content: '';
+    display: block;
+    width: 60px;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    margin: 16px auto 0;
+    border-radius: 2px;
+  }
+  .header h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: 32px;
+    font-weight: 800;
+    letter-spacing: -1px;
+    background: linear-gradient(135deg, var(--text), var(--muted));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .header p { color: var(--muted); font-size: 14px; margin-top: 6px; }
+
+  /* Botão sair */
+  .logout-btn {
+    position: fixed;
+    top: 16px;
+    right: 16px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 12px;
+    cursor: pointer;
+    z-index: 100;
+    font-family: 'DM Sans', sans-serif;
+    transition: color 0.2s, border-color 0.2s;
+  }
+  .logout-btn:hover { color: var(--text); border-color: var(--accent); }
+
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    padding: 0 16px;
+    max-width: 500px;
+    margin: 0 auto;
+  }
+
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 22px 16px 18px;
+    text-decoration: none;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.18s, border-color 0.18s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .card:active { transform: scale(0.96); }
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--c1), var(--c2));
+    opacity: 0.8;
+  }
+
+  .card-icon { font-size: 28px; line-height: 1; }
+  .card-name { font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700; color: var(--text); line-height: 1.2; }
+  .card-desc { font-size: 11px; color: var(--muted); line-height: 1.4; }
+  .card-arrow { position: absolute; bottom: 14px; right: 14px; font-size: 16px; color: var(--muted); opacity: 0.5; }
+
+  .c-purple  { --c1: #7c6aff; --c2: #a78bff; }
+  .c-pink    { --c1: #ff6a8a; --c2: #ff9eb5; }
+  .c-teal    { --c1: #00c9a7; --c2: #00e5c0; }
+  .c-amber   { --c1: #f59e0b; --c2: #fbbf24; }
+  .c-blue    { --c1: #3b82f6; --c2: #60a5fa; }
+  .c-coral   { --c1: #f97316; --c2: #fb923c; }
+  .c-green   { --c1: #22c55e; --c2: #4ade80; }
+  .c-red     { --c1: #ef4444; --c2: #f87171; }
+  .c-violet  { --c1: #8b5cf6; --c2: #c4b5fd; }
+
+  .card-wide {
+    grid-column: span 2;
+    flex-direction: row;
+    align-items: center;
+    gap: 14px;
+    padding: 18px 20px;
+  }
+  .card-wide .card-text { flex: 1; }
+  .card-wide .card-icon { font-size: 32px; }
+
+  .footer { text-align: center; color: var(--muted); font-size: 11px; margin-top: 40px; padding: 0 24px; }
+
+  #pwa-banner {
+    display: none;
+    position: fixed;
+    bottom: 16px;
+    left: 16px; right: 16px;
+    background: #1e1e2e;
+    border: 1px solid #333;
+    border-radius: 14px;
+    padding: 14px 16px;
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
+    z-index: 999;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.4);
+  }
+  #pwa-banner.show { display: flex; }
+  #pwa-banner span { flex: 1; font-size: 13px; color: var(--text); }
+  #pwa-install { background: var(--accent); color: white; border: none; border-radius: 8px; padding: 8px 14px; font-size: 13px; font-weight: 600; cursor: pointer; }
+  #pwa-dismiss { background: none; border: none; color: var(--muted); font-size: 20px; cursor: pointer; padding: 0 4px; }
+</style>
+</head>
+<body>
+
+<!-- TELA DE LOGIN -->
+<div id="lock-screen">
+  <div class="lock-icon">🔒</div>
+  <div class="lock-title">Acesso restrito</div>
+  <div class="lock-subtitle">Entre com seu e-mail e senha</div>
+  <input class="lock-input" type="email" id="email-input" placeholder="seu@email.com">
+  <input class="lock-input" type="password" id="pw-input" placeholder="Senha">
+  <div class="lock-error" id="pw-error">E-mail ou senha incorretos.</div>
+  <div class="lock-loading" id="pw-loading">Entrando...</div>
+  <button class="lock-btn" id="login-btn" onclick="fazerLogin()">Entrar</button>
+</div>
+
+<!-- CONTEÚDO DO APP -->
+<div id="app-content">
+
+  <button class="logout-btn" onclick="fazerLogout()">Sair 🚪</button>
+
+  <div class="header">
+    <h1>Meus Apps</h1>
+    <p>Toque para abrir</p>
+  </div>
+
+  <div class="grid">
+
+    <a class="card c-purple" href="TAPETE-CRM.html">
+      <span class="card-icon">🪴</span>
+      <span class="card-name">Tapete CRM</span>
+      <span class="card-desc">Clientes e registros</span>
+      <span class="card-arrow">→</span>
+    </a>
+    <a class="card c-teal" href="TAPETES.html">
+      <span class="card-icon">🗂️</span>
+      <span class="card-name">Tapetes</span>
+      <span class="card-desc">Catálogo</span>
+      <span class="card-arrow">→</span>
+    </a>
+
+    <a class="card c-pink" href="PRE-VENDA.html">
+      <span class="card-icon">💬</span>
+      <span class="card-name">Pré-Venda</span>
+      <span class="card-desc">Atendimento</span>
+      <span class="card-arrow">→</span>
+    </a>
+    <a class="card c-amber" href="MEU-CRM.html">
+      <span class="card-icon">👥</span>
+      <span class="card-name">Meu CRM</span>
+      <span class="card-desc">Gestão de clientes</span>
+      <span class="card-arrow">→</span>
+    </a>
+
+    <a class="card c-blue" href="METODO-OPA.html">
+      <span class="card-icon">🎯</span>
+      <span class="card-name">Método OPA</span>
+      <span class="card-desc">Processo de vendas</span>
+      <span class="card-arrow">→</span>
+    </a>
+    <a class="card c-green" href="RETINA.html">
+      <span class="card-icon">👁️</span>
+      <span class="card-name">Retina</span>
+      <span class="card-desc">Análise visual</span>
+      <span class="card-arrow">→</span>
+    </a>
+
+    <a class="card card-wide c-violet" href="OUTROS.html">
+      <span class="card-icon">🗃️</span>
+      <div class="card-text">
+        <div class="card-name">Outros</div>
+        <div class="card-desc">Rico, Workshop, DOA, Estudo e Código</div>
+      </div>
+      <span class="card-arrow">→</span>
+    </a>
+
+    <a class="card card-wide c-coral" href="ADM.html">
+      <span class="card-icon">⚙️</span>
+      <div class="card-text">
+        <div class="card-name">ADM</div>
+        <div class="card-desc">Painel administrativo geral</div>
+      </div>
+      <span class="card-arrow">→</span>
+    </a>
+
+    <a class="card card-wide c-red" href="WEBSITE.html">
+      <span class="card-icon">🌐</span>
+      <div class="card-text">
+        <div class="card-name">Website</div>
+        <div class="card-desc">Página principal do negócio</div>
+      </div>
+      <span class="card-arrow">→</span>
+    </a>
+
+  </div>
+
+  <div class="footer">
+    <p>arquivos98126066-sudo · SOFTWARE</p>
+  </div>
+
+  <div id="pwa-banner">
+    <span>📲 Instalar como app na tela inicial?</span>
+    <button id="pwa-install">Instalar</button>
+    <button id="pwa-dismiss">×</button>
+  </div>
+
+</div>
+
+<!-- FIREBASE SDK -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyDPJvM-XZWfa8HQ7h8v0Usb1Hf3q8sDqpg",
+    authDomain: "meus-apps-8ca76.firebaseapp.com",
+    projectId: "meus-apps-8ca76",
+    storageBucket: "meus-apps-8ca76.firebasestorage.app",
+    messagingSenderId: "768854372271",
+    appId: "1:768854372271:web:467b541baf3c513f03095a",
+    measurementId: "G-251F3PL3ET"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+
+  // Verifica se já está logado
+  onAuthStateChanged(auth, (user) => {
+    if (user) {
+      mostrarApp();
+    } else {
+      mostrarLogin();
+    }
+  });
+
+  // Função de login — exposta globalmente
+  window.fazerLogin = async function() {
+    const email = document.getElementById('email-input').value;
+    const senha = document.getElementById('pw-input').value;
+    const erro = document.getElementById('pw-error');
+    const loading = document.getElementById('pw-loading');
+    const btn = document.getElementById('login-btn');
+
+    erro.classList.remove('show');
+    loading.classList.add('show');
+    btn.disabled = true;
+
+    try {
+      await signInWithEmailAndPassword(auth, email, senha);
+      // onAuthStateChanged vai chamar mostrarApp() automaticamente
+    } catch (e) {
+      erro.classList.add('show');
+      loading.classList.remove('show');
+      btn.disabled = false;
+      document.getElementById('pw-input').value = '';
+    }
+  };
+
+  // Função de logout — exposta globalmente
+  window.fazerLogout = async function() {
+    await signOut(auth);
+  };
+
+  function mostrarApp() {
+    document.getElementById('lock-screen').classList.remove('show');
+    document.getElementById('app-content').classList.add('show');
+  }
+
+  function mostrarLogin() {
+    document.getElementById('app-content').classList.remove('show');
+    document.getElementById('lock-screen').classList.add('show');
+  }
+
+  // Enter para logar
+  document.getElementById('pw-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter') window.fazerLogin();
+  });
+  document.getElementById('email-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter') document.getElementById('pw-input').focus();
+  });
+
+  // PWA
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/service-worker.js')
+      .then(reg => console.log('SW registrado:', reg.scope))
+      .catch(err => console.warn('SW erro:', err));
+  }
+
+  let deferredPrompt;
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    document.getElementById('pwa-banner').classList.add('show');
+  });
+  document.getElementById('pwa-install').addEventListener('click', async () => {
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+      deferredPrompt = null;
+      document.getElementById('pwa-banner').classList.remove('show');
+    }
+  });
+  document.getElementById('pwa-dismiss').addEventListener('click', () => {
+    document.getElementById('pwa-banner').classList.remove('show');
+  });
+</script>
+
+</body>
+</html>
