@@ -1,29 +1,29 @@
 const CACHE_NAME = 'meus-apps-v10';
 
 const URLS_TO_CACHE = [
-  '/SOFTWARE/',
-  '/SOFTWARE/index.html',
-  '/SOFTWARE/ADM.html',
-  '/SOFTWARE/TAPETE-CRM.html',
-  '/SOFTWARE/TAPETES.html',
-  '/SOFTWARE/PRE-VENDA.html',
-  '/SOFTWARE/MEU-CRM.html',
-  '/SOFTWARE/METODO-OPA.html',
-  '/SOFTWARE/RETINA.html',
-  '/SOFTWARE/WEBSITE.html',
-  '/SOFTWARE/OUTROS.html',
-  '/SOFTWARE/RICO.html',
-  '/SOFTWARE/Workshop.html',
-  '/SOFTWARE/DOA.html',
-  '/SOFTWARE/ESTUDO.html',
-  '/SOFTWARE/Code.html',
-  '/SOFTWARE/manifest.json',
-  '/SOFTWARE/icon-192.png',
-  '/SOFTWARE/icon-512.png',
-  '/SOFTWARE/open-external.js',
-  '/SOFTWARE/auth-check.js',
-  '/SOFTWARE/firebase-sync.js',
-  '/SOFTWARE/sync-indicator.js'
+  './',
+  './index.html',
+  './ADM.html',
+  './TAPETE-CRM.html',
+  './TAPETES.html',
+  './PRE-VENDA.html',
+  './MEU-CRM.html',
+  './METODO-OPA.html',
+  './RETINA.html',
+  './WEBSITE.html',
+  './OUTROS.html',
+  './RICO.html',
+  './Workshop.html',
+  './DOA.html',
+  './ESTUDO.html',
+  './Code.html',
+  './manifest.json',
+  './icon-192.png',
+  './icon-512.png',
+  './open-external.js',
+  './auth-check.js',
+  './firebase-sync.js',
+  './sync-indicator.js'
 ];
 
 const EXTERNAL_CACHE = [
@@ -37,7 +37,7 @@ self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME).then(cache => {
       return cache.addAll(URLS_TO_CACHE).catch(err => {
-        console.warn('Alguns arquivos locais não cacheados:', err);
+        console.warn('Alguns arquivos locais nao cacheados:', err);
       });
     }).then(() => {
       return caches.open(CACHE_NAME).then(cache => {
@@ -64,7 +64,6 @@ self.addEventListener('activate', event => {
 self.addEventListener('fetch', event => {
   const url = new URL(event.request.url);
 
-  // Não interceptar requisições Firebase Auth/Firestore nem métodos não-GET
   if (
     url.hostname === 'identitytoolkit.googleapis.com' ||
     url.hostname === 'securetoken.googleapis.com' ||
@@ -78,7 +77,6 @@ self.addEventListener('fetch', event => {
   const isLocal = url.hostname === self.location.hostname;
 
   if (isLocal) {
-    // Cache First para arquivos locais
     event.respondWith(
       caches.match(event.request).then(cached => {
         const networkFetch = fetch(event.request).then(response => {
@@ -93,7 +91,6 @@ self.addEventListener('fetch', event => {
       })
     );
   } else {
-    // Network First para externos (Firebase SDK, fonts)
     event.respondWith(
       fetch(event.request).then(response => {
         if (response && response.status === 200) {
