@@ -1,0 +1,1442 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Método DOA — Modelo de Negócio</title>
+<script src="./sync-indicator.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #f9f9f8;
+    --surface: #ffffff;
+    --surface2: #f4f4f2;
+    --border: rgba(0,0,0,0.09);
+    --text: #111110;
+    --text2: #6b6b68;
+    --text3: #a0a09e;
+    --radius: 10px;
+    --radius-sm: 6px;
+    --green-bg: #e6f4ee; --green-fg: #0f6e56;
+    --amber-bg: #fef3da; --amber-fg: #854f0b;
+    --purple-bg: #eeedfe; --purple-fg: #3c3489;
+    --blue-bg: #e8f1fc; --blue-fg: #1a4fa0;
+    --red-bg: #fee8e8; --red-fg: #8b1a1a;
+  }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 14px;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  /* NAV */
+  .nav {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: rgba(249,249,248,0.95);
+    backdrop-filter: blur(8px);
+    border-bottom: 0.5px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    height: 48px;
+  }
+
+  .nav-brand {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .hamburger {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 6px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    border-radius: 6px;
+    transition: background 0.12s;
+  }
+
+  .hamburger:hover { background: var(--surface2); }
+
+  .hamburger span {
+    display: block;
+    width: 20px;
+    height: 1.5px;
+    background: var(--text);
+    border-radius: 2px;
+    transition: all 0.2s;
+  }
+
+  .hamburger.open span:nth-child(1) { transform: translateY(6.5px) rotate(45deg); }
+  .hamburger.open span:nth-child(2) { opacity: 0; }
+  .hamburger.open span:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg); }
+
+  /* DRAWER */
+  .drawer-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.18);
+    z-index: 99;
+  }
+
+  .drawer-overlay.open { display: block; }
+
+  .drawer {
+    position: fixed;
+    top: 0;
+    right: -260px;
+    width: 240px;
+    height: 100%;
+    background: var(--surface);
+    border-left: 0.5px solid var(--border);
+    z-index: 100;
+    transition: right 0.22s ease;
+    padding: 20px 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .drawer.open { right: 0; }
+
+  .drawer-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px 16px;
+    border-bottom: 0.5px solid var(--border);
+    margin-bottom: 8px;
+  }
+
+  .drawer-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .drawer-close {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text2);
+    font-size: 18px;
+    padding: 2px 4px;
+    line-height: 1;
+  }
+
+  .drawer a {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13.5px;
+    color: var(--text2);
+    text-decoration: none;
+    padding: 11px 20px;
+    transition: background 0.1s, color 0.1s;
+  }
+
+  .drawer a:hover { background: var(--surface2); color: var(--text); }
+  .drawer a i { font-size: 15px; width: 18px; }
+
+  /* LAYOUT */
+  .page {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 32px 20px 80px;
+  }
+
+  /* SECTION LABEL */
+  .label {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text3);
+    margin: 0 0 10px;
+  }
+
+  /* DIVIDER */
+  hr {
+    border: none;
+    border-top: 0.5px solid var(--border);
+    margin: 24px 0;
+  }
+
+  /* HERO */
+  .hero {
+    background: var(--surface2);
+    border-radius: var(--radius);
+    padding: 20px;
+    margin-bottom: 24px;
+  }
+
+  .hero-title {
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--text);
+    margin: 0 0 6px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .hero-sub {
+    font-size: 13.5px;
+    color: var(--text2);
+    margin: 0;
+    line-height: 1.65;
+  }
+
+  /* CARD */
+  .card {
+    background: var(--surface);
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    margin-bottom: 8px;
+  }
+
+  .card-title {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text);
+    margin: 0 0 4px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .card-body {
+    font-size: 13px;
+    color: var(--text2);
+    line-height: 1.65;
+    margin: 0;
+  }
+
+  /* BADGE */
+  .badge {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 500;
+    padding: 2px 8px;
+    border-radius: 4px;
+  }
+
+  .bg { background: var(--green-bg); color: var(--green-fg); }
+  .ba { background: var(--amber-bg); color: var(--amber-fg); }
+  .bp { background: var(--purple-bg); color: var(--purple-fg); }
+  .bb { background: var(--blue-bg); color: var(--blue-fg); }
+  .br { background: var(--red-bg); color: var(--red-fg); }
+
+  /* GRID */
+  .grid2 {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+
+  .metric {
+    background: var(--surface2);
+    border-radius: var(--radius-sm);
+    padding: 12px 14px;
+  }
+
+  .metric-label {
+    font-size: 12px;
+    color: var(--text2);
+    margin: 0 0 4px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .metric-val {
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--text);
+    margin: 0 0 4px;
+  }
+
+  .metric-desc {
+    font-size: 12px;
+    color: var(--text2);
+    line-height: 1.5;
+    margin: 0;
+  }
+
+  /* QUOTE */
+  .quote {
+    background: var(--surface);
+    border: 0.5px solid var(--border);
+    border-left: 2px solid #534AB7;
+    border-radius: 0 var(--radius) var(--radius) 0;
+    padding: 14px 16px;
+    font-size: 13.5px;
+    font-style: italic;
+    color: var(--text);
+    line-height: 1.7;
+    margin-bottom: 8px;
+  }
+
+  /* STEPS */
+  .steps { display: flex; flex-direction: column; gap: 0; }
+
+  .step {
+    display: flex;
+    gap: 14px;
+    padding: 14px 0;
+    border-bottom: 0.5px solid var(--border);
+    align-items: flex-start;
+  }
+
+  .step:last-child { border-bottom: none; }
+
+  .step-num {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: var(--surface2);
+    border: 0.5px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text2);
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .step-title {
+    font-size: 13.5px;
+    font-weight: 500;
+    color: var(--text);
+    margin-bottom: 2px;
+  }
+
+  .step-body {
+    font-size: 12.5px;
+    color: var(--text2);
+    line-height: 1.6;
+  }
+
+  /* SIMULADOR */
+  .sim-controls {
+    background: var(--surface2);
+    border-radius: var(--radius);
+    padding: 16px;
+    margin-bottom: 12px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 16px;
+  }
+
+  .sim-field label {
+    display: block;
+    font-size: 12px;
+    color: var(--text2);
+    margin-bottom: 6px;
+  }
+
+  .sim-field input[type=range] {
+    width: 100%;
+    accent-color: var(--text);
+    margin-bottom: 4px;
+  }
+
+  .sim-val {
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--text);
+  }
+
+  .sim-results {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+
+  .sim-card {
+    background: var(--surface);
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 12px 14px;
+  }
+
+  .sim-card.main {
+    background: var(--text);
+    border-color: var(--text);
+  }
+
+  .sim-card-label {
+    font-size: 11px;
+    color: var(--text3);
+    margin-bottom: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .sim-card.main .sim-card-label { color: rgba(255,255,255,0.5); }
+
+  .sim-card-val {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .sim-card.main .sim-card-val { color: #fff; }
+
+  /* TABELA */
+  .tbl-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; width: 100%; }
+
+  .tbl {
+    width: 100%;
+    min-width: 480px;
+    border-collapse: collapse;
+    font-size: 12.5px;
+    background: var(--surface);
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+
+  .tbl th {
+    background: var(--surface2);
+    font-size: 11px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text2);
+    padding: 9px 12px;
+    text-align: left;
+    border-bottom: 0.5px solid var(--border);
+    white-space: nowrap;
+  }
+
+  .tbl td {
+    padding: 10px 12px;
+    border-bottom: 0.5px solid var(--border);
+    color: var(--text2);
+    vertical-align: top;
+    white-space: nowrap;
+  }
+
+  .tbl td:first-child { color: var(--text); font-weight: 500; }
+  .tbl tr:last-child td { border-bottom: none; }
+
+  .tbl tr.hl td {
+    background: #f0f0ee;
+    font-weight: 500;
+    color: var(--text);
+  }
+
+  /* SCRIPT BLOCK */
+  .script-section {
+    margin-bottom: 8px;
+  }
+
+  .script-tag {
+    font-size: 11px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--text3);
+    margin-bottom: 6px;
+  }
+
+  /* OBJEÇÃO */
+  .obj {
+    background: var(--surface);
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    margin-bottom: 8px;
+    overflow: hidden;
+  }
+
+  .obj-q {
+    padding: 10px 14px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text);
+    background: var(--surface2);
+    border-bottom: 0.5px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .obj-a {
+    padding: 10px 14px;
+    font-size: 13px;
+    color: var(--text2);
+    line-height: 1.6;
+  }
+
+  /* CONTRATO */
+  .contract-fields {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+
+  .cf {
+    background: var(--surface);
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 10px 14px;
+  }
+
+  .cf label {
+    display: block;
+    font-size: 11px;
+    color: var(--text3);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 4px;
+  }
+
+  .cf input {
+    width: 100%;
+    border: none;
+    background: transparent;
+    font-family: 'Inter', sans-serif;
+    font-size: 13.5px;
+    color: var(--text);
+    outline: none;
+  }
+
+  .cf input::placeholder { color: var(--text3); }
+
+  .clause {
+    margin-bottom: 14px;
+  }
+
+  .clause-title {
+    font-size: 12px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text3);
+    margin-bottom: 6px;
+  }
+
+  .clause p, .clause li {
+    font-size: 13px;
+    color: var(--text2);
+    line-height: 1.65;
+  }
+
+  .clause ul { padding-left: 18px; margin-top: 4px; }
+  .clause li { margin-bottom: 3px; }
+
+  .sig-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 0.5px solid var(--border);
+  }
+
+  .sig-line {
+    border-bottom: 0.5px solid var(--border);
+    height: 36px;
+    margin-bottom: 6px;
+  }
+
+  .sig-label {
+    font-size: 11px;
+    color: var(--text3);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  /* BTNS */
+  .btn-row {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 24px;
+  }
+
+  .btn {
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 8px 16px;
+    border-radius: var(--radius-sm);
+    border: 0.5px solid var(--border);
+    background: var(--surface);
+    color: var(--text);
+    cursor: pointer;
+    transition: background 0.12s;
+  }
+
+  .btn:hover { background: var(--surface2); }
+
+  .btn-dark {
+    background: var(--text);
+    color: #fff;
+    border-color: var(--text);
+  }
+
+  .btn-dark:hover { background: #333; }
+
+  i.ti { font-size: 15px; vertical-align: -2px; }
+
+  /* MONTH CARDS */
+  .month-card {
+    background: var(--surface);
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+  }
+
+  .month-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 11px 14px;
+    cursor: pointer;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    transition: background 0.1s;
+  }
+
+  .month-card-header:hover { background: var(--surface2); }
+  .month-card.highlight .month-card-header { background: var(--text); color: #fff; }
+  .month-card.highlight .month-card-header .mc-label { color: rgba(255,255,255,0.55); }
+  .month-card.highlight .month-card-header .mc-total { color: #fff; }
+  .month-card.highlight .month-card-header .mc-chevron { color: rgba(255,255,255,0.6); }
+
+  .mc-left { display: flex; align-items: center; gap: 10px; }
+  .mc-month { font-size: 13px; font-weight: 500; }
+  .mc-clients { font-size: 12px; color: var(--text3); }
+  .month-card.highlight .mc-clients { color: rgba(255,255,255,0.5); }
+
+  .mc-right { display: flex; align-items: center; gap: 10px; }
+  .mc-total { font-size: 13px; font-weight: 600; color: var(--text); }
+  .mc-chevron { font-size: 13px; color: var(--text3); transition: transform 0.2s; }
+  .month-card.open .mc-chevron { transform: rotate(180deg); }
+
+  .month-card-body {
+    display: none;
+    border-top: 0.5px solid var(--border);
+    padding: 10px 14px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .month-card.open .month-card-body { display: grid; }
+  .month-card-body { display: none; }
+
+  .mc-row { }
+  .mc-label { font-size: 11px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 2px; }
+  .mc-val { font-size: 13px; font-weight: 500; color: var(--text); }
+  .mc-acc { grid-column: 1 / -1; padding-top: 6px; border-top: 0.5px solid var(--border); margin-top: 2px; }
+
+  /* TOAST */
+  #toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: #111110;
+    color: #fff;
+    padding: 10px 22px;
+    border-radius: 30px;
+    font-size: .8rem;
+    font-weight: 700;
+    font-family: 'Inter', sans-serif;
+    z-index: 999;
+    opacity: 0;
+    transition: all .3s;
+    pointer-events: none;
+    white-space: nowrap;
+    max-width: 90vw;
+    text-align: center;
+  }
+  #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  /* CONTRATOS SALVOS */
+  .saved-card {
+    background: var(--surface);
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    margin-bottom: 8px;
+  }
+  .saved-card-title { font-size: 13.5px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
+  .saved-card-row { display: flex; justify-content: space-between; font-size: 12.5px; padding: 3px 0; }
+  .saved-card-key { color: var(--text3); }
+  .saved-card-val { font-weight: 500; color: var(--text2); }
+  .saved-card-footer { margin-top: 10px; display: flex; gap: 6px; flex-wrap: wrap; }
+
+  @media (max-width: 500px) {
+    .sim-results { grid-template-columns: 1fr; }
+    .sig-grid { grid-template-columns: 1fr; }
+    .grid2 { grid-template-columns: repeat(2, 1fr); }
+    .sim-controls { grid-template-columns: 1fr; }
+  }
+
+  @media print {
+    .nav, .btn-row, .drawer, .drawer-overlay, #toast, #secao-salvos { display: none; }
+    body { background: white; }
+  }
+</style>
+</head>
+<body>
+
+<div id="toast"></div>
+
+<div class="drawer-overlay" id="overlay" onclick="closeDrawer()"></div>
+
+<div class="drawer" id="drawer">
+  <div class="drawer-header">
+    <span class="drawer-title">Menu</span>
+    <button class="drawer-close" onclick="closeDrawer()">✕</button>
+  </div>
+  <a href="#metodo" onclick="closeDrawer()"><i class="ti ti-search"></i> Método DOA</a>
+  <a href="#proposta" onclick="closeDrawer()"><i class="ti ti-star"></i> Proposta de valor</a>
+  <a href="#receita" onclick="closeDrawer()"><i class="ti ti-currency-dollar"></i> Receita</a>
+  <a href="#simulador" onclick="closeDrawer()"><i class="ti ti-chart-bar"></i> Simulador</a>
+  <a href="#script" onclick="closeDrawer()"><i class="ti ti-phone"></i> Script de vendas</a>
+  <a href="#contrato" onclick="closeDrawer()"><i class="ti ti-file-text"></i> Contrato</a>
+  <a href="#secao-salvos" onclick="closeDrawer()"><i class="ti ti-database"></i> Contratos Salvos</a>
+</div>
+
+<nav class="nav">
+  <div class="nav-brand">Método DOA</div>
+  <button class="hamburger" id="hamburger" onclick="toggleDrawer()" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<div class="page">
+
+  <!-- HERO -->
+  <div class="hero">
+    <p class="hero-title"><i class="ti ti-rocket"></i> Método DOA — Modelo de Negócio</p>
+    <p class="hero-sub">Você chega no negócio do cliente, faz o diagnóstico, otimiza os processos com sistemas personalizados e automatiza tudo com agentes de IA. O cliente só paga quando estiver satisfeito — e você recebe mensalidade todo mês.</p>
+  </div>
+
+  <!-- MÉTODO -->
+  <div id="metodo">
+    <p class="label">O Método</p>
+
+    <div class="card">
+      <p class="card-title"><i class="ti ti-search"></i> D — Diagnóstico</p>
+      <p class="card-body">Você analisa o negócio do cliente de ponta a ponta: ferramentas que ele paga, processos ineficientes, gargalos e oportunidades. Entrega um laudo técnico completo com tudo que ele não enxerga sozinho — e cobra por esse olhar especializado antes de qualquer desenvolvimento.</p>
+    </div>
+
+    <div class="card">
+      <p class="card-title"><i class="ti ti-adjustments"></i> O — Otimização</p>
+      <p class="card-body">Com base no diagnóstico, você desenvolve sistemas personalizados — feitos do zero para aquele negócio. O cliente não se adapta ao sistema; o sistema se adapta a ele. Qualquer funcionalidade nova que ele quiser, você implementa. Sem fila, sem burocracia, sem depender de empresa grande.</p>
+    </div>
+
+    <div class="card">
+      <p class="card-title"><i class="ti ti-robot"></i> A — Automação</p>
+      <p class="card-body">Tudo que pode ser automatizado, é automatizado. Agentes de IA autônomos executam tarefas repetitivas 24h por dia, sem erros. O cliente ganha tempo, reduz custo operacional e o negócio começa a rodar sozinho.</p>
+    </div>
+  </div>
+
+  <hr>
+
+  <!-- PROPOSTA DE VALOR -->
+  <div id="proposta">
+    <p class="label">Proposta de valor</p>
+
+    <div class="card">
+      <p class="card-title"><i class="ti ti-palette"></i> Personalização total</p>
+      <p class="card-body">Sistema feito do zero para o cliente. Cores, fluxos, funcionalidades — tudo do jeito dele. Nada de solução genérica que serve pra todo mundo e não é perfeita pra ninguém.</p>
+    </div>
+
+    <div class="card">
+      <p class="card-title"><i class="ti ti-refresh"></i> Atualizações sob demanda</p>
+      <p class="card-body">Qualquer coisa nova que o cliente precisar, você implementa. Sem depender de um fornecedor que coloca na fila, cobra absurdo ou simplesmente ignora o pedido. Ele tem um desenvolvedor dedicado — você.</p>
+    </div>
+
+    <div class="card">
+      <p class="card-title"><i class="ti ti-shield-check"></i> Resultado garantido</p>
+      <p class="card-body">O cliente não paga nada adiantado. Só paga quando o sistema estiver pronto, funcionando e aprovado por ele. Se você não entregar o que prometeu — ele não deve nada. A pressão para entregar fica com você, não com ele.</p>
+    </div>
+
+    <div class="card">
+      <p class="card-title"><i class="ti ti-currency-dollar"></i> Substitui o que ele já paga</p>
+      <p class="card-body">A mensalidade que o cliente paga pra você substitui o que ele já gastava com plataformas genéricas. Ele paga o mesmo valor — ou menos — e recebe um sistema exclusivo com suporte dedicado.</p>
+    </div>
+  </div>
+
+  <hr>
+
+  <!-- FONTES DE RECEITA -->
+  <div id="receita">
+    <p class="label">Como você ganha dinheiro</p>
+    <div class="grid2">
+      <div class="metric">
+        <p class="metric-label"><i class="ti ti-search"></i> Diagnóstico</p>
+        <p class="metric-val">Pagamento único</p>
+        <p class="metric-desc">Cobrado antes de qualquer desenvolvimento. Você entrega valor já na primeira reunião.</p>
+      </div>
+      <div class="metric">
+        <p class="metric-label"><i class="ti ti-currency-dollar"></i> Implementação</p>
+        <p class="metric-val">Pagamento único</p>
+        <p class="metric-desc">Pelo desenvolvimento do sistema. Recebido somente após aprovação do cliente.</p>
+      </div>
+      <div class="metric">
+        <p class="metric-label"><i class="ti ti-repeat"></i> Mensalidade — Sistema</p>
+        <p class="metric-val">Recorrente / mês</p>
+        <p class="metric-desc">Substitui o que ele pagava a outros softwares. Você vira o fornecedor.</p>
+      </div>
+      <div class="metric">
+        <p class="metric-label"><i class="ti ti-robot"></i> Mensalidade — IA</p>
+        <p class="metric-val">Recorrente / mês</p>
+        <p class="metric-desc">Manutenção dos agentes de IA rodando. Pode ser inclusa ou cobrada separado.</p>
+      </div>
+      <div class="metric">
+        <p class="metric-label"><i class="ti ti-code-plus"></i> Novas funcionalidades</p>
+        <p class="metric-val">Extra por demanda</p>
+        <p class="metric-desc">Qualquer pedido fora do escopo inicial é cobrado à parte. Fonte extra de receita.</p>
+      </div>
+    </div>
+  </div>
+
+  <hr>
+
+  <!-- SIMULADOR -->
+  <div id="simulador">
+    <p class="label">Simulador de receita</p>
+
+    <div class="sim-controls">
+      <div class="sim-field">
+        <label>Clientes ativos</label>
+        <input type="range" id="s-clients" min="1" max="30" value="5">
+        <div class="sim-val" id="v-clients">5</div>
+      </div>
+      <div class="sim-field">
+        <label>Mensalidade por cliente</label>
+        <input type="range" id="s-monthly" min="300" max="3000" step="50" value="700">
+        <div class="sim-val" id="v-monthly">R$ 700</div>
+      </div>
+      <div class="sim-field">
+        <label>Extras no mês</label>
+        <input type="range" id="s-extras" min="0" max="5000" step="100" value="500">
+        <div class="sim-val" id="v-extras">R$ 500</div>
+      </div>
+    </div>
+
+    <div class="sim-results">
+      <div class="sim-card">
+        <div class="sim-card-label">Mensalidades</div>
+        <div class="sim-card-val" id="r-monthly">R$ 3.500</div>
+      </div>
+      <div class="sim-card">
+        <div class="sim-card-label">Extras</div>
+        <div class="sim-card-val" id="r-extras">R$ 500</div>
+      </div>
+      <div class="sim-card main">
+        <div class="sim-card-label">Total / mês</div>
+        <div class="sim-card-val" id="r-total">R$ 4.000</div>
+      </div>
+    </div>
+
+    <p class="label" style="margin-top:16px;">Projeção anual</p>
+    <div id="proj-cards" style="display:flex;flex-direction:column;gap:6px;"></div>
+  </div>
+
+  <hr>
+
+  <!-- FLUXO -->
+  <p class="label">Como funciona na prática</p>
+  <div class="card" style="padding: 6px 16px;">
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div>
+          <div class="step-title">Prospectar</div>
+          <div class="step-body">Liga para PMEs do segmento-alvo. Pergunta sobre os sistemas que já usam e as dores que têm. Quem já sente a dor precisa de menos convencimento.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div>
+          <div class="step-title">Diagnóstico pago</div>
+          <div class="step-body">Marca reunião, analisa o negócio inteiro e entrega um laudo técnico com oportunidades reais. Cobra por esse serviço — você já gera valor antes de desenvolver qualquer coisa.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div>
+          <div class="step-title">Proposta e contrato</div>
+          <div class="step-body">Apresenta o que será feito, prazos e valores. Assina contrato antes de começar. Escopo claro protege você e o cliente.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div>
+          <div class="step-title">Desenvolvimento</div>
+          <div class="step-body">Constrói o sistema ou automação. O cliente acompanha. Você só recebe o pagamento da implementação depois que ele aprovar.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">5</div>
+        <div>
+          <div class="step-title">Ativar mensalidade</div>
+          <div class="step-body">Sistema entregue, mensalidade ativada. Receita recorrente todo mês enquanto você atende novos clientes. As mensalidades se acumulam.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <hr>
+
+  <!-- CLIENTES IDEAIS -->
+  <p class="label">Clientes ideais</p>
+  <div class="card">
+    <p class="card-body" style="margin-bottom:10px;">Foco em pequenas e médias empresas que já pagam algum software mas estão insatisfeitas com rigidez, custo ou falta de suporte.</p>
+    <div class="grid2">
+      <div class="metric"><p class="metric-label">🏥 Clínicas e consultórios</p></div>
+      <div class="metric"><p class="metric-label">🛒 Comércio e e-commerce</p></div>
+      <div class="metric"><p class="metric-label">🏠 Imobiliárias</p></div>
+      <div class="metric"><p class="metric-label">⚖️ Escritórios e contabilidades</p></div>
+      <div class="metric"><p class="metric-label">🍽️ Restaurantes e food service</p></div>
+      <div class="metric"><p class="metric-label">🚚 Logística e transportadoras</p></div>
+      <div class="metric"><p class="metric-label">🏗️ Construtoras e engenharia</p></div>
+      <div class="metric"><p class="metric-label">💆 Prestadores de serviço</p></div>
+    </div>
+  </div>
+
+  <hr>
+
+  <!-- RISCOS -->
+  <p class="label">Riscos e como controlar</p>
+
+  <div class="card">
+    <p class="card-title"><i class="ti ti-alert-triangle" style="color:#854f0b"></i> Trabalhar sem receber</p>
+    <p class="card-body">Contrato assinado antes de começar qualquer desenvolvimento. Escopo fechado, prazo combinado e valor definido por escrito. A garantia de não pagar só vale após aprovação formal.</p>
+  </div>
+
+  <div class="card">
+    <p class="card-title"><i class="ti ti-alert-triangle" style="color:#854f0b"></i> Pedidos sem fim</p>
+    <p class="card-body">Defina claramente no contrato o que a mensalidade cobre (manutenção, suporte) e o que é cobrado à parte (novas funcionalidades). Isso protege seu tempo e ainda gera receita extra.</p>
+  </div>
+
+  <div class="card">
+    <p class="card-title"><i class="ti ti-alert-triangle" style="color:#854f0b"></i> Muitos sistemas diferentes</p>
+    <p class="card-body">Crie uma base técnica comum e personalize por cima. Não reinvente tudo do zero para cada cliente. Isso reduz tempo de desenvolvimento e facilita a manutenção com muitos clientes ativos.</p>
+  </div>
+
+  <div class="card">
+    <p class="card-title"><i class="ti ti-alert-triangle" style="color:#854f0b"></i> Primeiros meses sem caixa</p>
+    <p class="card-body">As mensalidades demoram para acumular. Tenha reserva para os 3 primeiros meses. Fechar o diagnóstico como serviço pago ajuda a gerar caixa antes da entrega do sistema.</p>
+  </div>
+
+  <hr>
+
+  <!-- SCRIPT -->
+  <div id="script">
+    <p class="label">Script de vendas — telefone</p>
+
+    <div class="script-section">
+      <p class="script-tag">Abertura — primeiros 20 segundos</p>
+      <div class="quote">"Oi, <strong>[nome]</strong>! Tudo bem? Meu nome é <strong>[seu nome]</strong>, sou especialista em sistemas e automação para negócios. Eu entro em contato porque trabalho com empresas do seu segmento — posso te fazer uma pergunta rápida?"</div>
+    </div>
+
+    <div class="script-section">
+      <p class="script-tag">Diagnóstico da dor</p>
+      <div class="quote">"Você já usa algum sistema para gerenciar o seu negócio — controle de clientes, gestão, atendimento, algo assim?"<br><br>
+      <strong>Se SIM:</strong> "Entendi. E está satisfeito com ele? Tem alguma coisa que falta ou que você queria que funcionasse diferente?"<br><br>
+      <strong>Se NÃO:</strong> "Tudo no Excel ou papel então? E isso já te causou algum problema — perdeu informação, esqueceu algo importante?"</div>
+    </div>
+
+    <div class="script-section">
+      <p class="script-tag">Apresentação da proposta</p>
+      <div class="quote">"Então deixa eu te contar o que eu faço. Eu desenvolvo sistemas personalizados — feito do zero para o seu negócio, do jeito que você funciona. Qualquer mudança que você precisar, eu faço. Sem depender de empresa grande que vai te ignorar ou cobrar caro por algo simples.<br><br>
+      E o mais importante: você não paga nada adiantado. Só paga quando o sistema estiver pronto e você aprovar. Se eu não entregar o que prometi — você não deve nada."</div>
+    </div>
+
+    <div class="script-section">
+      <p class="script-tag">Fechamento — próximo passo</p>
+      <div class="quote">"Que tal marcar 20 minutos essa semana por videochamada para eu entender melhor o seu negócio e te mostrar como ficaria? Sem compromisso nenhum da sua parte."</div>
+    </div>
+
+    <hr>
+    <p class="label">Respostas para objeções</p>
+
+    <div class="obj">
+      <div class="obj-q"><i class="ti ti-message-2"></i> "Já tenho um sistema e estou satisfeito."</div>
+      <div class="obj-a">Que ótimo! Só uma curiosidade — tem alguma funcionalidade que você queria ter mas o sistema não oferece? Às vezes a gente se acostuma com as limitações sem perceber.</div>
+    </div>
+
+    <div class="obj">
+      <div class="obj-q"><i class="ti ti-message-2"></i> "Quanto custa?"</div>
+      <div class="obj-a">Depende do que você precisa — cada projeto é único. Mas a mensalidade costuma ficar no mesmo valor ou abaixo do que você já paga hoje. E o desenvolvimento só é cobrado depois que você aprovar.</div>
+    </div>
+
+    <div class="obj">
+      <div class="obj-q"><i class="ti ti-message-2"></i> "Não tenho tempo pra isso agora."</div>
+      <div class="obj-a">Por isso que eu cuido de tudo. Você me explica como funciona, eu desenvolvo, você só aprova. Não toma seu tempo operacional. Posso te mandar um resumo no WhatsApp para você ver quando tiver um minuto?</div>
+    </div>
+
+    <div class="obj">
+      <div class="obj-q"><i class="ti ti-message-2"></i> "Como eu sei que você vai entregar?"</div>
+      <div class="obj-a">Exatamente por isso a proposta é assim: você não paga nada antes. O contrato garante que o pagamento só acontece com o sistema aprovado por você. Quem corre o risco sou eu — não você.</div>
+    </div>
+
+    <div class="obj">
+      <div class="obj-q"><i class="ti ti-message-2"></i> "Deixa eu pensar..."</div>
+      <div class="obj-a">Claro, sem pressão. Me diz: o que você precisaria ver ou saber para se sentir confortável em avançar? Assim eu já te passo exatamente o que precisa.</div>
+    </div>
+  </div>
+
+  <hr>
+
+  <!-- CONTRATO -->
+  <div id="contrato">
+    <p class="label">Modelo de contrato</p>
+
+    <div class="hero" style="margin-bottom:12px;">
+      <p class="hero-title"><i class="ti ti-file-text"></i> Contrato de Desenvolvimento e Manutenção de Sistema</p>
+      <p class="hero-sub">Preencha os campos abaixo e clique em <strong>Salvar contrato</strong> para guardar no Firebase.</p>
+    </div>
+
+    <div class="contract-fields">
+      <div class="cf"><label>Nome do contratante (cliente)</label><input type="text" id="ct_contratante" placeholder="Nome completo ou razão social"></div>
+      <div class="cf"><label>CPF / CNPJ do contratante</label><input type="text" id="ct_cpf_contratante" placeholder="000.000.000-00"></div>
+      <div class="cf"><label>Nome do contratado (você)</label><input type="text" id="ct_contratado" placeholder="Seu nome completo"></div>
+      <div class="cf"><label>CPF / CNPJ do contratado</label><input type="text" id="ct_cpf_contratado" placeholder="000.000.000-00"></div>
+      <div class="cf"><label>Descrição do projeto</label><input type="text" id="ct_projeto" placeholder="Ex: Sistema de gestão de agendamentos"></div>
+      <div class="cf"><label>Prazo de entrega</label><input type="text" id="ct_prazo" placeholder="Ex: 30 dias corridos após assinatura"></div>
+      <div class="cf"><label>Valor da implementação (R$)</label><input type="text" id="ct_valor_impl" placeholder="R$ 0,00"></div>
+      <div class="cf"><label>Valor da mensalidade (R$)</label><input type="text" id="ct_mensalidade" placeholder="R$ 0,00 / mês"></div>
+      <div class="cf"><label>Início da mensalidade</label><input type="text" id="ct_inicio" placeholder="Após aprovação do sistema"></div>
+      <div class="cf"><label>Local e data</label><input type="text" id="ct_local_data" placeholder="Cidade, DD/MM/AAAA"></div>
+    </div>
+
+    <div class="btn-row" style="margin-top:0;margin-bottom:16px;">
+      <button class="btn btn-dark" onclick="salvarContrato()"><i class="ti ti-device-floppy"></i> Salvar contrato</button>
+      <button class="btn" onclick="limparContrato()"><i class="ti ti-trash"></i> Limpar</button>
+    </div>
+
+    <div class="card">
+      <div class="clause">
+        <div class="clause-title">Cláusula 1 — Objeto</div>
+        <p>O contratado se compromete a desenvolver o sistema descrito acima, personalizado conforme as necessidades do contratante, dentro do prazo e especificações acordados em proposta anexa.</p>
+      </div>
+      <hr style="margin: 12px 0;">
+      <div class="clause">
+        <div class="clause-title">Cláusula 2 — Pagamento</div>
+        <p>O pagamento da implementação será realizado somente após entrega, aprovação e funcionamento confirmado do sistema pelo contratante. Não há obrigação de pagamento caso o sistema não seja entregue conforme o escopo acordado. A mensalidade inicia na data definida acima.</p>
+      </div>
+      <hr style="margin: 12px 0;">
+      <div class="clause">
+        <div class="clause-title">Cláusula 3 — Escopo e atualizações</div>
+        <p>O escopo inclui as funcionalidades descritas em proposta anexa. Novas funcionalidades solicitadas após a conclusão são extras, cobradas separadamente após orçamento aprovado. A mensalidade cobre:</p>
+        <ul>
+          <li>Manutenção corretiva (bugs e falhas do sistema original)</li>
+          <li>Disponibilidade e hospedagem</li>
+          <li>Suporte por mensagem em horário comercial</li>
+        </ul>
+      </div>
+      <hr style="margin: 12px 0;">
+      <div class="clause">
+        <div class="clause-title">Cláusula 4 — Confidencialidade</div>
+        <p>Ambas as partes mantêm em sigilo informações estratégicas, dados de clientes e qualquer informação sensível do negócio do contratante, durante e após a vigência deste contrato.</p>
+      </div>
+      <hr style="margin: 12px 0;">
+      <div class="clause">
+        <div class="clause-title">Cláusula 5 — Rescisão</div>
+        <p>O contrato pode ser rescindido por qualquer das partes com aviso prévio de 30 dias. Em caso de rescisão pelo contratante após a entrega aprovada, os valores em aberto são devidos. Em caso de não entrega no prazo, o contratante pode rescindir sem qualquer ônus.</p>
+      </div>
+      <hr style="margin: 12px 0;">
+      <div class="clause">
+        <div class="clause-title">Cláusula 6 — Foro</div>
+        <p>As partes elegem o foro da comarca de residência do contratado para dirimir eventuais litígios decorrentes deste contrato.</p>
+      </div>
+
+      <div class="sig-grid">
+        <div>
+          <div class="sig-line"></div>
+          <div class="sig-label">Contratante — Assinatura</div>
+        </div>
+        <div>
+          <div class="sig-line"></div>
+          <div class="sig-label">Contratado — Assinatura</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONTRATOS SALVOS -->
+  <hr>
+  <div id="secao-salvos">
+    <p class="label">Contratos Salvos</p>
+    <div id="lista-contratos"><div style="font-size:13px;color:var(--text3);padding:12px 0;">Carregando...</div></div>
+    <div style="margin-top:10px;">
+      <button class="btn" style="color:#8b1a1a;border-color:#fee8e8;" onclick="apagarTodosContratos()"><i class="ti ti-trash"></i> Apagar todos</button>
+    </div>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn btn-dark" onclick="window.print()"><i class="ti ti-printer"></i> Imprimir / Salvar PDF</button>
+    <button class="btn" onclick="copyScript()"><i class="ti ti-copy"></i> Copiar script de vendas</button>
+  </div>
+
+</div>
+
+<script type="module">
+import { db } from "./firebase-sync.js";
+import {
+  collection, addDoc, getDocs, updateDoc, deleteDoc, doc,
+  onSnapshot, query, orderBy, writeBatch
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+// ─── Cache local ─────────────────────────────────────────────────────────────
+var contratosCache = [];
+
+// ─── Toast ───────────────────────────────────────────────────────────────────
+window.toast = function(msg, tipo) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.background = tipo === 'erro' ? '#ef4444' : tipo === 'aviso' ? '#f59e0b' : '#111110';
+  t.classList.add('show');
+  setTimeout(function() { t.classList.remove('show'); }, 2800);
+};
+
+// ─── Salvar pendente (offline) ────────────────────────────────────────────────
+function salvarPendente(colecao, obj) {
+  try {
+    var key = 'pending_' + colecao;
+    var arr = JSON.parse(localStorage.getItem(key) || '[]');
+    arr.push(obj);
+    localStorage.setItem(key, JSON.stringify(arr));
+  } catch(e) {}
+}
+
+// ─── Salvar Contrato ──────────────────────────────────────────────────────────
+window.salvarContrato = async function() {
+  var contratante = document.getElementById('ct_contratante').value.trim();
+  var cpfContratante = document.getElementById('ct_cpf_contratante').value.trim();
+  var contratado = document.getElementById('ct_contratado').value.trim();
+  var cpfContratado = document.getElementById('ct_cpf_contratado').value.trim();
+  var projeto = document.getElementById('ct_projeto').value.trim();
+  var prazo = document.getElementById('ct_prazo').value.trim();
+  var valorImpl = document.getElementById('ct_valor_impl').value.trim();
+  var mensalidade = document.getElementById('ct_mensalidade').value.trim();
+  var inicio = document.getElementById('ct_inicio').value.trim();
+  var localData = document.getElementById('ct_local_data').value.trim();
+
+  if (!contratante || !projeto) {
+    toast('Preencha ao menos o nome do contratante e o projeto', 'aviso');
+    return;
+  }
+
+  var contrato = {
+    contratante, cpfContratante, contratado, cpfContratado,
+    projeto, prazo, valorImpl, mensalidade, inicio, localData,
+    criadoEm: new Date().toISOString()
+  };
+
+  if (window.syncShow) window.syncShow.syncing();
+  try {
+    var docRef = await addDoc(collection(db, 'doa_contratos'), contrato);
+    contrato.id = docRef.id;
+    contratosCache.push(contrato);
+    if (window.syncShow) window.syncShow.synced('DOA');
+    toast('Contrato salvo!');
+  } catch(e) {
+    salvarPendente('doa_contratos', { ...contrato, pendingSync: true });
+    if (window.syncShow) window.syncShow.local();
+    toast('Salvo localmente (offline)', 'aviso');
+  }
+  limparContrato();
+  renderContratos();
+};
+
+// ─── Limpar formulário ────────────────────────────────────────────────────────
+window.limparContrato = function() {
+  ['ct_contratante','ct_cpf_contratante','ct_contratado','ct_cpf_contratado',
+   'ct_projeto','ct_prazo','ct_valor_impl','ct_mensalidade','ct_inicio','ct_local_data']
+  .forEach(function(id) { document.getElementById(id).value = ''; });
+};
+
+// ─── Render Contratos ─────────────────────────────────────────────────────────
+window.renderContratos = function() {
+  var el = document.getElementById('lista-contratos');
+  if (!contratosCache.length) {
+    el.innerHTML = '<div style="font-size:13px;color:var(--text3);padding:12px 0;">Nenhum contrato salvo ainda.</div>';
+    return;
+  }
+  var h = '';
+  contratosCache.slice().reverse().forEach(function(c) {
+    var data = c.criadoEm ? new Date(c.criadoEm).toLocaleDateString('pt-BR') : '---';
+    h += '<div class="saved-card">';
+    h += '<div class="saved-card-title">' + (c.contratante || '---') + '</div>';
+    if (c.projeto) h += '<div class="saved-card-row"><span class="saved-card-key">Projeto</span><span class="saved-card-val">' + c.projeto + '</span></div>';
+    if (c.prazo) h += '<div class="saved-card-row"><span class="saved-card-key">Prazo</span><span class="saved-card-val">' + c.prazo + '</span></div>';
+    if (c.valorImpl) h += '<div class="saved-card-row"><span class="saved-card-key">Implementação</span><span class="saved-card-val">' + c.valorImpl + '</span></div>';
+    if (c.mensalidade) h += '<div class="saved-card-row"><span class="saved-card-key">Mensalidade</span><span class="saved-card-val">' + c.mensalidade + '</span></div>';
+    if (c.localData) h += '<div class="saved-card-row"><span class="saved-card-key">Local / Data</span><span class="saved-card-val">' + c.localData + '</span></div>';
+    h += '<div class="saved-card-row"><span class="saved-card-key">Salvo em</span><span class="saved-card-val">' + data + '</span></div>';
+    h += '<div class="saved-card-footer">';
+    h += '<button class="btn" style="font-size:12px;padding:6px 12px;" onclick="carregarContrato(\'' + c.id + '\')"><i class="ti ti-edit"></i> Carregar</button>';
+    h += '<button class="btn" style="font-size:12px;padding:6px 12px;color:#8b1a1a;border-color:#fee8e8;" onclick="deletarContrato(\'' + c.id + '\')"><i class="ti ti-trash"></i> Excluir</button>';
+    h += '</div></div>';
+  });
+  el.innerHTML = h;
+};
+
+// ─── Carregar contrato nos campos ─────────────────────────────────────────────
+window.carregarContrato = function(id) {
+  var c = contratosCache.find(function(x) { return x.id === id; });
+  if (!c) return;
+  document.getElementById('ct_contratante').value = c.contratante || '';
+  document.getElementById('ct_cpf_contratante').value = c.cpfContratante || '';
+  document.getElementById('ct_contratado').value = c.contratado || '';
+  document.getElementById('ct_cpf_contratado').value = c.cpfContratado || '';
+  document.getElementById('ct_projeto').value = c.projeto || '';
+  document.getElementById('ct_prazo').value = c.prazo || '';
+  document.getElementById('ct_valor_impl').value = c.valorImpl || '';
+  document.getElementById('ct_mensalidade').value = c.mensalidade || '';
+  document.getElementById('ct_inicio').value = c.inicio || '';
+  document.getElementById('ct_local_data').value = c.localData || '';
+  document.getElementById('contrato').scrollIntoView({ behavior: 'smooth' });
+  toast('Contrato carregado!');
+};
+
+// ─── Deletar contrato ─────────────────────────────────────────────────────────
+window.deletarContrato = async function(id) {
+  if (!confirm('Excluir este contrato?')) return;
+  if (window.syncShow) window.syncShow.syncing();
+  try {
+    await deleteDoc(doc(db, 'doa_contratos', id));
+    contratosCache = contratosCache.filter(function(c) { return c.id !== id; });
+    if (window.syncShow) window.syncShow.synced('DOA');
+  } catch(e) {
+    if (window.syncShow) window.syncShow.offline();
+  }
+  renderContratos();
+  toast('Excluído');
+};
+
+// ─── Apagar todos ─────────────────────────────────────────────────────────────
+window.apagarTodosContratos = async function() {
+  if (!confirm('Apagar TODOS os contratos?')) return;
+  if (window.syncShow) window.syncShow.syncing();
+  try {
+    var batch = writeBatch(db);
+    contratosCache.forEach(function(c) { batch.delete(doc(db, 'doa_contratos', c.id)); });
+    await batch.commit();
+    contratosCache = [];
+    if (window.syncShow) window.syncShow.synced('DOA');
+  } catch(e) {
+    if (window.syncShow) window.syncShow.offline();
+  }
+  renderContratos();
+  toast('Apagados');
+};
+
+// ─── onSnapshot — escuta em tempo real ───────────────────────────────────────
+function iniciarListeners() {
+  onSnapshot(query(collection(db, 'doa_contratos'), orderBy('criadoEm', 'desc')), function(snap) {
+    contratosCache = [];
+    snap.forEach(function(d) { contratosCache.push({ id: d.id, ...d.data() }); });
+    renderContratos();
+  });
+}
+
+// ─── INIT ─────────────────────────────────────────────────────────────────────
+iniciarListeners();
+
+// ─── Drawer com histórico ────────────────────────────────────────────────────
+
+// PASSO 4 — base do histórico: nunca sai da página
+if (!window.__voltarBloqueado) {
+      window.__voltarBloqueado = true;
+      setTimeout(function() { window.__voltarBloqueado = false; }, 600);
+      window.location.href = 'OUTROS.html';
+    }
+
+window.toggleDrawer = function() {
+  var drawer = document.getElementById('drawer');
+  if (drawer.classList.contains('open')) {
+    // Fechar via botão: usa history.back() para consistência
+    history.back();
+  } else {
+    history.pushState({ nav: 'drawer' }, '');
+    drawer.classList.add('open');
+    document.getElementById('overlay').classList.add('open');
+    document.getElementById('hamburger').classList.add('open');
+  }
+};
+
+window.closeDrawer = function() {
+  document.getElementById('drawer').classList.remove('open');
+  document.getElementById('overlay').classList.remove('open');
+  document.getElementById('hamburger').classList.remove('open');
+};
+
+function _closeDrawerDirect() {
+  document.getElementById('drawer').classList.remove('open');
+  document.getElementById('overlay').classList.remove('open');
+  document.getElementById('hamburger').classList.remove('open');
+}
+
+// PASSO 3 — popstate: Drawer → Base
+window.addEventListener('popstate', function(e) {
+  var st = e.state;
+
+  // 1. Drawer aberto? Fecha
+  if (document.getElementById('drawer').classList.contains('open')) {
+    _closeDrawerDirect();
+    return;
+  }
+
+  // 2. Base — reafirma para não sair da página
+  if (!window.__voltarBloqueado) {
+      window.__voltarBloqueado = true;
+      setTimeout(function() { window.__voltarBloqueado = false; }, 600);
+      window.location.href = 'OUTROS.html';
+    }
+});
+
+// ─── Simulador ────────────────────────────────────────────────────────────────
+function toggleMonth(header) {
+  var card = header.parentElement;
+  var body = card.querySelector('.month-card-body');
+  var isOpen = card.classList.contains('open');
+  if (isOpen) {
+    card.classList.remove('open');
+    body.style.display = 'none';
+  } else {
+    card.classList.add('open');
+    body.style.display = 'grid';
+  }
+}
+window.toggleMonth = toggleMonth;
+
+var fmt = function(n) { return 'R$ ' + Math.round(n).toLocaleString('pt-BR'); };
+
+function update() {
+  var c = +document.getElementById('s-clients').value;
+  var m = +document.getElementById('s-monthly').value;
+  var e = +document.getElementById('s-extras').value;
+
+  document.getElementById('v-clients').textContent = c;
+  document.getElementById('v-monthly').textContent = fmt(m);
+  document.getElementById('v-extras').textContent = fmt(e);
+  document.getElementById('r-monthly').textContent = fmt(c * m);
+  document.getElementById('r-extras').textContent = fmt(e);
+  document.getElementById('r-total').textContent = fmt(c * m + e);
+
+  var container = document.getElementById('proj-cards');
+  container.innerHTML = '';
+  var acc = 0;
+  var impl = m * 2.5;
+
+  for (var i = 1; i <= 12; i++) {
+    var cl = Math.min(Math.ceil(c * i / 12), c);
+    var men = cl * m;
+    var imp = i <= c ? impl : 0;
+    var ext = i >= 3 ? e : 0;
+    var tot = men + imp + ext;
+    acc += tot;
+
+    var card = document.createElement('div');
+    card.className = 'month-card' + (i === 6 || i === 12 ? ' highlight' : '');
+    card.innerHTML =
+      '<div class="month-card-header" onclick="toggleMonth(this)">' +
+        '<div class="mc-left">' +
+          '<span class="mc-month">Mês ' + i + '</span>' +
+          '<span class="mc-clients">' + cl + ' cliente' + (cl !== 1 ? 's' : '') + '</span>' +
+        '</div>' +
+        '<div class="mc-right">' +
+          '<span class="mc-total">' + fmt(tot) + '</span>' +
+          '<span class="mc-chevron">▾</span>' +
+        '</div>' +
+      '</div>' +
+      '<div class="month-card-body">' +
+        '<div class="mc-row"><div class="mc-label">Mensalidades</div><div class="mc-val">' + fmt(men) + '</div></div>' +
+        '<div class="mc-row"><div class="mc-label">Implementações</div><div class="mc-val">' + fmt(imp) + '</div></div>' +
+        '<div class="mc-row"><div class="mc-label">Extras</div><div class="mc-val">' + fmt(ext) + '</div></div>' +
+        '<div class="mc-row"><div class="mc-label">Total do mês</div><div class="mc-val">' + fmt(tot) + '</div></div>' +
+        '<div class="mc-row mc-acc"><div class="mc-label">Acumulado até aqui</div><div class="mc-val">' + fmt(acc) + '</div></div>' +
+      '</div>';
+    container.appendChild(card);
+  }
+}
+
+['s-clients','s-monthly','s-extras'].forEach(function(id) {
+  document.getElementById(id).addEventListener('input', update);
+});
+update();
+
+// ─── Copiar script ────────────────────────────────────────────────────────────
+window.copyScript = function() {
+  var txt = 'SCRIPT DE VENDAS — MÉTODO DOA\n\n' +
+    'ABERTURA:\n"Oi, [nome]! Tudo bem? Meu nome é [seu nome], sou especialista em sistemas e automação para negócios. Posso te fazer uma pergunta rápida?"\n\n' +
+    'DIAGNÓSTICO DA DOR:\n"Você já usa algum sistema para gerenciar o seu negócio?"\nSe SIM: "Está satisfeito? Tem alguma coisa que falta ou que queria diferente?"\nSe NÃO: "Tudo no Excel? Isso já te causou algum problema?"\n\n' +
+    'PROPOSTA:\n"Eu desenvolvo sistemas personalizados — feito do zero para o seu negócio. Qualquer mudança, eu faço. E você não paga nada adiantado. Só paga quando o sistema estiver pronto e você aprovar."\n\n' +
+    'FECHAMENTO:\n"Que tal marcar 20 minutos essa semana por videochamada? Sem compromisso nenhum."\n\n' +
+    'OBJEÇÕES:\n"Já tenho sistema" → "Tem alguma funcionalidade que falta?"\n"Quanto custa?" → "A mensalidade fica no mesmo valor ou menos que você já paga hoje."\n"Sem tempo" → "Eu cuido de tudo. Posso mandar resumo no WhatsApp?"\n"Como sei que vai entregar?" → "Você não paga nada antes. O contrato garante isso."';
+
+  navigator.clipboard.writeText(txt).then(function() { toast('Script copiado!'); });
+};
+
+</script>
+
+<!-- BOTÃO VOLTAR -->
+<style>
+  /* BOTÃO VOLTAR */
+  #__btn-voltar {
+    position: fixed;
+    bottom: 28px;
+    left: 20px;
+    z-index: 99999;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    color: rgba(255, 255, 255, 0.28);
+    text-decoration: none;
+    width: 52px;
+    height: 52px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    font-weight: 300;
+    line-height: 1;
+    transition: color 0.2s, transform 0.15s;
+    -webkit-tap-highlight-color: transparent;
+    cursor: pointer;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  #__btn-voltar:active {
+    color: rgba(255, 255, 255, 0.65);
+    transform: scale(0.88) translateX(-3px);
+  }
+</style>
+<a id="__btn-voltar" href="OUTROS.html">←</a>
+<!-- FIM BOTÃO VOLTAR -->
+</body>
+</html>
