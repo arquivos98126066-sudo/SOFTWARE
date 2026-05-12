@@ -1,0 +1,1503 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>OPA VIDA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<!-- Firebase carregado como módulo separado, expõe funções via window -->
+<script src="https://arquivos98126066-sudo.github.io/SOFTWARE/sync-indicator.js"></script>
+<script type="module">
+import { db } from "https://arquivos98126066-sudo.github.io/SOFTWARE/firebase-sync.js";
+import { doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const COL = 'metodo_opa';
+const DOC_ID = 'dados_principais';
+const LS_KEY = 'metodo_opa_offline';
+
+function _lsLer(){try{const v=localStorage.getItem(LS_KEY);return v?JSON.parse(v):null;}catch(e){return null;}}
+function _lsGravar(d){try{localStorage.setItem(LS_KEY,JSON.stringify(d));}catch(e){}}
+
+// Expõe função de gravação para o script principal (não-module)
+window._firebaseGravar = async function(d){
+  _lsGravar(d);
+  if(window.syncShow)window.syncShow.syncing();
+  try{
+    await setDoc(doc(db,COL,DOC_ID),d);
+    if(window.syncShow)window.syncShow.synced('Método OPA');
+  }catch(e){
+    console.warn('Erro ao salvar:',e);
+    if(window.syncShow)window.syncShow.local();
+  }
+};
+
+// Listener em tempo real
+onSnapshot(doc(db,COL,DOC_ID),(snap)=>{
+  const activeEl=document.activeElement;
+  const isTyping=activeEl&&(activeEl.tagName==='TEXTAREA'||activeEl.tagName==='INPUT');
+  if(snap.exists()){
+    const dados=snap.data();
+    if(!dados.planos)dados.planos=[];
+    _lsGravar(dados);
+    if(!isTyping && window._opaAtualizarCache){
+      window._opaAtualizarCache(dados);
+    }
+  }
+},(err)=>{
+  console.warn('onSnapshot erro:',err);
+  if(window.syncShow)window.syncShow.offline();
+});
+
+// Carrega dados iniciais
+const ls=_lsLer();
+if(ls){
+  if(!ls.planos)ls.planos=[];
+  window._opaDadosIniciais=ls;
+}
+// Sinaliza que o Firebase está pronto
+window._opaFirebaseReady=true;
+if(window._opaOnFirebaseReady)window._opaOnFirebaseReady();
+</script>
+<style>
+:root{
+  --bg:#ffffff;--bg-card:#f4f7ff;--bg-alt:#eaf0ff;--bg-cinza:#f0f0f0;
+  --azul-escuro:var(--azul);--azul:#2d5be3;--azul-claro:#5b8dee;
+  --texto:#111111;--texto-sec:#555555;--texto-dis:#aaaaaa;
+  --borda:rgba(0,0,0,0.08);--borda-media:#d0d9f0;
+  --verde:#10B981;--vermelho:#EF4444;--amarelo:#F59E0B;
+  --fonte:'Inter',sans-serif;
+  --nav:64px;--r:12px;--r-btn:10px;
+  --safe-bottom:env(safe-area-inset-bottom,0px);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overscroll-behavior:none}
+body{font-family:var(--fonte);background:#e8edf5;color:var(--texto);display:flex;justify-content:center;overflow:hidden;height:100%}
+#app{max-width:480px;width:100%;height:100%;display:flex;flex-direction:column;background:var(--bg);position:relative;overflow:hidden}
+
+/* MÓDULOS — padding-bottom garante que botões nunca fiquem atrás da nav */
+.mod{display:none;flex:1;overflow-y:auto;overflow-x:hidden;padding-bottom:calc(var(--nav) + 32px + var(--safe-bottom));-webkit-overflow-scrolling:touch}
+.mod.ativo{display:flex;flex-direction:column}
+.tela{flex:1;padding:20px 18px;animation:fadeIn 200ms ease-out;display:none;flex-direction:column;min-height:auto}
+.tela.ativa{display:flex}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+@keyframes slideDown{from{opacity:0;max-height:0}to{opacity:1;max-height:600px}}
+@keyframes popIn{from{opacity:0;transform:scale(0.92) translateY(8px)}to{opacity:1;transform:scale(1) translateY(0)}}
+
+/* NAV — SEMPRE FIXA, NUNCA SOBE COM TECLADO */
+#nav{
+  position:fixed;bottom:0;left:50%;transform:translateX(-50%);
+  width:100%;max-width:480px;
+  height:calc(var(--nav) + var(--safe-bottom));
+  background:var(--bg);border-top:1px solid var(--borda-media);
+  display:flex;z-index:1000;
+  box-shadow:0 -2px 16px rgba(0,0,0,0.08);
+  padding-bottom:var(--safe-bottom);
+}
+.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;border:none;background:none;padding:8px 4px;transition:all 150ms;position:relative}
+.nav-item .ni{font-size:19px;transition:transform 150ms}
+.nav-item .nl{font-family:var(--fonte);font-size:10px;font-weight:600;color:var(--texto-dis);transition:color 150ms;letter-spacing:0.02em}
+.nav-item.ativo .nl{color:var(--azul)}
+.nav-item.ativo .ni{transform:scale(1.1)}
+.nav-item.ativo::after{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:24px;height:3px;background:var(--azul);border-radius:0 0 4px 4px}
+
+/* TIPOGRAFIA */
+.titulo{font-size:16px;font-weight:800;color:var(--azul);line-height:1.2;text-transform:uppercase;letter-spacing:0.04em}
+.subtitulo{font-size:13px;font-weight:700;color:var(--texto);text-transform:uppercase;letter-spacing:0.04em}
+.label-sec{font-size:11px;font-weight:700;color:var(--texto-sec);text-transform:uppercase;letter-spacing:0.06em}
+
+/* INPUTS */
+textarea,input[type=text],input[type=time]{width:100%;font-family:var(--fonte);font-size:14px;color:var(--texto);background:var(--bg);border:1.5px solid var(--borda-media);border-radius:var(--r);padding:10px 14px;resize:none;outline:none;transition:border-color 150ms,box-shadow 150ms}
+textarea:focus,input[type=text]:focus,input[type=time]:focus{border-color:var(--azul);box-shadow:0 0 0 3px rgba(45,91,227,0.1)}
+textarea{min-height:38px;padding:10px 14px}
+input[type=text]{height:44px}
+input[type=time]{height:40px}
+::placeholder{color:var(--texto-dis)}
+
+/* BOTÕES */
+.btn{display:flex;align-items:center;justify-content:center;width:100%;height:48px;border-radius:var(--r-btn);font-family:var(--fonte);font-size:14px;font-weight:700;border:none;cursor:pointer;transition:all 150ms;gap:8px}
+.btn-azul{background:var(--azul);color:#fff}
+.btn-azul:hover{background:#2550cc;transform:translateY(-1px);box-shadow:0 4px 14px rgba(45,91,227,0.3)}
+.btn-azul:disabled{background:var(--borda-media);color:var(--texto-dis);cursor:not-allowed;transform:none;box-shadow:none}
+.btn-esc{background:var(--azul);color:#fff}
+.btn-esc:hover{background:#142d52;transform:translateY(-1px)}
+.btn-esc:disabled{background:var(--borda-media);color:var(--texto-dis);cursor:not-allowed;transform:none}
+.btn-sec{background:var(--bg-card);color:var(--texto);border:1.5px solid var(--borda-media);font-weight:600}
+.btn-sec:hover{border-color:var(--azul-claro)}
+.btn-verde{background:var(--verde);color:#fff}
+.btn-verde:hover{filter:brightness(1.05)}
+.btn-danger{background:#FEF2F2;color:var(--vermelho);border:1.5px solid #FCA5A5;font-weight:600}
+.btn-danger:hover{background:var(--vermelho);color:#fff}
+.btn-sm{height:34px;font-size:13px;padding:0 14px;width:auto;border-radius:8px}
+.btn-xs{height:28px;font-size:12px;padding:0 10px;width:auto;border-radius:6px;font-weight:600}
+
+/* CARD */
+.card{background:var(--bg-card);border-radius:var(--r);padding:16px;border:1px solid var(--borda-media)}
+
+/* VOLTAR */
+.voltar{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;color:var(--texto-sec);background:none;border:none;cursor:pointer;padding:0;margin-bottom:18px;transition:color 150ms;font-family:var(--fonte)}
+.voltar:hover{color:var(--azul)}
+
+/* INFO BALÃO — tamanho reduzido 30% */
+.info-btn{width:14px;height:14px;border-radius:99px;background:var(--bg-alt);border:1px solid var(--azul-claro);cursor:pointer;font-size:8px;font-weight:800;color:var(--azul);display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;transition:all 150ms;font-family:var(--fonte)}
+.info-btn:hover{background:var(--azul);color:#fff}
+.info-balao{display:none;position:absolute;left:0;bottom:22px;width:200px;max-width:200px;background:var(--azul);color:#fff;border-radius:10px;padding:8px 12px;font-size:11px;font-weight:400;line-height:1.45;z-index:200;box-shadow:0 8px 24px rgba(0,0,0,0.2);animation:popIn 150ms ease;font-family:var(--fonte);text-transform:none}
+.info-balao::before{content:'';position:absolute;top:-5px;left:7px;width:10px;height:10px;background:var(--azul);transform:rotate(45deg);border-radius:2px}
+.info-balao.vis{display:block}
+.info-wrap{position:relative;display:inline-flex;align-items:center}
+
+/* PROGRESSO */
+.prog-wrap{background:var(--bg-alt);border-radius:99px;height:12px;overflow:hidden;border:1px solid var(--borda-media)}
+.prog-fill{height:100%;border-radius:99px;background:var(--azul);transition:width 400ms ease}
+.prog-fill.verde{background:var(--verde)}
+.prog-fill.roxo{background:#8B5CF6}
+
+/* ZONA BADGE */
+.zbadge{display:inline-flex;align-items:center;padding:3px 9px;border-radius:99px;font-size:11px;font-weight:700;font-family:var(--fonte);border:1px solid transparent;cursor:pointer}
+.z1{background:#FEF2F2;color:#991B1B;border-color:#FCA5A5}
+.z2{background:#FFFBEB;color:#92400E;border-color:#FDE68A}
+.z3{background:#FFF7ED;color:#9A3412;border-color:#FDBA74}
+.z4{background:#F0FDF4;color:#166534;border-color:#86EFAC}
+
+/* BLOCO CARD */
+.bloco-card{background:#fff;border-radius:16px;overflow:hidden;animation:slideDown 200ms ease-out;box-shadow:0 4px 16px rgba(45,91,227,0.10),0 1px 4px rgba(0,0,0,0.06)}
+.bloco-card.bz1{border-left:5px solid var(--vermelho)}
+.bloco-card.bz2{border-left:5px solid var(--amarelo)}
+.bloco-card.bz3{border-left:5px solid #F97316}
+.bloco-card.bz4{border-left:5px solid var(--verde)}
+.bloco-header{display:flex;align-items:center;gap:8px;padding:16px 14px 10px 14px}
+.bloco-body{padding:0 12px 12px 12px}
+.bloco-nome-inp{font-size:15px;font-weight:700;border:none;background:transparent;font-family:var(--fonte);color:var(--texto);outline:none;flex:1;padding:0;min-width:0;line-height:1;vertical-align:middle}
+.bloco-nome-inp::placeholder{color:var(--texto-dis);font-weight:500}
+.bloco-secao{margin-top:12px;padding-left:0}
+.bloco-secao.s-conteudo{padding-left:16px}
+.bloco-secao-titulo{font-size:12px;font-weight:700;color:var(--texto-sec);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px;display:flex;align-items:center;gap:6px;padding-left:8px}
+.bloco-acao-row{display:flex;align-items:center;gap:6px;margin-bottom:6px}
+.bloco-acao-row input[type=text]{flex:1;height:38px;font-size:13px}
+.rm-btn{width:26px;height:26px;min-width:26px;border-radius:6px;border:1.5px solid var(--borda-media);background:var(--bg);color:var(--texto-dis);cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;transition:all 150ms}
+.rm-btn:hover{border-color:var(--vermelho);color:var(--vermelho);background:#FEF2F2}
+.bloco-expandir{background:none;border:none;cursor:pointer;font-size:12px;font-weight:600;color:var(--azul);font-family:var(--fonte);padding:4px 0;display:flex;align-items:center;gap:4px;transition:color 150ms}
+.bloco-extras{display:none}
+.bloco-extras.vis{display:block}
+
+/* ZONA SELECTOR */
+.zona-sel-wrap{position:relative}
+.zona-dropdown{display:none;position:absolute;left:0;top:26px;background:var(--bg);border:1.5px solid var(--borda-media);border-radius:10px;padding:6px;z-index:100;box-shadow:0 8px 20px rgba(0,0,0,0.14);min-width:150px;animation:popIn 150ms ease;margin-left:8px}
+.zona-dropdown.vis{display:flex;flex-direction:column;gap:3px}
+.zona-opt{padding:8px 10px;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;border:none;font-family:var(--fonte);text-align:left;background:var(--bg);transition:background 150ms;display:flex;align-items:center;gap:8px}
+.zona-opt:hover{background:var(--bg-alt)}
+.zona-opt.ativo{background:var(--bg-alt);border-left:3px solid currentColor}
+
+/* PRIORIDADE BADGE */
+.prior-wrap{position:relative}
+.prior-badge{width:26px;height:26px;min-width:26px;border-radius:8px;background:var(--azul);color:#fff;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all 150ms;border:none;font-family:var(--fonte)}
+.prior-badge.pa{background:var(--azul)}
+.prior-badge.pm{background:var(--azul)}
+.prior-badge.pb{background:var(--azul)}
+.prior-dropdown{display:none;position:absolute;left:0;top:30px;background:var(--bg);border:1.5px solid var(--borda-media);border-radius:10px;padding:8px;z-index:100;box-shadow:0 8px 20px rgba(0,0,0,0.14);animation:popIn 150ms ease}
+.prior-dropdown.vis{display:grid;grid-template-columns:repeat(5,1fr);gap:4px}
+.prior-opt{width:32px;height:32px;border-radius:7px;border:1.5px solid var(--borda-media);background:var(--bg-card);font-size:12px;font-weight:800;color:var(--texto-sec);cursor:pointer;font-family:var(--fonte);display:flex;align-items:center;justify-content:center;transition:all 150ms}
+.prior-opt:hover{border-color:var(--azul);color:var(--azul)}
+.prior-opt.psel{background:var(--azul);border-color:var(--azul);color:#fff}
+.prior-opt.p1sel{background:var(--azul);border-color:var(--azul);color:#fff}
+
+/* PURIFICAÇÃO */
+.purif-item{display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--bg-card);border:1.5px solid var(--borda-media);border-radius:var(--r)!important;cursor:pointer;transition:all 150ms;user-select:none}
+.purif-item.desmarcado{opacity:0.4}
+.purif-item.desmarcado .pnome{text-decoration:line-through}
+.pcheck{width:22px;height:22px;min-width:22px;border-radius:6px;border:2px solid var(--borda-media);display:flex;align-items:center;justify-content:center;transition:all 150ms;font-size:12px;background:var(--bg)}
+.purif-item.marcado .pcheck{background:var(--verde);border-color:var(--verde);color:#fff}
+.pnome{font-size:14px;font-weight:500;flex:1}
+.p-bloco-tag{font-size:11px;color:var(--texto-dis);font-weight:600;white-space:nowrap}
+
+/* HORÁRIO NA PURIFICAÇÃO */
+.purif-hor-wrap{padding:10px 14px;background:var(--bg);border:1.5px solid var(--borda-media);border-radius:0 0 var(--r) var(--r);border-top:none;display:none}
+.purif-hor-wrap.vis{display:flex;align-items:center;gap:8px}
+.purif-hor-erro{font-size:11px;color:var(--vermelho);padding:4px 14px 8px;display:none}
+.purif-hor-erro.vis{display:block}
+
+/* PRIORIDADE AÇÕES (tela após purif) */
+.prior-acao-item{display:flex;align-items:center;gap:10px;padding:12px 14px;background:var(--bg-card);border:1.5px solid var(--borda-media);border-radius:var(--r);user-select:none}
+.prior-acao-num{width:28px;height:28px;min-width:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:#fff}
+
+/* TAREFA EXECUÇÃO */
+.tarefa-card{background:#fff;border-radius:16px;padding:16px;transition:all 200ms;box-shadow:0 6px 28px rgba(45,91,227,0.14),0 2px 8px rgba(0,0,0,0.10);border:none;margin-bottom:2px}
+.tarefa-card.feita{background:#F0FDF4;box-shadow:none;opacity:0.7;border-left:4px solid var(--verde)}
+.tarefa-card.agora{background:#fff;border-left:4px solid var(--azul);box-shadow:0 4px 20px rgba(45,91,227,0.15)}
+.tarefa-card.atrasada{background:#FFFBEB;border-left:4px solid var(--amarelo)}
+.tarefa-tag{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:700;padding:4px 10px;border-radius:99px;margin-bottom:8px}
+.tag-agora{background:#EEF2FF;color:var(--azul)}
+.tag-atrasada{background:#FEF3C7;color:#92400E}
+.tarefa-btns{display:flex;gap:8px;margin-top:14px}
+.tarefa-btn{flex:1;height:40px;border-radius:12px;font-family:var(--fonte);font-size:13px;font-weight:700;border:none;cursor:pointer;transition:all 150ms;color:var(--texto-dis);background:#F4F7FF}
+.tarefa-btn.av{background:var(--verde);color:#fff;box-shadow:0 4px 12px rgba(16,185,129,0.3)}
+.tarefa-btn.ac{background:#6B7280;color:#fff;box-shadow:0 4px 12px rgba(107,114,128,0.3)}
+
+/* REVISÃO POR BLOCO */
+.rev-bloco{background:var(--bg-card);border:1px solid var(--borda-media);border-radius:var(--r);overflow:hidden;margin-bottom:12px}
+.rev-bloco-header{background:var(--azul);padding:11px 14px}
+.rev-bloco-header p{font-size:13px;font-weight:700;color:#fff}
+.rev-bloco-body{padding:14px}
+.rev-pergunta{margin-bottom:12px}
+.rev-pergunta:last-child{margin-bottom:0}
+.rev-pergunta label{font-size:12px;font-weight:700;color:var(--azul);display:block;margin-bottom:6px}
+.rev-pergunta textarea{min-height:60px;font-size:13px}
+
+/* HÁBITOS */
+.hab-card{background:#ffffff;border:none;border-radius:var(--r);padding:16px;box-shadow:0 -3px 10px rgba(45,91,227,0.10),0 6px 20px rgba(45,91,227,0.16),0 1px 4px rgba(0,0,0,0.08)}
+.hab-card-topo{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.hab-nome-row{display:flex;align-items:center;gap:8px;flex:1;cursor:pointer;min-width:0}
+.hab-nome{font-size:15px;font-weight:700;color:var(--texto);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hab-streak{font-size:12px;font-weight:600;color:var(--amarelo);white-space:nowrap;flex-shrink:0}
+.hab-grid{display:flex;flex-direction:column;gap:3px;margin-bottom:12px}
+.hab-row{display:flex;gap:3px}
+.hdot{flex:1;aspect-ratio:1;border-radius:4px;background:#ffffff;border:none;box-shadow:0 -1px 3px rgba(45,91,227,0.15),0 2px 6px rgba(45,91,227,0.22);min-width:0}
+.hdot.feito{background:var(--verde);border-color:var(--verde)}
+.hdot.nao{background:#FCA5A5;border-color:var(--vermelho)}
+.hdot.prox{background:var(--bg-alt);border:2px dashed var(--azul-claro)}
+.hab-today{display:flex;gap:8px}
+.hab-btn{flex:1;height:38px;border-radius:8px;font-family:var(--fonte);font-size:13px;font-weight:700;border:none;background:var(--bg);cursor:pointer;color:var(--texto-dis);transition:all 150ms;box-shadow:0 -2px 6px rgba(45,91,227,0.12),0 4px 12px rgba(45,91,227,0.18)}
+.hab-btn.fiz{background:var(--verde);border-color:var(--verde);color:#fff}
+.hab-btn.nfiz{background:#6B7280;border-color:#6B7280;color:#fff}
+.hab-btn:disabled{cursor:not-allowed;opacity:0.7}
+.hab-confirm{display:none;background:#FEF2F2;border:1px solid #FCA5A5;border-radius:8px;padding:12px;margin-top:10px}
+.hab-confirm.vis{display:block}
+.hab-confirm p{font-size:13px;color:#7F1D1D;margin-bottom:10px}
+
+/* DETALHE HÁBITO */
+.hab-stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.hab-stat{background:var(--bg-card);border:1px solid var(--borda-media);border-radius:var(--r);padding:14px;text-align:center}
+.hab-stat .sv{font-size:24px;font-weight:800;color:var(--azul)}
+.hab-stat .sl{font-size:11px;font-weight:600;color:var(--texto-sec);margin-top:2px}
+
+/* DECISÃO */
+.dec-metodo{background:var(--azul);color:#fff;border-radius:var(--r);padding:16px 18px;margin-bottom:20px}
+.dec-metodo h3{font-size:15px;font-weight:800;margin-bottom:6px}
+.dec-metodo p{font-size:13px;line-height:1.55;opacity:0.9}
+.dec-item{padding:13px 14px;background:var(--bg-card);border:1px solid var(--borda-media);border-radius:var(--r);cursor:pointer;transition:all 150ms}
+.dec-item:hover{border-color:var(--azul)}
+
+/* DECISÃO RESUMO — pergunta preta + resposta cinza separadas */
+.dec-par{margin-bottom:14px}
+.dec-par-q{padding:10px 0 8px 0}
+.dec-par-q p{font-size:12px;font-weight:700;color:var(--texto);line-height:1.4;text-transform:uppercase;letter-spacing:0.04em}
+.dec-par-r{background:var(--bg-cinza);border:1px solid var(--borda-media);border-radius:var(--r);padding:11px 14px}
+.dec-par-r p{font-size:14px;color:var(--texto-sec);line-height:1.5;word-break:break-word}
+
+/* HISTÓRICO */
+.hist-filtros{display:flex;gap:8px;margin-bottom:18px}
+.hfiltro{flex:1;height:34px;border-radius:8px;font-family:var(--fonte);font-size:12px;font-weight:700;border:1.5px solid var(--borda-media);background:var(--bg-card);cursor:pointer;color:var(--texto-sec);transition:all 150ms}
+.hfiltro.ativo{background:var(--azul);border-color:var(--azul);color:#fff}
+.hist-item{background:var(--bg-card);border:1px solid var(--borda-media);border-radius:var(--r);padding:14px;cursor:pointer;transition:all 150ms}
+.hist-item:hover{border-color:var(--azul);box-shadow:0 2px 12px rgba(45,91,227,0.1)}
+.zonas-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:18px}
+.zona-stat{background:var(--bg-card);border-radius:var(--r);padding:12px;border:1px solid var(--borda-media);text-align:center}
+.zona-stat .zv{font-size:22px;font-weight:800}
+.zona-stat .zl{font-size:11px;font-weight:600;color:var(--texto-sec);margin-top:2px}
+.zs4 .zv{color:var(--verde)}.zs3 .zv{color:#F97316}.zs2 .zv{color:var(--amarelo)}.zs1 .zv{color:var(--vermelho)}
+
+/* MODAL */
+#modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:500;align-items:center;justify-content:center;padding:20px}
+#modal.vis{display:flex}
+.modal-box{background:var(--bg);border-radius:16px;padding:24px 20px;width:100%;max-width:420px;animation:popIn 200ms ease;position:relative;max-height:80vh;overflow-y:auto}
+.modal-close{position:absolute;top:12px;right:12px;background:var(--bg-card);border:none;border-radius:99px;width:28px;height:28px;cursor:pointer;font-size:16px;color:var(--texto-sec);display:flex;align-items:center;justify-content:center}
+.guia-item{display:flex;gap:12px;align-items:flex-start;margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid var(--borda-media)}
+.guia-item:last-child{margin-bottom:0;padding-bottom:0;border-bottom:none}
+.guia-emoji{font-size:22px;flex-shrink:0}
+.guia-titulo{font-size:13px;font-weight:800;color:var(--azul);margin-bottom:3px}
+.guia-desc{font-size:13px;color:var(--texto-sec);line-height:1.5}
+@keyframes bounce{from{transform:translateY(0)}to{transform:translateY(-8px)}}
+
+/* TOAST */
+#toast{position:fixed;bottom:calc(var(--nav) + var(--safe-bottom) + 12px);left:50%;transform:translateX(-50%);background:var(--azul);color:#fff;font-family:var(--fonte);font-size:13px;font-weight:600;padding:10px 20px;border-radius:99px;z-index:9999;pointer-events:none;opacity:0;transition:opacity 200ms;white-space:nowrap}
+#toast.show{opacity:1}
+
+/* UTIL */
+.spacer{flex:0;min-height:16px}
+.mt-6{margin-top:6px}.mt-8{margin-top:8px}.mt-10{margin-top:10px}.mt-12{margin-top:12px}.mt-16{margin-top:16px}.mt-20{margin-top:20px}.mt-24{margin-top:24px}
+.flex-col{display:flex;flex-direction:column}
+.row{display:flex;align-items:center}
+.row-between{display:flex;align-items:center;justify-content:space-between}
+.chip{display:inline-flex;align-items:center;gap:4px;background:var(--bg-alt);color:var(--azul);font-size:12px;font-weight:700;padding:4px 10px;border-radius:99px;border:1px solid var(--borda-media)}
+.divisor{border:none;border-top:1px solid var(--borda-media);margin:16px 0}
+.empty{text-align:center;padding:40px 20px;color:var(--texto-dis)}
+.empty .ei{font-size:38px;margin-bottom:10px}
+.dica{background:var(--bg-alt);border:1px solid var(--borda-media);border-radius:8px;padding:11px 13px;font-size:13px;color:var(--texto-sec);line-height:1.5}
+::-webkit-scrollbar{width:3px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--borda-media);border-radius:99px}
+</style>
+</head>
+<body>
+<div id="app">
+
+<!-- ===== MÓDULO HOJE ===== -->
+<div class="mod ativo" id="mod-hoje">
+
+  <!-- BLOCOS PRINCIPAL -->
+  <div class="tela ativa" id="t-hoje-main">
+    <div class="row-between">
+      <div>
+        <p id="saudacao" class="label-sec" style="color:var(--azul);margin-bottom:4px"></p>
+      </div>
+      <button class="btn-xs btn-sec" id="btn-add-bloco-top">+ Bloco</button>
+    </div>
+    <div class="dica mt-12">💡 Crie blocos com objetivo, porquê e ações. Depois purifique e priorize.</div>
+    <div class="flex-col" style="gap:10px;margin-top:16px" id="blocos-lista"></div>
+    <div class="spacer"></div>
+    
+    
+  </div>
+
+  <!-- GERENCIAR BLOCO -->
+  <div class="tela" id="t-gerenciar-bloco">
+    <button class="voltar" onclick="history.back()">← BLOCOS</button>
+    <div class="row-between">
+      <h1 class="titulo" id="gbloco-nome" style="flex:1"></h1>
+      <span id="gbloco-hor" style="font-size:12px;font-weight:600;color:var(--azul)"></span>
+    </div>
+    <p id="gbloco-obj" style="font-size:13px;color:var(--texto-sec);margin-top:6px"></p>
+    <div class="flex-col" style="gap:8px;margin-top:16px;flex:1" id="gbloco-acoes"></div>
+    <div class="spacer"></div>
+    <button class="btn btn-esc mt-16" id="btn-gbloco-purif">PURIFICAR AÇÕES →</button>
+  </div>
+
+  <!-- PURIFICAÇÃO -->
+  <div class="tela" id="t-purificar">
+    <button class="voltar" onclick="history.back()">← BLOCOS</button>
+    <div class="row" style="gap:8px">
+      <h1 class="titulo" style="flex:1;font-size:16px;text-transform:uppercase;letter-spacing:0.06em"></h1>
+      <div class="info-wrap"><button class="info-btn" onclick="tgInfo('info-purif')">i</button>
+      <div class="info-balao" id="info-purif">Desmarque as ações que não são essenciais hoje. As desmarcadas ficam para depois.</div></div>
+    </div>
+    <p style="font-size:13px;color:var(--texto-sec);margin-top:8px">Selecione as ações que realmente importam hoje.</p>
+    <div class="flex-col" style="gap:8px;margin-top:16px;flex:1" id="purif-lista"></div>
+    <div class="row-between mt-12"><span id="purif-count" class="chip">0 selecionadas</span></div>
+    <div class="spacer"></div>
+    <button class="btn btn-esc mt-16" id="btn-purif-prox">DEFINIR PRIORIDADES →</button>
+  </div>
+
+  <!-- PRIORIDADE AÇÕES -->
+  <div class="tela" id="t-prioridade">
+    <button class="voltar" onclick="history.back()">← PURIFICAR</button>
+    <div class="row" style="gap:8px">
+      <h1 class="titulo" style="flex:1;font-size:16px;text-transform:uppercase;letter-spacing:0.06em"></h1>
+      <div class="info-wrap"><button class="info-btn" onclick="tgInfo('info-prior')">i</button>
+      <div class="info-balao" id="info-prior">Regra 80/20: toque no número para definir a prioridade de cada ação. Nível 1 é o mais importante.</div></div>
+    </div>
+    <p style="font-size:13px;color:var(--texto-sec);margin-top:8px">Toque no número para definir a prioridade de 1 a 10.</p>
+    <div class="flex-col" style="gap:8px;margin-top:16px;flex:1" id="prior-lista"></div>
+    <div class="spacer"></div>
+    <button class="btn btn-esc mt-16" id="btn-prior-prox">VER MEU DIA →</button>
+  </div>
+
+  <!-- HORÁRIOS (após prioridade) -->
+  <div class="tela" id="t-horarios">
+    <button class="voltar" onclick="history.back()">← PRIORIDADES</button>
+    <div class="row" style="gap:8px">
+      <h1 class="titulo" style="flex:1;font-size:16px;text-transform:uppercase;letter-spacing:0.06em">Horários</h1>
+      <div class="info-wrap"><button class="info-btn" onclick="tgInfo('info-hor')">i</button>
+      <div class="info-balao" id="info-hor" style="right:0;left:auto">O horário da ação deve estar dentro do intervalo do bloco. Ex: se o bloco é 09:00-12:00, as ações devem ser entre 09:00 e 12:00.</div></div>
+    </div>
+    <p style="font-size:13px;color:var(--texto-sec);margin-top:8px">Opcional. Defina o horário de cada ação.</p>
+    <div class="flex-col" style="gap:8px;margin-top:16px;flex:1" id="hor-lista"></div>
+    <div class="spacer"></div>
+    <button class="btn btn-esc mt-16" id="btn-hor-prox">VER MEU DIA →</button>
+  </div>
+
+  <!-- RELATÓRIO -->
+  <div class="tela" id="t-relatorio">
+    <button class="voltar" onclick="history.back()">← BLOCOS</button>
+    <p id="rel-data" class="label-sec" style="color:var(--azul);margin-bottom:6px"></p>
+    <h1 class="titulo" style="font-size:16px;text-transform:uppercase;letter-spacing:0.06em">Plano do Dia</h1>
+    <div class="flex-col" style="gap:12px;margin-top:16px;flex:1" id="rel-lista"></div><style>#rel-prog,#t-relatorio .divisor{display:none},#rel-pct,.divisor+.row-between{display:none!important}</style>
+    <hr class="divisor">
+    <div class="row-between" style="margin-bottom:6px">
+      <span style="font-size:13px;font-weight:600;color:var(--texto-sec);display:none">Progresso</span>
+      <span id="rel-pct" style="display:none">0%</span>
+    </div>
+    <div class="prog-wrap"><div class="prog-fill" id="rel-prog" style="width:0%"></div></div>
+    <div class="prog-wrap" style="display:none"><div class="prog-fill" id="rel-prog" style="width:0%"></div></div><button class="btn btn-esc mt-20" id="btn-comecar-dia" style="display:none">COMEÇAR O DIA ▶</button>
+  </div>
+
+  <!-- EXECUÇÃO -->
+  <div class="tela" id="t-execucao">
+    <button class="voltar" onclick="history.back()">← BLOCOS</button>
+    <div class="row-between">
+      <p id="exec-data" class="label-sec" style="color:var(--azul)"></p>
+      <span id="exec-clock" style="font-size:13px;font-weight:700;color:var(--texto-sec);position:fixed;top:10px;right:18px;z-index:999;background:var(--bg);padding:2px 8px;border-radius:99px"></span>
+    </div>
+    <div class="mt-10">
+      <div class="row-between" style="margin-bottom:5px">
+      <span id="exec-pct" style="font-size:13px;font-weight:800;color:var(--azul);margin-left:auto">0%</span>
+      </div>
+      <div class="prog-wrap"><div class="prog-fill" id="exec-prog" style="width:0%"></div></div>
+    </div>
+    <div class="flex-col" style="gap:10px;margin-top:20px;flex:1" id="exec-lista"></div>
+    <button class="btn btn-sec mt-20" id="btn-revisar" style="text-transform:uppercase;letter-spacing:0.04em">📝 Revisar o Dia</button>
+  </div>
+
+  <!-- REVISÃO -->
+  <div class="tela" id="t-revisao">
+    <button class="voltar" onclick="history.back()">← MEU DIA</button>
+    <h1 class="titulo" style="font-size:16px;text-transform:uppercase;letter-spacing:0.06em"></h1>
+    <p style="font-size:13px;color:var(--texto-sec);margin-top:8px">Avalie cada bloco do seu dia.</p>
+    <div class="flex-col" style="margin-top:16px;flex:1" id="rev-lista"></div>
+    <div class="spacer"></div>
+    <button class="btn btn-verde mt-16" id="btn-salvar-rev">SALVAR REVISÃO 🎉</button>
+  </div>
+</div>
+
+<!-- ===== MÓDULO HÁBITOS ===== -->
+<div class="mod" id="mod-habitos">
+  <div class="tela ativa" id="t-habitos-lista">
+    <div class="row-between">
+      <h1 class="titulo" style="font-size:16px;text-transform:uppercase;letter-spacing:0.06em">Hábitos</h1>
+      <div style="display:flex;gap:8px">
+        <button style="display:inline-flex;align-items:center;gap:5px;background:var(--bg-card);border:1.5px solid var(--borda-media);border-radius:99px;padding:6px 12px;font-size:12px;font-weight:600;color:var(--azul);cursor:pointer;font-family:var(--fonte)" id="btn-frase-dia">💬 Frase</button>
+        <button style="display:inline-flex;align-items:center;gap:5px;background:var(--bg-card);border:1.5px solid var(--borda-media);border-radius:99px;padding:6px 12px;font-size:12px;font-weight:600;color:var(--texto-sec);cursor:pointer;font-family:var(--fonte)" id="btn-guia">📚 Guia</button>
+      </div>
+    </div>
+    <p style="font-size:12px;color:var(--texto-sec);margin-top:6px;font-style:italic">"Você não sobe ao nível dos seus objetivos — você cai ao nível dos seus sistemas."</p>
+    <div id="novo-hab-wrap" style="display:none;background:var(--bg-card);border:1.5px solid var(--azul);border-radius:var(--r);padding:12px;margin-top:14px;gap:10px" class="row">
+      <input type="text" id="inp-novo-hab" placeholder="Nome do hábito..." maxlength="100" style="flex:1">
+      <button class="btn btn-azul btn-sm" id="btn-salvar-hab">Salvar</button>
+      <button class="btn btn-sec btn-sm" onclick="fecharNovoHab()">✕</button>
+    </div>
+    <div class="flex-col" style="gap:12px;margin-top:16px" id="habitos-lista"></div>
+    <div class="spacer"></div>
+    <button class="btn btn-sec mt-20" id="btn-novo-hab">+ Novo Hábito</button>
+  </div>
+  <div class="tela" id="t-hab-detalhe">
+    <button class="voltar" onclick="history.back()">← HÁBITOS</button>
+    <h1 class="titulo" id="hdet-nome"></h1>
+    <p class="label-sec mt-4" id="hdet-data" style="color:var(--azul)"></p>
+    <div class="hab-stat-grid mt-16">
+      <div class="hab-stat"><p class="sv" id="hdet-streak">0</p><p class="sl">🔥 Dias seguidos</p></div>
+      <div class="hab-stat"><p class="sv" id="hdet-recorde">0</p><p class="sl">🏆 Recorde</p></div>
+      <div class="hab-stat"><p class="sv" id="hdet-total">0</p><p class="sl">📅 Total feitos</p></div>
+      <div class="hab-stat"><p class="sv" id="hdet-ciclo">1</p><p class="sl">🔄 Ciclo atual</p></div>
+    </div>
+    <p class="label-sec mt-4" style="color:var(--azul);margin-bottom:8px">MOTIVAÇÃO</p>
+    <div class="card" id="hdet-motiv" style="font-size:13px;color:var(--texto-sec);font-style:italic;line-height:1.55"></div>
+    <p class="label-sec mt-16" style="color:var(--azul);margin-bottom:10px">HISTÓRICO DE CICLOS</p>
+    <div class="flex-col" style="gap:8px" id="hdet-ciclos"></div>
+  </div>
+</div>
+
+<!-- ===== MÓDULO DECISÃO ===== -->
+<div class="mod" id="mod-decisao">
+  <div class="tela ativa" id="t-dec-inicio">
+    <h1 class="titulo" style="font-size:16px;text-transform:uppercase;letter-spacing:0.06em;display:none">Decisão</h1>
+    <div class="dec-metodo mt-16">
+      <h3>O Método Completo</h3>
+      <p>6 passos preparatórios para colocar você no estado certo, seguidos de 10 perguntas que eliminam os pontos cegos. Responda com honestidade.</p>
+    </div>
+    <p style="font-size:14px;font-weight:600;color:var(--texto-sec)">O que você precisa decidir?</p>
+    <div class="flex-col" style="gap:10px;margin-top:10px;flex:1">
+      <input type="text" id="inp-dec-tema" placeholder="Descreva a decisão..." maxlength="300">
+      <button class="btn btn-esc" id="btn-comecar-dec" disabled>COMEÇAR PROCESSO →</button>
+      <hr class="divisor">
+      <p class="label-sec" style="color:var(--azul);margin-bottom:8px">DECISÕES ANTERIORES</p>
+      <div class="flex-col" style="gap:8px" id="dec-anteriores"></div>
+    </div>
+  </div>
+  <div class="tela" id="t-dec-prep">
+    <button class="voltar" onclick="history.back()">← DECISÕES</button>
+    <div class="row-between" style="margin-bottom:6px">
+      <span id="prep-label" class="label-sec" style="color:var(--azul)">PREPARAÇÃO 1 DE 6</span>
+      <span id="prep-pct" style="font-size:13px;font-weight:800;color:var(--azul)">17%</span>
+    </div>
+    <div class="prog-wrap" style="margin-bottom:18px"><div class="prog-fill roxo" id="prep-prog" style="width:17%"></div></div>
+    <div class="row" style="gap:8px;margin-bottom:14px">
+      <h2 id="prep-titulo" class="subtitulo" style="flex:1;line-height:1.35"></h2>
+      <div class="info-wrap"><button class="info-btn" onclick="tgInfo('info-prep')">i</button>
+      <div class="info-balao" id="info-prep" style="right:0;left:auto"></div></div>
+    </div>
+    <div class="flex-col" style="gap:10px;flex:1">
+      <textarea id="prep-resp" placeholder="Sua resposta..." style="min-height:110px;flex:1"></textarea>
+      <div class="spacer"></div>
+      <div style="display:flex;gap:10px">
+        <button class="btn btn-sec" id="btn-prep-ant" style="flex:0 0 50px;font-size:18px">←</button>
+        <button class="btn btn-esc" id="btn-prep-prox" style="flex:1" disabled>PRÓXIMO →</button>
+      </div>
+    </div>
+  </div>
+  <div class="tela" id="t-dec-processo">
+    <button class="voltar" onclick="history.back()">← DECISÕES</button>
+    <div class="row-between" style="margin-bottom:6px">
+      <span id="dec-label" class="label-sec" style="color:var(--azul)">PASSO 1 DE 10</span>
+      <span id="dec-pct" style="font-size:13px;font-weight:800;color:var(--azul)">10%</span>
+    </div>
+    <div class="prog-wrap" style="margin-bottom:18px"><div class="prog-fill" id="dec-prog" style="width:10%"></div></div>
+    <div class="row" style="gap:8px;margin-bottom:14px">
+      <h2 id="dec-pergunta" class="subtitulo" style="flex:1;line-height:1.35"></h2>
+      <div class="info-wrap"><button class="info-btn" onclick="tgInfo('info-dec')">i</button>
+      <div class="info-balao" id="info-dec" style="right:0;left:auto"></div></div>
+    </div>
+    <div class="flex-col" style="gap:10px;flex:1">
+      <textarea id="dec-resp" placeholder="Sua resposta..." style="min-height:110px;flex:1"></textarea>
+      <div class="spacer"></div>
+      <div style="display:flex;gap:10px">
+        <button class="btn btn-sec" id="btn-dec-ant" style="flex:0 0 50px;font-size:18px">←</button>
+        <button class="btn btn-esc" id="btn-dec-prox" style="flex:1" disabled>PRÓXIMO →</button>
+      </div>
+    </div>
+  </div>
+  <div class="tela" id="t-dec-resultado">
+    <button class="voltar" onclick="history.back()">← DECISÕES</button>
+    <h1 class="titulo" style="font-size:16px;text-transform:uppercase;letter-spacing:0.06em">Sua Decisão</h1>
+    <p style="font-size:13px;color:var(--texto-sec);margin-top:6px" id="dec-res-tema"></p>
+    <hr class="divisor">
+    <div id="dec-resumo" class="flex-col" style="gap:0;margin-bottom:16px"></div>
+    <div style="display:flex;gap:10px;margin-top:14px">
+      <button class="btn btn-sec" id="btn-dec-salvar">💾 Salvar</button>
+      <button class="btn btn-sec" id="btn-dec-refazer">🔄 Refazer</button>
+    </div>
+  </div>
+  <div class="tela" id="t-dec-detalhe">
+    <button class="voltar" onclick="history.back()">← DECISÕES</button>
+    <h1 class="titulo" id="dec-det-tema" style="color:var(--texto);margin-bottom:10px"></h1>
+    <p class="label-sec mt-4" id="dec-det-data" style="color:var(--azul);margin-bottom:16px"></p>
+    <hr class="divisor">
+    <div id="dec-det-lista" class="flex-col" style="gap:0;margin-bottom:16px"></div>
+    <p id="dec-det-conclusao" style="display:none"></p>
+    <button class="btn btn-danger mt-16" id="btn-del-dec">🗑️ Apagar Decisão</button>
+  </div>
+</div>
+
+<!-- ===== MÓDULO HISTÓRICO ===== -->
+<div class="mod" id="mod-historico">
+  <div class="tela ativa" id="t-hist-lista">
+    <h1 class="titulo" style="font-size:16px;text-transform:uppercase;letter-spacing:0.06em">Histórico</h1>
+    <div class="zonas-grid mt-16">
+      <div class="zona-stat zs4"><p class="zv" id="z4p">0%</p><p class="zl">🟢 Z4 Realização</p></div>
+      <div class="zona-stat zs3"><p class="zv" id="z3p">0%</p><p class="zl">🟠 Z3 Exigência</p></div>
+      <div class="zona-stat zs2"><p class="zv" id="z2p">0%</p><p class="zl">🟡 Z2 Ilusão</p></div>
+      <div class="zona-stat zs1"><p class="zv" id="z1p">0%</p><p class="zl">🔴 Z1 Distração</p></div>
+    </div>
+    <div class="hist-filtros">
+      <button class="hfiltro ativo" data-f="semana">SEMANA</button>
+      <button class="hfiltro" data-f="mes">MÊS</button>
+      <button class="hfiltro" data-f="tudo">TUDO</button>
+    </div>
+    <div class="flex-col" style="gap:10px" id="hist-lista"></div>
+  </div>
+  <div class="tela" id="t-hist-det">
+    <button class="voltar" onclick="history.back()">← HISTÓRICO</button>
+    <div class="mt-4">
+      <p id="hdet-data-label" class="label-sec" style="color:var(--azul);margin-bottom:10px"></p>
+      <div class="flex-col" style="gap:10px" id="hdet-blocos"></div>
+    </div>
+
+    <button class="btn btn-danger mt-20" id="btn-apagar-dia">🗑️ Apagar Dia</button>
+  </div>
+</div>
+
+<div class="mod" id="mod-planos"><div class="tela ativa" id="t-planos-lista"><h1 class="titulo" style="font-size:16px;text-transform:uppercase;letter-spacing:0.06em">Planos</h1><p style="font-size:13px;color:var(--texto-sec);margin-top:6px">Seus modelos de planejamento salvos.</p><div class="flex-col" style="gap:10px;margin-top:16px" id="planos-lista"></div><div class="empty" id="planos-empty" style="display:none"><div class="ei">📋</div><p>Nenhum plano salvo ainda.</p></div></div></div>
+<nav id="nav">
+  <button class="nav-item ativo" data-mod="hoje" onclick="navegar('hoje')"><span class="ni">📅</span><span class="nl">HOJE</span></button>
+  <button class="nav-item" data-mod="habitos" onclick="navegar('habitos')"><span class="ni">🔥</span><span class="nl">HÁBITOS</span></button>
+  <button class="nav-item" data-mod="decisao" onclick="navegar('decisao')"><span class="ni">🎯</span><span class="nl">DECISÃO</span></button>
+  <button class="nav-item" data-mod="planos" onclick="navegar('planos')"><span class="ni">📋</span><span class="nl">PLANOS</span></button><button class="nav-item" data-mod="historico" onclick="navegar('historico')"><span class="ni">📊</span><span class="nl">HISTÓRICO</span></button>
+</nav>
+</div>
+
+<div id="modal"><div class="modal-box" id="modal-box"><button class="modal-close" onclick="fecharModal()">✕</button><div id="modal-content"></div></div></div>
+<div id="toast"></div>
+
+<script>
+const $=s=>document.querySelector(s),$$=s=>document.querySelectorAll(s);
+
+// ===== STORAGE — bridge para Firebase (carregado no head como module) =====
+const LS_KEY_MAIN = 'metodo_opa_offline';
+let _cache = {planejamentos:[],habitos:[],decisoes:[],planos:[]};
+
+// Carrega cache do localStorage imediatamente (antes do Firebase responder)
+(function(){
+  try{
+    const v=localStorage.getItem(LS_KEY_MAIN);
+    if(v){const d=JSON.parse(v);if(d){_cache=d;if(!_cache.planos)_cache.planos=[];}}
+  }catch(e){}
+})();
+
+// Função chamada pelo module Firebase quando dados chegam do servidor
+window._opaAtualizarCache = function(dados){
+  _cache = dados;
+  if(!_cache.planos)_cache.planos=[];
+  // Se estamos em bloqueio (acabamos de salvar localmente), ignora completamente
+  if(_bloqueioRerender)return;
+  const modAtivo=document.querySelector('.mod.ativo');
+  if(!modAtivo)return;
+  const telaAtiva=modAtivo.querySelector('.tela.ativa');
+  if(modAtivo.id==='mod-hoje'&&telaAtiva&&telaAtiva.id==='t-hoje-main'){
+    const p=gph();
+    if(!p||!p.blocos||!p.blocos.length)return;
+    const jsonNovo=JSON.stringify(p.blocos);
+    const jsonAtual=JSON.stringify(blocosTemp);
+    if(jsonNovo===jsonAtual)return;
+    blocosTemp=JSON.parse(JSON.stringify(p.blocos));
+    renderBlocosUI();
+    checkBtns();
+  }
+};
+
+function gd(){return JSON.parse(JSON.stringify(_cache))}
+
+// Bloqueia re-render por 3s após salvar localmente (evita piscar pelo onSnapshot)
+let _bloqueioRerender=false,_bloqueioTimer=null;
+function _bloquear(){_bloqueioRerender=true;clearTimeout(_bloqueioTimer);_bloqueioTimer=setTimeout(()=>{_bloqueioRerender=false;},3000);}
+
+function sd(d){
+  _cache=d;
+  if(!_cache.planos)_cache.planos=[];
+  _bloquear();
+  try{localStorage.setItem(LS_KEY_MAIN,JSON.stringify(d));}catch(e){}
+  if(window._firebaseGravar)window._firebaseGravar(d);
+}
+function md(fn){const d=gd();fn(d);sd(d)}
+function hoje(){const d=new Date();return`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`}
+function hId(){return`plan_${hoje().replace(/-/g,'')}`}
+function gph(){return gd().planejamentos.find(p=>p.data===hoje())||null}
+function sp(p){md(d=>{const i=d.planejamentos.findIndex(x=>x.id===p.id);if(i>=0)d.planejamentos[i]=p;else d.planejamentos.unshift(p)})}
+function fBR(iso){if(!iso)return'';const[y,m,dd]=iso.split('-');const ms=['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];return`${parseInt(dd)} de ${ms[parseInt(m)-1]} de ${y}`}
+function toast(msg,dur=1800){const t=$('#toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),dur)}
+function abrirModal(html){$('#modal-content').innerHTML=html;$('#modal').classList.add('vis');history.pushState({nav:'modal'},'')}
+function fecharModal(){$('#modal').classList.remove('vis')}
+$('#modal').addEventListener('click',e=>{if(e.target===$('#modal'))fecharModal()})
+
+// NAV
+function navegar(mod){
+  $$('.mod').forEach(m=>m.classList.remove('ativo'));$$('.nav-item').forEach(n=>n.classList.remove('ativo'));
+  document.getElementById('mod-'+mod).classList.add('ativo');document.querySelector(`[data-mod="${mod}"]`).classList.add('ativo');
+  if(mod==='habitos')renderHabitos();if(mod==='historico'){calcZonas();renderHistorico()}if(mod==='decisao')renderDecAnt();if(mod==='planos')renderPlanos();
+  if(mod!=='hoje')history.pushState({nav:mod,tela:'root'},'');
+}
+function irT(id){$('#mod-hoje').querySelectorAll('.tela').forEach(t=>t.classList.remove('ativa'));document.getElementById(id).classList.add('ativa');if(id!=='t-hoje-main')history.pushState({nav:'hoje',tela:id},'')}
+function irTHab(id){$('#mod-habitos').querySelectorAll('.tela').forEach(t=>t.classList.remove('ativa'));document.getElementById(id).classList.add('ativa');if(id!=='t-habitos-lista')history.pushState({nav:'habitos',tela:id},'')}
+function irTDec(id){$('#mod-decisao').querySelectorAll('.tela').forEach(t=>t.classList.remove('ativa'));document.getElementById(id).classList.add('ativa');if(id!=='t-dec-inicio')history.pushState({nav:'decisao',tela:id},'')}
+function irTHist(id){$('#mod-historico').querySelectorAll('.tela').forEach(t=>t.classList.remove('ativa'));document.getElementById(id).classList.add('ativa');if(id!=='t-hist-lista')history.pushState({nav:'historico',tela:id},'')}
+// Versões internas sem pushState (para uso no popstate)
+function _irT(id){$('#mod-hoje').querySelectorAll('.tela').forEach(t=>t.classList.remove('ativa'));document.getElementById(id).classList.add('ativa')}
+function _irTHab(id){$('#mod-habitos').querySelectorAll('.tela').forEach(t=>t.classList.remove('ativa'));document.getElementById(id).classList.add('ativa')}
+function _irTDec(id){$('#mod-decisao').querySelectorAll('.tela').forEach(t=>t.classList.remove('ativa'));document.getElementById(id).classList.add('ativa')}
+function _irTHist(id){$('#mod-historico').querySelectorAll('.tela').forEach(t=>t.classList.remove('ativa'));document.getElementById(id).classList.add('ativa')}
+
+// INFO BALÕES
+function tgInfo(id){const el=document.getElementById(id);$$('.info-balao').forEach(b=>{if(b.id!==id)b.classList.remove('vis')});el.classList.toggle('vis')}
+document.addEventListener('click',e=>{if(!e.target.classList.contains('info-btn'))$$('.info-balao').forEach(b=>b.classList.remove('vis'))})
+
+// DROPDOWNS
+function tgDropdown(id){$$('.zona-dropdown,.prior-dropdown').forEach(d=>{if(d.id!==id)d.classList.remove('vis')});document.getElementById(id).classList.toggle('vis')}
+document.addEventListener('click',e=>{if(!e.target.closest('.zona-sel-wrap')&&!e.target.closest('.prior-wrap'))$$('.zona-dropdown,.prior-dropdown').forEach(d=>d.classList.remove('vis'))})
+
+// ===== HOJE =====
+let blocosTemp=[];let ultimosBlocos=[];
+const zonaInfo={z1:{label:'Z1 Distração',cor:'#EF4444',desc:'Perde tempo'},z2:{label:'Z2 Ilusão',cor:'#F59E0B',desc:'Parece importante'},z3:{label:'Z3 Exigência',cor:'#F97316',desc:'Urgente'},z4:{label:'Z4 Realização',cor:'#10B981',desc:'Move sua vida'}};
+
+function initHoje(){
+  const d=new Date();
+  const dias=['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábado'];
+  const meses=['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
+  $('#saudacao').textContent=`${dias[d.getDay()]}, ${d.getDate()} de ${meses[d.getMonth()]}`;
+  const p=gph();
+  if(p&&p.blocos&&p.blocos.length){if(p.iniciado){irT('t-execucao');renderExec();startClock();return}else{blocosTemp=JSON.parse(JSON.stringify(p.blocos));renderBlocosUI();checkBtns();return}}
+  if(p&&p.blocos&&p.blocos.length)blocosTemp=JSON.parse(JSON.stringify(p.blocos));
+  else{blocosTemp=[];adicionarBloco()}
+  renderBlocosUI();
+}
+
+function voltarParaBlocos(){
+  const p=gph();
+  if(p&&p.blocos&&p.blocos.length){
+    blocosTemp=JSON.parse(JSON.stringify(p.blocos));
+  }
+  irT('t-hoje-main');
+  renderBlocosUI();
+  checkBtns();
+}
+
+function criarBloco(nome=''){
+return{id:`b_${Date.now()}_${Math.random().toString(36).substr(2,4)}`,nome,zona:'z4',objetivo:'',proposito:'',acoes:[],prior:5,horario_inicio:'',horario_fim:'',status:'pendente'};
+}
+function adicionarBloco(){const p=blocosTemp.length+1;const b=criarBloco();b.prior=p;blocosTemp.push(b);renderBlocosUI()}
+$('#btn-add-bloco-top').addEventListener('click',adicionarBloco);
+
+function renderBlocosUI(){
+  const lista=$('#blocos-lista');lista.innerHTML='';
+  blocosTemp.forEach(b=>lista.appendChild(criarBlocoUI(b)));
+  checkBtns();
+}
+
+function criarBlocoUI(b){
+  const card=document.createElement('div');
+  const zi=zonaInfo[b.zona||'z4'];
+  card.className=`bloco-card b${b.zona||'z4'}`;card.dataset.id=b.id;
+  card.innerHTML=`
+    <div class="bloco-header">
+      <div class="prior-wrap" style="position:relative">
+        <button class="prior-badge ${b.prior<=3?'pa':b.prior<=6?'pm':'pb'}" onclick="tgDropdown('pdrop-${b.id}')">${b.prior}</button>
+        <div class="prior-dropdown" id="pdrop-${b.id}">
+          ${[1,2,3,4,5,6,7,8,9,10].map(n=>`<button class="prior-opt ${b.prior===n?(n===1?'p1sel':'psel'):''}" onclick="setBlocoP('${b.id}',${n})">${n}</button>`).join('')}
+        </div>
+      </div>
+      <div class="zona-sel-wrap">
+        <button class="zbadge ${b.zona||'z4'}" onclick="tgDropdown('zdrop-${b.id}')">${zi.label}</button>
+        <div class="zona-dropdown" id="zdrop-${b.id}">
+          ${Object.entries(zonaInfo).map(([k,v])=>`<button class="zona-opt ${b.zona===k?'ativo':''}" style="color:${v.cor}" onclick="setBlocoZ('${b.id}','${k}')">${v.label}<span style="font-size:11px;font-weight:400;color:var(--texto-dis);margin-left:4px">${v.desc}</span></button>`).join('')}
+        </div>
+      </div>
+      <input class="bloco-nome-inp" placeholder="Nome do bloco..." value="${b.nome}" maxlength="60" data-id="${b.id}">
+      <button class="rm-btn" style="color:var(--azul);border-color:var(--azul)" onclick="gerenciarBloco('${b.id}')">+</button><button class="rm-btn" style="color:var(--azul);border-color:var(--azul)" onclick="remBloco('${b.id}')">×</button>
+    </div>
+    <div class="bloco-body">
+      <button class="bloco-expandir" onclick="tgBlocoExtras('${b.id}')">
+        <span id="exp-${b.id}">${b.objetivo||b.acoes.length?'▼ ocultar':'▶ objetivo, porquê e ações'}</span>
+      </button>
+      <div class="bloco-extras ${b.objetivo||b.acoes.length?'vis':''}" id="bext-${b.id}">
+        <div class="bloco-secao">
+          <div class="bloco-secao-titulo">Objetivo
+            <div class="info-wrap"><button class="info-btn" onclick="tgInfo('iobj-${b.id}')">i</button>
+            <div class="info-balao" id="iobj-${b.id}">O resultado claro que você quer ao final deste bloco. Seja específico.</div></div>
+          </div>
+          <textarea class="bobj" data-id="${b.id}" placeholder="O que você quer alcançar?" style="min-height:80px;height:auto;font-size:13px;padding:12px 14px;line-height:1.6;overflow:hidden;resize:none;box-sizing:border-box">${b.objetivo}</textarea>
+        </div>
+        <div class="bloco-secao">
+          <div class="bloco-secao-titulo">Por quê?
+            <div class="info-wrap"><button class="info-btn" onclick="tgInfo('iprop-${b.id}')">i</button>
+            <div class="info-balao" id="iprop-${b.id}">Combine razão prática + como vai se sentir. Ex: "Preciso de energia E vou me sentir vivo e confiante."</div></div>
+          </div>
+          <textarea class="bprop" data-id="${b.id}" placeholder="Por que este bloco importa?" style="min-height:80px;height:auto;font-size:13px;padding:12px 14px;line-height:1.6;overflow:hidden;resize:none;box-sizing:border-box">${b.proposito}</textarea>
+        </div>
+        <div class="bloco-secao">
+          <div class="bloco-secao-titulo">Ações
+            <div class="info-wrap"><button class="info-btn" onclick="tgInfo('iacao-${b.id}')">i</button>
+            <div class="info-balao" id="iacao-${b.id}">Liste as ações específicas deste bloco. Horários serão definidos depois da purificação e priorização.</div></div>
+          </div>
+          <div id="balist-${b.id}" class="flex-col" style="gap:6px"></div><button style="margin-top:8px;width:100%;height:40px;border-radius:10px;border:1.5px solid var(--azul-claro);background:var(--bg-alt);color:var(--azul);font-size:13px;font-weight:700;cursor:pointer;font-family:var(--fonte)" onclick="addAcaoBloco('${b.id}')">+ Adicionar</button>
+          
+        </div>
+        <div class="bloco-secao">
+          <div class="bloco-secao-titulo">🕐 Horário
+          
+          </div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <input type="time" class="bhor-ini" data-id="${b.id}" value="${b.horario_inicio||''}" style="flex:1">
+            <span style="font-size:13px;color:var(--texto-sec)">às</span>
+            <input type="time" class="bhor-fim" data-id="${b.id}" value="${b.horario_fim||''}" style="flex:1">
+          </div>
+          <p id="bconf-${b.id}" style="font-size:12px;color:var(--vermelho);margin-top:5px;display:none"></p>
+        </div>
+      </div>
+    </div>`;
+  card.querySelector('.bloco-nome-inp').addEventListener('input',e=>{const bk=blocosTemp.find(x=>x.id===e.target.dataset.id);if(bk){bk.nome=e.target.value;checkBtns()}});
+  card.querySelector('.bloco-nome-inp').addEventListener('blur',e=>{const bk=blocosTemp.find(x=>x.id===e.target.dataset.id);if(bk){bk.nome=e.target.value;salvarBlocos();checkBtns()}});
+  card.querySelector('.bobj').addEventListener('input',e=>{e.target.style.height='auto';e.target.style.height=e.target.scrollHeight+'px';const bk=blocosTemp.find(x=>x.id===e.target.dataset.id);if(bk)bk.objetivo=e.target.value;});
+  card.querySelector('.bobj').addEventListener('blur',e=>{const bk=blocosTemp.find(x=>x.id===e.target.dataset.id);if(bk){bk.objetivo=e.target.value;salvarBlocos()}});
+  card.querySelector('.bprop').addEventListener('input',e=>{e.target.style.height='auto';e.target.style.height=e.target.scrollHeight+'px';const bk=blocosTemp.find(x=>x.id===e.target.dataset.id);if(bk)bk.proposito=e.target.value;});
+  card.querySelector('.bprop').addEventListener('blur',e=>{const bk=blocosTemp.find(x=>x.id===e.target.dataset.id);if(bk){bk.proposito=e.target.value;salvarBlocos()}});
+  card.querySelector('.bhor-ini').addEventListener('change',e=>{const bk=blocosTemp.find(x=>x.id===e.target.dataset.id);if(bk){const v=e.target.value;const conflito=blocosTemp.find(b=>b.id!==bk.id&&b.horario_inicio&&b.horario_fim&&v<b.horario_fim&&(bk.horario_fim||'99:99')>b.horario_inicio);if(conflito){toast(`⚠️ Conflito com bloco "${conflito.nome}"`);e.target.value=bk.horario_inicio||'';return}bk.horario_inicio=v;salvarBlocos();checkConfBlocos()}});
+  card.querySelector('.bhor-fim').addEventListener('change',e=>{const bk=blocosTemp.find(x=>x.id===e.target.dataset.id);if(bk){const v=e.target.value;if(bk.horario_inicio&&v&&v<=bk.horario_inicio){toast('⚠️ Horário fim deve ser maior que início');e.target.value=bk.horario_fim||'';return}const conflito=blocosTemp.find(b=>b.id!==bk.id&&b.horario_inicio&&b.horario_fim&&bk.horario_inicio<b.horario_fim&&v>b.horario_inicio);if(conflito){toast(`⚠️ Conflito com bloco "${conflito.nome}"`);e.target.value=bk.horario_fim||'';return}bk.horario_fim=v;salvarBlocos();checkConfBlocos()}});
+  const bk=blocosTemp.find(x=>x.id===b.id);
+  if(bk&&bk.acoes.length)bk.acoes.forEach(a=>addAcaoBlocoUI(b.id,a));
+  return card;
+}
+
+let blocoAtual=null;
+function gerenciarBloco(id){
+  blocoAtual=blocosTemp.find(x=>x.id===id);if(!blocoAtual)return;
+  $('#gbloco-nome').textContent=blocoAtual.nome||'Sem nome';
+  $('#gbloco-obj').textContent=blocoAtual.objetivo||'';
+  $('#gbloco-hor').textContent=blocoAtual.horario_inicio&&blocoAtual.horario_fim?`${blocoAtual.horario_inicio} – ${blocoAtual.horario_fim}`:'';
+  const lista=$('#gbloco-acoes');lista.innerHTML='';
+  const acoes=blocoAtual.acoes.filter(a=>a.nome.trim());
+  if(!acoes.length){lista.innerHTML='<p style="font-size:13px;color:var(--texto-dis);text-align:center;padding:20px 0">Nenhuma ação ainda.</p>';$('#btn-gbloco-purif').style.display='none'}
+  else{$('#btn-gbloco-purif').style.display='flex';acoes.forEach(a=>{const item=document.createElement('div');item.className='card';item.style.padding='10px 14px';item.innerHTML=`<div style="display:flex;align-items:center;gap:8px"><span style="font-size:10px;font-weight:800;color:var(--azul);min-width:20px">P${a.prior}</span><span style="flex:1;font-size:13px">${a.nome}</span>${a.horario_inicio?`<span style="font-size:11px;color:var(--texto-dis)">${a.horario_inicio}</span>`:''}</div>`;lista.appendChild(item)})}
+  irT('t-purificar');renderPurificarBloco();
+}
+function tgBlocoExtras(id){
+  const ext=document.getElementById('bext-'+id),sp=document.getElementById('exp-'+id);
+  ext.classList.toggle('vis');sp.textContent=ext.classList.contains('vis')?'▼ ocultar':'▶ objetivo, porquê e ações';
+}
+
+function tgAcoesBloco(id){
+  const lista=document.getElementById('balist-'+id);
+  const btn=document.getElementById('btg-acoes-'+id);
+  if(!lista||!btn)return;
+  const oculto=lista.style.display==='none';
+  lista.style.display=oculto?'flex':'none';
+  // Também esconde/mostra o botão + Adicionar
+  const addBtn=lista.nextElementSibling;
+  if(addBtn)addBtn.style.display=oculto?'block':'none';
+  // Só troca o ícone
+  btn.textContent=oculto?'▼':'▶';
+}
+function remBloco(id){abrirModal(`<div style="text-align:center"><p style="font-size:36px;margin-bottom:12px">⚠️</p><h2 style="font-size:16px;font-weight:800;color:var(--azul);margin-bottom:8px">Excluir bloco?</h2><p style="font-size:13px;color:var(--texto-sec);margin-bottom:16px">Esta ação não pode ser desfeita.</p><div style="display:flex;gap:10px"><button class="btn btn-danger" onclick="confirmarRemBloco('${id}')">Sim, excluir</button><button class="btn btn-sec" onclick="fecharModal()">Cancelar</button></div></div>`)}
+function confirmarRemBloco(id){fecharModal();blocosTemp=blocosTemp.filter(b=>b.id!==id);salvarBlocos();renderBlocosUI()}
+function setBlocoP(id,p){const b=blocosTemp.find(x=>x.id===id);if(b){b.prior=p;salvarBlocos();renderBlocosUI()}}
+function setBlocoZ(id,z){const b=blocosTemp.find(x=>x.id===id);if(b){b.zona=z;salvarBlocos();renderBlocosUI()}}
+
+function addAcaoBloco(blocoId){
+  const b=blocosTemp.find(x=>x.id===blocoId);if(!b)return;
+  const a={id:`a_${Date.now()}`,nome:'',prior:5,horario_inicio:'',status:'pendente',selecionada:true};
+  b.acoes.push(a);
+  // Salva silencioso — sem acionar re-render
+  const p=gph()||{id:hId(),data:hoje(),blocos:[],progresso_percentual:0,iniciado:false,revisao:null};
+  p.blocos=blocosTemp;
+  _bloquear();
+  _cache.planejamentos=_cache.planejamentos||[];
+  const idx=_cache.planejamentos.findIndex(x=>x.id===p.id);
+  if(idx>=0)_cache.planejamentos[idx]=p;else _cache.planejamentos.unshift(p);
+  try{localStorage.setItem(LS_KEY_MAIN,JSON.stringify(_cache));}catch(e){}
+  if(window._firebaseGravar)window._firebaseGravar(_cache);
+  addAcaoBlocoUI(blocoId,a,true);
+  // Atualiza contador do botão toggle
+  const btgA=document.getElementById('btg-acoes-'+blocoId);
+  if(btgA){
+    const bx=blocosTemp.find(x=>x.id===blocoId);
+    const qtd=bx?bx.acoes.filter(x=>x.nome.trim()).length:0;
+    // Se estava oculto, mostra de volta
+    const listaA=document.getElementById('balist-'+blocoId);
+    if(listaA&&listaA.style.display==='none'){
+      listaA.style.display='flex';
+      const addBtnA=listaA.nextElementSibling;
+      if(addBtnA)addBtnA.style.display='block';
+    }
+    btgA.textContent='▼';
+  }
+  checkBtns();
+}
+
+function addAcaoBlocoUI(blocoId,acao,foco=false){
+  const lista=document.getElementById('balist-'+blocoId);if(!lista)return;
+  const row=document.createElement('div');row.className='bloco-acao-row';row.dataset.aid=acao.id;
+   row.innerHTML=`<input type="text" placeholder="Descreva a ação..." value="${acao.nome}" maxlength="200" style="flex:1;height:38px;font-size:13px"><button class="rm-btn" onclick="remAcaoBloco('${blocoId}','${acao.id}')">×</button>`;
+  
+
+    
+  
+  row.querySelector('input').addEventListener('input',e=>{const b=blocosTemp.find(x=>x.id===blocoId);const a=b&&b.acoes.find(x=>x.id===acao.id);if(a)a.nome=e.target.value;});
+  row.querySelector('input').addEventListener('blur',e=>{const b=blocosTemp.find(x=>x.id===blocoId);const a=b&&b.acoes.find(x=>x.id===acao.id);if(a){a.nome=e.target.value;salvarBlocos();checkBtns()}});
+  lista.appendChild(row);
+  if(foco)setTimeout(()=>row.querySelector('input').focus(),50);
+}
+
+function remAcaoBloco(blocoId,acaoId){
+  const b=blocosTemp.find(x=>x.id===blocoId);if(b)b.acoes=b.acoes.filter(a=>a.id!==acaoId);
+  const row=document.querySelector(`[data-aid="${acaoId}"]`);
+  if(row){row.style.opacity='0';row.style.transition='opacity 150ms';setTimeout(()=>{row.remove();salvarBlocos();checkBtns();
+    const btgR=document.getElementById('btg-acoes-'+blocoId);
+    if(btgR){const br=blocosTemp.find(x=>x.id===blocoId);const qtdR=br?br.acoes.filter(x=>x.nome.trim()).length:0;const isOculto=document.getElementById('balist-'+blocoId)&&document.getElementById('balist-'+blocoId).style.display==='none';btgR.textContent=isOculto?'▶':'▼';}
+  },150)}
+}
+
+function checkBtns(){
+  const temAcoes=blocosTemp.some(b=>b.acoes.some(a=>a.nome.trim()));
+  const temBlocos=blocosTemp.some(b=>b.nome.trim().length>1);
+  if($('#btn-purificar'))$('#btn-purificar').style.display=temAcoes?'flex':'none';
+  if($('#btn-ver-dia'))$('#btn-ver-dia').style.display=temBlocos&&!temAcoes?'flex':'none';
+}
+
+function salvarBlocos(){
+  const p=gph()||{id:hId(),data:hoje(),blocos:[],progresso_percentual:0,iniciado:false,revisao:null};
+  p.blocos=blocosTemp;sp(p);
+}
+
+function checkConfBlocos(){const com=blocosTemp.filter(b=>b.horario_inicio&&b.horario_fim);blocosTemp.forEach(b=>{const el=document.getElementById('bconf-'+b.id);if(!el)return;if(!b.horario_inicio||!b.horario_fim){el.style.display='none';return}const conf=com.find(x=>x.id!==b.id&&b.horario_inicio<x.horario_fim&&b.horario_fim>x.horario_inicio);if(conf){el.style.display='block';el.textContent=`⚠️ Conflito com "${conf.nome}"`}else{el.style.display='none'}});}
+// PURIFICAÇÃO
+if($('#btn-purificar'))$('#btn-purificar').addEventListener('click',()=>{irT('t-purificar');renderPurificar()});
+$('#btn-gbloco-purif').addEventListener('click',()=>{irT('t-purificar');renderPurificarBloco()});
+function renderPurificarBloco(){
+  if(!blocoAtual)return;
+  const lista=$('#purif-lista');lista.innerHTML='';
+  blocoAtual.acoes.filter(a=>a.nome.trim()&&a.selecionada!==false).forEach(a=>{
+    const wrap=document.createElement('div');
+    const marcado=a.selecionada!==false;
+    const item=document.createElement('div');
+    item.className='purif-item '+(marcado?'marcado':'desmarcado');
+    item.dataset.bid=blocoAtual.id;item.dataset.aid=a.id;
+    item.innerHTML=`<div class="pcheck">${marcado?'✓':''}</div><span class="pnome">${a.nome}</span><span class="p-bloco-tag">${blocoAtual.nome}</span>`;
+    item.addEventListener('pointerup',()=>{
+      const m=item.classList.contains('marcado');
+      const bk=blocosTemp.find(x=>x.id===blocoAtual.id);
+      const ak=bk&&bk.acoes.find(x=>x.id===item.dataset.aid);
+      if(ak)ak.selecionada=!m;salvarBlocos();
+      if(m){wrap.style.opacity='0';wrap.style.transition='opacity 200ms';setTimeout(()=>{wrap.remove();atualizarContPurif()},200)}
+      else{item.classList.add('marcado');item.classList.remove('desmarcado');item.querySelector('.pcheck').textContent='✓';atualizarContPurif()}
+    });
+    wrap.appendChild(item);lista.appendChild(wrap);
+  });
+  atualizarContPurif();
+}
+function renderPurificar(){
+  const lista=$('#purif-lista');lista.innerHTML='';
+  blocosTemp.forEach(b=>{
+    b.acoes.filter(a=>a.nome.trim()&&a.selecionada!==false).forEach(a=>{
+      // wrapper para item + horário
+      const wrap=document.createElement('div');
+      const marcado=a.selecionada!==false;
+      const item=document.createElement('div');
+      item.className='purif-item '+(marcado?'marcado':'desmarcado');
+      item.dataset.bid=b.id;item.dataset.aid=a.id;
+      item.style.borderRadius=marcado?`var(--r) var(--r) 0 0`:'var(--r)';
+      item.innerHTML=`<div class="pcheck">${marcado?'✓':''}</div><span class="pnome">${a.nome}</span><span class="p-bloco-tag">${b.nome}</span>`;
+      item.addEventListener('pointerup',()=>{
+        const m=item.classList.contains('marcado');
+        item.classList.toggle('marcado',!m);item.classList.toggle('desmarcado',m);
+        item.querySelector('.pcheck').textContent=m?'':'✓';
+        item.style.borderRadius=!m?`var(--r) var(--r) 0 0`:'var(--r)';
+        horWrap.classList.toggle('vis',!m);
+        const bk=blocosTemp.find(x=>x.id===item.dataset.bid);
+        const ak=bk&&bk.acoes.find(x=>x.id===item.dataset.aid);
+        if(ak)ak.selecionada=!m;salvarBlocos();if(m){wrap.style.opacity='0';wrap.style.transition='opacity 200ms';setTimeout(()=>{wrap.remove();atualizarContPurif()},200)}else{item.classList.add('marcado');item.classList.remove('desmarcado');item.querySelector('.pcheck').textContent='✓';item.style.borderRadius=`var(--r) var(--r) 0 0`;horWrap.classList.add('vis');atualizarContPurif()}
+      });
+      // horário inline na purificação
+      const horWrap=document.createElement('div');horWrap.className='purif-hor-wrap';horWrap.dataset.bid=b.id;horWrap.dataset.aid=a.id;
+      horWrap.innerHTML=`<span style="font-size:12px;font-weight:600;color:var(--texto-sec)">⏰</span><input type="time" class="pur-hor" value="${a.horario_inicio||''}" style="flex:1;height:36px;font-size:13px"><p class="purif-hor-erro" id="pherr-${a.id}"></p>`;
+      horWrap.querySelector('.pur-hor').addEventListener('change',e=>salvarHorPurif(b.id,a.id,e.target.value));
+      wrap.appendChild(item);wrap.appendChild(horWrap);
+      lista.appendChild(wrap);
+    });
+  });
+  atualizarContPurif();
+}
+
+function salvarHorPurif(blocoId,acaoId,valor){
+  const bk=blocosTemp.find(x=>x.id===blocoId);const ak=bk&&bk.acoes.find(x=>x.id===acaoId);
+  if(!ak)return;
+  const errEl=document.getElementById('pherr-'+acaoId);
+  if(errEl)errEl.classList.remove('vis');
+  ak.horario_inicio=valor;salvarBlocos();
+}
+
+function atualizarContPurif(){
+  const total=$$('#purif-lista .purif-item').length,sel=$$('#purif-lista .purif-item.marcado').length;
+  $('#purif-count').textContent=`${sel} de ${total} selecionadas`;
+  $('#btn-purif-prox').disabled=false;
+}
+$('#btn-purif-prox').addEventListener('click',()=>{irT('t-prioridade');renderPrioridadeBloco()});
+
+// PRIORIDADE
+function renderPrioridadeBloco(){
+  if(!blocoAtual)return;
+  const lista=$('#prior-lista');lista.innerHTML='';
+  blocoAtual=blocosTemp.find(x=>x.id===blocoAtual.id)||blocoAtual;const acoes=blocoAtual.acoes.filter(a=>a.selecionada!==false&&a.nome.trim());
+  acoes.sort((x,y)=>x.prior-y.prior);
+  acoes.forEach(({prior:_,..._a},i)=>{if(acoes[i].prior===5)acoes[i].prior=i+1});
+  acoes.sort((x,y)=>x.prior-y.prior);
+  acoes.forEach((a,idx)=>{
+    const item=document.createElement('div');item.className='prior-acao-item';
+    const cor='var(--azul)';
+    item.innerHTML=`<div class="prior-acao-num" style="background:${cor}">${a.prior}</div><div style="flex:1"><p style="font-size:14px;font-weight:600">${a.nome}</p><p style="font-size:12px;color:var(--texto-sec)">${blocoAtual.nome}</p></div><input type="time" value="${a.horario_inicio||''}" style="width:100px;height:32px;font-size:13px;border:1.5px solid var(--borda-media);border-radius:8px;padding:0 6px" onchange="alterarPriorAcao('${blocoAtual.id}','${a.id}',${a.prior},this.value)"><select style="height:32px;border-radius:8px;border:1.5px solid var(--borda-media);background:var(--bg-card);font-family:var(--fonte);font-size:13px;font-weight:700;color:var(--azul);padding:0 6px;cursor:pointer" onchange="alterarPriorAcao('${blocoAtual.id}','${a.id}',parseInt(this.value))">${acoes.map((_,i)=>`<option value="${i+1}" ${a.prior===i+1?'selected':''}>${i+1}º</option>`).join('')}</select>`;
+    lista.appendChild(item);
+  });
+}
+function renderPrioridade(){
+  const lista=$('#prior-lista');lista.innerHTML='';
+  const todas=[];
+  blocosTemp.forEach(b=>b.acoes.filter(a=>a.selecionada!==false&&a.nome.trim()).forEach(a=>todas.push({b,a})));
+  todas.sort((x,y)=>x.a.prior-y.a.prior);todas.forEach(({a},i)=>{if(a.prior===5)a.prior=i+1});todas.sort((x,y)=>x.a.prior-y.a.prior);
+  todas.forEach(({b,a},idx)=>{
+    const item=document.createElement('div');item.className='prior-acao-item';
+    const cor=a.prior<=3?'var(--azul)':a.prior<=6?'var(--azul)':'var(--azul-claro)';
+    item.innerHTML=`
+      <div class="prior-acao-num" style="background:${cor}">${a.prior}</div>
+      <div style="flex:1"><p style="font-size:14px;font-weight:600">${a.nome}</p><p style="font-size:12px;color:var(--texto-sec)">${b.nome}</p></div><input type="time" value="${a.horario_inicio||''}" style="width:100px;height:32px;font-size:13px;border:1.5px solid var(--borda-media);border-radius:8px;padding:0 6px" onchange="alterarPriorAcao('${b.id}','${a.id}',${a.prior},this.value)">
+      <select style="height:32px;border-radius:8px;border:1.5px solid var(--borda-media);background:var(--bg-card);font-family:var(--fonte);font-size:13px;font-weight:700;color:var(--azul);padding:0 6px;cursor:pointer" onchange="alterarPriorAcao('${b.id}','${a.id}',parseInt(this.value))">${Array.from({length:todas.length},(_,i)=>`<option value="${i+1}" ${a.prior===i+1?'selected':''}>${i+1}º</option>`).join('')}</select>
+        
+        
+      </div>`;
+    lista.appendChild(item);
+  });
+}
+
+function alterarPriorAcao(blocoId,acaoId,novaPrior,novoHor){
+  const bk=blocosTemp.find(x=>x.id===blocoId);const ak=bk&&bk.acoes.find(x=>x.id===acaoId);
+  if(ak){if(novoHor!==undefined){ak.horario_inicio=novoHor}else{const todas2=[];blocosTemp.forEach(bb=>bb.acoes.filter(aa=>aa.selecionada!==false&&aa.nome.trim()).forEach(aa=>todas2.push(aa)));todas2.sort((x,y)=>x.prior-y.prior);const antiga=ak.prior;const alvo=novaPrior;if(antiga<alvo){todas2.filter(aa=>aa.prior>antiga&&aa.prior<=alvo).forEach(aa=>aa.prior--)}else{todas2.filter(aa=>aa.prior>=alvo&&aa.prior<antiga).forEach(aa=>aa.prior++)}ak.prior=alvo}salvarBlocos();renderPrioridade()}
+}
+
+$('#btn-prior-prox').addEventListener('click',()=>{const p=gph();if(!p)return;ultimosBlocos=JSON.parse(JSON.stringify(p.blocos));p.iniciado=true;sp(p);irT('t-execucao');renderExec();startClock()});
+if($('#btn-ver-dia'))$('#btn-ver-dia').addEventListener('click',()=>{const p=gph();if(!p)return;p.iniciado=true;sp(p);irT('t-execucao');renderExec();startClock()});
+
+// HORÁRIOS (tela após prioridade)
+function renderHorarios(){
+  const lista=$('#hor-lista');lista.innerHTML='';
+  blocosTemp.forEach(b=>{
+    const acoesSel=b.acoes.filter(a=>a.selecionada!==false&&a.nome.trim()).sort((x,y)=>x.prior-y.prior);
+    if(!acoesSel.length)return;
+    const secao=document.createElement('div');secao.className='card';
+    const blocoHor=b.horario_inicio?` (${b.horario_inicio}–${b.horario_fim||'?'})`:' (sem horário de bloco)';
+    secao.innerHTML=`<p style="font-size:13px;font-weight:700;color:var(--azul);margin-bottom:10px">📦 ${b.nome}<span style="font-size:11px;font-weight:500;color:var(--texto-dis)">${blocoHor}</span></p>`;
+    acoesSel.forEach(a=>{
+      const row=document.createElement('div');row.style.cssText='display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--borda)';
+      row.innerHTML=`
+        <span style="font-size:10px;font-weight:800;color:var(--azul);min-width:20px">P${a.prior}</span>
+        <span style="flex:1;font-size:13px">${a.nome}</span>
+        <input type="time" value="${a.horario_inicio||''}" style="width:100px;height:36px;font-size:13px;flex-shrink:0">
+        <p class="hor-err" id="herr-${a.id}" style="font-size:11px;color:var(--vermelho);display:none;width:100%"></p>`;
+      row.querySelector('input').addEventListener('change',e=>salvarHorAcao(b.id,a.id,e.target.value,b));
+      secao.appendChild(row);
+    });
+    lista.appendChild(secao);
+  });
+}
+
+function salvarHorAcao(blocoId,acaoId,valor,bloco){
+  const bk=blocosTemp.find(x=>x.id===blocoId);const ak=bk&&bk.acoes.find(x=>x.id===acaoId);if(!ak)return;
+  const errEl=document.getElementById('herr-'+acaoId);
+  if(valor&&bk.horario_inicio&&bk.horario_fim){
+    if(valor<bk.horario_inicio||valor>=bk.horario_fim){
+      if(errEl){errEl.textContent=`⚠️ Fora do bloco (${bk.horario_inicio}–${bk.horario_fim})`;errEl.style.display='block'}
+      return;
+    }
+  }
+  if(errEl)errEl.style.display='none';
+  ak.horario_inicio=valor;salvarBlocos();
+}
+
+$('#btn-hor-prox').addEventListener('click',()=>{const p=gph();if(!p)return;p.iniciado=true;sp(p);irT('t-execucao');renderExec();startClock()});
+
+// RELATÓRIO
+function renderRelatorio(){
+  const p=gph();if(!p)return;
+  $('#rel-data').textContent=fBR(p.data).toUpperCase();
+  const blocos=[...p.blocos].filter(b=>b.nome.trim()).sort((a,b)=>{
+    if(a.horario_inicio&&b.horario_inicio)return a.horario_inicio.localeCompare(b.horario_inicio);
+    if(a.horario_inicio)return-1;if(b.horario_inicio)return 1;return a.prior-b.prior;
+  });
+  const lista=$('#rel-lista');lista.innerHTML='';
+  blocos.forEach(b=>lista.appendChild(criarCardExec(b,'rel')));
+  atualizarProg(p,'rel');
+}
+
+function criarCardExec(b,modo){
+  const card=document.createElement('div');card.className='tarefa-card';card.dataset.id=b.id;
+  if(b.status==='feito')card.classList.add('feita');
+  const hor=b.horario_inicio?`${b.horario_inicio}${b.horario_fim?' → '+b.horario_fim:''}`:null;
+  const acoesSel=(b.acoes||[]).filter(a=>a.selecionada!==false&&a.nome.trim()).sort((x,y)=>{if(x.horario_inicio&&y.horario_inicio){const c=x.horario_inicio.localeCompare(y.horario_inicio);return c!==0?c:x.prior-y.prior;}if(x.horario_inicio)return-1;if(y.horario_inicio)return 1;return x.prior-y.prior;});
+  card.innerHTML=`
+    ${hor?`<p style="font-size:11px;font-weight:700;color:var(--azul);margin-bottom:4px">${hor}</p>`:''}
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+      <p style="font-size:15px;font-weight:700;color:var(--azul)">📦 ${b.nome}</p>
+      <span class="zbadge ${b.zona||'z4'}" style="cursor:default">${zonaInfo[b.zona||'z4'].label}</span>
+    </div>    ${acoesSel.length?`<div style="margin-bottom:8px">${acoesSel.map(a=>`<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--borda);cursor:pointer" onclick="marcarAcao('${b.id}','${a.id}','${modo}')"><div style="width:20px;height:20px;min-width:20px;border-radius:6px;border:2px solid ${a.status==='feito'?'var(--verde)':'var(--borda-media)'};background:${a.status==='feito'?'var(--verde)':'var(--bg)'};display:flex;align-items:center;justify-content:center;font-size:11px;color:#fff">${a.status==='feito'?'✓':''}</div><span style="font-size:10px;font-weight:800;color:var(--azul);min-width:20px">P${a.prior}</span><span style="flex:1;font-size:12px;${a.status==='feito'?'text-decoration:line-through;color:var(--texto-dis)':''}">${a.nome}</span>${a.horario_inicio?`<span style="font-size:11px;color:var(--texto-dis)">${a.horario_inicio}</span>`:''}</div>`).join('')}<div style="margin-top:8px"><div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:11px;color:var(--texto-sec)">Progresso</span><span style="font-size:11px;font-weight:700;color:var(--azul)">${acoesSel.filter(a=>a.status==='feito').length}/${acoesSel.length}</span></div><div class="prog-wrap"><div class="prog-fill verde" style="width:${Math.round(acoesSel.filter(a=>a.status==='feito').length/acoesSel.length*100)}%"></div></div></div></div>`:''}
+    <div class="tarefa-btns">
+      <button class="tarefa-btn ${b.status==='feito'?'av':''}" data-s="feito" data-id="${b.id}">✅ FEITO</button>
+      <button class="tarefa-btn ${b.status==='nao-feito'?'ac':''}" data-s="nao-feito" data-id="${b.id}">❌ NÃO FEITO</button>
+    </div>`;
+  card.querySelectorAll('.tarefa-btn').forEach(btn=>btn.addEventListener('click',()=>marcarBloco(btn.dataset.id,btn.dataset.s,modo)));
+  return card;
+}
+
+function marcarAcao(blocoId,acaoId,modo){const p=gph();if(!p)return;const b=p.blocos.find(x=>x.id===blocoId);if(!b)return;const a=b.acoes.find(x=>x.id===acaoId);if(!a)return;a.status=a.status==='feito'?'pendente':'feito';sp(p);if(modo==='rel')renderRelatorio();else renderExec();}
+function marcarBloco(id,status,modo){
+  const p=gph();if(!p)return;const b=p.blocos.find(x=>x.id===id);if(!b)return;
+  b.status=b.status===status?'pendente':status;p.progresso_percentual=calcProg(p);sp(p);
+  if(modo==='rel')renderRelatorio();else renderExec();
+}
+function calcProg(p){const bl=p.blocos.filter(b=>b.nome.trim());if(!bl.length)return 0;return Math.round(bl.filter(b=>b.status==='feito').length/bl.length*100)}
+function atualizarProg(p,pfx){const pct=calcProg(p);const f=document.getElementById(pfx+'-prog'),l=document.getElementById(pfx+'-pct');if(f)f.style.width=pct+'%';if(l)l.textContent=pct+'%'}
+
+$('#btn-comecar-dia').addEventListener('click',()=>{const p=gph();if(!p)return;ultimosBlocos=JSON.parse(JSON.stringify(p.blocos));p.iniciado=true;sp(p);irT('t-execucao');renderExec();startClock()});
+
+function renderExec(){
+  const p=gph();if(!p)return;
+  const agora=new Date();const ha=`${String(agora.getHours()).padStart(2,'0')}:${String(agora.getMinutes()).padStart(2,'0')}`;
+  $('#exec-data').textContent=fBR(p.data).toUpperCase();atualizarProg(p,'exec');
+  const blocos=[...p.blocos].filter(b=>b.nome.trim()).sort((a,b)=>{
+    if(a.horario_inicio&&b.horario_inicio)return a.horario_inicio.localeCompare(b.horario_inicio);
+    if(a.horario_inicio)return-1;if(b.horario_inicio)return 1;return a.prior-b.prior;
+  });
+  const lista=$('#exec-lista');lista.innerHTML='';let aMarcado=false;
+  blocos.filter(b=>b.status==='feito').forEach(b=>lista.appendChild(criarCardExec(b,'exec')));
+  blocos.filter(b=>b.status!=='feito').forEach(b=>{
+    const c=criarCardExec(b,'exec');
+    if(b.horario_inicio&&b.horario_fim){
+      if(ha>=b.horario_inicio&&ha<b.horario_fim&&!aMarcado){c.classList.add('agora');const t=document.createElement('p');t.className='tarefa-tag tag-agora';t.textContent='⚡ AGORA';c.insertBefore(t,c.firstChild);aMarcado=true}
+    }
+    lista.appendChild(c);
+  });
+}
+
+let clkInt;
+function startClock(){clearInterval(clkInt);const t=()=>{const d=new Date();const el=$('#exec-clock');if(el)el.textContent=`${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`};t();clkInt=setInterval(()=>{t();renderExec()},60000)}
+$('#btn-revisar').addEventListener('click',()=>{renderRevisao();irT('t-revisao')});
+
+function renderRevisao(){
+  const p=gph();const blocos=p?p.blocos:blocosTemp;if(!blocos||!blocos.length)return;const lista=$('#rev-lista');lista.innerHTML='';
+  blocos.filter(b=>b.nome.trim()).forEach(b=>{
+    const wrap=document.createElement('div');wrap.className='rev-bloco';
+    wrap.innerHTML=`<div class="rev-bloco-header"><p>📦 ${b.nome}</p></div><div class="rev-bloco-body">
+      <div class="rev-pergunta"><label>✅ Consegui o objetivo deste bloco?</label><textarea class="rv1" data-bid="${b.id}" placeholder="Seja honesto...">${p&&p.revisao&&p.revisao[b.id]?p.revisao[b.id].r1||'':''}</textarea></div>
+      <div class="rev-pergunta"><label>🔧 O que melhorar neste bloco da próxima vez?</label><textarea class="rv2" data-bid="${b.id}" placeholder="Uma melhoria concreta...">${p&&p.revisao&&p.revisao[b.id]?p.revisao[b.id].r2||'':''}</textarea></div>
+    </div>`;
+    lista.appendChild(wrap);
+  });
+}
+
+$('#btn-salvar-rev').addEventListener('click',()=>{const p=gph();const rev={};$$('.rv1').forEach(el=>{const bid=el.dataset.bid;if(!rev[bid])rev[bid]={};rev[bid].r1=el.value});$$('.rv2').forEach(el=>{const bid=el.dataset.bid;if(!rev[bid])rev[bid]={};rev[bid].r2=el.value});if(p){const copia=JSON.parse(JSON.stringify(p));copia.id=`plan_${Date.now()}`;copia.revisao=rev;md(d=>{d.planejamentos.unshift(copia)});ultimosBlocos=JSON.parse(JSON.stringify(p.blocos));md(d=>{d.planejamentos=d.planejamentos.filter(x=>x.id!==p.id)})}else if(blocosTemp.length){ultimosBlocos=JSON.parse(JSON.stringify(blocosTemp))}abrirModal(`<div style="text-align:center"><p style="font-size:44px;margin-bottom:12px">🎉</p><h2 style="font-size:18px;font-weight:800;color:var(--azul);margin-bottom:8px">Revisão Salva!</h2><p style="font-size:13px;color:var(--texto-sec);margin-bottom:16px">Deseja salvar este plano em PLANOS?</p><div style="display:flex;gap:10px"><button class="btn btn-azul" onclick="salvarComoModeloEVoltar()">💾 Salvar em Planos</button><button class="btn btn-sec" onclick="voltarInicio()">Não</button></div></div>`);});
+function salvarComoModeloEVoltar(){salvarComoModelo();voltarInicio();}
+function voltarInicio(){fecharModal();blocosTemp=[];renderBlocosUI();checkBtns();irT('t-hoje-main');}
+function salvarComoModelo(){const nome=ultimosBlocos&&ultimosBlocos[0]?ultimosBlocos[0].nome:fBR(hoje());md(d=>{if(!d.planos)d.planos=[];d.planos.unshift({id:`modelo_${Date.now()}`,nome,data:hoje(),blocos:JSON.parse(JSON.stringify(ultimosBlocos||[]))})});fecharModal();toast('✅ Modelo salvo em PLANOS!');renderPlanos()}
+function renderPlanos(){const data=gd();const lista=$('#planos-lista');const empty=$('#planos-empty');lista.innerHTML='';const planos=data.planos||[];if(!planos.length){empty.style.display='block';return}empty.style.display='none';planos.forEach(p=>{const item=document.createElement('div');item.className='card';item.style.marginBottom='0';item.innerHTML=`<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px"><p style="font-size:15px;font-weight:700;color:var(--azul)">${p.nome||'Plano sem nome'}</p><span style="font-size:11px;color:var(--texto-dis)">${fBR(p.data)}</span></div><p style="font-size:13px;color:var(--texto-sec);margin-bottom:10px">${p.blocos?p.blocos.length+' bloco(s)':'0 blocos'}</p><div style="display:flex;gap:8px"><button class="btn btn-azul btn-sm" onclick="reusarPlano('${p.id}')">▶ Usar</button><button class="btn btn-danger btn-sm" onclick="excluirPlano('${p.id}')">🗑️</button></div>`;lista.appendChild(item);})}
+function reusarPlano(id){const data=gd();const p=data.planos.find(x=>x.id===id);if(!p)return;const novos=JSON.parse(JSON.stringify(p.blocos));novos.forEach(b=>{b.id=`b_${Date.now()}_${Math.random().toString(36).substr(2,4)}`;b.status='pendente';b.acoes.forEach(a=>{a.id=`a_${Date.now()}_${Math.random().toString(36).substr(2,4)}`;a.status='pendente';a.selecionada=true})});blocosTemp=[...blocosTemp,...novos];salvarBlocos();navegar('hoje');renderBlocosUI();checkBtns();toast('✅ Blocos adicionados!')}
+function excluirPlano(id){md(d=>{d.planos=(d.planos||[]).filter(x=>x.id!==id)});renderPlanos();toast('Plano removido')}
+// ===== HÁBITOS =====
+const FRASES=["Pequenas melhorias de 1% por dia resultam em 37 vezes mais resultado em 1 ano.","Você não sobe ao nível dos seus objetivos — você cai ao nível dos seus sistemas.","Cada ação que você toma é um voto para o tipo de pessoa que deseja se tornar.","O hábito não precisa ser perfeito. Precisa ser consistente.","Nunca falhe duas vezes. Uma falta é acidente, dois é um novo hábito.","O ambiente é a mão invisível que molda o comportamento humano.","Torne os bons hábitos óbvios, atraentes, fáceis e satisfatórios.","A identidade emerge dos hábitos. Cada hábito é um voto em quem você está se tornando.","Você não precisa ser a vítima do seu ambiente. Pode ser o arquiteto dele.","O platô do potencial latente: os resultados chegam depois da consistência.","Comece com dois minutos. O início é o hábito.","Empilhe comportamentos: depois de [hábito atual], farei [novo hábito].","Reduza o atrito. Quanto menos passos, mais chance de acontecer.","Celebre cada pequena vitória. A satisfação consolida o hábito.","Um dia ruim não define você. Define o dia seguinte.","Foque no sistema, não na meta. Vencedores e perdedores têm as mesmas metas.","O poder dos hábitos está na continuidade, não na intensidade isolada.","Em vez de 'tenho que', diga 'eu escolho'. Isso muda tudo.","A melhor hora para criar um hábito era ontem. A segunda melhor é agora.","Identidade antes de resultado: 'sou uma pessoa que...' muda tudo.","Cada repetição é uma escultura da sua identidade futura.","O sucesso é o produto de hábitos diários, não de transformações raras.","Torne os maus hábitos invisíveis, sem atração, difíceis e insatisfatórios.","Progredir 1% por dia é mais poderoso do que mudar tudo de uma vez.","O maior obstáculo para mudar hábitos é a ilusão de que precisamos de motivação.","Quando a identidade muda, o comportamento muda naturalmente.","Não quebre a corrente. A consistência cria o resultado.","Hábitos são os juros compostos do auto-aperfeiçoamento.","Faça a versão mínima nos dias difíceis. Zero é o inimigo.","Você se torna o que repetidamente faz.","O ambiente certo torna o comportamento certo inevitável."];
+const MOTIV=[{min:0,max:2,txt:"Comece pequeno. A versão mínima já é uma vitória real."},{min:3,max:6,txt:"Você está construindo sua identidade. Cada dia é um voto."},{min:7,max:13,txt:"Não quebre a corrente. Uma falta é acidente, duas é hábito ruim."},{min:14,max:20,txt:"Você está no platô do potencial. O resultado explode depois."},{min:21,max:9999,txt:"Este hábito já é parte de quem você é. Continue."}];
+function getMotiv(s){return MOTIV.find(m=>s>=m.min&&s<=m.max)?.txt||''}
+
+$('#btn-frase-dia').addEventListener('click',()=>{const dia=new Date().getDate()-1;
+  
+  abrirModal(`<div onclick="fecharModal()" style="cursor:pointer">
+    <p style="font-size:11px;font-weight:700;color:var(--azul);margin-bottom:14px;letter-spacing:0.06em">💬 FRASE DO DIA</p>
+    <p style="font-size:16px;color:var(--azul);font-style:italic;line-height:1.6;font-weight:500">"${FRASES[dia%FRASES.length]}"</p>
+    <p style="font-size:12px;color:var(--texto-sec);margin-top:12px">— Hábitos Atômicos, James Clear</p>
+    <p style="font-size:11px;color:var(--texto-dis);margin-top:16px;text-align:center">Toque para fechar</p></div>`);
+});
+
+$('#btn-guia').addEventListener('click',()=>{
+  const itens=[['⏱','Regra dos 2 Minutos','Se um hábito leva menos de 2 minutos, faça agora. Para hábitos maiores, comece pela versão mínima. "Treinar 1h" vira "Colocar o tênis".'],['🔗','Empilhamento','Conecte o novo hábito a um já existente. Fórmula: "Depois que eu [ATUAL], vou [NOVO]". Ex: Depois do café, farei a visualização.'],['🏛','Design de Ambiente','Torne o hábito óbvio. O ambiente deve gritar o hábito antes de você pensar nele.'],['⚡','Lei do Menor Esforço','Reduza o atrito. Quanto menos passos entre você e o hábito, maior a chance.'],['🎯','Identidade Primeiro','Não diga "quero correr". Diga "sou uma pessoa que se exercita". Cada repetição vota nessa identidade.'],['🔥','Nunca Falhe Duas Vezes','Um dia perdido é acidente. Dois é hábito ruim. Nos dias difíceis, faça a versão mínima.']];
+  abrirModal(`<p style="font-size:15px;font-weight:800;color:var(--texto);margin-bottom:28px;text-transform:uppercase;letter-spacing:0.04em">Como Criar Hábitos</p>${itens.map(([e,t,d])=>`<div class="guia-item"><span class="guia-emoji">${e}</span><div><p class="guia-titulo">${t}</p><p class="guia-desc">${d}</p></div></div>`).join('')}`);
+});
+
+function renderHabitos(){
+  const data=gd();const lista=$('#habitos-lista');lista.innerHTML='';
+  if(!data.habitos.length){lista.innerHTML='<div class="empty"><div class="ei">🔥</div><p>Nenhum hábito ainda.<br>Crie o primeiro abaixo!</p></div>';return}
+  data.habitos.forEach(h=>lista.appendChild(criarHabCard(h)));
+}
+
+function criarHabCard(h){
+  const card=document.createElement('div');card.className='hab-card';
+  const hoje_=hoje();const reg=h.registros||[];const criado=h.criado_em||hoje_;
+  const diasGrid=[];const dCriado=new Date(criado+'T00:00:00');
+  for(let i=0;i<21;i++){
+    const d=new Date(dCriado);d.setDate(d.getDate()+i);
+    const iso=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    if(iso>hoje_){diasGrid.push('futuro');continue}
+    const r=reg.find(x=>x.data===iso);
+    if(iso===hoje_)diasGrid.push(r?(r.feito?'feito':'nao'):'prox');
+    else diasGrid.push(r?(r.feito?'feito':'nao'):'vazio');
+  }
+  const rows=[diasGrid.slice(0,7),diasGrid.slice(7,14),diasGrid.slice(14,21)];
+  const streak=h.streak_atual||0;const regHoje=reg.find(r=>r.data===hoje_);
+  card.innerHTML=`
+    <div class="hab-card-topo">
+      <div class="hab-nome-row" onclick="abrirDetHab('${h.id}')">
+        <span class="hab-nome">${h.nome}</span>
+        <span class="hab-streak">🔥 ${streak} dias</span>
+      </div>
+      <button class="btn-xs btn-sec" style="flex-shrink:0;margin-left:12px" onclick="tgHabConf('${h.id}')">🗑️</button>
+    </div>
+    <div class="hab-grid">${rows.map(row=>`<div class="hab-row">${row.map(t=>`<div class="hdot ${t==='futuro'||t==='vazio'?'':t}"></div>`).join('')}</div>`).join('')}</div>
+    <div class="hab-today">
+      <button class="hab-btn ${regHoje&&regHoje.feito?'fiz':''}" ${regHoje?'disabled':''} onclick="marcarHab('${h.id}',true)">✅ FIZ</button>
+      <button class="hab-btn ${regHoje&&!regHoje.feito?'nfiz':''}" ${regHoje?'disabled':''} onclick="marcarHab('${h.id}',false)">❌ NÃO FIZ</button>
+    </div>
+    <div class="hab-confirm" id="hconf-${h.id}">
+      <p>Tem certeza? Isso apaga todo o histórico.</p>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-sec btn-sm" onclick="tgHabConf('${h.id}')">Cancelar</button>
+        <button class="btn btn-danger btn-sm" onclick="remHab('${h.id}')">Sim, remover</button>
+      </div>
+    </div>`;
+  return card;
+}
+
+function marcarHab(id,feito){
+  md(d=>{
+    const h=d.habitos.find(x=>x.id===id);if(!h)return;
+    const hoje_=hoje();h.registros=h.registros||[];
+    const idx=h.registros.findIndex(r=>r.data===hoje_);
+    if(idx>=0)h.registros[idx].feito=feito;else h.registros.push({data:hoje_,feito});
+    if(!feito){h.streak_atual=0}else{let s=0;let d2=new Date();while(true){const iso=`${d2.getFullYear()}-${String(d2.getMonth()+1).padStart(2,'0')}-${String(d2.getDate()).padStart(2,'0')}`;const r=h.registros.find(r=>r.data===iso);if(r&&r.feito){s++;d2.setDate(d2.getDate()-1)}else break}h.streak_atual=s;if(s>(h.streak_max||0))h.streak_max=s}
+  });
+  renderHabitos();
+  
+}
+
+function tgHabConf(id){document.getElementById('hconf-'+id).classList.toggle('vis')}
+function remHab(id){md(d=>{d.habitos=d.habitos.filter(h=>h.id!==id)});renderHabitos();toast('Hábito removido')}
+$('#btn-novo-hab').addEventListener('click',()=>{$('#novo-hab-wrap').style.display='flex';$('#inp-novo-hab').focus()});
+function fecharNovoHab(){$('#novo-hab-wrap').style.display='none';$('#inp-novo-hab').value=''}
+$('#inp-novo-hab').addEventListener('keydown',e=>{if(e.key==='Enter')salvarNovoHab()});
+$('#btn-salvar-hab').addEventListener('click',salvarNovoHab);
+function salvarNovoHab(){
+  const nome=$('#inp-novo-hab').value.trim();if(nome.length<3){toast('⚠️ Mínimo 3 caracteres');return}
+  md(d=>{d.habitos.unshift({id:`h_${Date.now()}`,nome,criado_em:hoje(),registros:[],streak_atual:0,streak_max:0})});
+  fecharNovoHab();renderHabitos();toast('✅ Hábito criado!');
+}
+
+function abrirDetHab(id){
+  const data=gd();const h=data.habitos.find(x=>x.id===id);if(!h)return;
+  $('#hdet-nome').textContent=h.nome;$('#hdet-data').textContent='Criado em '+fBR(h.criado_em);
+  $('#hdet-streak').textContent=h.streak_atual||0;$('#hdet-recorde').textContent=h.streak_max||0;
+  const feitos=(h.registros||[]).filter(r=>r.feito).length;$('#hdet-total').textContent=feitos;
+  const cicloAtual=Math.floor((h.registros||[]).length/21)+1;$('#hdet-ciclo').textContent=cicloAtual;
+  $('#hdet-motiv').textContent=getMotiv(h.streak_atual||0);
+  const ciclos=$('#hdet-ciclos');ciclos.innerHTML='';
+  for(let c=0;c<cicloAtual;c++){
+    const ini=new Date(h.criado_em+'T00:00:00');ini.setDate(ini.getDate()+c*21);
+    const fim=new Date(ini);fim.setDate(fim.getDate()+20);
+    const fc=(h.registros||[]).filter(r=>r.feito&&r.data>=ini.toISOString().slice(0,10)&&r.data<=fim.toISOString().slice(0,10)).length;
+    const item=document.createElement('div');item.className='card row-between';item.style.gap='12px';
+    item.innerHTML=`<div><p style="font-size:14px;font-weight:700">Ciclo ${c+1}</p><p style="font-size:12px;color:var(--texto-sec)">${fc} de 21 dias feitos</p></div><div style="min-width:100px"><div class="prog-wrap"><div class="prog-fill verde" style="width:${Math.round(fc/21*100)}%"></div></div><p style="font-size:11px;color:var(--texto-sec);margin-top:3px;text-align:right">${Math.round(fc/21*100)}%</p></div>`;
+    ciclos.appendChild(item);
+  }
+  irTHab('t-hab-detalhe');
+}
+
+// ===== DECISÃO =====
+const PREP=[{t:'Estado de Recurso',i:'Você está em bom estado emocional agora? Decisões em medo ou raiva quase sempre são erradas. Respire fundo antes de continuar.'},{t:'Defina sua Visão Final',i:'O que você quer exatamente ao final disso? Quanto mais claro o destino, mais fácil escolher o caminho.'},{t:'Consulte Pessoas Experientes',i:'Há alguém que já passou por situação parecida? Uma perspectiva real vale mais do que 10 opiniões teóricas.'},{t:'Aprenda com seu Histórico',i:'Como você resolveu problemas parecidos no passado? Seu histórico é sua maior fonte de soluções.'},{t:'Defina a Situação Atual',i:'Descreva sua situação com clareza. Fatos, não emoções. Sem diagnóstico claro não há solução clara.'},{t:'Mapeie Recursos e Restrições',i:'Quais recursos você tem (tempo, dinheiro, energia)? Quais são as restrições reais?'}];
+const PERGS=[{q:'O que realmente você quer e por quê?',i:'Se houver mais de um objetivo, coloque em ordem de importância. Objetivos vagos geram decisões vagas.'},{q:'Quais são suas opções para alcançar esse resultado?',i:'Liste pelo menos 3 opções. Você só deve decidir quando tiver pelo menos 3 caminhos possíveis.'},{q:'Quais as consequências e vantagens de cada opção?',i:'Analise cada opção: o que pode dar errado e o que pode dar certo. Seja honesto.'},{q:'As vantagens de cada opção garantem o resultado que você quer?',i:'Para cada opção: de 0 a 10, qual a probabilidade de funcionar? Quantos benefícios e malefícios traz?'},{q:'Elimine as opções desvantajosas. Quais duas ficaram?',i:'Após analisar, elimine as piores opções até restar apenas duas.'},{q:'Existe algo que elimine as desvantagens das duas opções restantes?',i:'Para cada desvantagem, busque uma estratégia de mitigação.'},{q:'Qual das duas opções é a melhor e por quê?',i:'Qual te fará chegar mais rápido ao objetivo com mais vantagens? Escolha e se comprometa.'},{q:'Você está firme nesta decisão? Não vai voltar atrás?',i:'Firmeza na decisão é o que transforma plano em resultado. A indecisão é mais cara do que uma decisão imperfeita.'},{q:'Visualize a aplicação: como você vai executar esta decisão?',i:'Visualize claramente os passos de execução. Sinta as emoções positivas.'},{q:'Quando você vai entrar em ação?',i:'Defina um prazo concreto. Decisão sem data de início não é decisão — é sonho.'}];
+
+let dTemp={tema:'',prep:[],resp:[],passo:0,fase:'prep'};
+
+function renderDecAnt(){
+  const data=gd();const lista=$('#dec-anteriores');lista.innerHTML='';
+  if(!data.decisoes.length){lista.innerHTML='<p style="font-size:13px;color:var(--texto-dis)">Nenhuma decisão ainda.</p>';return}
+  data.decisoes.slice(0,5).forEach(d=>{
+    const item=document.createElement('div');item.className='dec-item';
+    item.innerHTML=`<p style="font-size:15px;font-weight:600">${d.tema}</p><p style="font-size:12px;color:var(--texto-sec);margin-top:3px">${fBR(d.data)} · ${d.conclusao||''}</p>`;
+    item.addEventListener('click',()=>abrirDetDec(d.id));lista.appendChild(item);
+  });
+}
+
+$('#inp-dec-tema').addEventListener('input',()=>$('#btn-comecar-dec').disabled=$('#inp-dec-tema').value.trim().length<5);
+$('#btn-comecar-dec').addEventListener('click',()=>{dTemp={tema:$('#inp-dec-tema').value.trim(),prep:[],resp:[],passo:0,fase:'prep'};mostrarPrep(0);irTDec('t-dec-prep')});
+
+function mostrarPrep(i){
+  dTemp.passo=i;const p=PREP[i];
+  $('#prep-label').textContent=`PREPARAÇÃO ${i+1} DE 6`;$('#prep-pct').textContent=`${Math.round((i+1)/6*100)}%`;$('#prep-prog').style.width=`${Math.round((i+1)/6*100)}%`;
+  $('#prep-titulo').textContent=p.t;document.getElementById('info-prep').textContent=p.i;
+  $('#prep-resp').value=dTemp.prep[i]||'';$('#btn-prep-prox').disabled=$('#prep-resp').value.trim().length<3;
+  $('#btn-prep-ant').disabled=i===0;$('#btn-prep-prox').textContent=i===5?'INICIAR AS 10 PERGUNTAS →':'PRÓXIMO →';
+}
+$('#prep-resp').addEventListener('input',()=>$('#btn-prep-prox').disabled=$('#prep-resp').value.trim().length<3);
+$('#btn-prep-ant').addEventListener('click',()=>{dTemp.prep[dTemp.passo]=$('#prep-resp').value.trim();if(dTemp.passo>0)mostrarPrep(dTemp.passo-1)});
+$('#btn-prep-prox').addEventListener('click',()=>{dTemp.prep[dTemp.passo]=$('#prep-resp').value.trim();if(dTemp.passo<5)mostrarPrep(dTemp.passo+1);else{mostrarPerg(0);irTDec('t-dec-processo')}});
+
+function mostrarPerg(i){
+  dTemp.passo=i;const p=PERGS[i];
+  $('#dec-label').textContent=`PASSO ${i+1} DE 10`;$('#dec-pct').textContent=`${(i+1)*10}%`;$('#dec-prog').style.width=`${(i+1)*10}%`;
+  $('#dec-pergunta').textContent=p.q;document.getElementById('info-dec').textContent=p.i;
+  $('#dec-resp').value=dTemp.resp[i]||'';$('#btn-dec-prox').disabled=$('#dec-resp').value.trim().length<3;
+  $('#btn-dec-ant').disabled=i===0;$('#btn-dec-prox').textContent=i===9?'VER RESULTADO →':'PRÓXIMO →';
+}
+$('#dec-resp').addEventListener('input',()=>$('#btn-dec-prox').disabled=$('#dec-resp').value.trim().length<3);
+$('#btn-dec-ant').addEventListener('click',()=>{dTemp.resp[dTemp.passo]=$('#dec-resp').value.trim();if(dTemp.passo>0)mostrarPerg(dTemp.passo-1);else{mostrarPrep(5);irTDec('t-dec-prep')}});
+$('#btn-dec-prox').addEventListener('click',()=>{dTemp.resp[dTemp.passo]=$('#dec-resp').value.trim();if(dTemp.passo<9)mostrarPerg(dTemp.passo+1);else mostrarResDec()});
+
+function mostrarResDec(){
+  $('#dec-res-tema').textContent=dTemp.tema;
+  const resumo=$('#dec-resumo');resumo.innerHTML='';
+  PERGS.forEach((p,i)=>{
+    const par=document.createElement('div');par.className='dec-par';
+    par.innerHTML=`<div class="dec-par-q"><p>${i+1}. ${p.q}</p></div><div class="dec-par-r"><p>${dTemp.resp[i]||'—'}</p></div>`;
+    resumo.appendChild(par);
+  });
+  const rs=dTemp.resp;let pos=0;[0,1,6,7,9].forEach(i=>{if((rs[i]||'').trim().length>5)pos++});
+  irTDec('t-dec-resultado');
+}
+
+$('#btn-dec-salvar').addEventListener('click',()=>{
+  md(d=>{d.decisoes.unshift({id:`dec_${Date.now()}`,data:hoje(),tema:dTemp.tema,prep:dTemp.prep,respostas:dTemp.resp.map((r,i)=>({pergunta:i+1,texto:r})),conclusao:''})});
+  toast('✅ Decisão salva!');renderDecAnt();$('#inp-dec-tema').value='';$('#btn-comecar-dec').disabled=true;setTimeout(()=>irTDec('t-dec-inicio'),600);
+});
+$('#btn-dec-refazer').addEventListener('click',()=>{dTemp.resp=[];mostrarPerg(0);irTDec('t-dec-processo')});
+
+function abrirDetDec(id){
+  const data=gd();const d=data.decisoes.find(x=>x.id===id);if(!d)return;
+  $('#dec-det-tema').textContent=d.tema;$('#dec-det-data').textContent=fBR(d.data);
+  const lista=$('#dec-det-lista');lista.innerHTML='';
+  (d.respostas||[]).forEach(r=>{
+    const p=PERGS[r.pergunta-1];const par=document.createElement('div');par.className='dec-par';
+    par.innerHTML=`<div class="dec-par-q"><p>${r.pergunta}. ${p?p.q:'Pergunta '+r.pergunta}</p></div><div class="dec-par-r"><p>${r.texto||'—'}</p></div>`;
+    lista.appendChild(par);
+  });
+  $('#dec-det-conclusao').textContent=d.conclusao||'';
+  $('#btn-del-dec').onclick=()=>{md(x=>{x.decisoes=x.decisoes.filter(y=>y.id!==id)});toast('Decisão apagada');renderDecAnt();irTDec('t-dec-inicio')};
+  irTDec('t-dec-detalhe');
+}
+
+// ===== HISTÓRICO =====
+let filtroH='semana';
+$$('.hfiltro').forEach(b=>b.addEventListener('click',()=>{$$('.hfiltro').forEach(x=>x.classList.remove('ativo'));b.classList.add('ativo');filtroH=b.dataset.f;renderHistorico()}));
+
+function calcZonas(){
+  const p=gph();const counts={z1:0,z2:0,z3:0,z4:0};
+  if(p&&p.blocos){p.blocos.filter(b=>b.nome).forEach(b=>{counts[b.zona||'z4']++});const total=Object.values(counts).reduce((a,b)=>a+b,0)||1;['z1','z2','z3','z4'].forEach(z=>{const el=document.getElementById(z+'p');if(el)el.textContent=Math.round(counts[z]/total*100)+'%'})}
+}
+
+function renderHistorico(){
+  const data=gd();let planos=[...data.planejamentos].sort((a,b)=>b.data.localeCompare(a.data));
+  if(filtroH==='semana'){const l=new Date();l.setDate(l.getDate()-7);planos=planos.filter(p=>p.data>=l.toISOString().slice(0,10))}
+  else if(filtroH==='mes'){const l=new Date();l.setDate(l.getDate()-30);planos=planos.filter(p=>p.data>=l.toISOString().slice(0,10))}
+  const lista=$('#hist-lista');lista.innerHTML='';
+  if(!planos.length){lista.innerHTML='<div class="empty"><div class="ei">📅</div><p>Nenhum planejamento neste período.</p></div>';return}
+  // Conta nomes de blocos duplicados para numeração /00, /01...
+  const nomesContagem={};
+  planos.forEach(p=>{const b=(p.blocos||[]).find(x=>x.nome);const n=b?b.nome.trim():'';if(n){nomesContagem[n]=(nomesContagem[n]||0)+1;}});
+  const nomesIdx={};
+  planos.forEach(p=>{
+    const item=document.createElement('div');item.className='hist-item';
+    const pct=p.progresso_percentual||0;const isHj=p.data===hoje();
+    const bPrincipal=(p.blocos||[]).find(x=>x.nome);
+    let nomeTxt='(sem título)';
+    if(bPrincipal&&bPrincipal.nome){
+      const n=bPrincipal.nome.trim();
+      if(nomesIdx[n]===undefined)nomesIdx[n]=0;
+      nomeTxt=n+' / '+String(nomesIdx[n]).padStart(2,'0');
+      nomesIdx[n]++;
+    }
+    const dataFormatada=p.data.slice(8,10)+'/'+p.data.slice(5,7)+'/'+p.data.slice(0,4);
+    item.innerHTML=`<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px"><p style="font-size:15px;font-weight:700;color:var(--texto);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;min-width:0">${nomeTxt}</p><p style="font-size:11px;font-weight:700;color:var(--azul);white-space:nowrap;margin-left:8px;flex-shrink:0">${dataFormatada}</p></div><div style="display:flex;align-items:center;gap:10px"><div class="prog-wrap" style="flex:1"><div class="prog-fill" style="width:${pct}%"></div></div><span style="font-size:13px;font-weight:800;color:var(--azul)">${pct}%</span></div>`;
+    item.addEventListener('click',()=>abrirDetHist(p.id));lista.appendChild(item);
+  });
+}
+
+function abrirDetHist(id){
+  const data=gd();const p=data.planejamentos.find(x=>x.id===id);if(!p)return;
+  $('#hdet-data-label').textContent=fBR(p.data).toUpperCase();
+  const bl=$('#hdet-blocos');bl.innerHTML='';
+  (p.blocos||[]).filter(b=>b.nome).forEach(b=>{
+    const card=document.createElement('div');card.className='card';
+    const icon=b.status==='feito'?'✅':b.status==='nao-feito'?'❌':'⏳';
+    const statusTxt=b.status==='feito'?'Feito':b.status==='nao-feito'?'Não feito':'Pendente';
+    const statusCor=b.status==='feito'?'var(--verde)':b.status==='nao-feito'?'var(--vermelho)':'var(--texto-dis)';
+    const acoesSel=(b.acoes||[]).filter(a=>a.selecionada!==false&&a.nome).sort((x,y)=>{if(x.horario_inicio&&y.horario_inicio){const c=x.horario_inicio.localeCompare(y.horario_inicio);return c!==0?c:x.prior-y.prior;}if(x.horario_inicio)return-1;if(y.horario_inicio)return 1;return x.prior-y.prior;});
+    const totalA=acoesSel.length;const feitasA=acoesSel.filter(a=>a.status==='feito').length;
+    const pctA=totalA?Math.round(feitasA/totalA*100):0;
+    const rev=p.revisao&&p.revisao[b.id];
+    const revHtml=rev&&(rev.r1||rev.r2)?`
+      <div style="margin-top:12px;padding-top:12px;border-top:1.5px dashed var(--borda-media);display:flex;flex-direction:column;gap:8px">
+        ${rev.r1?`<div style="display:flex;gap:8px;align-items:flex-start"><span style="font-size:16px;flex-shrink:0">✅</span><p style="font-size:13px;color:var(--texto);line-height:1.4">${rev.r1}</p></div>`:''}
+        ${rev.r2?`<div style="display:flex;gap:8px;align-items:flex-start"><span style="font-size:16px;flex-shrink:0">🔧</span><p style="font-size:13px;color:var(--texto);line-height:1.4">${rev.r2}</p></div>`:''}
+      </div>`:'';
+    card.innerHTML=`
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:18px">${icon}</span>
+          <p style="font-size:14px;font-weight:700;color:var(--azul)">${b.nome}</p>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px">
+          <span style="font-size:11px;font-weight:700;color:${statusCor}">${statusTxt}</span>
+          <span class="zbadge ${b.zona||'z4'}" style="cursor:default">${zonaInfo[b.zona||'z4'].label}</span>
+        </div>
+      </div>
+      ${b.horario_inicio?`<p style="font-size:12px;color:var(--azul);font-weight:600;margin-bottom:8px">${b.horario_inicio}${b.horario_fim?' → '+b.horario_fim:''}</p>`:''}
+      ${totalA?`
+        <div style="margin-bottom:8px">
+          <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+            <span style="font-size:11px;color:var(--texto-sec)">Progresso das atividades</span>
+            <span style="font-size:11px;font-weight:700;color:var(--azul)">${feitasA}/${totalA} · ${pctA}%</span>
+          </div>
+          <div class="prog-wrap"><div class="prog-fill verde" style="width:${pctA}%"></div></div>
+        </div>
+        ${acoesSel.map(a=>`
+          <div style="display:flex;align-items:center;gap:6px;padding:5px 0;border-bottom:1px solid var(--borda)">
+            <div style="width:18px;height:18px;min-width:18px;border-radius:5px;border:2px solid ${a.status==='feito'?'var(--verde)':'var(--borda-media)'};background:${a.status==='feito'?'var(--verde)':'var(--bg)'};display:flex;align-items:center;justify-content:center;font-size:10px;color:#fff">${a.status==='feito'?'✓':''}</div>
+            <span style="font-size:10px;font-weight:800;color:var(--azul);min-width:20px">P${a.prior}</span>
+            <span style="flex:1;font-size:12px;${a.status==='feito'?'text-decoration:line-through;color:var(--texto-dis)':''}">${a.nome}</span>
+            ${a.horario_inicio?`<span style="font-size:11px;color:var(--texto-dis)">${a.horario_inicio}</span>`:''}
+          </div>`).join('')}
+      `:''}
+      ${revHtml}`;
+    bl.appendChild(card);
+  });
+  $('#btn-apagar-dia').onclick=()=>{md(d=>{d.planejamentos=d.planejamentos.filter(x=>x.id!==id)});toast('Dia apagado');renderHistorico();irTHist('t-hist-lista')};
+  irTHist('t-hist-det');
+}
+
+// ===== SISTEMA DE NAVEGAÇÃO HISTORY =====
+(function setupNavHistory(){
+
+  // Base — nunca deixa o botão voltar fechar a aba
+  history.replaceState({_base:true}, '');
+
+  // voltarParaBlocos sem pushState (só para uso interno do popstate)
+  function _voltarParaBlocos(){
+    var p=gph();
+    if(p&&p.blocos&&p.blocos.length) blocosTemp=JSON.parse(JSON.stringify(p.blocos));
+    _irT('t-hoje-main');
+    renderBlocosUI();
+    checkBtns();
+  }
+
+  // ── POPSTATE — do mais profundo para o mais raso ─────────────────
+  window.addEventListener('popstate',function(e){
+    var state=e.state||{};
+
+    // 1. Modal global (mais profundo)
+    if(document.getElementById('modal').classList.contains('vis')){
+      fecharModal();
+      return;
+    }
+
+    // 2. Sub-telas HOJE
+    var modH=document.getElementById('mod-hoje');
+    if(modH&&modH.classList.contains('ativo')){
+      var tH=modH.querySelector('.tela.ativa');
+      if(tH){
+        var tid=tH.id;
+        if(tid==='t-revisao'){_irT('t-execucao');return;}
+        if(tid==='t-execucao'){_voltarParaBlocos();return;}
+        if(tid==='t-relatorio'){_irT('t-hoje-main');return;}
+        if(tid==='t-horarios'){_irT('t-prioridade');return;}
+        if(tid==='t-prioridade'){_irT('t-purificar');return;}
+        if(tid==='t-purificar'){_irT('t-hoje-main');return;}
+        if(tid==='t-gerenciar-bloco'){_irT('t-hoje-main');return;}
+      }
+    }
+
+    // 3. Sub-telas HÁBITOS
+    var modHab=document.getElementById('mod-habitos');
+    if(modHab&&modHab.classList.contains('ativo')){
+      var tHab=modHab.querySelector('.tela.ativa');
+      if(tHab&&tHab.id==='t-hab-detalhe'){_irTHab('t-habitos-lista');return;}
+    }
+
+    // 4. Sub-telas DECISÃO
+    var modDec=document.getElementById('mod-decisao');
+    if(modDec&&modDec.classList.contains('ativo')){
+      var tDec=modDec.querySelector('.tela.ativa');
+      if(tDec){
+        var did=tDec.id;
+        if(did==='t-dec-detalhe'){_irTDec('t-dec-inicio');return;}
+        if(did==='t-dec-resultado'){_irTDec('t-dec-inicio');return;}
+        if(did==='t-dec-processo'){_irTDec('t-dec-prep');return;}
+        if(did==='t-dec-prep'){_irTDec('t-dec-inicio');return;}
+      }
+    }
+
+    // 5. Sub-telas HISTÓRICO
+    var modHist=document.getElementById('mod-historico');
+    if(modHist&&modHist.classList.contains('ativo')){
+      var tHist=modHist.querySelector('.tela.ativa');
+      if(tHist&&tHist.id==='t-hist-det'){_irTHist('t-hist-lista');return;}
+    }
+
+    // 6. Módulos secundários — volta para HOJE
+    var modsSecundarios=['mod-habitos','mod-decisao','mod-planos','mod-historico'];
+    var mAtivo=document.querySelector('.mod.ativo');
+    if(mAtivo&&modsSecundarios.includes(mAtivo.id)){
+      $$('.mod').forEach(m=>m.classList.remove('ativo'));
+      $$('.nav-item').forEach(n=>n.classList.remove('ativo'));
+      document.getElementById('mod-hoje').classList.add('ativo');
+      document.querySelector('[data-mod="hoje"]').classList.add('ativo');
+      return;
+    }
+
+    // Raiz: reaplica base
+    if(!state._base){
+      history.replaceState({_base:true},'');
+    }
+  });
+
+})();
+
+// ===== INIT =====
+initHoje();
+</script>
+<!-- VOLTAR DESKTOP --><style>@media(max-width:768px){#__btn-voltar{display:none!important}}#__btn-voltar{position:fixed;bottom:22px;left:22px;z-index:99999;background:#13131a;border:1px solid #2a2a4a;color:#a0a0c0;text-decoration:none;padding:10px 18px;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;transition:all .2s;box-shadow:0 2px 12px rgba(0,0,0,.4)}#__btn-voltar:hover{background:#7c6aff;border-color:#7c6aff;color:#fff}</style><a id="__btn-voltar" href="index.html">← Meus Apps</a><!-- FIM VOLTAR DESKTOP -->
+</body>
+</html>
