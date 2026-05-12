@@ -1,0 +1,25 @@
+{
+  "name": "Software",
+  "short_name": "Software",
+  "description": "Central de aplicativos",
+  "start_url": "/SOFTWARE/index.html",
+  "scope": "/SOFTWARE/",
+  "display": "standalone",
+  "background_color": "#0d0f1a",
+  "theme_color": "#0d0f1a",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/SOFTWARE/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/SOFTWARE/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
