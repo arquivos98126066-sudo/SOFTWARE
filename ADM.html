@@ -443,6 +443,91 @@ hr.hr{border:none;border-top:1px solid var(--brd2);margin:10px 0}
 import { db } from "https://arquivos98126066-sudo.github.io/SOFTWARE/firebase-sync.js";
 import { doc, getDoc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
+// ── CAMADA 1: LOCAL — IndexedDB com fallback localStorage ──────────────
+function saveLocal(key, data) {
+  try {
+    const req = indexedDB.open('meus_apps_backup', 1);
+    req.onupgradeneeded = e => e.target.result.createObjectStore('data');
+    req.onsuccess = e => {
+      const tx = e.target.result.transaction('data', 'readwrite');
+      tx.objectStore('data').put(JSON.stringify(data), key);
+    };
+  } catch(_) {
+    try { localStorage.setItem(key, JSON.stringify(data)); } catch(_) {}
+  }
+}
+
+function loadLocal(key) {
+  return new Promise(resolve => {
+    try {
+      const req = indexedDB.open('meus_apps_backup', 1);
+      req.onupgradeneeded = e => e.target.result.createObjectStore('data');
+      req.onsuccess = e => {
+        const tx = e.target.result.transaction('data', 'readonly');
+        const r = tx.objectStore('data').get(key);
+        r.onsuccess = () => resolve(r.result ? JSON.parse(r.result) : null);
+        r.onerror = () => resolve(null);
+      };
+      req.onerror = () => resolve(null);
+    } catch(_) {
+      try { resolve(JSON.parse(localStorage.getItem(key))); } catch(_) { resolve(null); }
+    }
+  });
+}
+
+// ── CAMADA 2: MERGE de lançamentos por ID (complementa, nunca substitui) ──
+function mergeLancamentos(cloud, local) {
+  // Começa com todos os da nuvem
+  var merged = cloud.slice();
+  var cloudIds = new Set(cloud.map(function(l){ return String(l.id); }));
+  // Adiciona do local os que não existem na nuvem (complementa)
+  local.forEach(function(l) {
+    if (!cloudIds.has(String(l.id))) {
+      merged.push(l);
+    }
+  });
+  // Ordena por id (cronológico)
+  merged.sort(function(a, b){ return (a.id || 0) - (b.id || 0); });
+  return merged;
+}
+
+// ── CAMADA 3: setupSnapshot com merge ────────────────────────────────────
+function setupSnapshot(colId, docId, onData) {
+  onSnapshot(doc(db, colId, docId), async (snap) => {
+    const local = await loadLocal(colId + '_' + docId);
+    const localTime = local ? (local.updatedAt || 0) : 0;
+    if (snap.exists()) {
+      const cloud = snap.data();
+      const cloudTime = cloud.updatedAt || 0;
+
+      // Se ambos têm dados, COMPLEMENTA lançamentos
+      if (local && local.itens && cloud.itens) {
+        const merged = mergeLancamentos(cloud.itens, local.itens);
+        const payload = { itens: merged, updatedAt: Date.now() };
+        saveLocal(colId + '_' + docId, payload);
+        await setDoc(doc(db, colId, docId), payload);
+        onData(payload);
+      } else if (localTime > cloudTime && local) {
+        // Local mais recente, sobe local
+        await setDoc(doc(db, colId, docId), local);
+        onData(local);
+      } else {
+        // Nuvem mais recente
+        saveLocal(colId + '_' + docId, cloud);
+        onData(cloud);
+      }
+    } else {
+      if (local) {
+        await setDoc(doc(db, colId, docId), local);
+        onData(local);
+      } else {
+        onData(null);
+      }
+    }
+  });
+}
+
+
 // ===== CACHE LOCAL =====
 var _cache = {
   lancamentos: [],
@@ -458,20 +543,19 @@ var _cache = {
 var docLanc = doc(db, 'adm', 'lancamentos');
 var docConfig = doc(db, 'adm', 'config');
 
-// ===== SALVAR NO FIRESTORE =====
+// ===== SALVAR NO FIRESTORE (com saveLocal antes) =====
 async function salvar() {
+  const payloadLanc = { itens: _cache.lancamentos, updatedAt: Date.now() };
+  const payloadConfig = { ..._cache.adm, updatedAt: Date.now() };
+  saveLocal('adm_lancamentos', payloadLanc);
+  saveLocal('adm_config', payloadConfig);
   if (window.syncShow) window.syncShow.syncing();
   try {
-    await setDoc(docLanc, { itens: _cache.lancamentos });
-    await setDoc(docConfig, _cache.adm);
+    await setDoc(docLanc, payloadLanc);
+    await setDoc(docConfig, payloadConfig);
     if (window.syncShow) window.syncShow.synced('ADM');
   } catch (e) {
     console.error('Erro ao salvar:', e);
-    // fallback offline
-    try {
-      localStorage.setItem('adm_cache_offline', JSON.stringify(_cache));
-      localStorage.setItem('adm_pendingSync', 'true');
-    } catch (_) {}
     if (window.syncShow) window.syncShow.offline();
   }
 }
@@ -507,24 +591,24 @@ async function carregarDados() {
   }
 }
 
-// ===== ESCUTA EM TEMPO REAL =====
+// ===== ESCUTA EM TEMPO REAL (com merge/complementação) =====
 function iniciarListeners() {
-  onSnapshot(docLanc, function(snap) {
-    if (snap.exists()) {
-      _cache.lancamentos = snap.data().itens || [];
+  setupSnapshot('adm', 'lancamentos', function(data) {
+    if (data) {
+      _cache.lancamentos = data.itens || [];
       renderHistorico();
       renderRelatorio();
       atualizarHeader();
     }
-  }, function(e) { console.error('Listener lancamentos:', e); });
+  });
 
-  onSnapshot(docConfig, function(snap) {
-    if (snap.exists()) {
-      _cache.adm = snap.data();
+  setupSnapshot('adm', 'config', function(data) {
+    if (data) {
+      _cache.adm = data;
       garantirEstrutura();
       renderADM();
     }
-  }, function(e) { console.error('Listener config:', e); });
+  });
 }
 
 // ===== UTIL =====
@@ -1108,4 +1192,4 @@ init();
 })();
 </script>
 </body>
-            </html>
+</html>
