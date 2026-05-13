@@ -139,7 +139,21 @@ input[type=time]{height:40px}
 .voltar{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;color:var(--texto-sec);background:none;border:none;cursor:pointer;padding:0;margin-bottom:18px;transition:color 150ms;font-family:var(--fonte)}
 .voltar:hover{color:var(--azul)}
 
-/* INFO BALÃO — tamanho reduzido 30% */
+/* DRAG HANDLE */
+.drag-handle{font-size:16px;color:var(--texto-dis);cursor:grab;padding:4px 6px;user-select:none;letter-spacing:-2px;flex-shrink:0}
+.drag-handle:active{cursor:grabbing}
+.bloco-card.dragging{opacity:0.4;border:2px dashed var(--azul)}
+.bloco-card.drag-over{border-top:3px solid var(--azul)}
+/* LIXEIRA ITEM */
+.lixeira-item{background:var(--bg-card);border:1px solid var(--borda-media);border-radius:var(--r);padding:14px;display:flex;align-items:center;gap:12px}
+.lixeira-item-info{flex:1;min-width:0}
+.lixeira-item-tipo{font-size:10px;font-weight:700;color:var(--texto-dis);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:2px}
+.lixeira-item-nome{font-size:14px;font-weight:600;color:var(--texto);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lixeira-item-data{font-size:11px;color:var(--texto-dis);margin-top:2px}
+.lixeira-btns{display:flex;flex-direction:column;gap:6px;flex-shrink:0}
+/* HAB EDIT INLINE */
+.hab-edit-wrap{display:none;padding:8px 0 4px;gap:8px;align-items:center}
+.hab-edit-wrap.vis{display:flex}
 .info-btn{width:14px;height:14px;border-radius:99px;background:var(--bg-alt);border:1px solid var(--azul-claro);cursor:pointer;font-size:8px;font-weight:800;color:var(--azul);display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;transition:all 150ms;font-family:var(--fonte)}
 .info-btn:hover{background:var(--azul);color:#fff}
 .info-balao{display:none;position:absolute;left:0;bottom:22px;width:200px;max-width:200px;background:var(--azul);color:#fff;border-radius:10px;padding:8px 12px;font-size:11px;font-weight:400;line-height:1.45;z-index:200;box-shadow:0 8px 24px rgba(0,0,0,0.2);animation:popIn 150ms ease;font-family:var(--fonte);text-transform:none}
@@ -568,7 +582,10 @@ input[type=time]{height:40px}
 <!-- ===== MÓDULO HISTÓRICO ===== -->
 <div class="mod" id="mod-historico">
   <div class="tela ativa" id="t-hist-lista">
-    <h1 class="titulo" style="font-size:16px;text-transform:uppercase;letter-spacing:0.06em">Histórico</h1>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0">
+      <h1 class="titulo" style="font-size:16px;text-transform:uppercase;letter-spacing:0.06em">Histórico</h1>
+      <button onclick="irTHist('t-hist-lixeira')" style="display:inline-flex;align-items:center;gap:5px;background:var(--bg-card);border:1.5px solid var(--borda-media);border-radius:99px;padding:6px 12px;font-size:12px;font-weight:600;color:var(--texto-sec);cursor:pointer;font-family:var(--fonte)">🗑️ Lixeira <span id="lixeira-badge" style="display:none;background:var(--vermelho);color:#fff;border-radius:99px;padding:1px 6px;font-size:10px;font-weight:800"></span></button>
+    </div>
     <div class="zonas-grid mt-16">
       <div class="zona-stat zs4"><p class="zv" id="z4p">0%</p><p class="zl">🟢 Z4 Realização</p></div>
       <div class="zona-stat zs3"><p class="zv" id="z3p">0%</p><p class="zl">🟠 Z3 Exigência</p></div>
@@ -590,6 +607,16 @@ input[type=time]{height:40px}
     </div>
 
     <button class="btn btn-danger mt-20" id="btn-apagar-dia">🗑️ Apagar Dia</button>
+  </div>
+  <!-- LIXEIRA -->
+  <div class="tela" id="t-hist-lixeira">
+    <button class="voltar" onclick="history.back()">← HISTÓRICO</button>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+      <h1 class="titulo" style="font-size:16px">🗑️ Lixeira</h1>
+      <button id="btn-esvaziar-lixeira" class="btn btn-danger btn-sm" onclick="esvaziarLixeira()">Esvaziar</button>
+    </div>
+    <div id="lixeira-vazia" style="display:none" class="empty"><div class="ei">🗑️</div><p>Lixeira vazia.</p></div>
+    <div class="flex-col" style="gap:10px" id="lixeira-lista"></div>
   </div>
 </div>
 
@@ -656,8 +683,8 @@ function sd(d){
 }
 function md(fn){const d=gd();fn(d);sd(d)}
 function hoje(){const d=new Date();return`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`}
-function hId(){return`plan_${hoje().replace(/-/g,'')}`}
-function gph(){return gd().planejamentos.find(p=>p.data===hoje())||null}
+function hId(){return`plan_${hoje().replace(/-/g,'')}_${Date.now()}`}
+function gph(){return gd().planejamentos.find(p=>p.data===hoje()&&!p.revisao)||null}
 function sp(p){md(d=>{const i=d.planejamentos.findIndex(x=>x.id===p.id);if(i>=0)d.planejamentos[i]=p;else d.planejamentos.unshift(p)})}
 function fBR(iso){if(!iso)return'';const[y,m,dd]=iso.split('-');const ms=['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];return`${parseInt(dd)} de ${ms[parseInt(m)-1]} de ${y}`}
 function toast(msg,dur=1800){const t=$('#toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),dur)}
@@ -795,6 +822,10 @@ function criarBlocoUI(b){
   card.querySelector('.bobj').addEventListener('blur',e=>{const bk=blocosTemp.find(x=>x.id===e.target.dataset.id);if(bk){bk.objetivo=e.target.value;salvarBlocos()}});
   card.querySelector('.bprop').addEventListener('input',e=>{e.target.style.height='auto';e.target.style.height=e.target.scrollHeight+'px';const bk=blocosTemp.find(x=>x.id===e.target.dataset.id);if(bk)bk.proposito=e.target.value;});
   card.querySelector('.bprop').addEventListener('blur',e=>{const bk=blocosTemp.find(x=>x.id===e.target.dataset.id);if(bk){bk.proposito=e.target.value;salvarBlocos()}});
+  // auto-resize imediato para blocos restaurados com texto já preenchido
+  requestAnimationFrame(()=>{
+    ['.bobj','.bprop'].forEach(sel=>{const el=card.querySelector(sel);if(el&&el.value){el.style.height='auto';el.style.height=el.scrollHeight+'px';}});
+  });
   card.querySelector('.bhor-ini').addEventListener('change',e=>{const bk=blocosTemp.find(x=>x.id===e.target.dataset.id);if(bk){const v=e.target.value;const conflito=blocosTemp.find(b=>b.id!==bk.id&&b.horario_inicio&&b.horario_fim&&v<b.horario_fim&&(bk.horario_fim||'99:99')>b.horario_inicio);if(conflito){toast(`⚠️ Conflito com bloco "${conflito.nome}"`);e.target.value=bk.horario_inicio||'';return}bk.horario_inicio=v;salvarBlocos();checkConfBlocos()}});
   card.querySelector('.bhor-fim').addEventListener('change',e=>{const bk=blocosTemp.find(x=>x.id===e.target.dataset.id);if(bk){const v=e.target.value;if(bk.horario_inicio&&v&&v<=bk.horario_inicio){toast('⚠️ Horário fim deve ser maior que início');e.target.value=bk.horario_fim||'';return}const conflito=blocosTemp.find(b=>b.id!==bk.id&&b.horario_inicio&&b.horario_fim&&bk.horario_inicio<b.horario_fim&&v>b.horario_inicio);if(conflito){toast(`⚠️ Conflito com bloco "${conflito.nome}"`);e.target.value=bk.horario_fim||'';return}bk.horario_fim=v;salvarBlocos();checkConfBlocos()}});
   const bk=blocosTemp.find(x=>x.id===b.id);
@@ -831,7 +862,7 @@ function tgAcoesBloco(id){
   // Só troca o ícone
   btn.textContent=oculto?'▼':'▶';
 }
-function remBloco(id){abrirModal(`<div style="text-align:center"><p style="font-size:36px;margin-bottom:12px">⚠️</p><h2 style="font-size:16px;font-weight:800;color:var(--azul);margin-bottom:8px">Excluir bloco?</h2><p style="font-size:13px;color:var(--texto-sec);margin-bottom:16px">Esta ação não pode ser desfeita.</p><div style="display:flex;gap:10px"><button class="btn btn-danger" onclick="confirmarRemBloco('${id}')">Sim, excluir</button><button class="btn btn-sec" onclick="fecharModal()">Cancelar</button></div></div>`)}
+function remBloco(id){confirmar('Excluir este bloco?',()=>{moverLixeira('bloco',id)})}
 function confirmarRemBloco(id){fecharModal();blocosTemp=blocosTemp.filter(b=>b.id!==id);salvarBlocos();renderBlocosUI()}
 function setBlocoP(id,p){const b=blocosTemp.find(x=>x.id===id);if(b){b.prior=p;salvarBlocos();renderBlocosUI()}}
 function setBlocoZ(id,z){const b=blocosTemp.find(x=>x.id===id);if(b){b.zona=z;salvarBlocos();renderBlocosUI()}}
@@ -882,12 +913,14 @@ function addAcaoBlocoUI(blocoId,acao,foco=false){
 }
 
 function remAcaoBloco(blocoId,acaoId){
-  const b=blocosTemp.find(x=>x.id===blocoId);if(b)b.acoes=b.acoes.filter(a=>a.id!==acaoId);
-  const row=document.querySelector(`[data-aid="${acaoId}"]`);
-  if(row){row.style.opacity='0';row.style.transition='opacity 150ms';setTimeout(()=>{row.remove();salvarBlocos();checkBtns();
-    const btgR=document.getElementById('btg-acoes-'+blocoId);
-    if(btgR){const br=blocosTemp.find(x=>x.id===blocoId);const qtdR=br?br.acoes.filter(x=>x.nome.trim()).length:0;const isOculto=document.getElementById('balist-'+blocoId)&&document.getElementById('balist-'+blocoId).style.display==='none';btgR.textContent=isOculto?'▶':'▼';}
-  },150)}
+  confirmar('Excluir esta ação?',()=>{
+    const b=blocosTemp.find(x=>x.id===blocoId);if(b)b.acoes=b.acoes.filter(a=>a.id!==acaoId);
+    const row=document.querySelector(`[data-aid="${acaoId}"]`);
+    if(row){row.style.opacity='0';row.style.transition='opacity 150ms';setTimeout(()=>{row.remove();salvarBlocos();checkBtns();
+      const btgR=document.getElementById('btg-acoes-'+blocoId);
+      if(btgR){const br=blocosTemp.find(x=>x.id===blocoId);const isOculto=document.getElementById('balist-'+blocoId)&&document.getElementById('balist-'+blocoId).style.display==='none';btgR.textContent=isOculto?'▶':'▼';}
+    },150)}
+  });
 }
 
 function checkBtns(){
@@ -1134,13 +1167,78 @@ function renderRevisao(){
   });
 }
 
-$('#btn-salvar-rev').addEventListener('click',()=>{const p=gph();const rev={};$$('.rv1').forEach(el=>{const bid=el.dataset.bid;if(!rev[bid])rev[bid]={};rev[bid].r1=el.value});$$('.rv2').forEach(el=>{const bid=el.dataset.bid;if(!rev[bid])rev[bid]={};rev[bid].r2=el.value});if(p){const copia=JSON.parse(JSON.stringify(p));copia.id=`plan_${Date.now()}`;copia.revisao=rev;md(d=>{d.planejamentos.unshift(copia)});ultimosBlocos=JSON.parse(JSON.stringify(p.blocos));md(d=>{d.planejamentos=d.planejamentos.filter(x=>x.id!==p.id)})}else if(blocosTemp.length){ultimosBlocos=JSON.parse(JSON.stringify(blocosTemp))}abrirModal(`<div style="text-align:center"><p style="font-size:44px;margin-bottom:12px">🎉</p><h2 style="font-size:18px;font-weight:800;color:var(--azul);margin-bottom:8px">Revisão Salva!</h2><p style="font-size:13px;color:var(--texto-sec);margin-bottom:16px">Deseja salvar este plano em PLANOS?</p><div style="display:flex;gap:10px"><button class="btn btn-azul" onclick="salvarComoModeloEVoltar()">💾 Salvar em Planos</button><button class="btn btn-sec" onclick="voltarInicio()">Não</button></div></div>`);});
+$('#btn-salvar-rev').addEventListener('click',()=>{
+  const rev={};
+  $$('.rv1').forEach(el=>{const bid=el.dataset.bid;if(!rev[bid])rev[bid]={};rev[bid].r1=el.value});
+  $$('.rv2').forEach(el=>{const bid=el.dataset.bid;if(!rev[bid])rev[bid]={};rev[bid].r2=el.value});
+  const data=gd();
+  const hj=hoje();
+  const pOriginal=data.planejamentos.find(x=>x.data===hj);
+  const base=pOriginal||( blocosTemp.length?{id:hId(),data:hj,blocos:blocosTemp,progresso_percentual:0,iniciado:false,revisao:null}:null);
+  if(base){
+    const copia=JSON.parse(JSON.stringify(base));
+    copia.id=`plan_${Date.now()}_${Math.random().toString(36).substr(2,4)}`;
+    copia.revisao=rev;
+    ultimosBlocos=JSON.parse(JSON.stringify(copia.blocos));
+    md(d=>{
+      // Remove o rascunho do dia (sem revisão) se existir, insere o finalizado com revisão
+      if(pOriginal) d.planejamentos=d.planejamentos.filter(x=>x.id!==pOriginal.id);
+      d.planejamentos.unshift(copia);
+    });
+  }
+  abrirModal(`<div style="text-align:center"><p style="font-size:44px;margin-bottom:12px">🎉</p><h2 style="font-size:18px;font-weight:800;color:var(--azul);margin-bottom:8px">Revisão Salva!</h2><p style="font-size:13px;color:var(--texto-sec);margin-bottom:16px">Deseja salvar este plano em PLANOS?</p><div style="display:flex;gap:10px"><button class="btn btn-azul" onclick="salvarComoModeloEVoltar()">💾 Salvar em Planos</button><button class="btn btn-sec" onclick="voltarInicio()">Não</button></div></div>`);
+});
 function salvarComoModeloEVoltar(){salvarComoModelo();voltarInicio();}
 function voltarInicio(){fecharModal();blocosTemp=[];renderBlocosUI();checkBtns();irT('t-hoje-main');}
 function salvarComoModelo(){const nome=ultimosBlocos&&ultimosBlocos[0]?ultimosBlocos[0].nome:fBR(hoje());md(d=>{if(!d.planos)d.planos=[];d.planos.unshift({id:`modelo_${Date.now()}`,nome,data:hoje(),blocos:JSON.parse(JSON.stringify(ultimosBlocos||[]))})});fecharModal();toast('✅ Modelo salvo em PLANOS!');renderPlanos()}
-function renderPlanos(){const data=gd();const lista=$('#planos-lista');const empty=$('#planos-empty');lista.innerHTML='';const planos=data.planos||[];if(!planos.length){empty.style.display='block';return}empty.style.display='none';planos.forEach(p=>{const item=document.createElement('div');item.className='card';item.style.marginBottom='0';item.innerHTML=`<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px"><p style="font-size:15px;font-weight:700;color:var(--azul)">${p.nome||'Plano sem nome'}</p><span style="font-size:11px;color:var(--texto-dis)">${fBR(p.data)}</span></div><p style="font-size:13px;color:var(--texto-sec);margin-bottom:10px">${p.blocos?p.blocos.length+' bloco(s)':'0 blocos'}</p><div style="display:flex;gap:8px"><button class="btn btn-azul btn-sm" onclick="reusarPlano('${p.id}')">▶ Usar</button><button class="btn btn-danger btn-sm" onclick="excluirPlano('${p.id}')">🗑️</button></div>`;lista.appendChild(item);})}
+function renderPlanos(){
+  const data=gd();const lista=$('#planos-lista');const empty=$('#planos-empty');lista.innerHTML='';
+  const planos=data.planos||[];
+  if(!planos.length){empty.style.display='block';return;}
+  empty.style.display='none';
+  planos.forEach(p=>{
+    const item=document.createElement('div');item.className='card';item.style.cssText='margin-bottom:0;position:relative;';
+    const nomeEsc=(p.nome||'Plano sem nome').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
+    item.innerHTML=
+      `<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:8px">`+
+        `<div style="flex:1;min-width:0">`+
+          `<p id="planonome-${p.id}" style="font-size:15px;font-weight:700;color:var(--azul);word-break:break-word;cursor:pointer">${p.nome||'Plano sem nome'}</p>`+
+          `<input id="planoinp-${p.id}" value="${nomeEsc}" maxlength="80" style="display:none;width:100%;height:36px;font-size:14px;font-weight:700;border:1.5px solid var(--azul);border-radius:8px;padding:0 10px;font-family:var(--fonte);color:var(--texto);background:var(--bg);outline:none;box-sizing:border-box">`+
+        `</div>`+
+        `<div style="display:flex;flex-direction:row;gap:3px;flex-shrink:0">`+
+          `<button onclick="moverPlano('${p.id}',-1)" style="width:24px;height:22px;border:1.5px solid var(--borda-media);border-radius:5px;background:var(--bg-card);color:var(--texto-sec);font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0">▲</button>`+
+          `<button onclick="moverPlano('${p.id}',1)" style="width:24px;height:22px;border:1.5px solid var(--borda-media);border-radius:5px;background:var(--bg-card);color:var(--texto-sec);font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0">▼</button>`+
+        `</div>`+
+        `<span style="font-size:11px;color:var(--texto-dis);white-space:nowrap;flex-shrink:0;margin-top:2px">${fBR(p.data)}</span>`+
+      `</div>`+
+      `<p style="font-size:13px;color:var(--texto-sec);margin-bottom:10px">${p.blocos?p.blocos.length+' bloco(s)':'0 blocos'}</p>`+
+      `<div style="display:flex;gap:8px">`+
+        `<button class="btn btn-azul btn-sm" onclick="reusarPlano('${p.id}')">▶ Usar</button>`+
+        `<button class="btn btn-danger btn-sm" onclick="excluirPlano('${p.id}')">🗑️</button>`+
+      `</div>`;
+    // segurar no nome = editar
+    const nomeTxt=item.querySelector('#planonome-'+p.id);
+    const nomeInp=item.querySelector('#planoinp-'+p.id);
+    let _pt=null,_px=0,_py=0;
+    nomeTxt.addEventListener('pointerdown',e=>{e.stopPropagation();_px=e.clientX;_py=e.clientY;_pt=setTimeout(()=>{nomeTxt.style.display='none';nomeInp.style.display='block';nomeInp.focus();nomeInp.select();},600);});
+    nomeTxt.addEventListener('pointermove',e=>{if(_pt&&(Math.abs(e.clientX-_px)>8||Math.abs(e.clientY-_py)>8)){clearTimeout(_pt);_pt=null;}});
+    nomeTxt.addEventListener('pointerup',()=>{clearTimeout(_pt);_pt=null;});
+    nomeTxt.addEventListener('pointercancel',()=>{clearTimeout(_pt);_pt=null;});
+    nomeInp.addEventListener('blur',()=>_salvarNomePlano(p.id,nomeTxt,nomeInp));
+    nomeInp.addEventListener('keydown',e=>{
+      if(e.key==='Enter')_salvarNomePlano(p.id,nomeTxt,nomeInp);
+      if(e.key==='Escape'){nomeInp.style.display='none';nomeTxt.style.display='';}
+    });
+    lista.appendChild(item);
+  });
+}
+function _salvarNomePlano(id,nomeTxt,nomeInp){
+  const nome=nomeInp.value.trim();
+  if(nome.length>0){md(d=>{const p=(d.planos||[]).find(x=>x.id===id);if(p)p.nome=nome;});nomeTxt.textContent=nome;toast('✅ Plano renomeado!');}
+  nomeInp.style.display='none';nomeTxt.style.display='';
+}
 function reusarPlano(id){const data=gd();const p=data.planos.find(x=>x.id===id);if(!p)return;const novos=JSON.parse(JSON.stringify(p.blocos));novos.forEach(b=>{b.id=`b_${Date.now()}_${Math.random().toString(36).substr(2,4)}`;b.status='pendente';b.acoes.forEach(a=>{a.id=`a_${Date.now()}_${Math.random().toString(36).substr(2,4)}`;a.status='pendente';a.selecionada=true})});blocosTemp=[...blocosTemp,...novos];salvarBlocos();navegar('hoje');renderBlocosUI();checkBtns();toast('✅ Blocos adicionados!')}
-function excluirPlano(id){md(d=>{d.planos=(d.planos||[]).filter(x=>x.id!==id)});renderPlanos();toast('Plano removido')}
+function excluirPlano(id){confirmar('Excluir este plano?',()=>moverLixeira('plano',id))}
 // ===== HÁBITOS =====
 const FRASES=["Pequenas melhorias de 1% por dia resultam em 37 vezes mais resultado em 1 ano.","Você não sobe ao nível dos seus objetivos — você cai ao nível dos seus sistemas.","Cada ação que você toma é um voto para o tipo de pessoa que deseja se tornar.","O hábito não precisa ser perfeito. Precisa ser consistente.","Nunca falhe duas vezes. Uma falta é acidente, dois é um novo hábito.","O ambiente é a mão invisível que molda o comportamento humano.","Torne os bons hábitos óbvios, atraentes, fáceis e satisfatórios.","A identidade emerge dos hábitos. Cada hábito é um voto em quem você está se tornando.","Você não precisa ser a vítima do seu ambiente. Pode ser o arquiteto dele.","O platô do potencial latente: os resultados chegam depois da consistência.","Comece com dois minutos. O início é o hábito.","Empilhe comportamentos: depois de [hábito atual], farei [novo hábito].","Reduza o atrito. Quanto menos passos, mais chance de acontecer.","Celebre cada pequena vitória. A satisfação consolida o hábito.","Um dia ruim não define você. Define o dia seguinte.","Foque no sistema, não na meta. Vencedores e perdedores têm as mesmas metas.","O poder dos hábitos está na continuidade, não na intensidade isolada.","Em vez de 'tenho que', diga 'eu escolho'. Isso muda tudo.","A melhor hora para criar um hábito era ontem. A segunda melhor é agora.","Identidade antes de resultado: 'sou uma pessoa que...' muda tudo.","Cada repetição é uma escultura da sua identidade futura.","O sucesso é o produto de hábitos diários, não de transformações raras.","Torne os maus hábitos invisíveis, sem atração, difíceis e insatisfatórios.","Progredir 1% por dia é mais poderoso do que mudar tudo de uma vez.","O maior obstáculo para mudar hábitos é a ilusão de que precisamos de motivação.","Quando a identidade muda, o comportamento muda naturalmente.","Não quebre a corrente. A consistência cria o resultado.","Hábitos são os juros compostos do auto-aperfeiçoamento.","Faça a versão mínima nos dias difíceis. Zero é o inimigo.","Você se torna o que repetidamente faz.","O ambiente certo torna o comportamento certo inevitável."];
 const MOTIV=[{min:0,max:2,txt:"Comece pequeno. A versão mínima já é uma vitória real."},{min:3,max:6,txt:"Você está construindo sua identidade. Cada dia é um voto."},{min:7,max:13,txt:"Não quebre a corrente. Uma falta é acidente, duas é hábito ruim."},{min:14,max:20,txt:"Você está no platô do potencial. O resultado explode depois."},{min:21,max:9999,txt:"Este hábito já é parte de quem você é. Continue."}];
@@ -1183,10 +1281,19 @@ function criarHabCard(h){
   card.innerHTML=`
     <div class="hab-card-topo">
       <div class="hab-nome-row" onclick="abrirDetHab('${h.id}')">
-        <span class="hab-nome">${h.nome}</span>
+        <span class="hab-nome" id="habnome-${h.id}">${h.nome}</span>
         <span class="hab-streak">🔥 ${streak} dias</span>
       </div>
-      <button class="btn-xs btn-sec" style="flex-shrink:0;margin-left:12px" onclick="tgHabConf('${h.id}')">🗑️</button>
+      <div style="display:flex;flex-direction:row;gap:3px;flex-shrink:0;margin-left:8px">
+        <button onclick="moverHab('${h.id}',-1)" style="width:24px;height:22px;border:1.5px solid var(--borda-media);border-radius:5px;background:var(--bg-card);color:var(--texto-sec);font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0">▲</button>
+        <button onclick="moverHab('${h.id}',1)" style="width:24px;height:22px;border:1.5px solid var(--borda-media);border-radius:5px;background:var(--bg-card);color:var(--texto-sec);font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0">▼</button>
+      </div>
+      <button class="btn-xs btn-sec" style="flex-shrink:0;margin-left:6px" onclick="tgHabConf('${h.id}')">🗑️</button>
+    </div>
+    <div class="hab-edit-wrap" id="habedit-${h.id}">
+      <input type="text" id="habinp-${h.id}" value="${h.nome}" maxlength="100" style="flex:1;height:36px;font-size:13px">
+      <button class="btn btn-azul btn-sm" onclick="salvarEditHab('${h.id}')">✓</button>
+      <button class="btn btn-sec btn-sm" onclick="cancelarEditHab('${h.id}')">✕</button>
     </div>
     <div class="hab-grid">${rows.map(row=>`<div class="hab-row">${row.map(t=>`<div class="hdot ${t==='futuro'||t==='vazio'?'':t}"></div>`).join('')}</div>`).join('')}</div>
     <div class="hab-today">
@@ -1197,9 +1304,16 @@ function criarHabCard(h){
       <p>Tem certeza? Isso apaga todo o histórico.</p>
       <div style="display:flex;gap:8px">
         <button class="btn btn-sec btn-sm" onclick="tgHabConf('${h.id}')">Cancelar</button>
-        <button class="btn btn-danger btn-sm" onclick="remHab('${h.id}')">Sim, remover</button>
+        <button class="btn btn-danger btn-sm" onclick="moverLixeira('habito','${h.id}')">Sim, remover</button>
       </div>
     </div>`;
+  // segurar no nome = editar
+  let _lpT=null,_lpX=0,_lpY=0;
+  const nomeEl=card.querySelector('.hab-nome');
+  nomeEl.addEventListener('pointerdown',e=>{e.stopPropagation();_lpX=e.clientX;_lpY=e.clientY;_lpT=setTimeout(()=>abrirEditHab(h.id),600);});
+  nomeEl.addEventListener('pointermove',e=>{if(_lpT&&(Math.abs(e.clientX-_lpX)>8||Math.abs(e.clientY-_lpY)>8)){clearTimeout(_lpT);_lpT=null;}});
+  nomeEl.addEventListener('pointerup',()=>{clearTimeout(_lpT);_lpT=null;});
+  nomeEl.addEventListener('pointercancel',()=>{clearTimeout(_lpT);_lpT=null;});
   return card;
 }
 
@@ -1315,7 +1429,7 @@ function abrirDetDec(id){
     lista.appendChild(par);
   });
   $('#dec-det-conclusao').textContent=d.conclusao||'';
-  $('#btn-del-dec').onclick=()=>{md(x=>{x.decisoes=x.decisoes.filter(y=>y.id!==id)});toast('Decisão apagada');renderDecAnt();irTDec('t-dec-inicio')};
+  $('#btn-del-dec').onclick=()=>confirmar('Apagar esta decisão?',()=>moverLixeira('decisao',id));
   irTDec('t-dec-detalhe');
 }
 
@@ -1360,7 +1474,7 @@ function abrirDetHist(id){
   $('#hdet-data-label').textContent=fBR(p.data).toUpperCase();
   const bl=$('#hdet-blocos');bl.innerHTML='';
   (p.blocos||[]).filter(b=>b.nome).forEach(b=>{
-    const card=document.createElement('div');card.className='card';
+    const card=document.createElement('div');card.className='card';card.style.cssText='background:#fff;box-shadow:0 2px 12px rgba(0,0,0,0.08);border:none;';
     const icon=b.status==='feito'?'✅':b.status==='nao-feito'?'❌':'⏳';
     const statusTxt=b.status==='feito'?'Feito':b.status==='nao-feito'?'Não feito':'Pendente';
     const statusCor=b.status==='feito'?'var(--verde)':b.status==='nao-feito'?'var(--vermelho)':'var(--texto-dis)';
@@ -1370,19 +1484,15 @@ function abrirDetHist(id){
     const rev=p.revisao&&p.revisao[b.id];
     const revHtml=rev&&(rev.r1||rev.r2)?`
       <div style="margin-top:12px;padding-top:12px;border-top:1.5px dashed var(--borda-media);display:flex;flex-direction:column;gap:8px">
-        ${rev.r1?`<div style="display:flex;gap:8px;align-items:flex-start"><span style="font-size:16px;flex-shrink:0">✅</span><p style="font-size:13px;color:var(--texto);line-height:1.4">${rev.r1}</p></div>`:''}
-        ${rev.r2?`<div style="display:flex;gap:8px;align-items:flex-start"><span style="font-size:16px;flex-shrink:0">🔧</span><p style="font-size:13px;color:var(--texto);line-height:1.4">${rev.r2}</p></div>`:''}
+        ${rev.r1?`<div style="display:flex;gap:8px;align-items:flex-start"><span style="font-size:13px;flex-shrink:0;margin-top:1px">✅</span><p style="font-size:13px;color:var(--texto);line-height:1.5">${rev.r1}</p></div>`:''}
+        ${rev.r2?`<div style="display:flex;gap:8px;align-items:flex-start"><span style="font-size:13px;flex-shrink:0;margin-top:1px">🔧</span><p style="font-size:13px;color:var(--texto);line-height:1.5">${rev.r2}</p></div>`:''}
       </div>`:'';
     card.innerHTML=`
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
         <div style="display:flex;align-items:center;gap:8px">
-          <span style="font-size:18px">${icon}</span>
           <p style="font-size:14px;font-weight:700;color:var(--azul)">${b.nome}</p>
         </div>
-        <div style="display:flex;align-items:center;gap:6px">
-          <span style="font-size:11px;font-weight:700;color:${statusCor}">${statusTxt}</span>
-          <span class="zbadge ${b.zona||'z4'}" style="cursor:default">${zonaInfo[b.zona||'z4'].label}</span>
-        </div>
+        <span class="zbadge ${b.zona||'z4'}" style="cursor:default">${zonaInfo[b.zona||'z4'].label}</span>
       </div>
       ${b.horario_inicio?`<p style="font-size:12px;color:var(--azul);font-weight:600;margin-bottom:8px">${b.horario_inicio}${b.horario_fim?' → '+b.horario_fim:''}</p>`:''}
       ${totalA?`
@@ -1404,7 +1514,7 @@ function abrirDetHist(id){
       ${revHtml}`;
     bl.appendChild(card);
   });
-  $('#btn-apagar-dia').onclick=()=>{md(d=>{d.planejamentos=d.planejamentos.filter(x=>x.id!==id)});toast('Dia apagado');renderHistorico();irTHist('t-hist-lista')};
+  $('#btn-apagar-dia').onclick=()=>confirmar('Apagar este dia do histórico?',()=>moverLixeira('dia',id));
   irTHist('t-hist-det');
 }
 
@@ -1474,6 +1584,7 @@ function abrirDetHist(id){
     if(modHist&&modHist.classList.contains('ativo')){
       var tHist=modHist.querySelector('.tela.ativa');
       if(tHist&&tHist.id==='t-hist-det'){_irTHist('t-hist-lista');return;}
+      if(tHist&&tHist.id==='t-hist-lixeira'){_irTHist('t-hist-lista');return;}
     }
 
     // 6. Módulos secundários — volta para HOJE
@@ -1494,6 +1605,252 @@ function abrirDetHist(id){
   });
 
 })();
+
+// ===== CONFIRMAR MODAL =====
+function confirmar(msg, onSim){
+  abrirModal(`<div style="text-align:center;padding:8px 0">
+    <p style="font-size:32px;margin-bottom:10px">⚠️</p>
+    <p style="font-size:15px;font-weight:700;color:var(--texto);margin-bottom:6px">${msg}</p>
+    <p style="font-size:12px;color:var(--texto-sec);margin-bottom:18px">Esta ação não pode ser desfeita.</p>
+    <div style="display:flex;gap:10px">
+      <button class="btn btn-sec" onclick="fecharModal()">Cancelar</button>
+      <button class="btn btn-danger" id="btn-confirmar-sim">Sim, excluir</button>
+    </div>
+  </div>`);
+  setTimeout(()=>{const b=document.getElementById('btn-confirmar-sim');if(b)b.onclick=()=>{fecharModal();onSim();}},50);
+}
+
+// ===== LIXEIRA =====
+function getLixeira(){try{const v=localStorage.getItem('opa_lixeira');return v?JSON.parse(v):[]}catch(e){return[]}}
+function setLixeira(arr){try{localStorage.setItem('opa_lixeira',JSON.stringify(arr))}catch(e){}}
+function atualizarBadgeLixeira(){const n=getLixeira().length;const b=document.getElementById('lixeira-badge');if(b){b.textContent=n;b.style.display=n?'inline':'none'}}
+
+function moverLixeira(tipo,id){
+  const data=gd();
+  let item=null,nome='';
+  if(tipo==='bloco'){
+    const p=gph();if(!p)return;item=p.blocos.find(x=>x.id===id);nome=item?item.nome:'Bloco';
+    blocosTemp=blocosTemp.filter(b=>b.id!==id);salvarBlocos();renderBlocosUI();
+  } else if(tipo==='habito'){
+    item=data.habitos.find(x=>x.id===id);nome=item?item.nome:'Hábito';
+    md(d=>{d.habitos=d.habitos.filter(h=>h.id!==id)});renderHabitos();
+  } else if(tipo==='decisao'){
+    item=data.decisoes.find(x=>x.id===id);nome=item?item.tema:'Decisão';
+    md(d=>{d.decisoes=d.decisoes.filter(y=>y.id!==id)});renderDecAnt();irTDec('t-dec-inicio');
+  } else if(tipo==='plano'){
+    item=(data.planos||[]).find(x=>x.id===id);nome=item?item.nome:'Plano';
+    md(d=>{d.planos=(d.planos||[]).filter(x=>x.id!==id)});renderPlanos();
+  } else if(tipo==='dia'){
+    item=data.planejamentos.find(x=>x.id===id);nome=item?fBR(item.data):'Dia';
+    md(d=>{d.planejamentos=d.planejamentos.filter(x=>x.id!==id)});renderHistorico();irTHist('t-hist-lista');
+  }
+  if(!item)return;
+  const lx=getLixeira();
+  lx.unshift({lxId:`lx_${Date.now()}`,tipo,nome,data:hoje(),item:JSON.parse(JSON.stringify(item))});
+  setLixeira(lx);atualizarBadgeLixeira();
+  toast('🗑️ Movido para a lixeira');
+}
+
+function renderLixeira(){
+  const lx=getLixeira();
+  const lista=document.getElementById('lixeira-lista');
+  const vazia=document.getElementById('lixeira-vazia');
+  const btnEsv=document.getElementById('btn-esvaziar-lixeira');
+  lista.innerHTML='';
+  if(!lx.length){vazia.style.display='block';if(btnEsv)btnEsv.style.display='none';return}
+  vazia.style.display='none';if(btnEsv)btnEsv.style.display='flex';
+  const tipoLabel={bloco:'Bloco',habito:'Hábito',decisao:'Decisão',plano:'Plano',dia:'Dia'};
+  const tipoIcon={bloco:'📦',habito:'🔥',decisao:'🎯',plano:'📋',dia:'📅'};
+  lx.forEach(e=>{
+    const el=document.createElement('div');el.className='lixeira-item';
+    el.innerHTML=`
+      <div style="font-size:28px;flex-shrink:0">${tipoIcon[e.tipo]||'📄'}</div>
+      <div class="lixeira-item-info">
+        <div class="lixeira-item-tipo">${tipoLabel[e.tipo]||e.tipo}</div>
+        <div class="lixeira-item-nome">${e.nome}</div>
+        <div class="lixeira-item-data">Excluído em ${fBR(e.data)}</div>
+      </div>
+      <div class="lixeira-btns">
+        <button class="btn btn-azul btn-xs" onclick="restaurarLixeira('${e.lxId}')">↩ Restaurar</button>
+        <button class="btn btn-danger btn-xs" onclick="apagarPermanente('${e.lxId}')">× Apagar</button>
+      </div>`;
+    lista.appendChild(el);
+  });
+}
+
+function restaurarLixeira(lxId){
+  const lx=getLixeira();const e=lx.find(x=>x.lxId===lxId);if(!e)return;
+  const data=gd();
+  if(e.tipo==='bloco'){
+    const p=gph()||{id:hId(),data:hoje(),blocos:[],progresso_percentual:0,iniciado:false,revisao:null};
+    e.item.id=`b_${Date.now()}_${Math.random().toString(36).substr(2,4)}`;
+    e.item.status='pendente';
+    p.blocos.push(e.item);sp(p);
+    blocosTemp=JSON.parse(JSON.stringify(p.blocos));renderBlocosUI();
+  } else if(e.tipo==='habito'){
+    md(d=>{d.habitos=d.habitos||[];d.habitos.push(e.item)});
+  } else if(e.tipo==='decisao'){
+    md(d=>{d.decisoes=d.decisoes||[];d.decisoes.push(e.item)});
+  } else if(e.tipo==='plano'){
+    md(d=>{d.planos=d.planos||[];d.planos.push(e.item)});
+  } else if(e.tipo==='dia'){
+    md(d=>{d.planejamentos=d.planejamentos||[];d.planejamentos.push(e.item)});
+  }
+  setLixeira(lx.filter(x=>x.lxId!==lxId));
+  atualizarBadgeLixeira();renderLixeira();
+  toast('✅ Item restaurado!');
+}
+
+function apagarPermanente(lxId){
+  confirmar('Apagar permanentemente?',()=>{
+    setLixeira(getLixeira().filter(x=>x.lxId!==lxId));
+    atualizarBadgeLixeira();renderLixeira();
+    toast('Apagado permanentemente');
+  });
+}
+
+function esvaziarLixeira(){
+  confirmar('Esvaziar a lixeira? Tudo será apagado para sempre.',()=>{
+    setLixeira([]);atualizarBadgeLixeira();renderLixeira();
+    toast('Lixeira esvaziada');
+  });
+}
+
+// Abrir lixeira: renderiza antes de mostrar
+const _origIrTHist=irTHist;
+irTHist=function(id){_origIrTHist(id);if(id==='t-hist-lixeira')renderLixeira();}
+
+// ===== DRAG TO REORDER BLOCOS =====
+function initDragBlocos(lista){
+  let dragged=null;
+  lista.addEventListener('dragstart',e=>{
+    dragged=e.target.closest('.bloco-card');
+    if(dragged){dragged.classList.add('dragging');e.dataTransfer.effectAllowed='move';}
+  });
+  lista.addEventListener('dragend',e=>{
+    if(dragged)dragged.classList.remove('dragging');
+    lista.querySelectorAll('.drag-over').forEach(el=>el.classList.remove('drag-over'));
+    dragged=null;
+    // Sync order to blocosTemp
+    const newOrder=[];
+    lista.querySelectorAll('.bloco-card').forEach(card=>{
+      const b=blocosTemp.find(x=>x.id===card.dataset.id);if(b)newOrder.push(b);
+    });
+    blocosTemp=newOrder;
+    salvarBlocos();
+  });
+  lista.addEventListener('dragover',e=>{
+    e.preventDefault();
+    const target=e.target.closest('.bloco-card');
+    if(target&&target!==dragged){
+      lista.querySelectorAll('.drag-over').forEach(el=>el.classList.remove('drag-over'));
+      target.classList.add('drag-over');
+      const rect=target.getBoundingClientRect();
+      const after=e.clientY>rect.top+rect.height/2;
+      if(after)target.after(dragged);else target.before(dragged);
+    }
+  });
+  // Touch drag
+  let touchItem=null,touchClone=null,touchOffX=0,touchOffY=0;
+  lista.addEventListener('touchstart',e=>{
+    const handle=e.target.closest('.drag-handle');if(!handle)return;
+    touchItem=handle.closest('.bloco-card');if(!touchItem)return;
+    const t=e.touches[0];const rect=touchItem.getBoundingClientRect();
+    touchOffX=t.clientX-rect.left;touchOffY=t.clientY-rect.top;
+    touchClone=touchItem.cloneNode(true);
+    touchClone.style.cssText=`position:fixed;left:${rect.left}px;top:${rect.top}px;width:${rect.width}px;opacity:0.8;z-index:9999;pointer-events:none;box-shadow:0 8px 24px rgba(0,0,0,0.2)`;
+    document.body.appendChild(touchClone);touchItem.classList.add('dragging');
+  },{passive:true});
+  lista.addEventListener('touchmove',e=>{
+    if(!touchItem)return;e.preventDefault();
+    const t=e.touches[0];
+    touchClone.style.left=(t.clientX-touchOffX)+'px';touchClone.style.top=(t.clientY-touchOffY)+'px';
+    const below=document.elementFromPoint(t.clientX,t.clientY);
+    const target=below&&below.closest('.bloco-card');
+    if(target&&target!==touchItem){
+      const rect=target.getBoundingClientRect();
+      if(t.clientY>rect.top+rect.height/2)target.after(touchItem);else target.before(touchItem);
+    }
+  },{passive:false});
+  lista.addEventListener('touchend',()=>{
+    if(!touchItem)return;
+    if(touchClone)touchClone.remove();touchItem.classList.remove('dragging');
+    const newOrder=[];
+    lista.querySelectorAll('.bloco-card').forEach(card=>{
+      const b=blocosTemp.find(x=>x.id===card.dataset.id);if(b)newOrder.push(b);
+    });
+    blocosTemp=newOrder;salvarBlocos();touchItem=null;touchClone=null;
+  });
+}
+
+// Enable drag on bloco cards
+const _origRenderBlocosUI=renderBlocosUI;
+renderBlocosUI=function(){
+  _origRenderBlocosUI();
+  const lista=document.getElementById('blocos-lista');if(!lista)return;
+  lista.querySelectorAll('.bloco-card').forEach(c=>c.draggable=true);
+  if(!lista._dragInit){lista._dragInit=true;initDragBlocos(lista);}
+};
+
+// ===== EDITAR HÁBITO =====
+function abrirEditHab(id){
+  const wrap=document.getElementById('habedit-'+id);if(wrap)wrap.classList.add('vis');
+  const inp=document.getElementById('habinp-'+id);if(inp){inp.focus();inp.select();}
+}
+function cancelarEditHab(id){
+  const wrap=document.getElementById('habedit-'+id);if(wrap)wrap.classList.remove('vis');
+}
+function salvarEditHab(id){
+  const inp=document.getElementById('habinp-'+id);if(!inp)return;
+  const nome=inp.value.trim();if(nome.length<3){toast('⚠️ Mínimo 3 caracteres');return;}
+  md(d=>{const h=d.habitos.find(x=>x.id===id);if(h)h.nome=nome;});
+  const span=document.getElementById('habnome-'+id);if(span)span.textContent=nome;
+  cancelarEditHab(id);toast('✅ Hábito atualizado!');
+}
+
+// ===== MOVER HÁBITO (popup após segurar 2s) =====
+function mostrarMoverHab(id,card){
+  document.querySelectorAll('.hab-move-popup').forEach(p=>p.remove());
+  const popup=document.createElement('div');
+  popup.className='hab-move-popup';
+  popup.style.cssText='position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:#fff;border:1.5px solid var(--borda-media);border-radius:14px;box-shadow:0 8px 32px rgba(0,0,0,0.18);display:flex;overflow:hidden;z-index:999;user-select:none;';
+  popup.innerHTML=
+    `<button onclick="moverHab('${id}',-1)" style="padding:14px 28px;font-size:22px;border:none;background:#fff;cursor:pointer;border-right:1px solid var(--borda-media);font-family:var(--fonte)">▲</button>`+
+    `<button onclick="document.querySelectorAll('.hab-move-popup').forEach(p=>p.remove())" style="padding:14px 18px;font-size:13px;font-weight:700;border:none;background:#fff;cursor:pointer;color:var(--texto-sec);border-right:1px solid var(--borda-media);font-family:var(--fonte)">✕</button>`+
+    `<button onclick="moverHab('${id}',1)" style="padding:14px 28px;font-size:22px;border:none;background:#fff;cursor:pointer;font-family:var(--fonte)">▼</button>`;
+  card.style.position='relative';
+  card.appendChild(popup);
+  const t=setTimeout(()=>popup.remove(),4000);
+  popup.addEventListener('click',()=>clearTimeout(t),{once:true});
+}
+function moverHab(id,dir){
+  md(d=>{const arr=d.habitos;const i=arr.findIndex(x=>x.id===id);if(i<0)return;const j=i+dir;if(j<0||j>=arr.length)return;const tmp=arr[i];arr[i]=arr[j];arr[j]=tmp;});
+  document.querySelectorAll('.hab-move-popup').forEach(p=>p.remove());
+  renderHabitos();
+}
+
+// ===== MOVER PLANO (popup após segurar 2s) =====
+function mostrarMoverPlano(id,card){
+  document.querySelectorAll('.plano-move-popup').forEach(p=>p.remove());
+  const popup=document.createElement('div');
+  popup.className='plano-move-popup';
+  popup.style.cssText='position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:#fff;border:1.5px solid var(--borda-media);border-radius:14px;box-shadow:0 8px 32px rgba(0,0,0,0.18);display:flex;overflow:hidden;z-index:999;user-select:none;';
+  popup.innerHTML=
+    `<button onclick="moverPlano('${id}',-1)" style="padding:14px 28px;font-size:22px;border:none;background:#fff;cursor:pointer;border-right:1px solid var(--borda-media);font-family:var(--fonte)">▲</button>`+
+    `<button onclick="document.querySelectorAll('.plano-move-popup').forEach(p=>p.remove())" style="padding:14px 18px;font-size:13px;font-weight:700;border:none;background:#fff;cursor:pointer;color:var(--texto-sec);border-right:1px solid var(--borda-media);font-family:var(--fonte)">✕</button>`+
+    `<button onclick="moverPlano('${id}',1)" style="padding:14px 28px;font-size:22px;border:none;background:#fff;cursor:pointer;font-family:var(--fonte)">▼</button>`;
+  card.appendChild(popup);
+  const t=setTimeout(()=>popup.remove(),4000);
+  popup.addEventListener('click',()=>clearTimeout(t),{once:true});
+}
+function moverPlano(id,dir){
+  md(d=>{const arr=d.planos||[];const i=arr.findIndex(x=>x.id===id);if(i<0)return;const j=i+dir;if(j<0||j>=arr.length)return;const tmp=arr[i];arr[i]=arr[j];arr[j]=tmp;});
+  document.querySelectorAll('.plano-move-popup').forEach(p=>p.remove());
+  renderPlanos();
+}
+
+// Init badge
+atualizarBadgeLixeira();
 
 // ===== INIT =====
 initHoje();
