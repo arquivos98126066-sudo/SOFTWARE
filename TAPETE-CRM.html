@@ -225,7 +225,7 @@
   z-index:9999;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap;max-width:92vw;text-align:center"></div>
 
 <div class="nav">
-  <button class="nav-back" id="navBack" style="display:none" onclick="history.back()">←</button>
+  <button class="nav-back" id="navBack" style="display:none" onclick="goBack()">←</button>
   <span class="nav-title" id="navTitle">📱 TAPETES CRM</span>
   <span style="width:32px"></span>
 </div>
@@ -340,7 +340,7 @@
     </div>
   </div>
   <div class="form-actions">
-    <button class="btn btn-ghost" onclick="history.back()">❌ Cancelar</button>
+    <button class="btn btn-ghost" onclick="goBack()">❌ Cancelar</button>
     <button class="btn btn-primary" onclick="salvarCliente()">✅ Salvar Cliente</button>
   </div>
 </div>
@@ -637,10 +637,6 @@ function showScreen(name, push=true){
   if(name==='home') renderHome();
   if(name==='clientes') renderAllClients();
   if(name==='config') renderConfig();
-  // Registra no history se não for tela raiz e o push foi solicitado
-  if(push && !ROOT_SCREENS.includes(name)){
-    history.pushState({nav:name}, '');
-  }
 }
 window.showScreen = showScreen;
 
@@ -652,13 +648,13 @@ function _goBackInterno(){
 }
 
 // goBack público: chamado por botões inline dentro de forms dinâmicos
-function goBack(){ history.back(); }
+function goBack(){ _goBackInterno(); }
 window.goBack = goBack;
 
 function setNav(i){ document.querySelectorAll('.bnav-btn').forEach((b,j)=>b.classList.toggle('active',i===j)); }
 window.setNav = setNav;
 
-function openModal(id){ document.getElementById(id).classList.add('open'); history.pushState({nav:'modal',id}, ''); }
+function openModal(id){ document.getElementById(id).classList.add('open'); }
 function closeModal(id){ document.getElementById(id).classList.remove('open'); }
 window.closeModal = closeModal;
 
@@ -1246,35 +1242,6 @@ function renderConfig(){
   renderDaysAccordion();
 }
 
-// ── SISTEMA DE NAVEGAÇÃO HISTORY ──────────────────────────────────────────────
-(function setupNavHistory(){
-  // Base — nunca deixa o botão voltar fechar a aba
-  history.replaceState({_base:true}, '');
-
-  // POPSTATE — do mais profundo para o mais raso
-  window.addEventListener('popstate', function(e){
-    const state = e.state || {};
-
-    // 1. Modals (mais profundos)
-    const modalAberto = document.querySelector('.overlay.open');
-    if(modalAberto){
-      modalAberto.classList.remove('open');
-      return;
-    }
-
-    // 2. Screens secundárias (timeline, enviar, fechamento, duvida)
-    if(!ROOT_SCREENS.includes(curScreen)){
-      _goBackInterno();
-      return;
-    }
-
-    // 3. Raiz: reaplica base para nunca sair da página
-    if(!state._base){
-      history.replaceState({_base:true}, '');
-    }
-  });
-})();
-
 // ── INIT ──────────────────────────────────────────────────────────────────────
 window.addEventListener('DOMContentLoaded', async () => {
   await loadConfig();
@@ -1283,6 +1250,5 @@ window.addEventListener('DOMContentLoaded', async () => {
   renderHome();
 });
 </script>
-<!-- VOLTAR DESKTOP --><style>@media(max-width:768px){#__btn-voltar{display:none!important}}#__btn-voltar{position:fixed;bottom:22px;left:22px;z-index:99999;background:#13131a;border:1px solid #2a2a4a;color:#a0a0c0;text-decoration:none;padding:10px 18px;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;transition:all .2s;box-shadow:0 2px 12px rgba(0,0,0,.4)}#__btn-voltar:hover{background:#7c6aff;border-color:#7c6aff;color:#fff}</style><a id="__btn-voltar" href="index.html">← Meus Apps</a><!-- FIM VOLTAR DESKTOP -->
 </body>
 </html>
