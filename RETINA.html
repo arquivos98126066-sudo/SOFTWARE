@@ -1270,17 +1270,13 @@ function toggleBloco(id) {
   document.getElementById(`bloco-${id}`).classList.toggle('collapsed');
   document.getElementById(`arrow-${id}`).classList.toggle('rotated');
 }
-// PASSO 4 — base do histórico: nunca sai da página
-history.replaceState({ _base: true }, '');
-
 function toggleSidebar() {
   const isOpen = document.getElementById('sidebar').classList.contains('open');
   if (!isOpen) {
-    history.pushState({ nav: 'sidebar' }, '');
     document.getElementById('sidebar').classList.add('open');
     document.getElementById('sidebar-overlay').classList.add('show');
   } else {
-    history.back();
+    _fecharSidebarDirect();
   }
 }
 function fecharSidebar() {
@@ -1376,7 +1372,6 @@ function salvarEstadoLocal() {
 
 // ─── ABRIR HISTÓRICO ─────────────────────────────────────────────────────────
 function abrirHistorico() {
-  history.pushState({ nav: 'modal', modalId: 'modal-historico' }, '');
   if (window._abrirHistoricoFirestore) {
     window._abrirHistoricoFirestore();
   } else {
@@ -1388,13 +1383,7 @@ function abrirHistorico() {
     }, 1500);
   }
 }
-function fecharHistorico() {
-  if (history.state && history.state.nav === 'modal' && history.state.modalId === 'modal-historico') {
-    history.back();
-  } else {
-    _fecharHistoricoDirect();
-  }
-}
+function fecharHistorico() { _fecharHistoricoDirect(); }
 function _fecharHistoricoDirect() { document.getElementById('modal-historico').classList.add('hidden'); }
 
 // ─── CHAT ─────────────────────────────────────────────────────────────────────
@@ -1426,7 +1415,6 @@ function addPromptBox(prompt) {
   window._currentPrompt = prompt;
   const esc = prompt.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
   document.getElementById('prompt-overlay-content').innerHTML = esc;
-  history.pushState({ nav: 'promptOverlay' }, '');
   document.getElementById('prompt-overlay').classList.remove('hidden');
   const c = document.getElementById('chat-area');
   const d = document.createElement('div');
@@ -1435,13 +1423,7 @@ function addPromptBox(prompt) {
   c.appendChild(d);
 }
 
-function fecharOverlay() {
-  if (history.state && history.state.nav === 'promptOverlay') {
-    history.back();
-  } else {
-    _fecharOverlayDirect();
-  }
-}
+function fecharOverlay() { _fecharOverlayDirect(); }
 function _fecharOverlayDirect() {
   document.getElementById('prompt-overlay').classList.add('hidden');
   reiniciar();
@@ -1501,27 +1483,9 @@ function toast(msg,tipo='ok') {
 
 // ─── POPSTATE — Passo 3: do mais profundo ao mais raso ───────────────────────
 // Ordem: modal-historico → prompt-overlay → sidebar → base
-window.addEventListener('popstate', function(e) {
-  const st = e.state;
-
-  // 1. Modal histórico aberto?
-  if (!document.getElementById('modal-historico').classList.contains('hidden')) {
-    _fecharHistoricoDirect(); return;
-  }
-  // 2. Prompt overlay aberto?
-  if (!document.getElementById('prompt-overlay').classList.contains('hidden')) {
-    _fecharOverlayDirect(); return;
-  }
-  // 3. Sidebar aberta (mobile)?
-  if (document.getElementById('sidebar').classList.contains('open')) {
-    _fecharSidebarDirect(); return;
-  }
-  // 4. Base — reafirma para não sair da página
-  history.replaceState({ _base: true }, '');
-});
 
 function reiniciar() { if(S.modulo) selecionarModulo(S.modulo); }
 </script>
-<!-- VOLTAR DESKTOP --><style>@media(max-width:768px){#__btn-voltar{display:none!important}}#__btn-voltar{position:fixed;bottom:22px;left:22px;z-index:99999;background:#13131a;border:1px solid #2a2a4a;color:#a0a0c0;text-decoration:none;padding:10px 18px;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;transition:all .2s;box-shadow:0 2px 12px rgba(0,0,0,.4)}#__btn-voltar:hover{background:#7c6aff;border-color:#7c6aff;color:#fff}</style><a id="__btn-voltar" href="index.html">← Meus Apps</a><!-- FIM VOLTAR DESKTOP -->
+
 </body>
-</html>
+  </html>
