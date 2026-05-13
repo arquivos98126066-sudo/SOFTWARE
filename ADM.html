@@ -1088,47 +1088,7 @@ async function init() {
   renderHistorico();
   renderRelatorio();
 }
-
 init();
-
-// ===== NAVEGAÇÃO — BOTÃO VOLTAR (celular e desktop) =====
-history.replaceState({ _base: true }, '');
-
-function _navPush(tag) { history.pushState({ nav: tag }, ''); }
-
-// Patcha abrirMenu para registrar no histórico
-var _origAbrirMenu = window.abrirMenu;
-window.abrirMenu = function() { _navPush('drawer'); _origAbrirMenu && _origAbrirMenu.apply(this, arguments); };
-
-// Patcha abrirModal para registrar no histórico
-var _abrirModal_real = abrirModal;
-window.abrirModal = function(id) { _navPush('modal_' + id); _abrirModal_real(id); };
-
-// _abrirPagarDiv também abre mPagarDiv internamente — patcha após definição
-setTimeout(function() {
-  var _origPagarDiv = window._abrirPagarDiv;
-  if (_origPagarDiv) {
-    window._abrirPagarDiv = function() { _navPush('modal_mPagarDiv'); _origPagarDiv.apply(this, arguments); };
-  }
-}, 0);
-
-// Intercepta botão físico de voltar — do mais profundo ao mais raso
-window.addEventListener('popstate', function() {
-  // 1. Modais (.moverlay) — fecha o mais recente aberto
-  var mods = document.querySelectorAll('.moverlay.open');
-  if (mods.length) { mods[mods.length - 1].classList.remove('open'); return; }
-  // 2. Drawer lateral
-  var dr = document.getElementById('drawer');
-  if (dr && dr.classList.contains('open')) { fecharMenu(); return; }
-  // Nenhum painel aberto — reinjeta estado base para nunca fechar a aba
-  history.replaceState({ _base: true }, '');
-});
-
-// Teclado desktop: Alt+← = voltar 1 passo
-document.addEventListener('keydown', function(e) {
-  if (e.altKey && e.key === 'ArrowLeft') { e.preventDefault(); history.back(); }
-});
 </script>
-
 </body>
-            </html>
+                                                                      </html>
