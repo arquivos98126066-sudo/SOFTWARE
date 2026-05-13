@@ -431,7 +431,6 @@ window.mascaraValor = function(el){
 
 // ─── Menu ────────────────────────────────────────────────────────────────────
 window.abrirMenu = function(){
-  history.pushState({ nav: 'drawer' }, '');
   document.getElementById('drawer').classList.add('open');
   document.getElementById('drawerOverlay').classList.add('open');
 };
@@ -443,15 +442,9 @@ function _fecharMenuDirect(){
   document.getElementById('drawer').classList.remove('open');
   document.getElementById('drawerOverlay').classList.remove('open');
 }
-// PASSO 4 — base do histórico
-history.replaceState({ _base: true, aba: 't7' }, '');
 var _abaAtual = 't7';
 
 window.irPara = function(tabId, nome, el){
-  if(tabId !== _abaAtual) {
-    history.pushState({ nav: 'aba', aba: tabId, prev: _abaAtual }, '');
-    _abaAtual = tabId;
-  }
   document.querySelectorAll('.tab-content').forEach(function(c){c.classList.remove('active');});
   document.getElementById(tabId).classList.add('active');
   document.querySelectorAll('.drawer-item').forEach(function(i){i.classList.remove('active');});
@@ -764,7 +757,6 @@ window.abrirComp = function(id){
   h+='<div class="irow"><span class="k">Valor vendido</span><span class="v">'+R(p.valor)+'</span></div>';
   document.getElementById('cinfo').innerHTML=h;
   document.getElementById('ccusto').value='';
-  history.pushState({ nav: 'modal', modalId: 'mcomp' }, '');
   document.getElementById('mcomp').classList.add('open');
 };
 window.salvarCusto = async function(){
@@ -781,10 +773,7 @@ window.salvarCusto = async function(){
   } catch(e){if(window.syncShow) window.syncShow.offline();}
   fComp();renderP();renderG();renderC();toast('Custo salvo!');
 };
-window.fComp = function(){
-  if(history.state && history.state.nav==='modal' && history.state.modalId==='mcomp'){ history.back(); }
-  else{ _fCompDirect(); }
-};
+window.fComp = function(){ _fCompDirect(); };
 function _fCompDirect(){document.getElementById('mcomp').classList.remove('open');compId=null;}
 
 // ─── Modal Detalhe ───────────────────────────────────────────────────────────
@@ -817,7 +806,6 @@ window.verDet = function(id){
   document.getElementById('dtit').textContent='Detalhes - '+p.nome;
   document.getElementById('dcorp').innerHTML=h;
   renderFotosDet(p);
-  history.pushState({ nav: 'modal', modalId: 'mdet' }, '');
   document.getElementById('mdet').classList.add('open');
 };
 
@@ -877,18 +865,11 @@ window.abrirFotoGrande = function(idx){
   if(!p||!p.fotos) return;
   fotoDetAtual=p.fotos[fotoGrandeIdx]||'';
   document.getElementById('mfoto_img').src=fotoDetAtual;
-  history.pushState({ nav: 'modal', modalId: 'mfoto' }, '');
   document.getElementById('mfoto').classList.add('open');
 };
-window.fFoto = function(){
-  if(history.state && history.state.nav==='modal' && history.state.modalId==='mfoto'){ history.back(); }
-  else{ _fFotoDirect(); }
-};
+window.fFoto = function(){ _fFotoDirect(); };
 function _fFotoDirect(){document.getElementById('mfoto').classList.remove('open');}
-window.fDet = function(){
-  if(history.state && history.state.nav==='modal' && history.state.modalId==='mdet'){ history.back(); }
-  else{ _fDetDirect(); }
-};
+window.fDet = function(){ _fDetDirect(); };
 function _fDetDirect(){document.getElementById('mdet').classList.remove('open');detId=null;}
 
 // ─── Copiar foto ─────────────────────────────────────────────────────────────
@@ -1283,15 +1264,11 @@ window.removerTapeteExtra = function(n){
 var _fotoCtx='p';
 window.abrirEscolhaFoto = function(ctx){
   _fotoCtx=ctx||'p';
-  history.pushState({ nav: 'fotoEscolha' }, '');
   document.getElementById('fotoEscolhaOverlay').style.display='flex';
   document.getElementById('btnEscolhaCam').onclick=function(){fecharEscolhaFoto();document.getElementById(_fotoCtx+'_foto_input').click();};
   document.getElementById('btnEscolhaGal').onclick=function(){fecharEscolhaFoto();document.getElementById(_fotoCtx+'_galeria_input').click();};
 };
-window.fecharEscolhaFoto = function(){
-  if(history.state && history.state.nav==='fotoEscolha'){ history.back(); }
-  else{ _fecharEscolhaFotoDirect(); }
-};
+window.fecharEscolhaFoto = function(){ _fecharEscolhaFotoDirect(); };
 function _fecharEscolhaFotoDirect(){document.getElementById('fotoEscolhaOverlay').style.display='none';}
 
 // ─── Fechar modais ao clicar fora ────────────────────────────────────────────
@@ -1335,45 +1312,6 @@ function iniciarListeners(){
   });
 }
 
-// ─── POPSTATE — Passo 3: do mais profundo ao mais raso ───────────────────────
-// Ordem: mfoto → mdet/mcomp → fotoEscolha → drawer → aba → base
-window.addEventListener('popstate', function(e){
-  var st = e.state;
-
-  // 1. mfoto aberto?
-  if(document.getElementById('mfoto').classList.contains('open')){
-    _fFotoDirect(); return;
-  }
-  // 2. mdet ou mcomp aberto?
-  if(document.getElementById('mdet').classList.contains('open')){
-    _fDetDirect(); return;
-  }
-  if(document.getElementById('mcomp').classList.contains('open')){
-    _fCompDirect(); return;
-  }
-  // 3. fotoEscolhaOverlay aberto?
-  if(document.getElementById('fotoEscolhaOverlay').style.display==='flex'){
-    _fecharEscolhaFotoDirect(); return;
-  }
-  // 4. Drawer aberto?
-  if(document.getElementById('drawer').classList.contains('open')){
-    _fecharMenuDirect(); return;
-  }
-  // 5. Voltar para aba anterior
-  if(st && st.nav==='aba' && st.prev){
-    var prevAba = st.prev;
-    _abaAtual = prevAba;
-    document.querySelectorAll('.tab-content').forEach(function(c){c.classList.remove('active');});
-    document.getElementById(prevAba).classList.add('active');
-    document.querySelectorAll('.drawer-item').forEach(function(i){i.classList.remove('active');});
-    var elPrev = document.querySelector('.drawer-item[data-tab="'+prevAba+'"]');
-    if(elPrev) elPrev.classList.add('active');
-    return;
-  }
-  // 6. Base — reafirma para não sair da página
-  history.replaceState({ _base: true, aba: _abaAtual }, '');
-});
-
 // ─── INIT ────────────────────────────────────────────────────────────────────
 (function init(){
   document.getElementById('c_data').value=new Date().toISOString().split('T')[0];
@@ -1381,7 +1319,6 @@ window.addEventListener('popstate', function(e){
   verificarOnline();
   iniciarListeners();
 
-  // Restaurar aba salva
   try{
     var abaS=localStorage.getItem('abaAtual')||'t7';
     var elAba=document.querySelector('.drawer-item[data-tab="'+abaS+'"]');
@@ -1389,6 +1326,6 @@ window.addEventListener('popstate', function(e){
   }catch(e){}
 })();
 </script>
-<!-- VOLTAR DESKTOP --><style>@media(max-width:768px){#__btn-voltar{display:none!important}}#__btn-voltar{position:fixed;bottom:22px;left:22px;z-index:99999;background:#13131a;border:1px solid #2a2a4a;color:#a0a0c0;text-decoration:none;padding:10px 18px;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;transition:all .2s;box-shadow:0 2px 12px rgba(0,0,0,.4)}#__btn-voltar:hover{background:#7c6aff;border-color:#7c6aff;color:#fff}</style><a id="__btn-voltar" href="index.html">← Meus Apps</a><!-- FIM VOLTAR DESKTOP -->
+
 </body>
-</html>
+  </html>
