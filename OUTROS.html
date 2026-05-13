@@ -2,169 +2,284 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Outros</title>
-<meta name="theme-color" content="#0a0a0f">
+<meta name="theme-color" content="#010d1e">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@600;700;800&family=Barlow+Condensed:wght@700;800&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500&display=swap');
+:root {
+  --bg:        #010d1e;
+  --surface:   #041a30;
+  --card:      #041a30;
+  --card-hi:   #062440;
+  --border:    rgba(0,160,255,0.11);
+  --border-hi: rgba(0,190,255,0.32);
+  --blue:      #00b4ff;
+  --blue-dim:  rgba(0,180,255,0.13);
+  --blue-glow: rgba(0,180,255,0.50);
+  --white:     #dff3ff;
+  --muted:     rgba(140,200,255,0.52);
+  --muted2:    rgba(100,170,240,0.28);
+  --fh:        'Barlow', sans-serif;
+  --fl:        'Barlow Condensed', sans-serif;
+  --fb:        'DM Sans', sans-serif;
+  --r:         14px;
+}
 
-  :root {
-    --bg: #0a0a0f;
-    --card: #13131a;
-    --border: #222230;
-    --accent: #7c6aff;
-    --accent2: #ff6a8a;
-    --text: #f0f0f8;
-    --muted: #6b6b80;
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html { height: 100%; }
+body {
+  background: var(--bg);
+  color: var(--white);
+  font-family: var(--fb);
+  min-height: 100dvh;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  pointer-events: none; z-index: 0;
+  background-image:
+    linear-gradient(rgba(0,140,255,0.028) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,140,255,0.028) 1px, transparent 1px);
+  background-size: 34px 34px;
+  mask-image: radial-gradient(ellipse 90% 55% at 50% 0%, black 15%, transparent 100%);
+}
+body::after {
+  content: '';
+  position: fixed;
+  top: -130px; left: 50%; transform: translateX(-50%);
+  width: 540px; height: 380px; border-radius: 50%;
+  background: radial-gradient(ellipse, rgba(0,140,255,0.14) 0%, transparent 65%);
+  pointer-events: none; z-index: 0;
+}
+
+/* Back */
+.back-btn {
+  display: inline-flex; align-items: center; gap: 7px;
+  color: var(--muted);
+  font-size: 13px; font-family: var(--fh); font-weight: 600;
+  text-decoration: none;
+  margin: max(18px, env(safe-area-inset-top, 18px)) 0 0 13px;
+  padding: 8px 14px;
+  border: 1px solid var(--border); border-radius: 9px;
+  background: var(--surface);
+  transition: color .2s, border-color .2s;
+  position: relative; z-index: 10;
+}
+.back-btn:active { opacity: .7; }
+.back-btn:hover  { color: var(--blue); border-color: var(--border-hi); }
+
+.page-wrap {
+  display: flex; flex-direction: column;
+  min-height: 100dvh;
+  padding-bottom: max(18px, env(safe-area-inset-bottom, 18px));
+  position: relative; z-index: 1;
+}
+
+.identity {
+  display: flex; align-items: center; justify-content: center;
+  gap: 7px; padding: 14px 20px 16px;
+  position: relative; z-index: 1;
+}
+.identity-dot {
+  width: 5px; height: 5px; border-radius: 50%;
+  background: var(--blue);
+  box-shadow: 0 0 8px 2px var(--blue-glow);
+}
+.identity-label {
+  font-family: var(--fl);
+  font-size: 9.5px; font-weight: 800;
+  letter-spacing: 3.5px; text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* Grid — mesmo do index, 2 colunas, cards não alargam */
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  padding: 0 12px;
+  max-width: 480px;
+  margin: 0 auto;
+  width: 100%;
+  position: relative; z-index: 1;
+}
+
+/* Card — idêntico ao index */
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 15px 13px 14px;
+  text-decoration: none;
+  display: flex; flex-direction: column;
+  align-items: flex-start; gap: 6px;
+  position: relative; overflow: hidden;
+  transition: transform .16s cubic-bezier(.22,.68,0,1.2),
+              border-color .2s, background .2s, box-shadow .2s;
+  -webkit-tap-highlight-color: transparent;
+  will-change: transform;
+}
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 15%; right: 15%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--c1,#00b4ff) 40%, var(--c2,#33ccff) 60%, transparent);
+  opacity: .62;
+  transition: opacity .22s, left .25s, right .25s;
+}
+.card::after {
+  content: '';
+  position: absolute;
+  bottom: -26px; left: -18px;
+  width: 90px; height: 90px; border-radius: 50%;
+  background: radial-gradient(circle, var(--c1,#00b4ff) 0%, transparent 70%);
+  opacity: .055;
+  pointer-events: none;
+}
+.card:active { transform: scale(.952); border-color: var(--border-hi); }
+@media (hover: hover) {
+  .card:hover {
+    background: var(--card-hi);
+    border-color: rgba(0,180,255,.22);
+    box-shadow: 0 6px 28px rgba(0,0,0,.65);
+    transform: translateY(-1px);
   }
+  .card:hover::before { opacity: 1; left: 5%; right: 5%; }
+}
 
-  * { margin: 0; padding: 0; box-sizing: border-box; }
+.card-icon {
+  width: 34px; height: 34px; border-radius: 9px;
+  background: rgba(0,140,255,.08);
+  border: 1px solid rgba(0,150,255,.14);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 17px; line-height: 1; flex-shrink: 0;
+  transition: background .2s, border-color .2s, box-shadow .2s;
+}
+.card:active .card-icon,
+.card:hover  .card-icon {
+  background: var(--blue-dim);
+  border-color: rgba(0,180,255,.35);
+  box-shadow: 0 0 12px rgba(0,180,255,.18);
+}
 
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'DM Sans', sans-serif;
-    min-height: 100vh;
-    padding: 0 0 60px;
-  }
+.card-name {
+  font-family: var(--fh);
+  font-size: 13.5px; font-weight: 800;
+  color: var(--white); line-height: 1.2; letter-spacing: -.2px;
+}
+.card-desc { font-size: 10.5px; color: var(--muted); line-height: 1.4; }
 
-  .header {
-    padding: 48px 24px 32px;
-    text-align: center;
-    position: relative;
-  }
-  .header::after {
-    content: '';
-    display: block;
-    width: 60px;
-    height: 3px;
-    background: linear-gradient(90deg, var(--accent), var(--accent2));
-    margin: 16px auto 0;
-    border-radius: 2px;
-  }
-  .header h1 {
-    font-family: 'Syne', sans-serif;
-    font-size: 32px;
-    font-weight: 800;
-    letter-spacing: -1px;
-    background: linear-gradient(135deg, var(--text), var(--muted));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-  .header p { color: var(--muted); font-size: 14px; margin-top: 6px; }
+.card-arrow {
+  position: absolute; bottom: 11px; right: 11px;
+  width: 20px; height: 20px; border-radius: 5px;
+  background: rgba(0,140,255,.07);
+  display: flex; align-items: center; justify-content: center;
+  color: var(--muted2); font-size: 11px; font-weight: 700;
+  transition: background .2s, color .2s, box-shadow .2s;
+}
+.card:hover .card-arrow,
+.card:active .card-arrow {
+  background: var(--blue-dim); color: var(--blue);
+  box-shadow: 0 0 8px rgba(0,180,255,.22);
+}
 
-  .back-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    color: var(--muted);
-    font-size: 13px;
-    text-decoration: none;
-    margin: 24px 24px 0;
-    padding: 8px 14px;
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    background: var(--card);
-    transition: border-color 0.2s;
-  }
-  .back-btn:active { opacity: 0.7; }
+/* Colors */
+.c-gold    { --c1:#f59e0b; --c2:#fbbf24; }
+.c-indigo  { --c1:#6c8fff; --c2:#9eb3ff; }
+.c-rose    { --c1:#f43f5e; --c2:#fb7185; }
+.c-emerald { --c1:#10b981; --c2:#34d399; }
+.c-violet  { --c1:#9b7aff; --c2:#c4b5fd; }
 
-  .grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-    padding: 0 16px;
-    max-width: 500px;
-    margin: 0 auto;
-  }
+.footer {
+  text-align: center;
+  color: var(--muted2);
+  font-family: var(--fl); font-size: 9.5px; font-weight: 700;
+  letter-spacing: 2.5px; text-transform: uppercase;
+  padding: 16px 24px 0;
+  position: relative; z-index: 1;
+}
 
-  .card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 18px;
-    padding: 22px 16px 18px;
-    text-decoration: none;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 8px;
-    position: relative;
-    overflow: hidden;
-    transition: transform 0.18s, border-color 0.18s;
-    -webkit-tap-highlight-color: transparent;
-  }
-  .card:active { transform: scale(0.96); }
-  .card::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 2px;
-    background: linear-gradient(90deg, var(--c1), var(--c2));
-    opacity: 0.8;
-  }
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.card { animation: fadeUp .36s cubic-bezier(.22,.68,0,1.1) both; }
+.card:nth-child(1) { animation-delay: .04s; }
+.card:nth-child(2) { animation-delay: .08s; }
+.card:nth-child(3) { animation-delay: .12s; }
+.card:nth-child(4) { animation-delay: .16s; }
+.card:nth-child(5) { animation-delay: .20s; }
 
-  .card-icon { font-size: 28px; line-height: 1; }
-  .card-name { font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700; color: var(--text); line-height: 1.2; }
-  .card-desc { font-size: 11px; color: var(--muted); line-height: 1.4; }
-  .card-arrow { position: absolute; bottom: 14px; right: 14px; font-size: 16px; color: var(--muted); opacity: 0.5; }
-
-  .c-gold    { --c1: #f59e0b; --c2: #fbbf24; }
-  .c-indigo  { --c1: #6366f1; --c2: #818cf8; }
-  .c-rose    { --c1: #f43f5e; --c2: #fb7185; }
-  .c-emerald { --c1: #10b981; --c2: #34d399; }
-  .c-violet  { --c1: #8b5cf6; --c2: #c4b5fd; }
-
-  .footer { text-align: center; color: var(--muted); font-size: 11px; margin-top: 40px; padding: 0 24px; }
+@media (max-width: 360px) {
+  .grid { gap: 7px; padding: 0 10px; }
+  .card { padding: 13px 11px 12px; }
+  .card-name { font-size: 13px; }
+}
 </style>
 </head>
 <body>
 
+<div class="page-wrap">
+
   <a class="back-btn" href="index.html">← Voltar</a>
 
-  <div class="header">
-    <h1>Outros</h1>
-    <p>Toque para abrir</p>
+  <div class="identity">
+    <div class="identity-dot"></div>
+    <span class="identity-label">Outros</span>
+    <div class="identity-dot"></div>
   </div>
 
   <div class="grid">
+
     <a class="card c-gold" href="RICO.html">
-      <span class="card-icon">💰</span>
+      <div class="card-icon">💰</div>
       <span class="card-name">Rico</span>
       <span class="card-desc">Finanças e riqueza</span>
-      <span class="card-arrow">→</span>
+      <span class="card-arrow">↗</span>
     </a>
+
     <a class="card c-indigo" href="Workshop.html">
-      <span class="card-icon">🛠️</span>
+      <div class="card-icon">🛠️</div>
       <span class="card-name">Workshop</span>
       <span class="card-desc">Oficina e projetos</span>
-      <span class="card-arrow">→</span>
+      <span class="card-arrow">↗</span>
     </a>
+
     <a class="card c-rose" href="DOA.html">
-      <span class="card-icon">🤝</span>
+      <div class="card-icon">🤝</div>
       <span class="card-name">DOA</span>
       <span class="card-desc">Doações e apoio</span>
-      <span class="card-arrow">→</span>
+      <span class="card-arrow">↗</span>
     </a>
+
     <a class="card c-emerald" href="ESTUDO.html">
-      <span class="card-icon">📚</span>
+      <div class="card-icon">📚</div>
       <span class="card-name">Estudo</span>
       <span class="card-desc">Aprendizado</span>
-      <span class="card-arrow">→</span>
+      <span class="card-arrow">↗</span>
     </a>
-    <a class="card c-indigo" href="Code.html">
-      <span class="card-icon">🖥️</span>
+
+    <a class="card c-violet" href="Code.html">
+      <div class="card-icon">🖥️</div>
       <span class="card-name">Code</span>
       <span class="card-desc">Código HTML</span>
-      <span class="card-arrow">→</span>
+      <span class="card-arrow">↗</span>
     </a>
+
   </div>
 
-  <div class="footer">
-    <p>arquivos98126066-sudo · SOFTWARE</p>
-  </div>
+  <div class="footer">arquivos98126066-sudo · software</div>
+
+</div>
 
 </body>
 </html>
