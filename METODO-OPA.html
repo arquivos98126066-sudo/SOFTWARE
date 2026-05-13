@@ -364,7 +364,7 @@ input[type=time]{height:40px}
 
   <!-- GERENCIAR BLOCO -->
   <div class="tela" id="t-gerenciar-bloco">
-    <button class="voltar" onclick="history.back()">← BLOCOS</button>
+    <button class="voltar" onclick="irT('t-hoje-main')">← BLOCOS</button>
     <div class="row-between">
       <h1 class="titulo" id="gbloco-nome" style="flex:1"></h1>
       <span id="gbloco-hor" style="font-size:12px;font-weight:600;color:var(--azul)"></span>
@@ -377,7 +377,7 @@ input[type=time]{height:40px}
 
   <!-- PURIFICAÇÃO -->
   <div class="tela" id="t-purificar">
-    <button class="voltar" onclick="history.back()">← BLOCOS</button>
+    <button class="voltar" onclick="irT('t-hoje-main')">← BLOCOS</button>
     <div class="row" style="gap:8px">
       <h1 class="titulo" style="flex:1;font-size:16px;text-transform:uppercase;letter-spacing:0.06em"></h1>
       <div class="info-wrap"><button class="info-btn" onclick="tgInfo('info-purif')">i</button>
@@ -392,7 +392,7 @@ input[type=time]{height:40px}
 
   <!-- PRIORIDADE AÇÕES -->
   <div class="tela" id="t-prioridade">
-    <button class="voltar" onclick="history.back()">← PURIFICAR</button>
+    <button class="voltar" onclick="irT('t-purificar')">← PURIFICAR</button>
     <div class="row" style="gap:8px">
       <h1 class="titulo" style="flex:1;font-size:16px;text-transform:uppercase;letter-spacing:0.06em"></h1>
       <div class="info-wrap"><button class="info-btn" onclick="tgInfo('info-prior')">i</button>
@@ -406,7 +406,7 @@ input[type=time]{height:40px}
 
   <!-- HORÁRIOS (após prioridade) -->
   <div class="tela" id="t-horarios">
-    <button class="voltar" onclick="history.back()">← PRIORIDADES</button>
+    <button class="voltar" onclick="irT('t-prioridade')">← PRIORIDADES</button>
     <div class="row" style="gap:8px">
       <h1 class="titulo" style="flex:1;font-size:16px;text-transform:uppercase;letter-spacing:0.06em">Horários</h1>
       <div class="info-wrap"><button class="info-btn" onclick="tgInfo('info-hor')">i</button>
@@ -420,7 +420,7 @@ input[type=time]{height:40px}
 
   <!-- RELATÓRIO -->
   <div class="tela" id="t-relatorio">
-    <button class="voltar" onclick="history.back()">← BLOCOS</button>
+    <button class="voltar" onclick="irT('t-hoje-main')">← BLOCOS</button>
     <p id="rel-data" class="label-sec" style="color:var(--azul);margin-bottom:6px"></p>
     <h1 class="titulo" style="font-size:16px;text-transform:uppercase;letter-spacing:0.06em">Plano do Dia</h1>
     <div class="flex-col" style="gap:12px;margin-top:16px;flex:1" id="rel-lista"></div><style>#rel-prog,#t-relatorio .divisor{display:none},#rel-pct,.divisor+.row-between{display:none!important}</style>
@@ -435,7 +435,7 @@ input[type=time]{height:40px}
 
   <!-- EXECUÇÃO -->
   <div class="tela" id="t-execucao">
-    <button class="voltar" onclick="history.back()">← BLOCOS</button>
+    <button class="voltar" onclick="irT('t-hoje-main')">← BLOCOS</button>
     <div class="row-between">
       <p id="exec-data" class="label-sec" style="color:var(--azul)"></p>
       <span id="exec-clock" style="font-size:13px;font-weight:700;color:var(--texto-sec);position:fixed;top:10px;right:18px;z-index:999;background:var(--bg);padding:2px 8px;border-radius:99px"></span>
@@ -452,7 +452,7 @@ input[type=time]{height:40px}
 
   <!-- REVISÃO -->
   <div class="tela" id="t-revisao">
-    <button class="voltar" onclick="history.back()">← MEU DIA</button>
+    <button class="voltar" onclick="irT('t-execucao')">← MEU DIA</button>
     <h1 class="titulo" style="font-size:16px;text-transform:uppercase;letter-spacing:0.06em"></h1>
     <p style="font-size:13px;color:var(--texto-sec);margin-top:8px">Avalie cada bloco do seu dia.</p>
     <div class="flex-col" style="margin-top:16px;flex:1" id="rev-lista"></div>
@@ -482,7 +482,7 @@ input[type=time]{height:40px}
     <button class="btn btn-sec mt-20" id="btn-novo-hab">+ Novo Hábito</button>
   </div>
   <div class="tela" id="t-hab-detalhe">
-    <button class="voltar" onclick="history.back()">← HÁBITOS</button>
+    <button class="voltar" onclick="irTHab('t-habitos-lista')">← HÁBITOS</button>
     <h1 class="titulo" id="hdet-nome"></h1>
     <p class="label-sec mt-4" id="hdet-data" style="color:var(--azul)"></p>
     <div class="hab-stat-grid mt-16">
@@ -516,7 +516,7 @@ input[type=time]{height:40px}
     </div>
   </div>
   <div class="tela" id="t-dec-prep">
-    <button class="voltar" onclick="history.back()">← DECISÕES</button>
+    <button class="voltar" onclick="irTDec('t-dec-inicio')">← DECISÕES</button>
     <div class="row-between" style="margin-bottom:6px">
       <span id="prep-label" class="label-sec" style="color:var(--azul)">PREPARAÇÃO 1 DE 6</span>
       <span id="prep-pct" style="font-size:13px;font-weight:800;color:var(--azul)">17%</span>
@@ -537,7 +537,7 @@ input[type=time]{height:40px}
     </div>
   </div>
   <div class="tela" id="t-dec-processo">
-    <button class="voltar" onclick="history.back()">← DECISÕES</button>
+    <button class="voltar" onclick="irTDec('t-dec-inicio')">← DECISÕES</button>
     <div class="row-between" style="margin-bottom:6px">
       <span id="dec-label" class="label-sec" style="color:var(--azul)">PASSO 1 DE 10</span>
       <span id="dec-pct" style="font-size:13px;font-weight:800;color:var(--azul)">10%</span>
@@ -558,7 +558,7 @@ input[type=time]{height:40px}
     </div>
   </div>
   <div class="tela" id="t-dec-resultado">
-    <button class="voltar" onclick="history.back()">← DECISÕES</button>
+    <button class="voltar" onclick="irTDec('t-dec-inicio')">← DECISÕES</button>
     <h1 class="titulo" style="font-size:16px;text-transform:uppercase;letter-spacing:0.06em">Sua Decisão</h1>
     <p style="font-size:13px;color:var(--texto-sec);margin-top:6px" id="dec-res-tema"></p>
     <hr class="divisor">
@@ -569,7 +569,7 @@ input[type=time]{height:40px}
     </div>
   </div>
   <div class="tela" id="t-dec-detalhe">
-    <button class="voltar" onclick="history.back()">← DECISÕES</button>
+    <button class="voltar" onclick="irTDec('t-dec-inicio')">← DECISÕES</button>
     <h1 class="titulo" id="dec-det-tema" style="color:var(--texto);margin-bottom:10px"></h1>
     <p class="label-sec mt-4" id="dec-det-data" style="color:var(--azul);margin-bottom:16px"></p>
     <hr class="divisor">
@@ -600,7 +600,7 @@ input[type=time]{height:40px}
     <div class="flex-col" style="gap:10px" id="hist-lista"></div>
   </div>
   <div class="tela" id="t-hist-det">
-    <button class="voltar" onclick="history.back()">← HISTÓRICO</button>
+    <button class="voltar" onclick="irTHist('t-hist-lista')">← HISTÓRICO</button>
     <div class="mt-4">
       <p id="hdet-data-label" class="label-sec" style="color:var(--azul);margin-bottom:10px"></p>
       <div class="flex-col" style="gap:10px" id="hdet-blocos"></div>
@@ -610,7 +610,7 @@ input[type=time]{height:40px}
   </div>
   <!-- LIXEIRA -->
   <div class="tela" id="t-hist-lixeira">
-    <button class="voltar" onclick="history.back()">← HISTÓRICO</button>
+    <button class="voltar" onclick="irTHist('t-hist-lista')">← HISTÓRICO</button>
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
       <h1 class="titulo" style="font-size:16px">🗑️ Lixeira</h1>
       <button id="btn-esvaziar-lixeira" class="btn btn-danger btn-sm" onclick="esvaziarLixeira()">Esvaziar</button>
@@ -688,7 +688,7 @@ function gph(){return gd().planejamentos.find(p=>p.data===hoje()&&!p.revisao)||n
 function sp(p){md(d=>{const i=d.planejamentos.findIndex(x=>x.id===p.id);if(i>=0)d.planejamentos[i]=p;else d.planejamentos.unshift(p)})}
 function fBR(iso){if(!iso)return'';const[y,m,dd]=iso.split('-');const ms=['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];return`${parseInt(dd)} de ${ms[parseInt(m)-1]} de ${y}`}
 function toast(msg,dur=1800){const t=$('#toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),dur)}
-function abrirModal(html){$('#modal-content').innerHTML=html;$('#modal').classList.add('vis');history.pushState({nav:'modal'},'')}
+function abrirModal(html){$('#modal-content').innerHTML=html;$('#modal').classList.add('vis');}
 function fecharModal(){$('#modal').classList.remove('vis')}
 $('#modal').addEventListener('click',e=>{if(e.target===$('#modal'))fecharModal()})
 
@@ -697,13 +697,13 @@ function navegar(mod){
   $$('.mod').forEach(m=>m.classList.remove('ativo'));$$('.nav-item').forEach(n=>n.classList.remove('ativo'));
   document.getElementById('mod-'+mod).classList.add('ativo');document.querySelector(`[data-mod="${mod}"]`).classList.add('ativo');
   if(mod==='habitos')renderHabitos();if(mod==='historico'){calcZonas();renderHistorico()}if(mod==='decisao')renderDecAnt();if(mod==='planos')renderPlanos();
-  if(mod!=='hoje')history.pushState({nav:mod,tela:'root'},'');
+
 }
-function irT(id){$('#mod-hoje').querySelectorAll('.tela').forEach(t=>t.classList.remove('ativa'));document.getElementById(id).classList.add('ativa');if(id!=='t-hoje-main')history.pushState({nav:'hoje',tela:id},'')}
-function irTHab(id){$('#mod-habitos').querySelectorAll('.tela').forEach(t=>t.classList.remove('ativa'));document.getElementById(id).classList.add('ativa');if(id!=='t-habitos-lista')history.pushState({nav:'habitos',tela:id},'')}
-function irTDec(id){$('#mod-decisao').querySelectorAll('.tela').forEach(t=>t.classList.remove('ativa'));document.getElementById(id).classList.add('ativa');if(id!=='t-dec-inicio')history.pushState({nav:'decisao',tela:id},'')}
-function irTHist(id){$('#mod-historico').querySelectorAll('.tela').forEach(t=>t.classList.remove('ativa'));document.getElementById(id).classList.add('ativa');if(id!=='t-hist-lista')history.pushState({nav:'historico',tela:id},'')}
-// Versões internas sem pushState (para uso no popstate)
+function irT(id){$('#mod-hoje').querySelectorAll('.tela').forEach(t=>t.classList.remove('ativa'));document.getElementById(id).classList.add('ativa')}
+function irTHab(id){$('#mod-habitos').querySelectorAll('.tela').forEach(t=>t.classList.remove('ativa'));document.getElementById(id).classList.add('ativa')}
+function irTDec(id){$('#mod-decisao').querySelectorAll('.tela').forEach(t=>t.classList.remove('ativa'));document.getElementById(id).classList.add('ativa')}
+function irTHist(id){$('#mod-historico').querySelectorAll('.tela').forEach(t=>t.classList.remove('ativa'));document.getElementById(id).classList.add('ativa')}
+// Versões internas de navegação
 function _irT(id){$('#mod-hoje').querySelectorAll('.tela').forEach(t=>t.classList.remove('ativa'));document.getElementById(id).classList.add('ativa')}
 function _irTHab(id){$('#mod-habitos').querySelectorAll('.tela').forEach(t=>t.classList.remove('ativa'));document.getElementById(id).classList.add('ativa')}
 function _irTDec(id){$('#mod-decisao').querySelectorAll('.tela').forEach(t=>t.classList.remove('ativa'));document.getElementById(id).classList.add('ativa')}
@@ -1518,343 +1518,12 @@ function abrirDetHist(id){
   irTHist('t-hist-det');
 }
 
-// ===== SISTEMA DE NAVEGAÇÃO HISTORY =====
-(function setupNavHistory(){
-
-  // Base — nunca deixa o botão voltar fechar a aba
-  history.replaceState({_base:true}, '');
-
-  // voltarParaBlocos sem pushState (só para uso interno do popstate)
-  function _voltarParaBlocos(){
-    var p=gph();
-    if(p&&p.blocos&&p.blocos.length) blocosTemp=JSON.parse(JSON.stringify(p.blocos));
-    _irT('t-hoje-main');
-    renderBlocosUI();
-    checkBtns();
-  }
-
-  // ── POPSTATE — do mais profundo para o mais raso ─────────────────
-  window.addEventListener('popstate',function(e){
-    var state=e.state||{};
-
-    // 1. Modal global (mais profundo)
-    if(document.getElementById('modal').classList.contains('vis')){
-      fecharModal();
-      return;
-    }
-
-    // 2. Sub-telas HOJE
-    var modH=document.getElementById('mod-hoje');
-    if(modH&&modH.classList.contains('ativo')){
-      var tH=modH.querySelector('.tela.ativa');
-      if(tH){
-        var tid=tH.id;
-        if(tid==='t-revisao'){_irT('t-execucao');return;}
-        if(tid==='t-execucao'){_voltarParaBlocos();return;}
-        if(tid==='t-relatorio'){_irT('t-hoje-main');return;}
-        if(tid==='t-horarios'){_irT('t-prioridade');return;}
-        if(tid==='t-prioridade'){_irT('t-purificar');return;}
-        if(tid==='t-purificar'){_irT('t-hoje-main');return;}
-        if(tid==='t-gerenciar-bloco'){_irT('t-hoje-main');return;}
-      }
-    }
-
-    // 3. Sub-telas HÁBITOS
-    var modHab=document.getElementById('mod-habitos');
-    if(modHab&&modHab.classList.contains('ativo')){
-      var tHab=modHab.querySelector('.tela.ativa');
-      if(tHab&&tHab.id==='t-hab-detalhe'){_irTHab('t-habitos-lista');return;}
-    }
-
-    // 4. Sub-telas DECISÃO
-    var modDec=document.getElementById('mod-decisao');
-    if(modDec&&modDec.classList.contains('ativo')){
-      var tDec=modDec.querySelector('.tela.ativa');
-      if(tDec){
-        var did=tDec.id;
-        if(did==='t-dec-detalhe'){_irTDec('t-dec-inicio');return;}
-        if(did==='t-dec-resultado'){_irTDec('t-dec-inicio');return;}
-        if(did==='t-dec-processo'){_irTDec('t-dec-prep');return;}
-        if(did==='t-dec-prep'){_irTDec('t-dec-inicio');return;}
-      }
-    }
-
-    // 5. Sub-telas HISTÓRICO
-    var modHist=document.getElementById('mod-historico');
-    if(modHist&&modHist.classList.contains('ativo')){
-      var tHist=modHist.querySelector('.tela.ativa');
-      if(tHist&&tHist.id==='t-hist-det'){_irTHist('t-hist-lista');return;}
-      if(tHist&&tHist.id==='t-hist-lixeira'){_irTHist('t-hist-lista');return;}
-    }
-
-    // 6. Módulos secundários — volta para HOJE
-    var modsSecundarios=['mod-habitos','mod-decisao','mod-planos','mod-historico'];
-    var mAtivo=document.querySelector('.mod.ativo');
-    if(mAtivo&&modsSecundarios.includes(mAtivo.id)){
-      $$('.mod').forEach(m=>m.classList.remove('ativo'));
-      $$('.nav-item').forEach(n=>n.classList.remove('ativo'));
-      document.getElementById('mod-hoje').classList.add('ativo');
-      document.querySelector('[data-mod="hoje"]').classList.add('ativo');
-      return;
-    }
-
-    // Raiz: reaplica base
-    if(!state._base){
-      history.replaceState({_base:true},'');
-    }
-  });
-
-})();
-
-// ===== CONFIRMAR MODAL =====
-function confirmar(msg, onSim){
-  abrirModal(`<div style="text-align:center;padding:8px 0">
-    <p style="font-size:32px;margin-bottom:10px">⚠️</p>
-    <p style="font-size:15px;font-weight:700;color:var(--texto);margin-bottom:6px">${msg}</p>
-    <p style="font-size:12px;color:var(--texto-sec);margin-bottom:18px">Esta ação não pode ser desfeita.</p>
-    <div style="display:flex;gap:10px">
-      <button class="btn btn-sec" onclick="fecharModal()">Cancelar</button>
-      <button class="btn btn-danger" id="btn-confirmar-sim">Sim, excluir</button>
-    </div>
-  </div>`);
-  setTimeout(()=>{const b=document.getElementById('btn-confirmar-sim');if(b)b.onclick=()=>{fecharModal();onSim();}},50);
-}
-
-// ===== LIXEIRA =====
-function getLixeira(){try{const v=localStorage.getItem('opa_lixeira');return v?JSON.parse(v):[]}catch(e){return[]}}
-function setLixeira(arr){try{localStorage.setItem('opa_lixeira',JSON.stringify(arr))}catch(e){}}
-function atualizarBadgeLixeira(){const n=getLixeira().length;const b=document.getElementById('lixeira-badge');if(b){b.textContent=n;b.style.display=n?'inline':'none'}}
-
-function moverLixeira(tipo,id){
-  const data=gd();
-  let item=null,nome='';
-  if(tipo==='bloco'){
-    const p=gph();if(!p)return;item=p.blocos.find(x=>x.id===id);nome=item?item.nome:'Bloco';
-    blocosTemp=blocosTemp.filter(b=>b.id!==id);salvarBlocos();renderBlocosUI();
-  } else if(tipo==='habito'){
-    item=data.habitos.find(x=>x.id===id);nome=item?item.nome:'Hábito';
-    md(d=>{d.habitos=d.habitos.filter(h=>h.id!==id)});renderHabitos();
-  } else if(tipo==='decisao'){
-    item=data.decisoes.find(x=>x.id===id);nome=item?item.tema:'Decisão';
-    md(d=>{d.decisoes=d.decisoes.filter(y=>y.id!==id)});renderDecAnt();irTDec('t-dec-inicio');
-  } else if(tipo==='plano'){
-    item=(data.planos||[]).find(x=>x.id===id);nome=item?item.nome:'Plano';
-    md(d=>{d.planos=(d.planos||[]).filter(x=>x.id!==id)});renderPlanos();
-  } else if(tipo==='dia'){
-    item=data.planejamentos.find(x=>x.id===id);nome=item?fBR(item.data):'Dia';
-    md(d=>{d.planejamentos=d.planejamentos.filter(x=>x.id!==id)});renderHistorico();irTHist('t-hist-lista');
-  }
-  if(!item)return;
-  const lx=getLixeira();
-  lx.unshift({lxId:`lx_${Date.now()}`,tipo,nome,data:hoje(),item:JSON.parse(JSON.stringify(item))});
-  setLixeira(lx);atualizarBadgeLixeira();
-  toast('🗑️ Movido para a lixeira');
-}
-
-function renderLixeira(){
-  const lx=getLixeira();
-  const lista=document.getElementById('lixeira-lista');
-  const vazia=document.getElementById('lixeira-vazia');
-  const btnEsv=document.getElementById('btn-esvaziar-lixeira');
-  lista.innerHTML='';
-  if(!lx.length){vazia.style.display='block';if(btnEsv)btnEsv.style.display='none';return}
-  vazia.style.display='none';if(btnEsv)btnEsv.style.display='flex';
-  const tipoLabel={bloco:'Bloco',habito:'Hábito',decisao:'Decisão',plano:'Plano',dia:'Dia'};
-  const tipoIcon={bloco:'📦',habito:'🔥',decisao:'🎯',plano:'📋',dia:'📅'};
-  lx.forEach(e=>{
-    const el=document.createElement('div');el.className='lixeira-item';
-    el.innerHTML=`
-      <div style="font-size:28px;flex-shrink:0">${tipoIcon[e.tipo]||'📄'}</div>
-      <div class="lixeira-item-info">
-        <div class="lixeira-item-tipo">${tipoLabel[e.tipo]||e.tipo}</div>
-        <div class="lixeira-item-nome">${e.nome}</div>
-        <div class="lixeira-item-data">Excluído em ${fBR(e.data)}</div>
-      </div>
-      <div class="lixeira-btns">
-        <button class="btn btn-azul btn-xs" onclick="restaurarLixeira('${e.lxId}')">↩ Restaurar</button>
-        <button class="btn btn-danger btn-xs" onclick="apagarPermanente('${e.lxId}')">× Apagar</button>
-      </div>`;
-    lista.appendChild(el);
-  });
-}
-
-function restaurarLixeira(lxId){
-  const lx=getLixeira();const e=lx.find(x=>x.lxId===lxId);if(!e)return;
-  const data=gd();
-  if(e.tipo==='bloco'){
-    const p=gph()||{id:hId(),data:hoje(),blocos:[],progresso_percentual:0,iniciado:false,revisao:null};
-    e.item.id=`b_${Date.now()}_${Math.random().toString(36).substr(2,4)}`;
-    e.item.status='pendente';
-    p.blocos.push(e.item);sp(p);
-    blocosTemp=JSON.parse(JSON.stringify(p.blocos));renderBlocosUI();
-  } else if(e.tipo==='habito'){
-    md(d=>{d.habitos=d.habitos||[];d.habitos.push(e.item)});
-  } else if(e.tipo==='decisao'){
-    md(d=>{d.decisoes=d.decisoes||[];d.decisoes.push(e.item)});
-  } else if(e.tipo==='plano'){
-    md(d=>{d.planos=d.planos||[];d.planos.push(e.item)});
-  } else if(e.tipo==='dia'){
-    md(d=>{d.planejamentos=d.planejamentos||[];d.planejamentos.push(e.item)});
-  }
-  setLixeira(lx.filter(x=>x.lxId!==lxId));
-  atualizarBadgeLixeira();renderLixeira();
-  toast('✅ Item restaurado!');
-}
-
-function apagarPermanente(lxId){
-  confirmar('Apagar permanentemente?',()=>{
-    setLixeira(getLixeira().filter(x=>x.lxId!==lxId));
-    atualizarBadgeLixeira();renderLixeira();
-    toast('Apagado permanentemente');
-  });
-}
-
-function esvaziarLixeira(){
-  confirmar('Esvaziar a lixeira? Tudo será apagado para sempre.',()=>{
-    setLixeira([]);atualizarBadgeLixeira();renderLixeira();
-    toast('Lixeira esvaziada');
-  });
-}
-
-// Abrir lixeira: renderiza antes de mostrar
-const _origIrTHist=irTHist;
-irTHist=function(id){_origIrTHist(id);if(id==='t-hist-lixeira')renderLixeira();}
-
-// ===== DRAG TO REORDER BLOCOS =====
-function initDragBlocos(lista){
-  let dragged=null;
-  lista.addEventListener('dragstart',e=>{
-    dragged=e.target.closest('.bloco-card');
-    if(dragged){dragged.classList.add('dragging');e.dataTransfer.effectAllowed='move';}
-  });
-  lista.addEventListener('dragend',e=>{
-    if(dragged)dragged.classList.remove('dragging');
-    lista.querySelectorAll('.drag-over').forEach(el=>el.classList.remove('drag-over'));
-    dragged=null;
-    // Sync order to blocosTemp
-    const newOrder=[];
-    lista.querySelectorAll('.bloco-card').forEach(card=>{
-      const b=blocosTemp.find(x=>x.id===card.dataset.id);if(b)newOrder.push(b);
-    });
-    blocosTemp=newOrder;
-    salvarBlocos();
-  });
-  lista.addEventListener('dragover',e=>{
-    e.preventDefault();
-    const target=e.target.closest('.bloco-card');
-    if(target&&target!==dragged){
-      lista.querySelectorAll('.drag-over').forEach(el=>el.classList.remove('drag-over'));
-      target.classList.add('drag-over');
-      const rect=target.getBoundingClientRect();
-      const after=e.clientY>rect.top+rect.height/2;
-      if(after)target.after(dragged);else target.before(dragged);
-    }
-  });
-  // Touch drag
-  let touchItem=null,touchClone=null,touchOffX=0,touchOffY=0;
-  lista.addEventListener('touchstart',e=>{
-    const handle=e.target.closest('.drag-handle');if(!handle)return;
-    touchItem=handle.closest('.bloco-card');if(!touchItem)return;
-    const t=e.touches[0];const rect=touchItem.getBoundingClientRect();
-    touchOffX=t.clientX-rect.left;touchOffY=t.clientY-rect.top;
-    touchClone=touchItem.cloneNode(true);
-    touchClone.style.cssText=`position:fixed;left:${rect.left}px;top:${rect.top}px;width:${rect.width}px;opacity:0.8;z-index:9999;pointer-events:none;box-shadow:0 8px 24px rgba(0,0,0,0.2)`;
-    document.body.appendChild(touchClone);touchItem.classList.add('dragging');
-  },{passive:true});
-  lista.addEventListener('touchmove',e=>{
-    if(!touchItem)return;e.preventDefault();
-    const t=e.touches[0];
-    touchClone.style.left=(t.clientX-touchOffX)+'px';touchClone.style.top=(t.clientY-touchOffY)+'px';
-    const below=document.elementFromPoint(t.clientX,t.clientY);
-    const target=below&&below.closest('.bloco-card');
-    if(target&&target!==touchItem){
-      const rect=target.getBoundingClientRect();
-      if(t.clientY>rect.top+rect.height/2)target.after(touchItem);else target.before(touchItem);
-    }
-  },{passive:false});
-  lista.addEventListener('touchend',()=>{
-    if(!touchItem)return;
-    if(touchClone)touchClone.remove();touchItem.classList.remove('dragging');
-    const newOrder=[];
-    lista.querySelectorAll('.bloco-card').forEach(card=>{
-      const b=blocosTemp.find(x=>x.id===card.dataset.id);if(b)newOrder.push(b);
-    });
-    blocosTemp=newOrder;salvarBlocos();touchItem=null;touchClone=null;
-  });
-}
-
-// Enable drag on bloco cards
-const _origRenderBlocosUI=renderBlocosUI;
-renderBlocosUI=function(){
-  _origRenderBlocosUI();
-  const lista=document.getElementById('blocos-lista');if(!lista)return;
-  lista.querySelectorAll('.bloco-card').forEach(c=>c.draggable=true);
-  if(!lista._dragInit){lista._dragInit=true;initDragBlocos(lista);}
-};
-
-// ===== EDITAR HÁBITO =====
-function abrirEditHab(id){
-  const wrap=document.getElementById('habedit-'+id);if(wrap)wrap.classList.add('vis');
-  const inp=document.getElementById('habinp-'+id);if(inp){inp.focus();inp.select();}
-}
-function cancelarEditHab(id){
-  const wrap=document.getElementById('habedit-'+id);if(wrap)wrap.classList.remove('vis');
-}
-function salvarEditHab(id){
-  const inp=document.getElementById('habinp-'+id);if(!inp)return;
-  const nome=inp.value.trim();if(nome.length<3){toast('⚠️ Mínimo 3 caracteres');return;}
-  md(d=>{const h=d.habitos.find(x=>x.id===id);if(h)h.nome=nome;});
-  const span=document.getElementById('habnome-'+id);if(span)span.textContent=nome;
-  cancelarEditHab(id);toast('✅ Hábito atualizado!');
-}
-
-// ===== MOVER HÁBITO (popup após segurar 2s) =====
-function mostrarMoverHab(id,card){
-  document.querySelectorAll('.hab-move-popup').forEach(p=>p.remove());
-  const popup=document.createElement('div');
-  popup.className='hab-move-popup';
-  popup.style.cssText='position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:#fff;border:1.5px solid var(--borda-media);border-radius:14px;box-shadow:0 8px 32px rgba(0,0,0,0.18);display:flex;overflow:hidden;z-index:999;user-select:none;';
-  popup.innerHTML=
-    `<button onclick="moverHab('${id}',-1)" style="padding:14px 28px;font-size:22px;border:none;background:#fff;cursor:pointer;border-right:1px solid var(--borda-media);font-family:var(--fonte)">▲</button>`+
-    `<button onclick="document.querySelectorAll('.hab-move-popup').forEach(p=>p.remove())" style="padding:14px 18px;font-size:13px;font-weight:700;border:none;background:#fff;cursor:pointer;color:var(--texto-sec);border-right:1px solid var(--borda-media);font-family:var(--fonte)">✕</button>`+
-    `<button onclick="moverHab('${id}',1)" style="padding:14px 28px;font-size:22px;border:none;background:#fff;cursor:pointer;font-family:var(--fonte)">▼</button>`;
-  card.style.position='relative';
-  card.appendChild(popup);
-  const t=setTimeout(()=>popup.remove(),4000);
-  popup.addEventListener('click',()=>clearTimeout(t),{once:true});
-}
-function moverHab(id,dir){
-  md(d=>{const arr=d.habitos;const i=arr.findIndex(x=>x.id===id);if(i<0)return;const j=i+dir;if(j<0||j>=arr.length)return;const tmp=arr[i];arr[i]=arr[j];arr[j]=tmp;});
-  document.querySelectorAll('.hab-move-popup').forEach(p=>p.remove());
-  renderHabitos();
-}
-
-// ===== MOVER PLANO (popup após segurar 2s) =====
-function mostrarMoverPlano(id,card){
-  document.querySelectorAll('.plano-move-popup').forEach(p=>p.remove());
-  const popup=document.createElement('div');
-  popup.className='plano-move-popup';
-  popup.style.cssText='position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:#fff;border:1.5px solid var(--borda-media);border-radius:14px;box-shadow:0 8px 32px rgba(0,0,0,0.18);display:flex;overflow:hidden;z-index:999;user-select:none;';
-  popup.innerHTML=
-    `<button onclick="moverPlano('${id}',-1)" style="padding:14px 28px;font-size:22px;border:none;background:#fff;cursor:pointer;border-right:1px solid var(--borda-media);font-family:var(--fonte)">▲</button>`+
-    `<button onclick="document.querySelectorAll('.plano-move-popup').forEach(p=>p.remove())" style="padding:14px 18px;font-size:13px;font-weight:700;border:none;background:#fff;cursor:pointer;color:var(--texto-sec);border-right:1px solid var(--borda-media);font-family:var(--fonte)">✕</button>`+
-    `<button onclick="moverPlano('${id}',1)" style="padding:14px 28px;font-size:22px;border:none;background:#fff;cursor:pointer;font-family:var(--fonte)">▼</button>`;
-  card.appendChild(popup);
-  const t=setTimeout(()=>popup.remove(),4000);
-  popup.addEventListener('click',()=>clearTimeout(t),{once:true});
-}
-function moverPlano(id,dir){
-  md(d=>{const arr=d.planos||[];const i=arr.findIndex(x=>x.id===id);if(i<0)return;const j=i+dir;if(j<0||j>=arr.length)return;const tmp=arr[i];arr[i]=arr[j];arr[j]=tmp;});
-  document.querySelectorAll('.plano-move-popup').forEach(p=>p.remove());
-  renderPlanos();
-}
-
 // Init badge
 atualizarBadgeLixeira();
 
 // ===== INIT =====
 initHoje();
 </script>
-<!-- VOLTAR DESKTOP --><style>@media(max-width:768px){#__btn-voltar{display:none!important}}#__btn-voltar{position:fixed;bottom:22px;left:22px;z-index:99999;background:#13131a;border:1px solid #2a2a4a;color:#a0a0c0;text-decoration:none;padding:10px 18px;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;transition:all .2s;box-shadow:0 2px 12px rgba(0,0,0,.4)}#__btn-voltar:hover{background:#7c6aff;border-color:#7c6aff;color:#fff}</style><a id="__btn-voltar" href="index.html">← Meus Apps</a><!-- FIM VOLTAR DESKTOP -->
+
 </body>
-</html>
+      </html>
