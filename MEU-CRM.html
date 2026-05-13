@@ -880,19 +880,8 @@ async function fsDelete(colKey, id) {
 }
 
 // ══════════════════════════════════════════════
-// NAVEGAÇÃO COM HISTÓRICO
-// ══════════════════════════════════════════════
-
-// PASSO 4 — base do histórico: nunca sai da página
-history.replaceState({ _base: true, page: 'contatos' }, '');
-
-// Página anterior para o popstate
-let _prevPage = null;
-
 window.navigate = function(page) {
   if (page === currentPage) { closeSidebar(); return; }
-  _prevPage = currentPage;
-  history.pushState({ nav: 'page', page: page, prev: _prevPage }, '');
   currentPage = page;
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
@@ -929,16 +918,15 @@ function renderPage(page) {
 }
 
 // ══════════════════════════════════════════════
-// SIDEBAR COM HISTÓRICO
+// SIDEBAR
 // ══════════════════════════════════════════════
 window.toggleSidebar = function() {
   const isOpen = document.getElementById('sidebar').classList.contains('open');
   if (!isOpen) {
-    history.pushState({ nav: 'sidebar' }, '');
     document.getElementById('sidebar').classList.add('open');
     document.getElementById('overlay').classList.add('active');
   } else {
-    history.back();
+    closeSidebar();
   }
 }
 function closeSidebar() {
@@ -984,10 +972,9 @@ function toast(msg) {
 window.toast = toast;
 
 // ══════════════════════════════════════════════
-// MODAIS COM HISTÓRICO
+// MODAIS
 // ══════════════════════════════════════════════
 window.openModal = function(id) {
-  history.pushState({ nav: 'modal', modalId: id }, '');
   document.getElementById(id).classList.add('active');
 }
 function _closeModalDirect(id) {
@@ -996,11 +983,7 @@ function _closeModalDirect(id) {
 window.closeModal = function(id) {
   const el = document.getElementById(id);
   if (!el) return;
-  if (history.state && history.state.nav === 'modal' && history.state.modalId === id) {
-    history.back();
-  } else {
-    _closeModalDirect(id);
-  }
+  _closeModalDirect(id);
 }
 
 document.querySelectorAll('.modal-backdrop').forEach(b => {
@@ -1843,39 +1826,11 @@ if ('serviceWorker' in navigator) {
 // POPSTATE — Passo 3: do mais profundo ao mais raso
 // Ordem: Modal → Sidebar → Page → Base
 // ══════════════════════════════════════════════
-window.addEventListener('popstate', function(e) {
-  const st = e.state;
-
-  // 1. Modal aberto? Fecha o mais recente
-  const openModals = document.querySelectorAll('.modal-backdrop.active');
-  if (openModals.length > 0) {
-    const lastModal = openModals[openModals.length - 1];
-    _closeModalDirect(lastModal.id);
-    return;
-  }
-
-  // 2. Sidebar aberta? Fecha
-  if (document.getElementById('sidebar').classList.contains('open')) {
-    _closeSidebarDirect();
-    return;
-  }
-
-  // 3. Voltar para page anterior
-  if (st && st.nav === 'page' && st.prev) {
-    _navigateDirect(st.prev);
-    return;
-  }
-
-  // 4. Base — reafirma para não sair da página
-  history.replaceState({ _base: true, page: currentPage }, '');
-});
-
 // ══════════════════════════════════════════════
 // INIT
 // ══════════════════════════════════════════════
 requestNotifPermission();
 initListeners();
 </script>
-<!-- VOLTAR DESKTOP --><style>@media(max-width:768px){#__btn-voltar{display:none!important}}#__btn-voltar{position:fixed;bottom:22px;left:22px;z-index:99999;background:#13131a;border:1px solid #2a2a4a;color:#a0a0c0;text-decoration:none;padding:10px 18px;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;transition:all .2s;box-shadow:0 2px 12px rgba(0,0,0,.4)}#__btn-voltar:hover{background:#7c6aff;border-color:#7c6aff;color:#fff}</style><a id="__btn-voltar" href="index.html">← Meus Apps</a><!-- FIM VOLTAR DESKTOP -->
 </body>
-</html>
+  </html>
