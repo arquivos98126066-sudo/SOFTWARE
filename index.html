@@ -2,344 +2,539 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Meus Apps</title>
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icon-192.png">
-<meta name="theme-color" content="#0a0a0f">
+<meta name="theme-color" content="#010d1e">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Meus Apps">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@600;700;800&family=Barlow+Condensed:wght@700;800&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500&display=swap');
+/* =============================================
+   TOKENS
+============================================= */
+:root {
+  --bg:        #010d1e;
+  --surface:   #041a30;
+  --card:      #041a30;
+  --card-hi:   #062440;
+  --border:    rgba(0,160,255,0.11);
+  --border-hi: rgba(0,190,255,0.32);
+  --blue:      #00b4ff;
+  --blue-dim:  rgba(0,180,255,0.13);
+  --blue-glow: rgba(0,180,255,0.50);
+  --white:     #dff3ff;
+  --muted:     rgba(140,200,255,0.52);
+  --muted2:    rgba(100,170,240,0.28);
+  --fh:        'Barlow', sans-serif;
+  --fl:        'Barlow Condensed', sans-serif;
+  --fb:        'DM Sans', sans-serif;
+  --r:         14px;
+}
 
-  :root {
-    --bg: #0a0a0f;
-    --card: #13131a;
-    --border: #222230;
-    --accent: #7c6aff;
-    --accent2: #ff6a8a;
-    --text: #f0f0f8;
-    --muted: #6b6b80;
+/* =============================================
+   RESET
+============================================= */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html { height: 100%; }
+body {
+  background: var(--bg);
+  color: var(--white);
+  font-family: var(--fb);
+  min-height: 100dvh;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Grid pattern */
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  pointer-events: none; z-index: 0;
+  background-image:
+    linear-gradient(rgba(0,140,255,0.028) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,140,255,0.028) 1px, transparent 1px);
+  background-size: 34px 34px;
+  mask-image: radial-gradient(ellipse 90% 55% at 50% 0%, black 15%, transparent 100%);
+}
+/* Ambient top glow */
+body::after {
+  content: '';
+  position: fixed;
+  top: -130px; left: 50%; transform: translateX(-50%);
+  width: 540px; height: 380px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse, rgba(0,140,255,0.14) 0%, transparent 65%);
+  pointer-events: none; z-index: 0;
+}
+
+/* =============================================
+   LOCK SCREEN
+============================================= */
+#lock-screen {
+  display: none;
+  position: fixed; inset: 0;
+  background: var(--bg);
+  z-index: 9999;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 28px;
+}
+#lock-screen.show { display: flex; }
+
+#lock-screen::before {
+  content: '';
+  position: absolute;
+  width: 300px; height: 300px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(0,150,255,0.13) 0%, transparent 70%);
+  top: 50%; left: 50%;
+  transform: translate(-50%, -60%);
+  pointer-events: none;
+}
+
+.lock-logo {
+  width: 48px; height: 48px;
+  border-radius: 13px;
+  background: var(--blue-dim);
+  border: 1px solid var(--border-hi);
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 22px;
+  position: relative; z-index: 1;
+  box-shadow: 0 0 24px rgba(0,180,255,0.18);
+}
+.lock-logo svg { width: 22px; height: 22px; }
+
+.lock-title {
+  font-family: var(--fh);
+  font-size: 21px; font-weight: 800;
+  color: var(--white);
+  letter-spacing: -0.3px;
+  margin-bottom: 5px;
+  position: relative; z-index: 1;
+}
+.lock-subtitle {
+  font-size: 13px; color: var(--muted);
+  margin-bottom: 24px;
+  position: relative; z-index: 1;
+}
+
+.lock-field {
+  width: 100%; max-width: 300px;
+  margin-bottom: 10px;
+  position: relative; z-index: 1;
+}
+.lock-input {
+  width: 100%;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 11px;
+  padding: 13px 16px;
+  color: var(--white);
+  font-family: var(--fb); font-size: 14px;
+  outline: none;
+  transition: border-color .2s, box-shadow .2s;
+  -webkit-appearance: none;
+}
+.lock-input::placeholder { color: var(--muted2); }
+.lock-input:focus {
+  border-color: rgba(0,180,255,.45);
+  box-shadow: 0 0 0 3px rgba(0,180,255,.10);
+}
+.lock-input.error {
+  border-color: rgba(255,80,80,.6);
+  animation: shake .32s ease;
+}
+
+.lock-btn {
+  width: 100%; max-width: 300px;
+  background: var(--blue); color: #fff;
+  border: none; border-radius: 11px;
+  padding: 14px;
+  font-family: var(--fh); font-size: 14px; font-weight: 700;
+  cursor: pointer; margin-top: 6px;
+  position: relative; z-index: 1;
+  letter-spacing: .2px;
+  transition: opacity .2s, transform .14s, box-shadow .2s;
+  box-shadow: 0 4px 22px rgba(0,180,255,.38);
+}
+.lock-btn:active { transform: scale(.97); box-shadow: none; }
+.lock-btn:disabled { opacity: .4; cursor: not-allowed; }
+
+.lock-error {
+  font-size: 12px; color: rgba(255,100,100,.9);
+  display: none; text-align: center;
+  margin-top: 8px; position: relative; z-index: 1;
+}
+.lock-error.show { display: block; }
+.lock-loading {
+  font-size: 12px; color: var(--muted);
+  display: none; text-align: center;
+  margin-top: 8px; position: relative; z-index: 1;
+}
+.lock-loading.show { display: block; }
+
+@keyframes shake {
+  0%,100% { transform: translateX(0); }
+  25%      { transform: translateX(-7px); }
+  75%      { transform: translateX(7px); }
+}
+
+/* =============================================
+   APP CONTENT
+============================================= */
+#app-content { display: none; position: relative; z-index: 1; }
+#app-content.show { display: block; }
+
+/* Logout */
+.logout-btn {
+  position: fixed;
+  top: max(14px, env(safe-area-inset-top, 14px));
+  right: 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--muted);
+  border-radius: 8px;
+  padding: 7px 13px;
+  font-size: 11px; font-family: var(--fb); font-weight: 500;
+  cursor: pointer; z-index: 100;
+  transition: color .2s, border-color .2s;
+  letter-spacing: .3px;
+}
+.logout-btn:hover { color: var(--blue); border-color: var(--border-hi); }
+
+/* App wrapper */
+.app-wrap {
+  display: flex; flex-direction: column;
+  min-height: 100dvh;
+  padding-top: max(22px, env(safe-area-inset-top, 22px));
+  padding-bottom: max(16px, env(safe-area-inset-bottom, 16px));
+}
+
+/* Top identity */
+.identity {
+  display: flex; align-items: center; justify-content: center;
+  gap: 7px;
+  padding: 0 20px 16px;
+  position: relative; z-index: 1;
+}
+.identity-dot {
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: var(--blue);
+  box-shadow: 0 0 8px 2px var(--blue-glow);
+}
+.identity-label {
+  font-family: var(--fl);
+  font-size: 9.5px; font-weight: 800;
+  letter-spacing: 3.5px; text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* Grid */
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  padding: 0 12px;
+  max-width: 480px;
+  margin: 0 auto;
+  width: 100%; flex: 1;
+  position: relative; z-index: 1;
+}
+
+/* Card */
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 15px 13px 14px;
+  text-decoration: none;
+  display: flex; flex-direction: column;
+  align-items: flex-start; gap: 6px;
+  position: relative; overflow: hidden;
+  transition: transform .16s cubic-bezier(.22,.68,0,1.2),
+              border-color .2s, background .2s, box-shadow .2s;
+  -webkit-tap-highlight-color: transparent;
+  will-change: transform;
+}
+/* Top accent line */
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 15%; right: 15%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--c1,#00b4ff) 40%, var(--c2,#33ccff) 60%, transparent);
+  opacity: .62;
+  transition: opacity .22s, left .25s, right .25s;
+}
+/* Bottom blob */
+.card::after {
+  content: '';
+  position: absolute;
+  bottom: -26px; left: -18px;
+  width: 90px; height: 90px;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--c1,#00b4ff) 0%, transparent 70%);
+  opacity: .055;
+  transition: opacity .3s;
+  pointer-events: none;
+}
+.card:active {
+  transform: scale(.952);
+  border-color: var(--border-hi);
+}
+@media (hover: hover) {
+  .card:hover {
+    background: var(--card-hi);
+    border-color: rgba(0,180,255,.22);
+    box-shadow: 0 6px 28px rgba(0,0,0,.65), 0 0 16px rgba(0,150,255,.06);
+    transform: translateY(-1px);
   }
+  .card:hover::before { opacity: 1; left: 5%; right: 5%; }
+  .card:hover::after  { opacity: .09; }
+}
 
-  * { margin: 0; padding: 0; box-sizing: border-box; }
+/* Icon */
+.card-icon {
+  width: 34px; height: 34px;
+  border-radius: 9px;
+  background: rgba(0,140,255,.08);
+  border: 1px solid rgba(0,150,255,.14);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 17px; line-height: 1; flex-shrink: 0;
+  transition: background .2s, border-color .2s, box-shadow .2s;
+}
+.card:active .card-icon,
+.card:hover .card-icon {
+  background: var(--blue-dim);
+  border-color: rgba(0,180,255,.35);
+  box-shadow: 0 0 12px rgba(0,180,255,.18);
+}
 
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'DM Sans', sans-serif;
-    min-height: 100vh;
-    padding: 0 0 60px;
-  }
+/* Text */
+.card-name {
+  font-family: var(--fh);
+  font-size: 13.5px; font-weight: 800;
+  color: var(--white); line-height: 1.2; letter-spacing: -.2px;
+}
+.card-desc {
+  font-size: 10.5px; color: var(--muted); line-height: 1.4;
+}
 
-  /* ===== TELA DE LOGIN ===== */
-  #lock-screen {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: var(--bg);
-    z-index: 9999;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 20px;
-    padding: 40px 32px;
-  }
-  #lock-screen.show { display: flex; }
+/* Arrow */
+.card-arrow {
+  position: absolute; bottom: 11px; right: 11px;
+  width: 20px; height: 20px;
+  border-radius: 5px;
+  background: rgba(0,140,255,.07);
+  display: flex; align-items: center; justify-content: center;
+  color: var(--muted2); font-size: 11px; font-weight: 700;
+  transition: background .2s, color .2s, box-shadow .2s;
+}
+.card:hover .card-arrow,
+.card:active .card-arrow {
+  background: var(--blue-dim);
+  color: var(--blue);
+  box-shadow: 0 0 8px rgba(0,180,255,.22);
+}
 
-  .lock-icon { font-size: 48px; }
-  .lock-title {
-    font-family: 'Syne', sans-serif;
-    font-size: 22px;
-    font-weight: 800;
-    color: var(--text);
-    text-align: center;
-  }
-  .lock-subtitle { font-size: 13px; color: var(--muted); text-align: center; }
+/* Wide card */
+.card-wide {
+  grid-column: span 2;
+  flex-direction: row;
+  align-items: center;
+  gap: 12px; padding: 13px 15px;
+}
+.card-wide .card-text { flex: 1; display: flex; flex-direction: column; gap: 3px; }
+.card-wide .card-icon { font-size: 18px; width: 38px; height: 38px; border-radius: 10px; }
+.card-wide .card-arrow { bottom: 50%; right: 13px; transform: translateY(50%); }
 
-  .lock-input {
-    width: 100%;
-    max-width: 280px;
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 14px 18px;
-    color: var(--text);
-    font-family: 'DM Sans', sans-serif;
-    font-size: 16px;
-    outline: none;
-    transition: border-color 0.2s;
-  }
-  .lock-input:focus { border-color: var(--accent); }
-  .lock-input.error { border-color: #ef4444; animation: shake 0.3s; }
+/* Colors */
+.c-purple { --c1:#a855f7; --c2:#c084fc; }
+.c-teal   { --c1:#00d4b0; --c2:#00f0cc; }
+.c-pink   { --c1:#f06292; --c2:#f48fb1; }
+.c-amber  { --c1:#f59e0b; --c2:#fbbf24; }
+.c-blue   { --c1:#00b4ff; --c2:#33ccff; }
+.c-green  { --c1:#22c55e; --c2:#4ade80; }
+.c-violet { --c1:#9b7aff; --c2:#c4b5fd; }
+.c-coral  { --c1:#ff7043; --c2:#ff9068; }
+.c-red    { --c1:#ef4444; --c2:#f87171; }
 
-  .lock-btn {
-    width: 100%;
-    max-width: 280px;
-    background: var(--accent);
-    color: white;
-    border: none;
-    border-radius: 12px;
-    padding: 14px;
-    font-family: 'Syne', sans-serif;
-    font-size: 15px;
-    font-weight: 700;
-    cursor: pointer;
-    transition: opacity 0.2s;
-  }
-  .lock-btn:active { opacity: 0.8; }
-  .lock-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+/* Footer */
+.footer {
+  text-align: center;
+  color: var(--muted2);
+  font-family: var(--fl); font-size: 9.5px; font-weight: 700;
+  letter-spacing: 2.5px; text-transform: uppercase;
+  padding: 14px 24px 0;
+  position: relative; z-index: 1;
+}
 
-  .lock-error { font-size: 12px; color: #ef4444; display: none; text-align: center; }
-  .lock-error.show { display: block; }
+/* PWA */
+#pwa-banner {
+  display: none;
+  position: fixed;
+  bottom: max(14px, env(safe-area-inset-bottom, 14px));
+  left: 12px; right: 12px;
+  background: var(--surface);
+  border: 1px solid rgba(0,160,255,.18);
+  border-radius: 14px;
+  padding: 13px 15px;
+  flex-direction: row; align-items: center; gap: 10px;
+  z-index: 999;
+  box-shadow: 0 8px 32px rgba(0,0,0,.7);
+}
+#pwa-banner.show { display: flex; }
+#pwa-banner span { flex: 1; font-size: 12.5px; color: var(--white); }
+#pwa-install {
+  background: var(--blue); color: #fff; border: none;
+  border-radius: 8px; padding: 8px 13px;
+  font-size: 12px; font-weight: 700; cursor: pointer;
+  font-family: var(--fh);
+  box-shadow: 0 2px 12px rgba(0,180,255,.32);
+}
+#pwa-dismiss {
+  background: none; border: none; color: var(--muted);
+  font-size: 18px; cursor: pointer; padding: 0 2px; line-height: 1;
+}
 
-  .lock-loading { font-size: 13px; color: var(--muted); display: none; text-align: center; }
-  .lock-loading.show { display: block; }
+/* Entry animations */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+#app-content.show .card { animation: fadeUp .36s cubic-bezier(.22,.68,0,1.1) both; }
+#app-content.show .card:nth-child(1) { animation-delay: .04s; }
+#app-content.show .card:nth-child(2) { animation-delay: .08s; }
+#app-content.show .card:nth-child(3) { animation-delay: .12s; }
+#app-content.show .card:nth-child(4) { animation-delay: .16s; }
+#app-content.show .card:nth-child(5) { animation-delay: .20s; }
+#app-content.show .card:nth-child(6) { animation-delay: .24s; }
+#app-content.show .card:nth-child(7) { animation-delay: .28s; }
+#app-content.show .card:nth-child(8) { animation-delay: .32s; }
+#app-content.show .card:nth-child(9) { animation-delay: .36s; }
 
-  @keyframes shake {
-    0%,100% { transform: translateX(0); }
-    25% { transform: translateX(-8px); }
-    75% { transform: translateX(8px); }
-  }
-
-  /* ===== CONTEÚDO DO APP ===== */
-  #app-content { display: none; }
-  #app-content.show { display: block; }
-
-  .header {
-    padding: 48px 24px 32px;
-    text-align: center;
-    position: relative;
-  }
-  .header::after {
-    content: '';
-    display: block;
-    width: 60px;
-    height: 3px;
-    background: linear-gradient(90deg, var(--accent), var(--accent2));
-    margin: 16px auto 0;
-    border-radius: 2px;
-  }
-  .header h1 {
-    font-family: 'Syne', sans-serif;
-    font-size: 32px;
-    font-weight: 800;
-    letter-spacing: -1px;
-    background: linear-gradient(135deg, var(--text), var(--muted));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-  .header p { color: var(--muted); font-size: 14px; margin-top: 6px; }
-
-  /* Botão sair */
-  .logout-btn {
-    position: fixed;
-    top: 16px;
-    right: 16px;
-    background: var(--card);
-    border: 1px solid var(--border);
-    color: var(--muted);
-    border-radius: 8px;
-    padding: 8px 12px;
-    font-size: 12px;
-    cursor: pointer;
-    z-index: 100;
-    font-family: 'DM Sans', sans-serif;
-    transition: color 0.2s, border-color 0.2s;
-  }
-  .logout-btn:hover { color: var(--text); border-color: var(--accent); }
-
-  .grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-    padding: 0 16px;
-    max-width: 500px;
-    margin: 0 auto;
-  }
-
-  .card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 18px;
-    padding: 22px 16px 18px;
-    text-decoration: none;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 8px;
-    position: relative;
-    overflow: hidden;
-    transition: transform 0.18s, border-color 0.18s;
-    -webkit-tap-highlight-color: transparent;
-  }
-  .card:active { transform: scale(0.96); }
-  .card::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 2px;
-    background: linear-gradient(90deg, var(--c1), var(--c2));
-    opacity: 0.8;
-  }
-
-  .card-icon { font-size: 28px; line-height: 1; }
-  .card-name { font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700; color: var(--text); line-height: 1.2; }
-  .card-desc { font-size: 11px; color: var(--muted); line-height: 1.4; }
-  .card-arrow { position: absolute; bottom: 14px; right: 14px; font-size: 16px; color: var(--muted); opacity: 0.5; }
-
-  .c-purple  { --c1: #7c6aff; --c2: #a78bff; }
-  .c-pink    { --c1: #ff6a8a; --c2: #ff9eb5; }
-  .c-teal    { --c1: #00c9a7; --c2: #00e5c0; }
-  .c-amber   { --c1: #f59e0b; --c2: #fbbf24; }
-  .c-blue    { --c1: #3b82f6; --c2: #60a5fa; }
-  .c-coral   { --c1: #f97316; --c2: #fb923c; }
-  .c-green   { --c1: #22c55e; --c2: #4ade80; }
-  .c-red     { --c1: #ef4444; --c2: #f87171; }
-  .c-violet  { --c1: #8b5cf6; --c2: #c4b5fd; }
-
-  .card-wide {
-    grid-column: span 2;
-    flex-direction: row;
-    align-items: center;
-    gap: 14px;
-    padding: 18px 20px;
-  }
-  .card-wide .card-text { flex: 1; }
-  .card-wide .card-icon { font-size: 32px; }
-
-  .footer { text-align: center; color: var(--muted); font-size: 11px; margin-top: 40px; padding: 0 24px; }
-
-  #pwa-banner {
-    display: none;
-    position: fixed;
-    bottom: 16px;
-    left: 16px; right: 16px;
-    background: #1e1e2e;
-    border: 1px solid #333;
-    border-radius: 14px;
-    padding: 14px 16px;
-    flex-direction: row;
-    align-items: center;
-    gap: 12px;
-    z-index: 999;
-    box-shadow: 0 4px 24px rgba(0,0,0,0.4);
-  }
-  #pwa-banner.show { display: flex; }
-  #pwa-banner span { flex: 1; font-size: 13px; color: var(--text); }
-  #pwa-install { background: var(--accent); color: white; border: none; border-radius: 8px; padding: 8px 14px; font-size: 13px; font-weight: 600; cursor: pointer; }
-  #pwa-dismiss { background: none; border: none; color: var(--muted); font-size: 20px; cursor: pointer; padding: 0 4px; }
+@media (max-width: 360px) {
+  .grid { gap: 7px; padding: 0 10px; }
+  .card { padding: 13px 11px 12px; }
+  .card-name { font-size: 13px; }
+}
 </style>
 </head>
 <body>
 
-<!-- TELA DE LOGIN -->
+<!-- LOCK SCREEN -->
 <div id="lock-screen">
-  <div class="lock-icon">🔒</div>
+  <div class="lock-logo">
+    <svg viewBox="0 0 24 24" fill="none" stroke="#00b4ff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="3" y="11" width="18" height="11" rx="2"/>
+      <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+    </svg>
+  </div>
   <div class="lock-title">Acesso restrito</div>
   <div class="lock-subtitle">Entre com seu e-mail e senha</div>
-  <input class="lock-input" type="email" id="email-input" placeholder="seu@email.com">
-  <input class="lock-input" type="password" id="pw-input" placeholder="Senha">
+  <div class="lock-field">
+    <input class="lock-input" type="email" id="email-input" placeholder="seu@email.com" autocomplete="email">
+  </div>
+  <div class="lock-field">
+    <input class="lock-input" type="password" id="pw-input" placeholder="Senha" autocomplete="current-password">
+  </div>
   <div class="lock-error" id="pw-error">E-mail ou senha incorretos.</div>
-  <div class="lock-loading" id="pw-loading">Entrando...</div>
+  <div class="lock-loading" id="pw-loading">Entrando…</div>
   <button class="lock-btn" id="login-btn" onclick="fazerLogin()">Entrar</button>
 </div>
 
-<!-- CONTEÚDO DO APP -->
+<!-- APP -->
 <div id="app-content">
+  <button class="logout-btn" onclick="fazerLogout()">Sair</button>
+  <div class="app-wrap">
 
-  <button class="logout-btn" onclick="fazerLogout()">Sair 🚪</button>
+    <div class="identity">
+      <div class="identity-dot"></div>
+      <span class="identity-label">Workspace</span>
+      <div class="identity-dot"></div>
+    </div>
 
-  <div class="header">
-    <h1>Meus Apps</h1>
-    <p>Toque para abrir</p>
-  </div>
+    <div class="grid">
+      <a class="card c-purple" href="TAPETE-CRM.html">
+        <div class="card-icon">🪴</div>
+        <span class="card-name">Tapete CRM</span>
+        <span class="card-desc">Clientes e registros</span>
+        <span class="card-arrow">↗</span>
+      </a>
+      <a class="card c-teal" href="TAPETES.html">
+        <div class="card-icon">🗂️</div>
+        <span class="card-name">Tapetes</span>
+        <span class="card-desc">Catálogo</span>
+        <span class="card-arrow">↗</span>
+      </a>
+      <a class="card c-pink" href="PRE-VENDA.html">
+        <div class="card-icon">💬</div>
+        <span class="card-name">Pré-Venda</span>
+        <span class="card-desc">Atendimento</span>
+        <span class="card-arrow">↗</span>
+      </a>
+      <a class="card c-amber" href="MEU-CRM.html">
+        <div class="card-icon">👥</div>
+        <span class="card-name">Meu CRM</span>
+        <span class="card-desc">Gestão de clientes</span>
+        <span class="card-arrow">↗</span>
+      </a>
+      <a class="card c-blue" href="METODO-OPA.html">
+        <div class="card-icon">🎯</div>
+        <span class="card-name">Método OPA</span>
+        <span class="card-desc">Processo de vendas</span>
+        <span class="card-arrow">↗</span>
+      </a>
+      <a class="card c-green" href="RETINA.html">
+        <div class="card-icon">👁️</div>
+        <span class="card-name">Retina</span>
+        <span class="card-desc">Análise visual</span>
+        <span class="card-arrow">↗</span>
+      </a>
+      <a class="card card-wide c-violet" href="OUTROS.html">
+        <div class="card-icon">🗃️</div>
+        <div class="card-text">
+          <div class="card-name">Outros</div>
+          <div class="card-desc">Rico, Workshop, DOA, Estudo e Código</div>
+        </div>
+        <span class="card-arrow">↗</span>
+      </a>
+      <a class="card card-wide c-coral" href="ADM.html">
+        <div class="card-icon">⚙️</div>
+        <div class="card-text">
+          <div class="card-name">ADM</div>
+          <div class="card-desc">Painel administrativo geral</div>
+        </div>
+        <span class="card-arrow">↗</span>
+      </a>
+      <a class="card card-wide c-red" href="WEBSITE.html">
+        <div class="card-icon">🌐</div>
+        <div class="card-text">
+          <div class="card-name">Website</div>
+          <div class="card-desc">Página principal do negócio</div>
+        </div>
+        <span class="card-arrow">↗</span>
+      </a>
+    </div>
 
-  <div class="grid">
-
-    <a class="card c-purple" href="TAPETE-CRM.html">
-      <span class="card-icon">🪴</span>
-      <span class="card-name">Tapete CRM</span>
-      <span class="card-desc">Clientes e registros</span>
-      <span class="card-arrow">→</span>
-    </a>
-    <a class="card c-teal" href="TAPETES.html">
-      <span class="card-icon">🗂️</span>
-      <span class="card-name">Tapetes</span>
-      <span class="card-desc">Catálogo</span>
-      <span class="card-arrow">→</span>
-    </a>
-
-    <a class="card c-pink" href="PRE-VENDA.html">
-      <span class="card-icon">💬</span>
-      <span class="card-name">Pré-Venda</span>
-      <span class="card-desc">Atendimento</span>
-      <span class="card-arrow">→</span>
-    </a>
-    <a class="card c-amber" href="MEU-CRM.html">
-      <span class="card-icon">👥</span>
-      <span class="card-name">Meu CRM</span>
-      <span class="card-desc">Gestão de clientes</span>
-      <span class="card-arrow">→</span>
-    </a>
-
-    <a class="card c-blue" href="METODO-OPA.html">
-      <span class="card-icon">🎯</span>
-      <span class="card-name">Método OPA</span>
-      <span class="card-desc">Processo de vendas</span>
-      <span class="card-arrow">→</span>
-    </a>
-    <a class="card c-green" href="RETINA.html">
-      <span class="card-icon">👁️</span>
-      <span class="card-name">Retina</span>
-      <span class="card-desc">Análise visual</span>
-      <span class="card-arrow">→</span>
-    </a>
-
-    <a class="card card-wide c-violet" href="OUTROS.html">
-      <span class="card-icon">🗃️</span>
-      <div class="card-text">
-        <div class="card-name">Outros</div>
-        <div class="card-desc">Rico, Workshop, DOA, Estudo e Código</div>
-      </div>
-      <span class="card-arrow">→</span>
-    </a>
-
-    <a class="card card-wide c-coral" href="ADM.html">
-      <span class="card-icon">⚙️</span>
-      <div class="card-text">
-        <div class="card-name">ADM</div>
-        <div class="card-desc">Painel administrativo geral</div>
-      </div>
-      <span class="card-arrow">→</span>
-    </a>
-
-    <a class="card card-wide c-red" href="WEBSITE.html">
-      <span class="card-icon">🌐</span>
-      <div class="card-text">
-        <div class="card-name">Website</div>
-        <div class="card-desc">Página principal do negócio</div>
-      </div>
-      <span class="card-arrow">→</span>
-    </a>
-
-  </div>
-
-  <div class="footer">
-    <p>arquivos98126066-sudo · SOFTWARE</p>
+    <div class="footer">arquivos98126066-sudo · software</div>
   </div>
 
   <div id="pwa-banner">
-    <span>📲 Instalar como app na tela inicial?</span>
+    <span>Instalar como app na tela inicial?</span>
     <button id="pwa-install">Instalar</button>
     <button id="pwa-dismiss">×</button>
   </div>
-
 </div>
 
-<!-- FIREBASE SDK -->
+<!-- FIREBASE — UNTOUCHED -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
   import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
@@ -357,54 +552,41 @@
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
 
-  // Verifica se já está logado
-  onAuthStateChanged(auth, (user) => {
-    if (user) {
-      mostrarApp();
-    } else {
-      mostrarLogin();
-    }
-  });
+  onAuthStateChanged(auth, u => u ? mostrarApp() : mostrarLogin());
 
-  // Função de login — exposta globalmente
-  window.fazerLogin = async function() {
-    const email = document.getElementById('email-input').value;
-    const senha = document.getElementById('pw-input').value;
-    const erro = document.getElementById('pw-error');
+  window.fazerLogin = async function () {
+    const email   = document.getElementById('email-input').value;
+    const senha   = document.getElementById('pw-input').value;
+    const erro    = document.getElementById('pw-error');
     const loading = document.getElementById('pw-loading');
-    const btn = document.getElementById('login-btn');
-
+    const btn     = document.getElementById('login-btn');
     erro.classList.remove('show');
     loading.classList.add('show');
     btn.disabled = true;
-
     try {
       await signInWithEmailAndPassword(auth, email, senha);
-      // onAuthStateChanged vai chamar mostrarApp() automaticamente
     } catch (e) {
       erro.classList.add('show');
       loading.classList.remove('show');
       btn.disabled = false;
-      document.getElementById('pw-input').value = '';
+      const pw = document.getElementById('pw-input');
+      pw.classList.add('error');
+      pw.value = '';
+      setTimeout(() => pw.classList.remove('error'), 600);
     }
   };
 
-  // Função de logout — exposta globalmente
-  window.fazerLogout = async function() {
-    await signOut(auth);
-  };
+  window.fazerLogout = async function () { await signOut(auth); };
 
   function mostrarApp() {
     document.getElementById('lock-screen').classList.remove('show');
     document.getElementById('app-content').classList.add('show');
   }
-
   function mostrarLogin() {
     document.getElementById('app-content').classList.remove('show');
     document.getElementById('lock-screen').classList.add('show');
   }
 
-  // Enter para logar
   document.getElementById('pw-input').addEventListener('keydown', e => {
     if (e.key === 'Enter') window.fazerLogin();
   });
@@ -412,15 +594,12 @@
     if (e.key === 'Enter') document.getElementById('pw-input').focus();
   });
 
-  // PWA
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('./service-worker.js')
-      .then(reg => console.log('SW registrado:', reg.scope))
-      .catch(err => console.warn('SW erro:', err));
+    navigator.serviceWorker.register('./service-worker.js').catch(e => console.warn(e));
   }
 
   let deferredPrompt;
-  window.addEventListener('beforeinstallprompt', (e) => {
+  window.addEventListener('beforeinstallprompt', e => {
     e.preventDefault();
     deferredPrompt = e;
     document.getElementById('pwa-banner').classList.add('show');
@@ -428,7 +607,7 @@
   document.getElementById('pwa-install').addEventListener('click', async () => {
     if (deferredPrompt) {
       deferredPrompt.prompt();
-      const { outcome } = await deferredPrompt.userChoice;
+      await deferredPrompt.userChoice;
       deferredPrompt = null;
       document.getElementById('pwa-banner').classList.remove('show');
     }
