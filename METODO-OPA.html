@@ -17,7 +17,7 @@ const COL = 'metodo_opa';
 const DOC_ID = 'dados_principais';
 const LS_KEY = 'metodo_opa_offline';
 
-// ── CAMADA 1: LOCAL — IndexedDB com fallback localStorage ──
+// ── IndexedDB com fallback localStorage (igual ao ESTUDO) ──
 function saveLocal(key, data) {
   try {
     const req = indexedDB.open('meus_apps_backup', 1);
@@ -30,7 +30,6 @@ function saveLocal(key, data) {
     try { localStorage.setItem(key, JSON.stringify(data)); } catch(_) {}
   }
 }
-
 function loadLocal(key) {
   return new Promise(resolve => {
     try {
@@ -49,78 +48,118 @@ function loadLocal(key) {
   });
 }
 
-function _lsLer(){try{const v=localStorage.getItem(LS_KEY);return v?JSON.parse(v):null;}catch(e){return null;}}
-function _lsGravar(d){try{localStorage.setItem(LS_KEY,JSON.stringify(d));}catch(e){}}
+// Bloqueia onSnapshot de sobrescrever dados logo após um save local
+var _blockSnapshotUntil = 0;
+var _unsubscribe = null;
+var _syncAtivo = false;
 
-// ── CAMADA 2: Gravação com saveLocal antes da nuvem ──
-window._firebaseGravar = async function(d){
-  const payload = { ...d, updatedAt: Date.now() };
-  _lsGravar(payload);
-  saveLocal(COL + '_' + DOC_ID, payload);
-  if(window.syncShow)window.syncShow.syncing();
-  try{
-    await setDoc(doc(db,COL,DOC_ID),payload);
-    if(window.syncShow)window.syncShow.synced('Método OPA');
-  }catch(e){
-    console.warn('Erro ao salvar:',e);
-    if(window.syncShow)window.syncShow.local();
+// ── Salva localmente + nuvem ──
+window._opaGravar = async function(dados) {
+  dados.updatedAt = Date.now();
+  // 1) Salva local IMEDIATAMENTE (IndexedDB + localStorage)
+  saveLocal(COL + '_' + DOC_ID, dados);
+  try { localStorage.setItem(LS_KEY, JSON.stringify(dados)); } catch(_) {}
+  // 2) Bloqueia snapshot por 5s para não sobrescrever
+  _blockSnapshotUntil = Date.now() + 5000;
+  if(window.syncShow) window.syncShow.syncing();
+  // 3) Sobe pra nuvem em background
+  try {
+    await setDoc(doc(db, COL, DOC_ID), dados);
+    if(window.syncShow) window.syncShow.synced('Método OPA');
+  } catch(e) {
+    console.warn('Firebase offline, salvo local:', e);
+    if(window.syncShow) window.syncShow.local();
   }
 };
 
-// ── CAMADA 3: Listener com mesclagem local/nuvem ──
-onSnapshot(doc(db,COL,DOC_ID), async (snap)=>{
-  const local = await loadLocal(COL + '_' + DOC_ID);
-  const localTime = local ? (local.updatedAt || 0) : 0;
-
-  const activeEl=document.activeElement;
-  const isTyping=activeEl&&(activeEl.tagName==='TEXTAREA'||activeEl.tagName==='INPUT');
-
-  if(snap.exists()){
-    const cloud = snap.data();
-    const cloudTime = cloud.updatedAt || 0;
-    if(localTime > cloudTime){
-      await setDoc(doc(db,COL,DOC_ID), local);
-      _lsGravar(local);
-      if(!isTyping && window._opaAtualizarCache) window._opaAtualizarCache(local);
-    } else {
-      if(!cloud.planos) cloud.planos=[];
-      saveLocal(COL + '_' + DOC_ID, cloud);
-      _lsGravar(cloud);
-      if(!isTyping && window._opaAtualizarCache) window._opaAtualizarCache(cloud);
-    }
-  } else {
-    if(local){
-      await setDoc(doc(db,COL,DOC_ID), local);
-      if(!isTyping && window._opaAtualizarCache) window._opaAtualizarCache(local);
-    }
+// ── Carrega local e renderiza imediatamente ──
+async function opaCarregarLocal() {
+  let dados = await loadLocal(COL + '_' + DOC_ID);
+  if(!dados) {
+    try { const v = localStorage.getItem(LS_KEY); dados = v ? JSON.parse(v) : null; } catch(_) {}
   }
-}, async (err)=>{
-  console.warn('onSnapshot offline — carregando local:',err);
-  if(window.syncShow)window.syncShow.offline();
-  // Carga offline: usa IndexedDB
-  const local = await loadLocal(COL + '_' + DOC_ID);
-  if(local && window._opaAtualizarCache) window._opaAtualizarCache(local);
-});
-
-// Sync ao voltar online
-window.addEventListener('online', async function() {
-  const local = await loadLocal(COL + '_' + DOC_ID);
-  if(!local) return;
-  try {
-    await setDoc(doc(db,COL,DOC_ID), local);
-    if(window.syncShow) window.syncShow.synced('Método OPA');
-  } catch(_) {}
-});
-
-// Carrega dados iniciais
-const ls=_lsLer();
-if(ls){
-  if(!ls.planos)ls.planos=[];
-  window._opaDadosIniciais=ls;
+  if(dados && window._opaAtualizarCache) window._opaAtualizarCache(dados);
 }
-// Sinaliza que o Firebase está pronto
-window._opaFirebaseReady=true;
-if(window._opaOnFirebaseReady)window._opaOnFirebaseReady();
+
+// ── Liga listener do Firebase ──
+function opaLigarListener() {
+  if(_syncAtivo) return;
+  _syncAtivo = true;
+  try {
+    _unsubscribe = onSnapshot(doc(db, COL, DOC_ID), async (snap) => {
+      // Se acabamos de salvar, ignora snapshot para não sobrescrever
+      if(Date.now() < _blockSnapshotUntil) return;
+      const local = await loadLocal(COL + '_' + DOC_ID);
+      const localTime = local ? (local.updatedAt || 0) : 0;
+      if(snap.exists()) {
+        const cloud = snap.data();
+        const cloudTime = cloud.updatedAt || 0;
+        if(localTime > cloudTime) {
+          // Local é mais novo — sobe pra nuvem
+          setDoc(doc(db, COL, DOC_ID), local).catch(() => {});
+          if(window._opaAtualizarCache) window._opaAtualizarCache(local);
+        } else if(cloudTime > localTime) {
+          // Nuvem é mais nova — atualiza local
+          saveLocal(COL + '_' + DOC_ID, cloud);
+          try { localStorage.setItem(LS_KEY, JSON.stringify(cloud)); } catch(_) {}
+          if(window._opaAtualizarCache) window._opaAtualizarCache(cloud);
+        }
+        if(window.syncShow) window.syncShow.synced('Método OPA');
+      } else if(local) {
+        setDoc(doc(db, COL, DOC_ID), local).catch(() => {});
+      }
+    }, (err) => {
+      console.warn('OPA offline:', err);
+      _syncAtivo = false;
+      _unsubscribe = null;
+      if(window.syncShow) window.syncShow.offline();
+    });
+  } catch(e) {
+    _syncAtivo = false;
+    if(window.syncShow) window.syncShow.offline();
+  }
+}
+
+// ── Inicialização ──
+async function iniciar() {
+  // 1) Carrega local e mostra imediatamente
+  await opaCarregarLocal();
+
+  // 2) Se online, liga Firebase com timeout de segurança
+  if(navigator.onLine) {
+    const timeout = setTimeout(() => {
+      // Firebase não respondeu em 8s — fica só no local
+      if(window.syncShow) window.syncShow.offline();
+    }, 8000);
+    // Cancela timeout quando sincronizar
+    const origSynced = window.syncShow ? window.syncShow.synced : null;
+    if(window.syncShow) window.syncShow.synced = function(n) {
+      clearTimeout(timeout);
+      if(origSynced) origSynced.call(window.syncShow, n);
+    };
+    opaLigarListener();
+  } else {
+    if(window.syncShow) window.syncShow.offline();
+  }
+
+  // 3) Ao voltar online: bloqueia snapshot e reconecta
+  window.addEventListener('online', () => {
+    _blockSnapshotUntil = Date.now() + 10000;
+    if(_unsubscribe) { try { _unsubscribe(); } catch(_) {} }
+    _unsubscribe = null; _syncAtivo = false;
+    setTimeout(() => { opaLigarListener(); if(window.syncShow) window.syncShow.syncing(); }, 800);
+  });
+
+  // 4) Ao ficar offline: desliga listener
+  window.addEventListener('offline', () => {
+    if(_unsubscribe) { try { _unsubscribe(); } catch(_) {} }
+    _unsubscribe = null; _syncAtivo = false;
+    opaCarregarLocal();
+    if(window.syncShow) window.syncShow.offline();
+  });
+}
+
+iniciar();
 </script>
 <style>
 :root{
@@ -146,6 +185,9 @@ body{font-family:var(--fonte);background:#e0e0e0;color:var(--texto);display:flex
 
 /* MÓDULOS — padding-bottom garante que botões nunca fiquem atrás da nav */
 .mod{display:none;flex:1;overflow-y:auto;overflow-x:hidden;padding-bottom:calc(var(--nav) + 32px + var(--safe-bottom));-webkit-overflow-scrolling:touch}
+/* PULL TO REFRESH */
+#ptr-indicator{position:fixed;top:0;left:50%;transform:translateX(-50%);background:var(--azul);color:#fff;font-size:12px;font-weight:700;padding:6px 18px;border-radius:0 0 12px 12px;z-index:2000;opacity:0;transition:opacity 200ms;pointer-events:none;font-family:var(--fonte)}
+#ptr-indicator.vis{opacity:1}
 .mod.ativo{display:flex;flex-direction:column}
 .tela{flex:1;padding:20px 18px;animation:fadeIn 200ms ease-out;display:none;flex-direction:column;min-height:auto}
 .tela.ativa{display:flex}
@@ -410,6 +452,7 @@ input[type=time]{height:40px}
 </style>
 </head>
 <body>
+<div id="ptr-indicator">↓ Solte para atualizar</div>
 <div id="app">
 
 <!-- ===== MÓDULO HOJE ===== -->
@@ -703,51 +746,65 @@ input[type=time]{height:40px}
 <script>
 const $=s=>document.querySelector(s),$$=s=>document.querySelectorAll(s);
 
-// ===== STORAGE — bridge para Firebase (carregado no head como module) =====
+// ===== STORAGE =====
 const LS_KEY_MAIN = 'metodo_opa_offline';
-let _cache = {planejamentos:[],habitos:[],decisoes:[],planos:[]};
 
-// Carrega cache do localStorage imediatamente (antes do Firebase responder)
+function _normalizar(d){
+  if(!d.planos)d.planos=[];
+  if(!d.habitos)d.habitos=[];
+  if(!d.decisoes)d.decisoes=[];
+  if(!d.planejamentos)d.planejamentos=[];
+  if(!d.lixeira)d.lixeira=[];
+  return d;
+}
+
+// _cache: fonte única de verdade em memória, carregado do localStorage imediatamente
+let _cache = _normalizar({planejamentos:[],habitos:[],decisoes:[],planos:[],lixeira:[]});
 (function(){
   try{
     const v=localStorage.getItem(LS_KEY_MAIN);
-    if(v){const d=JSON.parse(v);if(d){_cache=d;if(!_cache.planos)_cache.planos=[];}}
+    if(v){const d=JSON.parse(v);if(d)_cache=_normalizar(d);}
   }catch(e){}
 })();
 
-// Função chamada pelo module Firebase quando dados chegam do servidor
+// Chamada pelo módulo Firebase quando dados chegam (nuvem ou local)
 window._opaAtualizarCache = function(dados){
-  _cache = dados;
-  if(!_cache.planos)_cache.planos=[];
-  // Se estamos em bloqueio (acabamos de salvar localmente), ignora completamente
-  if(_bloqueioRerender)return;
+  if(!dados) return;
+  const novo = _normalizar(JSON.parse(JSON.stringify(dados)));
+  // Nunca substitui por dado mais antigo
+  if(novo.updatedAt && _cache.updatedAt && novo.updatedAt < _cache.updatedAt) return;
+  _cache = novo;
+  _renderTelaAtiva();
+};
+
+function _renderTelaAtiva(){
   const modAtivo=document.querySelector('.mod.ativo');
   if(!modAtivo)return;
   const telaAtiva=modAtivo.querySelector('.tela.ativa');
   if(modAtivo.id==='mod-hoje'&&telaAtiva&&telaAtiva.id==='t-hoje-main'){
     const p=gph();
-    if(!p||!p.blocos||!p.blocos.length)return;
-    const jsonNovo=JSON.stringify(p.blocos);
-    const jsonAtual=JSON.stringify(blocosTemp);
-    if(jsonNovo===jsonAtual)return;
-    blocosTemp=JSON.parse(JSON.stringify(p.blocos));
-    renderBlocosUI();
-    checkBtns();
-  }
-};
+    if(p&&p.blocos&&p.blocos.length){
+      blocosTemp=JSON.parse(JSON.stringify(p.blocos));
+      if(p.iniciado){irT('t-execucao');renderExec();startClock();}
+      else{renderBlocosUI();checkBtns();}
+    } else {
+      blocosTemp=[];renderBlocosUI();checkBtns();
+    }
+  } else if(modAtivo.id==='mod-habitos'){renderHabitos();
+  } else if(modAtivo.id==='mod-historico'){calcZonas();renderHistorico();
+  } else if(modAtivo.id==='mod-planos'){renderPlanos();
+  } else if(modAtivo.id==='mod-decisao'){renderDecAnt();}
+}
 
 function gd(){return JSON.parse(JSON.stringify(_cache))}
 
-// Bloqueia re-render por 3s após salvar localmente (evita piscar pelo onSnapshot)
-let _bloqueioRerender=false,_bloqueioTimer=null;
-function _bloquear(){_bloqueioRerender=true;clearTimeout(_bloqueioTimer);_bloqueioTimer=setTimeout(()=>{_bloqueioRerender=false;},3000);}
-
 function sd(d){
-  _cache=d;
-  if(!_cache.planos)_cache.planos=[];
-  _bloquear();
-  try{localStorage.setItem(LS_KEY_MAIN,JSON.stringify(d));}catch(e){}
-  if(window._firebaseGravar)window._firebaseGravar(d);
+  d.updatedAt = Date.now();
+  _cache = _normalizar(d);
+  // Salva no localStorage imediatamente
+  try{localStorage.setItem(LS_KEY_MAIN, JSON.stringify(_cache));}catch(e){}
+  // Envia pra nuvem via módulo Firebase
+  if(window._opaGravar) window._opaGravar(_cache);
 }
 function md(fn){const d=gd();fn(d);sd(d)}
 function hoje(){const d=new Date();return`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`}
@@ -795,10 +852,15 @@ function initHoje(){
   const meses=['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
   $('#saudacao').textContent=`${dias[d.getDay()]}, ${d.getDate()} de ${meses[d.getMonth()]}`;
   const p=gph();
-  if(p&&p.blocos&&p.blocos.length){if(p.iniciado){irT('t-execucao');renderExec();startClock();return}else{blocosTemp=JSON.parse(JSON.stringify(p.blocos));renderBlocosUI();checkBtns();return}}
-  if(p&&p.blocos&&p.blocos.length)blocosTemp=JSON.parse(JSON.stringify(p.blocos));
-  else{blocosTemp=[];adicionarBloco()}
+  if(p&&p.blocos&&p.blocos.length){
+    blocosTemp=JSON.parse(JSON.stringify(p.blocos));
+    if(p.iniciado){irT('t-execucao');renderExec();startClock();return}
+    renderBlocosUI();checkBtns();return;
+  }
+  // Nenhum planejamento hoje — começa vazio sem criar bloco automático
+  blocosTemp=[];
   renderBlocosUI();
+  checkBtns();
 }
 
 function voltarParaBlocos(){
@@ -814,7 +876,7 @@ function voltarParaBlocos(){
 function criarBloco(nome=''){
 return{id:`b_${Date.now()}_${Math.random().toString(36).substr(2,4)}`,nome,zona:'z4',objetivo:'',proposito:'',acoes:[],prior:5,horario_inicio:'',horario_fim:'',status:'pendente'};
 }
-function adicionarBloco(){const p=blocosTemp.length+1;const b=criarBloco();b.prior=p;blocosTemp.push(b);renderBlocosUI()}
+function adicionarBloco(){const p=blocosTemp.length+1;const b=criarBloco();b.prior=p;blocosTemp.push(b);salvarBlocos();renderBlocosUI();}
 $('#btn-add-bloco-top').addEventListener('click',adicionarBloco);
 
 function renderBlocosUI(){
@@ -939,15 +1001,8 @@ function addAcaoBloco(blocoId){
   const b=blocosTemp.find(x=>x.id===blocoId);if(!b)return;
   const a={id:`a_${Date.now()}`,nome:'',prior:5,horario_inicio:'',status:'pendente',selecionada:true};
   b.acoes.push(a);
-  // Salva silencioso — sem acionar re-render
-  const p=gph()||{id:hId(),data:hoje(),blocos:[],progresso_percentual:0,iniciado:false,revisao:null};
-  p.blocos=blocosTemp;
-  _bloquear();
-  _cache.planejamentos=_cache.planejamentos||[];
-  const idx=_cache.planejamentos.findIndex(x=>x.id===p.id);
-  if(idx>=0)_cache.planejamentos[idx]=p;else _cache.planejamentos.unshift(p);
-  try{localStorage.setItem(LS_KEY_MAIN,JSON.stringify(_cache));}catch(e){}
-  if(window._firebaseGravar)window._firebaseGravar(_cache);
+  // Salva via sd() — caminho único de salvamento
+  salvarBlocos();
   addAcaoBlocoUI(blocoId,a,true);
   // Atualiza contador do botão toggle
   const btgA=document.getElementById('btg-acoes-'+blocoId);
@@ -999,8 +1054,20 @@ function checkBtns(){
 }
 
 function salvarBlocos(){
-  const p=gph()||{id:hId(),data:hoje(),blocos:[],progresso_percentual:0,iniciado:false,revisao:null};
-  p.blocos=blocosTemp;sp(p);
+  // Busca planejamento de hoje (sem revisão) ou cria novo
+  let p=gph();
+  if(!p){
+    p={id:hId(),data:hoje(),blocos:[],progresso_percentual:0,iniciado:false,revisao:null};
+    // Insere diretamente no cache antes de salvar
+    _cache.planejamentos=_cache.planejamentos||[];
+    _cache.planejamentos.unshift(p);
+  }
+  p.blocos=blocosTemp;
+  // Salva via md para garantir persistência
+  md(d=>{
+    const i=d.planejamentos.findIndex(x=>x.id===p.id);
+    if(i>=0)d.planejamentos[i]=p;else d.planejamentos.unshift(p);
+  });
 }
 
 function checkConfBlocos(){const com=blocosTemp.filter(b=>b.horario_inicio&&b.horario_fim);blocosTemp.forEach(b=>{const el=document.getElementById('bconf-'+b.id);if(!el)return;if(!b.horario_inicio||!b.horario_fim){el.style.display='none';return}const conf=com.find(x=>x.id!==b.id&&b.horario_inicio<x.horario_fim&&b.horario_fim>x.horario_inicio);if(conf){el.style.display='block';el.textContent=`⚠️ Conflito com "${conf.nome}"`}else{el.style.display='none'}});}
@@ -1254,7 +1321,17 @@ $('#btn-salvar-rev').addEventListener('click',()=>{
       d.planejamentos.unshift(copia);
     });
   }
-  abrirModal(`<div style="text-align:center"><p style="font-size:44px;margin-bottom:12px">🎉</p><h2 style="font-size:18px;font-weight:800;color:var(--azul);margin-bottom:8px">Revisão Salva!</h2><p style="font-size:13px;color:var(--texto-sec);margin-bottom:16px">Deseja salvar este plano em PLANOS?</p><div style="display:flex;gap:10px"><button class="btn btn-azul" onclick="salvarComoModeloEVoltar()">💾 Salvar em Planos</button><button class="btn btn-sec" onclick="voltarInicio()">Não</button></div></div>`);
+  // Verifica se já existe um plano salvo com os mesmos blocos (pelo nome do primeiro bloco)
+  const nomeAtual=ultimosBlocos&&ultimosBlocos[0]?ultimosBlocos[0].nome.trim():'';
+  const dataAtual=gd();
+  const jaTemPlano=nomeAtual&&(dataAtual.planos||[]).some(p=>p.blocos&&p.blocos[0]&&p.blocos[0].nome.trim()===nomeAtual);
+  if(jaTemPlano){
+    // Já tem esse plano salvo — vai direto sem perguntar
+    voltarInicio();
+    toast('✅ Dia salvo! (Plano já existe em PLANOS)');
+  } else {
+    abrirModal(`<div style="text-align:center"><p style="font-size:44px;margin-bottom:12px">🎉</p><h2 style="font-size:18px;font-weight:800;color:var(--azul);margin-bottom:8px">Revisão Salva!</h2><p style="font-size:13px;color:var(--texto-sec);margin-bottom:16px">Deseja salvar este plano em PLANOS?</p><div style="display:flex;gap:10px"><button class="btn btn-azul" onclick="salvarComoModeloEVoltar()">💾 Salvar em Planos</button><button class="btn btn-sec" onclick="voltarInicio()">Não</button></div></div>`);
+  }
 });
 function salvarComoModeloEVoltar(){salvarComoModelo();voltarInicio();}
 function voltarInicio(){fecharModal();blocosTemp=[];renderBlocosUI();checkBtns();irT('t-hoje-main');}
@@ -1284,28 +1361,54 @@ function renderPlanos(){
         `<button class="btn btn-azul btn-sm" onclick="reusarPlano('${p.id}')">▶ Usar</button>`+
         `<button class="btn btn-danger btn-sm" onclick="excluirPlano('${p.id}')">🗑️</button>`+
       `</div>`;
-    // segurar no nome = editar
+    // long press no nome = editar; toque simples = nada (sem ação no toque)
     const nomeTxt=item.querySelector('#planonome-'+p.id);
     const nomeInp=item.querySelector('#planoinp-'+p.id);
-    let _pt=null,_px=0,_py=0;
-    nomeTxt.addEventListener('pointerdown',e=>{e.stopPropagation();_px=e.clientX;_py=e.clientY;_pt=setTimeout(()=>{nomeTxt.style.display='none';nomeInp.style.display='block';nomeInp.focus();nomeInp.select();},600);});
+    let _pt=null,_px=0,_py=0,_ptAtivou=false;
+    nomeTxt.addEventListener('pointerdown',e=>{_ptAtivou=false;e.stopPropagation();_px=e.clientX;_py=e.clientY;_pt=setTimeout(()=>{_ptAtivou=true;nomeTxt.style.display='none';nomeInp.style.display='block';nomeInp.focus();nomeInp.select();},600);});
     nomeTxt.addEventListener('pointermove',e=>{if(_pt&&(Math.abs(e.clientX-_px)>8||Math.abs(e.clientY-_py)>8)){clearTimeout(_pt);_pt=null;}});
     nomeTxt.addEventListener('pointerup',()=>{clearTimeout(_pt);_pt=null;});
     nomeTxt.addEventListener('pointercancel',()=>{clearTimeout(_pt);_pt=null;});
     nomeInp.addEventListener('blur',()=>_salvarNomePlano(p.id,nomeTxt,nomeInp));
     nomeInp.addEventListener('keydown',e=>{
       if(e.key==='Enter')_salvarNomePlano(p.id,nomeTxt,nomeInp);
-      if(e.key==='Escape'){nomeInp.style.display='none';nomeTxt.style.display='';}
+      if(e.key==='Escape'){nomeInp.style.display='none';nomeTxt.style.display='block';}
     });
     lista.appendChild(item);
   });
 }
+function moverPlano(id, dir){
+  md(d=>{
+    const planos=d.planos||[];
+    const idx=planos.findIndex(p=>p.id===id);
+    if(idx<0)return;
+    const novo=idx+dir;
+    if(novo<0||novo>=planos.length)return;
+    const tmp=planos[idx];planos[idx]=planos[novo];planos[novo]=tmp;
+    d.planos=planos;
+  });
+  renderPlanos();
+}
 function _salvarNomePlano(id,nomeTxt,nomeInp){
   const nome=nomeInp.value.trim();
   if(nome.length>0){md(d=>{const p=(d.planos||[]).find(x=>x.id===id);if(p)p.nome=nome;});nomeTxt.textContent=nome;toast('✅ Plano renomeado!');}
-  nomeInp.style.display='none';nomeTxt.style.display='';
+  nomeInp.style.display='none';nomeTxt.style.display='block';
 }
-function reusarPlano(id){const data=gd();const p=data.planos.find(x=>x.id===id);if(!p)return;const novos=JSON.parse(JSON.stringify(p.blocos));novos.forEach(b=>{b.id=`b_${Date.now()}_${Math.random().toString(36).substr(2,4)}`;b.status='pendente';b.acoes.forEach(a=>{a.id=`a_${Date.now()}_${Math.random().toString(36).substr(2,4)}`;a.status='pendente';a.selecionada=true})});blocosTemp=[...blocosTemp,...novos];salvarBlocos();navegar('hoje');renderBlocosUI();checkBtns();toast('✅ Blocos adicionados!')}
+function reusarPlano(id){
+  const data=gd();const p=(data.planos||[]).find(x=>x.id===id);if(!p)return;
+  const novos=JSON.parse(JSON.stringify(p.blocos||[]));
+  novos.forEach(b=>{
+    b.id='b_'+Date.now()+'_'+Math.random().toString(36).substr(2,4);
+    b.status='pendente';b.horario_inicio='';b.horario_fim='';
+    (b.acoes||[]).forEach(a=>{
+      a.id='a_'+Date.now()+'_'+Math.random().toString(36).substr(2,4);
+      a.status='pendente';a.selecionada=true;a.horario_inicio='';
+    });
+  });
+  blocosTemp=[...blocosTemp,...novos];
+  salvarBlocos();navegar('hoje');renderBlocosUI();checkBtns();
+  toast('✅ Blocos adicionados!');
+}
 function excluirPlano(id){confirmar('Excluir este plano?',()=>moverLixeira('plano',id))}
 // ===== HÁBITOS =====
 const FRASES=["Pequenas melhorias de 1% por dia resultam em 37 vezes mais resultado em 1 ano.","Você não sobe ao nível dos seus objetivos — você cai ao nível dos seus sistemas.","Cada ação que você toma é um voto para o tipo de pessoa que deseja se tornar.","O hábito não precisa ser perfeito. Precisa ser consistente.","Nunca falhe duas vezes. Uma falta é acidente, dois é um novo hábito.","O ambiente é a mão invisível que molda o comportamento humano.","Torne os bons hábitos óbvios, atraentes, fáceis e satisfatórios.","A identidade emerge dos hábitos. Cada hábito é um voto em quem você está se tornando.","Você não precisa ser a vítima do seu ambiente. Pode ser o arquiteto dele.","O platô do potencial latente: os resultados chegam depois da consistência.","Comece com dois minutos. O início é o hábito.","Empilhe comportamentos: depois de [hábito atual], farei [novo hábito].","Reduza o atrito. Quanto menos passos, mais chance de acontecer.","Celebre cada pequena vitória. A satisfação consolida o hábito.","Um dia ruim não define você. Define o dia seguinte.","Foque no sistema, não na meta. Vencedores e perdedores têm as mesmas metas.","O poder dos hábitos está na continuidade, não na intensidade isolada.","Em vez de 'tenho que', diga 'eu escolho'. Isso muda tudo.","A melhor hora para criar um hábito era ontem. A segunda melhor é agora.","Identidade antes de resultado: 'sou uma pessoa que...' muda tudo.","Cada repetição é uma escultura da sua identidade futura.","O sucesso é o produto de hábitos diários, não de transformações raras.","Torne os maus hábitos invisíveis, sem atração, difíceis e insatisfatórios.","Progredir 1% por dia é mais poderoso do que mudar tudo de uma vez.","O maior obstáculo para mudar hábitos é a ilusão de que precisamos de motivação.","Quando a identidade muda, o comportamento muda naturalmente.","Não quebre a corrente. A consistência cria o resultado.","Hábitos são os juros compostos do auto-aperfeiçoamento.","Faça a versão mínima nos dias difíceis. Zero é o inimigo.","Você se torna o que repetidamente faz.","O ambiente certo torna o comportamento certo inevitável."];
@@ -1335,20 +1438,22 @@ function renderHabitos(){
 function criarHabCard(h){
   const card=document.createElement('div');card.className='hab-card';
   const hoje_=hoje();const reg=h.registros||[];const criado=h.criado_em||hoje_;
-  const diasGrid=[];const dCriado=new Date(criado+'T00:00:00');
+  // Grid: slot 0 = hoje (canto superior esquerdo), slot 1 = ontem, ..., slot 20 = 20 dias atrás
+  const slots=[];
   for(let i=0;i<21;i++){
-    const d=new Date(dCriado);d.setDate(d.getDate()+i);
+    const d=new Date(hoje_+'T12:00:00');d.setDate(d.getDate()-i);
     const iso=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-    if(iso>hoje_){diasGrid.push('futuro');continue}
+    if(iso<criado){slots.push('');continue}
     const r=reg.find(x=>x.data===iso);
-    if(iso===hoje_)diasGrid.push(r?(r.feito?'feito':'nao'):'prox');
-    else diasGrid.push(r?(r.feito?'feito':'nao'):'vazio');
+    if(i===0)slots.push(r?(r.feito?'feito':'nao'):'prox');
+    else slots.push(r?(r.feito?'feito':'nao'):'vazio');
   }
-  const rows=[diasGrid.slice(0,7),diasGrid.slice(7,14),diasGrid.slice(14,21)];
+  const rows=[slots.slice(0,7),slots.slice(7,14),slots.slice(14,21)];
   const streak=h.streak_atual||0;const regHoje=reg.find(r=>r.data===hoje_);
+  let _lpAtivou=false;
   card.innerHTML=`
     <div class="hab-card-topo">
-      <div class="hab-nome-row" onclick="abrirDetHab('${h.id}')">
+      <div class="hab-nome-row" id="habnomerow-${h.id}" style="cursor:pointer">
         <span class="hab-nome" id="habnome-${h.id}">${h.nome}</span>
         <span class="hab-streak">🔥 ${streak} dias</span>
       </div>
@@ -1375,14 +1480,52 @@ function criarHabCard(h){
         <button class="btn btn-danger btn-sm" onclick="moverLixeira('habito','${h.id}')">Sim, remover</button>
       </div>
     </div>`;
-  // segurar no nome = editar
+  // Long press no nome = editar; toque simples = abrir detalhe
   let _lpT=null,_lpX=0,_lpY=0;
-  const nomeEl=card.querySelector('.hab-nome');
-  nomeEl.addEventListener('pointerdown',e=>{e.stopPropagation();_lpX=e.clientX;_lpY=e.clientY;_lpT=setTimeout(()=>abrirEditHab(h.id),600);});
-  nomeEl.addEventListener('pointermove',e=>{if(_lpT&&(Math.abs(e.clientX-_lpX)>8||Math.abs(e.clientY-_lpY)>8)){clearTimeout(_lpT);_lpT=null;}});
-  nomeEl.addEventListener('pointerup',()=>{clearTimeout(_lpT);_lpT=null;});
-  nomeEl.addEventListener('pointercancel',()=>{clearTimeout(_lpT);_lpT=null;});
+  const nomeRow=card.querySelector('#habnomerow-'+h.id);
+  nomeRow.addEventListener('pointerdown',e=>{
+    _lpAtivou=false;_lpX=e.clientX;_lpY=e.clientY;
+    _lpT=setTimeout(()=>{_lpAtivou=true;abrirEditHab(h.id);},600);
+  });
+  nomeRow.addEventListener('pointermove',e=>{
+    if(_lpT&&(Math.abs(e.clientX-_lpX)>8||Math.abs(e.clientY-_lpY)>8)){clearTimeout(_lpT);_lpT=null;}
+  });
+  nomeRow.addEventListener('pointerup',()=>{clearTimeout(_lpT);_lpT=null;});
+  nomeRow.addEventListener('pointercancel',()=>{clearTimeout(_lpT);_lpT=null;});
+  nomeRow.addEventListener('click',()=>{ if(!_lpAtivou) abrirDetHab(h.id); _lpAtivou=false; });
   return card;
+}
+
+function moverHab(id, dir){
+  md(d=>{
+    const idx=d.habitos.findIndex(h=>h.id===id);
+    if(idx<0)return;
+    const novo=idx+dir;
+    if(novo<0||novo>=d.habitos.length)return;
+    const tmp=d.habitos[idx];d.habitos[idx]=d.habitos[novo];d.habitos[novo]=tmp;
+  });
+  renderHabitos();
+}
+
+function abrirEditHab(id){
+  const wrap=document.getElementById('habedit-'+id);
+  if(wrap)wrap.classList.add('vis');
+  const inp=document.getElementById('habinp-'+id);
+  if(inp){inp.focus();inp.select();}
+}
+
+function salvarEditHab(id){
+  const inp=document.getElementById('habinp-'+id);
+  const nome=inp?inp.value.trim():'';
+  if(nome.length<1)return;
+  md(d=>{const h=d.habitos.find(x=>x.id===id);if(h)h.nome=nome;});
+  const span=document.getElementById('habnome-'+id);if(span)span.textContent=nome;
+  const wrap=document.getElementById('habedit-'+id);if(wrap)wrap.classList.remove('vis');
+  toast('✅ Nome atualizado!');
+}
+
+function cancelarEditHab(id){
+  const wrap=document.getElementById('habedit-'+id);if(wrap)wrap.classList.remove('vis');
 }
 
 function marcarHab(id,feito){
@@ -1511,7 +1654,9 @@ function calcZonas(){
 }
 
 function renderHistorico(){
-  const data=gd();let planos=[...data.planejamentos].sort((a,b)=>b.data.localeCompare(a.data));
+  const data=gd();
+  // Só mostra: dias com revisão finalizada, OU hoje se já iniciado
+  let planos=[...data.planejamentos].filter(p=>p.revisao||(p.data===hoje()&&p.iniciado)).sort((a,b)=>b.data.localeCompare(a.data));
   if(filtroH==='semana'){const l=new Date();l.setDate(l.getDate()-7);planos=planos.filter(p=>p.data>=l.toISOString().slice(0,10))}
   else if(filtroH==='mes'){const l=new Date();l.setDate(l.getDate()-30);planos=planos.filter(p=>p.data>=l.toISOString().slice(0,10))}
   const lista=$('#hist-lista');lista.innerHTML='';
@@ -1708,6 +1853,36 @@ irTHist = function(id) { _origIrTHist(id); if (id === 't-hist-lixeira') renderLi
 // Init badge
 atualizarBadgeLixeira();
 
+// ===== PULL TO REFRESH =====
+(function(){
+  let ptrStart=0,ptrDelta=0,ptrAtivo=false;
+  const ind=document.getElementById('ptr-indicator');
+  document.addEventListener('touchstart',e=>{
+    const mod=document.querySelector('.mod.ativo');
+    if(!mod||mod.scrollTop>0)return;
+    ptrStart=e.touches[0].clientY;ptrAtivo=true;
+  },{passive:true});
+  document.addEventListener('touchmove',e=>{
+    if(!ptrAtivo)return;
+    ptrDelta=e.touches[0].clientY-ptrStart;
+    if(ptrDelta>10&&ind){ind.classList.add('vis');ind.textContent=ptrDelta>60?'↑ Solte para atualizar':'↓ Puxe para atualizar';}
+  },{passive:true});
+  document.addEventListener('touchend',()=>{
+    if(!ptrAtivo)return;
+    ptrAtivo=false;
+    if(ind)ind.classList.remove('vis');
+    if(ptrDelta>60){
+      // Força reload dos dados do localStorage
+      try{
+        const v=localStorage.getItem('metodo_opa_offline');
+        if(v){const d=JSON.parse(v);if(d&&window._opaAtualizarCache)window._opaAtualizarCache(d);}
+      }catch(_){}
+      toast('🔄 Dados atualizados!');
+    }
+    ptrDelta=0;
+  });
+})();
+
 // ===== INIT =====
 initHoje();
 </script>
@@ -1726,4 +1901,4 @@ initHoje();
 })();
 </script>
 </body>
-  </html>
+</html>
