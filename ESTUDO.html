@@ -1443,6 +1443,8 @@ window.deleteChapter = async function(fid, cid){
     criadoEm: new Date().toISOString()
   };
   chaptersCache = chaptersCache.filter(function(c){ return String(c.id) !== String(cid); });
+  marcarDeletadoChapter(cid);
+  saveLocal('estudo_chapters_cache', chaptersCache);
   if(window.syncShow) window.syncShow.syncing();
   try {
     var lixRef = await addDoc(collection(db,'estudo_lixeira'), lixItem);
@@ -1504,7 +1506,10 @@ window.deleteFolder = async function(fid){
   if(!confirm('Remover esta pasta e todos os capítulos?')) return;
   // Atualiza local e renderiza IMEDIATAMENTE
   pastasCache = pastasCache.filter(function(f){ return f.id != fid; });
+  var removedChapters = chaptersCache.filter(function(c){ return c.folderId === fid; });
   chaptersCache = chaptersCache.filter(function(c){ return c.folderId !== fid; });
+  marcarDeletadoPasta(fid);
+  removedChapters.forEach(function(ch){ marcarDeletadoChapter(ch.id); });
   saveLocal('estudo_pastas_cache', pastasCache);
   saveLocal('estudo_chapters_cache', chaptersCache);
   render();
@@ -1641,6 +1646,24 @@ window.render = function(){
 
 // ─── Controle de timestamp para ESTUDO ────────────────────────────────────────
 var _estudoBlockUntil = { pastas: 0, chapters: 0, lixeira: 0 };
+
+// ── IDs excluídos (evita onSnapshot restaurar) ────────────────────────────────
+var _estudoDeletedPastas = {};
+var _estudoDeletedChapters = {};
+try {
+  var _edp = localStorage.getItem('estudo_deleted_pastas');
+  if (_edp) _estudoDeletedPastas = JSON.parse(_edp);
+  var _edc = localStorage.getItem('estudo_deleted_chapters');
+  if (_edc) _estudoDeletedChapters = JSON.parse(_edc);
+} catch(_) {}
+function marcarDeletadoPasta(id) {
+  _estudoDeletedPastas[id] = Date.now();
+  try { localStorage.setItem('estudo_deleted_pastas', JSON.stringify(_estudoDeletedPastas)); } catch(_) {}
+}
+function marcarDeletadoChapter(id) {
+  _estudoDeletedChapters[id] = Date.now();
+  try { localStorage.setItem('estudo_deleted_chapters', JSON.stringify(_estudoDeletedChapters)); } catch(_) {}
+}
 var _estudoUnsubscribe = { pastas: null, chapters: null, lixeira: null };
 var _estudoSyncAtivo = false;
 
@@ -1679,8 +1702,11 @@ function estudoLigarListeners(){
         snap.forEach(function(d){ cloudList.push({ id: d.id, ...d.data() }); });
         var localMax = pastasCache.reduce(function(mx,c){ return Math.max(mx, c.updatedAt||0); }, 0);
         var cloudMax = cloudList.reduce(function(mx,c){ return Math.max(mx, c.updatedAt||0); }, 0);
-        if(cloudMax >= localMax){
-          pastasCache = cloudList;
+        var filteredPastas = cloudList.filter(function(p){ return !_estudoDeletedPastas[p.id]; });
+        // Preserva pastas locais que ainda não foram ao Firebase
+        var soLocal = pastasCache.filter(function(p){ return !filteredPastas.find(function(x){ return x.id === p.id; }) && !_estudoDeletedPastas[p.id]; });
+        if(cloudMax >= localMax || soLocal.length === 0){
+          pastasCache = [...filteredPastas, ...soLocal];
           pastasCache.sort(function(a,b){ return ((a.ordem!==undefined)?a.ordem:9999) - ((b.ordem!==undefined)?b.ordem:9999); });
           saveLocal('estudo_pastas_cache', pastasCache);
         }
@@ -1706,8 +1732,10 @@ function estudoLigarListeners(){
         snap.forEach(function(d){ cloudList.push({ id: d.id, ...d.data() }); });
         var localMax = chaptersCache.reduce(function(mx,c){ return Math.max(mx, c.updatedAt||0); }, 0);
         var cloudMax = cloudList.reduce(function(mx,c){ return Math.max(mx, c.updatedAt||0); }, 0);
-        if(cloudMax >= localMax){
-          chaptersCache = cloudList;
+        var filteredChapters = cloudList.filter(function(ch){ return !_estudoDeletedChapters[ch.id]; });
+        var soLocalCh = chaptersCache.filter(function(ch){ return !filteredChapters.find(function(x){ return x.id === ch.id; }) && !_estudoDeletedChapters[ch.id]; });
+        if(cloudMax >= localMax || soLocalCh.length === 0){
+          chaptersCache = [...filteredChapters, ...soLocalCh];
           saveLocal('estudo_chapters_cache', chaptersCache);
         }
         render();
@@ -1766,9 +1794,15 @@ function iniciarListeners(){
 
   // 3) Reconecta ao voltar online
   window.addEventListener('online', function(){
-    estudoUnsubscribeAll(); // limpa estado antigo
-    estudoLigarListeners();
-    if(window.syncShow) window.syncShow.syncing();
+    // Bloqueia snapshots por 10s para dar tempo de subir dados pendentes
+    _estudoBlockUntil.pastas = Date.now() + 10000;
+    _estudoBlockUntil.chapters = Date.now() + 10000;
+    _estudoBlockUntil.lixeira = Date.now() + 5000;
+    estudoUnsubscribeAll();
+    setTimeout(function(){
+      estudoLigarListeners();
+      if(window.syncShow) window.syncShow.syncing();
+    }, 800);
   });
 
   // 4) Desliga listeners ao ficar offline (evita estado inconsistente)
