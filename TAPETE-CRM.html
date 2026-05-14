@@ -565,6 +565,17 @@ function daysUntil(dateStr){ if(!dateStr) return 999; const diff=new Date(dateSt
 // ── CONTROLE DE TIMESTAMP ─────────────────────────────────────────────────────
 let _crmTapBlockUntil = 0;
 
+// ── IDs excluídos (evita onSnapshot restaurar) ───────────────────────────────
+let _crmTapDeletedIds = {};
+try {
+  const _raw = localStorage.getItem('tapete_crm_deleted_ids');
+  if (_raw) _crmTapDeletedIds = JSON.parse(_raw);
+} catch(_) {}
+function marcarDeletadoCrmTap(id) {
+  _crmTapDeletedIds[id] = Date.now();
+  try { localStorage.setItem('tapete_crm_deleted_ids', JSON.stringify(_crmTapDeletedIds)); } catch(_) {}
+}
+
 async function fsAddClient(c) {
   const payload = { ...c, updatedAt: Date.now() };
   // Atualiza local e memória imediatamente
@@ -659,6 +670,8 @@ window.renderLixeiraTapeteCRM = renderLixeiraTapeteCRM;
 async function fsDeleteClient(id) {
   enviarClienteParaLixeira(id);
   clients = clients.filter(c => c.id !== id);
+  marcarDeletadoCrmTap(id);
+  saveLocal('tapete_crm_clients_cache', clients);
   window.syncShow?.syncing();
   try {
     await deleteDoc(doc(db, COL_CLIENTS, id));
@@ -722,8 +735,12 @@ function startRealtimeSync() {
     snapshot.forEach(docSnap => { cloudList.push({ ...docSnap.data(), id: docSnap.id }); });
     const localMaxTime = clients.reduce((mx, c) => Math.max(mx, c.updatedAt||0), 0);
     const cloudMaxTime = cloudList.reduce((mx, c) => Math.max(mx, c.updatedAt||0), 0);
-    if(cloudMaxTime >= localMaxTime) {
-      clients = cloudList;
+    const filteredCloud = cloudList.filter(c => !_crmTapDeletedIds[c.id]);
+    const filteredMax = filteredCloud.reduce((mx, c) => Math.max(mx, c.updatedAt||0), 0);
+    // Preserva itens locais que ainda não foram sincronizados
+    const localOnly = clients.filter(c => !filteredCloud.find(x => x.id === c.id) && !_crmTapDeletedIds[c.id]);
+    if(filteredMax >= localMaxTime || localOnly.length === 0) {
+      clients = [...filteredCloud, ...localOnly];
       saveLocal('tapete_crm_clients_cache', clients);
     }
     if(curScreen==='home') renderHome();
@@ -733,7 +750,10 @@ function startRealtimeSync() {
     await crmTapCarregarLocal();
   });
 
-  window.addEventListener('online', () => syncPending());
+  window.addEventListener('online', () => {
+  _crmTapBlockUntil = Date.now() + 10000;
+  setTimeout(() => syncPending(), 800);
+});
 }
 
 // ── TENTAR SINCRONIZAR PENDENTES ──────────────────────────────────────────────
@@ -1395,4 +1415,4 @@ window.addEventListener('DOMContentLoaded', async () => {
 })();
 </script>
 </body>
-</html>
+  </html>
