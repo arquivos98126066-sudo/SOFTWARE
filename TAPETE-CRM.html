@@ -147,9 +147,10 @@
     .bottom-nav{position:fixed;bottom:0;left:0;right:0;background:var(--card);
       display:flex;box-shadow:0 -2px 8px rgba(0,0,0,.08);z-index:150;padding-bottom:env(safe-area-inset-bottom)}
     .bnav-btn{flex:1;padding:10px 4px 9px;border:none;background:none;cursor:pointer;
-      font-size:10px;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:3px;min-width:0}
+      font-size:10px;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:3px;min-width:0;position:relative;}
     .bnav-btn .ico{font-size:22px}
-    .bnav-btn.active{color:#111111}
+    .bnav-btn.active{color:#111111;font-weight:800;}
+    .bnav-btn.active::after{content:'';position:absolute;bottom:0;left:20%;right:20%;height:3px;background:#111111;border-radius:4px 4px 0 0;}
 
     .status-pill{padding:3px 9px;border-radius:20px;font-size:10px;font-weight:800;text-transform:uppercase;white-space:nowrap;flex-shrink:0}
     .status-ativo{background:#f5f5f5;color:#374151}
@@ -279,7 +280,7 @@
   <div class="form-card">
     <div class="form-card-title">👤 DADOS DO CLIENTE</div>
     <div class="fg"><label>Nome *</label><input type="text" id="f-nome" placeholder="Nome completo"></div>
-    <div class="fg"><label>Telefone (só números) *</label><input type="tel" id="f-tel" placeholder="5579999292683" inputmode="numeric"></div>
+    <div class="fg"><label>Telefone (só números) *</label><input type="tel" id="f-tel" placeholder="(55) 7 9999-2926" inputmode="numeric" maxlength="16" oninput="mascararTelCRM(this)"></div>
   </div>
   <div class="form-card">
     <div class="form-card-title">📸 FOTO DO CLIENTE *</div>
@@ -388,7 +389,7 @@
 <div class="screen" id="screen-lixeira">
   <div style="padding:16px;">
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
-      <button onclick="showScreen('home');setNav(0)" style="background:none;border:none;font-size:22px;cursor:pointer;color:var(--primary);">←</button>
+      <button onclick="showScreen('home');setNav(2)" style="background:none;border:none;font-size:22px;cursor:pointer;color:var(--primary);">←</button>
       <div style="font-size:18px;font-weight:700;color:var(--text);">🗑️ Lixeira</div>
     </div>
     <div id="lixeira-tapete-lista"></div>
@@ -397,9 +398,9 @@
 
 <!-- ── BOTTOM NAV ── -->
 <div class="bottom-nav">
-  <button class="bnav-btn active" id="bnav-0" onclick="showScreen('home');setNav(0)"><span class="ico">🏠</span>HOJE</button>
+  <button class="bnav-btn active" id="bnav-0" onclick="showScreen('registrar');setNav(0);initForm()"><span class="ico">➕</span>REGISTRAR</button>
   <button class="bnav-btn" id="bnav-1" onclick="showScreen('clientes');setNav(1)"><span class="ico">👥</span>CLIENTES</button>
-  <button class="bnav-btn" id="bnav-2" onclick="showScreen('registrar');setNav(2);initForm()"><span class="ico">➕</span>REGISTRAR</button>
+  <button class="bnav-btn" id="bnav-2" onclick="showScreen('home');setNav(2)"><span class="ico">🏠</span>HOJE</button>
   <button class="bnav-btn" id="bnav-3" onclick="showScreen('config');setNav(3)"><span class="ico">⚙️</span>CONFIG</button>
   <button class="bnav-btn" id="bnav-4" onclick="renderLixeiraTapeteCRM();setNav(4)"><span class="ico">🗑️</span>LIXEIRA</button>
 </div>
@@ -507,12 +508,74 @@ const LS_PENDING   = 'tapete_crm_pending';
 // Dados em memória (alimentados pelo onSnapshot)
 let clients = [];
 let messages = {
-  'nao-estava':   { sem_resposta:{}, com_resposta:{} },
-  'interessado':  { sem_resposta:{}, com_resposta:{} },
-  'super-quente': { sem_resposta:{}, com_resposta:{} }
+  'nao-estava': {
+    sem_resposta: {
+      1:  { texto: 'Olá {nome}, tudo bem? Aqui é o Klebson! Passei no seu estabelecimento hoje mas infelizmente não te encontrei.\n\nFiz a medição do espaço e já trouxe uma simulação de como ficaria o tapete ideal pro seu negócio, com o tamanho certinho e o orçamento completo.\n\nAbaixo você tem tudo: a simulação e o orçamento. Qualquer dúvida é só me chamar!' },
+      2:  { texto: 'Oi {nome}! Klebson aqui de novo. Não quero te incomodar, só vim verificar se você teve chance de ver a simulação e o orçamento que te mandei ontem.\n\nSe tiver alguma dúvida sobre medida, cor ou prazo, estou à disposição!' },
+      7:  { texto: 'Olá {nome}! Klebson aqui. Já faz uma semana e queria saber se você teve tempo de analisar a proposta.\n\nPosso ajustar algum detalhe se precisar — medida, cor, prazo. É só me falar!' },
+      15: { texto: 'Oi {nome}, Klebson aqui. Última tentativa da minha parte — tenho essa semana uma condição especial pra fechar com você.\n\nSe tiver qualquer dúvida ou quiser negociar, agora é a hora!' },
+      30: { texto: 'Olá {nome}! Klebson aqui. Faz um tempo que tentei te alcançar — não quero te incomodar, só quero garantir que você viu a proposta que te mandei.\n\nRefaço o resumo abaixo pra facilitar: a simulação de como ficaria o tapete no seu negócio e o orçamento completo com a medida certinha.\n\nQualquer dúvida é só me chamar!' },
+      60: { texto: 'Oi {nome}! Klebson aqui. 2 meses já — sei que a rotina é corrida. Aproveitando pra te lembrar da simulação e orçamento que fiz pro seu estabelecimento.\n\nSegue novamente tudo abaixo: a simulação com a medida certinha e o valor. Se quiser atualizar algum detalhe é só falar!' },
+      90: { texto: 'Olá {nome}! Klebson aqui. 3 meses — tempo suficiente pra gente retomar do zero se precisar.\n\nMando novamente a simulação e o orçamento que fiz pra você. Se as medidas ou o modelo precisarem de ajuste, eu refaço na hora. É só me falar!' },
+      180: { texto: 'Oi {nome}! Klebson aqui. 6 meses já — é bastante tempo, sei que muita coisa acontece. Quero te apresentar uma proposta atualizada.\n\nSegue a simulação e o orçamento novamente. Se quiser, posso passar pessoalmente pra refazer a medição e atualizar tudo pra você!' },
+      360: { texto: 'Olá {nome}! Klebson aqui. Um ano já! Muita coisa mudou — nossa linha evoluiu bastante.\n\nQuero te fazer uma proposta completamente atualizada. Abaixo segue a simulação e orçamento que tenho registrado. Posso passar pessoalmente pra refazer tudo do zero se preferir!' }
+    },
+    com_resposta: {
+      1:  { texto: 'Oi {nome}! Klebson aqui. Fico feliz que conseguimos conversar hoje! Segue a simulação e o orçamento completo.\n\nQualquer dúvida sobre medida, cor ou prazo é só me chamar. Fico no aguardo!' },
+      2:  { texto: 'Olá {nome}! Passando pra ver se ficou alguma dúvida do que conversamos ontem. Estou à disposição pra ajustar qualquer detalhe da proposta!' },
+      7:  { texto: 'Oi {nome}, Klebson aqui! Uma semana depois do nosso papo. Ainda tenho o tapete personalizado disponível e posso ajustar o que precisar. O que acha?' },
+      15: { texto: 'Olá {nome}! Última chamada pra aproveitar as condições que combinamos. Depois o estoque pode mudar. Me avisa pra eu dar continuidade!' },
+      30: { texto: 'Oi {nome}! Klebson aqui. Retomando o contato — posso passar pessoalmente pra você ver o tapete de perto e a gente fechar de vez?' }
+    }
+  },
+  'interessado': {
+    sem_resposta: {
+      1:  { texto: 'Olá {nome}! Klebson aqui. Ficamos de eu te mandar o orçamento com a simulação de como ficaria o tapete no seu estabelecimento — segue tudo abaixo!\n\nFiz a medição certinha. Qualquer ajuste é só me falar!' },
+      2:  { texto: 'Oi {nome}, Klebson aqui! Você não chegou a responder — tudo bem? Segue novamente a simulação e o orçamento. Qualquer dúvida estou à disposição!' },
+      7:  { texto: 'Olá {nome}! Uma semana depois do nosso contato. O tapete personalizado que conversamos ainda está disponível. Posso ajustar medida, cor ou prazo. É só me falar!' },
+      15: { texto: 'Oi {nome}! Klebson aqui. Última oportunidade de garantir o tapete personalizado com as condições que te passei. Ainda consigo segurar mais alguns dias. Me avisa!' },
+      30: { texto: 'Olá {nome}! Klebson aqui. Um mês desde o nosso contato — sei que a rotina é agitada.\n\nMando novamente a simulação e o orçamento pra facilitar. Se quiser ajustar algum detalhe, é só me falar!' }
+    },
+    com_resposta: {
+      1:  { texto: 'Perfeito {nome}! Vou separar o tapete personalizado que combina com o seu negócio. Segue a simulação e o orçamento completo abaixo. Qualquer coisa é só me chamar!' },
+      2:  { texto: 'Oi {nome}! Klebson aqui. Passando pra confirmar se recebeu tudo certinho. Estou finalizando alguns tapetes essa semana — posso incluir o seu?' },
+      7:  { texto: 'Olá {nome}! Uma semana desde o nosso papo. Ainda tenho o tapete reservado. Quer fechar essa semana e garantir entrega mais rápida?' },
+      15: { texto: 'Oi {nome}! Última chamada para aproveitar as condições que combinamos. Me avisa pra eu dar andamento!' },
+      30: { texto: 'Olá {nome}! Klebson aqui. Posso passar pessoalmente pra você ver o tapete de perto e a gente fechar de vez?' }
+    }
+  },
+  'super-quente': {
+    sem_resposta: {
+      1:  { texto: 'Olá {nome}! Klebson aqui. Você estava bem ocupado quando passei, então fui lá e fiz a simulação de como ficaria o tapete ideal pro seu negócio — com a medida certinha e o orçamento completo.\n\nSegue tudo abaixo. Quando você tiver um minuto, dá uma olhada!' },
+      2:  { texto: 'Oi {nome}! Klebson aqui de novo. Vi que você não respondeu ainda — sem problema! Segue novamente a simulação e o orçamento. Me avisa quando tiver um tempinho!' },
+      7:  { texto: 'Olá {nome}! Uma semana depois. Ainda tenho o tapete personalizado separado pra você. Não consigo segurar por muito mais tempo. Quando fechamos?' },
+      15: { texto: 'Oi {nome}! Klebson aqui. Última oportunidade de garantir o tapete personalizado e as condições que separei pra você. Me avisa hoje!' },
+      30: { texto: 'Olá {nome}! Klebson aqui. Um mês já — não desisti não! Mando novamente a simulação e o orçamento que preparei pra você.\n\nSe as medidas precisarem de atualização ou quiser ver outras opções, posso passar pessoalmente. Só me falar!' }
+    },
+    com_resposta: {
+      1:  { texto: 'Ótimo {nome}! Vou priorizar seu pedido. Segue a confirmação da simulação e orçamento abaixo. Qualquer ajuste de última hora é só me falar. Obrigado pela confiança!' },
+      2:  { texto: 'Oi {nome}! Klebson aqui. Passando pra confirmar os detalhes finais. Tudo certo da minha parte — só precisamos alinhar entrega e pagamento!' },
+      7:  { texto: 'Olá {nome}! Seu pedido está sendo preparado. Qualquer ajuste de última hora me avisa. Prazo de entrega conforme combinamos!' },
+      15: { texto: 'Oi {nome}! Passando pra garantir que está tudo certo. Estou à disposição pra qualquer detalhe!' },
+      30: { texto: 'Olá {nome}! Klebson aqui. Espero que esteja satisfeito com os tapetes. Tenho tapetes personalizados novos que podem complementar o que você já tem. Posso passar?' }
+    }
+  }
 };
 let links = [];
 let textoFixo = '';
+
+// ── Máscara de telefone: (48) 9 9929-0000 ───────────────────────────────────
+window.mascararTelCRM = function(input) {
+  let v = input.value.replace(/\D/g, '').slice(0, 11);
+  if (v.length === 0) { input.value = ''; return; }
+  const dd = v.slice(0,2), nono = v.slice(2,3), bloco = v.slice(3,7), final = v.slice(7,11);
+  let r = '';
+  if (v.length <= 2)       r = '(' + dd;
+  else if (v.length === 3) r = '(' + dd + ') ' + nono;
+  else if (v.length <= 7)  r = '(' + dd + ') ' + nono + ' ' + bloco;
+  else                     r = '(' + dd + ') ' + nono + ' ' + bloco + '-' + final;
+  input.value = r;
+}
 
 let curScreen='home', stack=[], curCid=null, curTipo=null;
 let curBorda='nao', curViu='nao', curFilter='todos';
@@ -774,7 +837,7 @@ async function syncPending() {
 }
 
 // ── NAV ───────────────────────────────────────────────────────────────────────
-const ROOT_SCREENS = ['home','clientes','registrar','config'];
+const ROOT_SCREENS = ['registrar','clientes','home','config'];
 
 function showScreen(name, push=true){
   if(push && curScreen!==name) stack.push(curScreen);
@@ -971,7 +1034,7 @@ window.syncBordaTxt = syncBordaTxt;
 
 async function salvarCliente(){
   const nome=document.getElementById('f-nome').value.trim();
-  const tel=document.getElementById('f-tel').value.trim();
+  const tel=document.getElementById('f-tel').value.replace(/[^0-9]/g,'').trim();
   const tam=document.getElementById('f-tamanho').value.trim();
   const cor=document.getElementById('f-cor').value.trim();
   const prazo=document.getElementById('f-prazo').value.trim();
@@ -1000,7 +1063,7 @@ async function salvarCliente(){
   await fsAddClient(c);
   initForm();
   toast('✅ Cliente registrado!');
-  showScreen('home'); setNav(0);
+  showScreen('home'); setNav(2);
 }
 window.salvarCliente = salvarCliente;
 
@@ -1013,9 +1076,10 @@ function openEnviar(id){
   const msg=((messages[c.tipo]||{})[fase]||{})[d]||{};
   const lnks=links||[];
   const tf=textoFixo||'';
-  const bt=c.borda==='sim'?`Com Borda (${c.bordaCor||''})`:' Sem Borda';
-  const specs=`📐 ${c.tamanho} | ${c.cor} | ${bt}\n💰 R$ ${fmt(c.preco)}\n📦 Prazo: ${c.prazo} dias${c.obs?'\n📝 '+c.obs:''}`;
-  const txtMsg=(msg.texto||'(Configure a mensagem em ⚙️ Config)')+'\n\n'+specs;
+  const bt=c.borda==='sim'?`\n🔲 Borda: ${c.bordaCor||'preta'}`:''
+  const specs=`📐 Medida: ${c.tamanho}\n🎨 Cor do fundo: ${c.cor}${bt}\n💰 Valor: R$ ${fmt(c.preco)}\n📦 Prazo: ${c.prazo} dias${c.obs?'\n📝 Obs: '+c.obs:''}`;
+  const rawTxt=(msg.texto||'(Configure a mensagem em ⚙️ Config)').replace(/\{nome\}/g, c.nome||'');
+  const txtMsg=rawTxt+'\n\n'+specs;
 
   document.getElementById('enviar-content').innerHTML=`
     <div class="envio-bloco">
@@ -1073,9 +1137,10 @@ function copiarTexto(id){
   const c=clients.find(x=>x.id===id); if(!c) return;
   const d=curDay(c); const fase=c.sequenciaFase||'sem_resposta';
   const msg=((messages[c.tipo]||{})[fase]||{})[d]||{};
-  const bt=c.borda==='sim'?'Com Borda':'Sem Borda';
-  const specs=`📐 ${c.tamanho} | ${c.cor} | ${bt}\n💰 R$ ${fmt(c.preco)}\n📦 Prazo: ${c.prazo} dias${c.obs?'\n📝 '+c.obs:''}`;
-  const txt=(msg.texto?msg.texto+'\n\n':'')+specs;
+  const bt=c.borda==='sim'?`\n🔲 Borda: ${c.bordaCor||'preta'}`:''
+  const specs=`📐 Medida: ${c.tamanho}\n🎨 Cor do fundo: ${c.cor}${bt}\n💰 Valor: R$ ${fmt(c.preco)}\n📦 Prazo: ${c.prazo} dias${c.obs?'\n📝 Obs: '+c.obs:''}`;
+  const rawTxt2=(msg.texto||'').replace(/\{nome\}/g, c.nome||'');
+  const txt=(rawTxt2?rawTxt2+'\n\n':'')+specs;
   copyText(txt, '✅ Texto copiado! Cole no WhatsApp.');
 }
 window.copiarTexto = copiarTexto;
@@ -1140,7 +1205,7 @@ function openTimeline(id){
   const c=clients.find(x=>x.id===id); if(!c) return;
   curCid=id;
   const te={'nao-estava':'🟢','interessado':'🔵','super-quente':'🔴'}[c.tipo]||'';
-  const bt=c.borda==='sim'?`Com Borda (${c.bordaCor||''})`:' Sem Borda';
+  const bt=c.borda==='sim'?`Com borda ${c.bordaCor||'preta'}`:'Sem borda';
   let tl='';
   (c.sequencia||[]).forEach(d=>{
     const sent=(c.historico||[]).find(h=>h.dia===d&&h.tipo==='enviado');
@@ -1222,20 +1287,20 @@ window.pararResponder = pararResponder;
 
 async function encerrar(id){
   await fsUpdateClient(id, { status:'parou' });
-  toast('🚫 Fluxo encerrado'); showScreen('home');setNav(0);
+  toast('🚫 Fluxo encerrado'); showScreen('home');setNav(2);
 }
 window.encerrar = encerrar;
 
 async function arquivar(id){
   await fsUpdateClient(id, { status:'arquivado' });
-  toast('🗄️ Arquivado'); showScreen('home');setNav(0);
+  toast('🗄️ Arquivado'); showScreen('home');setNav(2);
 }
 window.arquivar = arquivar;
 
 async function excluir(id){
   if(!confirm('Excluir este cliente?')) return;
   await fsDeleteClient(id);
-  toast('❌ Excluído'); showScreen('home');setNav(0);
+  toast('❌ Excluído'); showScreen('home');setNav(2);
 }
 window.excluir = excluir;
 
@@ -1280,7 +1345,7 @@ async function confirmarVenda(id){
     obsFechamento: document.getElementById('fo').value.trim(),
     historico: hist
   });
-  toast('🎉 Venda confirmada!'); showScreen('home');setNav(0);
+  toast('🎉 Venda confirmada!'); showScreen('home');setNav(2);
 }
 window.confirmarVenda = confirmarVenda;
 
@@ -1398,7 +1463,7 @@ window.addEventListener('DOMContentLoaded', async () => {
   await loadConfig();
   startRealtimeSync();
   syncPending();
-  renderHome();
+  showScreen('registrar'); setNav(0); initForm();
 });
 </script>
 <script>
