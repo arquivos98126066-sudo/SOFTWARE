@@ -389,6 +389,17 @@ function D() { return STATE.prods.find(p => p.id === STATE.sel) || null; }
 const _saveTimestamps = {}; // id → timestamp do último saveProd
 let _blockSnapshotUntil = 0; // bloqueia onSnapshot por N ms após qualquer save
 
+// ── IDs excluídos (evita onSnapshot restaurar) ───────────────────────────────
+let _deletedProdsIds = {};
+try {
+  const _raw = localStorage.getItem('deleted_prevenda_ids');
+  if (_raw) _deletedProdsIds = JSON.parse(_raw);
+} catch(_) {}
+function marcarDeletadoProd(id) {
+  _deletedProdsIds[id] = Date.now();
+  try { localStorage.setItem('deleted_prevenda_ids', JSON.stringify(_deletedProdsIds)); } catch(_) {}
+}
+
 // ── FIRESTORE SAVE ────────────────────────────────────────
 async function saveProd(p) {
   const now = Date.now();
@@ -482,6 +493,8 @@ function initRealtimeSync() {
     // Para cada produto, aceita da nuvem só se nuvem for igual ou mais recente que local
     const merged = [];
     for (const cloud of cloudList) {
+      // Ignora itens excluídos localmente
+      if (_deletedProdsIds[cloud.id]) continue;
       const localTs = _saveTimestamps[cloud.id] || 0;
       const cloudTs = cloud.updatedAt || 0;
       if (localTs > cloudTs) {
@@ -495,9 +508,9 @@ function initRealtimeSync() {
       }
     }
 
-    // Adiciona produtos novos que estão só no local (acabaram de ser criados offline)
+    // Adiciona produtos novos que estão só no local (criados offline) — nunca dropa pendentes
     for (const local of STATE.prods) {
-      if (!merged.find(p => p.id === local.id)) merged.push(local);
+      if (!merged.find(p => p.id === local.id) && !_deletedProdsIds[local.id]) merged.push(local);
     }
 
     STATE.prods = merged;
@@ -519,7 +532,8 @@ function initRealtimeSync() {
 
   // Monitora reconexão para sincronizar pendentes
   window.addEventListener('online', async () => {
-    await syncPending();
+    _blockSnapshotUntil = Date.now() + 10000;
+    setTimeout(async () => { await syncPending(); }, 800);
   });
 }
 
@@ -594,6 +608,8 @@ function delProd(e, id) {
   const prod = STATE.prods.find(p => p.id === id);
   if (prod) enviarParaLixeira(JSON.parse(JSON.stringify(prod)));
   STATE.prods = STATE.prods.filter(p => p.id !== id);
+  marcarDeletadoProd(id);
+  saveLocal('pre_venda_cache', STATE.prods);
   if (STATE.sel === id) {
     STATE.sel = STATE.prods[0]?.id || null;
     localStorage.setItem(SEL_KEY, STATE.sel || '');
@@ -1541,4 +1557,4 @@ carregarLixeira();
 })();
 </script>
 </body>
-</html>
+  </html>
