@@ -1242,35 +1242,42 @@ window.deletarContrato = async function(id) {
   if (!confirm('Mover este contrato para a lixeira?')) return;
   var contrato = contratosCache.find(function(c) { return c.id === id; });
   if (contrato) enviarContratoParaLixeira(contrato);
+  // Remove local IMEDIATAMENTE
+  contratosCache = contratosCache.filter(function(c) { return c.id !== id; });
+  marcarDeletadoContrato(id);
+  saveLocal('doa_contratos_cache', contratosCache);
+  renderContratos();
+  toast('Contrato movido para a lixeira');
+  // Firebase em background
   if (window.syncShow) window.syncShow.syncing();
   try {
     await deleteDoc(doc(db, 'doa_contratos', id));
-    contratosCache = contratosCache.filter(function(c) { return c.id !== id; });
     if (window.syncShow) window.syncShow.synced('DOA');
   } catch(e) {
     if (window.syncShow) window.syncShow.offline();
   }
-  renderContratos();
-  toast('Contrato movido para a lixeira');
 };
 
 // ─── Apagar todos (vai para lixeira) ─────────────────────────────────────────
 window.apagarTodosContratos = async function() {
   if (!confirm('Mover TODOS os contratos para a lixeira?')) return;
   contratosCache.forEach(function(c) { enviarContratoParaLixeira(c); });
+  var ids = contratosCache.map(function(c) { return c.id; });
+  contratosCache = [];
+  ids.forEach(function(id) { marcarDeletadoContrato(id); });
+  saveLocal('doa_contratos_cache', contratosCache);
+  renderContratos();
+  renderLixeiraContratos();
+  toast('Contratos movidos para a lixeira');
   if (window.syncShow) window.syncShow.syncing();
   try {
     var batch = writeBatch(db);
-    contratosCache.forEach(function(c) { batch.delete(doc(db, 'doa_contratos', c.id)); });
+    ids.forEach(function(id) { batch.delete(doc(db, 'doa_contratos', id)); });
     await batch.commit();
-    contratosCache = [];
     if (window.syncShow) window.syncShow.synced('DOA');
   } catch(e) {
     if (window.syncShow) window.syncShow.offline();
   }
-  renderContratos();
-  renderLixeiraContratos();
-  toast('Contratos movidos para a lixeira');
 };
 
 // ─── Lixeira de contratos ─────────────────────────────────────────────────────
@@ -1333,6 +1340,17 @@ function renderLixeiraContratos() {
 // ─── Controle de timestamp (bloqueia snapshots após save) ────────────────────
 var _doaBlockSnapshotUntil = 0;
 
+// ─── IDs excluídos (evita onSnapshot restaurar) ───────────────────────────────
+var _deletedContratosIds = {};
+try {
+  var _dcRaw = localStorage.getItem('deleted_doa_contratos_ids');
+  if (_dcRaw) _deletedContratosIds = JSON.parse(_dcRaw);
+} catch(_) {}
+function marcarDeletadoContrato(id) {
+  _deletedContratosIds[id] = Date.now();
+  try { localStorage.setItem('deleted_doa_contratos_ids', JSON.stringify(_deletedContratosIds)); } catch(_) {}
+}
+
 // ─── Salvar Contrato — corrigido ──────────────────────────────────────────────
 window.salvarContrato = async function() {
   var contratante = document.getElementById('ct_contratante').value.trim();
@@ -1391,6 +1409,7 @@ async function doaSyncPending() {
   try {
     var pending = JSON.parse(localStorage.getItem('doa_pending') || '[]');
     if (!pending.length) return;
+    _doaBlockSnapshotUntil = Date.now() + 30000; // bloqueia snapshot durante todo o sync
     var remaining = [];
     for (var i = 0; i < pending.length; i++) {
       var c = Object.assign({}, pending[i]);
@@ -1426,10 +1445,12 @@ function iniciarListeners() {
     if (Date.now() < _doaBlockSnapshotUntil) return; // guard: ignora snapshots logo após save
     var cloudList = [];
     snap.forEach(function(d) { cloudList.push(Object.assign({ id: d.id }, d.data())); });
+    // Ignora itens excluídos localmente
+    var filtered = cloudList.filter(function(c) { return !_deletedContratosIds[c.id]; });
     var localMaxTime = contratosCache.reduce(function(mx, c){ return Math.max(mx, c.updatedAt||0); }, 0);
-    var cloudMaxTime = cloudList.reduce(function(mx, c){ return Math.max(mx, c.updatedAt||0); }, 0);
+    var cloudMaxTime = filtered.reduce(function(mx, c){ return Math.max(mx, c.updatedAt||0); }, 0);
     if (cloudMaxTime >= localMaxTime) {
-      contratosCache = cloudList;
+      contratosCache = filtered;
       saveLocal('doa_contratos_cache', contratosCache);
     }
     renderContratos();
@@ -1438,7 +1459,10 @@ function iniciarListeners() {
     await doaCarregarLocal();
   });
 
-  window.addEventListener('online', function() { doaSyncPending(); });
+  window.addEventListener('online', function() {
+  _doaBlockSnapshotUntil = Date.now() + 10000;
+  setTimeout(function() { doaSyncPending(); }, 800);
+});
 }
 
 // ─── INIT ─────────────────────────────────────────────────────────────────────
@@ -1576,4 +1600,4 @@ window.copyScript = function() {
 </script>
 <!-- VOLTAR DESKTOP --><style>@media(max-width:768px){#__btn-voltar{display:none!important}}#__btn-voltar{position:fixed;bottom:22px;left:22px;z-index:99999;background:#13131a;border:1px solid #2a2a4a;color:#a0a0c0;text-decoration:none;padding:10px 18px;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;transition:all .2s;box-shadow:0 2px 12px rgba(0,0,0,.4)}#__btn-voltar:hover{background:#7c6aff;border-color:#7c6aff;color:#fff}</style><a id="__btn-voltar" href="OUTROS.html">← Outros</a><!-- FIM VOLTAR DESKTOP -->
 </body>
-</html>
+ </html>
