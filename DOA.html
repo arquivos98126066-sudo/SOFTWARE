@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Método DOA — Modelo de Negócio</title>
+<title>Meu Plano — Modelo de Negócio</title>
 <script src="https://arquivos98126066-sudo.github.io/SOFTWARE/sync-indicator.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
@@ -62,14 +62,16 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0 20px;
-    height: 48px;
+    padding: 2px 20px;
+    height: 56px;
   }
 
   .nav-brand {
-    font-size: 13px;
+    font-size: 14px;
     font-weight: 600;
     color: var(--text);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
   }
 
   .hamburger {
@@ -170,7 +172,7 @@
   .page {
     max-width: 720px;
     margin: 0 auto;
-    padding: 32px 20px 80px;
+    padding: 21px 20px 80px;
   }
 
   /* SECTION LABEL */
@@ -562,17 +564,24 @@
   .clause li { margin-bottom: 3px; }
 
   .sig-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
     margin-top: 24px;
     padding-top: 20px;
     border-top: 0.5px solid var(--border);
   }
 
+  .sig-item {
+    margin-bottom: 20px;
+  }
+
+  .sig-space {
+    height: 44px;
+  }
+
   .sig-line {
     border-bottom: 0.5px solid var(--border);
-    height: 36px;
     margin-bottom: 6px;
   }
 
@@ -729,17 +738,20 @@
     <span class="drawer-title">Menu</span>
     <button class="drawer-close" onclick="closeDrawer()">✕</button>
   </div>
-  <a href="#metodo" onclick="closeDrawer()"><i class="ti ti-search"></i> Método DOA</a>
-  <a href="#proposta" onclick="closeDrawer()"><i class="ti ti-star"></i> Proposta de valor</a>
-  <a href="#receita" onclick="closeDrawer()"><i class="ti ti-currency-dollar"></i> Receita</a>
-  <a href="#simulador" onclick="closeDrawer()"><i class="ti ti-chart-bar"></i> Simulador</a>
-  <a href="#script" onclick="closeDrawer()"><i class="ti ti-phone"></i> Script de vendas</a>
+  <a href="#proposito" onclick="closeDrawer()"><i class="ti ti-target"></i> Propósito</a>
+  <a href="#metodo" onclick="closeDrawer()"><i class="ti ti-list-check"></i> Método</a>
+  <a href="#receita" onclick="closeDrawer()"><i class="ti ti-currency-dollar"></i> Formas de ganho</a>
+  <a href="#entrega" onclick="closeDrawer()"><i class="ti ti-package"></i> Como entregar</a>
+  <a href="#simulador" onclick="closeDrawer()"><i class="ti ti-calculator"></i> Simulador</a>
+  <a href="#segmentos" onclick="closeDrawer()"><i class="ti ti-building-store"></i> Segmentos</a>
+  <a href="#script" onclick="closeDrawer()"><i class="ti ti-message"></i> Script de vendas</a>
+  <a href="#abordagem-alt" onclick="closeDrawer()"><i class="ti ti-mood-smile"></i> Abordagem alternativa</a>
   <a href="#contrato" onclick="closeDrawer()"><i class="ti ti-file-text"></i> Contrato</a>
   <a href="#secao-salvos" onclick="closeDrawer()"><i class="ti ti-database"></i> Contratos Salvos</a>
 </div>
 
 <nav class="nav">
-  <div class="nav-brand">Método DOA</div>
+  <div class="nav-brand">Modelo de Negócio</div>
   <button class="hamburger" id="hamburger" onclick="toggleDrawer()" aria-label="Menu">
     <span></span><span></span><span></span>
   </button>
@@ -747,89 +759,155 @@
 
 <div class="page">
 
-  <!-- HERO -->
-  <div class="hero">
-    <p class="hero-title"><i class="ti ti-rocket"></i> Método DOA — Modelo de Negócio</p>
-    <p class="hero-sub">Você chega no negócio do cliente, faz o diagnóstico, otimiza os processos com sistemas personalizados e automatiza tudo com agentes de IA. O cliente só paga quando estiver satisfeito — e você recebe mensalidade todo mês.</p>
+  <!-- 1. PROPÓSITO -->
+  <div id="proposito">
+
+    <p class="label">O Objetivo</p>
+    <div class="card">
+      <p class="card-title"><i class="ti ti-briefcase"></i> O que eu faço e para onde estou indo</p>
+      <p class="card-body">
+        Vendo sistemas personalizados para empresas — construídos do zero, do jeito exato que cada negócio funciona. Não são sistemas genéricos que servem pra todo mundo e não são perfeitos pra ninguém. São sistemas feitos sob medida, que o cliente molda do jeito que precisa.<br><br>
+        O cliente pode pagar de três formas: uma única vez pela entrega do sistema, uma mensalidade recorrente pelo uso e suporte, ou por novas funcionalidades que queira adicionar depois. Cada negócio tem uma necessidade diferente — e o modelo se adapta a isso.<br><br>
+        À medida que a carteira de clientes cresce, o plano é escalar: contratar pessoas para prospectar, para vender e para desenvolver as soluções. Assim libero tempo para gerir o negócio, fechar contratos maiores e expandir para novos segmentos — sem depender de fazer tudo sozinho.
+      </p>
+    </div>
+
+    <p class="label" style="margin-top:20px;">O Porquê</p>
+    <div class="card">
+      <p class="card-title"><i class="ti ti-heart"></i> Por que eu faço isso</p>
+      <p class="card-body">
+        Meu propósito é fazer com que empresários aumentem seus lucros com previsibilidade — sem depender da sorte ou do improviso.<br><br>
+        Fazer com que eles tenham mais tempo: tempo para estar com a família, tempo para pensar no negócio em vez de só apagar incêndio, tempo para viver fora do trabalho.<br><br>
+        E fazer com que eles eliminem a dor de cabeça que consomem dia após dia tentando gerir tudo ao mesmo tempo, com ferramentas que não foram feitas para eles.
+      </p>
+    </div>
+
   </div>
 
-  <!-- MÉTODO -->
+  <hr>
+
+  <!-- 2. MÉTODO -->
   <div id="metodo">
     <p class="label">O Método</p>
 
-    <div class="card">
-      <p class="card-title"><i class="ti ti-search"></i> D — Diagnóstico</p>
-      <p class="card-body">Você analisa o negócio do cliente de ponta a ponta: ferramentas que ele paga, processos ineficientes, gargalos e oportunidades. Entrega um laudo técnico completo com tudo que ele não enxerga sozinho — e cobra por esse olhar especializado antes de qualquer desenvolvimento.</p>
-    </div>
+    <div class="card" style="padding: 6px 16px;">
+      <div class="steps">
 
-    <div class="card">
-      <p class="card-title"><i class="ti ti-adjustments"></i> O — Otimização</p>
-      <p class="card-body">Com base no diagnóstico, você desenvolve sistemas personalizados — feitos do zero para aquele negócio. O cliente não se adapta ao sistema; o sistema se adapta a ele. Qualquer funcionalidade nova que ele quiser, você implementa. Sem fila, sem burocracia, sem depender de empresa grande.</p>
-    </div>
+        <div class="step">
+          <div class="step-num">1</div>
+          <div>
+            <div class="step-title">Criação de vínculo</div>
+            <div class="step-body">No início da conversa, o foco é criar conexão genuína com o dono do negócio. Mostrar interesse real pelo que ele faz, pelo dia a dia dele, pelos desafios que enfrenta. Sem pressa para falar de sistema. A venda começa com confiança — e confiança começa com vínculo.</div>
+          </div>
+        </div>
 
-    <div class="card">
-      <p class="card-title"><i class="ti ti-robot"></i> A — Automação</p>
-      <p class="card-body">Tudo que pode ser automatizado, é automatizado. Agentes de IA autônomos executam tarefas repetitivas 24h por dia, sem erros. O cliente ganha tempo, reduz custo operacional e o negócio começa a rodar sozinho.</p>
+        <div class="step">
+          <div class="step-num">2</div>
+          <div>
+            <div class="step-title">Sondagem</div>
+            <div class="step-body">Com vínculo criado, ouvir mais do que falar. Descobrir: o que consome mais tempo? O que dá mais dor de cabeça? O que ele queria ter mas não tem? Quais os maiores gargalos do negócio hoje? Essas respostas são o que vai guiar a apresentação da solução.</div>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-num">3</div>
+          <div>
+            <div class="step-title">Apresentação irresistível</div>
+            <div class="step-body">Com base no que foi dito na sondagem, apresentar como o sistema resolve exatamente aquelas dores. Mostrar que é feito do zero para aquele negócio, que ele não paga nada adiantado, e que a mensalidade substitui o que ele já gasta. A apresentação é personalizada — nunca genérica.</div>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-num">4</div>
+          <div>
+            <div class="step-title">Elaborar proposta</div>
+            <div class="step-body">Após a reunião, no dia seguinte, montar uma proposta visual, bonita e personalizada em HTML com tudo que foi alinhado: o que será desenvolvido, prazo, valor da implementação e valor da mensalidade. A proposta precisa impressionar — é a primeira coisa que ele vai ver por escrito.</div>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-num">5</div>
+          <div>
+            <div class="step-title">Enviar a proposta</div>
+            <div class="step-body">Enviar no dia seguinte, enquanto o interesse ainda está fresco. Aguardar o retorno, tirar dúvidas e, após aprovação, assinar o contrato antes de começar qualquer desenvolvimento.</div>
+          </div>
+        </div>
+
+      </div>
     </div>
   </div>
 
   <hr>
 
-  <!-- PROPOSTA DE VALOR -->
-  <div id="proposta">
-    <p class="label">Proposta de valor</p>
-
-    <div class="card">
-      <p class="card-title"><i class="ti ti-palette"></i> Personalização total</p>
-      <p class="card-body">Sistema feito do zero para o cliente. Cores, fluxos, funcionalidades — tudo do jeito dele. Nada de solução genérica que serve pra todo mundo e não é perfeita pra ninguém.</p>
-    </div>
-
-    <div class="card">
-      <p class="card-title"><i class="ti ti-refresh"></i> Atualizações sob demanda</p>
-      <p class="card-body">Qualquer coisa nova que o cliente precisar, você implementa. Sem depender de um fornecedor que coloca na fila, cobra absurdo ou simplesmente ignora o pedido. Ele tem um desenvolvedor dedicado — você.</p>
-    </div>
-
-    <div class="card">
-      <p class="card-title"><i class="ti ti-shield-check"></i> Resultado garantido</p>
-      <p class="card-body">O cliente não paga nada adiantado. Só paga quando o sistema estiver pronto, funcionando e aprovado por ele. Se você não entregar o que prometeu — ele não deve nada. A pressão para entregar fica com você, não com ele.</p>
-    </div>
-
-    <div class="card">
-      <p class="card-title"><i class="ti ti-currency-dollar"></i> Substitui o que ele já paga</p>
-      <p class="card-body">A mensalidade que o cliente paga pra você substitui o que ele já gastava com plataformas genéricas. Ele paga o mesmo valor — ou menos — e recebe um sistema exclusivo com suporte dedicado.</p>
-    </div>
-  </div>
-
-  <hr>
-
-  <!-- FONTES DE RECEITA -->
+  <!-- 3. FORMAS DE GANHO -->
   <div id="receita">
-    <p class="label">Como você ganha dinheiro</p>
-    <div class="grid2">
-      <div class="metric">
-        <p class="metric-label"><i class="ti ti-search"></i> Diagnóstico</p>
-        <p class="metric-val">Pagamento único</p>
-        <p class="metric-desc">Cobrado antes de qualquer desenvolvimento. Você entrega valor já na primeira reunião.</p>
-      </div>
-      <div class="metric">
-        <p class="metric-label"><i class="ti ti-currency-dollar"></i> Implementação</p>
-        <p class="metric-val">Pagamento único</p>
-        <p class="metric-desc">Pelo desenvolvimento do sistema. Recebido somente após aprovação do cliente.</p>
-      </div>
-      <div class="metric">
-        <p class="metric-label"><i class="ti ti-repeat"></i> Mensalidade — Sistema</p>
-        <p class="metric-val">Recorrente / mês</p>
-        <p class="metric-desc">Substitui o que ele pagava a outros softwares. Você vira o fornecedor.</p>
-      </div>
-      <div class="metric">
-        <p class="metric-label"><i class="ti ti-robot"></i> Mensalidade — IA</p>
-        <p class="metric-val">Recorrente / mês</p>
-        <p class="metric-desc">Manutenção dos agentes de IA rodando. Pode ser inclusa ou cobrada separado.</p>
-      </div>
-      <div class="metric">
-        <p class="metric-label"><i class="ti ti-code-plus"></i> Novas funcionalidades</p>
-        <p class="metric-val">Extra por demanda</p>
-        <p class="metric-desc">Qualquer pedido fora do escopo inicial é cobrado à parte. Fonte extra de receita.</p>
+    <p class="label">Formas de ganhar dinheiro</p>
+
+    <div class="card">
+      <p class="card-title"><i class="ti ti-cash"></i> Forma 1 — Entrega única</p>
+      <p class="card-body">Pagamento pelo desenvolvimento e entrega do sistema. Recebido uma única vez, somente após o cliente aprovar o sistema funcionando. Não há cobrança adiantada — o risco de não entregar é meu, não dele.</p>
+    </div>
+
+    <div class="card">
+      <p class="card-title"><i class="ti ti-repeat"></i> Forma 2 — Mensalidade</p>
+      <p class="card-body">Após a entrega, o cliente paga uma mensalidade fixa todo mês. Cobre manutenção, disponibilidade do sistema e suporte. Essa é a receita recorrente que acumula a cada novo cliente ativo na carteira — e cresce sem cancelar o anterior.</p>
+    </div>
+
+    <div class="card">
+      <p class="card-title"><i class="ti ti-code-plus"></i> Forma 3 — Novas funcionalidades</p>
+      <p class="card-body">Qualquer funcionalidade que o cliente quiser adicionar depois da entrega é cobrada à parte. É uma fonte de receita extra que surge naturalmente conforme o negócio dele cresce e as necessidades evoluem.</p>
+    </div>
+  </div>
+
+  <hr>
+
+  <!-- 4. COMO ENTREGAR -->
+  <div id="entrega">
+    <p class="label">Como entregar</p>
+
+    <div class="card" style="padding: 6px 16px;">
+      <div class="steps">
+
+        <div class="step">
+          <div class="step-num">1</div>
+          <div>
+            <div class="step-title">Escrever o que ele quer</div>
+            <div class="step-body">Documentar tudo que foi alinhado na reunião — funcionalidades, fluxos, o que o sistema precisa fazer. Clareza total antes de escrever uma linha de código.</div>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-num">2</div>
+          <div>
+            <div class="step-title">Criar o sistema</div>
+            <div class="step-body">Desenvolver o sistema com base no que foi documentado. Construído do zero, personalizado para aquele negócio específico.</div>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-num">3</div>
+          <div>
+            <div class="step-title">Dar para aprovação</div>
+            <div class="step-body">Apresentar o sistema ao cliente antes de finalizar. Coletar feedback, fazer os ajustes necessários. Só avança quando ele aprovar.</div>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-num">4</div>
+          <div>
+            <div class="step-title">Finalizar com segurança</div>
+            <div class="step-body">Aplicar segurança de dados, sincronização com a nuvem e proteção contra furtos ou perda de informação. Entregar pronto e blindado.</div>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-num">5</div>
+          <div>
+            <div class="step-title">Entregar e receber</div>
+            <div class="step-body">Entregar o sistema, receber o pagamento da implementação e ativar a mensalidade. Continuar o relacionamento com o cliente, oferecendo novas funcionalidades conforme ele crescer.</div>
+          </div>
+        </div>
+
       </div>
     </div>
   </div>
@@ -840,196 +918,175 @@
   <div id="simulador">
     <p class="label">Simulador de receita</p>
 
-    <div class="sim-controls">
-      <div class="sim-field">
-        <label>Clientes ativos</label>
-        <input type="range" id="s-clients" min="1" max="30" value="5">
-        <div class="sim-val" id="v-clients">5</div>
-      </div>
-      <div class="sim-field">
-        <label>Mensalidade por cliente</label>
-        <input type="range" id="s-monthly" min="300" max="3000" step="50" value="700">
-        <div class="sim-val" id="v-monthly">R$ 700</div>
-      </div>
-      <div class="sim-field">
-        <label>Extras no mês</label>
-        <input type="range" id="s-extras" min="0" max="5000" step="100" value="500">
-        <div class="sim-val" id="v-extras">R$ 500</div>
-      </div>
-    </div>
+    <div class="card">
+      <p class="card-title" style="margin-bottom:14px;"><i class="ti ti-calculator"></i> Quanto vou receber em mensalidades?</p>
 
-    <div class="sim-results">
-      <div class="sim-card">
-        <div class="sim-card-label">Mensalidades</div>
-        <div class="sim-card-val" id="r-monthly">R$ 3.500</div>
-      </div>
-      <div class="sim-card">
-        <div class="sim-card-label">Extras</div>
-        <div class="sim-card-val" id="r-extras">R$ 500</div>
-      </div>
-      <div class="sim-card main">
-        <div class="sim-card-label">Total / mês</div>
-        <div class="sim-card-val" id="r-total">R$ 4.000</div>
-      </div>
-    </div>
+      <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:12px;">
 
-    <p class="label" style="margin-top:16px;">Projeção anual</p>
-    <div id="proj-cards" style="display:flex;flex-direction:column;gap:6px;"></div>
+        <div style="background:var(--surface2);border-radius:var(--radius-sm);padding:12px 14px;">
+          <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:6px;">Mensalidade por cliente</div>
+          <div style="display:flex;align-items:center;gap:6px;">
+            <span style="font-size:13px;color:var(--text2);">R$</span>
+            <input type="number" id="sim_valor" placeholder="0" min="0"
+              style="width:100%;border:none;background:transparent;font-family:'Inter',sans-serif;font-size:15px;font-weight:500;color:var(--text);outline:none;padding:4px 0;">
+          </div>
+        </div>
+
+        <div style="background:var(--surface2);border-radius:var(--radius-sm);padding:12px 14px;">
+          <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:6px;">Clientes fechados por dia</div>
+          <div style="display:flex;align-items:center;gap:6px;">
+            <input type="number" id="sim_por_dia" placeholder="0" min="0" step="0.1"
+              style="width:100%;border:none;background:transparent;font-family:'Inter',sans-serif;font-size:15px;font-weight:500;color:var(--text);outline:none;padding:4px 0;">
+            <span style="font-size:13px;color:var(--text2);white-space:nowrap;">clientes/dia</span>
+          </div>
+        </div>
+
+        <div style="background:var(--surface2);border-radius:var(--radius-sm);padding:12px 14px;">
+          <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:6px;">Dias trabalhados por mês</div>
+          <div style="display:flex;align-items:center;gap:6px;">
+            <input type="number" id="sim_dias" placeholder="0" min="1" max="31"
+              style="width:100%;border:none;background:transparent;font-family:'Inter',sans-serif;font-size:15px;font-weight:500;color:var(--text);outline:none;padding:4px 0;">
+            <span style="font-size:13px;color:var(--text2);">dias/mês</span>
+          </div>
+        </div>
+
+        <div style="background:var(--surface2);border-radius:var(--radius-sm);padding:12px 14px;">
+          <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:8px;">Projetar por quanto tempo?</div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <input type="number" id="sim_periodo" placeholder="0" min="1"
+              style="width:100%;border:none;background:transparent;font-family:'Inter',sans-serif;font-size:15px;font-weight:500;color:var(--text);outline:none;padding:4px 0;">
+            <div style="display:flex;gap:4px;flex-shrink:0;">
+              <button id="btn_meses" onclick="simSetUnidade('meses')"
+                style="padding:5px 11px;border-radius:4px;font-family:'Inter',sans-serif;font-size:12px;font-weight:500;cursor:pointer;border:0.5px solid var(--border);background:var(--surface);color:var(--text2);">Meses</button>
+              <button id="btn_anos" onclick="simSetUnidade('anos')"
+                style="padding:5px 11px;border-radius:4px;font-family:'Inter',sans-serif;font-size:12px;font-weight:500;cursor:pointer;border:0.5px solid var(--text);background:var(--text);color:#fff;">Anos</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <button onclick="simCalc()"
+        style="width:100%;padding:13px;background:#111110;color:#fff;border:none;border-radius:var(--radius-sm);font-family:'Inter',sans-serif;font-size:13px;font-weight:600;cursor:pointer;">
+        Calcular
+      </button>
+
+      <div id="sim_resultado" style="display:none;margin-top:16px;">
+        <div style="border-top:0.5px solid var(--border);padding-top:14px;">
+
+          <div id="sim_bloco_mes" style="margin-bottom:14px;display:none;">
+            <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:8px;">Por mês</div>
+            <div id="sim_cards_mes" style="display:flex;flex-direction:column;gap:5px;"></div>
+          </div>
+
+          <div id="sim_bloco_ano" style="margin-bottom:14px;display:none;">
+            <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:8px;">Por ano</div>
+            <div id="sim_cards_ano" style="display:flex;flex-direction:column;gap:5px;"></div>
+          </div>
+
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:9px 12px;border-radius:6px;background:#111110;">
+            <div>
+              <div style="font-size:12px;font-weight:500;color:#fff;">Total acumulado</div>
+              <div id="sim_total_clientes" style="font-size:11px;color:rgba(255,255,255,0.45);margin-top:1px;"></div>
+            </div>
+            <div id="sim_total_valor" style="font-size:13px;font-weight:600;color:#fff;"></div>
+          </div>
+
+          <button onclick="simLimpar()"
+            style="width:100%;margin-top:10px;padding:11px;background:transparent;color:var(--text2);border:0.5px solid var(--border);border-radius:var(--radius-sm);font-family:'Inter',sans-serif;font-size:13px;font-weight:500;cursor:pointer;">
+            Limpar
+          </button>
+
+        </div>
+      </div>
+
+    </div>
   </div>
 
   <hr>
 
-  <!-- FLUXO -->
-  <p class="label">Como funciona na prática</p>
-  <div class="card" style="padding: 6px 16px;">
-    <div class="steps">
-      <div class="step">
-        <div class="step-num">1</div>
-        <div>
-          <div class="step-title">Prospectar</div>
-          <div class="step-body">Liga para PMEs do segmento-alvo. Pergunta sobre os sistemas que já usam e as dores que têm. Quem já sente a dor precisa de menos convencimento.</div>
-        </div>
-      </div>
-      <div class="step">
-        <div class="step-num">2</div>
-        <div>
-          <div class="step-title">Diagnóstico pago</div>
-          <div class="step-body">Marca reunião, analisa o negócio inteiro e entrega um laudo técnico com oportunidades reais. Cobra por esse serviço — você já gera valor antes de desenvolver qualquer coisa.</div>
-        </div>
-      </div>
-      <div class="step">
-        <div class="step-num">3</div>
-        <div>
-          <div class="step-title">Proposta e contrato</div>
-          <div class="step-body">Apresenta o que será feito, prazos e valores. Assina contrato antes de começar. Escopo claro protege você e o cliente.</div>
-        </div>
-      </div>
-      <div class="step">
-        <div class="step-num">4</div>
-        <div>
-          <div class="step-title">Desenvolvimento</div>
-          <div class="step-body">Constrói o sistema ou automação. O cliente acompanha. Você só recebe o pagamento da implementação depois que ele aprovar.</div>
-        </div>
-      </div>
-      <div class="step">
-        <div class="step-num">5</div>
-        <div>
-          <div class="step-title">Ativar mensalidade</div>
-          <div class="step-body">Sistema entregue, mensalidade ativada. Receita recorrente todo mês enquanto você atende novos clientes. As mensalidades se acumulam.</div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <hr>
-
-  <!-- CLIENTES IDEAIS -->
-  <p class="label">Clientes ideais</p>
-  <div class="card">
-    <p class="card-body" style="margin-bottom:10px;">Foco em pequenas e médias empresas que já pagam algum software mas estão insatisfeitas com rigidez, custo ou falta de suporte.</p>
+  <!-- 5. SEGMENTOS -->
+  <div id="segmentos">
+    <p class="label">Segmentos principais</p>
     <div class="grid2">
-      <div class="metric"><p class="metric-label">🏥 Clínicas e consultórios</p></div>
-      <div class="metric"><p class="metric-label">🛒 Comércio e e-commerce</p></div>
-      <div class="metric"><p class="metric-label">🏠 Imobiliárias</p></div>
-      <div class="metric"><p class="metric-label">⚖️ Escritórios e contabilidades</p></div>
-      <div class="metric"><p class="metric-label">🍽️ Restaurantes e food service</p></div>
-      <div class="metric"><p class="metric-label">🚚 Logística e transportadoras</p></div>
-      <div class="metric"><p class="metric-label">🏗️ Construtoras e engenharia</p></div>
-      <div class="metric"><p class="metric-label">💆 Prestadores de serviço</p></div>
+      <div class="metric">
+        <p class="metric-label">🍕 Alimentação</p>
+        <p class="metric-desc">Lanchonetes, pizzarias, restaurantes, hamburguerias, delivery e food service em geral.</p>
+      </div>
+      <div class="metric">
+        <p class="metric-label">🚗 Automotivo</p>
+        <p class="metric-desc">Oficinas mecânicas, borracharias, autopeças, lava-rápidos e serviços relacionados a veículos.</p>
+      </div>
+      <div class="metric">
+        <p class="metric-label">🔧 Prestação de serviços</p>
+        <p class="metric-desc">Qualquer negócio que presta serviços ao cliente final e precisa organizar agendamentos, ordens de serviço ou equipe.</p>
+      </div>
+      <div class="metric">
+        <p class="metric-label">🏥 Saúde</p>
+        <p class="metric-desc">Clínicas, consultórios médicos, odontológicos, psicólogos e outros profissionais da área da saúde.</p>
+      </div>
     </div>
   </div>
 
   <hr>
 
-  <!-- RISCOS -->
-  <p class="label">Riscos e como controlar</p>
-
-  <div class="card">
-    <p class="card-title"><i class="ti ti-alert-triangle" style="color:#854f0b"></i> Trabalhar sem receber</p>
-    <p class="card-body">Contrato assinado antes de começar qualquer desenvolvimento. Escopo fechado, prazo combinado e valor definido por escrito. A garantia de não pagar só vale após aprovação formal.</p>
-  </div>
-
-  <div class="card">
-    <p class="card-title"><i class="ti ti-alert-triangle" style="color:#854f0b"></i> Pedidos sem fim</p>
-    <p class="card-body">Defina claramente no contrato o que a mensalidade cobre (manutenção, suporte) e o que é cobrado à parte (novas funcionalidades). Isso protege seu tempo e ainda gera receita extra.</p>
-  </div>
-
-  <div class="card">
-    <p class="card-title"><i class="ti ti-alert-triangle" style="color:#854f0b"></i> Muitos sistemas diferentes</p>
-    <p class="card-body">Crie uma base técnica comum e personalize por cima. Não reinvente tudo do zero para cada cliente. Isso reduz tempo de desenvolvimento e facilita a manutenção com muitos clientes ativos.</p>
-  </div>
-
-  <div class="card">
-    <p class="card-title"><i class="ti ti-alert-triangle" style="color:#854f0b"></i> Primeiros meses sem caixa</p>
-    <p class="card-body">As mensalidades demoram para acumular. Tenha reserva para os 3 primeiros meses. Fechar o diagnóstico como serviço pago ajuda a gerar caixa antes da entrega do sistema.</p>
-  </div>
-
-  <hr>
-
-  <!-- SCRIPT -->
+  <!-- 6. SCRIPT DE VENDAS -->
   <div id="script">
-    <p class="label">Script de vendas — telefone</p>
+    <p class="label">Script de vendas</p>
 
     <div class="script-section">
-      <p class="script-tag">Abertura — primeiros 20 segundos</p>
-      <div class="quote">"Oi, <strong>[nome]</strong>! Tudo bem? Meu nome é <strong>[seu nome]</strong>, sou especialista em sistemas e automação para negócios. Eu entro em contato porque trabalho com empresas do seu segmento — posso te fazer uma pergunta rápida?"</div>
-    </div>
-
-    <div class="script-section">
-      <p class="script-tag">Diagnóstico da dor</p>
-      <div class="quote">"Você já usa algum sistema para gerenciar o seu negócio — controle de clientes, gestão, atendimento, algo assim?"<br><br>
-      <strong>Se SIM:</strong> "Entendi. E está satisfeito com ele? Tem alguma coisa que falta ou que você queria que funcionasse diferente?"<br><br>
-      <strong>Se NÃO:</strong> "Tudo no Excel ou papel então? E isso já te causou algum problema — perdeu informação, esqueceu algo importante?"</div>
-    </div>
-
-    <div class="script-section">
-      <p class="script-tag">Apresentação da proposta</p>
-      <div class="quote">"Então deixa eu te contar o que eu faço. Eu desenvolvo sistemas personalizados — feito do zero para o seu negócio, do jeito que você funciona. Qualquer mudança que você precisar, eu faço. Sem depender de empresa grande que vai te ignorar ou cobrar caro por algo simples.<br><br>
-      E o mais importante: você não paga nada adiantado. Só paga quando o sistema estiver pronto e você aprovar. Se eu não entregar o que prometi — você não deve nada."</div>
+      <p class="script-tag">Abertura</p>
+      <div class="quote">
+        "Bom dia, quem aqui seria o responsável pelo estabelecimento?"<br><br>
+        "Pedro, vou ser bem curto e objetivo no que vou falar — posso falar?"<br><br>
+        "Eu consigo aumentar os seus lucros com previsibilidade, consigo fazer com que você tenha mais tempo com a família ou para gerir outras áreas do seu negócio, e consigo fazer com que você elimine a dor de cabeça que você às vezes costuma ter para gerir seu negócio como um todo.<br><br>
+        Digo isso porque eu passei por esses três desafios, e hoje a cada dia meu lucro aumenta, tenho cada vez mais tempo, e fica bem mais fácil e simples gerir o meu negócio.<br><br>
+        Isso significa que se você me der 30 minutos do seu tempo, eu não vou mostrar — eu vou te provar que posso fazer o mesmo por você."
+      </div>
     </div>
 
     <div class="script-section">
-      <p class="script-tag">Fechamento — próximo passo</p>
-      <div class="quote">"Que tal marcar 20 minutos essa semana por videochamada para eu entender melhor o seu negócio e te mostrar como ficaria? Sem compromisso nenhum da sua parte."</div>
+      <p class="script-tag">Agendamento — perguntas em sequência</p>
+      <div class="quote">
+        "Agora me diz — fica melhor fazermos essa reunião hoje ou em um dia específico da semana?"<br><br>
+        "Fica melhor sábado ou segunda?"<br><br>
+        "Qual o melhor período — tarde, manhã ou noite?"<br><br>
+        "Qual o melhor horário?"<br><br>
+        "Certinho — espero que você apareça nessa reunião, porque o que tenho para mostrar é algo surpreendente."
+      </div>
     </div>
 
-    <hr>
-    <p class="label">Respostas para objeções</p>
-
-    <div class="obj">
-      <div class="obj-q"><i class="ti ti-message-2"></i> "Já tenho um sistema e estou satisfeito."</div>
-      <div class="obj-a">Que ótimo! Só uma curiosidade — tem alguma funcionalidade que você queria ter mas o sistema não oferece? Às vezes a gente se acostuma com as limitações sem perceber.</div>
-    </div>
-
-    <div class="obj">
-      <div class="obj-q"><i class="ti ti-message-2"></i> "Quanto custa?"</div>
-      <div class="obj-a">Depende do que você precisa — cada projeto é único. Mas a mensalidade costuma ficar no mesmo valor ou abaixo do que você já paga hoje. E o desenvolvimento só é cobrado depois que você aprovar.</div>
-    </div>
-
-    <div class="obj">
-      <div class="obj-q"><i class="ti ti-message-2"></i> "Não tenho tempo pra isso agora."</div>
-      <div class="obj-a">Por isso que eu cuido de tudo. Você me explica como funciona, eu desenvolvo, você só aprova. Não toma seu tempo operacional. Posso te mandar um resumo no WhatsApp para você ver quando tiver um minuto?</div>
-    </div>
-
-    <div class="obj">
-      <div class="obj-q"><i class="ti ti-message-2"></i> "Como eu sei que você vai entregar?"</div>
-      <div class="obj-a">Exatamente por isso a proposta é assim: você não paga nada antes. O contrato garante que o pagamento só acontece com o sistema aprovado por você. Quem corre o risco sou eu — não você.</div>
-    </div>
-
-    <div class="obj">
-      <div class="obj-q"><i class="ti ti-message-2"></i> "Deixa eu pensar..."</div>
-      <div class="obj-a">Claro, sem pressão. Me diz: o que você precisaria ver ou saber para se sentir confortável em avançar? Assim eu já te passo exatamente o que precisa.</div>
-    </div>
   </div>
 
   <hr>
 
-  <!-- CONTRATO -->
+  <!-- 7. ABORDAGEM ALTERNATIVA -->
+  <div id="abordagem-alt">
+    <p class="label">Abordagem alternativa</p>
+
+    <div class="card">
+      <p class="card-title"><i class="ti ti-mood-smile"></i> Criar conversa por observação</p>
+      <p class="card-body">Em vez de chegar com o script direto, outra forma de abrir o contato é observar o estabelecimento antes de falar — o movimento, o tipo de negócio, o que parece desafiador — e usar isso para iniciar uma conversa natural, como se já conhecesse a realidade daquele dono.</p>
+    </div>
+
+    <div class="quote" style="margin-top:8px;">
+      <strong>Exemplos de abertura por observação:</strong><br><br>
+      "Deve ser um desafio né, cuidar de uma pizzaria movimentada assim..."<br><br>
+      "Você lida com bastante gente por dia aqui, imagino que organizar tudo isso dá um trabalhão..."<br><br>
+      "Vejo que o movimento aqui é bom — mas aposto que tem coisas nos bastidores que consomem muito tempo..."<br><br>
+      <em>A partir desse gancho, o dono naturalmente abre — e a conversa flui para as dores dele sem parecer uma venda. Daí é só ouvir e conduzir para o agendamento.</em>
+    </div>
+
+  </div>
+
+  <hr>
+
+  <!-- 8. CONTRATO -->
   <div id="contrato">
     <p class="label">Modelo de contrato</p>
 
     <div class="hero" style="margin-bottom:12px;">
-      <p class="hero-title"><i class="ti ti-file-text"></i> Contrato de Desenvolvimento e Manutenção de Sistema</p>
+      <p class="hero-title" style="font-size:13px;"><i class="ti ti-file-text"></i> Contrato de Desenvolvimento</p>
       <p class="hero-sub">Preencha os campos abaixo e clique em <strong>Salvar contrato</strong> para guardar no Firebase.</p>
     </div>
 
@@ -1088,13 +1145,15 @@
       </div>
 
       <div class="sig-grid">
-        <div>
-          <div class="sig-line"></div>
+        <div class="sig-item">
           <div class="sig-label">Contratante — Assinatura</div>
-        </div>
-        <div>
+          <div class="sig-space"></div>
           <div class="sig-line"></div>
+        </div>
+        <div class="sig-item">
           <div class="sig-label">Contratado — Assinatura</div>
+          <div class="sig-space"></div>
+          <div class="sig-line"></div>
         </div>
       </div>
     </div>
@@ -1585,19 +1644,117 @@ function update() {
 });
 update();
 
+
 // ─── Copiar script ────────────────────────────────────────────────────────────
 window.copyScript = function() {
-  var txt = 'SCRIPT DE VENDAS — MÉTODO DOA\n\n' +
-    'ABERTURA:\n"Oi, [nome]! Tudo bem? Meu nome é [seu nome], sou especialista em sistemas e automação para negócios. Posso te fazer uma pergunta rápida?"\n\n' +
-    'DIAGNÓSTICO DA DOR:\n"Você já usa algum sistema para gerenciar o seu negócio?"\nSe SIM: "Está satisfeito? Tem alguma coisa que falta ou que queria diferente?"\nSe NÃO: "Tudo no Excel? Isso já te causou algum problema?"\n\n' +
-    'PROPOSTA:\n"Eu desenvolvo sistemas personalizados — feito do zero para o seu negócio. Qualquer mudança, eu faço. E você não paga nada adiantado. Só paga quando o sistema estiver pronto e você aprovar."\n\n' +
-    'FECHAMENTO:\n"Que tal marcar 20 minutos essa semana por videochamada? Sem compromisso nenhum."\n\n' +
-    'OBJEÇÕES:\n"Já tenho sistema" → "Tem alguma funcionalidade que falta?"\n"Quanto custa?" → "A mensalidade fica no mesmo valor ou menos que você já paga hoje."\n"Sem tempo" → "Eu cuido de tudo. Posso mandar resumo no WhatsApp?"\n"Como sei que vai entregar?" → "Você não paga nada antes. O contrato garante isso."';
+  var txt = 'SCRIPT DE VENDAS\n\n' +
+    'ABERTURA — ABORDAGEM PRESENCIAL OU POR TELEFONE:\n"Bom dia, quem aqui seria o responsável pelo estabelecimento?"\n[Após identificar o dono]: "Pedro, vou ser bem curto e objetivo — posso falar?"\n"Eu consigo aumentar os seus lucros com previsibilidade, fazer com que você tenha mais tempo — e eliminar a dor de cabeça de gerir o negócio. Me dá 30 minutos e eu não vou mostrar, vou provar."\n\n' +
+    'ABORDAGEM POR OBSERVAÇÃO (alternativa):\n"Deve ser um desafio né, cuidar de uma pizzaria dessas..."\nA partir desse gancho, conduzir para o agendamento.\n\n' +
+    'AGENDAMENTO:\n1. "Fica melhor hoje ou em outro dia da semana?"\n2. "Sábado ou segunda?"\n3. "Tarde, manhã ou noite?"\n4. "Qual o melhor horário?"\n"Certo — espero você nessa reunião. O que tenho pra mostrar é algo surpreendente."\n\n' +
+    'SONDAGEM NA REUNIÃO:\n"Você já usa algum sistema para gerenciar o seu negócio?"\nSe SIM: "Está satisfeito? Tem alguma coisa que falta ou que queria diferente?"\nSe NÃO: "Tudo no papel ou no WhatsApp? Isso já te causou algum problema?"\n\n' +
+    'OFERTA:\n"Eu desenvolvo sistemas personalizados — feito do zero para o seu negócio. Do jeito que você funciona. Qualquer funcionalidade nova, eu implemento. E o mais importante: você não paga nada adiantado. Só paga quando o sistema estiver pronto e você aprovar."\n\n' +
+    'FECHAMENTO:\n"No dia seguinte trago uma proposta personalizada pra você ver como ficaria. Sem compromisso nenhum da sua parte."\n\n' +
+    'OBJEÇÕES:\n"Já tenho sistema" → "Tem alguma funcionalidade que falta?"\n"Quanto custa?" → "A mensalidade fica no mesmo valor ou menos que você já paga hoje."\n"Sem tempo" → "Eu cuido de tudo. Posso mandar resumo no WhatsApp?"\n"Como sei que vai entregar?" → "Você não paga nada antes. O contrato garante isso."\n"Deixa eu pensar" → "O que você precisaria ver para se sentir confortável em avançar?"';
 
   navigator.clipboard.writeText(txt).then(function() { toast('Script copiado!'); });
 };
 
 </script>
-<!-- VOLTAR DESKTOP --><style>@media(max-width:768px){#__btn-voltar{display:none!important}}#__btn-voltar{position:fixed;bottom:22px;left:22px;z-index:99999;background:#13131a;border:1px solid #2a2a4a;color:#a0a0c0;text-decoration:none;padding:10px 18px;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;transition:all .2s;box-shadow:0 2px 12px rgba(0,0,0,.4)}#__btn-voltar:hover{background:#7c6aff;border-color:#7c6aff;color:#fff}</style><a id="__btn-voltar" href="OUTROS.html">← Outros</a><!-- FIM VOLTAR DESKTOP -->
+<!-- SIMULADOR SCRIPT -->
+<script>
+var _simUnidade = 'anos';
+
+function simSetUnidade(u) {
+  _simUnidade = u;
+  var btnM = document.getElementById('btn_meses');
+  var btnA = document.getElementById('btn_anos');
+  if (u === 'meses') {
+    btnM.style.background = '#111110'; btnM.style.color = '#fff'; btnM.style.borderColor = '#111110';
+    btnA.style.background = 'var(--surface)'; btnA.style.color = 'var(--text2)'; btnA.style.borderColor = 'var(--border)';
+  } else {
+    btnA.style.background = '#111110'; btnA.style.color = '#fff'; btnA.style.borderColor = '#111110';
+    btnM.style.background = 'var(--surface)'; btnM.style.color = 'var(--text2)'; btnM.style.borderColor = 'var(--border)';
+  }
+}
+
+function simLimpar() {
+  ['sim_valor','sim_por_dia','sim_dias','sim_periodo'].forEach(function(id) {
+    document.getElementById(id).value = '';
+  });
+  document.getElementById('sim_resultado').style.display = 'none';
+  document.getElementById('sim_cards_mes').innerHTML = '';
+  document.getElementById('sim_cards_ano').innerHTML = '';
+  document.getElementById('sim_total_clientes').textContent = '';
+  document.getElementById('sim_total_valor').textContent = '';
+  simSetUnidade('anos');
+}
+
+function simCalc() {
+  var valor    = parseFloat(document.getElementById('sim_valor').value)   || 0;
+  var porDia   = parseFloat(document.getElementById('sim_por_dia').value) || 0;
+  var dias     = parseFloat(document.getElementById('sim_dias').value)    || 0;
+  var periodo  = parseInt(document.getElementById('sim_periodo').value)   || 0;
+
+  if (!valor || !porDia || !dias || !periodo) {
+    alert('Preencha todos os campos antes de calcular.');
+    return;
+  }
+
+  var clientesPorMes = porDia * dias;
+  var totalMeses = (_simUnidade === 'anos') ? periodo * 12 : periodo;
+  var totalAnos  = Math.ceil(totalMeses / 12);
+
+  var resultado  = document.getElementById('sim_resultado');
+  var blocoMes   = document.getElementById('sim_bloco_mes');
+  var blocoAno   = document.getElementById('sim_bloco_ano');
+  var cardsMes   = document.getElementById('sim_cards_mes');
+  var cardsAno   = document.getElementById('sim_cards_ano');
+
+  cardsMes.innerHTML = '';
+  cardsAno.innerHTML = '';
+  resultado.style.display = 'block';
+
+  // ── Por mês ──
+  blocoMes.style.display = 'block';
+  for (var m = 1; m <= totalMeses; m++) {
+    var clM  = Math.round(clientesPorMes * m);
+    var recM = clM * valor;
+    var last = m === totalMeses;
+    var div  = document.createElement('div');
+    div.style.cssText = 'display:flex;justify-content:space-between;align-items:center;padding:9px 12px;border-radius:6px;background:' + (last ? '#111110' : 'var(--surface2)') + ';';
+    div.innerHTML =
+      '<div>' +
+        '<div style="font-size:12px;font-weight:500;color:' + (last ? '#fff' : 'var(--text)') + ';">Mês ' + m + '</div>' +
+        '<div style="font-size:11px;color:' + (last ? 'rgba(255,255,255,0.45)' : 'var(--text3)') + ';margin-top:1px;">' + clM + ' clientes acumulados</div>' +
+      '</div>' +
+      '<div style="font-size:13px;font-weight:600;color:' + (last ? '#fff' : 'var(--text)') + ';">R$ ' + recM.toLocaleString('pt-BR') + '/mês</div>';
+    cardsMes.appendChild(div);
+  }
+
+  // ── Por ano ──
+  blocoAno.style.display = 'block';
+  for (var a = 1; a <= totalAnos; a++) {
+    var mesesAno = Math.min(a * 12, totalMeses);
+    var clA  = Math.round(clientesPorMes * mesesAno);
+    var recA = clA * valor;
+    var lastA = a === totalAnos;
+    var divA  = document.createElement('div');
+    divA.style.cssText = 'display:flex;justify-content:space-between;align-items:center;padding:9px 12px;border-radius:6px;background:' + (lastA ? '#111110' : 'var(--surface2)') + ';';
+    divA.innerHTML =
+      '<div>' +
+        '<div style="font-size:12px;font-weight:500;color:' + (lastA ? '#fff' : 'var(--text)') + ';">' + a + ' ano' + (a > 1 ? 's' : '') + '</div>' +
+        '<div style="font-size:11px;color:' + (lastA ? 'rgba(255,255,255,0.45)' : 'var(--text3)') + ';margin-top:1px;">' + clA + ' clientes acumulados</div>' +
+      '</div>' +
+      '<div style="font-size:13px;font-weight:600;color:' + (lastA ? '#fff' : 'var(--text)') + ';">R$ ' + recA.toLocaleString('pt-BR') + '/mês</div>';
+    cardsAno.appendChild(divA);
+  }
+
+  // ── Total ──
+  var totalClientes = Math.round(clientesPorMes * totalMeses);
+  document.getElementById('sim_total_clientes').textContent = totalClientes + ' clientes acumulados';
+  document.getElementById('sim_total_valor').textContent = 'R$ ' + (totalClientes * valor).toLocaleString('pt-BR') + '/mês';
+}
+</script>
+<style>@media(max-width:768px){#__btn-voltar{display:none!important}}#__btn-voltar{position:fixed;bottom:22px;left:22px;z-index:99999;background:#13131a;border:1px solid #2a2a4a;color:#a0a0c0;text-decoration:none;padding:10px 18px;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;transition:all .2s;box-shadow:0 2px 12px rgba(0,0,0,.4)}#__btn-voltar:hover{background:#7c6aff;border-color:#7c6aff;color:#fff}</style><a id="__btn-voltar" href="OUTROS.html">← Outros</a><!-- FIM VOLTAR DESKTOP -->
 </body>
- </html>
+     </html>
