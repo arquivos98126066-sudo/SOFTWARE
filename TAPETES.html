@@ -10,18 +10,18 @@
 :root{--laranja:#111111;--escuro:#000000;--bg:#ffffff;--card:#ffffff;--texto:#111111;--cinza:#6b7280;--borda:#d1d5db;--verde:#10b981;--vermelho:#ef4444;--azul:#374151;--amarelo:#4b5563;}
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
 body{font-family:'Nunito',system-ui,sans-serif;background:var(--bg);color:var(--texto);min-height:100vh;padding-bottom:80px;}
-header{background:linear-gradient(135deg,#000000,#222222);color:#fff;padding:12px 14px;position:sticky;top:0;z-index:100;box-shadow:0 4px 20px rgba(0,0,0,.3);display:flex;align-items:center;justify-content:space-between;}
-header h1{font-size:1.05rem;font-weight:900;color:#ffffff;}
-.menu-btn{background:rgba(255,255,255,.18);border:none;color:#fff;border-radius:10px;padding:8px 12px;font-size:1.2rem;cursor:pointer;display:flex;align-items:center;gap:6px;font-family:'Nunito',sans-serif;font-weight:800;font-size:.8rem;}
+header{background:#ffffff;color:#111111;padding:12px 14px;position:sticky;top:0;z-index:100;border-bottom:1px solid rgba(0,0,0,.10);display:flex;align-items:center;justify-content:space-between;}
+header h1{font-size:1.05rem;font-weight:900;color:#111111;}
+.menu-btn{background:#111111;border:none;color:#fff;border-radius:10px;padding:6px 10px;font-size:.8rem;cursor:pointer;display:flex;align-items:center;gap:6px;font-family:'Nunito',sans-serif;font-weight:800;}
 .menu-btn span{font-size:1.1rem;}
 .drawer-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;}
 .drawer-overlay.open{display:block;}
-.drawer{position:fixed;top:0;left:-280px;width:260px;height:100vh;background:#111111;z-index:201;transition:left .25s ease;padding:20px 0;overflow-y:auto;}
+.drawer{position:fixed;top:0;left:-280px;width:260px;height:100vh;background:#ffffff;z-index:201;transition:left .25s ease;padding:20px 0;overflow-y:auto;border-right:1px solid rgba(0,0,0,.10);}
 .drawer.open{left:0;}
-.drawer-title{color:#ffffff;font-size:1rem;font-weight:900;padding:0 20px 16px;border-bottom:1px solid rgba(255,255,255,.1);margin-bottom:13px;}
-.drawer-item{display:flex;align-items:center;gap:12px;padding:14px 20px;color:rgba(255,255,255,.7);font-size:.92rem;font-weight:700;cursor:pointer;transition:all .2s;border-left:3px solid transparent;}
-.drawer-item:hover{background:rgba(255,255,255,.08);color:#fff;}
-.drawer-item.active{background:rgba(255,255,255,.15);color:#ffffff;border-left-color:#ffffff;}
+.drawer-title{color:#111111;font-size:1rem;font-weight:900;padding:0 20px 16px;border-bottom:none;box-shadow:0 4px 6px -2px rgba(0,0,0,.08);margin-bottom:13px;}
+.drawer-item{display:flex;align-items:center;gap:12px;padding:14px 20px;color:#444444;font-size:.92rem;font-weight:700;cursor:pointer;transition:all .2s;border-left:3px solid transparent;border-bottom:none;box-shadow:0 4px 6px -2px rgba(0,0,0,.08);}
+.drawer-item:hover{background:rgba(0,0,0,.04);color:#111111;}
+.drawer-item.active{background:rgba(0,0,0,.06);color:#111111;border-left-color:#111111;}
 .drawer-item .ic{font-size:1.2rem;width:24px;text-align:center;}
 .aba-atual{color:rgba(255,255,255,.6);font-size:.75rem;font-weight:600;}
 .tab-content{display:none;padding:14px 12px;}
@@ -315,8 +315,7 @@ tbody tr:hover td{background:#fafafa;}
     <div class="foto-preview" id="p_foto_prev">
       <img id="p_foto_img" src="">
     </div>
-    <button class="ext-btn ext-gemini" onclick="abrirGemini()">&#x1F916; Abrir Gemini</button>
-    <div class="brow" style="margin-top:10px">
+    <div class="brow" style="margin-top:24px">
       <button class="btn btn-d" style="flex:1" onclick="limparTudoPrompt()">&#x1F5D1; Limpar tudo</button>
       <button class="btn btn-az btn-sm" onclick="copiarFotoPrompt()" style="margin-left:auto">&#x1F4CB; Copiar foto</button>
       <button class="btn btn-g btn-sm" onclick="limparFotoPrompt()">Limpar foto</button>
@@ -475,13 +474,14 @@ function marcarDeletadoRua(id){
 
 // ─── Máscaras ────────────────────────────────────────────────────────────────
 window.mascaraTel = function(el){
-  var v=el.value.replace(/\D/g,'');
-  if(v.length>11) v=v.slice(0,11);
+  var v=el.value.replace(/\D/g,'').slice(0,11);
   var fmt='';
-  if(v.length<=2) fmt=v;
-  else if(v.length<=6) fmt='('+v.slice(0,2)+') '+v.slice(2);
-  else if(v.length<=10) fmt='('+v.slice(0,2)+') '+v.slice(2,6)+'-'+v.slice(6);
-  else fmt='('+v.slice(0,2)+') '+v.slice(2,7)+'-'+v.slice(7);
+  if(v.length===0){ el.value=''; }
+  var dd=v.slice(0,2), nono=v.slice(2,3), bloco=v.slice(3,7), final=v.slice(7,11);
+  if(v.length<=2)       fmt='('+dd;
+  else if(v.length===3) fmt='('+dd+') '+nono;
+  else if(v.length<=7)  fmt='('+dd+') '+nono+' '+bloco;
+  else                  fmt='('+dd+') '+nono+' '+bloco+'-'+final;
   el.value=fmt;
   var msg=document.getElementById('c_contato_msg');
   if(v.length===0){msg.textContent='';el.style.borderColor='var(--borda)';}
@@ -1623,4 +1623,4 @@ async function iniciarListeners(){
 })();
 </script>
 </body>
-</html>
+      </html>
