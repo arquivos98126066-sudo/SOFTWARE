@@ -454,6 +454,25 @@ var _blockSnapshotUntil = 0;
 var _saveTimestampsPedidos = {};
 var _saveTimestampsRuas = {};
 
+// ─── IDs excluídos (para o onSnapshot não restaurar) ─────────────────────────
+var _deletedPedidosIds = {};
+var _deletedRuasIds = {};
+try{
+  var _dpRaw = localStorage.getItem('deleted_pedidos_ids');
+  if(_dpRaw) _deletedPedidosIds = JSON.parse(_dpRaw);
+  var _drRaw = localStorage.getItem('deleted_ruas_ids');
+  if(_drRaw) _deletedRuasIds = JSON.parse(_drRaw);
+}catch(e){}
+
+function marcarDeletadoPedido(id){
+  _deletedPedidosIds[id] = Date.now();
+  try{ localStorage.setItem('deleted_pedidos_ids', JSON.stringify(_deletedPedidosIds)); }catch(e){}
+}
+function marcarDeletadoRua(id){
+  _deletedRuasIds[id] = Date.now();
+  try{ localStorage.setItem('deleted_ruas_ids', JSON.stringify(_deletedRuasIds)); }catch(e){}
+}
+
 // ─── Máscaras ────────────────────────────────────────────────────────────────
 window.mascaraTel = function(el){
   var v=el.value.replace(/\D/g,'');
@@ -611,8 +630,10 @@ function verificarOnline(){
 }
 window.addEventListener('online', function(){
   verificarOnline();
-  // Quando a conexão volta, tenta sincronizar os dados pendentes
-  setTimeout(function(){ sincronizarPendentes(); }, 1500);
+  // Bloqueia o snapshot imediatamente ao detectar online,
+  // dando tempo para o sync subir os dados antes do Firebase disparar
+  _blockSnapshotUntil = Date.now() + 10000;
+  setTimeout(function(){ sincronizarPendentes(); }, 800);
 });
 window.addEventListener('offline',verificarOnline);
 
@@ -801,26 +822,34 @@ window.renderP = function(){
 
 window.delP = async function(id){
   if(!confirm('Excluir este pedido?')) return;
+  // Remove do cache local IMEDIATAMENTE (independente do Firebase)
+  pedidosCache=pedidosCache.filter(function(p){return p.id!==id;});
+  delete _saveTimestampsPedidos[id];
+  marcarDeletadoPedido(id);
+  salvarCacheLocal();
+  renderP();renderG();renderC();toast('Excluido');
+  // Tenta deletar no Firebase em segundo plano
   if(window.syncShow) window.syncShow.syncing();
   try{
     await deleteDoc(doc(db,'tapetes',id));
-    pedidosCache=pedidosCache.filter(function(p){return p.id!==id;});
     if(window.syncShow) window.syncShow.synced('Tapetes');
   } catch(e){if(window.syncShow) window.syncShow.offline();}
-  renderP();renderG();renderC();toast('Excluido');
 };
 
 window.apagarTodosP = async function(){
   if(!confirm('Apagar TODOS?')) return;
+  var ids=pedidosCache.map(function(p){return p.id;});
+  pedidosCache=[];
+  _saveTimestampsPedidos={};
+  salvarCacheLocal();
+  renderP();renderG();renderC();toast('Apagados');
   if(window.syncShow) window.syncShow.syncing();
   try{
     var batch=writeBatch(db);
-    pedidosCache.forEach(function(p){batch.delete(doc(db,'tapetes',p.id));});
+    ids.forEach(function(id){batch.delete(doc(db,'tapetes',id));});
     await batch.commit();
-    pedidosCache=[];
     if(window.syncShow) window.syncShow.synced('Tapetes');
   } catch(e){if(window.syncShow) window.syncShow.offline();}
-  renderP();renderG();renderC();toast('Apagados');
 };
 
 // ─── Modal Custo ─────────────────────────────────────────────────────────────
@@ -1062,13 +1091,27 @@ window.renderG = function(){
   });
   el.innerHTML=h;
 };
-window.delV = async function(id){if(!confirm('Excluir?'))return;await deleteDoc(doc(db,'tapetes',id));pedidosCache=pedidosCache.filter(function(p){return p.id!==id;});renderG();renderP();renderC();toast('Excluido');};
+window.delV = async function(id){
+  if(!confirm('Excluir?'))return;
+  pedidosCache=pedidosCache.filter(function(p){return p.id!==id;});
+  delete _saveTimestampsPedidos[id];
+  marcarDeletadoPedido(id);
+  salvarCacheLocal();
+  renderG();renderP();renderC();toast('Excluido');
+  try{ await deleteDoc(doc(db,'tapetes',id)); } catch(e){}
+};
 window.apagarTodasV = async function(){
   if(!confirm('Apagar TODAS?'))return;
-  var batch=writeBatch(db);
-  pedidosCache.forEach(function(p){batch.delete(doc(db,'tapetes',p.id));});
-  await batch.commit();
-  pedidosCache=[];renderG();renderP();renderC();toast('Apagadas');
+  var ids=pedidosCache.map(function(p){return p.id;});
+  pedidosCache=[];
+  _saveTimestampsPedidos={};
+  salvarCacheLocal();
+  renderG();renderP();renderC();toast('Apagadas');
+  try{
+    var batch=writeBatch(db);
+    ids.forEach(function(id){batch.delete(doc(db,'tapetes',id));});
+    await batch.commit();
+  } catch(e){}
 };
 
 // ─── ABA 4 Ruas ──────────────────────────────────────────────────────────────
@@ -1137,15 +1180,25 @@ window.renderR = function(){
 };
 window.delR = async function(id){
   if(!confirm('Remover?'))return;
-  await deleteDoc(doc(db,'tapetes_ruas',id));
   ruasCache=ruasCache.filter(function(r){return r.id!==id;});
+  delete _saveTimestampsRuas[id];
+  marcarDeletadoRua(id);
+  salvarCacheLocal();
   renderR();renderRC();toast('Removida');
+  try{ await deleteDoc(doc(db,'tapetes_ruas',id)); } catch(e){}
 };
 window.apagarTodasR = async function(){
   if(!confirm('Apagar TODAS as ruas?'))return;
-  var batch=writeBatch(db);
-  ruasCache.forEach(function(r){batch.delete(doc(db,'tapetes_ruas',r.id));});
-  await batch.commit();ruasCache=[];renderR();renderRC();toast('Apagadas');
+  var ids=ruasCache.map(function(r){return r.id;});
+  ruasCache=[];
+  _saveTimestampsRuas={};
+  salvarCacheLocal();
+  renderR();renderRC();toast('Removidas');
+  try{
+    var batch=writeBatch(db);
+    ids.forEach(function(id){batch.delete(doc(db,'tapetes_ruas',id));});
+    await batch.commit();
+  } catch(e){}
 };
 
 // ─── ABA 5 Completo ──────────────────────────────────────────────────────────
@@ -1404,9 +1457,15 @@ async function carregarCacheLocal(){
 // ─── Sincronizar pendentes quando voltar online ───────────────────────────────
 async function sincronizarPendentes(){
   if(!_firebaseOk) return;
-
-  // Sincronizar pedidos com pendingSync no cache
   var pedidosPendentes = pedidosCache.filter(function(p){ return p.pendingSync; });
+  var ruasPendentes = ruasCache.filter(function(r){ return r.pendingSync; });
+  if(!pedidosPendentes.length && !ruasPendentes.length) return;
+
+  // Bloqueia onSnapshot durante todo o sync para evitar race condition
+  _blockSnapshotUntil = Date.now() + 30000;
+  if(window.syncShow) window.syncShow.syncing();
+
+  // Sincronizar pedidos
   for(var i=0; i<pedidosPendentes.length; i++){
     var obj = Object.assign({}, pedidosPendentes[i]);
     var localId = obj.id;
@@ -1416,13 +1475,16 @@ async function sincronizarPendentes(){
       var idx = pedidosCache.findIndex(function(x){ return x.id === localId; });
       if(idx>=0){
         pedidosCache[idx] = Object.assign({}, obj, {id: docRef.id});
+        // Remove o ID local da lista de deletados (se existir por engano)
+        delete _deletedPedidosIds[localId];
+        delete _deletedPedidosIds[docRef.id];
         _saveTimestampsPedidos[docRef.id] = obj.updatedAt || Date.now();
+        delete _saveTimestampsPedidos[localId];
       }
-    } catch(e){ /* mantém pendente */ }
+    } catch(e){ /* mantém pendente, não remove do cache */ }
   }
 
-  // Sincronizar ruas com pendingSync no cache
-  var ruasPendentes = ruasCache.filter(function(r){ return r.pendingSync; });
+  // Sincronizar ruas
   for(var j=0; j<ruasPendentes.length; j++){
     var robj = Object.assign({}, ruasPendentes[j]);
     var rlocalId = robj.id;
@@ -1432,12 +1494,16 @@ async function sincronizarPendentes(){
       var ridx = ruasCache.findIndex(function(x){ return x.id === rlocalId; });
       if(ridx>=0){
         ruasCache[ridx] = Object.assign({}, robj, {id: ruaRef.id});
+        delete _deletedRuasIds[rlocalId];
         _saveTimestampsRuas[ruaRef.id] = robj.updatedAt || Date.now();
+        delete _saveTimestampsRuas[rlocalId];
       }
     } catch(e){ /* mantém pendente */ }
   }
 
   salvarCacheLocal();
+  // Libera o bloqueio apenas agora, após tudo salvo
+  _blockSnapshotUntil = Date.now() + 3000;
   renderP();renderG();renderC();renderR();renderRC();renderAgenda();
   if(window.syncShow) window.syncShow.synced('Tapetes');
   toast('Dados sincronizados com a nuvem!');
@@ -1466,6 +1532,8 @@ async function iniciarListeners(){
     // Mescla: para cada item da nuvem, usa o mais recente (local ou nuvem)
     var merged = [];
     dadosFirebase.forEach(function(cloud){
+      // Ignora itens que foram excluídos localmente
+      if(_deletedPedidosIds[cloud.id]) return;
       var localTs = _saveTimestampsPedidos[cloud.id] || 0;
       var cloudTs = cloud.updatedAt || 0;
       if(localTs > cloudTs){
@@ -1476,9 +1544,12 @@ async function iniciarListeners(){
         merged.push(cloud);
       }
     });
-    // Adiciona itens que estão só no local (pendingSync ou recém-criados)
+    // Adiciona itens que estão só no local (pendingSync, recém-criados ou IDs locais ainda não sincronizados)
     pedidosCache.forEach(function(local){
-      if(!merged.find(function(p){ return p.id === local.id; })) merged.push(local);
+      if(!merged.find(function(p){ return p.id === local.id; })){
+        // Só adiciona se NÃO foi marcado como deletado
+        if(!_deletedPedidosIds[local.id]) merged.push(local);
+      }
     });
 
     pedidosCache = merged;
@@ -1500,6 +1571,8 @@ async function iniciarListeners(){
 
     var merged = [];
     dadosFirebase.forEach(function(cloud){
+      // Ignora ruas excluídas localmente
+      if(_deletedRuasIds[cloud.id]) return;
       var localTs = _saveTimestampsRuas[cloud.id] || 0;
       var cloudTs = cloud.updatedAt || 0;
       if(localTs > cloudTs){
@@ -1510,7 +1583,9 @@ async function iniciarListeners(){
       }
     });
     ruasCache.forEach(function(local){
-      if(!merged.find(function(r){ return r.id === local.id; })) merged.push(local);
+      if(!merged.find(function(r){ return r.id === local.id; })){
+        if(!_deletedRuasIds[local.id]) merged.push(local);
+      }
     });
 
     ruasCache = merged;
