@@ -85,6 +85,7 @@
   .sync-badge {
     display: flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 500;
     color: var(--gray-400); padding: 4px 8px; border-radius: 20px; background: var(--gray-100);
+    opacity: 0; pointer-events: none;
   }
   .sync-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); }
 
@@ -525,7 +526,7 @@
     </div>
     <div class="form-group">
       <label class="form-label">Número (DDD + número) *</label>
-      <input class="form-input" id="inp-numero" placeholder="79999292683" type="tel" inputmode="numeric" maxlength="20">
+      <input class="form-input" id="inp-numero" placeholder="(48) 98120-0000" type="tel" inputmode="numeric" maxlength="16" oninput="mascararTelefone(this)">
     </div>
     <div class="form-group">
       <label class="form-label">Indicado por (opcional)</label>
@@ -611,15 +612,15 @@
     </div>
     <div class="form-group">
       <label class="form-label">💬 Mensagem — 1 dia antes</label>
-      <textarea class="form-textarea" id="re-msg-dia-antes" placeholder="Ex: Olá! Só lembrando que amanhã temos reunião às {hora}. Confirma sua presença?" style="min-height:70px"></textarea>
+      <textarea class="form-textarea" id="re-msg-dia-antes" style="min-height:70px"></textarea>
     </div>
     <div class="form-group">
       <label class="form-label">☀️ Mensagem — Manhã do dia</label>
-      <textarea class="form-textarea" id="re-msg-manha" placeholder="Ex: Bom dia! Hoje é o dia da nossa reunião às {hora}. Até logo!" style="min-height:70px"></textarea>
+      <textarea class="form-textarea" id="re-msg-manha" style="min-height:70px"></textarea>
     </div>
     <div class="form-group">
       <label class="form-label">⏰ Mensagem — 1 hora antes</label>
-      <textarea class="form-textarea" id="re-msg-hora-antes" placeholder="Ex: Falta 1 hora para nossa reunião! Nos vemos às {hora}." style="min-height:70px"></textarea>
+      <textarea class="form-textarea" id="re-msg-hora-antes" style="min-height:70px"></textarea>
     </div>
     <div class="modal-row">
       <div class="form-group"><button class="btn-full gray" onclick="closeModal('modal-reuniao')">Cancelar</button></div>
@@ -910,16 +911,26 @@ async function crmSyncPending() {
   try {
     const pending = JSON.parse(localStorage.getItem('meucrm_pending') || '[]');
     if (!pending.length) return;
+    // Bloqueia snapshot durante todo o sync para evitar race condition
+    Object.keys(_crmBlockUntil).forEach(k => { _crmBlockUntil[k] = Date.now() + 30000; });
     const remaining = [];
     for (const item of pending) {
       try {
-        if (item.op === 'add') await addDoc(collection(firestoreDb, COLS[item.col]), item.data);
+        if (item.op === 'add') {
+          const ref = await addDoc(collection(firestoreDb, COLS[item.col]), item.data);
+          // Atualiza ID local → real no state
+          if (state[item.col]) {
+            const i = state[item.col].findIndex(x => x.id === (item.data._localId || item.data.id));
+            if (i >= 0) { state[item.col][i] = { ...item.data, id: ref.id }; saveLocal('meucrm_state_' + COLS[item.col], state[item.col]); }
+          }
+        }
         else if (item.op === 'update') await updateDoc(doc(firestoreDb, COLS[item.col], item.id), item.data);
         else if (item.op === 'delete') await deleteDoc(doc(firestoreDb, COLS[item.col], item.id));
       } catch(_) { remaining.push(item); }
     }
     localStorage.setItem('meucrm_pending', JSON.stringify(remaining));
-    if (!remaining.length && window.syncShow) window.syncShow.synced('MEU CRM');
+    // Libera o block após sync completo
+    Object.keys(_crmBlockUntil).forEach(k => { _crmBlockUntil[k] = Date.now() + 3000; });
   } catch(_) {}
 }
 
@@ -958,16 +969,17 @@ async function fsAdd(colKey, data) {
   const now = Date.now();
   const tempId = data.id || uid();
   const payload = { ...data, id: tempId, createdAt: now, updatedAt: now };
-  // Atualiza state e local imediatamente
+  // Atualiza state e local imediatamente — nunca bloqueia a UI
   if (!state[colKey]) state[colKey] = [];
   state[colKey].push(payload);
   saveLocal('meucrm_state_' + COLS[colKey], state[colKey]);
   _crmBlockUntil[colKey] = now + 5000;
   renderPage(currentPage); updateBadges();
   if (window.syncShow) window.syncShow.syncing();
+  // Firebase em background com timeout de 4s
+  const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 1000));
   try {
-    const ref = await addDoc(collection(firestoreDb, COLS[colKey]), payload);
-    // Atualiza id real no state
+    const ref = await Promise.race([addDoc(collection(firestoreDb, COLS[colKey]), payload), timeout]);
     const idx = state[colKey].findIndex(x => x.id === tempId);
     if (idx >= 0) state[colKey][idx].id = ref.id;
     saveLocal('meucrm_state_' + COLS[colKey], state[colKey]);
@@ -985,14 +997,17 @@ async function fsAdd(colKey, data) {
 async function fsUpdate(colKey, id, data) {
   const now = Date.now();
   const withTs = { ...data, updatedAt: now };
-  // Atualiza state imediatamente
+  // Atualiza state imediatamente — nunca bloqueia a UI
   const idx = (state[colKey] || []).findIndex(x => x.id === id);
   if (idx >= 0) Object.assign(state[colKey][idx], withTs);
   saveLocal('meucrm_state_' + COLS[colKey], state[colKey]);
   _crmBlockUntil[colKey] = now + 5000;
+  renderPage(currentPage); updateBadges();
   if (window.syncShow) window.syncShow.syncing();
+  // Firebase em background com timeout de 4s
+  const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 1000));
   try {
-    await updateDoc(doc(firestoreDb, COLS[colKey], id), withTs);
+    await Promise.race([updateDoc(doc(firestoreDb, COLS[colKey], id), withTs), timeout]);
     if (window.syncShow) window.syncShow.synced('MEU CRM');
   } catch(e) {
     const pending = JSON.parse(localStorage.getItem('meucrm_pending') || '[]');
@@ -1072,22 +1087,23 @@ function showToastCRM(msg) {
 
 async function fsDelete(colKey, id) {
   enviarItemParaLixeiraCRM(colKey, id);
-  // Remove do estado local IMEDIATAMENTE
+  // Remove do estado local IMEDIATAMENTE — nunca bloqueia a UI
   if (state[colKey]) state[colKey] = state[colKey].filter(x => x.id !== id);
   marcarDeletadoCRM(colKey, id);
   saveLocal('meucrm_state_' + COLS[colKey], state[colKey] || []);
   renderPage(currentPage); updateBadges();
-  // Firebase em background
-  if (window.syncShow) window.syncShow.syncing();
+  // IDs locais nunca existiram no Firebase
+  if (id.startsWith('local_') || id.startsWith('tmp_')) return;
+  // Firebase em background com timeout de 4s
+  const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 1000));
   try {
-    await deleteDoc(doc(firestoreDb, COLS[colKey], id));
-    if (window.syncShow) window.syncShow.synced('MEU CRM');
+    await Promise.race([deleteDoc(doc(firestoreDb, COLS[colKey], id)), timeout]);
   } catch(e) {
-    // Offline: salva na fila de pendentes
     const pending = JSON.parse(localStorage.getItem('meucrm_pending') || '[]');
-    pending.push({ op: 'delete', col: colKey, id });
-    localStorage.setItem('meucrm_pending', JSON.stringify(pending));
-    if (window.syncShow) window.syncShow.offline();
+    if (!pending.find(p => p.op === 'delete' && p.col === colKey && p.id === id)) {
+      pending.push({ op: 'delete', col: colKey, id });
+      localStorage.setItem('meucrm_pending', JSON.stringify(pending));
+    }
   }
 }
 
@@ -1101,6 +1117,8 @@ window.navigate = function(page) {
   document.querySelector('[data-page="' + page + '"]')?.classList.add('active');
   closeSidebar();
   renderPage(page);
+  // Abre modal de novo contato automaticamente ao entrar em Contatos
+  if (page === 'contatos') setTimeout(() => window.openModalNovoContato(), 150);
 }
 
 function _navigateDirect(page) {
@@ -1522,6 +1540,31 @@ function verificarConflitoHorario(data, hora) {
 // ══════════════════════════════════════════════
 // CONTATOS ACTIONS
 // ══════════════════════════════════════════════
+// ── Máscara de telefone: (48) 98120-0000 ────────────────────────────────────
+window.mascararTelefone = function(input) {
+  // Pega só dígitos, limita a 11 (DD + 9 + 8 dígitos)
+  let v = input.value.replace(/\D/g, '').slice(0, 11);
+  let r = '';
+  if (v.length === 0) { input.value = ''; return; }
+  const dd    = v.slice(0, 2);   // 2 dígitos do DDD
+  const nono  = v.slice(2, 3);   // 9 obrigatório
+  const bloco = v.slice(3, 7);   // 4 dígitos
+  const final = v.slice(7, 11);  // 4 dígitos finais
+  if (v.length <= 2) {
+    r = '(' + dd;
+  } else if (v.length === 3) {
+    // Apenas o primeiro dígito após DDD
+    r = '(' + dd + ') ' + nono;
+  } else if (v.length <= 7) {
+    // (48) 9 9929
+    r = '(' + dd + ') ' + nono + ' ' + bloco;
+  } else {
+    // (48) 9 9929-0000
+    r = '(' + dd + ') ' + nono + ' ' + bloco + '-' + final;
+  }
+  input.value = r;
+};
+
 window.openModalNovoContato = function() {
   document.getElementById('modal-novo-title').textContent = 'Novo Contato';
   document.getElementById('edit-id').value = '';
@@ -1536,7 +1579,11 @@ window.editarContato = function(id) {
   document.getElementById('modal-novo-title').textContent = 'Editar Contato';
   document.getElementById('edit-id').value = id;
   document.getElementById('inp-nome').value = c.nome;
-  document.getElementById('inp-numero').value = c.numero;
+  // Aplica máscara ao número existente ao editar
+  const numLimpo = (c.numero || '').replace(/\D/g,'');
+  const fakeInput = { value: numLimpo };
+  window.mascararTelefone(fakeInput);
+  document.getElementById('inp-numero').value = fakeInput.value;
   document.getElementById('inp-indicado').value = c.indicado || '';
   document.getElementById('inp-obs').value = c.obs || '';
   window.openModal('modal-novo');
@@ -1588,22 +1635,26 @@ async function moverParaArquivo(id) {
 window.openAtendeu = function(id) {
   selectedContatoId = id;
   const c = state.contatos.find(x => x.id === id);
-  if (!c) return;
+  if (!c) { toast('Contato não encontrado'); return; }
   document.getElementById('atendeu-title').textContent = `${c.nome} atendeu! 🎉`;
-  window.openModal('modal-atendeu');
+  // Garante que qualquer modal anterior foi fechado antes de abrir
+  document.querySelectorAll('.modal-backdrop.active').forEach(m => m.classList.remove('active'));
+  setTimeout(function() { window.openModal('modal-atendeu'); }, 50);
 }
 
 window.atendeuOpcao = function(opcao) {
   window.closeModal('modal-atendeu');
-  if (opcao === 'agenda') { openModalAgendar(); return; }
-  if (opcao === 'reuniao') { openModalReuniao(); return; }
-  if (opcao === 'proposta') { openModalProposta(); return; }
-  if (opcao === 'excluir') {
-    confirm2('Excluir contato?', 'Essa ação é permanente e não pode ser desfeita.', async () => {
-      await fsDelete('contatos', selectedContatoId);
-      toast('Contato excluído');
-    });
-  }
+  setTimeout(function() {
+    if (opcao === 'agenda') { openModalAgendar(); return; }
+    if (opcao === 'reuniao') { openModalReuniao(); return; }
+    if (opcao === 'proposta') { openModalProposta(); return; }
+    if (opcao === 'excluir') {
+      confirm2('Excluir contato?', 'Essa ação é permanente e não pode ser desfeita.', async () => {
+        await fsDelete('contatos', selectedContatoId);
+        toast('Contato excluído');
+      });
+    }
+  }, 320);
 }
 
 // ══════════════════════════════════════════════
@@ -1636,9 +1687,11 @@ function openModalReuniao() {
   document.getElementById('re-data').value = new Date().toISOString().slice(0,10);
   document.getElementById('re-hora').value = '';
   const msgPadrao = JSON.parse(localStorage.getItem('meucrmMsgReuniao') || '{}');
-  document.getElementById('re-msg-dia-antes').value = msgPadrao.diaAntes || '';
-  document.getElementById('re-msg-manha').value = msgPadrao.manha || '';
-  document.getElementById('re-msg-hora-antes').value = msgPadrao.horaAntes || '';
+  const c = state.contatos.find(x => x.id === selectedContatoId);
+  const nome = c ? c.nome.split(' ')[0] : '{nome}';
+  document.getElementById('re-msg-dia-antes').value  = msgPadrao.diaAntes  || `Olá, ${nome}! Só lembrando que amanhã temos nossa reunião às {hora}. Confirma sua presença?`;
+  document.getElementById('re-msg-manha').value      = msgPadrao.manha     || `Bom dia, ${nome}! Hoje é o dia da nossa reunião às {hora}. Estou te esperando!`;
+  document.getElementById('re-msg-hora-antes').value = msgPadrao.horaAntes || `${nome}, falta 1 hora para nossa reunião! Nos vemos às {hora}. 👍`;
   window.openModal('modal-reuniao');
 }
 
@@ -1657,6 +1710,25 @@ window.confirmarReuniao = async function() {
   window.closeModal('modal-reuniao');
   await fsAdd('reunioes', { contatoId: c.id, nome: c.nome, numero: c.numero, data, hora, tipo, obs: c.obs || '', msgDiaAntes, msgManha, msgHoraAntes });
   await fsDelete('contatos', selectedContatoId);
+
+  // ── Google Agenda ──
+  const dataGcal = data.replace(/-/g,'');
+  const [hhG, mmG] = hora.split(':').map(Number);
+  const pad2 = n => String(n).padStart(2,'0');
+  const inicio = `${dataGcal}T${pad2(hhG)}${pad2(mmG)}00`;
+  const fimH = hhG + 1 >= 24 ? 0 : hhG + 1;
+  const fim = `${dataGcal}T${pad2(fimH)}${pad2(mmG)}00`;
+  const titulo = encodeURIComponent(`Reunião com ${c.nome}`);
+  const gcalUrl = `https://www.google.com/calendar/event?action=TEMPLATE&text=${titulo}&dates=${inicio}/${fim}&sf=true&output=xml`;
+
+  setTimeout(() => {
+    const t = document.createElement('div');
+    t.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#111;color:#fff;padding:12px 20px;border-radius:12px;font-size:13px;font-weight:600;z-index:9999;display:flex;gap:10px;align-items:center;box-shadow:0 4px 20px rgba(0,0,0,0.3);white-space:nowrap;';
+    t.innerHTML = `<span>📅</span><a href="${gcalUrl}" target="_blank" style="color:#fff;text-decoration:none;">Salvar no Google Agenda</a>`;
+    document.body.appendChild(t);
+    setTimeout(() => t.remove(), 8000);
+  }, 600);
+
   toast('Reunião marcada! 🤝');
   scheduleReuniaoNotifications(c.nome, c.numero, data, hora, msgDiaAntes, msgManha, msgHoraAntes);
 }
@@ -2045,6 +2117,8 @@ requestNotifPermission();
 carregarLixeiraCRM();
 crmSyncPending();
 initListeners();
+// Abre modal de novo contato automaticamente ao carregar (já começa em contatos)
+setTimeout(() => window.openModalNovoContato && window.openModalNovoContato(), 300);
 </script>
 <script>
 // ECOSISTEMA: botao fisico voltar -> index.html (sem logout)
@@ -2060,4 +2134,4 @@ initListeners();
 })();
 </script>
 </body>
-  </html>
+        </html>
