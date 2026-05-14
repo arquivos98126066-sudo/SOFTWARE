@@ -882,6 +882,18 @@ const COLS = {
 // ══════════════════════════════════════════════
 const _crmBlockUntil = {}; // colKey → timestamp
 
+// ── IDs excluídos (evita onSnapshot restaurar após delete) ───────────────────
+const _crmDeletedIds = {};
+try {
+  const _raw = localStorage.getItem('meucrm_deleted_ids');
+  if (_raw) Object.assign(_crmDeletedIds, JSON.parse(_raw));
+} catch(_) {}
+function marcarDeletadoCRM(colKey, id) {
+  if (!_crmDeletedIds[colKey]) _crmDeletedIds[colKey] = {};
+  _crmDeletedIds[colKey][id] = Date.now();
+  try { localStorage.setItem('meucrm_deleted_ids', JSON.stringify(_crmDeletedIds)); } catch(_) {}
+}
+
 async function crmCarregarLocal() {
   for (const [key, colName] of Object.entries(COLS)) {
     const cache = await loadLocal('meucrm_state_' + colName);
@@ -919,9 +931,10 @@ function initListeners() {
       if (Date.now() < (_crmBlockUntil[key] || 0)) return; // guard
       const cloudList = snap.docs.map(d => ({ id: d.id, ...d.data() }));
       const localMaxTime = (state[key] || []).reduce((mx, c) => Math.max(mx, c.updatedAt || c.createdAt || 0), 0);
-      const cloudMaxTime = cloudList.reduce((mx, c) => Math.max(mx, c.updatedAt || c.createdAt || 0), 0);
+      const filtered = cloudList.filter(c => !(_crmDeletedIds[key] && _crmDeletedIds[key][c.id]));
+      const cloudMaxTime = filtered.reduce((mx, c) => Math.max(mx, c.updatedAt || c.createdAt || 0), 0);
       if (cloudMaxTime >= localMaxTime) {
-        state[key] = cloudList;
+        state[key] = filtered;
         saveLocal('meucrm_state_' + colName, state[key]);
       }
       renderPage(currentPage);
@@ -932,7 +945,10 @@ function initListeners() {
     });
   });
 
-  window.addEventListener('online', () => crmSyncPending());
+  window.addEventListener('online', () => {
+  Object.keys(_crmBlockUntil).forEach(k => { _crmBlockUntil[k] = Date.now() + 10000; });
+  setTimeout(() => crmSyncPending(), 800);
+});
 }
 
 // ══════════════════════════════════════════════
@@ -1056,12 +1072,21 @@ function showToastCRM(msg) {
 
 async function fsDelete(colKey, id) {
   enviarItemParaLixeiraCRM(colKey, id);
+  // Remove do estado local IMEDIATAMENTE
+  if (state[colKey]) state[colKey] = state[colKey].filter(x => x.id !== id);
+  marcarDeletadoCRM(colKey, id);
+  saveLocal('meucrm_state_' + COLS[colKey], state[colKey] || []);
+  renderPage(currentPage); updateBadges();
+  // Firebase em background
   if (window.syncShow) window.syncShow.syncing();
   try {
     await deleteDoc(doc(firestoreDb, COLS[colKey], id));
     if (window.syncShow) window.syncShow.synced('MEU CRM');
   } catch(e) {
-    console.error(e);
+    // Offline: salva na fila de pendentes
+    const pending = JSON.parse(localStorage.getItem('meucrm_pending') || '[]');
+    pending.push({ op: 'delete', col: colKey, id });
+    localStorage.setItem('meucrm_pending', JSON.stringify(pending));
     if (window.syncShow) window.syncShow.offline();
   }
 }
@@ -2035,4 +2060,4 @@ initListeners();
 })();
 </script>
 </body>
-</html>
+  </html>
