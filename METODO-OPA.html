@@ -1586,6 +1586,125 @@ function abrirDetHist(id){
   irTHist('t-hist-det');
 }
 
+// ===== LIXEIRA =====
+function confirmar(msg, cb) {
+  abrirModal(`
+    <p style="font-size:15px;font-weight:700;color:var(--texto);margin-bottom:18px">${msg}</p>
+    <div style="display:flex;gap:10px">
+      <button class="btn btn-sec" onclick="fecharModal()">Cancelar</button>
+      <button class="btn btn-danger" id="btn-confirmar-ok">Confirmar</button>
+    </div>`);
+  document.getElementById('btn-confirmar-ok').addEventListener('click', () => { fecharModal(); cb(); });
+}
+
+function moverLixeira(tipo, id) {
+  md(d => {
+    if (!d.lixeira) d.lixeira = [];
+    let item = null;
+    if (tipo === 'bloco') {
+      const p = d.planejamentos.find(x => x.data === hoje() && !x.revisao);
+      if (p) { item = p.blocos.find(b => b.id === id); if (item) p.blocos = p.blocos.filter(b => b.id !== id); }
+      blocosTemp = blocosTemp.filter(b => b.id !== id);
+    } else if (tipo === 'habito') {
+      item = d.habitos.find(h => h.id === id);
+      if (item) d.habitos = d.habitos.filter(h => h.id !== id);
+    } else if (tipo === 'decisao') {
+      item = d.decisoes.find(x => x.id === id);
+      if (item) d.decisoes = d.decisoes.filter(x => x.id !== id);
+    } else if (tipo === 'dia') {
+      item = d.planejamentos.find(x => x.id === id);
+      if (item) d.planejamentos = d.planejamentos.filter(x => x.id !== id);
+    } else if (tipo === 'plano') {
+      item = (d.planos || []).find(x => x.id === id);
+      if (item) d.planos = d.planos.filter(x => x.id !== id);
+    }
+    if (item) d.lixeira.unshift({ tipo, id, nome: item.nome || item.tema || fBR(item.data) || 'Item', data: hoje(), item });
+  });
+  // Re-render conforme contexto
+  if (tipo === 'bloco') { renderBlocosUI(); checkBtns(); }
+  else if (tipo === 'habito') renderHabitos();
+  else if (tipo === 'decisao') { renderDecAnt(); irTDec('t-dec-inicio'); }
+  else if (tipo === 'dia') { renderHistorico(); irTHist('t-hist-lista'); }
+  else if (tipo === 'plano') renderPlanos();
+  atualizarBadgeLixeira();
+  toast('🗑️ Movido para a lixeira');
+}
+
+function renderLixeira() {
+  const data = gd();
+  const lista = $('#lixeira-lista');
+  const vazia = $('#lixeira-vazia');
+  const itens = data.lixeira || [];
+  lista.innerHTML = '';
+  if (!itens.length) { vazia.style.display = 'block'; return; }
+  vazia.style.display = 'none';
+  itens.forEach(lx => {
+    const div = document.createElement('div');
+    div.className = 'lixeira-item';
+    div.innerHTML = `
+      <div class="lixeira-item-info">
+        <p class="lixeira-item-tipo">${lx.tipo}</p>
+        <p class="lixeira-item-nome">${lx.nome || 'Item'}</p>
+        <p class="lixeira-item-data">${fBR(lx.data)}</p>
+      </div>
+      <div class="lixeira-btns">
+        <button class="btn btn-sec btn-xs" id="btn-rest-${lx.id}">↩ Restaurar</button>
+        <button class="btn btn-danger btn-xs" id="btn-del-${lx.id}">✕ Apagar</button>
+      </div>`;
+    div.querySelector('#btn-rest-' + lx.id).addEventListener('click', () => restaurarLixeira(lx.id, lx.tipo));
+    div.querySelector('#btn-del-' + lx.id).addEventListener('click', () => confirmar('Apagar permanentemente?', () => apagarLixeira(lx.id)));
+    lista.appendChild(div);
+  });
+}
+
+function restaurarLixeira(id, tipo) {
+  md(d => {
+    if (!d.lixeira) return;
+    const lx = d.lixeira.find(x => x.id === id);
+    if (!lx) return;
+    d.lixeira = d.lixeira.filter(x => x.id !== id);
+    if (tipo === 'bloco') {
+      const p = d.planejamentos.find(x => x.data === hoje() && !x.revisao);
+      if (p) p.blocos.push(lx.item); else d.planejamentos.unshift({ id: hId(), data: hoje(), blocos: [lx.item], progresso_percentual: 0, iniciado: false, revisao: null });
+      blocosTemp = (d.planejamentos.find(x => x.data === hoje() && !x.revisao) || { blocos: [] }).blocos;
+    } else if (tipo === 'habito') { d.habitos = d.habitos || []; d.habitos.unshift(lx.item); }
+    else if (tipo === 'decisao') { d.decisoes = d.decisoes || []; d.decisoes.unshift(lx.item); }
+    else if (tipo === 'dia') { d.planejamentos = d.planejamentos || []; d.planejamentos.unshift(lx.item); }
+    else if (tipo === 'plano') { d.planos = d.planos || []; d.planos.unshift(lx.item); }
+  });
+  renderLixeira();
+  atualizarBadgeLixeira();
+  toast('✅ Item restaurado!');
+}
+
+function apagarLixeira(id) {
+  md(d => { if (d.lixeira) d.lixeira = d.lixeira.filter(x => x.id !== id); });
+  renderLixeira();
+  atualizarBadgeLixeira();
+  toast('🗑️ Apagado permanentemente');
+}
+
+function esvaziarLixeira() {
+  confirmar('Esvaziar a lixeira permanentemente?', () => {
+    md(d => { d.lixeira = []; });
+    renderLixeira();
+    atualizarBadgeLixeira();
+    toast('🗑️ Lixeira esvaziada');
+  });
+}
+
+function atualizarBadgeLixeira() {
+  const data = gd();
+  const qtd = (data.lixeira || []).length;
+  const badge = document.getElementById('lixeira-badge');
+  if (!badge) return;
+  if (qtd > 0) { badge.style.display = 'inline'; badge.textContent = qtd; } else { badge.style.display = 'none'; }
+}
+
+// Abre renderLixeira ao entrar na tela
+const _origIrTHist = irTHist;
+irTHist = function(id) { _origIrTHist(id); if (id === 't-hist-lixeira') renderLixeira(); };
+
 // Init badge
 atualizarBadgeLixeira();
 
@@ -1607,4 +1726,4 @@ initHoje();
 })();
 </script>
 </body>
-</html>
+  </html>
