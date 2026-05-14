@@ -1,0 +1,1733 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Born Rich — Caderno de Atividades</title>
+<script src="https://arquivos98126066-sudo.github.io/SOFTWARE/sync-indicator.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    /* ── Variáveis padrão do sistema ── */
+    --sys-bg: #07070f;
+    --sys-glass: rgba(255,255,255,0.05);
+    --sys-glass2: rgba(255,255,255,0.09);
+    --sys-border-r: rgba(255,255,255,0.08);
+    --sys-border2-r: rgba(255,255,255,0.15);
+    --sys-text-r: #f0f0fa;
+    --sys-muted: #6b6b88;
+    --sys-muted2: #9999bb;
+    --sys-accent: #7c6dfa;
+    --sys-accent2: #c96dfa;
+    --sys-green-r: #3ddc84;
+    --sys-red-r: #f87171;
+    /* ── Tema RICO ── */
+    --gold: #111111;
+    --gold-light: #d1d5db;
+    --dark: #141414;
+    --cream: #ffffff;
+    --mid: #f5f5f5;
+    --text: #2d2d2d;
+    --muted: #999;
+    --border: rgba(0,0,0,0.10);
+    --accent: #333333;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--cream);
+    color: var(--text);
+    font-size: 15px;
+    line-height: 1.75;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── COVER ── */
+  .cover {
+    background: var(--dark);
+    color: #fff;
+    min-height: 100svh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 56px 28px 80px;
+    position: relative;
+    overflow: hidden;
+  }
+  .cover::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 50% 30%, rgba(255,255,255,.04) 0%, transparent 65%);
+    pointer-events: none;
+  }
+  .cover-ornament {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 10px;
+    letter-spacing: 6px;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 28px;
+    font-weight: 500;
+  }
+  .cover h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(3.2rem, 14vw, 5.5rem);
+    font-weight: 700;
+    letter-spacing: 1px;
+    line-height: 1.05;
+    margin-bottom: 8px;
+  }
+  .cover h1 span { color: #ffffff; }
+  .cover-line {
+    width: 50px; height: 1px;
+    background: var(--gold);
+    margin: 28px auto;
+    opacity: .7;
+  }
+  .cover-sub {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 1.1rem;
+    color: var(--gold-light);
+    margin-bottom: 36px;
+    font-weight: 400;
+  }
+  .cover-author {
+    font-size: 10px;
+    letter-spacing: 3px;
+    color: #666;
+    text-transform: uppercase;
+    font-weight: 400;
+  }
+  .cover-scroll {
+    position: absolute;
+    bottom: 32px;
+    font-size: 10px;
+    letter-spacing: 4px;
+    color: #444;
+    text-transform: uppercase;
+    animation: bounce 2.2s ease-in-out infinite;
+  }
+  @keyframes bounce {
+    0%,100%{transform:translateY(0)} 50%{transform:translateY(7px)}
+  }
+
+  /* ── NAV ── */
+  .nav-bar {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: var(--dark);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 13px 20px;
+    border-bottom: 1px solid #222;
+  }
+  .nav-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #ffffff;
+    letter-spacing: 2px;
+  }
+
+  /* ── SECTIONS ── */
+  .section {
+    padding: 52px 20px;
+    max-width: 680px;
+    margin: 0 auto;
+  }
+  .section + .section {
+    border-top: 1px solid var(--border);
+  }
+
+  .section-tag {
+    font-size: 9px;
+    letter-spacing: 5px;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 10px;
+    font-weight: 600;
+  }
+  .section-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(1.7rem, 6vw, 2.3rem);
+    font-weight: 700;
+    color: var(--dark);
+    margin-bottom: 18px;
+    line-height: 1.15;
+  }
+  .section-text {
+    color: #5a5a5a;
+    margin-bottom: 16px;
+    font-size: 14px;
+    line-height: 1.75;
+  }
+
+  /* ── QUOTE ── */
+  .quote-block {
+    border-left: 2px solid var(--gold);
+    padding: 14px 20px;
+    margin: 24px 0;
+    background: var(--mid);
+    border-radius: 0 6px 6px 0;
+  }
+  .quote-block p {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 1rem;
+    color: #3a3a3a;
+    line-height: 1.65;
+  }
+  .quote-block cite {
+    display: block;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-top: 10px;
+    font-style: normal;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 500;
+  }
+
+  /* ── CONCEPT BOX ── */
+  .concept-box {
+    background: var(--dark);
+    color: #fff;
+    border-radius: 8px;
+    padding: 20px;
+    margin: 18px 0;
+  }
+  .concept-box h4 {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.9rem;
+    color: var(--gold);
+    margin-bottom: 10px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+  }
+  .concept-box p { font-size: 13px; color: #ccc; line-height: 1.75; }
+
+  /* ── QUESTION CARD ── */
+  .question-card {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    margin: 18px 0;
+    overflow: hidden;
+    box-shadow: 0 1px 6px rgba(0,0,0,.04);
+  }
+  .question-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 16px 16px 14px;
+  }
+  .q-number {
+    background: var(--gold);
+    color: var(--dark);
+    font-weight: 700;
+    font-size: 11px;
+    min-width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 1px;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .q-text {
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--dark);
+    flex: 1;
+    line-height: 1.5;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .hint-btn {
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    font-size: 11px;
+    color: var(--muted);
+    cursor: pointer;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: border-color .2s, color .2s, background .2s;
+    margin-top: 2px;
+    font-family: 'DM Sans', sans-serif;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .hint-btn:active { border-color: #111111; color: #111111; background: #f5f5f5; }
+  .hint-btn.active { background: #111111; color: #ffffff; border-color: #111111; }
+
+  .hint-panel {
+    display: none;
+    padding: 12px 16px 14px 56px;
+    background: #f9f9f9;
+    border-top: 1px solid rgba(0,0,0,0.08);
+    font-size: 13px;
+    color: #374151;
+    line-height: 1.7;
+  }
+  .hint-panel.open { display: block; }
+  .hint-panel strong { color: var(--accent); }
+
+  /* choices */
+  .choice-row {
+    display: flex;
+    gap: 8px;
+    padding: 0 16px 14px 56px;
+    flex-wrap: wrap;
+  }
+  .choice-label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    color: #444;
+    padding: 6px 13px;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    transition: border-color .2s, background .2s;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .choice-label input { display: none; }
+  .choice-label.selected { background: #111111; color: #ffffff; border-color: #111111; font-weight: 600; }
+
+  /* textarea / inputs */
+  .answer-area {
+    padding: 0 16px 16px 56px;
+  }
+  .answer-area textarea,
+  .answer-area input[type=text] {
+    width: 100%;
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    padding: 10px 12px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    color: var(--text);
+    background: var(--cream);
+    resize: vertical;
+    min-height: 90px;
+    outline: none;
+    transition: border-color .2s;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+  .answer-area input[type=text] { min-height: unset; height: 42px; resize: none; }
+  .answer-area textarea:focus,
+  .answer-area input[type=text]:focus { border-color: #111111; background: #fff; }
+
+  /* list fields */
+  .list-fields { padding: 0 16px 16px 56px; display: flex; flex-direction: column; gap: 8px; }
+  .list-field-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .list-num {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--muted);
+    min-width: 18px;
+    text-align: right;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .list-field-row input {
+    flex: 1;
+    border: none;
+    border-bottom: 1px solid var(--border);
+    padding: 7px 4px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13.5px;
+    background: transparent;
+    outline: none;
+    color: var(--text);
+    transition: border-color .2s;
+    -webkit-appearance: none;
+    border-radius: 0;
+  }
+  .list-field-row input:focus { border-bottom-color: #111111; }
+
+  /* two-col table */
+  .two-col-fields { padding: 0 16px 16px 16px; display: flex; flex-direction: column; gap: 10px; }
+  .two-col-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .two-col-row input {
+    border: none;
+    border-bottom: 1px solid var(--border);
+    padding: 7px 4px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    background: transparent;
+    outline: none;
+    color: var(--text);
+    -webkit-appearance: none;
+    border-radius: 0;
+    width: 100%;
+  }
+  .two-col-row input:focus { border-bottom-color: #111111; }
+  .col-header { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 0 16px 8px 16px; }
+  .col-header span { font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: #6b7280; font-weight: 700; font-family: 'DM Sans', sans-serif; }
+
+  /* save button */
+  .save-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    background: #111111;
+    color: #ffffff;
+    border: none;
+    border-radius: 6px;
+    padding: 9px 18px;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    transition: background .2s;
+    -webkit-tap-highlight-color: transparent;
+    font-weight: 500;
+  }
+  .save-btn:active { background: #333; }
+  .save-btn .check { display: none; }
+  .save-btn.saved .label { display: none; }
+  .save-btn.saved .check { display: inline; }
+  .save-btn.saved { background: #2d5a27; color: #a8d5a2; }
+
+  .answer-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 16px 14px 56px;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .char-count { font-size: 11px; color: var(--muted); font-family: 'DM Sans', sans-serif; }
+
+  /* commitment block */
+  .commitment-block {
+    background: var(--dark);
+    border-radius: 12px;
+    padding: 24px 20px;
+    margin: 20px 0;
+    color: #fff;
+  }
+  .commitment-block h4 {
+    font-family: 'Cormorant Garamond', serif;
+    color: var(--gold);
+    margin-bottom: 14px;
+    font-size: 1.15rem;
+    font-weight: 700;
+  }
+  .commitment-block p {
+    font-size: 13px;
+    color: #bbb;
+    margin-bottom: 14px;
+    line-height: 1.7;
+  }
+  .commitment-block textarea,
+  .commitment-block input[type=text] {
+    width: 100%;
+    background: #222;
+    border: 1px solid #3a3a3a;
+    border-radius: 7px;
+    padding: 12px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    color: #eee;
+    outline: none;
+    transition: border-color .2s;
+    -webkit-appearance: none;
+  }
+  .commitment-block textarea { resize: vertical; min-height: 120px; }
+  .commitment-block input[type=text] { height: 44px; }
+  .commitment-block textarea:focus,
+  .commitment-block input[type=text]:focus { border-color: #ffffff; }
+
+  .sig-line {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 18px;
+    border-top: 1px solid #2a2a2a;
+    padding-top: 16px;
+  }
+  .sig-line label { font-size: 11px; color: #777; letter-spacing: 1px; white-space: nowrap; font-family: 'DM Sans', sans-serif; }
+  .sig-line input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid #444;
+    padding: 6px 4px;
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 1.15rem;
+    color: #fff;
+    outline: none;
+    -webkit-appearance: none;
+    border-radius: 0;
+  }
+
+  /* steps */
+  .steps-box { margin: 20px 0; display: flex; flex-direction: column; gap: 10px; }
+  .step-item {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 16px;
+  }
+  .step-num {
+    background: var(--gold);
+    color: var(--dark);
+    font-weight: 700;
+    font-size: 12px;
+    min-width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .step-text { font-size: 13.5px; font-weight: 500; color: var(--dark); padding-top: 3px; font-family: 'DM Sans', sans-serif; }
+
+  /* diagram card */
+  .diagram-card {
+    background: var(--mid);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 24px 20px;
+    margin: 20px 0;
+    text-align: center;
+  }
+  .diagram-card h4 {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.9rem;
+    margin-bottom: 18px;
+    color: var(--dark);
+    font-weight: 600;
+  }
+  .mind-model { display: flex; flex-direction: column; align-items: center; }
+  .mind-circle {
+    width: 160px;
+    border: 2px solid var(--dark);
+    border-radius: 80px;
+    overflow: hidden;
+  }
+  .mind-top, .mind-bottom {
+    padding: 10px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .mind-top { background: var(--gold); color: var(--dark); border-bottom: 2px solid var(--dark); }
+  .mind-bottom { background: #e0d8c8; color: #444; }
+  .mind-body-circle {
+    width: 68px;
+    height: 68px;
+    border: 2px solid var(--dark);
+    border-radius: 50%;
+    background: #f5f0e8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: #444;
+    margin-top: 8px;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .mind-connector { width: 2px; height: 14px; background: var(--dark); }
+
+  /* planes table */
+  .planes-table { width: 100%; border-collapse: collapse; margin: 16px 0; }
+  .planes-table td {
+    padding: 10px 14px;
+    border: 1px solid var(--border);
+    font-size: 13px;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .planes-table td:first-child { font-weight: 600; background: var(--mid); width: 42%; }
+  .planes-table td:last-child { color: #666; }
+
+  /* cycle */
+  .cycle-block {
+    background: var(--dark);
+    border-radius: 10px;
+    padding: 20px;
+    margin: 20px 0;
+    color: #fff;
+  }
+  .cycle-block h4 { color: var(--gold); font-family: 'Cormorant Garamond', serif; margin-bottom: 14px; font-size: 1.1rem; font-weight: 700; }
+  .cycle-chain {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .cycle-item {
+    background: #222;
+    border: 1px solid #3a3a3a;
+    border-radius: 20px;
+    padding: 6px 12px;
+    font-size: 11.5px;
+    letter-spacing: 0.5px;
+    color: #ddd;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .cycle-arrow { color: var(--gold); font-size: 14px; }
+
+  /* sep */
+  .sep {
+    text-align: center;
+    color: var(--gold);
+    font-size: 16px;
+    letter-spacing: 10px;
+    padding: 10px 0;
+    opacity: .4;
+  }
+
+  /* footer */
+  footer {
+    background: var(--dark);
+    color: #555;
+    text-align: center;
+    padding: 32px 20px;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    font-family: 'DM Sans', sans-serif;
+  }
+  footer span { color: var(--gold); }
+
+  /* toast */
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(70px);
+    background: #2d5a27;
+    color: #a8d5a2;
+    padding: 10px 22px;
+    border-radius: 20px;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    transition: transform .3s ease;
+    pointer-events: none;
+    z-index: 999;
+    font-family: 'DM Sans', sans-serif;
+    white-space: nowrap;
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+
+  /* mobile */
+  @media (max-width: 480px) {
+    .section { padding: 40px 16px; }
+    .answer-area { padding: 0 14px 14px 14px; }
+    .answer-footer { padding: 0 14px 12px 14px; }
+    .list-fields { padding: 0 14px 14px 14px; }
+    .hint-panel { padding-left: 16px; }
+    .choice-row { padding-left: 16px; }
+    .two-col-row { grid-template-columns: 1fr; }
+    .col-header { display: none; }
+    .question-header { padding: 14px 14px 12px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- COVER -->
+<div class="cover">
+  <p class="cover-ornament">Proctor Gallagher Institute</p>
+  <h1>I Was<br><span>Born Rich</span></h1>
+  <div class="cover-line"></div>
+  <p class="cover-sub">Caderno de Atividades — Bob Proctor</p>
+  <p class="cover-author">Suas respostas · Sua jornada · Sua riqueza</p>
+  <p class="cover-scroll">↓ começar</p>
+</div>
+
+<!-- NAV -->
+<nav class="nav-bar">
+  <span class="nav-title">Born Rich</span>
+</nav>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- INTRODUÇÃO -->
+<!-- ══════════════════════════════════════════ -->
+<div class="section" id="intro">
+  <p class="section-tag">Introdução</p>
+  <h2 class="section-title">O Ponto de Partida</h2>
+
+  <div class="quote-block">
+    <p>"A educação não significa ensinar às pessoas o que elas não sabem. Significa ensiná-las a se comportar como não se comportam."</p>
+    <cite>— John Ruskin</cite>
+  </div>
+
+  <p class="section-text">Este programa parte de uma premissa: você possui recursos ricos dormentes dentro de si, esperando para serem desenvolvidos. Cada exercício é direcionado a alterar sua <strong>mente condicionada</strong> — que controla seu estado material.</p>
+
+  <div class="concept-box">
+    <h4>🔑 Premissa Central</h4>
+    <p>A riqueza material é um estado normal e natural para você viver. Falta e limitação só existem quando abrimos espaço para elas em nossa mente. A consciência de prosperidade não conhece falta nem limitação.</p>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- A MENTE -->
+<!-- ══════════════════════════════════════════ -->
+<div class="section" id="mente">
+  <p class="section-tag">Módulo 1</p>
+  <h2 class="section-title">Como Funciona Sua Mente</h2>
+
+  <p class="section-text">Você vive simultaneamente em três planos distintos de ser:</p>
+
+  <table class="planes-table">
+    <tr><td>1. Espiritual</td><td>Energia de pensamento — não-físico</td></tr>
+    <tr><td>2. Intelectual</td><td>Ideias</td></tr>
+    <tr><td>3. Físico</td><td>Coisas ou Resultados</td></tr>
+  </table>
+
+  <div class="diagram-card">
+    <h4>O Modelo Mente–Corpo (Dr. Thurman Fleet, 1934)</h4>
+    <div class="mind-model">
+      <div class="mind-circle">
+        <div class="mind-top">Mente Consciente</div>
+        <div class="mind-bottom">Mente Subconsciente</div>
+      </div>
+      <div class="mind-connector"></div>
+      <div class="mind-body-circle">Corpo</div>
+    </div>
+  </div>
+
+  <div class="concept-box">
+    <h4>💡 Mente Consciente — "A Mente Pensante"</h4>
+    <p>Pensa e raciocina. Pode aceitar ou rejeitar qualquer ideia. Nenhuma pessoa ou circunstância pode te fazer pensar pensamentos que você não escolhe. Os pensamentos que você escolhe determinarão seus resultados na vida.</p>
+  </div>
+
+  <div class="concept-box" style="margin-top:10px; background:#1e1e1e;">
+    <h4>💡 Mente Subconsciente — "O Centro de Poder"</h4>
+    <p>Funciona em cada célula do seu corpo. Não tem a capacidade de rejeitar — aceita tudo que a mente consciente imprime. Ideias fixas continuam se expressando sem assistência consciente até serem substituídas. Essas ideias fixas são chamadas de hábitos.</p>
+  </div>
+
+  <div class="concept-box" style="margin-top:10px; background:#121212;">
+    <h4>💡 Corpo — "O Instrumento da Mente"</h4>
+    <p>É a apresentação física de você. Pensamentos e imagens escolhidos conscientemente, impressos no subconsciente, devem mover seu corpo para a ação. Ações determinam resultados.<br><br><strong style="color:var(--gold)">Pensamentos → Sentimentos → Ações → Resultados</strong></p>
+  </div>
+
+  <div class="sep">· · ·</div>
+
+  <h3 style="font-family:'Cormorant Garamond',serif; margin: 20px 0 12px; font-size:1.2rem; font-weight:700; color:var(--dark);">Raciocínio Dedutivo vs. Indutivo</h3>
+  <p class="section-text">Seu <strong>Fator de Raciocínio Indutivo</strong> é seu "PENSADOR" — separa você do resto do reino animal. Ele pode questionar cada ideia que entra na mente consciente e decidir se ela é BOA ou MÁ para você.</p>
+  <p class="section-text">Seu <strong>Fator de Raciocínio Dedutivo</strong> não tem a capacidade de rejeitar — aceita tudo e entrega ao subconsciente.</p>
+
+  <div class="quote-block">
+    <p>"Esta ideia vai melhorar a qualidade da minha vida?"</p>
+    <cite>— A pergunta-chave do Raciocínio Indutivo</cite>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- EU E O DINHEIRO -->
+<!-- ══════════════════════════════════════════ -->
+<div class="section" id="dinheiro">
+  <p class="section-tag">Módulo 2</p>
+  <h2 class="section-title">Eu e o Dinheiro</h2>
+
+  <p class="section-text">Você deve começar a ver o dinheiro como um <strong>servo obediente e diligente</strong> que você pode empregar para ganhar mais dinheiro. Sinta-se confortável ao falar sobre dinheiro — você verdadeiramente nasceu rico.</p>
+
+  <div class="question-card" data-qid="q_renda_mensal">
+    <div class="question-header">
+      <span class="q-number">1</span>
+      <span class="q-text">Em sua posição atual, quanto dinheiro você ganha por mês?</span>
+      <button class="hint-btn" onclick="toggleHint(this)" title="Ver dica">?</button>
+    </div>
+    <div class="hint-panel">
+      <strong>Como responder:</strong> Escreva um valor aproximado em reais (R$). Seja honesto — este é seu ponto de partida, não seu destino.
+    </div>
+    <div class="answer-area">
+      <input type="text" placeholder="R$ _________ por mês" oninput="agendarSalvamento(this)">
+    </div>
+  </div>
+
+  <div class="question-card" data-qid="q_total_vida">
+    <div class="question-header">
+      <span class="q-number">2</span>
+      <span class="q-text">Quanto dinheiro você ganhou ao longo de toda a sua vida? (inclua heranças)</span>
+      <button class="hint-btn" onclick="toggleHint(this)" title="Ver dica">?</button>
+    </div>
+    <div class="hint-panel">
+      <strong>Como responder:</strong> Faça um cálculo aproximado somando sua renda ao longo dos anos de trabalho. Não precisa ser exato — uma estimativa honesta já serve.
+    </div>
+    <div class="answer-area">
+      <input type="text" placeholder="R$ _________ (aproximadamente)" oninput="agendarSalvamento(this)">
+    </div>
+  </div>
+
+  <div class="question-card" data-qid="q_patrimonio">
+    <div class="question-header">
+      <span class="q-number">3</span>
+      <span class="q-text">Se você convertesse tudo o que possui em dinheiro e pagasse todas as dívidas, quanto sobraria?</span>
+      <button class="hint-btn" onclick="toggleHint(this)" title="Ver dica">?</button>
+    </div>
+    <div class="hint-panel">
+      <strong>Como responder:</strong> Some o valor de seus bens e subtraia todas as dívidas. Este número revela seu patrimônio líquido real.
+    </div>
+    <div class="answer-area">
+      <input type="text" placeholder="R$ _________ (aproximadamente)" oninput="agendarSalvamento(this)">
+    </div>
+  </div>
+
+  <div class="question-card" data-qid="q_melhor_ano">
+    <div class="question-header">
+      <span class="q-number">4</span>
+      <span class="q-text">No seu melhor ano, quanto dinheiro você ganhou?</span>
+      <button class="hint-btn" onclick="toggleHint(this)" title="Ver dica">?</button>
+    </div>
+    <div class="hint-panel">
+      <strong>Como responder:</strong> Lembre do seu ano de maior renda — pode incluir bônus, projetos extras, herança.
+    </div>
+    <div class="answer-area">
+      <input type="text" placeholder="R$ _________ (aproximadamente)" oninput="agendarSalvamento(this)">
+    </div>
+  </div>
+
+  <div class="question-card" data-qid="q_milionario">
+    <div class="question-header">
+      <span class="q-number">5</span>
+      <span class="q-text">Você acredita que qualquer pessoa pode valer um milhão de dólares por ano? Por quê / Por que não?</span>
+      <button class="hint-btn" onclick="toggleHint(this)" title="Ver dica">?</button>
+    </div>
+    <div class="hint-panel">
+      <strong>Como responder:</strong> Reflita honestamente sobre suas crenças a respeito do valor humano. Sua resposta revelará crenças limitantes ou expansivas.
+    </div>
+    <div class="choice-row">
+      <label class="choice-label" onclick="selectChoice(this, 'q5')"><input type="radio" name="q5">Sim, acredito</label>
+      <label class="choice-label" onclick="selectChoice(this, 'q5')"><input type="radio" name="q5">Não acredito</label>
+      <label class="choice-label" onclick="selectChoice(this, 'q5')"><input type="radio" name="q5">Depende da pessoa</label>
+    </div>
+    <div class="answer-area">
+      <textarea placeholder="Explique seu raciocínio aqui..." rows="3" oninput="updateChar(this);agendarSalvamento(this)"></textarea>
+    </div>
+    <div class="answer-footer">
+      <span class="char-count"></span>
+      <button class="save-btn" onclick="saveAnswer(this)"><span class="label">Salvar</span><span class="check">✓ Salvo</span></button>
+    </div>
+  </div>
+
+  <div class="question-card" data-qid="q_valor_proprio">
+    <div class="question-header">
+      <span class="q-number">6</span>
+      <span class="q-text">Quanto você acha que vale por ano? Por quê?</span>
+      <button class="hint-btn" onclick="toggleHint(this)" title="Ver dica">?</button>
+    </div>
+    <div class="hint-panel">
+      <strong>Como responder:</strong> Pense no valor que você entrega ao mundo, seus talentos, habilidades, experiência.
+    </div>
+    <div class="answer-area">
+      <input type="text" placeholder="R$ _________ por ano" style="margin-bottom:8px" oninput="agendarSalvamento(this)">
+      <textarea placeholder="Por quê esse valor? Qual crença está por trás disso?" rows="3" oninput="updateChar(this);agendarSalvamento(this)"></textarea>
+    </div>
+    <div class="answer-footer">
+      <span class="char-count"></span>
+      <button class="save-btn" onclick="saveAnswer(this)"><span class="label">Salvar</span><span class="check">✓ Salvo</span></button>
+    </div>
+  </div>
+
+  <div class="question-card" data-qid="q_renda_anual">
+    <div class="question-header">
+      <span class="q-number">7</span>
+      <span class="q-text">Quanto você ganha atualmente por ano?</span>
+      <button class="hint-btn" onclick="toggleHint(this)" title="Ver dica">?</button>
+    </div>
+    <div class="hint-panel">
+      <strong>Como responder:</strong> Escreva sua renda anual atual. Compare com sua resposta à questão 6 — a diferença é o "gap de consciência" que este programa quer fechar.
+    </div>
+    <div class="answer-area">
+      <input type="text" placeholder="R$ _________ por ano (aproximadamente)" oninput="agendarSalvamento(this)">
+    </div>
+  </div>
+
+  <div class="question-card" data-qid="q_shaw">
+    <div class="question-header">
+      <span class="q-number">8</span>
+      <span class="q-text">George Bernard Shaw disse: "É um pecado ser pobre." Você concorda ou discorda? Por quê?</span>
+      <button class="hint-btn" onclick="toggleHint(this)" title="Ver dica">?</button>
+    </div>
+    <div class="hint-panel">
+      <strong>Como responder:</strong> Shaw quis provocar a reflexão de que aceitar a pobreza como destino inevitável é uma escolha inconsciente.
+    </div>
+    <div class="choice-row">
+      <label class="choice-label" onclick="selectChoice(this, 'q8')"><input type="radio" name="q8">Concordo</label>
+      <label class="choice-label" onclick="selectChoice(this, 'q8')"><input type="radio" name="q8">Discordo</label>
+      <label class="choice-label" onclick="selectChoice(this, 'q8')"><input type="radio" name="q8">Concordo parcialmente</label>
+    </div>
+    <div class="answer-area">
+      <textarea placeholder="Escreva sua reflexão aqui..." rows="3" oninput="updateChar(this);agendarSalvamento(this)"></textarea>
+    </div>
+    <div class="answer-footer">
+      <span class="char-count"></span>
+      <button class="save-btn" onclick="saveAnswer(this)"><span class="label">Salvar</span><span class="check">✓ Salvo</span></button>
+    </div>
+  </div>
+
+  <div class="question-card" data-qid="q_falta_dinheiro">
+    <div class="question-header">
+      <span class="q-number">9</span>
+      <span class="q-text">A falta de dinheiro apresenta um problema em sua vida? Por quê?</span>
+      <button class="hint-btn" onclick="toggleHint(this)" title="Ver dica">?</button>
+    </div>
+    <div class="hint-panel">
+      <strong>Como responder:</strong> Seja completamente honesto. Se a resposta for "Sim", descreva como esse problema se manifesta no dia a dia.
+    </div>
+    <div class="choice-row">
+      <label class="choice-label" onclick="selectChoice(this, 'q9')"><input type="radio" name="q9">Sim</label>
+      <label class="choice-label" onclick="selectChoice(this, 'q9')"><input type="radio" name="q9">Não</label>
+    </div>
+    <div class="answer-area">
+      <textarea placeholder="Por quê? Descreva com detalhes..." rows="3" oninput="updateChar(this);agendarSalvamento(this)"></textarea>
+    </div>
+    <div class="answer-footer">
+      <span class="char-count"></span>
+      <button class="save-btn" onclick="saveAnswer(this)"><span class="label">Salvar</span><span class="check">✓ Salvo</span></button>
+    </div>
+  </div>
+
+  <div class="question-card" data-qid="q_subconsciencia">
+    <div class="question-header">
+      <span class="q-number">✦</span>
+      <span class="q-text">Descreva os tipos de pensamentos e ideias com os quais você gostaria que sua mente subconsciente fosse condicionada.</span>
+      <button class="hint-btn" onclick="toggleHint(this)" title="Ver dica">?</button>
+    </div>
+    <div class="hint-panel">
+      <strong>Como responder:</strong> Escreva no presente, como se já fosse verdade. Ex: "Dinheiro vem para mim facilmente."
+    </div>
+    <div class="answer-area">
+      <textarea placeholder="Escreva os pensamentos que deseja imprimir no seu subconsciente..." rows="5" oninput="updateChar(this);agendarSalvamento(this)"></textarea>
+    </div>
+    <div class="answer-footer">
+      <span class="char-count"></span>
+      <button class="save-btn" onclick="saveAnswer(this)"><span class="label">Salvar</span><span class="check">✓ Salvo</span></button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- QUANTO É SUFICIENTE? -->
+<!-- ══════════════════════════════════════════ -->
+<div class="section">
+  <p class="section-tag">Módulo 2B</p>
+  <h2 class="section-title">Quanto é Suficiente?</h2>
+
+  <div class="quote-block">
+    <p>"A maioria das pessoas acha que quer mais dinheiro do que realmente quer, e se contentam com muito menos do que poderiam conseguir."</p>
+    <cite>— Earl Nightingale</cite>
+  </div>
+
+  <p class="section-text">Para ativar o conceito de prosperidade, você deve ser específico. O subconsciente não pensa — ele apenas aceita imagens e as move para a forma.</p>
+
+  <div class="concept-box">
+    <h4>💰 As Duas Formas de Ganhar Dinheiro</h4>
+    <p>1. <strong>Pessoas trabalhando</strong> — troca de tempo por dinheiro<br>2. <strong>Dinheiro trabalhando</strong> — investimentos, ativos, sistemas</p>
+  </div>
+
+  <div class="question-card" data-qid="q_suficiente">
+    <div class="question-header">
+      <span class="q-number">✦</span>
+      <span class="q-text">Qual é o valor exato que você precisa para viver da forma que deseja?</span>
+      <button class="hint-btn" onclick="toggleHint(this)" title="Ver dica">?</button>
+    </div>
+    <div class="hint-panel">
+      <strong>Como responder:</strong> Calcule quanto custaria sua vida ideal por mês. Multiplique por 12. Seja específico e corajoso.
+    </div>
+    <div class="answer-area">
+      <input type="text" placeholder="R$ _________ por ano / mês" oninput="agendarSalvamento(this)">
+    </div>
+  </div>
+
+  <div class="commitment-block" data-qid="q_planejador">
+    <h4>Meu Compromisso Financeiro</h4>
+    <p>Terei uma consulta com um planejador financeiro competente até:</p>
+    <input type="text" placeholder="Data: ___/___/______" oninput="agendarSalvamento(this)">
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- O CRIADOR DE IMAGENS -->
+<!-- ══════════════════════════════════════════ -->
+<div class="section" id="imagem">
+  <p class="section-tag">Módulo 3</p>
+  <h2 class="section-title">O Criador de Imagens</h2>
+
+  <div class="quote-block">
+    <p>"Agimos, nos comportamos e sentimos de acordo com o que consideramos ser nossa AUTO-IMAGEM e não nos desviamos desse padrão."</p>
+    <cite>— Dr. Maxwell Maltz</cite>
+  </div>
+
+  <p class="section-text">O conhecimento da criação de imagens elimina a competição da sua vida, movendo você do plano competitivo para o plano criativo.</p>
+
+  <div class="question-card" data-qid="q_ponto_imagem">
+    <div class="question-header">
+      <span class="q-number">✦</span>
+      <span class="q-text">Na sua opinião, qual é o ponto mais importante do capítulo "O Criador de Imagens"?</span>
+      <button class="hint-btn" onclick="toggleHint(this)" title="Ver dica">?</button>
+    </div>
+    <div class="hint-panel">
+      <strong>Como responder:</strong> Reflita sobre o que mais impactou sua forma de pensar neste capítulo.
+    </div>
+    <div class="answer-area">
+      <textarea placeholder="Escreva o ponto que mais te impactou e por quê..." rows="4" oninput="updateChar(this);agendarSalvamento(this)"></textarea>
+    </div>
+    <div class="answer-footer">
+      <span class="char-count"></span>
+      <button class="save-btn" onclick="saveAnswer(this)"><span class="label">Salvar</span><span class="check">✓ Salvo</span></button>
+    </div>
+  </div>
+
+  <div class="question-card" data-qid="q_satisfacao">
+    <div class="question-header">
+      <span class="q-number">✦</span>
+      <span class="q-text">Você está satisfeito com os resultados que experimenta na sua vida atualmente?</span>
+      <button class="hint-btn" onclick="toggleHint(this)" title="Ver dica">?</button>
+    </div>
+    <div class="hint-panel">
+      <strong>Como responder:</strong> Os resultados de hoje são a manifestação física das imagens que seu subconsciente sustentou no passado.
+    </div>
+    <div class="choice-row">
+      <label class="choice-label" onclick="selectChoice(this, 'qimg2')"><input type="radio" name="qimg2">Sim, estou satisfeito</label>
+      <label class="choice-label" onclick="selectChoice(this, 'qimg2')"><input type="radio" name="qimg2">Não, quero mudar</label>
+      <label class="choice-label" onclick="selectChoice(this, 'qimg2')"><input type="radio" name="qimg2">Em algumas áreas</label>
+    </div>
+  </div>
+
+  <div class="question-card" data-qid="q_resultados_mudar">
+    <div class="question-header">
+      <span class="q-number">✦</span>
+      <span class="q-text">Liste os resultados que você quer mudar na sua vida:</span>
+      <button class="hint-btn" onclick="toggleHint(this)" title="Ver dica">?</button>
+    </div>
+    <div class="hint-panel">
+      <strong>Como responder:</strong> Pense em todas as áreas: financeira, relacionamentos, saúde, carreira, liberdade. Seja específico.
+    </div>
+    <div class="list-fields">
+      <div class="list-field-row"><span class="list-num">1</span><input type="text" placeholder="Resultado que quero mudar..." oninput="agendarSalvamento(this)"></div>
+      <div class="list-field-row"><span class="list-num">2</span><input type="text" placeholder="Resultado que quero mudar..." oninput="agendarSalvamento(this)"></div>
+      <div class="list-field-row"><span class="list-num">3</span><input type="text" placeholder="Resultado que quero mudar..." oninput="agendarSalvamento(this)"></div>
+      <div class="list-field-row"><span class="list-num">4</span><input type="text" placeholder="Resultado que quero mudar..." oninput="agendarSalvamento(this)"></div>
+      <div class="list-field-row"><span class="list-num">5</span><input type="text" placeholder="Resultado que quero mudar..." oninput="agendarSalvamento(this)"></div>
+      <div class="list-field-row"><span class="list-num">6</span><input type="text" placeholder="Resultado que quero mudar..." oninput="agendarSalvamento(this)"></div>
+      <div class="list-field-row"><span class="list-num">7</span><input type="text" placeholder="Resultado que quero mudar..." oninput="agendarSalvamento(this)"></div>
+      <div class="list-field-row"><span class="list-num">8</span><input type="text" placeholder="Resultado que quero mudar..." oninput="agendarSalvamento(this)"></div>
+      <div class="list-field-row"><span class="list-num">9</span><input type="text" placeholder="Resultado que quero mudar..." oninput="agendarSalvamento(this)"></div>
+      <div class="list-field-row"><span class="list-num">10</span><input type="text" placeholder="Resultado que quero mudar..." oninput="agendarSalvamento(this)"></div>
+    </div>
+  </div>
+
+  <div class="question-card" data-qid="q_descricao_futura">
+    <div class="question-header">
+      <span class="q-number">✦</span>
+      <span class="q-text">Faça uma descrição escrita da pessoa que você está prestes a se tornar:</span>
+      <button class="hint-btn" onclick="toggleHint(this)" title="Ver dica">?</button>
+    </div>
+    <div class="hint-panel">
+      <strong>Como responder:</strong> Escreva no presente, como se já fosse verdade. "Eu sou uma pessoa que..." Seja corajoso e detalhado.
+    </div>
+    <div class="answer-area">
+      <textarea placeholder="Eu sou uma pessoa que... Descreva essa versão futura de você com riqueza de detalhes..." rows="8" oninput="updateChar(this);agendarSalvamento(this)"></textarea>
+    </div>
+    <div class="answer-footer">
+      <span class="char-count"></span>
+      <button class="save-btn" onclick="saveAnswer(this)"><span class="label">Salvar</span><span class="check">✓ Salvo</span></button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- ESPERE UMA ABUNDÂNCIA -->
+<!-- ══════════════════════════════════════════ -->
+<div class="section" id="abundancia">
+  <p class="section-tag">Módulo 4</p>
+  <h2 class="section-title">Espere uma Abundância</h2>
+
+  <p class="section-text">A mente é um poderoso ímã que <strong>atrai</strong> o que corresponde ao seu estado dominante. A <strong>EXPECTATIVA</strong> dita esse estado e governa o que é atraído para sua vida.</p>
+
+  <div class="steps-box">
+    <div class="step-item">
+      <span class="step-num">1</span>
+      <span class="step-text">CONSTRUA A IMAGEM — Relaxe e se veja já em posse do bem que deseja</span>
+    </div>
+    <div class="step-item">
+      <span class="step-num">2</span>
+      <span class="step-text">DEIXE IR E DEIXE DEUS — Entregue ao poder universal</span>
+    </div>
+    <div class="step-item">
+      <span class="step-num">3</span>
+      <span class="step-text">ESPERE com todo o coração e alma que o Espírito o recompensará abertamente por sua fé</span>
+    </div>
+  </div>
+
+  <div class="question-card" data-qid="q_aumentar_renda">
+    <div class="question-header">
+      <span class="q-number">✦</span>
+      <span class="q-text">O que você está fazendo para aumentar sua renda?</span>
+      <button class="hint-btn" onclick="toggleHint(this)" title="Ver dica">?</button>
+    </div>
+    <div class="hint-panel">
+      <strong>Como responder:</strong> Liste ações concretas — não intenções.
+    </div>
+    <div class="answer-area">
+      <textarea placeholder="Liste as ações concretas que você já está tomando ou planeja tomar..." rows="4" oninput="updateChar(this);agendarSalvamento(this)"></textarea>
+    </div>
+    <div class="answer-footer">
+      <span class="char-count"></span>
+      <button class="save-btn" onclick="saveAnswer(this)"><span class="label">Salvar</span><span class="check">✓ Salvo</span></button>
+    </div>
+  </div>
+
+  <div class="question-card" data-qid="q_expectativa">
+    <div class="question-header">
+      <span class="q-number">✦</span>
+      <span class="q-text">Reconheça a diferença entre o que você DESEJA e o que você tem ESPERADO na vida. Descreva o que você realmente tem esperado até agora:</span>
+      <button class="hint-btn" onclick="toggleHint(this)" title="Ver dica">?</button>
+    </div>
+    <div class="hint-panel">
+      <strong>Como responder:</strong> Observe seus pensamentos automáticos sobre dinheiro, sucesso, relacionamentos. Esses são seus padrões de expectativa verdadeiros.
+    </div>
+    <div class="answer-area">
+      <textarea placeholder="O que eu verdadeiramente tenho esperado da minha vida é..." rows="6" oninput="updateChar(this);agendarSalvamento(this)"></textarea>
+    </div>
+    <div class="answer-footer">
+      <span class="char-count"></span>
+      <button class="save-btn" onclick="saveAnswer(this)"><span class="label">Salvar</span><span class="check">✓ Salvo</span></button>
+    </div>
+  </div>
+
+  <div class="question-card" data-qid="q_objetivo">
+    <div class="question-header">
+      <span class="q-number">✦</span>
+      <span class="q-text">Escreva seu objetivo com o máximo de detalhes possível — em suas próprias palavras:</span>
+      <button class="hint-btn" onclick="toggleHint(this)" title="Ver dica">?</button>
+    </div>
+    <div class="hint-panel">
+      <strong>Como responder:</strong> Descreva seu objetivo no presente e com emoção, como se já fosse realidade.
+    </div>
+    <div class="answer-area">
+      <textarea placeholder="Meu objetivo é... (escreva como se já fosse verdade, com detalhes sensoriais e emocionais)" rows="7" oninput="updateChar(this);agendarSalvamento(this)"></textarea>
+    </div>
+    <div class="answer-footer">
+      <span class="char-count"></span>
+      <button class="save-btn" onclick="saveAnswer(this)"><span class="label">Salvar</span><span class="check">✓ Salvo</span></button>
+    </div>
+  </div>
+
+  <div class="question-card" data-qid="q_visualizacao">
+    <div class="question-header">
+      <span class="q-number">✦</span>
+      <span class="q-text">Após relaxar e se visualizar em posse do bem que deseja, descreva a imagem que você construiu:</span>
+      <button class="hint-btn" onclick="toggleHint(this)" title="Ver dica">?</button>
+    </div>
+    <div class="hint-panel">
+      <strong>Como responder:</strong> Feche os olhos por 2 minutos. Respire fundo. Imagine-se já tendo o que deseja. Depois escreva tudo.
+    </div>
+    <div class="answer-area">
+      <textarea placeholder="Na minha visualização, eu vejo... eu sinto... eu estou..." rows="6" oninput="updateChar(this);agendarSalvamento(this)"></textarea>
+    </div>
+    <div class="answer-footer">
+      <span class="char-count"></span>
+      <button class="save-btn" onclick="saveAnswer(this)"><span class="label">Salvar</span><span class="check">✓ Salvo</span></button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- LEI DA VIBRAÇÃO -->
+<!-- ══════════════════════════════════════════ -->
+<div class="section" id="vibracao">
+  <p class="section-tag">Módulo 5</p>
+  <h2 class="section-title">A Lei da Vibração e Atração</h2>
+
+  <p class="section-text">Tudo vibra, nada repousa. O pensamento é uma das formas mais elevadas de vibração. Você atrai para sua vida aquilo com o qual está em vibração harmoniosa.</p>
+
+  <div class="cycle-block">
+    <h4>O Ciclo Vencedor</h4>
+    <div class="cycle-chain">
+      <span class="cycle-item">Pensamentos Prósperos</span>
+      <span class="cycle-arrow">→</span>
+      <span class="cycle-item">Envolvimento Emocional</span>
+      <span class="cycle-arrow">→</span>
+      <span class="cycle-item">Vibração Próspera</span>
+      <span class="cycle-arrow">→</span>
+      <span class="cycle-item">Ações</span>
+      <span class="cycle-arrow">→</span>
+      <span class="cycle-item">Novos Resultados</span>
+    </div>
+  </div>
+
+  <div class="concept-box" style="margin-top:18px;">
+    <h4>🔑 A Lei da Transmutação Perpétua de Energia</h4>
+    <p>Quando uma pessoa irradia uma vibração positiva, essa pessoa deve, pela Lei, RECEBER uma quantidade igual ao que irradiou. "Como plantares, assim colherás."</p>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- OS TOMADORES DE RISCO -->
+<!-- ══════════════════════════════════════════ -->
+<div class="section" id="risco">
+  <p class="section-tag">Módulo 6</p>
+  <h2 class="section-title">Os Tomadores de Risco</h2>
+
+  <div class="quote-block">
+    <p>"A partir de hoje você é um tomador de risco dinâmico e vigoroso, cujos olhos estão sempre voltados para seus pontos fortes e ativos."</p>
+    <cite>— Bob Proctor</cite>
+  </div>
+
+  <div class="question-card" data-qid="q_sonho">
+    <div class="question-header">
+      <span class="q-number">✦</span>
+      <span class="q-text">Escreva seu sonho, seu objetivo principal:</span>
+      <button class="hint-btn" onclick="toggleHint(this)" title="Ver dica">?</button>
+    </div>
+    <div class="hint-panel">
+      <strong>Como responder:</strong> Escreva seu maior sonho sem censura. Ignore a voz que diz "isso é impossível".
+    </div>
+    <div class="answer-area">
+      <textarea placeholder="Meu grande sonho/objetivo é..." rows="4" oninput="updateChar(this);agendarSalvamento(this)"></textarea>
+    </div>
+    <div class="answer-footer">
+      <span class="char-count"></span>
+      <button class="save-btn" onclick="saveAnswer(this)"><span class="label">Salvar</span><span class="check">✓ Salvo</span></button>
+    </div>
+  </div>
+
+  <div class="question-card" data-qid="q_riscos">
+    <div class="question-header">
+      <span class="q-number">✦</span>
+      <span class="q-text">Liste os riscos que você deve assumir para tornar seu sonho realidade:</span>
+      <button class="hint-btn" onclick="toggleHint(this)" title="Ver dica">?</button>
+    </div>
+    <div class="hint-panel">
+      <strong>Como responder:</strong> Liste as coisas específicas que você tem evitado: investir dinheiro, iniciar um negócio, mudar de carreira, aprender nova habilidade.
+    </div>
+    <div class="list-fields">
+      <div class="list-field-row"><span class="list-num">1</span><input type="text" placeholder="Risco necessário..." oninput="agendarSalvamento(this)"></div>
+      <div class="list-field-row"><span class="list-num">2</span><input type="text" placeholder="Risco necessário..." oninput="agendarSalvamento(this)"></div>
+      <div class="list-field-row"><span class="list-num">3</span><input type="text" placeholder="Risco necessário..." oninput="agendarSalvamento(this)"></div>
+      <div class="list-field-row"><span class="list-num">4</span><input type="text" placeholder="Risco necessário..." oninput="agendarSalvamento(this)"></div>
+      <div class="list-field-row"><span class="list-num">5</span><input type="text" placeholder="Risco necessário..." oninput="agendarSalvamento(this)"></div>
+      <div class="list-field-row"><span class="list-num">6</span><input type="text" placeholder="Risco necessário..." oninput="agendarSalvamento(this)"></div>
+      <div class="list-field-row"><span class="list-num">7</span><input type="text" placeholder="Risco necessário..." oninput="agendarSalvamento(this)"></div>
+    </div>
+  </div>
+
+  <div class="question-card" data-qid="q_movimentos">
+    <div class="question-header">
+      <span class="q-number">✦</span>
+      <span class="q-text">Liste os grandes movimentos que você se comprometeu a fazer e quando vai começar:</span>
+      <button class="hint-btn" onclick="toggleHint(this)" title="Ver dica">?</button>
+    </div>
+    <div class="hint-panel">
+      <strong>Como responder:</strong> Um objetivo sem data é apenas um desejo. Para cada ação, defina uma data de início concreta.
+    </div>
+    <div class="col-header"><span>Ação / Movimento</span><span>Data de Início</span></div>
+    <div class="two-col-fields">
+      <div class="two-col-row"><input type="text" placeholder="Ação 1..." oninput="agendarSalvamento(this)"><input type="text" placeholder="Data" oninput="agendarSalvamento(this)"></div>
+      <div class="two-col-row"><input type="text" placeholder="Ação 2..." oninput="agendarSalvamento(this)"><input type="text" placeholder="Data" oninput="agendarSalvamento(this)"></div>
+      <div class="two-col-row"><input type="text" placeholder="Ação 3..." oninput="agendarSalvamento(this)"><input type="text" placeholder="Data" oninput="agendarSalvamento(this)"></div>
+      <div class="two-col-row"><input type="text" placeholder="Ação 4..." oninput="agendarSalvamento(this)"><input type="text" placeholder="Data" oninput="agendarSalvamento(this)"></div>
+      <div class="two-col-row"><input type="text" placeholder="Ação 5..." oninput="agendarSalvamento(this)"><input type="text" placeholder="Data" oninput="agendarSalvamento(this)"></div>
+      <div class="two-col-row"><input type="text" placeholder="Ação 6..." oninput="agendarSalvamento(this)"><input type="text" placeholder="Data" oninput="agendarSalvamento(this)"></div>
+    </div>
+  </div>
+
+  <div class="question-card" data-qid="q_navalha">
+    <div class="question-header">
+      <span class="q-number">✦</span>
+      <span class="q-text">Liste 6 Ações da Navalha que você implementará imediatamente para fazer a diferença:</span>
+      <button class="hint-btn" onclick="toggleHint(this)" title="Ver dica">?</button>
+    </div>
+    <div class="hint-panel">
+      <strong>Como responder:</strong> "Ações da Navalha" são pequenas melhorias consistentes que, somadas, criam resultados extraordinários.
+    </div>
+    <div class="list-fields">
+      <div class="list-field-row"><span class="list-num">1</span><input type="text" placeholder="Ação pequena mas poderosa..." oninput="agendarSalvamento(this)"></div>
+      <div class="list-field-row"><span class="list-num">2</span><input type="text" placeholder="Ação pequena mas poderosa..." oninput="agendarSalvamento(this)"></div>
+      <div class="list-field-row"><span class="list-num">3</span><input type="text" placeholder="Ação pequena mas poderosa..." oninput="agendarSalvamento(this)"></div>
+      <div class="list-field-row"><span class="list-num">4</span><input type="text" placeholder="Ação pequena mas poderosa..." oninput="agendarSalvamento(this)"></div>
+      <div class="list-field-row"><span class="list-num">5</span><input type="text" placeholder="Ação pequena mas poderosa..." oninput="agendarSalvamento(this)"></div>
+      <div class="list-field-row"><span class="list-num">6</span><input type="text" placeholder="Ação pequena mas poderosa..." oninput="agendarSalvamento(this)"></div>
+    </div>
+  </div>
+
+  <div class="commitment-block" data-qid="q_compromisso_risco">
+    <h4>Meu Compromisso</h4>
+    <p>Comprometo-me a começar imediatamente a fazer as coisas que anteriormente evitava por medo:</p>
+    <textarea placeholder="Escreva seu compromisso aqui com convicção..." rows="5" oninput="agendarSalvamento(this)"></textarea>
+    <div class="sig-line">
+      <label>Assinatura:</label>
+      <input type="text" placeholder="Seu nome / assinatura" oninput="agendarSalvamento(this)">
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- LEI DO VÁCUO -->
+<!-- ══════════════════════════════════════════ -->
+<div class="section" id="vacuo">
+  <p class="section-tag">Módulo 7</p>
+  <h2 class="section-title">A Lei do Vácuo da Prosperidade</h2>
+
+  <div class="quote-block">
+    <p>"O elemento crucial desta lei do vácuo da prosperidade é que você deve soltar o velho antes de criar espaço para o novo."</p>
+    <cite>— Bob Proctor</cite>
+  </div>
+
+  <div class="concept-box">
+    <h4>🧹 Por Que Nos Agarramos ao Velho?</h4>
+    <p>A causa primária é a mesma para todos: <strong>falta de fé</strong> em nossa capacidade de obter novas ideias e novas coisas.</p>
+  </div>
+
+  <div class="question-card" data-qid="q_vacuo_areas">
+    <div class="question-header">
+      <span class="q-number">✦</span>
+      <span class="q-text">Liste as áreas da sua vida onde você criará um vácuo (liberar o velho para o novo entrar) e defina datas:</span>
+      <button class="hint-btn" onclick="toggleHint(this)" title="Ver dica">?</button>
+    </div>
+    <div class="hint-panel">
+      <strong>Como responder:</strong> Pense em áreas físicas (roupas que não usa, objetos acumulados) e mentais (crenças limitantes, ressentimentos, relacionamentos tóxicos).
+    </div>
+    <div class="col-header"><span>Área a Liberar</span><span>Data de Conclusão</span></div>
+    <div class="two-col-fields">
+      <div class="two-col-row"><input type="text" placeholder="Área física ou mental..." oninput="agendarSalvamento(this)"><input type="text" placeholder="Data" oninput="agendarSalvamento(this)"></div>
+      <div class="two-col-row"><input type="text" placeholder="Área física ou mental..." oninput="agendarSalvamento(this)"><input type="text" placeholder="Data" oninput="agendarSalvamento(this)"></div>
+      <div class="two-col-row"><input type="text" placeholder="Área física ou mental..." oninput="agendarSalvamento(this)"><input type="text" placeholder="Data" oninput="agendarSalvamento(this)"></div>
+      <div class="two-col-row"><input type="text" placeholder="Área física ou mental..." oninput="agendarSalvamento(this)"><input type="text" placeholder="Data" oninput="agendarSalvamento(this)"></div>
+      <div class="two-col-row"><input type="text" placeholder="Área física ou mental..." oninput="agendarSalvamento(this)"><input type="text" placeholder="Data" oninput="agendarSalvamento(this)"></div>
+      <div class="two-col-row"><input type="text" placeholder="Área física ou mental..." oninput="agendarSalvamento(this)"><input type="text" placeholder="Data" oninput="agendarSalvamento(this)"></div>
+      <div class="two-col-row"><input type="text" placeholder="Área física ou mental..." oninput="agendarSalvamento(this)"><input type="text" placeholder="Data" oninput="agendarSalvamento(this)"></div>
+      <div class="two-col-row"><input type="text" placeholder="Área física ou mental..." oninput="agendarSalvamento(this)"><input type="text" placeholder="Data" oninput="agendarSalvamento(this)"></div>
+    </div>
+  </div>
+
+  <div class="question-card" data-qid="q_crencas_limitantes">
+    <div class="question-header">
+      <span class="q-number">✦</span>
+      <span class="q-text">Faça uma lista de conceitos limitantes que você reconhece como obstruções para uma vida próspera:</span>
+      <button class="hint-btn" onclick="toggleHint(this)" title="Ver dica">?</button>
+    </div>
+    <div class="hint-panel">
+      <strong>Como responder:</strong> Ex: "Dinheiro é sujo", "Pessoas ricas são gananciosas", "Eu não mereço sucesso". Identificar a crença é o primeiro passo para dissolvê-la.
+    </div>
+    <div class="list-fields">
+      <div class="list-field-row"><span class="list-num">1</span><input type="text" placeholder="Crença limitante que vou liberar..." oninput="agendarSalvamento(this)"></div>
+      <div class="list-field-row"><span class="list-num">2</span><input type="text" placeholder="Crença limitante que vou liberar..." oninput="agendarSalvamento(this)"></div>
+      <div class="list-field-row"><span class="list-num">3</span><input type="text" placeholder="Crença limitante que vou liberar..." oninput="agendarSalvamento(this)"></div>
+      <div class="list-field-row"><span class="list-num">4</span><input type="text" placeholder="Crença limitante que vou liberar..." oninput="agendarSalvamento(this)"></div>
+      <div class="list-field-row"><span class="list-num">5</span><input type="text" placeholder="Crença limitante que vou liberar..." oninput="agendarSalvamento(this)"></div>
+      <div class="list-field-row"><span class="list-num">6</span><input type="text" placeholder="Crença limitante que vou liberar..." oninput="agendarSalvamento(this)"></div>
+    </div>
+  </div>
+
+  <div class="question-card" data-qid="q_novas_crencas">
+    <div class="question-header">
+      <span class="q-number">✦</span>
+      <span class="q-text">Liste os conceitos que você agora acredita serem verdadeiros (para substituir as crenças limitantes):</span>
+      <button class="hint-btn" onclick="toggleHint(this)" title="Ver dica">?</button>
+    </div>
+    <div class="hint-panel">
+      <strong>Como responder:</strong> Para cada crença limitante, escreva a crença expansiva que a substituirá.
+    </div>
+    <div class="list-fields">
+      <div class="list-field-row"><span class="list-num">1</span><input type="text" placeholder="Nova crença expansiva..." oninput="agendarSalvamento(this)"></div>
+      <div class="list-field-row"><span class="list-num">2</span><input type="text" placeholder="Nova crença expansiva..." oninput="agendarSalvamento(this)"></div>
+      <div class="list-field-row"><span class="list-num">3</span><input type="text" placeholder="Nova crença expansiva..." oninput="agendarSalvamento(this)"></div>
+      <div class="list-field-row"><span class="list-num">4</span><input type="text" placeholder="Nova crença expansiva..." oninput="agendarSalvamento(this)"></div>
+      <div class="list-field-row"><span class="list-num">5</span><input type="text" placeholder="Nova crença expansiva..." oninput="agendarSalvamento(this)"></div>
+      <div class="list-field-row"><span class="list-num">6</span><input type="text" placeholder="Nova crença expansiva..." oninput="agendarSalvamento(this)"></div>
+    </div>
+  </div>
+
+  <div class="question-card" data-qid="q_patti">
+    <div class="question-header">
+      <span class="q-number">✦</span>
+      <span class="q-text">Após ler a história de Patti's Cruise (pág. 181): Quais são os pontos importantes da história?</span>
+      <button class="hint-btn" onclick="toggleHint(this)" title="Ver dica">?</button>
+    </div>
+    <div class="hint-panel">
+      <strong>Como responder:</strong> A história ilustra como a fé e a expectativa atraem o bem desejado — mesmo antes de ver como vai acontecer.
+    </div>
+    <div class="answer-area">
+      <textarea placeholder="Os pontos importantes que identifiquei foram..." rows="4" oninput="updateChar(this);agendarSalvamento(this)"></textarea>
+    </div>
+    <div class="answer-footer">
+      <span class="char-count"></span>
+      <button class="save-btn" onclick="saveAnswer(this)"><span class="label">Salvar</span><span class="check">✓ Salvo</span></button>
+    </div>
+  </div>
+
+  <div class="question-card" data-qid="q_patti_aplicar">
+    <div class="question-header">
+      <span class="q-number">✦</span>
+      <span class="q-text">Como você pode aplicar esses pontos da história de Patti na sua própria vida?</span>
+      <button class="hint-btn" onclick="toggleHint(this)" title="Ver dica">?</button>
+    </div>
+    <div class="hint-panel">
+      <strong>Como responder:</strong> Pense em uma área específica da sua vida onde você pode aplicar imediatamente a lição.
+    </div>
+    <div class="answer-area">
+      <textarea placeholder="Na minha vida, vou aplicar isso da seguinte forma..." rows="5" oninput="updateChar(this);agendarSalvamento(this)"></textarea>
+    </div>
+    <div class="answer-footer">
+      <span class="char-count"></span>
+      <button class="save-btn" onclick="saveAnswer(this)"><span class="label">Salvar</span><span class="check">✓ Salvo</span></button>
+    </div>
+  </div>
+
+  <div class="question-card" data-qid="q_licao_vacuo">
+    <div class="question-header">
+      <span class="q-number">✦</span>
+      <span class="q-text">Qual é a lição que você aprendeu neste capítulo? Como vai aplicá-la para alcançar seu objetivo?</span>
+      <button class="hint-btn" onclick="toggleHint(this)" title="Ver dica">?</button>
+    </div>
+    <div class="hint-panel">
+      <strong>Como responder:</strong> Escreva a lição mais importante em suas próprias palavras. Depois descreva o primeiro passo concreto nas próximas 24 horas.
+    </div>
+    <div class="answer-area">
+      <textarea placeholder="A lição principal que aprendi foi... e vou aplicá-la..." rows="6" oninput="updateChar(this);agendarSalvamento(this)"></textarea>
+    </div>
+    <div class="answer-footer">
+      <span class="char-count"></span>
+      <button class="save-btn" onclick="saveAnswer(this)"><span class="label">Salvar</span><span class="check">✓ Salvo</span></button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- AFIRMAÇÃO FINAL -->
+<!-- ══════════════════════════════════════════ -->
+<div class="section">
+  <p class="section-tag">Encerramento</p>
+  <h2 class="section-title">Afirmação de Liberação</h2>
+
+  <div class="concept-box">
+    <h4>🌟 Afirmação para Liberar Ressentimento e Culpa</h4>
+    <p style="font-family:'Cormorant Garamond',serif; font-style:italic; font-size:1rem; margin-bottom:12px; color:#eee; line-height:1.7;">
+      "Libero voluntariamente os pensamentos e as coisas que agitaram minha mente. Libero ____________ para seu maior bem, felicidade, saúde e riqueza — e a mim para o meu."
+    </p>
+    <p style="font-size:12px; color:#888;">(Faça esta afirmação com emoção genuína.)</p>
+  </div>
+
+  <div class="question-card" data-qid="q_liberacao">
+    <div class="question-header">
+      <span class="q-number">✦</span>
+      <span class="q-text">Escreva o nome de quem você precisa liberar de ressentimentos, e o que você libera:</span>
+      <button class="hint-btn" onclick="toggleHint(this)" title="Ver dica">?</button>
+    </div>
+    <div class="hint-panel">
+      <strong>Como responder:</strong> O ressentimento é você bebendo veneno esperando que o outro sofra. Escreva os nomes e o que você libera — o ato de escrever tem poder de cura.
+    </div>
+    <div class="answer-area">
+      <textarea placeholder="Libero _________ para seu maior bem. Também libero _________ e _________ de minha mente..." rows="5" oninput="updateChar(this);agendarSalvamento(this)"></textarea>
+    </div>
+    <div class="answer-footer">
+      <span class="char-count"></span>
+      <button class="save-btn" onclick="saveAnswer(this)"><span class="label">Salvar</span><span class="check">✓ Salvo</span></button>
+    </div>
+  </div>
+
+  <div style="text-align:center; padding: 36px 0 20px;">
+    <div style="font-family:'Cormorant Garamond',serif; font-size:2.2rem; color:var(--gold); margin-bottom:10px; font-weight:700; letter-spacing:2px;">I AM PROSPEROUS</div>
+    <div style="font-size:10px; letter-spacing:5px; text-transform:uppercase; color:var(--muted); font-family:'DM Sans',sans-serif;">I Was Born Rich</div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <span>Born Rich</span> — Proctor Gallagher Institute<br>
+  <span style="color:#3a3a3a; font-size:9px; letter-spacing:1px; margin-top:6px; display:block;">Material de estudo pessoal · Todas as respostas são suas</span>
+</footer>
+
+<!-- TOAST -->
+<div class="toast" id="toast">✓ Resposta salva</div>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- FIREBASE + LÓGICA DE SALVAMENTO          -->
+<!-- (idêntico ao padrão do Sistema Tapetes)  -->
+<!-- ══════════════════════════════════════════ -->
+<script type="module">
+import { db } from "https://arquivos98126066-sudo.github.io/SOFTWARE/firebase-sync.js";
+import {
+  collection, doc, getDoc, setDoc, onSnapshot
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+// ─── ID único do caderno (fixo — um documento por caderno) ───────────────────
+var CADERNO_ID = 'born_rich_caderno_principal';
+var respostasCache = {};
+var _saveTimer = null;
+
+// ─── Camada 1: IndexedDB com fallback localStorage ────────────────────────────
+function saveLocal(key, data) {
+  try {
+    var req = indexedDB.open('meus_apps_backup', 1);
+    req.onupgradeneeded = function(e) { e.target.result.createObjectStore('data'); };
+    req.onsuccess = function(e) {
+      var tx = e.target.result.transaction('data', 'readwrite');
+      tx.objectStore('data').put(JSON.stringify(data), key);
+    };
+  } catch(_) { try { localStorage.setItem(key, JSON.stringify(data)); } catch(_) {} }
+}
+
+function loadLocal(key) {
+  return new Promise(function(resolve) {
+    try {
+      var req = indexedDB.open('meus_apps_backup', 1);
+      req.onupgradeneeded = function(e) { e.target.result.createObjectStore('data'); };
+      req.onsuccess = function(e) {
+        var tx = e.target.result.transaction('data', 'readonly');
+        var r = tx.objectStore('data').get(key);
+        r.onsuccess = function() { resolve(r.result ? JSON.parse(r.result) : null); };
+        r.onerror = function() { resolve(null); };
+      };
+      req.onerror = function() { resolve(null); };
+    } catch(_) { try { resolve(JSON.parse(localStorage.getItem(key))); } catch(_) { resolve(null); } }
+  });
+}
+
+// ─── Lixeira do RICO ─────────────────────────────────────────────────────────
+var lixeiraRico = (function(){ try{return JSON.parse(localStorage.getItem('rico_lixeira')||'[]');}catch(_){return[];} })();
+// (Born Rich é um caderno sem itens deletáveis individualmente — lixeira reservada para snapshots manuais)
+
+// ─── Toast ───────────────────────────────────────────────────────────────────
+window.showToast = function(msg, cor) {
+  var t = document.getElementById('toast');
+  t.textContent = msg || '✓ Resposta salva';
+  t.style.background = cor || '#2d5a27';
+  t.style.color = cor ? '#fff' : '#a8d5a2';
+  t.classList.add('show');
+  setTimeout(function() { t.classList.remove('show'); }, 2200);
+};
+
+// ─── Coletar todos os dados do formulário ─────────────────────────────────────
+function coletarDados() {
+  var dados = {};
+
+  // Para cada question-card com data-qid
+  document.querySelectorAll('[data-qid]').forEach(function(card) {
+    var qid = card.dataset.qid;
+    var entradas = {};
+
+    // textareas
+    card.querySelectorAll('textarea').forEach(function(el, i) {
+      entradas['textarea_' + i] = el.value;
+    });
+
+    // inputs text
+    card.querySelectorAll('input[type=text]').forEach(function(el, i) {
+      entradas['input_' + i] = el.value;
+    });
+
+    // choices selecionados (radio)
+    card.querySelectorAll('.choice-label.selected').forEach(function(el) {
+      entradas['choice'] = el.textContent.trim();
+    });
+
+    dados[qid] = entradas;
+  });
+
+  return dados;
+}
+
+// ─── Preencher formulário a partir dos dados do Firebase ─────────────────────
+function preencherDados(dados) {
+  if (!dados) return;
+
+  document.querySelectorAll('[data-qid]').forEach(function(card) {
+    var qid = card.dataset.qid;
+    if (!dados[qid]) return;
+    var entradas = dados[qid];
+
+    card.querySelectorAll('textarea').forEach(function(el, i) {
+      if (entradas['textarea_' + i] !== undefined) {
+        el.value = entradas['textarea_' + i];
+        updateChar(el);
+      }
+    });
+
+    card.querySelectorAll('input[type=text]').forEach(function(el, i) {
+      if (entradas['input_' + i] !== undefined) {
+        el.value = entradas['input_' + i];
+      }
+    });
+
+    if (entradas['choice']) {
+      card.querySelectorAll('.choice-label').forEach(function(lbl) {
+        if (lbl.textContent.trim() === entradas['choice']) {
+          lbl.classList.add('selected');
+        }
+      });
+    }
+  });
+}
+
+// ─── Salvar no Firebase ───────────────────────────────────────────────────────
+async function salvarNoFirebase() {
+  var dados = coletarDados();
+  var payload = {
+    dados: dados,
+    updatedAt: Date.now(),
+    atualizadoEm: new Date().toISOString()
+  };
+
+  saveLocal('born_rich_' + CADERNO_ID, payload);
+
+  if (window.syncShow) window.syncShow.syncing();
+  try {
+    await setDoc(doc(db, 'born_rich', CADERNO_ID), payload, { merge: true });
+    respostasCache = dados;
+    if (window.syncShow) window.syncShow.synced('Born Rich');
+  } catch(e) {
+    if (window.syncShow) window.syncShow.local();
+    showToast('Salvo localmente (offline)', '#f59e0b');
+  }
+}
+
+// ─── Agendador de salvamento (debounce — salva 1.5s após parar de digitar) ───
+window.agendarSalvamento = function(el) {
+  clearTimeout(_saveTimer);
+  _saveTimer = setTimeout(function() {
+    salvarNoFirebase().then(function() {
+      showToast('✓ Salvo automaticamente');
+    });
+  }, 1500);
+};
+
+// ─── Botão Salvar manual ─────────────────────────────────────────────────────
+window.saveAnswer = function(btn) {
+  btn.classList.add('saved');
+  salvarNoFirebase().then(function() {
+    showToast('✓ Resposta salva');
+    setTimeout(function() { btn.classList.remove('saved'); }, 3000);
+  });
+};
+
+// ─── Carregar dados com guard de timestamp ────────────────────────────────────
+async function carregarDados() {
+  var local = await loadLocal('born_rich_' + CADERNO_ID);
+  var localTime = local ? (local.updatedAt || 0) : 0;
+
+  try {
+    var snap = await getDoc(doc(db, 'born_rich', CADERNO_ID));
+    if (snap.exists()) {
+      var cloud = snap.data();
+      var cloudTime = cloud.updatedAt || 0;
+      if (localTime > cloudTime) {
+        // Local mais recente — usa local e corrige a nuvem
+        respostasCache = local.dados || {};
+        preencherDados(respostasCache);
+        try { await setDoc(doc(db, 'born_rich', CADERNO_ID), local, { merge: true }); } catch(_) {}
+      } else {
+        // Nuvem igual ou mais recente
+        respostasCache = cloud.dados || {};
+        preencherDados(respostasCache);
+        saveLocal('born_rich_' + CADERNO_ID, cloud);
+      }
+    } else if (local) {
+      respostasCache = local.dados || {};
+      preencherDados(respostasCache);
+      try { await setDoc(doc(db, 'born_rich', CADERNO_ID), local, { merge: true }); } catch(_) {}
+    }
+  } catch(e) {
+    if (local) {
+      respostasCache = local.dados || {};
+      preencherDados(respostasCache);
+      showToast('Dados carregados localmente', '#f59e0b');
+    }
+    if (window.syncShow) window.syncShow.offline();
+  }
+}
+
+// ─── INIT ─────────────────────────────────────────────────────────────────────
+carregarDados();
+// Sincroniza automaticamente ao voltar online
+window.addEventListener('online', function() {
+  var dados = coletarDados();
+  if (Object.keys(dados).length) {
+    salvarNoFirebase().then(function() { showToast('✓ Sincronizado com a nuvem'); });
+  }
+});
+</script>
+
+<!-- ─── Navegação: base history (impede fechar aba ao voltar) ────────────── -->
+<script>
+  // PASSO 4 — base do histórico: nunca sai da página ao pressionar voltar
+  history.replaceState({ _base: true }, '');
+
+  // PASSO 3 — popstate: nenhum painel/modal/overlay presente nesta página.
+  // Handler registrado como segurança — se o browser tentar sair, reanchora.
+  window.addEventListener('popstate', function(e) {
+    if (e.state && e.state._base) {
+      // Já estamos na base — nada a fechar, apenas reafirma o estado
+      history.replaceState({ _base: true }, '');
+    }
+  });
+</script>
+
+<!-- ─── Funções UI (não-module) ──────────────────────────────────────────── -->
+<script>
+  function toggleHint(btn) {
+    var card = btn.closest('.question-card');
+    var panel = card.querySelector('.hint-panel');
+    var isOpen = panel.classList.contains('open');
+    panel.classList.toggle('open', !isOpen);
+    btn.classList.toggle('active', !isOpen);
+    btn.textContent = isOpen ? '?' : '✕';
+  }
+
+  function selectChoice(label, name) {
+    document.querySelectorAll('input[name="' + name + '"]').forEach(function(r) {
+      r.closest('.choice-label').classList.remove('selected');
+    });
+    label.classList.add('selected');
+    // Disparar salvamento automático
+    if (window.agendarSalvamento) window.agendarSalvamento(label);
+  }
+
+  function updateChar(el) {
+    var card = el.closest('.question-card');
+    if (!card) return;
+    var counter = card.querySelector('.char-count');
+    if (counter) counter.textContent = el.value.length + ' caracteres';
+  }
+</script>
+<!-- VOLTAR DESKTOP --><style>@media(max-width:768px){#__btn-voltar{display:none!important}}#__btn-voltar{position:fixed;bottom:22px;left:22px;z-index:99999;background:#13131a;border:1px solid #2a2a4a;color:#a0a0c0;text-decoration:none;padding:10px 18px;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;transition:all .2s;box-shadow:0 2px 12px rgba(0,0,0,.4)}#__btn-voltar:hover{background:#7c6aff;border-color:#7c6aff;color:#fff}</style><a id="__btn-voltar" href="OUTROS.html">← Outros</a><!-- FIM VOLTAR DESKTOP -->
+</body>
+</html>
