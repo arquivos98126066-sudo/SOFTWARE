@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Outros</title>
-<meta name="theme-color" content="#010d1e">
+<meta name="theme-color" content="#ffffff">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -12,18 +12,17 @@
 <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@600;700;800&family=Barlow+Condensed:wght@700;800&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
 <style>
 :root {
-  --bg:        #010d1e;
-  --surface:   #041a30;
-  --card:      #041a30;
-  --card-hi:   #062440;
-  --border:    rgba(0,160,255,0.11);
-  --border-hi: rgba(0,190,255,0.32);
-  --blue:      #00b4ff;
-  --blue-dim:  rgba(0,180,255,0.13);
-  --blue-glow: rgba(0,180,255,0.50);
-  --white:     #dff3ff;
-  --muted:     rgba(140,200,255,0.52);
-  --muted2:    rgba(100,170,240,0.28);
+  --bg:        #ffffff;
+  --surface:   #f9fafb;
+  --card:      #ffffff;
+  --card-hi:   #f5f5f5;
+  --border:    rgba(0,0,0,0.08);
+  --border-hi: rgba(0,0,0,0.15);
+  --accent:    #111111;
+  --accent-dim: rgba(0,0,0,0.06);
+  --white:     #111111;
+  --muted:     #6b7280;
+  --muted2:    rgba(0,0,0,0.28);
   --fh:        'Barlow', sans-serif;
   --fl:        'Barlow Condensed', sans-serif;
   --fb:        'DM Sans', sans-serif;
@@ -46,8 +45,8 @@ body::before {
   position: fixed; inset: 0;
   pointer-events: none; z-index: 0;
   background-image:
-    linear-gradient(rgba(0,140,255,0.028) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0,140,255,0.028) 1px, transparent 1px);
+    linear-gradient(rgba(0,0,0,0.028) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,0,0,0.028) 1px, transparent 1px);
   background-size: 34px 34px;
   mask-image: radial-gradient(ellipse 90% 55% at 50% 0%, black 15%, transparent 100%);
 }
@@ -56,7 +55,7 @@ body::after {
   position: fixed;
   top: -130px; left: 50%; transform: translateX(-50%);
   width: 540px; height: 380px; border-radius: 50%;
-  background: radial-gradient(ellipse, rgba(0,140,255,0.14) 0%, transparent 65%);
+  background: radial-gradient(ellipse, rgba(0,0,0,0.04) 0%, transparent 65%);
   pointer-events: none; z-index: 0;
 }
 
@@ -74,7 +73,7 @@ body::after {
   position: relative; z-index: 10;
 }
 .back-btn:active { opacity: .7; }
-.back-btn:hover  { color: var(--blue); border-color: var(--border-hi); }
+.back-btn:hover  { color: #111111; border-color: var(--border-hi); }
 
 .page-wrap {
   display: flex; flex-direction: column;
@@ -90,8 +89,7 @@ body::after {
 }
 .identity-dot {
   width: 5px; height: 5px; border-radius: 50%;
-  background: var(--blue);
-  box-shadow: 0 0 8px 2px var(--blue-glow);
+  background: #111111;
 }
 .identity-label {
   font-family: var(--fl);
@@ -100,7 +98,6 @@ body::after {
   color: var(--muted);
 }
 
-/* Grid — mesmo do index, 2 colunas, cards não alargam */
 .grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -112,7 +109,6 @@ body::after {
   position: relative; z-index: 1;
 }
 
-/* Card — idêntico ao index */
 .card {
   background: var(--card);
   border: 1px solid var(--border);
@@ -126,13 +122,14 @@ body::after {
               border-color .2s, background .2s, box-shadow .2s;
   -webkit-tap-highlight-color: transparent;
   will-change: transform;
+  box-shadow: 0 4px 18px rgba(0,0,0,0.10), 0 1px 4px rgba(0,0,0,0.06);
 }
 .card::before {
   content: '';
   position: absolute;
   top: 0; left: 15%; right: 15%;
   height: 1px;
-  background: linear-gradient(90deg, transparent, var(--c1,#00b4ff) 40%, var(--c2,#33ccff) 60%, transparent);
+  background: linear-gradient(90deg, transparent, rgba(0,0,0,0.15) 40%, rgba(0,0,0,0.20) 60%, transparent);
   opacity: .62;
   transition: opacity .22s, left .25s, right .25s;
 }
@@ -141,16 +138,16 @@ body::after {
   position: absolute;
   bottom: -26px; left: -18px;
   width: 90px; height: 90px; border-radius: 50%;
-  background: radial-gradient(circle, var(--c1,#00b4ff) 0%, transparent 70%);
-  opacity: .055;
+  background: radial-gradient(circle, rgba(0,0,0,0.04) 0%, transparent 70%);
+  opacity: .6;
   pointer-events: none;
 }
 .card:active { transform: scale(.952); border-color: var(--border-hi); }
 @media (hover: hover) {
   .card:hover {
     background: var(--card-hi);
-    border-color: rgba(0,180,255,.22);
-    box-shadow: 0 6px 28px rgba(0,0,0,.65);
+    border-color: rgba(0,0,0,0.15);
+    box-shadow: 0 8px 28px rgba(0,0,0,0.14), 0 2px 8px rgba(0,0,0,0.08);
     transform: translateY(-1px);
   }
   .card:hover::before { opacity: 1; left: 5%; right: 5%; }
@@ -158,46 +155,46 @@ body::after {
 
 .card-icon {
   width: 34px; height: 34px; border-radius: 9px;
-  background: rgba(0,140,255,.08);
-  border: 1px solid rgba(0,150,255,.14);
+  background: rgba(0,0,0,0.04);
+  border: 1px solid rgba(0,0,0,0.08);
   display: flex; align-items: center; justify-content: center;
   font-size: 17px; line-height: 1; flex-shrink: 0;
   transition: background .2s, border-color .2s, box-shadow .2s;
 }
 .card:active .card-icon,
 .card:hover  .card-icon {
-  background: var(--blue-dim);
-  border-color: rgba(0,180,255,.35);
-  box-shadow: 0 0 12px rgba(0,180,255,.18);
+  background: rgba(0,0,0,0.07);
+  border-color: rgba(0,0,0,0.15);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.10);
 }
 
 .card-name {
   font-family: var(--fh);
-  font-size: 13.5px; font-weight: 800;
-  color: var(--white); line-height: 1.2; letter-spacing: -.2px;
+  font-size: 13.5px; font-weight: 500;
+  color: #111111; line-height: 1.2; letter-spacing: -.2px;
 }
 .card-desc { font-size: 10.5px; color: var(--muted); line-height: 1.4; }
 
 .card-arrow {
   position: absolute; bottom: 11px; right: 11px;
   width: 20px; height: 20px; border-radius: 5px;
-  background: rgba(0,140,255,.07);
+  background: rgba(0,0,0,0.04);
   display: flex; align-items: center; justify-content: center;
-  color: var(--muted2); font-size: 11px; font-weight: 700;
+  color: var(--muted); font-size: 11px; font-weight: 700;
   transition: background .2s, color .2s, box-shadow .2s;
 }
 .card:hover .card-arrow,
 .card:active .card-arrow {
-  background: var(--blue-dim); color: var(--blue);
-  box-shadow: 0 0 8px rgba(0,180,255,.22);
+  background: #111111;
+  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.18);
 }
 
-/* Colors */
-.c-gold    { --c1:#f59e0b; --c2:#fbbf24; }
-.c-indigo  { --c1:#6c8fff; --c2:#9eb3ff; }
-.c-rose    { --c1:#f43f5e; --c2:#fb7185; }
-.c-emerald { --c1:#10b981; --c2:#34d399; }
-.c-violet  { --c1:#9b7aff; --c2:#c4b5fd; }
+/* Colors — all neutralized */
+.c-gold, .c-indigo, .c-rose, .c-emerald, .c-violet {
+  --c1: rgba(0,0,0,0.12);
+  --c2: rgba(0,0,0,0.08);
+}
 
 .footer {
   text-align: center;
