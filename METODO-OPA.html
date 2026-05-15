@@ -783,13 +783,17 @@ function _renderTelaAtiva(){
   const telaAtiva=modAtivo.querySelector('.tela.ativa');
   if(modAtivo.id==='mod-hoje'&&telaAtiva&&telaAtiva.id==='t-hoje-main'){
     const p=gph();
-    if(p&&p.blocos&&p.blocos.length){
-      blocosTemp=JSON.parse(JSON.stringify(p.blocos));
-      if(p.iniciado){irT('t-execucao');renderExec();startClock();}
-      else{renderBlocosUI();checkBtns();}
-    } else {
-      blocosTemp=[];renderBlocosUI();checkBtns();
+    // Só atualiza blocosTemp a partir do cache se o cache tiver MAIS blocos que a memória.
+    // Nunca sobrescreve memória com dado menor (evita Firebase apagar blocos recém-adicionados).
+    const qtdCache = (p&&p.blocos) ? p.blocos.length : 0;
+    const qtdMem = blocosTemp ? blocosTemp.length : 0;
+    if(qtdCache > qtdMem){
+      blocosTemp = JSON.parse(JSON.stringify(p.blocos));
+    } else if(qtdMem === 0 && qtdCache === 0){
+      blocosTemp = [];
     }
+    if(p&&p.iniciado){irT('t-execucao');renderExec();startClock();}
+    else{renderBlocosUI();checkBtns();}
   } else if(modAtivo.id==='mod-habitos'){renderHabitos();
   } else if(modAtivo.id==='mod-historico'){calcZonas();renderHistorico();
   } else if(modAtivo.id==='mod-planos'){renderPlanos();
@@ -857,7 +861,7 @@ function initHoje(){
     if(p.iniciado){irT('t-execucao');renderExec();startClock();return}
     renderBlocosUI();checkBtns();return;
   }
-  // Nenhum planejamento hoje — começa vazio sem criar bloco automático
+  // Nenhum planejamento salvo hoje — garante lista vazia
   blocosTemp=[];
   renderBlocosUI();
   checkBtns();
@@ -952,10 +956,13 @@ function criarBlocoUI(b){
   card.querySelector('.bobj').addEventListener('blur',e=>{const bk=blocosTemp.find(x=>x.id===e.target.dataset.id);if(bk){bk.objetivo=e.target.value;salvarBlocos()}});
   card.querySelector('.bprop').addEventListener('input',e=>{e.target.style.height='auto';e.target.style.height=e.target.scrollHeight+'px';const bk=blocosTemp.find(x=>x.id===e.target.dataset.id);if(bk)bk.proposito=e.target.value;});
   card.querySelector('.bprop').addEventListener('blur',e=>{const bk=blocosTemp.find(x=>x.id===e.target.dataset.id);if(bk){bk.proposito=e.target.value;salvarBlocos()}});
-  // auto-resize imediato para blocos restaurados com texto já preenchido
-  requestAnimationFrame(()=>{
-    ['.bobj','.bprop'].forEach(sel=>{const el=card.querySelector(sel);if(el&&el.value){el.style.height='auto';el.style.height=el.scrollHeight+'px';}});
-  });
+  // auto-resize para blocos com texto já preenchido (duplo rAF garante DOM pintado)
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    ['.bobj','.bprop'].forEach(sel=>{
+      const el=card.querySelector(sel);
+      if(el&&el.value){el.style.height='auto';el.style.height=el.scrollHeight+'px';}
+    });
+  }));
   card.querySelector('.bhor-ini').addEventListener('change',e=>{const bk=blocosTemp.find(x=>x.id===e.target.dataset.id);if(bk){const v=e.target.value;const conflito=blocosTemp.find(b=>b.id!==bk.id&&b.horario_inicio&&b.horario_fim&&v<b.horario_fim&&(bk.horario_fim||'99:99')>b.horario_inicio);if(conflito){toast(`⚠️ Conflito com bloco "${conflito.nome}"`);e.target.value=bk.horario_inicio||'';return}bk.horario_inicio=v;salvarBlocos();checkConfBlocos()}});
   card.querySelector('.bhor-fim').addEventListener('change',e=>{const bk=blocosTemp.find(x=>x.id===e.target.dataset.id);if(bk){const v=e.target.value;if(bk.horario_inicio&&v&&v<=bk.horario_inicio){toast('⚠️ Horário fim deve ser maior que início');e.target.value=bk.horario_fim||'';return}const conflito=blocosTemp.find(b=>b.id!==bk.id&&b.horario_inicio&&b.horario_fim&&bk.horario_inicio<b.horario_fim&&v>b.horario_inicio);if(conflito){toast(`⚠️ Conflito com bloco "${conflito.nome}"`);e.target.value=bk.horario_fim||'';return}bk.horario_fim=v;salvarBlocos();checkConfBlocos()}});
   const bk=blocosTemp.find(x=>x.id===b.id);
@@ -999,7 +1006,10 @@ function setBlocoZ(id,z){const b=blocosTemp.find(x=>x.id===id);if(b){b.zona=z;sa
 
 function addAcaoBloco(blocoId){
   const b=blocosTemp.find(x=>x.id===blocoId);if(!b)return;
-  const a={id:`a_${Date.now()}`,nome:'',prior:5,horario_inicio:'',status:'pendente',selecionada:true};
+  // prior = total atual de ações selecionadas+1, para não colidir com existentes
+  const todasAcoes=[];blocosTemp.forEach(bb=>bb.acoes.filter(aa=>aa.selecionada!==false&&aa.nome.trim()).forEach(aa=>todasAcoes.push(aa)));
+  const proxPrior=todasAcoes.length+1;
+  const a={id:`a_${Date.now()}`,nome:'',prior:proxPrior,horario_inicio:'',status:'pendente',selecionada:true};
   b.acoes.push(a);
   // Salva via sd() — caminho único de salvamento
   salvarBlocos();
@@ -1148,14 +1158,15 @@ $('#btn-purif-prox').addEventListener('click',()=>{irT('t-prioridade');renderPri
 function renderPrioridadeBloco(){
   if(!blocoAtual)return;
   const lista=$('#prior-lista');lista.innerHTML='';
-  blocoAtual=blocosTemp.find(x=>x.id===blocoAtual.id)||blocoAtual;const acoes=blocoAtual.acoes.filter(a=>a.selecionada!==false&&a.nome.trim());
+  blocoAtual=blocosTemp.find(x=>x.id===blocoAtual.id)||blocoAtual;
+  const acoes=blocoAtual.acoes.filter(a=>a.selecionada!==false&&a.nome.trim());
+  // Normaliza sequencialmente para evitar colisões
   acoes.sort((x,y)=>x.prior-y.prior);
-  acoes.forEach(({prior:_,..._a},i)=>{if(acoes[i].prior===5)acoes[i].prior=i+1});
-  acoes.sort((x,y)=>x.prior-y.prior);
-  acoes.forEach((a,idx)=>{
+  acoes.forEach((a,i)=>{a.prior=i+1;});
+  acoes.forEach((a)=>{
     const item=document.createElement('div');item.className='prior-acao-item';
     const cor='var(--azul)';
-    item.innerHTML=`<div class="prior-acao-num" style="background:${cor}">${a.prior}</div><div style="flex:1"><p style="font-size:14px;font-weight:600">${a.nome}</p><p style="font-size:12px;color:var(--texto-sec)">${blocoAtual.nome}</p></div><input type="time" value="${a.horario_inicio||''}" style="width:100px;height:32px;font-size:13px;border:1.5px solid var(--borda-media);border-radius:8px;padding:0 6px" onchange="alterarPriorAcao('${blocoAtual.id}','${a.id}',${a.prior},this.value)"><select style="height:32px;border-radius:8px;border:1.5px solid var(--borda-media);background:var(--bg-card);font-family:var(--fonte);font-size:13px;font-weight:700;color:var(--azul);padding:0 6px;cursor:pointer" onchange="alterarPriorAcao('${blocoAtual.id}','${a.id}',parseInt(this.value))">${acoes.map((_,i)=>`<option value="${i+1}" ${a.prior===i+1?'selected':''}>${i+1}º</option>`).join('')}</select>`;
+    item.innerHTML=`<div class="prior-acao-num" style="background:${cor}">${a.prior}</div><div style="flex:1"><p style="font-size:14px;font-weight:600">${a.nome}</p><p style="font-size:12px;color:var(--texto-sec)">${blocoAtual.nome}</p></div><input type="time" data-bid="${blocoAtual.id}" data-aid="${a.id}" value="${a.horario_inicio||''}" style="width:100px;height:32px;font-size:13px;border:1.5px solid var(--borda-media);border-radius:8px;padding:0 6px" onchange="alterarPriorAcaoHor(this)"><select data-bid="${blocoAtual.id}" data-aid="${a.id}" style="height:32px;border-radius:8px;border:1.5px solid var(--borda-media);background:var(--bg-card);font-family:var(--fonte);font-size:13px;font-weight:700;color:var(--azul);padding:0 6px;cursor:pointer" onchange="alterarPriorAcaoPos(this)">${acoes.map((_,i)=>`<option value="${i+1}" ${a.prior===i+1?'selected':''}>${i+1}º</option>`).join('')}</select>`;
     lista.appendChild(item);
   });
 }
@@ -1163,24 +1174,54 @@ function renderPrioridade(){
   const lista=$('#prior-lista');lista.innerHTML='';
   const todas=[];
   blocosTemp.forEach(b=>b.acoes.filter(a=>a.selecionada!==false&&a.nome.trim()).forEach(a=>todas.push({b,a})));
-  todas.sort((x,y)=>x.a.prior-y.a.prior);todas.forEach(({a},i)=>{if(a.prior===5)a.prior=i+1});todas.sort((x,y)=>x.a.prior-y.a.prior);
-  todas.forEach(({b,a},idx)=>{
+  // Normaliza: garante que todas as prioridades são únicas e sequenciais (1, 2, 3...)
+  todas.sort((x,y)=>x.a.prior-y.a.prior);
+  todas.forEach(({a},i)=>{ a.prior=i+1; });
+  todas.forEach(({b,a})=>{
     const item=document.createElement('div');item.className='prior-acao-item';
-    const cor=a.prior<=3?'var(--azul)':a.prior<=6?'var(--azul)':'var(--azul-claro)';
-    item.innerHTML=`
-      <div class="prior-acao-num" style="background:${cor}">${a.prior}</div>
-      <div style="flex:1"><p style="font-size:14px;font-weight:600">${a.nome}</p><p style="font-size:12px;color:var(--texto-sec)">${b.nome}</p></div><input type="time" value="${a.horario_inicio||''}" style="width:100px;height:32px;font-size:13px;border:1.5px solid var(--borda-media);border-radius:8px;padding:0 6px" onchange="alterarPriorAcao('${b.id}','${a.id}',${a.prior},this.value)">
-      <select style="height:32px;border-radius:8px;border:1.5px solid var(--borda-media);background:var(--bg-card);font-family:var(--fonte);font-size:13px;font-weight:700;color:var(--azul);padding:0 6px;cursor:pointer" onchange="alterarPriorAcao('${b.id}','${a.id}',parseInt(this.value))">${Array.from({length:todas.length},(_,i)=>`<option value="${i+1}" ${a.prior===i+1?'selected':''}>${i+1}º</option>`).join('')}</select>
-        
-        
-      </div>`;
+    const cor='var(--azul)';
+    item.innerHTML=`<div class="prior-acao-num" style="background:${cor}">${a.prior}</div><div style="flex:1"><p style="font-size:14px;font-weight:600">${a.nome}</p><p style="font-size:12px;color:var(--texto-sec)">${b.nome}</p></div><input type="time" data-bid="${b.id}" data-aid="${a.id}" value="${a.horario_inicio||''}" style="width:100px;height:32px;font-size:13px;border:1.5px solid var(--borda-media);border-radius:8px;padding:0 6px" onchange="alterarPriorAcaoHor(this)"><select data-bid="${b.id}" data-aid="${a.id}" style="height:32px;border-radius:8px;border:1.5px solid var(--borda-media);background:var(--bg-card);font-family:var(--fonte);font-size:13px;font-weight:700;color:var(--azul);padding:0 6px;cursor:pointer" onchange="alterarPriorAcaoPos(this)">${Array.from({length:todas.length},(_,i)=>`<option value="${i+1}" ${a.prior===i+1?'selected':''}>${i+1}º</option>`).join('')}</select>`;
     lista.appendChild(item);
   });
 }
 
+// Chamada pelo input[time] na tela de prioridade — busca prior atual do dado
+function alterarPriorAcaoHor(el){
+  const blocoId=el.dataset.bid,acaoId=el.dataset.aid;
+  alterarPriorAcao(blocoId,acaoId,undefined,el.value);
+}
+// Chamada pelo select de posição — busca prior atual e passa novo
+function alterarPriorAcaoPos(el){
+  const blocoId=el.dataset.bid,acaoId=el.dataset.aid;
+  alterarPriorAcao(blocoId,acaoId,parseInt(el.value),undefined);
+}
 function alterarPriorAcao(blocoId,acaoId,novaPrior,novoHor){
-  const bk=blocosTemp.find(x=>x.id===blocoId);const ak=bk&&bk.acoes.find(x=>x.id===acaoId);
-  if(ak){if(novoHor!==undefined){ak.horario_inicio=novoHor}else{const todas2=[];blocosTemp.forEach(bb=>bb.acoes.filter(aa=>aa.selecionada!==false&&aa.nome.trim()).forEach(aa=>todas2.push(aa)));todas2.sort((x,y)=>x.prior-y.prior);const antiga=ak.prior;const alvo=novaPrior;if(antiga<alvo){todas2.filter(aa=>aa.prior>antiga&&aa.prior<=alvo).forEach(aa=>aa.prior--)}else{todas2.filter(aa=>aa.prior>=alvo&&aa.prior<antiga).forEach(aa=>aa.prior++)}ak.prior=alvo}salvarBlocos();renderPrioridade()}
+  const bk=blocosTemp.find(x=>x.id===blocoId);
+  const ak=bk&&bk.acoes.find(x=>x.id===acaoId);
+  if(!ak)return;
+  if(novoHor!==undefined){
+    // Só atualiza horário
+    ak.horario_inicio=novoHor;
+  } else {
+    // Recolhe todas as ações selecionadas de todos os blocos
+    const todas2=[];
+    blocosTemp.forEach(bb=>bb.acoes.filter(aa=>aa.selecionada!==false&&aa.nome.trim()).forEach(aa=>todas2.push(aa)));
+    // Normaliza prioridades sequenciais antes de mover
+    todas2.sort((x,y)=>x.prior-y.prior);
+    todas2.forEach((aa,i)=>{aa.prior=i+1;});
+    // Agora faz a troca: desloca as ações entre antiga e nova posição
+    const antiga=ak.prior;
+    const alvo=Math.max(1,Math.min(novaPrior,todas2.length));
+    if(antiga===alvo){salvarBlocos();renderPrioridade();return;}
+    if(antiga<alvo){
+      todas2.filter(aa=>aa.prior>antiga&&aa.prior<=alvo).forEach(aa=>aa.prior--);
+    } else {
+      todas2.filter(aa=>aa.prior>=alvo&&aa.prior<antiga).forEach(aa=>aa.prior++);
+    }
+    ak.prior=alvo;
+  }
+  salvarBlocos();
+  renderPrioridade();
 }
 
 $('#btn-prior-prox').addEventListener('click',()=>{const p=gph();if(!p)return;ultimosBlocos=JSON.parse(JSON.stringify(p.blocos));p.iniciado=true;sp(p);irT('t-execucao');renderExec();startClock()});
@@ -1399,10 +1440,12 @@ function reusarPlano(id){
   const novos=JSON.parse(JSON.stringify(p.blocos||[]));
   novos.forEach(b=>{
     b.id='b_'+Date.now()+'_'+Math.random().toString(36).substr(2,4);
-    b.status='pendente';b.horario_inicio='';b.horario_fim='';
+    b.status='pendente';
+    // Mantém horario_inicio e horario_fim originais do plano
     (b.acoes||[]).forEach(a=>{
       a.id='a_'+Date.now()+'_'+Math.random().toString(36).substr(2,4);
-      a.status='pendente';a.selecionada=true;a.horario_inicio='';
+      a.status='pendente';a.selecionada=true;
+      // Mantém horario_inicio original da ação
     });
   });
   blocosTemp=[...blocosTemp,...novos];
@@ -1901,4 +1944,4 @@ initHoje();
 })();
 </script>
 </body>
-</html>
+  </html>
