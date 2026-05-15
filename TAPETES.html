@@ -484,9 +484,7 @@ window.mascaraTel = function(el){
   else                  fmt='('+dd+') '+nono+' '+bloco+'-'+final;
   el.value=fmt;
   var msg=document.getElementById('c_contato_msg');
-  if(v.length===0){msg.textContent='';el.style.borderColor='var(--borda)';}
-  else if(v.length<11){msg.textContent='Numero incompleto ('+v.length+'/11 digitos)';msg.style.color='var(--vermelho)';el.style.borderColor='var(--vermelho)';}
-  else{msg.textContent='';el.style.borderColor='var(--borda)';}
+  msg.textContent='';el.style.borderColor='var(--borda)';
 };
 
 window.mascaraValor = function(el){
@@ -719,7 +717,6 @@ window.salvarPedido = async function(){
     }
   }
   if(!nome||!contato||!valor||!medida||!prazo){toast('Preencha os campos obrigatorios (*)','aviso');return;}
-  if(contato.length!==11){toast('Numero de WhatsApp deve ter 11 digitos!','aviso');document.getElementById('c_contato').style.borderColor='var(--vermelho)';return;}
   if(!fotoCadastroBase64){toast('Foto do cliente e obrigatoria!','aviso');return;}
   var custo=custoRaw!==''?parseFloat(custoRaw):null;
   var pedido={
@@ -1623,4 +1620,4 @@ async function iniciarListeners(){
 })();
 </script>
 </body>
-      </html>
+        </html>
