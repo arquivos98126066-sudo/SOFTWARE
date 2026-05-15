@@ -147,7 +147,7 @@ tbody tr:hover td{background:#fafafa;}
   <div class="card" style="padding-top:23px">
     <input type="text" id="c_nome" placeholder="Nome completo do cliente">
     <input type="text" id="c_loja" placeholder="Nome da loja (opcional)">
-    <div style="position:relative"><input type="text" id="c_contato" placeholder="(79) 99681-0020" inputmode="numeric" oninput="mascaraTel(this)" maxlength="15" style="margin-bottom:0"><div id="c_contato_msg" style="font-size:.7rem;font-weight:700;position:absolute;bottom:-16px;left:2px;height:14px"></div></div><div style="margin-bottom:13px"></div>
+    <div style="position:relative"><input type="text" id="c_contato" placeholder="(79) 99681-0020" inputmode="numeric" oninput="mascaraTel(this)" maxlength="16" style="margin-bottom:0"><div id="c_contato_msg" style="font-size:.7rem;font-weight:700;position:absolute;bottom:-16px;left:2px;height:14px"></div></div><div style="margin-bottom:13px"></div>
     <input type="text" id="c_medida" placeholder="Medida (ex: 100x60 cm)">
     <input type="text" id="c_valor" placeholder="Valor total (R$)" oninput="mascaraValor(this)" inputmode="numeric">
     <select id="c_borda" style="font-weight:400"><option value="sem">Sem borda</option><option value="com">Com borda</option></select>
@@ -1620,4 +1620,4 @@ async function iniciarListeners(){
 })();
 </script>
 </body>
-        </html>
+                                                                        </html>
