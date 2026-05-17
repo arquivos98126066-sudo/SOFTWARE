@@ -1764,19 +1764,11 @@ window.filaCopiarImagem = filaCopiarImagem;
 
 async function filaEnviarWhatsApp(id){
   const c = clients.find(x=>x.id===id); if(!c) return;
-  // Monta texto
-  const d = curDay(c);
-  const fase = c.sequenciaFase||'sem_resposta';
-  const msg = ((messages[c.tipo]||{})[fase]||{})[d]||{};
-  const bt = c.borda==='sim'?`\nCor da Borda: ${c.bordaCor||'preta'}`:'';
-  const specs = `Medida: ${c.tamanho}\nCor de Fundo: ${c.cor}${bt}\nValor: R$ ${fmt(c.preco)}\nPrazo: ${c.prazo} dias\nPagamento: somente na entrega\nFormas: Pix · Cartão · Dinheiro${c.obs?'\nObs: '+c.obs:''}`;
-  const rawTxt = (msg.texto||'').replace(/\{nome\}/g, c.nome||'');
-  const txt = (rawTxt?rawTxt+'\n\n':'')+specs;
+  const txt = buildMsgDia(c);
   copyText(txt, '✅ Texto copiado!');
   // Abre WhatsApp
   const tel = c.telefone.replace(/\D/g,'');
-  const waUrl = `https://wa.me/55${tel}`;
-  window.open(waUrl, '_blank');
+  window.open(`https://wa.me/55${tel}`, '_blank');
   // Move para clientes
   await fsUpdateClient(id, {_naFila:false});
   await marcarEnviado(id);
@@ -1793,6 +1785,10 @@ window.filaExcluir = filaExcluir;
 
 function cardHtml(c,showEnviar=false){
   const d=curDay(c); const done=allSent(c); const isHj=nextDate(c)===today();
+  const enviarBtn = showEnviar && isHj && !done ? `
+    <button class="btn btn-whatsapp" style="margin-top:4px" onclick="event.stopPropagation();enviarMensagemDia('${c.id}')">
+      📤 Enviar mensagem do Dia ${d}
+    </button>` : '';
   return `<div class="client-card ${c.tipo}" onclick="openTimeline('${c.id}')">
     <div class="card-row">
       <div>
@@ -1807,6 +1803,7 @@ function cardHtml(c,showEnviar=false){
       <span class="card-date">📅 ${fmtDate(c.dataRegistro)}</span>
     </div>
     <div class="card-btns" onclick="event.stopPropagation()">
+      ${enviarBtn}
       <button class="btn btn-ghost" onclick="openOpcoes('${c.id}')">⋮ Opções</button>
     </div>
   </div>`;
@@ -2682,15 +2679,9 @@ window.salvarCliente = salvarCliente;
 function openEnviar(id){
   const c=clients.find(x=>x.id===id); if(!c) return;
   curCid=id;
-  const d=curDay(c);
-  const fase=c.sequenciaFase||'sem_resposta';
-  const msg=((messages[c.tipo]||{})[fase]||{})[d]||{};
   const lnks=links||[];
   const tf=textoFixo||'';
-  const bt=c.borda==='sim'?`\nCor da Borda: ${c.bordaCor||'preta'}`:''
-  const specs=`Medida: ${c.tamanho}\nCor de Fundo: ${c.cor}${bt}\nValor: R$ ${fmt(c.preco)}\nPrazo: ${c.prazo} dias\nPagamento: somente na entrega\nFormas: Pix · Cartão · Dinheiro${c.obs?'\nObs: '+c.obs:''}`;
-  const rawTxt=(msg.texto||'(Configure a mensagem em ⚙️ Config)').replace(/\{nome\}/g, c.nome||'');
-  const txtMsg=rawTxt+'\n\n'+specs;
+  const txtMsg=buildMsgDia(c);
 
   document.getElementById('enviar-content').innerHTML=`
     <div class="envio-bloco">
@@ -2756,14 +2747,9 @@ async function enviarRapido(id){
     }
   }
 
-  // Passo 2: copiar texto personalizado + specs
+  // Passo 2: copiar texto do dia (specs só no Dia 1)
   const d=curDay(c);
-  const fase=c.sequenciaFase||'sem_resposta';
-  const msg=((messages[c.tipo]||{})[fase]||{})[d]||{};
-  const bt=c.borda==='sim'?`\nCor da Borda: ${c.bordaCor||'preta'}`:'';
-  const specs=`Medida: ${c.tamanho}\nCor de Fundo: ${c.cor}${bt}\nValor: R$ ${fmt(c.preco)}\nPrazo: ${c.prazo} dias\nPagamento: somente na entrega\nFormas: Pix · Cartão · Dinheiro${c.obs?'\nObs: '+c.obs:''}`;
-  const rawTxt=(msg.texto||'').replace(/\{nome\}/g, c.nome||'');
-  const txtFinal=(rawTxt?rawTxt+'\n\n':'')+specs;
+  const txtFinal=buildMsgDia(c);
   await new Promise(r=>setTimeout(r,300)); // pequena pausa entre cópias
   copyText(txtFinal, copiouImg?'✅ Simulação + texto copiados!':'✅ Texto copiado!');
 
@@ -2820,15 +2806,25 @@ function copyPromptCliente(id){
 }
 window.copyPromptCliente = copyPromptCliente;
 
+// ── FUNÇÃO CENTRAL: monta mensagem do dia ────────────────────────────────────
+// Specs (medida, cor, valor, prazo) só vão no Dia 1 — já foram enviadas antes
+function buildMsgDia(c){
+  const d=curDay(c);
+  const fase=c.sequenciaFase||'sem_resposta';
+  const msg=((messages[c.tipo]||{})[fase]||{})[d]||{};
+  const rawTxt=(msg.texto||'').replace(/\{nome\}/g, c.nome||'');
+  if(d===1){
+    const bt=c.borda==='sim'?`\nCor da Borda: ${c.bordaCor||'preta'}`:'';
+    const specs=`Medida: ${c.tamanho}\nCor de Fundo: ${c.cor}${bt}\nValor: R$ ${fmt(c.preco)}\nPrazo: ${c.prazo} dias\nPagamento: somente na entrega\nFormas: Pix · Cartão · Dinheiro${c.obs?'\nObs: '+c.obs:''}`;
+    return rawTxt?(rawTxt+'\n\n'+specs):specs;
+  }
+  return rawTxt; // Dia 2+ → só o texto da mensagem
+}
+window.buildMsgDia = buildMsgDia;
+
 function copiarTexto(id){
   const c=clients.find(x=>x.id===id); if(!c) return;
-  const d=curDay(c); const fase=c.sequenciaFase||'sem_resposta';
-  const msg=((messages[c.tipo]||{})[fase]||{})[d]||{};
-  const bt=c.borda==='sim'?`\nCor da Borda: ${c.bordaCor||'preta'}`:''
-  const specs=`Medida: ${c.tamanho}\nCor de Fundo: ${c.cor}${bt}\nValor: R$ ${fmt(c.preco)}\nPrazo: ${c.prazo} dias\nPagamento: somente na entrega\nFormas: Pix · Cartão · Dinheiro${c.obs?'\nObs: '+c.obs:''}`;
-  const rawTxt2=(msg.texto||'').replace(/\{nome\}/g, c.nome||'');
-  const txt=(rawTxt2?rawTxt2+'\n\n':'')+specs;
-  copyText(txt, '✅ Texto copiado! Cole no WhatsApp.');
+  copyText(buildMsgDia(c), '✅ Texto copiado! Cole no WhatsApp.');
 }
 window.copiarTexto = copiarTexto;
 
@@ -2861,6 +2857,63 @@ async function marcarEnviado(id){
   }
 }
 window.marcarEnviado = marcarEnviado;
+
+// ── ENVIAR MENSAGEM DO DIA (aba HOJE e modal Opções) ─────────────────────────
+async function enviarMensagemDia(id){
+  const c=clients.find(x=>x.id===id); if(!c) return;
+  const d=curDay(c);
+  const fase=c.sequenciaFase||'sem_resposta';
+  const msg=((messages[c.tipo]||{})[fase]||{})[d]||{};
+  const rawTxt=(msg.texto||'').replace(/\{nome\}/g, c.nome||'');
+  // Specs só no Dia 1 — do Dia 2 em diante o cliente já recebeu antes
+  const isFirstContact = d===1;
+  let txtCompleto = rawTxt;
+  if(isFirstContact){
+    const bt=c.borda==='sim'?`\nCor da Borda: ${c.bordaCor||'preta'}`:'';
+    const specs=`Medida: ${c.tamanho}\nCor de Fundo: ${c.cor}${bt}\nValor: R$ ${fmt(c.preco)}\nPrazo: ${c.prazo} dias\nPagamento: somente na entrega\nFormas: Pix · Cartão · Dinheiro${c.obs?'\nObs: '+c.obs:''}`;
+    txtCompleto=(rawTxt?rawTxt+'\n\n':'')+specs;
+  }
+
+  // Guarda o texto e id para o botão usar — evita JS inline com JSON.stringify
+  window._enviarMsgPendente = { txt: txtCompleto, id, d, tel: c.telefone.replace(/\D/g,'') };
+
+  const overlay=document.createElement('div');
+  overlay.id='enviar-msg-overlay';
+  overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:700;display:flex;align-items:flex-end';
+  const faseLabel=fase==='com_resposta'?'Com Resposta':'Sem Resposta';
+  const inner=document.createElement('div');
+  inner.style.cssText='background:#fff;width:100%;border-radius:20px 20px 0 0;padding:20px 16px 32px;max-height:80vh;overflow-y:auto';
+  inner.innerHTML=`
+    <div style="font-size:16px;font-weight:800;margin-bottom:4px">📤 ${esc(c.nome)} — Dia ${d}</div>
+    <div style="font-size:11px;color:#888;margin-bottom:14px">${typeName(c.tipo)} · ${faseLabel}</div>
+    <div style="background:#f5f5f5;border-radius:12px;padding:14px;font-size:13px;line-height:1.7;white-space:pre-wrap;word-break:break-word;margin-bottom:16px;max-height:260px;overflow-y:auto">${esc(txtCompleto)}</div>`;
+
+  const btnEnviar=document.createElement('button');
+  btnEnviar.textContent='💬 Copiar e abrir WhatsApp';
+  btnEnviar.style.cssText='width:100%;padding:16px;background:#25D366;color:#fff;border:none;border-radius:14px;font-size:15px;font-weight:700;cursor:pointer;margin-bottom:10px';
+  btnEnviar.onclick=async function(){
+    const p=window._enviarMsgPendente; if(!p) return;
+    overlay.remove();
+    copyText(p.txt,'✅ Mensagem copiada!');
+    window.open('https://wa.me/55'+p.tel,'_blank');
+    await marcarEnviado(p.id);
+    toast('✅ Enviado! Dia '+p.d+' marcado.');
+    setTimeout(()=>renderHome(),600);
+    delete window._enviarMsgPendente;
+  };
+
+  const btnCancelar=document.createElement('button');
+  btnCancelar.textContent='Cancelar';
+  btnCancelar.style.cssText='width:100%;padding:13px;background:#f5f5f5;border:none;border-radius:14px;font-size:14px;color:#555;cursor:pointer';
+  btnCancelar.onclick=()=>overlay.remove();
+
+  inner.appendChild(btnEnviar);
+  inner.appendChild(btnCancelar);
+  overlay.appendChild(inner);
+  document.body.appendChild(overlay);
+  overlay.onclick=e=>{ if(e.target===overlay) overlay.remove(); };
+}
+window.enviarMensagemDia = enviarMensagemDia;
 
 // ── IMG IA ────────────────────────────────────────────────────────────────────
 function openImgIA(id){ curCid=id; document.getElementById('img-ia-input').value=''; openModal('modal-img-ia'); }
@@ -2963,19 +3016,9 @@ window.alertaAntecipar = alertaAntecipar;
 
 async function alertaConfirmarEnvio(id){
   const c = clients.find(x=>x.id===id); if(!c) return;
-  // Copia texto
-  const d=curDay(c);
-  const fase=c.sequenciaFase||'sem_resposta';
-  const msg=((messages[c.tipo]||{})[fase]||{})[d]||{};
-  const bt=c.borda==='sim'?`\nCor da Borda: ${c.bordaCor||'preta'}`:'';
-  const specs=`Medida: ${c.tamanho}\nCor de Fundo: ${c.cor}${bt}\nValor: R$ ${fmt(c.preco)}\nPrazo: ${c.prazo} dias\nPagamento: somente na entrega\nFormas: Pix · Cartão · Dinheiro${c.obs?'\nObs: '+c.obs:''}`;
-  const rawTxt=(msg.texto||'').replace(/\{nome\}/g,c.nome||'');
-  const txt=(rawTxt?rawTxt+'\n\n':'')+specs;
-  copyText(txt,'✅ Texto copiado!');
-  // Abre WhatsApp
+  copyText(buildMsgDia(c),'✅ Texto copiado!');
   const tel=c.telefone.replace(/\D/g,'');
   window.open(`https://wa.me/55${tel}`,'_blank');
-  // Avança sequência
   await marcarEnviado(id);
   toast(`✅ Enviado! Avançou para Dia ${curDay(clients.find(x=>x.id===id))}`);
   renderHome();
@@ -2986,8 +3029,15 @@ window.alertaConfirmarEnvio = alertaConfirmarEnvio;
 function openOpcoes(id){
   curCid=id;
   const c=clients.find(x=>x.id===id); if(!c) return;
+  const d=curDay(c);
+  const isHj=nextDate(c)===today();
+  const done=allSent(c);
+  const enviarItem = (!done)
+    ? `<div class="modal-item" style="background:#f0fff4;border-left:3px solid #16a34a" onclick="closeModal('modal-opcoes');enviarMensagemDia('${c.id}')"><span class="ico">📤</span> Enviar mensagem do Dia ${d}</div>`
+    : '';
   document.getElementById('modal-opcoes-title').textContent=`⋮ ${c.nome}`;
   document.getElementById('modal-opcoes-body').innerHTML=`
+    ${enviarItem}
     <div class="modal-item" onclick="closeModal('modal-opcoes');clienteRespondeu('${c.id}')"><span class="ico">💬</span>${c.respondeu?'Marcar como Não Respondeu':'✅ Cliente Respondeu!'}</div>
     <div class="modal-item" onclick="closeModal('modal-opcoes');openDuvida('${c.id}')"><span class="ico">❓</span> Registrar Dúvida</div>
     <div class="modal-item" onclick="closeModal('modal-opcoes');openFechamento('${c.id}')"><span class="ico">🎉</span> Fechou a Venda</div>
@@ -4823,4 +4873,4 @@ setTimeout(function(){
 }, 600);
 </script>
 </body>
-  </html>
+          </html>
