@@ -928,6 +928,32 @@
   </div>
 </div>
 
+<!-- ── MODAL AGENDAR PRÓXIMO CONTATO ── -->
+<div id="modal-agendar" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:10020;align-items:flex-end;justify-content:center" onclick="if(event.target===this)fecharModalAgendar()">
+  <div style="background:#fff;border-radius:24px 24px 0 0;padding:20px 16px 36px;width:100%;max-width:520px;font-family:'Outfit',system-ui,sans-serif;" onclick="event.stopPropagation()">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px">
+      <div>
+        <div style="font-size:17px;font-weight:800;color:#111">📅 Agendar Contato</div>
+        <div style="font-size:11px;color:#888;margin-top:2px" id="agendar-modal-sub">Aparecerá na aba HOJE na data escolhida</div>
+      </div>
+      <button onclick="fecharModalAgendar()" style="background:#f3f4f6;border:none;border-radius:50%;width:36px;height:36px;font-size:16px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div style="background:#f0f9ff;border-radius:12px;padding:12px 14px;margin-bottom:16px;border-left:4px solid #0ea5e9">
+      <div style="font-size:12px;font-weight:700;color:#0369a1;margin-bottom:2px">💡 Como funciona</div>
+      <div style="font-size:12px;color:#0369a1;line-height:1.5">A mensagem da sequência só aparecerá para envio na data que você programar — ideal quando o cliente pediu pra contactar numa data específica.</div>
+    </div>
+    <label style="display:block;font-size:11px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.4px;margin-bottom:5px">DATA DO PRÓXIMO CONTATO</label>
+    <input type="date" id="agendar-data" style="width:100%;padding:14px;border:2px solid #d1d5db;border-radius:12px;font-size:16px;font-family:inherit;font-weight:600;background:#f9fafb;color:#111;margin-bottom:14px;box-sizing:border-box;-webkit-appearance:none">
+    <label style="display:block;font-size:11px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.4px;margin-bottom:5px">HORA (opcional)</label>
+    <input type="time" id="agendar-hora" style="width:100%;padding:14px;border:2px solid #d1d5db;border-radius:12px;font-size:16px;font-family:inherit;font-weight:600;background:#f9fafb;color:#111;margin-bottom:14px;box-sizing:border-box;-webkit-appearance:none">
+    <label style="display:block;font-size:11px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.4px;margin-bottom:5px">ANOTAÇÃO (opcional)</label>
+    <input type="text" id="agendar-nota" placeholder="Ex: Ele pediu pra mandar na terça" style="width:100%;padding:14px;border:2px solid #d1d5db;border-radius:12px;font-size:15px;font-family:inherit;font-weight:500;background:#f9fafb;color:#111;margin-bottom:18px;box-sizing:border-box">
+    <button onclick="confirmarAgendamento()" style="width:100%;padding:16px;background:#111;color:#fff;border:none;border-radius:14px;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit;margin-bottom:10px;touch-action:manipulation">✅ Confirmar Agendamento</button>
+    <button onclick="limparAgendamento()" id="agendar-btn-limpar" style="display:none;width:100%;padding:13px;background:#fee2e2;color:#dc2626;border:none;border-radius:14px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;margin-bottom:8px;touch-action:manipulation">🗑️ Remover Agendamento</button>
+    <button onclick="fecharModalAgendar()" style="width:100%;padding:13px;background:#f3f4f6;color:#555;border:none;border-radius:14px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;touch-action:manipulation">Cancelar</button>
+  </div>
+</div>
+
 <!-- ── BOTTOM NAV ── -->
 <div class="bottom-nav">
   <button class="bnav-btn active" id="bnav-0"
@@ -1308,6 +1334,8 @@ function curDay(c){
 }
 function nextDate(c){
   if(!c.sequencia?.length||!c.dataRegistro) return null;
+  // Se tem data marcada (agendamento especial), usa ela como próxima data
+  if(c.dataMarcada) return c.dataMarcada;
   const base=new Date(c.dataRegistro+'T00:00:00');
   for(const d of c.sequencia){
     if(!(c.historico||[]).find(h=>h.dia===d&&h.tipo==='enviado')){
@@ -1636,8 +1664,8 @@ function renderHome(){
   const aEl=document.getElementById('alertas-section');
   if(alertas.length){
     const tipoIcon = t => t==='nao-estava'?'🟢':t==='interessado'?'🔵':'🔴';
-    aEl.innerHTML=`<div class="sec-title">⏰ PRÓXIMAS AÇÕES</div>`+
-      alertas.sort((a,b)=>a.diff-b.diff).map(({c,diff})=>`
+    const _proxAberto = localStorage.getItem('_proxAcoesAberto')==='true';
+    const _proxCards = alertas.sort((a,b)=>a.diff-b.diff).map(({c,diff})=>`
         <div class="alerta-card" onclick="alertaAntecipar('${c.id}')">
           <div class="alerta-icon">${tipoIcon(c.tipo)}</div>
           <div class="alerta-info">
@@ -1646,8 +1674,19 @@ function renderHome(){
           </div>
           <div class="alerta-dias">${diff}d</div>
         </div>`).join('');
+    if(_proxAberto){
+      aEl.innerHTML=`<div class="sec-title" onclick="window._toggleProxAcoes()" style="cursor:pointer;display:flex;align-items:center;justify-content:space-between;user-select:none"><span>⏰ PRÓXIMAS AÇÕES</span><span style="font-size:13px;background:#111;color:#fff;border-radius:20px;padding:3px 12px;font-weight:700">▼ recolher</span></div><div id="prox-acoes-lista">${_proxCards}</div>`;
+    } else {
+      aEl.innerHTML=`<div style="margin-bottom:20px"><button onclick="window._toggleProxAcoes()" style="background:#f3f4f6;border:1.5px solid #e5e7eb;border-radius:10px;padding:8px 16px;font-size:13px;font-weight:700;color:#374151;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:8px">▶ PRÓXIMAS AÇÕES <span style="background:#111;color:#fff;border-radius:20px;padding:1px 8px;font-size:11px">${alertas.length}</span></button></div>`;
+    }
   } else { aEl.innerHTML=''; }
 
+  // Oculta/mostra seção HOJE conforme estado das próximas ações
+  const _proxOpen = localStorage.getItem('_proxAcoesAberto')==='true';
+  const _hojeSection = document.getElementById('hoje-list');
+  const _hojeTitles = document.querySelectorAll('.sec-title');
+  if(_hojeSection) _hojeSection.style.display = _proxOpen ? 'none' : '';
+  _hojeTitles.forEach(t=>{ if(t.textContent.includes('AÇÕES DE HOJE')) t.style.display = _proxOpen ? 'none' : ''; });
   const el=document.getElementById('hoje-list');
   el.innerHTML=hj.length ? hj.map(c=>cardHtml(c,true)).join('') :
     `<div class="empty"><div class="ico">🎉</div><p>Nenhuma ação para hoje!</p></div>`;
@@ -1785,22 +1824,28 @@ window.filaExcluir = filaExcluir;
 
 function cardHtml(c,showEnviar=false){
   const d=curDay(c); const done=allSent(c); const isHj=nextDate(c)===today();
+  const isAgendado=!!c.dataMarcada;
+  const agendadoHoje=isAgendado&&c.dataMarcada===today();
+  const agendadoBadge=isAgendado&&!agendadoHoje?`<span style="font-size:10px;background:#fef3c7;color:#92400e;border-radius:20px;padding:2px 8px;font-weight:700">📅 ${fmtDate(c.dataMarcada)}${c.horaMarcada?' '+c.horaMarcada:''}</span>`:'';
+  const lembreteNote=agendadoHoje&&c.notaMarcada?`<div style="font-size:11px;background:#fef3c7;border-radius:8px;padding:6px 10px;margin-top:6px;color:#92400e;font-weight:600">🔔 Lembrete: ${esc(c.notaMarcada)}</div>`:'';
   const enviarBtn = showEnviar && isHj && !done ? `
     <button class="btn btn-whatsapp" style="margin-top:4px" onclick="event.stopPropagation();enviarMensagemDia('${c.id}')">
-      📤 Enviar mensagem do Dia ${d}
+      ${agendadoHoje?'🔔':'📤'} ${agendadoHoje?'Lembrete — Enviar mensagem':'Enviar mensagem do Dia '+d}
     </button>` : '';
-  return `<div class="client-card ${c.tipo}" onclick="openTimeline('${c.id}')">
+  return `<div class="client-card ${c.tipo}${agendadoHoje?' ':''}${agendadoHoje?'super-quente':''}" style="${agendadoHoje?'border-left-color:#f59e0b':''}" onclick="openTimeline('${c.id}')">
     <div class="card-row">
       <div>
         <div class="card-name">${esc(c.nome)}</div>
-        <div class="card-sub">${done?'✅ Sequência completa':`Dia ${d}${isHj?' 🔔':''}`}${c.respondeu?' · 💬':''}</div>
+        <div class="card-sub">${done?'✅ Sequência completa':`Dia ${d}${isHj&&!isAgendado?' 🔔':''}${agendadoHoje?' 🔔 Agendamento de hoje!':''}`}${c.respondeu?' · 💬':''}</div>
       </div>
       <span class="status-pill status-${c.status}">${esc(c.status)}</span>
     </div>
+    ${lembreteNote}
     <div class="card-meta">
       <span class="badge ${c.tipo}">${esc(typeName(c.tipo))}</span>
       <span class="card-price">R$ ${fmt(c.preco)}</span>
       <span class="card-date">📅 ${fmtDate(c.dataRegistro)}</span>
+      ${agendadoBadge}
     </div>
     <div class="card-btns" onclick="event.stopPropagation()">
       ${enviarBtn}
@@ -2845,6 +2890,12 @@ function copyText(txt,msg){
   });
 }
 window.toast = toast;
+
+window._toggleProxAcoes = function(){
+  const aberto = localStorage.getItem('_proxAcoesAberto')==='true';
+  localStorage.setItem('_proxAcoesAberto', aberto?'false':'true');
+  renderHome();
+};
 window.copyText = copyText;
 
 async function marcarEnviado(id){
@@ -2852,7 +2903,17 @@ async function marcarEnviado(id){
   const d=curDay(c);
   if(!(c.historico||[]).find(h=>h.dia===d&&h.tipo==='enviado')){
     const hist=[...(c.historico||[]), {dia:d,tipo:'enviado',data:today()}];
-    await fsUpdateClient(id, { historico: hist });
+    // Se tinha agendamento especial, limpa e reinicia ciclo a partir de hoje
+    const fields = { historico: hist };
+    if(c.dataMarcada){
+      // Remove o agendamento e rebaseia o ciclo para hoje
+      fields.dataMarcada = null;
+      fields.horaMarcada = null;
+      fields.notaMarcada = null;
+      fields.dataRegistro = today(); // dia atual vira base do próximo ciclo
+      fields.historico = []; // recomeça histórico do ciclo a partir daqui
+    }
+    await fsUpdateClient(id, fields);
     renderHome();
   }
 }
@@ -3038,6 +3099,7 @@ function openOpcoes(id){
   document.getElementById('modal-opcoes-title').textContent=`⋮ ${c.nome}`;
   document.getElementById('modal-opcoes-body').innerHTML=`
     ${enviarItem}
+    <div class="modal-item" onclick="closeModal('modal-opcoes');abrirModalAgendar('${c.id}')" style="${c.dataMarcada?'background:#fffbeb;border-left:3px solid #f59e0b':''}"><span class="ico">📅</span> ${c.dataMarcada?'✏️ Editar Agendamento':'Agendar Próximo Contato'}</div>
     <div class="modal-item" onclick="closeModal('modal-opcoes');clienteRespondeu('${c.id}')"><span class="ico">💬</span>${c.respondeu?'Marcar como Não Respondeu':'✅ Cliente Respondeu!'}</div>
     <div class="modal-item" onclick="closeModal('modal-opcoes');openDuvida('${c.id}')"><span class="ico">❓</span> Registrar Dúvida</div>
     <div class="modal-item" onclick="closeModal('modal-opcoes');openFechamento('${c.id}')"><span class="ico">🎉</span> Fechou a Venda</div>
@@ -3244,6 +3306,74 @@ function renderConfig(){
   document.getElementById('cfg-texto-fixo').value=textoFixo||'';
   renderDaysAccordion();
 }
+
+// ── AGENDAMENTO DE PRÓXIMO CONTATO ───────────────────────────────────────────
+let _agendarClienteId = null;
+
+function abrirModalAgendar(id) {
+  const c = clients.find(x => x.id === id); if (!c) return;
+  _agendarClienteId = id;
+  const modal = document.getElementById('modal-agendar');
+  const inputData = document.getElementById('agendar-data');
+  const inputHora = document.getElementById('agendar-hora');
+  const inputNota = document.getElementById('agendar-nota');
+  const btnLimpar = document.getElementById('agendar-btn-limpar');
+  const sub = document.getElementById('agendar-modal-sub');
+
+  // Mínimo: amanhã
+  const amanha = new Date(); amanha.setDate(amanha.getDate()+1);
+  inputData.min = amanha.toISOString().split('T')[0];
+
+  // Se já tem agendamento, preenche
+  if (c.dataMarcada) {
+    inputData.value = c.dataMarcada;
+    inputHora.value = c.horaMarcada || '';
+    inputNota.value = c.notaMarcada || '';
+    btnLimpar.style.display = 'block';
+    sub.textContent = `Agendado para ${fmtDate(c.dataMarcada)}${c.horaMarcada?' às '+c.horaMarcada:''}`;
+  } else {
+    inputData.value = '';
+    inputHora.value = '';
+    inputNota.value = '';
+    btnLimpar.style.display = 'none';
+    sub.textContent = 'Aparecerá na aba HOJE na data escolhida';
+  }
+
+  modal.style.display = 'flex';
+}
+window.abrirModalAgendar = abrirModalAgendar;
+
+function fecharModalAgendar() {
+  document.getElementById('modal-agendar').style.display = 'none';
+  _agendarClienteId = null;
+}
+window.fecharModalAgendar = fecharModalAgendar;
+
+async function confirmarAgendamento() {
+  const id = _agendarClienteId; if (!id) return;
+  const data = document.getElementById('agendar-data').value;
+  if (!data) { toast('⚠️ Escolha uma data'); return; }
+  if (data <= today()) { toast('⚠️ Escolha uma data futura'); return; }
+  const hora = document.getElementById('agendar-hora').value || '';
+  const nota = document.getElementById('agendar-nota').value.trim() || '';
+  await fsUpdateClient(id, { dataMarcada: data, horaMarcada: hora, notaMarcada: nota });
+  fecharModalAgendar();
+  toast(`📅 Agendado para ${fmtDate(data)}${hora?' às '+hora:''}!`);
+  renderHome();
+  if (curScreen === 'clientes') renderAllClients();
+}
+window.confirmarAgendamento = confirmarAgendamento;
+
+async function limparAgendamento() {
+  const id = _agendarClienteId; if (!id) return;
+  if (!confirm('Remover o agendamento?')) return;
+  await fsUpdateClient(id, { dataMarcada: null, horaMarcada: null, notaMarcada: null });
+  fecharModalAgendar();
+  toast('🗑️ Agendamento removido');
+  renderHome();
+  if (curScreen === 'clientes') renderAllClients();
+}
+window.limparAgendamento = limparAgendamento;
 
 // ── INIT ──────────────────────────────────────────────────────────────────────
 window.addEventListener('DOMContentLoaded', async () => {
@@ -4873,4 +5003,4 @@ setTimeout(function(){
 }, 600);
 </script>
 </body>
-          </html>
+  </html>
