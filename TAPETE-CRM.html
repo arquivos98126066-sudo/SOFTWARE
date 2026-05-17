@@ -1892,6 +1892,7 @@ function initForm(){
   regCurStep = 0;
   tempFoto = null; tempImgIA = null;
   window._regFezGemini = false;
+  _regPrecoBase = 0;
   curTipo = null; curBorda = 'nao'; curViu = 'nao';
   regResumoOpen = false;
   limparEstadoRegistrar();
@@ -2064,26 +2065,11 @@ function renderStepInput(s){
     const isManual = REG_DATA._precoManual;
     const autoPreco = REG_DATA.preco && REG_DATA._tamanhoManual;
 
-    // Se tem preço calculado automaticamente do tamanho manual — mostra com opções
+    // Tamanho manual com preço calculado: pula direto para simulação, sem mostrar tela de preço
     if(autoPreco && !isManual){
-      // Salva base na variável global (igual TAPETES calcBase)
-      if(!_regPrecoBase || !REG_DATA._descontoAtivo) _regPrecoBase = parseInt(REG_DATA.preco);
-      const desconto = REG_DATA._desconto||0;
-      const valorFinal = desconto===10?Math.round(_regPrecoBase*0.9):desconto===30?Math.round(_regPrecoBase*0.7):_regPrecoBase;
-      const label = desconto===10?'com 10% de desconto':desconto===30?'com 30% de desconto':'';
-      return `<div>
-        <div style="background:#f0f9f6;border:2px solid #2E7D32;border-radius:14px;padding:24px;text-align:center;margin-bottom:16px">
-          <div style="font-size:36px;font-weight:800;color:#2E7D32">R$ ${valorFinal}</div>
-          ${label?`<div style="font-size:12px;color:#2E7D32;opacity:.7;margin-top:4px">${label}</div>`:''}
-        </div>
-        <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px">
-          ${desconto!==10?`<button class="reg-choice-btn" onclick="regAplicarDesconto(10)" style="padding:14px 20px;border-radius:12px">10% de desconto</button>`:''}
-          ${desconto!==30?`<button class="reg-choice-btn" onclick="regAplicarDesconto(30)" style="padding:14px 20px;border-radius:12px">30% de desconto</button>`:''}
-          ${desconto!==0?`<button class="reg-choice-btn" onclick="regAplicarDesconto(0)" style="padding:14px 20px;border-radius:12px">Remover desconto</button>`:''}
-          <button class="reg-choice-btn" onclick="regPrecoManual()" style="padding:14px 20px;border-radius:12px">✏️ Editar manualmente</button>
-        </div>
-        <button style="width:100%;padding:18px;background:#2E7D32;color:#fff;border:none;border-radius:16px;font-size:17px;font-weight:700;cursor:pointer;box-shadow:0 4px 14px rgba(46,125,50,.3)" onclick="regConfirmarPreco()">✅ Confirmar</button>
-      </div>`;
+      REG_DATA._precoConfirmado = true;
+      setTimeout(()=>regAdvance(), 0);
+      return '';
     }
 
     // Manual: campo livre
@@ -2127,6 +2113,29 @@ function renderStepInput(s){
     const fezGemini = !!window._regFezGemini;
     const temSimul  = !!tempImgIA;
 
+    // Bloco de preço/desconto — aparece sempre que tem preço
+    const mostrarPrecoAqui = !!REG_DATA.preco;
+
+    let blocoPreco = '';
+    if(mostrarPrecoAqui){
+      if(!_regPrecoBase || !REG_DATA._descontoAtivo) _regPrecoBase = parseInt(REG_DATA.preco);
+      const desconto = REG_DATA._desconto||0;
+      const valorFinal = desconto===10?Math.round(_regPrecoBase*0.9):desconto===30?Math.round(_regPrecoBase*0.7):_regPrecoBase;
+      const label = desconto===10?'com 10% de desconto':desconto===30?'com 30% de desconto':'';
+      blocoPreco = `
+        <div style="background:#f0f9f6;border:2px solid #2E7D32;border-radius:14px;padding:20px;text-align:center;margin-bottom:12px">
+          <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">💰 PREÇO (R$)</div>
+          <div style="font-size:34px;font-weight:800;color:#2E7D32">R$ ${valorFinal}</div>
+          ${label?`<div style="font-size:12px;color:#2E7D32;opacity:.7;margin-top:4px">${label}</div>`:''}
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px">
+          ${desconto!==10?`<button class="reg-choice-btn" onclick="regAplicarDesconto(10)" style="padding:14px 20px;border-radius:12px">10% de desconto</button>`:''}
+          ${desconto!==30?`<button class="reg-choice-btn" onclick="regAplicarDesconto(30)" style="padding:14px 20px;border-radius:12px">30% de desconto</button>`:''}
+          ${desconto!==0?`<button class="reg-choice-btn" onclick="regAplicarDesconto(0)" style="padding:14px 20px;border-radius:12px">Remover desconto</button>`:''}
+        </div>
+      `;
+    }
+
     return `<div>
 
       ${!fezGemini ? `
@@ -2163,6 +2172,8 @@ function renderStepInput(s){
         `}
       `}
 
+      ${blocoPreco}
+
       <div style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px;text-align:center">
         — Escolha para onde enviar: —
       </div>
@@ -2184,7 +2195,6 @@ function renderStepInput(s){
         </button>
       </div>
 
-      <button class="reg-skip-btn" onclick="regAdvance()">Pular →</button>
     </div>`;
   }
   return '';
@@ -2300,6 +2310,7 @@ function regConfirmarPreco(){
   REG_DATA.preco = String(valorFinal);
   REG_DATA._desconto = 0;
   REG_DATA._descontoAtivo = false;
+  REG_DATA._precoConfirmado = true; // sinaliza que preço já foi confirmado — não mostra de novo na tela de simulação
   _regPrecoBase = 0;
   regAdvance();
 }
@@ -2413,10 +2424,10 @@ function regAdvance(){
       REG_DATA[s.id]=s.type==='tel'?v.replace(/\D/g,''):v;
     }
   }
-  // Tamanho manual: auto-calcula preço
+  // Tamanho manual: auto-calcula preço e pula tela de preço direto para simulação
   if(s && s.id==='tamanho' && REG_DATA._tamanhoManual){
     const auto = calcPrecoAuto(REG_DATA.tamanho||'');
-    if(auto){ REG_DATA.preco = String(auto); _regPrecoBase = auto; REG_DATA._desconto=0; REG_DATA._descontoAtivo=false; }
+    if(auto){ REG_DATA.preco = String(auto); _regPrecoBase = auto; REG_DATA._desconto=0; REG_DATA._descontoAtivo=false; REG_DATA._precoConfirmado=true; }
   }
   // Se estava editando um campo, volta para onde estava
   if(regReturnStep !== null){
@@ -2607,6 +2618,11 @@ window.regEnviarCRM = async function(){
   if(!nome||!tel){ toast('⚠️ Nome e telefone obrigatórios'); return; }
   if(!curTipo){ toast('⚠️ Selecione o tipo de cliente'); return; }
   if(!tempFoto){ toast('⚠️ Foto obrigatória'); return; }
+  // Aplica desconto caso tenha sido selecionado na tela de simulação e não confirmado ainda
+  if(_regPrecoBase && REG_DATA._descontoAtivo){
+    const d=REG_DATA._desconto||0;
+    REG_DATA.preco=String(d===10?Math.round(_regPrecoBase*0.9):d===30?Math.round(_regPrecoBase*0.7):_regPrecoBase);
+  }
   const c={
     id:'c_'+Date.now(), nome, telefone:tel, tipo:curTipo,
     foto:tempFoto, imgIA:tempImgIA||null,
@@ -2630,7 +2646,11 @@ window.regEnviarParaCadastro = function(){
   const nome=(REG_DATA.nome||'').trim();
   const tel=(REG_DATA.tel||'').replace(/\D/g,'').trim();
   if(!nome||!tel){ toast('⚠️ Nome e telefone obrigatórios'); return; }
-
+  // Aplica desconto caso tenha sido selecionado na tela de simulação e não confirmado ainda
+  if(_regPrecoBase && REG_DATA._descontoAtivo){
+    const d=REG_DATA._desconto||0;
+    REG_DATA.preco=String(d===10?Math.round(_regPrecoBase*0.9):d===30?Math.round(_regPrecoBase*0.7):_regPrecoBase);
+  }
   // Formata telefone
   let telFmt=tel;
   if(tel.length===11) telFmt='('+tel.slice(0,2)+') '+tel.slice(2,7)+'-'+tel.slice(7);
@@ -3482,19 +3502,13 @@ window.abrirModalCadastro = function(){
       if(d.preco){
         var vel = document.getElementById('cad_valor');
         if(vel){
-          // Remove não-dígitos e aplica máscara
-          var raw = d.preco.toString().replace(/\D/g,'');
-          if(raw){
-            var reais = Math.floor(parseInt(raw)/100);
-            var cents = parseInt(raw)%100;
-            vel.value = 'R$ '+reais.toLocaleString('pt-BR')+','+(cents<10?'0':'')+cents;
-          } else {
-            // Se já veio como "450" sem centavos
-            var num = parseFloat(d.preco.toString().replace(',','.'));
-            if(!isNaN(num)){
-              var r2 = Math.floor(num), c2 = Math.round((num-r2)*100);
-              vel.value = 'R$ '+r2.toLocaleString('pt-BR')+','+(c2<10?'0':'')+c2;
-            }
+          // preco já é um número em reais (ex: 135), converte para centavos para a máscara
+          var num = parseFloat(d.preco.toString().replace(',','.'));
+          if(!isNaN(num) && num > 0){
+            var centavosTotal = Math.round(num * 100);
+            var reais = Math.floor(centavosTotal / 100);
+            var cents = centavosTotal % 100;
+            vel.value = 'R$ ' + reais.toLocaleString('pt-BR') + ',' + (cents < 10 ? '0' : '') + cents;
           }
         }
       }
@@ -3753,7 +3767,8 @@ window.cadSalvarPedido = async function(){
   var contato = document.getElementById('cad_contato').value.replace(/\D/g,'');
   var medida  = document.getElementById('cad_medida').value.trim();
   var cor     = document.getElementById('cad_cor') ? document.getElementById('cad_cor').value.trim() : '';
-  var valorRaw= document.getElementById('cad_valor').value.replace(/[^0-9,]/g,'').replace(',','.');
+  var _valorDigits = document.getElementById('cad_valor').value.replace(/\D/g,'');
+  var valorRaw = _valorDigits ? (parseInt(_valorDigits,10)/100).toFixed(2) : '';
   var custoRaw= document.getElementById('cad_custo').value;
   var prazo   = document.getElementById('cad_prazo').value;
   var borda   = document.getElementById('cad_borda').value;
@@ -3766,7 +3781,7 @@ window.cadSalvarPedido = async function(){
     var med = document.getElementById('cad_med_'+i);
     var val = document.getElementById('cad_val_'+i);
     if(med && val && med.value.trim() && val.value){
-      tapetesExtras.push({medida: med.value.trim(), valor: parseFloat(val.value.replace(/[^0-9,]/g,'').replace(',','.'))});
+      var _vd = val.value.replace(/\D/g,''); tapetesExtras.push({medida: med.value.trim(), valor: _vd ? parseInt(_vd,10)/100 : 0});
     }
   }
   if(!nome || !contato || !valorRaw || !medida || !prazo){
@@ -5003,4 +5018,4 @@ setTimeout(function(){
 }, 600);
 </script>
 </body>
-  </html>
+          </html>
