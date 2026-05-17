@@ -1128,6 +1128,155 @@ let curScreen='home', stack=[], curCid=null, curTipo=null;
 let curBorda='nao', curViu='nao', curFilter='todos';
 let curCfgTipo='nao-estava', curSeqTab='sem_resposta', curPag=null, tempFoto=null, tempImgIA=null;
 
+// ── PERSISTÊNCIA DO ESTADO DO REGISTRAR (IndexedDB + localStorage fallback) ───
+// Mesma estratégia do ESTUDO.html: dual-layer, merge por updatedAt, block guard
+
+const REG_STATE_KEY = 'tapete_crm_reg_state';
+const REG_STATE_MAX_AGE = 8 * 60 * 60 * 1000; // 8 horas
+
+// ── CAMADA DE STORAGE (IndexedDB primeiro, localStorage como fallback) ────────
+function regSaveLocal(data) {
+  const payload = JSON.stringify(data);
+  // Tenta IndexedDB primeiro (mesma DB do sistema principal: 'meus_apps_backup')
+  try {
+    const req = indexedDB.open('meus_apps_backup', 1);
+    req.onupgradeneeded = e => e.target.result.createObjectStore('data');
+    req.onsuccess = e => {
+      try {
+        const tx = e.target.result.transaction('data', 'readwrite');
+        tx.objectStore('data').put(payload, REG_STATE_KEY);
+      } catch(_) {}
+    };
+  } catch(_) {}
+  // Sempre salva também no localStorage como fallback
+  try { localStorage.setItem(REG_STATE_KEY, payload); } catch(_) {}
+}
+
+function regLoadLocal() {
+  return new Promise(resolve => {
+    // Tenta IndexedDB primeiro
+    try {
+      const req = indexedDB.open('meus_apps_backup', 1);
+      req.onupgradeneeded = e => e.target.result.createObjectStore('data');
+      req.onsuccess = e => {
+        try {
+          const tx = e.target.result.transaction('data', 'readonly');
+          const r = tx.objectStore('data').get(REG_STATE_KEY);
+          r.onsuccess = () => {
+            if (r.result) { try { resolve(JSON.parse(r.result)); return; } catch(_) {} }
+            // Não achou no IndexedDB — tenta localStorage
+            try { resolve(JSON.parse(localStorage.getItem(REG_STATE_KEY))); } catch(_) { resolve(null); }
+          };
+          r.onerror = () => {
+            try { resolve(JSON.parse(localStorage.getItem(REG_STATE_KEY))); } catch(_) { resolve(null); }
+          };
+        } catch(_) {
+          try { resolve(JSON.parse(localStorage.getItem(REG_STATE_KEY))); } catch(_) { resolve(null); }
+        }
+      };
+      req.onerror = () => {
+        try { resolve(JSON.parse(localStorage.getItem(REG_STATE_KEY))); } catch(_) { resolve(null); }
+      };
+    } catch(_) {
+      try { resolve(JSON.parse(localStorage.getItem(REG_STATE_KEY))); } catch(_) { resolve(null); }
+    }
+  });
+}
+
+function regDeleteLocal() {
+  // Remove do IndexedDB
+  try {
+    const req = indexedDB.open('meus_apps_backup', 1);
+    req.onsuccess = e => {
+      try {
+        const tx = e.target.result.transaction('data', 'readwrite');
+        tx.objectStore('data').delete(REG_STATE_KEY);
+      } catch(_) {}
+    };
+  } catch(_) {}
+  // Remove do localStorage
+  try { localStorage.removeItem(REG_STATE_KEY); } catch(_) {}
+}
+
+// ── SALVAR ESTADO ─────────────────────────────────────────────────────────────
+function salvarEstadoRegistrar() {
+  // Formulário vazio — limpa estado salvo
+  if (!REG_DATA.nome && regCurStep === 0) {
+    regDeleteLocal();
+    return;
+  }
+  const estado = {
+    REG_DATA: JSON.parse(JSON.stringify(REG_DATA)),
+    regCurStep,
+    regReturnStep: (typeof regReturnStep !== 'undefined') ? regReturnStep : null,
+    curTipo, curBorda, curViu,
+    tempFoto: tempFoto || null,
+    tempImgIA: tempImgIA || null,
+    _regFezGemini: !!window._regFezGemini,
+    updatedAt: Date.now()
+  };
+  regSaveLocal(estado);
+}
+
+// ── RESTAURAR ESTADO ──────────────────────────────────────────────────────────
+async function restaurarEstadoRegistrar() {
+  const estado = await regLoadLocal();
+  if (!estado) return false;
+  // Expirou (mais de 8h)
+  if (!estado.updatedAt || Date.now() - estado.updatedAt > REG_STATE_MAX_AGE) {
+    regDeleteLocal();
+    return false;
+  }
+  // Sem dados úteis
+  if (!estado.REG_DATA || !estado.REG_DATA.nome) return false;
+
+  // Restaura tudo
+  Object.keys(REG_DATA).forEach(k => delete REG_DATA[k]);
+  Object.assign(REG_DATA, estado.REG_DATA);
+  regCurStep = estado.regCurStep || 0;
+  if (typeof regReturnStep !== 'undefined') regReturnStep = estado.regReturnStep;
+  curTipo = estado.curTipo || null;
+  curBorda = estado.curBorda || 'nao';
+  curViu = estado.curViu || 'nao';
+  tempFoto = estado.tempFoto || null;
+  tempImgIA = estado.tempImgIA || null;
+  window._regFezGemini = !!estado._regFezGemini;
+  return true;
+}
+
+// ── LIMPAR ESTADO ─────────────────────────────────────────────────────────────
+function limparEstadoRegistrar() {
+  regDeleteLocal();
+}
+
+// ── DETECTA VOLTA AO FOREGROUND (usuário voltou do Gemini ou de outro app) ────
+// Igual ao ESTUDO: escuta visibilitychange e verifica se tem estado salvo
+document.addEventListener('visibilitychange', function() {
+  if (document.visibilityState !== 'visible') return;
+  regLoadLocal().then(function(estado) {
+    if (!estado || !estado.REG_DATA || !estado.REG_DATA.nome) return;
+    if (!estado.updatedAt || Date.now() - estado.updatedAt > REG_STATE_MAX_AGE) return;
+
+    if (curScreen !== 'registrar') {
+      // Estava em outra tela — navega de volta e restaura
+      restaurarEstadoRegistrar().then(function(ok) {
+        if (ok) {
+          showScreen('registrar', false);
+          setNav(0);
+          renderRegStep();
+          toast('✅ Voltou! Continue de onde parou.');
+        }
+      });
+    } else {
+      // Já está no registrar — só atualiza o flag do Gemini se necessário
+      if (estado._regFezGemini && !window._regFezGemini) {
+        window._regFezGemini = true;
+        renderRegStep();
+      }
+    }
+  }).catch(function(){});
+});
+
 // ── SEQUÊNCIAS ────────────────────────────────────────────────────────────────
 const SEQ = {
   'nao-estava':   { sem_resposta:[1,2,7,15,30,60,90,180,360], com_resposta:[1,2,7,15,30], recovery:[1,2,7] },
@@ -1703,6 +1852,7 @@ function initForm(){
   window._regFezGemini = false;
   curTipo = null; curBorda = 'nao'; curViu = 'nao';
   regResumoOpen = false;
+  limparEstadoRegistrar();
   const fab = document.getElementById('reg-fab');
   if(fab) fab.style.display='none';
   document.getElementById('reg-resumo-panel').style.display='none';
@@ -2180,6 +2330,7 @@ function regHandlePhoto(e){
           navigator.clipboard.write([new ClipboardItem({'image/png':blob})]);
         }catch(_){}
       },'image/png');
+      salvarEstadoRegistrar();
       regAdvance();
     };
     img.src=ev.target.result;
@@ -2200,6 +2351,7 @@ function regHandleImgIA(e){
       cv.width=w;cv.height=h;cv.getContext('2d').drawImage(img,0,0,w,h);
       tempImgIA=cv.toDataURL('image/jpeg',.8);
       REG_DATA.imgia=tempImgIA;
+      salvarEstadoRegistrar();
       renderRegStep();
     };
     img.src=ev.target.result;
@@ -2233,6 +2385,7 @@ function regAdvance(){
     const newSteps=regActiveSteps();
     if(regCurStep>newSteps.length) regCurStep=newSteps.length;
   }
+  salvarEstadoRegistrar();
   renderRegStep();
 }
 window.regAdvance = regAdvance;
@@ -2396,6 +2549,8 @@ window.regAbrirGeminiEFicar = function(){
   regCopyPrompt();
   // Marca que já foi ao Gemini (muda a UI)
   window._regFezGemini = true;
+  // Salva o estado ANTES de sair para o Gemini
+  salvarEstadoRegistrar();
   renderRegStep();
   // Abre o app do Gemini
   setTimeout(function(){
@@ -2423,6 +2578,7 @@ window.regEnviarCRM = async function(){
   };
   await fsAddClient(c);
   initForm();
+  limparEstadoRegistrar();
   toast('✅ Cliente enviado pro CRM!');
   showScreen('fila'); setNav(1);
 };
@@ -2454,6 +2610,7 @@ window.regEnviarParaCadastro = function(){
 
   // Limpa o registrar e abre cadastro
   initForm();
+  limparEstadoRegistrar();
   showScreen('home'); setNav(3);
   abrirModalCadastro();
   toast('✅ Abrindo Cadastro com os dados!');
@@ -2515,6 +2672,7 @@ async function salvarCliente(){
 
   await fsAddClient(c);
   initForm();
+  limparEstadoRegistrar();
   toast('✅ Cliente na fila de envio!');
   showScreen('fila'); setNav(1);
 }
@@ -4642,6 +4800,27 @@ window.addEventListener('online',function(){
 });
 
 iniciarListeners();
+
+// ── RESTAURAR ESTADO DO REGISTRAR SE O APP FOI MORTO ─────────────────────────
+// Mesma estratégia do ESTUDO: IndexedDB primeiro, localStorage como fallback
+setTimeout(function(){
+  regLoadLocal().then(function(estado) {
+    if (!estado || !estado.REG_DATA || !estado.REG_DATA.nome) return;
+    if (!estado.updatedAt || Date.now() - estado.updatedAt > REG_STATE_MAX_AGE) {
+      regDeleteLocal();
+      return;
+    }
+    // App foi morto — restaura e navega para o registrar
+    restaurarEstadoRegistrar().then(function(ok) {
+      if (ok) {
+        showScreen('registrar', false);
+        setNav(0);
+        renderRegStep();
+        toast('✅ Continuando de onde você parou!');
+      }
+    });
+  }).catch(function(){});
+}, 600);
 </script>
 </body>
-      </html>
+  </html>
