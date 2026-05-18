@@ -204,6 +204,16 @@
   .btn-atendeu { background: var(--green-light); color: var(--green); }
   .btn-nao:active, .btn-atendeu:active { transform: scale(0.97); }
 
+  .btn-mover-contato {
+    width: 100%; margin-top: 8px; padding: 9px;
+    border-radius: var(--radius-sm); border: 1.5px solid var(--gray-200);
+    background: var(--gray-100); color: var(--gray-700);
+    font-size: 13px; font-weight: 600; cursor: pointer;
+    font-family: 'Inter', sans-serif; transition: all 0.2s;
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+  }
+  .btn-mover-contato:active { transform: scale(0.97); background: var(--gray-200); }
+
   .card-obs {
     margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--gray-100);
     font-size: 12px; color: var(--gray-500); line-height: 1.6;
@@ -1117,8 +1127,6 @@ window.navigate = function(page) {
   document.querySelector('[data-page="' + page + '"]')?.classList.add('active');
   closeSidebar();
   renderPage(page);
-  // Abre modal de novo contato automaticamente ao entrar em Contatos
-  if (page === 'contatos') setTimeout(() => window.openModalNovoContato(), 150);
 }
 
 function _navigateDirect(page) {
@@ -1293,7 +1301,7 @@ function cardContato(c) {
       <div class="action-btns">
         <button class="btn-nao" onclick="naoAtendeu('${c.id}')">✕ Não Atendeu</button>
         <button class="btn-atendeu" onclick="openAtendeu('${c.id}')">✓ Atendeu</button>
-      </div>` : `<div style="text-align:center;font-size:13px;color:var(--red);font-weight:600;padding:6px 0">3 tentativas atingidas</div>`}
+      </div>` : `<div style="text-align:center;font-size:13px;color:var(--red);font-weight:600;padding:6px 0">3 tentativas atingidas — <span style="color:#111;cursor:pointer;text-decoration:underline" onclick="openAtendeu('${c.id}')">Mover contato</span></div>`}
       ${obsHtml}
     </div>`;
 }
@@ -1655,6 +1663,17 @@ window.atendeuOpcao = function(opcao) {
       });
     }
   }, 320);
+}
+
+// ══════════════════════════════════════════════
+// MARCAR REUNIÃO DIRETO DO CARD
+// ══════════════════════════════════════════════
+window.agendarReuniaoDirecto = function(id) {
+  selectedContatoId = id;
+  const c = state.contatos.find(x => x.id === id);
+  if (!c) { toast('Contato não encontrado'); return; }
+  document.querySelectorAll('.modal-backdrop.active').forEach(m => m.classList.remove('active'));
+  setTimeout(function() { openModalReuniao(); }, 50);
 }
 
 // ══════════════════════════════════════════════
@@ -2117,8 +2136,7 @@ requestNotifPermission();
 carregarLixeiraCRM();
 crmSyncPending();
 initListeners();
-// Abre modal de novo contato automaticamente ao carregar (já começa em contatos)
-setTimeout(() => window.openModalNovoContato && window.openModalNovoContato(), 300);
+
 </script>
 <script>
 // ECOSISTEMA: botao fisico voltar -> index.html (sem logout)
@@ -2134,4 +2152,4 @@ setTimeout(() => window.openModalNovoContato && window.openModalNovoContato(), 3
 })();
 </script>
 </body>
-        </html>
+</html>
