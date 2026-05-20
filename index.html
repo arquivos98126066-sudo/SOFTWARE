@@ -35,9 +35,6 @@
   --r:         14px;
 }
 
-/* =============================================
-   RESET
-============================================= */
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 html { height: 100%; }
 body {
@@ -49,7 +46,6 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* Grid pattern */
 body::before {
   content: '';
   position: fixed; inset: 0;
@@ -60,7 +56,6 @@ body::before {
   background-size: 34px 34px;
   mask-image: radial-gradient(ellipse 90% 55% at 50% 0%, black 15%, transparent 100%);
 }
-/* Ambient top glow */
 body::after {
   content: '';
   position: fixed;
@@ -190,7 +185,6 @@ body::after {
 #app-content { display: none; position: relative; z-index: 1; }
 #app-content.show { display: block; }
 
-/* Logout */
 .logout-btn {
   position: fixed;
   top: max(14px, env(safe-area-inset-top, 14px));
@@ -207,7 +201,6 @@ body::after {
 }
 .logout-btn:hover { color: #111111; border-color: var(--border-hi); }
 
-/* App wrapper */
 .app-wrap {
   display: flex; flex-direction: column;
   min-height: 100dvh;
@@ -215,7 +208,6 @@ body::after {
   padding-bottom: max(16px, env(safe-area-inset-bottom, 16px));
 }
 
-/* Top identity */
 .identity {
   display: flex; align-items: center; justify-content: center;
   gap: 7px;
@@ -234,27 +226,34 @@ body::after {
   color: var(--muted);
 }
 
-/* Grid */
+/* Grid — single column, fills remaining height */
 .grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+  display: flex;
+  flex-direction: column;
   gap: 8px;
   padding: 0 12px;
   max-width: 480px;
   margin: 0 auto;
-  width: 100%; flex: 1;
+  width: 100%;
+  flex: 1;
   position: relative; z-index: 1;
 }
 
-/* Card */
+.grid .card {
+  flex: 1;
+}
+
+/* Card — wide by default on main page */
 .card {
   background: var(--card);
   border: 1px solid var(--border);
   border-radius: var(--r);
-  padding: 15px 13px 14px;
+  padding: 18px 18px 18px;
   text-decoration: none;
-  display: flex; flex-direction: column;
-  align-items: flex-start; gap: 6px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 14px;
   position: relative; overflow: hidden;
   transition: transform .16s cubic-bezier(.22,.68,0,1.2),
               border-color .2s, background .2s, box-shadow .2s;
@@ -262,7 +261,6 @@ body::after {
   will-change: transform;
   box-shadow: 0 4px 18px rgba(0,0,0,0.10), 0 1px 4px rgba(0,0,0,0.06);
 }
-/* Top accent line */
 .card::before {
   content: '';
   position: absolute;
@@ -272,7 +270,6 @@ body::after {
   opacity: .62;
   transition: opacity .22s, left .25s, right .25s;
 }
-/* Bottom blob */
 .card::after {
   content: '';
   position: absolute;
@@ -285,7 +282,7 @@ body::after {
   pointer-events: none;
 }
 .card:active {
-  transform: scale(.952);
+  transform: scale(.98);
   border-color: var(--border-hi);
 }
 @media (hover: hover) {
@@ -299,14 +296,14 @@ body::after {
   .card:hover::after  { opacity: 1; }
 }
 
-/* Icon */
+/* Icon — larger for wide cards */
 .card-icon {
-  width: 34px; height: 34px;
-  border-radius: 9px;
+  width: 58px; height: 58px;
+  border-radius: 14px;
   background: rgba(0,0,0,0.04);
   border: 1px solid rgba(0,0,0,0.08);
   display: flex; align-items: center; justify-content: center;
-  font-size: 17px; line-height: 1; flex-shrink: 0;
+  font-size: 32px; line-height: 1; flex-shrink: 0;
   transition: background .2s, border-color .2s, box-shadow .2s;
 }
 .card:active .card-icon,
@@ -316,24 +313,27 @@ body::after {
   box-shadow: 0 2px 8px rgba(0,0,0,0.10);
 }
 
-/* Text */
+.card-text {
+  flex: 1;
+  display: flex; flex-direction: column; gap: 3px;
+}
+
 .card-name {
   font-family: var(--fh);
-  font-size: 13.5px; font-weight: 500;
+  font-size: 18px; font-weight: 700;
   color: #111111; line-height: 1.2; letter-spacing: -.2px;
 }
 .card-desc {
-  font-size: 10.5px; color: var(--muted); line-height: 1.4;
+  font-size: 11px; color: var(--muted); line-height: 1.4;
 }
 
-/* Arrow */
 .card-arrow {
-  position: absolute; bottom: 11px; right: 11px;
-  width: 20px; height: 20px;
-  border-radius: 5px;
+  width: 24px; height: 24px;
+  border-radius: 6px;
   background: rgba(0,0,0,0.04);
   display: flex; align-items: center; justify-content: center;
-  color: var(--muted); font-size: 11px; font-weight: 700;
+  color: var(--muted); font-size: 12px; font-weight: 700;
+  flex-shrink: 0;
   transition: background .2s, color .2s, box-shadow .2s;
 }
 .card:hover .card-arrow,
@@ -343,25 +343,6 @@ body::after {
   box-shadow: 0 2px 8px rgba(0,0,0,0.18);
 }
 
-/* Wide card */
-.card-wide {
-  grid-column: span 2;
-  flex-direction: row;
-  align-items: center;
-  gap: 12px; padding: 13px 15px;
-}
-.card-wide .card-text { flex: 1; display: flex; flex-direction: column; gap: 3px; }
-.card-wide .card-icon { font-size: 18px; width: 38px; height: 38px; border-radius: 10px; }
-.card-wide .card-arrow { bottom: 50%; right: 13px; transform: translateY(50%); }
-
-/* Colors — all neutralized to black tones */
-.c-purple, .c-teal, .c-pink, .c-amber,
-.c-blue, .c-green, .c-violet, .c-coral, .c-red {
-  --c1: rgba(0,0,0,0.12);
-  --c2: rgba(0,0,0,0.08);
-}
-
-/* Footer */
 .footer {
   text-align: center;
   color: var(--muted2);
@@ -399,7 +380,6 @@ body::after {
   font-size: 18px; cursor: pointer; padding: 0 2px; line-height: 1;
 }
 
-/* Entry animations */
 @keyframes fadeUp {
   from { opacity: 0; transform: translateY(16px); }
   to   { opacity: 1; transform: translateY(0); }
@@ -410,16 +390,6 @@ body::after {
 #app-content.show .card:nth-child(3) { animation-delay: .12s; }
 #app-content.show .card:nth-child(4) { animation-delay: .16s; }
 #app-content.show .card:nth-child(5) { animation-delay: .20s; }
-#app-content.show .card:nth-child(6) { animation-delay: .24s; }
-#app-content.show .card:nth-child(7) { animation-delay: .28s; }
-#app-content.show .card:nth-child(8) { animation-delay: .32s; }
-#app-content.show .card:nth-child(9) { animation-delay: .36s; }
-
-@media (max-width: 360px) {
-  .grid { gap: 7px; padding: 0 10px; }
-  .card { padding: 13px 11px 12px; }
-  .card-name { font-size: 13px; }
-}
 </style>
 </head>
 <body>
@@ -457,66 +427,52 @@ body::after {
     </div>
 
     <div class="grid">
-      <a class="card c-purple" href="TAPETE-CRM.html">
-        <div class="card-icon">🪴</div>
-        <span class="card-name">Tapete CRM</span>
-        <span class="card-desc">Clientes e registros</span>
+
+      <a class="card" href="TAPETE-CRM.html">
+        <div class="card-icon" style="background:#e11d48; border-color:#be123c;">📋</div>
+        <div class="card-text">
+          <div class="card-name">Tapete CRM</div>
+          <div class="card-desc">Clientes e registros</div>
+        </div>
         <span class="card-arrow">↗</span>
       </a>
-      <a class="card c-teal" href="TAPETES.html">
-        <div class="card-icon">🗂️</div>
-        <span class="card-name">Tapetes</span>
-        <span class="card-desc">Catálogo</span>
+
+      <a class="card" href="Workshop.html">
+        <div class="card-icon" style="background:#eab308; border-color:#ca8a04;">🛠️</div>
+        <div class="card-text">
+          <div class="card-name">Workshop</div>
+          <div class="card-desc">Oficina e projetos</div>
+        </div>
         <span class="card-arrow">↗</span>
       </a>
-      <a class="card c-pink" href="PRE-VENDA.html">
-        <div class="card-icon">💬</div>
-        <span class="card-name">Pré-Venda</span>
-        <span class="card-desc">Atendimento</span>
+
+      <a class="card" href="MEU-CRM.html">
+        <div class="card-icon" style="background:#16a34a; border-color:#15803d;">👥</div>
+        <div class="card-text">
+          <div class="card-name">Meu CRM</div>
+          <div class="card-desc">Gestão de clientes</div>
+        </div>
         <span class="card-arrow">↗</span>
       </a>
-      <a class="card c-amber" href="MEU-CRM.html">
-        <div class="card-icon">👥</div>
-        <span class="card-name">Meu CRM</span>
-        <span class="card-desc">Gestão de clientes</span>
+
+      <a class="card" href="METODO-OPA.html">
+        <div class="card-icon" style="background:#2563eb; border-color:#1d4ed8;">🎯</div>
+        <div class="card-text">
+          <div class="card-name">Método OPA</div>
+          <div class="card-desc">Processo de vendas</div>
+        </div>
         <span class="card-arrow">↗</span>
       </a>
-      <a class="card c-blue" href="METODO-OPA.html">
-        <div class="card-icon">🎯</div>
-        <span class="card-name">Método OPA</span>
-        <span class="card-desc">Processo de vendas</span>
-        <span class="card-arrow">↗</span>
-      </a>
-      <a class="card c-green" href="RETINA.html">
-        <div class="card-icon">👁️</div>
-        <span class="card-name">Retina</span>
-        <span class="card-desc">Análise visual</span>
-        <span class="card-arrow">↗</span>
-      </a>
-      <a class="card card-wide c-violet" href="OUTROS.html">
-        <div class="card-icon">🗃️</div>
+
+      <a class="card" href="OUTROS.html">
+        <div class="card-icon" style="background:#111111; border-color:#000000;">🗃️</div>
         <div class="card-text">
           <div class="card-name">Outros</div>
           <div class="card-desc">Rico, Workshop, DOA, Estudo e Código</div>
         </div>
         <span class="card-arrow">↗</span>
       </a>
-      <a class="card card-wide c-coral" href="ADM.html">
-        <div class="card-icon">⚙️</div>
-        <div class="card-text">
-          <div class="card-name">ADM</div>
-          <div class="card-desc">Painel administrativo geral</div>
-        </div>
-        <span class="card-arrow">↗</span>
-      </a>
-      <a class="card card-wide c-red" href="WEBSITE.html">
-        <div class="card-icon">🌐</div>
-        <div class="card-text">
-          <div class="card-name">Website</div>
-          <div class="card-desc">Página principal do negócio</div>
-        </div>
-        <span class="card-arrow">↗</span>
-      </a>
+
     </div>
 
     <div class="footer">arquivos98126066-sudo · software</div>
