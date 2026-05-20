@@ -1925,20 +1925,20 @@ document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==
 
 // ── PIN / FIXAR ARQUIVO ──────────────────────────────────────────────
 function fmGetPin(){
-  try{ return JSON.parse(localStorage.getItem('fmPinnedFile')||'null'); }catch(e){return null;}
+  return fmPrefs.pin || null;
 }
 
 window.fmTogglePinCurrent = function(){
   const pin = fmGetPin();
   // If already pinned at current location, unpin
   if(pin && JSON.stringify(pin.path) === JSON.stringify(fmPath) && !pin.key){
-    localStorage.removeItem('fmPinnedFile');
+    fmPrefs.pin=null; fmSavePrefs();
     fmUpdatePinnedBar();
     fmUpdateHeaderPin();
     return;
   }
   // Pin current folder (no specific file)
-  localStorage.setItem('fmPinnedFile', JSON.stringify({path:[...fmPath], key:null}));
+  fmPrefs.pin={path:[...fmPath],key:null}; fmSavePrefs();
   fmUpdatePinnedBar();
   fmUpdateHeaderPin();
 };
@@ -1960,16 +1960,16 @@ function fmUpdateHeaderPin(){
 window.fmTogglePin = function(key){
   const pin = fmGetPin();
   if(pin && pin.key===key && JSON.stringify(pin.path)===JSON.stringify(fmPath)){
-    localStorage.removeItem('fmPinnedFile');
+    fmPrefs.pin=null; fmSavePrefs();
   } else {
-    localStorage.setItem('fmPinnedFile', JSON.stringify({key, path:[...fmPath]}));
+    fmPrefs.pin={key,path:[...fmPath]}; fmSavePrefs();
   }
   fmUpdatePinnedBar();
   fmUpdateHeaderPin();
   renderFm();
 };
 window.fmClearPin = function(){
-  localStorage.removeItem('fmPinnedFile');
+  fmPrefs.pin=null; fmSavePrefs();
   fmUpdatePinnedBar();
   renderFm();
 };
@@ -2524,7 +2524,7 @@ setupSnapshot('launcher_fm', 'data', (data) => {
       if(pin.key){
         const folder = fmCurrentFolder();
         if(folder && folder.children && folder.children[pin.key]){
-          fmOpenEditor(pin.key);
+          fmOpenInReadMode(pin.key);
         }
       }
       // If no key, just stays in the pinned folder
@@ -2583,8 +2583,7 @@ window.openFm = function(){
       const folder = fmCurrentFolder();
       if(folder && folder.children && folder.children[nav.openFile]){
         if(nav.mode === 'read'){
-          fmOpenEditor(nav.openFile);
-          setTimeout(function(){ if(window.fmEnterReadMode) fmEnterReadMode(); }, 300);
+          fmOpenInReadMode(nav.openFile);
         } else if(nav.mode === 'editor'){
           fmOpenEditor(nav.openFile);
         }
@@ -2808,7 +2807,8 @@ function renderFm(){
             <button class="fm-item-del" onclick="event.stopPropagation();fmDelete('${key}')">✕</button></div>`;
         el.addEventListener('click',e=>{
           if(e.target.closest('.fm-item-btn')||e.target.closest('.fm-item-del'))return;
-          if(item.type==='image'||item.type==='pdf'){fmView(key);}else{fmOpenEditor(key);}
+          if(item.type==='image'||item.type==='pdf'){fmView(key);}
+          else{fmOpenInReadMode(key);}
         });
       }
     }
@@ -2923,13 +2923,13 @@ function fmShowLongPressMenu(key, touch){
     const folder = fmCurrentFolder();
     const item = folder && folder.children && folder.children[key];
     if(isCurrentPin){
-      localStorage.removeItem('fmPinnedFile');
+      fmPrefs.pin=null; fmSavePrefs();
     } else {
       // Se for pasta, fixa a pasta (key=null, path inclui a pasta)
       if(item && item.type === 'folder'){
-        localStorage.setItem('fmPinnedFile', JSON.stringify({key:null, path:[...fmPath, key]}));
+        fmPrefs.pin={key:null,path:[...fmPath,key]}; fmSavePrefs();
       } else {
-        localStorage.setItem('fmPinnedFile', JSON.stringify({key, path:[...fmPath]}));
+        fmPrefs.pin={key,path:[...fmPath]}; fmSavePrefs();
       }
     }
     fmUpdatePinnedBar();
@@ -3304,15 +3304,42 @@ function fmNormalizeContent(html){
 // ── EDITOR ────────────────────────────────────────────────────────────
 let fmEditorCurrentType = 'txt';
 let fmAutosaveTimer = null;
-let fmEditorZoom = parseFloat(localStorage.getItem('fmEditorZoom') || '1.0');
-let fmReadZoomLevel = parseFloat(localStorage.getItem('fmReadZoomLevel') || '1.0');
+let fmEditorZoom = 1.0;
+let fmReadZoomLevel = 1.0;
+let fmPrefs = { zoom: 1.0, readZoom: 1.0, editorFont: '', readFont: '', pin: null, navState: null };
+
+function fmSavePrefs(){
+  fsSetDoc('launcher_fm_prefs', 'data', fmPrefs);
+}
+
+setupSnapshot('launcher_fm_prefs', 'data', (data) => {
+  if(!data) return;
+  fmPrefs = { ...fmPrefs, ...data };
+  fmEditorZoom = fmPrefs.zoom || 1.0;
+  fmReadZoomLevel = fmPrefs.readZoom || 1.0;
+});
 
 function fmSaveNavState(extra){
-  const state = { path: fmPath, ...(extra||{}) };
-  localStorage.setItem('fmNavState', JSON.stringify(state));
+  fmPrefs.navState = { path: fmPath, ...(extra||{}) };
+  fmSavePrefs();
 }
 function fmLoadNavState(){
-  try { return JSON.parse(localStorage.getItem('fmNavState') || 'null'); } catch(e){ return null; }
+  return fmPrefs.navState || null;
+}
+
+function fmOpenInReadMode(key){
+  const item = fmCurrentFolder().children[key];
+  if(!item) return;
+  fmEditorKey = key;
+  fmEditorCurrentType = item.type || 'txt';
+  document.getElementById('fmReadTitle').textContent = key;
+  const c = document.getElementById('fmReadContent');
+  const raw = item.content || '';
+  const hasHTML = /<[a-z][\s\S]*>/i.test(raw);
+  c.innerHTML = fmNormalizeContent(hasHTML ? fmDetectLinks(raw) : fmProcessText(raw));
+  c.querySelectorAll('a').forEach(a=>{ if(!a.target) a.target='_blank'; a.style.pointerEvents='auto'; });
+  // Não salva no navState para não reabrir automaticamente ao entrar
+  fmOpenReadMode();
 }
 
 function fmOpenEditor(key){
@@ -3348,7 +3375,7 @@ function fmOpenEditor(key){
   fmSaveNavState({ openFile: key, mode: 'editor' });
   // Aplica zoom salvo ao abrir o editor
   document.getElementById('fmEditable').style.fontSize = (fmEditorZoom * 0.9) + 'rem';
-  const savedEditorFont = localStorage.getItem('fmEditorFont') || '';
+  const savedEditorFont = fmPrefs.editorFont || '';
   document.getElementById('fmEditable').style.fontFamily = savedEditorFont ? savedEditorFont + ', sans-serif' : '';
   const fontSel = document.getElementById('fmFontSelect');
   if(fontSel) fontSel.value = savedEditorFont;
@@ -3437,10 +3464,18 @@ window.closeFmEditor = function(){
   clearTimeout(fmAutosaveTimer);
   fmDoSave();
   document.getElementById('fmEditor').classList.remove('open');
+  // Volta pro modo leitura se tinha um arquivo aberto
+  const savedKey = fmEditorKey;
   document.getElementById('fmEditable').innerHTML='';
   document.getElementById('fmCodeEditor').value='';
-  fmEditorKey=null;
   fmHistory=[];fmHistoryIdx=-1;
+  if(savedKey){
+    // Reabre no modo leitura
+    fmEditorKey = savedKey;
+    fmOpenInReadMode(savedKey);
+    return;
+  }
+  fmEditorKey=null;
   // Remove listener do teclado
   if(window._fmVvListener && window.visualViewport){
     window.visualViewport.removeEventListener('resize', window._fmVvListener);
@@ -3606,7 +3641,7 @@ window.fmChangeFontSize = function(dir){
     // Sem seleção: zoom proporcional via font-size no elemento raiz
     fmEditorZoom = Math.max(0.5, Math.min(3.0, fmEditorZoom + dir * 0.1));
     el.style.fontSize = (fmEditorZoom * 0.9) + 'rem';
-    localStorage.setItem('fmEditorZoom', fmEditorZoom);
+    fmPrefs.zoom=fmEditorZoom; fmSavePrefs();
   } else {
     // Com seleção: aplica em span direto
     const sz = parseFloat(window.getComputedStyle(sel.anchorNode.parentElement || el).fontSize) || 14;
@@ -3629,7 +3664,7 @@ window.fmChangeFont = function(font){
     // Sem seleção: muda fonte de todo o editor
     el.querySelectorAll('*').forEach(e => { if(e.style.fontFamily) e.style.fontFamily = ''; });
     el.style.fontFamily = font + ', sans-serif';
-    localStorage.setItem('fmEditorFont', font);
+    fmPrefs.editorFont=font; fmSavePrefs();
   } else {
     // Com seleção: extrai o conteúdo, envolve em span e reinsere
     el.focus();
@@ -3652,14 +3687,14 @@ window.fmChangeFont = function(font){
 window.fmReadZoom = function(dir){
   fmReadZoomLevel = Math.max(0.5, Math.min(3.0, fmReadZoomLevel + dir * 0.1));
   document.getElementById('fmReadContent').style.fontSize = (fmReadZoomLevel * 0.9) + 'rem';
-  localStorage.setItem('fmReadZoomLevel', fmReadZoomLevel);
+  fmPrefs.readZoom=fmReadZoomLevel; fmSavePrefs();
 };
 
 // ── TROCA DE FONTE NO MODO LEITURA ───────────────────────────────────
 window.fmReadChangeFont = function(font){
   if(!font) return;
   document.getElementById('fmReadContent').style.fontFamily = font + ', sans-serif';
-  localStorage.setItem('fmReadFont', font);
+  fmPrefs.readFont=font; fmSavePrefs();
 };
 
 // ── HISTÓRICO MANUAL DE UNDO/REDO ────────────────────────────────────
@@ -4240,6 +4275,8 @@ window.fmEnterReadMode = function(){
 
 window.fmExitReadMode = function(){
   document.getElementById('fmReadMode').classList.remove('open');
+  // Limpa o arquivo aberto do estado — não reabre ao voltar
+  fmSaveNavState({ openFile: null, mode: null });
 };
 
 // Fecha o modo leitura e abre o editor no arquivo correto
@@ -4255,10 +4292,9 @@ window.fmExitReadModeToEditor = function(){
 };
 
 function fmOpenReadMode(){
-  fmSaveNavState({ openFile: fmEditorKey, mode: 'read' });
   const content = document.getElementById('fmReadContent');
   content.style.fontSize = (fmReadZoomLevel * 0.9) + 'rem';
-  const savedReadFont = localStorage.getItem('fmReadFont') || '';
+  const savedReadFont = fmPrefs.readFont || '';
   content.style.fontFamily = savedReadFont ? savedReadFont + ', sans-serif' : '';
   const rSel = document.getElementById('fmReadFontSelect');
   if(rSel) rSel.value = savedReadFont;
