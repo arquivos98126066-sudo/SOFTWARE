@@ -1381,40 +1381,20 @@ function marcarDeletadoCrmTap(id) {
   try { localStorage.setItem('tapete_crm_deleted_ids', JSON.stringify(_crmTapDeletedIds)); } catch(_) {}
 }
 
-// ── Remove campos de imagem base64 antes de enviar ao Firebase ───────────────
-// As fotos ficam apenas no cache local (localStorage). O Firebase só guarda
-// metadados de texto. Isso evita documentos pesados e quota esgotada.
-function _stripImgsForFirebase(obj) {
-  const out = { ...obj };
-  // Remove campos que contêm strings base64 longas
-  const isBase64 = v => typeof v === 'string' && v.startsWith('data:');
-  if (isBase64(out.foto))   delete out.foto;
-  if (isBase64(out.imgIA))  delete out.imgIA;
-  if (Array.isArray(out.fotos)) {
-    const filtered = out.fotos.filter(f => !isBase64(f));
-    // Se ficou vazio após filtrar, remove o campo completamente
-    if (filtered.length === 0) delete out.fotos;
-    else out.fotos = filtered;
-  }
-  return out;
-}
-
 async function fsAddClient(c) {
   const payload = { ...c, updatedAt: Date.now() };
-  // Atualiza local e memória imediatamente (com fotos, para exibição)
+  // Atualiza local e memória imediatamente
   clients.unshift(payload);
   saveLocal('tapete_crm_clients_cache', clients);
   _crmTapBlockUntil = Date.now() + 5000;
   if(curScreen==='home') renderHome();
   window.syncShow?.syncing();
   try {
-    // Envia sem base64 para o Firebase (fotos ficam só no cache local)
-    await setDoc(doc(db, COL_CLIENTS, payload.id), _stripImgsForFirebase(payload));
+    await setDoc(doc(db, COL_CLIENTS, payload.id), payload);
     window.syncShow?.synced('Tapetes CRM');
   } catch(e) {
     const pending = JSON.parse(localStorage.getItem(LS_PENDING)||'[]');
-    // Guarda versão sem base64 na fila de pendentes também
-    pending.push({op:'add', data:_stripImgsForFirebase(payload)});
+    pending.push({op:'add', data:payload});
     localStorage.setItem(LS_PENDING, JSON.stringify(pending));
     window.syncShow?.offline();
     toast('⚠️ Salvo local, sincronizará depois');
@@ -1430,12 +1410,11 @@ async function fsUpdateClient(id, fields) {
   _crmTapBlockUntil = Date.now() + 5000;
   window.syncShow?.syncing();
   try {
-    // Envia sem base64 para o Firebase (fotos ficam só no cache local)
-    await updateDoc(doc(db, COL_CLIENTS, id), _stripImgsForFirebase(withTs));
+    await updateDoc(doc(db, COL_CLIENTS, id), withTs);
     window.syncShow?.synced('Tapetes CRM');
   } catch(e) {
     const pending = JSON.parse(localStorage.getItem(LS_PENDING)||'[]');
-    pending.push({op:'update', id, fields:_stripImgsForFirebase(withTs)});
+    pending.push({op:'update', id, fields:withTs});
     localStorage.setItem(LS_PENDING, JSON.stringify(pending));
     window.syncShow?.offline();
   }
@@ -1593,8 +1572,8 @@ async function syncPending() {
   const remaining = [];
   for(const op of pending) {
     try {
-      if(op.op==='add')    await setDoc(doc(db, COL_CLIENTS, op.data.id), _stripImgsForFirebase(op.data));
-      if(op.op==='update') await updateDoc(doc(db, COL_CLIENTS, op.id), _stripImgsForFirebase(op.fields));
+      if(op.op==='add')    await setDoc(doc(db, COL_CLIENTS, op.data.id), op.data);
+      if(op.op==='update') await updateDoc(doc(db, COL_CLIENTS, op.id), op.fields);
       if(op.op==='delete') await deleteDoc(doc(db, COL_CLIENTS, op.id));
     } catch(e) {
       remaining.push(op);
@@ -2199,6 +2178,9 @@ function renderStepInput(s){
             📸
           </label>
         </div>
+        <button onclick="regAdvance()" style="width:100%;margin-top:14px;padding:16px;background:#1a6fd4;color:#fff;border:none;border-radius:14px;font-size:1rem;font-weight:800;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:8px;touch-action:manipulation;min-height:52px">
+          Próximo →
+        </button>
       </div>`;
     }
 
@@ -3107,8 +3089,6 @@ window.regEnviarCRM = async function(btnEl){
   const tel=(REG_DATA.tel||'').replace(/\D/g,'').trim();
   if(!nome||!tel){ toast('⚠️ Nome e telefone obrigatórios'); _regEnviandoCRM=false; if(btnEl){btnEl.disabled=false;btnEl.style.opacity='1';} return; }
   if(!curTipo){ toast('⚠️ Selecione o tipo de cliente'); _regEnviandoCRM=false; if(btnEl){btnEl.disabled=false;btnEl.style.opacity='1';} return; }
-  if(!tempFoto){ toast('⚠️ Foto obrigatória'); _regEnviandoCRM=false; if(btnEl){btnEl.disabled=false;btnEl.style.opacity='1';} return; }
-
   function valorComDesc(base, d){
     return d===10?Math.round(base*0.9):d===30?Math.round(base*0.7):base;
   }
@@ -3157,13 +3137,12 @@ window.regEnviarCRM = async function(btnEl){
       saveLocal('tapete_crm_clients_cache', clients);
       _crmTapBlockUntil = Date.now() + 5000;
       window.syncShow && window.syncShow.syncing && window.syncShow.syncing();
-      // Envia sem base64 para o Firebase (fotos ficam só no cache local)
-      await setDoc(doc(db, COL_CLIENTS, payload.id), _stripImgsForFirebase(payload));
+      await setDoc(doc(db, COL_CLIENTS, payload.id), payload);
       window.syncShow && window.syncShow.synced && window.syncShow.synced('Tapetes CRM');
     }catch(e){
       try{
         var pending = JSON.parse(localStorage.getItem(LS_PENDING)||'[]');
-        pending.push({op:'add', data:_stripImgsForFirebase(payload)});
+        pending.push({op:'add', data:payload});
         localStorage.setItem(LS_PENDING, JSON.stringify(pending));
       }catch(_){}
       window.syncShow && window.syncShow.offline && window.syncShow.offline();
@@ -3268,7 +3247,6 @@ async function salvarCliente(){
   const preco=(REG_DATA.preco||'').trim();
   if(!nome){ _salvarClienteGuard=false; return toast('⚠️ Informe o nome'); }
   if(!tel) { _salvarClienteGuard=false; return toast('⚠️ Informe o telefone'); }
-  if(!tempFoto){ _salvarClienteGuard=false; return toast('⚠️ Foto obrigatória'); }
   if(!curTipo) { _salvarClienteGuard=false; return toast('⚠️ Selecione o tipo'); }
   if(!tam) { _salvarClienteGuard=false; return toast('⚠️ Informe o tamanho'); }
   if(!cor) { _salvarClienteGuard=false; return toast('⚠️ Informe a cor'); }
@@ -4685,13 +4663,12 @@ window.cadSalvarPedido = async function(){
   if(!nome || !contato || !valorRaw || !medida || !prazo){
     cadToast('⚠️ Preencha os campos obrigatórios'); return;
   }
-  if(!cadFotoBase64){ cadToast('⚠️ Foto do cliente é obrigatória!'); return; }
   var custo = custoRaw !== '' ? parseFloat(custoRaw) : null;
   var pedido = {
     nome, contato, medida, cor, valor: valorTap1 || parseFloat(valorRaw), valorTotal: parseFloat(valorRaw), custo,
     prazo: parseInt(prazo), borda, bcor, endereco: end, dataVenda: data,
     completo: custo !== null, obs, tapetesExtras, categoria: 'Tapete',
-    criadoEm: new Date().toISOString(), fotos: [cadFotoBase64], // fotos salvas apenas localmente
+    criadoEm: new Date().toISOString(), fotos: cadFotoBase64 ? [cadFotoBase64] : [],
     updatedAt: Date.now()
   };
   // Salva local primeiro
@@ -4706,12 +4683,7 @@ window.cadSalvarPedido = async function(){
   // Tenta enviar para Firebase via refs globais expostas pelo módulo
   if(window._cadDB && window._cadCollection && window._cadAddDoc){
     try{
-      // Envia sem base64 para o Firebase
-      var pedidoSemFotos = Object.assign({}, pedido, {id:undefined});
-      var isB64 = function(v){ return typeof v === 'string' && v.startsWith('data:'); };
-      if(isB64(pedidoSemFotos.fotos && pedidoSemFotos.fotos[0])) pedidoSemFotos.fotos = [];
-      if(Array.isArray(pedidoSemFotos.fotos)) pedidoSemFotos.fotos = pedidoSemFotos.fotos.filter(function(f){ return !isB64(f); });
-      var ref = await window._cadAddDoc(window._cadCollection(window._cadDB,'tapetes'), pedidoSemFotos);
+      var ref = await window._cadAddDoc(window._cadCollection(window._cadDB,'tapetes'), Object.assign({}, pedido, {id:undefined}));
       var idx = cad_pedidosCache.findIndex(function(x){ return x.id === localId; });
       if(idx >= 0){ cad_pedidosCache[idx].id = ref.id; cadSalvarLocal(); }
     }catch(e){}
@@ -4869,10 +4841,6 @@ window.cadTransferirParaGestao = async function(id){
   if(window._cadDB && window._cadCollection && window._cadAddDoc){
     try{
       var obj = Object.assign({}, transferido, {id:undefined, _localId:undefined});
-      // Remove base64 antes de enviar ao Firebase
-      var isB64x = function(v){ return typeof v === 'string' && v.startsWith('data:'); };
-      if(Array.isArray(obj.fotos)) obj.fotos = obj.fotos.filter(function(f){ return !isB64x(f); });
-      if(obj.fotos && obj.fotos.length === 0) delete obj.fotos;
       var ref = await window._cadAddDoc(window._cadCollection(window._cadDB,'tapetes'), obj);
       if(typeof window._gestGetCache === 'function'){
         var cache = window._gestGetCache();
@@ -5700,8 +5668,7 @@ window.adicionarFotoDet = function(input){
       if(!p.fotos) p.fotos=[];
       p.fotos.push(b64);
       salvarCacheLocal();
-      // Não envia base64 para o Firebase; sincroniza só a contagem (sem imagem)
-      try{ updateDoc(doc(db,'tapetes',detId),{qtdFotos: p.fotos.length, updatedAt: Date.now()}); } catch(e){}
+      try{ updateDoc(doc(db,'tapetes',detId),{fotos:p.fotos}); } catch(e){}
       renderFotosDet(p);toast('Foto adicionada!');
     };
     img.src=e.target.result;
@@ -5713,8 +5680,7 @@ window.delFotoDet = function(i){
   if(!p||!p.fotos) return;
   p.fotos.splice(i,1);
   salvarCacheLocal();
-  // Não envia base64 para o Firebase; sincroniza só a contagem (sem imagem)
-  try{ updateDoc(doc(db,'tapetes',detId),{qtdFotos: p.fotos.length, updatedAt: Date.now()}); } catch(e){}
+  try{ updateDoc(doc(db,'tapetes',detId),{fotos:p.fotos}); } catch(e){}
   renderFotosDet(p);
 };
 window.abrirFotoGrande = function(i){
@@ -6084,9 +6050,6 @@ async function sincronizarPendentes(){
   for(var i=0;i<pedidosPendentes.length;i++){
     var obj=Object.assign({},pedidosPendentes[i]);
     var localId=obj.id;delete obj.pendingSync;delete obj._localId;delete obj.id;
-    // Remove base64 antes de enviar ao Firebase
-    var _isB64=function(v){return typeof v==='string'&&v.startsWith('data:');};
-    if(Array.isArray(obj.fotos)){obj.fotos=obj.fotos.filter(function(f){return !_isB64(f);});if(!obj.fotos.length)delete obj.fotos;}
     try{
       var docRef=await addDoc(collection(db,'tapetes'),obj);
       var idx=pedidosCache.findIndex(function(x){return x.id===localId;});
