@@ -1252,7 +1252,6 @@ body.img-active .ck-wrap{z-index:9100 !important;}
   white-space:nowrap;
 }
 .ad-feedback.show{opacity:1;}
-</style>
 
 /* Zero spacing for all block elements inside editor and read mode */
 .fm-editable > div, .fm-editable > p, .fm-editable > ul, .fm-editable > ol,
@@ -2455,26 +2454,26 @@ function fmCurrentFolder(){
 function fmPathLabel(){return fmPath.length===0?'🗂️':['🗂️',...fmPath].join(' › ');}
 
 window.openFm = function(){
-  // Restaura posição anterior se existir
-  const nav = fmLoadNavState();
-  fmPath = (nav && nav.path) ? nav.path : [];
   fmSelMode=false;fmSelected.clear();
   var so=document.getElementById('fmSortOthers');if(so)so.style.display='none';
+  // Restaura posição anterior
+  const nav = fmLoadNavState();
+  if(nav && nav.path) fmPath = nav.path;
   renderFm();
   document.getElementById('fmOverlay').classList.add('open');
-  // Restaura arquivo/modo aberto
+  // Restaura arquivo/modo após dados carregarem
   if(nav && nav.openFile){
     setTimeout(function(){
       const folder = fmCurrentFolder();
       if(folder && folder.children && folder.children[nav.openFile]){
         if(nav.mode === 'read'){
           fmOpenEditor(nav.openFile);
-          setTimeout(function(){ if(window.fmEnterReadMode) fmEnterReadMode(); }, 200);
+          setTimeout(function(){ if(window.fmEnterReadMode) fmEnterReadMode(); }, 300);
         } else if(nav.mode === 'editor'){
           fmOpenEditor(nav.openFile);
         }
       }
-    }, 500);
+    }, 800);
   }
 };
 function closeFm(){document.getElementById('fmOverlay').classList.remove('open');}
