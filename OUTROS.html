@@ -59,7 +59,6 @@ body::after {
   pointer-events: none; z-index: 0;
 }
 
-/* Back */
 .back-btn {
   display: inline-flex; align-items: center; gap: 7px;
   color: var(--muted);
@@ -98,6 +97,7 @@ body::after {
   color: var(--muted);
 }
 
+/* 2-column grid */
 .grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -190,12 +190,6 @@ body::after {
   box-shadow: 0 2px 8px rgba(0,0,0,0.18);
 }
 
-/* Colors — all neutralized */
-.c-gold, .c-indigo, .c-rose, .c-emerald, .c-violet {
-  --c1: rgba(0,0,0,0.12);
-  --c2: rgba(0,0,0,0.08);
-}
-
 .footer {
   text-align: center;
   color: var(--muted2);
@@ -215,6 +209,9 @@ body::after {
 .card:nth-child(3) { animation-delay: .12s; }
 .card:nth-child(4) { animation-delay: .16s; }
 .card:nth-child(5) { animation-delay: .20s; }
+.card:nth-child(6) { animation-delay: .24s; }
+.card:nth-child(7) { animation-delay: .28s; }
+.card:nth-child(8) { animation-delay: .32s; }
 
 @media (max-width: 360px) {
   .grid { gap: 7px; padding: 0 10px; }
@@ -237,35 +234,56 @@ body::after {
 
   <div class="grid">
 
-    <a class="card c-gold" href="RICO.html">
+    <a class="card" href="PRE-VENDA.html">
+      <div class="card-icon">💬</div>
+      <span class="card-name">Pré-Venda</span>
+      <span class="card-desc">Atendimento</span>
+      <span class="card-arrow">↗</span>
+    </a>
+
+    <a class="card" href="RETINA.html">
+      <div class="card-icon">👁️</div>
+      <span class="card-name">Retina</span>
+      <span class="card-desc">Análise visual</span>
+      <span class="card-arrow">↗</span>
+    </a>
+
+    <a class="card" href="ADM.html">
+      <div class="card-icon">⚙️</div>
+      <span class="card-name">ADM</span>
+      <span class="card-desc">Painel administrativo</span>
+      <span class="card-arrow">↗</span>
+    </a>
+
+    <a class="card" href="WEBSITE.html">
+      <div class="card-icon">🌐</div>
+      <span class="card-name">Website</span>
+      <span class="card-desc">Página do negócio</span>
+      <span class="card-arrow">↗</span>
+    </a>
+
+    <a class="card" href="RICO.html">
       <div class="card-icon">💰</div>
       <span class="card-name">Rico</span>
       <span class="card-desc">Finanças e riqueza</span>
       <span class="card-arrow">↗</span>
     </a>
 
-    <a class="card c-indigo" href="Workshop.html">
-      <div class="card-icon">🛠️</div>
-      <span class="card-name">Workshop</span>
-      <span class="card-desc">Oficina e projetos</span>
-      <span class="card-arrow">↗</span>
-    </a>
-
-    <a class="card c-rose" href="DOA.html">
+    <a class="card" href="DOA.html">
       <div class="card-icon">🤝</div>
       <span class="card-name">DOA</span>
       <span class="card-desc">Doações e apoio</span>
       <span class="card-arrow">↗</span>
     </a>
 
-    <a class="card c-emerald" href="ESTUDO.html">
+    <a class="card" href="ESTUDO.html">
       <div class="card-icon">📚</div>
       <span class="card-name">Estudo</span>
       <span class="card-desc">Aprendizado</span>
       <span class="card-arrow">↗</span>
     </a>
 
-    <a class="card c-violet" href="Code.html">
+    <a class="card" href="Code.html">
       <div class="card-icon">🖥️</div>
       <span class="card-name">Code</span>
       <span class="card-desc">Código HTML</span>
