@@ -3308,10 +3308,21 @@ let fmEditorZoom = 1.0;
 let fmReadZoomLevel = 1.0;
 let fmPrefs = { zoom: 1.0, readZoom: 1.0, editorFont: '', readFont: '', pin: null, navState: null };
 
+let fmPrefsTimer = null;
 function fmSavePrefs(){
-  fsSetDoc('launcher_fm_prefs', 'data', fmPrefs);
+  // Salva localmente imediato, Firebase com debounce de 2s
+  saveLocal('launcher_fm_prefs_data', fmPrefs);
+  clearTimeout(fmPrefsTimer);
+  fmPrefsTimer = setTimeout(()=>{
+    fsSetDoc('launcher_fm_prefs', 'data', fmPrefs);
+  }, 2000);
 }
 
+// Carrega preferências locais primeiro (instantâneo)
+loadLocal('launcher_fm_prefs_data').then(local => {
+  if(local){ fmPrefs = { ...fmPrefs, ...local }; fmEditorZoom = fmPrefs.zoom||1.0; fmReadZoomLevel = fmPrefs.readZoom||1.0; }
+});
+// Depois sincroniza com Firebase
 setupSnapshot('launcher_fm_prefs', 'data', (data) => {
   if(!data) return;
   fmPrefs = { ...fmPrefs, ...data };
