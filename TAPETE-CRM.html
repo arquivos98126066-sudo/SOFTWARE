@@ -29,10 +29,10 @@
     html,body{width:100%;max-width:100vw;overflow-x:hidden;background:var(--bg)}
     body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:var(--text);font-size:14px;min-height:100vh}
 
-    .nav{background:var(--card);padding:22px 16px;display:flex;align-items:center;gap:8px;
+    .nav{background:var(--card);padding:14px 16px;display:flex;align-items:center;gap:8px;
          box-shadow:var(--shadow);position:sticky;top:0;z-index:100;width:100%}
     .nav-back{background:none;border:none;font-size:22px;cursor:pointer;padding:0 6px;flex-shrink:0;line-height:1}
-    .nav-title{font-size:19px;font-weight:600;color:#111111;flex:1}
+    .nav-title{font-size:20px;font-weight:600;color:#111111;flex:1}
 
     .screen{display:none;padding:14px 14px 100px;width:100%;overflow-x:hidden;animation:fadeIn .18s}
     .screen.active{display:block}
@@ -128,7 +128,7 @@
     .color-swatch{width:44px;height:44px;border:none;padding:2px;cursor:pointer;border-radius:9px;flex-shrink:0}
     .color-row input[type=text]{flex:1;min-width:0}
 
-    .photo-area{border:2px dashed var(--border);border-radius:11px;padding:22px 16px;
+    .photo-area{border:2px solid var(--border);border-radius:11px;padding:22px 16px;
       text-align:center;cursor:pointer;background:var(--bg)}
     .photo-area.has-photo{border-color:var(--success);border-style:solid;background:#f0fff4}
     .photo-preview{width:100%;max-height:200px;object-fit:cover;border-radius:9px;margin-top:10px}
@@ -144,7 +144,7 @@
       display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;flex-shrink:0}
     .texto-preview{font-size:13px;line-height:1.7;white-space:pre-wrap;word-break:break-word;
       overflow-wrap:anywhere;background:var(--bg);border-radius:9px;padding:12px;margin-bottom:10px}
-    .img-slot{border:2px dashed var(--border);border-radius:11px;padding:20px;text-align:center;
+    .img-slot{border:2px solid var(--border);border-radius:11px;padding:20px;text-align:center;
       cursor:pointer;background:var(--bg);margin-bottom:10px}
     .img-slot.has-img{border-color:var(--success);border-style:solid;padding:0;overflow:hidden}
     .img-slot img{width:100%;max-height:220px;object-fit:cover;border-radius:9px;display:block}
@@ -174,14 +174,14 @@
     .reg-choice-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;padding:4px 0 8px}
     .reg-choice-btn{border:2px solid #e0e0e0;background:#fafafa;border-radius:14px;padding:16px 8px;text-align:center;font-size:13px;font-weight:600;cursor:pointer;transition:.15s;line-height:1.4}
     .reg-choice-btn:active,.reg-choice-btn.sel{border-color:var(--primary);background:var(--primary);color:#fff}
-    .reg-photo-btn{width:100%;padding:22px;border:2px dashed var(--primary);border-radius:14px;background:transparent;font-size:15px;font-weight:600;color:var(--primary);cursor:pointer;margin-bottom:8px}
+    .reg-photo-btn{width:100%;padding:22px;border:2px solid var(--primary);border-radius:14px;background:transparent;font-size:15px;font-weight:600;color:var(--primary);cursor:pointer;margin-bottom:8px}
     .reg-photo-preview{width:100%;max-height:200px;object-fit:cover;border-radius:12px;margin-bottom:8px}
     .reg-save-btn{width:calc(100% - 32px);margin:8px 16px 16px;padding:18px;font-size:17px;font-weight:700;border-radius:16px;border:none;background:var(--primary);color:#fff;cursor:pointer;box-shadow:0 4px 14px rgba(0,150,136,.3)}
     .reg-skip-btn{display:block;text-align:center;color:var(--muted);font-size:13px;padding:8px;cursor:pointer;text-decoration:underline}
 
     .bottom-nav{position:fixed;bottom:0;left:0;right:0;background:var(--card);
       display:flex;box-shadow:0 -2px 8px rgba(0,0,0,.08);z-index:150;padding-bottom:env(safe-area-inset-bottom)}
-    .bnav-btn{flex:1;padding:10px 4px 9px;border:none;background:none;cursor:pointer;
+    .bnav-btn{flex:1;padding:10px 4px 9px;border:none;background:none;cursor:pointer;position:relative;
       font-size:10px;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:3px;min-width:0;position:relative;}
     .bnav-btn .ico{font-size:22px}
     .bnav-btn.active{color:#111111;font-weight:800;}
@@ -344,13 +344,13 @@
 </head>
 <body>
 
-<div id="toast" style="position:fixed;top:68px;left:50%;transform:translateX(-50%);
-  background:#1A1A1A;color:#fff;padding:9px 20px;border-radius:22px;font-size:13px;font-weight:600;
-  z-index:9999;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap;max-width:92vw;text-align:center"></div>
+<div id="toast" style="position:fixed;top:68px;right:14px;left:auto;transform:none;
+  background:#1A1A1A;color:#fff;padding:9px 16px;border-radius:22px;font-size:13px;font-weight:600;
+  z-index:9999;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap;max-width:60vw;text-align:center"></div>
 
 <div class="nav">
   <button class="nav-back" id="navBack" style="display:none" onclick="goBack()">←</button>
-  <span class="nav-title" id="navTitle">🏠 TAPETES CRM</span>
+  <span class="nav-title" id="navTitle">TAPETES CRM</span>
   <div style="position:relative;flex-shrink:0;z-index:200">
     <button id="btn-cloud-menu" onclick="toggleCloudMenu()" title="Ferramentas"
       style="background:linear-gradient(135deg,#e0eaff 0%,#c7d9ff 50%,#dce8ff 100%);
@@ -479,73 +479,68 @@
   <div style="background:#fff;border-radius:18px;width:94%;max-width:480px;margin:40px auto 24px;padding:20px;font-family:'Nunito',system-ui,sans-serif;" onclick="event.stopPropagation()">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
       <h2 style="font-size:17px;font-weight:900;margin:0;color:#111">🗂️ Cadastro</h2>
-      <button onclick="fecharModalCadastro()" style="background:#f3f4f6;border:none;border-radius:50%;width:40px;height:40px;font-size:18px;cursor:pointer;touch-action:manipulation;min-height:48px">✕</button>
+      <button onclick="fecharModalCadastro()" style="background:#f3f4f6;border:none;border-radius:50%;width:30px;height:30px;font-size:13px;cursor:pointer;touch-action:manipulation;display:flex;align-items:center;justify-content:center">✕</button>
     </div>
 
-    <div class="tap-card" style="padding-top:20px">
+    <div class="tap-card" style="padding-top:10px">
       <label class="cad-label-field">NOME DO CLIENTE</label>
-      <input type="text" id="cad_nome" class="tap-input" placeholder="Ex: Maria Silva">
+      <input type="text" id="cad_nome" class="tap-input">
 
       <label class="cad-label-field">TELEFONE</label>
       <div style="position:relative">
-        <input type="text" id="cad_contato" class="tap-input" placeholder="(79) 9 9999-9999" inputmode="numeric" oninput="cadMascaraTel(this)" maxlength="16" style="margin-bottom:0">
+        <input type="text" id="cad_contato" class="tap-input" inputmode="numeric" oninput="cadMascaraTel(this)" maxlength="16" style="margin-bottom:0">
         <div id="cad_contato_msg" style="font-size:.7rem;font-weight:700;position:absolute;bottom:-16px;left:2px;height:14px"></div>
       </div>
       <div style="margin-bottom:13px"></div>
 
+      <!-- campos ocultos tapete 1 para compatibilidade com salvamento -->
       <label class="cad-label-field">MEDIDA DO TAPETE</label>
-      <input type="text" id="cad_medida" class="tap-input" placeholder="Ex: 100x60 cm">
-
-      <label class="cad-label-field">COR DE FUNDO DO TAPETE</label>
-      <input type="text" id="cad_cor" class="tap-input" placeholder="Ex: azul escuro, vermelho, preto">
+      <input type="text" id="cad_medida" class="tap-input" readonly style="background:#f0f4ff;color:#374151;font-weight:700">
+      <input type="text" id="cad_cor" style="display:none">
 
       <label class="cad-label-field">VALOR TOTAL (R$)</label>
-      <input type="text" id="cad_valor" class="tap-input" placeholder="Ex: R$ 450,00" oninput="cadMascaraValor(this)" inputmode="numeric">
+      <input type="text" id="cad_valor" class="tap-input" oninput="cadMascaraValor(this)" inputmode="numeric">
 
-      <label class="cad-label-field">BORDA</label>
-      <select id="cad_borda" class="tap-input" style="font-weight:400" onchange="cadToggleBorda()">
+      <!-- campos ocultos mantidos para compatibilidade -->
+      <select id="cad_borda" style="display:none">
         <option value="sem">Sem borda</option>
         <option value="com">Com borda</option>
       </select>
       <div id="cad_bdiv" style="display:none">
-        <label class="cad-label-field">COR DA BORDA</label>
-        <input type="text" id="cad_bcor" class="tap-input" placeholder="Ex: preta, dourada">
+        <input type="text" id="cad_bcor" style="display:none">
       </div>
+      <button type="button" id="cad_borda_btn" style="display:none;visibility:hidden;position:absolute;width:0;height:0;overflow:hidden"></button>
+      <input type="number" id="cad_custo" style="display:none">
 
       <label class="cad-label-field">PRAZO DE ENTREGA</label>
       <div style="position:relative">
-        <input type="number" id="cad_prazo" class="tap-input" placeholder="15" style="padding-right:50px">
-        <span style="position:absolute;right:14px;top:50%;transform:translateY(-50%);font-size:.82rem;font-weight:700;color:#6b7280;pointer-events:none">dias</span>
+        <input type="number" id="cad_prazo" class="tap-input">
       </div>
 
       <label class="cad-label-field">ENDERECO DO CLIENTE</label>
       <div class="tap-geowrap">
-        <textarea id="cad_end" rows="3" placeholder="Rua, número, bairro, cidade..." class="tap-input"></textarea>
+        <textarea id="cad_end" rows="3" class="tap-input"></textarea>
         <button class="tap-geobtn tap-vis" id="cad_geo_c" onclick="cadGps()">GPS</button>
       </div>
-      <div class="tap-geost" id="cad_geo_sc"></div>
-
-      <label class="cad-label-field">CUSTO REAL (preencher após a venda)</label>
-      <input type="number" id="cad_custo" class="tap-input" step="0.01" placeholder="Ex: 200,00">
-
-      <label class="cad-label-field">DATA DA VENDA</label>
+      <div class="tap-geost" id="cad_geo_sc" style="min-height:0;margin-top:0"></div>
+      <label class="cad-label-field" style="margin-top:2px">DATA DA VENDA</label>
       <input type="date" id="cad_data" class="tap-input">
 
       <label class="cad-label-field">OBSERVACOES</label>
-      <textarea id="cad_obs" rows="3" placeholder="Detalhes adicionais (opcional)" class="tap-input"></textarea>
+      <textarea id="cad_obs" rows="3" class="tap-input"></textarea>
 
       <label class="cad-label-field">SIMULACAO DO TAPETE (opcional)</label>
       <input type="file" id="cad_simul_input" accept="image/*" style="display:none" onchange="cadPreviewSimul(this)">
       <div id="cad_simul_preview_area">
         <button onclick="document.getElementById('cad_simul_input').click()" style="
-          width:100%;padding:16px;border-radius:12px;border:2px dashed #d1d5db;
+          width:100%;padding:16px;border-radius:12px;border:2px solid #d1d5db;
           background:#f9fafb;color:#374151;font-size:14px;font-weight:800;
           font-family:'Nunito',system-ui,sans-serif;cursor:pointer;margin-bottom:13px;
           display:flex;align-items:center;justify-content:center;gap:8px">
           📷 Adicionar simulação do tapete
         </button>
       </div>
-      <div id="cad_tapetes_extras"></div>
+      <div id="cad_blocos_tapetes"></div>
       <div class="tap-brow" style="margin-top:14px">
         <button class="tap-btn tap-btn-s" style="flex:1" onclick="cadAdicionarTapeteExtra()" id="cad_btn_add_tapete">➕ Outro tapete</button>
         <input type="file" id="cad_foto_input" accept="image/*" capture="environment" style="display:none" onchange="cadPreviewFoto(this)">
@@ -569,7 +564,7 @@
     <div class="tap-card">
       <div class="tap-stitle">Pedidos Salvos</div>
       <div class="tap-fbar">
-        <input type="text" id="cad_f1q" class="tap-input" placeholder="Buscar nome..." oninput="cadRenderP()">
+        <input type="text" id="cad_f1q" class="tap-input" oninput="cadRenderP()">
         <select id="cad_f1mes" class="tap-input" onchange="cadRenderP()"><option value="">Todos os meses</option></select>
         <input type="date" id="cad_f1dia" class="tap-input" onchange="cadRenderP()">
       </div>
@@ -582,14 +577,16 @@
 
 <!-- Modal Custo Cadastro -->
 <div class="cad-moverlay" id="cad-modal-custo" onclick="if(event.target===this)cadFComp()">
-  <div class="cad-mbox" onclick="event.stopPropagation()" style="max-height:70vh">
-    <button class="cad-mclose" onclick="cadFComp()">✕</button>
-    <div class="cad-mtitle">💰 Informar Custo</div>
-    <div id="cad_cinfo"></div>
-    <div class="cad-divider"></div>
-    <input type="number" id="cad_ccusto" class="cad-input" step="0.01" placeholder="Digite o custo real">
-    <button class="cad-btn cad-btn-ok" onclick="cadSalvarCusto()">✅ Salvar custo</button>
-    <button class="cad-btn cad-btn-g" onclick="cadFComp()">Cancelar</button>
+  <div class="cad-mbox" onclick="event.stopPropagation()" style="max-height:80vh;border-radius:24px 24px 0 0;padding:0;overflow:hidden">
+    <!-- Header -->
+    <div style="background:linear-gradient(135deg,#1e293b,#334155);padding:18px 20px 16px;color:#fff;display:flex;justify-content:space-between;align-items:center">
+      <div style="font-size:1rem;font-weight:900">💰 Informar Custo</div>
+      <button onclick="cadFComp()" style="background:rgba(255,255,255,.15);border:none;color:#fff;border-radius:50%;width:30px;height:30px;font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center">✕</button>
+    </div>
+    <!-- Info do pedido -->
+    <div style="padding:14px 18px 0" id="cad_cinfo"></div>
+    <!-- Campos de custo por tapete -->
+    <div style="padding:14px 18px 18px" id="cad_custo_campos"></div>
   </div>
 </div>
 
@@ -652,7 +649,7 @@
     <div class="tap-card">
       <div class="tap-stitle">Vendas</div>
       <div class="tap-fbar">
-        <input type="text" id="f3q" placeholder="Buscar nome..." oninput="renderG()" class="tap-input">
+        <input type="text" id="f3q" oninput="renderG()" class="tap-input">
         <select id="f3mes" onchange="renderG()" class="tap-input"><option value="">Todos os meses</option></select>
       </div>
       <div id="gt"></div>
@@ -671,9 +668,9 @@
     </div>
     <div class="tap-card">
       <div class="tap-stitle">Registrar Rua</div>
-      <div class="tap-geowrap"><textarea id="r_end" rows="4" placeholder="Endereco completo do cliente" class="tap-input"></textarea><button class="tap-geobtn tap-vis" id="geo_r" onclick="gps('r_end','geo_sr','geo_r')">GPS</button></div>
+      <div class="tap-geowrap"><textarea id="r_end" rows="4" class="tap-input"></textarea><button class="tap-geobtn tap-vis" id="geo_r" onclick="gps('r_end','geo_sr','geo_r')">GPS</button></div>
       <div class="tap-geost" id="geo_sr"></div>
-      <input type="text" id="r_cli" placeholder="Nome do cliente" class="tap-input">
+      <input type="text" id="r_cli" class="tap-input">
       <div class="tap-brow">
         <button class="tap-btn tap-btn-p" onclick="registrarRua()">Registrar</button>
         <button class="tap-btn tap-btn-g tap-btn-sm" onclick="limparRua()">Limpar</button>
@@ -683,7 +680,7 @@
     <div class="tap-card">
       <div class="tap-stitle">Ruas Registradas</div>
       <div class="tap-fbar">
-        <input type="text" id="f4q" placeholder="Buscar rua ou cliente..." oninput="renderR()" class="tap-input">
+        <input type="text" id="f4q" oninput="renderR()" class="tap-input">
         <select id="f4mes" onchange="renderR()" class="tap-input"><option value="">Todos os meses</option></select>
         <input type="date" id="f4dia" onchange="renderR()" class="tap-input" style="flex:1;min-width:100px">
       </div>
@@ -711,7 +708,7 @@
     <div class="tap-card">
       <div class="tap-stitle">Todas as Vendas</div>
       <div class="tap-fbar">
-        <input type="text" id="f5q" placeholder="Buscar nome..." oninput="renderC()" class="tap-input">
+        <input type="text" id="f5q" oninput="renderC()" class="tap-input">
         <select id="f5mes" onchange="renderC()" class="tap-input"><option value="">Todos os meses</option></select>
       </div>
       <div id="g5t"></div>
@@ -719,7 +716,7 @@
     <div class="tap-card">
       <div class="tap-stitle">Enderecos Registrados</div>
       <div class="tap-fbar">
-        <input type="text" id="f5rq" placeholder="Buscar rua ou cliente..." oninput="renderRC()" class="tap-input">
+        <input type="text" id="f5rq" oninput="renderRC()" class="tap-input">
         <select id="f5rmes" onchange="renderRC()" class="tap-input"><option value="">Todos os meses</option></select>
       </div>
       <div id="g5r"></div>
@@ -774,7 +771,7 @@
     <div class="tap-mtitle">Informar Custo</div>
     <div id="cinfo"></div>
     <div class="tap-div"></div>
-    <input type="number" id="ccusto" step="0.01" placeholder="Digite o custo real" class="tap-input">
+    <input type="number" id="ccusto" step="0.01" class="tap-input">
     <div class="tap-brow"><button class="tap-btn tap-btn-ok tap-btn-full" onclick="salvarCusto()">Salvar custo</button></div>
     <div class="tap-brow"><button class="tap-btn tap-btn-g tap-btn-sm" onclick="fComp()">Cancelar</button></div>
   </div>
@@ -835,7 +832,7 @@
 
 <!-- ── CLIENTES ── -->
 <div class="screen" id="screen-clientes">
-  <input class="search-box" id="search-input" placeholder="🔍 Buscar nome ou telefone..." oninput="renderAllClients()">
+  <input class="search-box" id="search-input" oninput="renderAllClients()">
   <div class="filter-dropdown" id="fdd">
     <div class="filter-trigger" id="ftrig" onclick="toggleFDD()">
       <span id="flabel">🔘 Todos os clientes</span>
@@ -865,8 +862,7 @@
     onkeydown="regKeyDown(event,'__ghost')" oninput="regGhostInput(this)">
   <div id="reg-nome-initial" class="reg-step">
     <div class="reg-step-label">👤 Nome do cliente</div>
-    <input id="reg-nome-static" class="reg-step-input" type="text" inputmode="text"
-      placeholder="Ex: Maria Silva" autocomplete="off"
+    <input id="reg-nome-static" class="reg-step-input" type="text" inputmode="text" autocomplete="off"
       oninput="regInputChange(this,'nome')"
       onkeydown="regKeyDown(event,'nome')">
     <div class="reg-step-hint">Digite e dê um espaço ou Enter para avançar</div>
@@ -886,7 +882,7 @@
     <div class="form-card-title">📝 TEXTO FIXO (Bloco Links)</div>
     <div class="fg">
       <label>Texto que sempre acompanha os links</label>
-      <textarea id="cfg-texto-fixo" placeholder="Ex: Conheça nossos tapetes personalizados! Acesse nosso catálogo..."></textarea>
+      <textarea id="cfg-texto-fixo"></textarea>
     </div>
     <button class="btn btn-success" onclick="saveTextoFixo()">💾 Salvar Texto Fixo</button>
   </div>
@@ -900,6 +896,19 @@
     <div class="seq-tab" id="seq-tab-com" onclick="setSeqTab('com_resposta',this)">💬 Com Resposta</div>
   </div>
   <div id="days-accordion"></div>
+
+  <!-- ── LIMPEZA DE FOTOS ── -->
+  <div class="form-card" style="margin-top:14px">
+    <div class="form-card-title">🧹 LIMPEZA DE FOTOS NO FIREBASE</div>
+    <p style="font-size:12px;color:var(--muted);margin-bottom:12px;line-height:1.6">
+      Remove as fotos e simulações dos clientes salvos na nuvem, sem apagar nenhum dado de cliente.
+      Use isso para liberar espaço no Firebase e deixar o app mais leve.
+    </p>
+    <div id="limpeza-fotos-resultado" style="display:none;margin-bottom:10px"></div>
+    <button class="btn btn-ghost" onclick="limparFotosFirebase()" style="border:1.5px solid #dc2626;color:#dc2626">
+      🗑️ Limpar fotos antigas do Firebase
+    </button>
+  </div>
 </div>
 
 <!-- ── ENVIAR ── -->
@@ -947,7 +956,7 @@
     <label style="display:block;font-size:11px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.4px;margin-bottom:5px">HORA (opcional)</label>
     <input type="time" id="agendar-hora" style="width:100%;padding:14px;border:2px solid #d1d5db;border-radius:12px;font-size:16px;font-family:inherit;font-weight:600;background:#f9fafb;color:#111;margin-bottom:14px;box-sizing:border-box;-webkit-appearance:none">
     <label style="display:block;font-size:11px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.4px;margin-bottom:5px">ANOTAÇÃO (opcional)</label>
-    <input type="text" id="agendar-nota" placeholder="Ex: Ele pediu pra mandar na terça" style="width:100%;padding:14px;border:2px solid #d1d5db;border-radius:12px;font-size:15px;font-family:inherit;font-weight:500;background:#f9fafb;color:#111;margin-bottom:18px;box-sizing:border-box">
+    <input type="text" id="agendar-nota" style="width:100%;padding:14px;border:2px solid #d1d5db;border-radius:12px;font-size:15px;font-family:inherit;font-weight:500;background:#f9fafb;color:#111;margin-bottom:18px;box-sizing:border-box">
     <button onclick="confirmarAgendamento()" style="width:100%;padding:16px;background:#111;color:#fff;border:none;border-radius:14px;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit;margin-bottom:10px;touch-action:manipulation">✅ Confirmar Agendamento</button>
     <button onclick="limparAgendamento()" id="agendar-btn-limpar" style="display:none;width:100%;padding:13px;background:#fee2e2;color:#dc2626;border:none;border-radius:14px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;margin-bottom:8px;touch-action:manipulation">🗑️ Remover Agendamento</button>
     <button onclick="fecharModalAgendar()" style="width:100%;padding:13px;background:#f3f4f6;color:#555;border:none;border-radius:14px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;touch-action:manipulation">Cancelar</button>
@@ -1153,6 +1162,11 @@ window.mascararTelCRM = function(input) {
 let curScreen='home', stack=[], curCid=null, curTipo=null;
 let curBorda='nao', curViu='nao', curFilter='todos';
 let curCfgTipo='nao-estava', curSeqTab='sem_resposta', curPag=null, tempFoto=null, tempImgIA=null;
+let _regParcelas = 0; // 0 = sem parcelamento, 2-6 = número de parcelas
+let tempFotos=[]; // todas as fotos capturadas no registrar
+let _regFotoQtd=1; // quantas fotos devem ser capturadas
+let _regFotoIdx=0; // qual foto está sendo capturada agora (0-based)
+let _regFotoEscolha=false; // se true, está mostrando o modal de escolha de quantidade
 
 // ── PERSISTÊNCIA DO ESTADO DO REGISTRAR (IndexedDB + localStorage fallback) ───
 // Mesma estratégia do ESTUDO.html: dual-layer, merge por updatedAt, block guard
@@ -1237,6 +1251,8 @@ function salvarEstadoRegistrar() {
     regReturnStep: (typeof regReturnStep !== 'undefined') ? regReturnStep : null,
     curTipo, curBorda, curViu,
     tempFoto: tempFoto || null,
+    tempFotos: tempFotos.length ? [...tempFotos] : [],
+    _regFotoQtd: (_regFotoQtd !== undefined ? _regFotoQtd : 1),
     tempImgIA: tempImgIA || null,
     _regFezGemini: !!window._regFezGemini,
     updatedAt: Date.now()
@@ -1265,6 +1281,8 @@ async function restaurarEstadoRegistrar() {
   curBorda = estado.curBorda || 'nao';
   curViu = estado.curViu || 'nao';
   tempFoto = estado.tempFoto || null;
+  tempFotos = estado.tempFotos || (tempFoto ? [tempFoto] : []);
+  _regFotoQtd = (estado._regFotoQtd !== undefined && estado._regFotoQtd !== null) ? estado._regFotoQtd : 1;
   tempImgIA = estado.tempImgIA || null;
   window._regFezGemini = !!estado._regFezGemini;
   return true;
@@ -1363,20 +1381,40 @@ function marcarDeletadoCrmTap(id) {
   try { localStorage.setItem('tapete_crm_deleted_ids', JSON.stringify(_crmTapDeletedIds)); } catch(_) {}
 }
 
+// ── Remove campos de imagem base64 antes de enviar ao Firebase ───────────────
+// As fotos ficam apenas no cache local (localStorage). O Firebase só guarda
+// metadados de texto. Isso evita documentos pesados e quota esgotada.
+function _stripImgsForFirebase(obj) {
+  const out = { ...obj };
+  // Remove campos que contêm strings base64 longas
+  const isBase64 = v => typeof v === 'string' && v.startsWith('data:');
+  if (isBase64(out.foto))   delete out.foto;
+  if (isBase64(out.imgIA))  delete out.imgIA;
+  if (Array.isArray(out.fotos)) {
+    const filtered = out.fotos.filter(f => !isBase64(f));
+    // Se ficou vazio após filtrar, remove o campo completamente
+    if (filtered.length === 0) delete out.fotos;
+    else out.fotos = filtered;
+  }
+  return out;
+}
+
 async function fsAddClient(c) {
   const payload = { ...c, updatedAt: Date.now() };
-  // Atualiza local e memória imediatamente
+  // Atualiza local e memória imediatamente (com fotos, para exibição)
   clients.unshift(payload);
   saveLocal('tapete_crm_clients_cache', clients);
   _crmTapBlockUntil = Date.now() + 5000;
   if(curScreen==='home') renderHome();
   window.syncShow?.syncing();
   try {
-    await setDoc(doc(db, COL_CLIENTS, payload.id), payload);
+    // Envia sem base64 para o Firebase (fotos ficam só no cache local)
+    await setDoc(doc(db, COL_CLIENTS, payload.id), _stripImgsForFirebase(payload));
     window.syncShow?.synced('Tapetes CRM');
   } catch(e) {
     const pending = JSON.parse(localStorage.getItem(LS_PENDING)||'[]');
-    pending.push({op:'add', data:payload});
+    // Guarda versão sem base64 na fila de pendentes também
+    pending.push({op:'add', data:_stripImgsForFirebase(payload)});
     localStorage.setItem(LS_PENDING, JSON.stringify(pending));
     window.syncShow?.offline();
     toast('⚠️ Salvo local, sincronizará depois');
@@ -1392,11 +1430,12 @@ async function fsUpdateClient(id, fields) {
   _crmTapBlockUntil = Date.now() + 5000;
   window.syncShow?.syncing();
   try {
-    await updateDoc(doc(db, COL_CLIENTS, id), withTs);
+    // Envia sem base64 para o Firebase (fotos ficam só no cache local)
+    await updateDoc(doc(db, COL_CLIENTS, id), _stripImgsForFirebase(withTs));
     window.syncShow?.synced('Tapetes CRM');
   } catch(e) {
     const pending = JSON.parse(localStorage.getItem(LS_PENDING)||'[]');
-    pending.push({op:'update', id, fields:withTs});
+    pending.push({op:'update', id, fields:_stripImgsForFirebase(withTs)});
     localStorage.setItem(LS_PENDING, JSON.stringify(pending));
     window.syncShow?.offline();
   }
@@ -1505,6 +1544,7 @@ async function crmTapCarregarLocal() {
   const cache = await loadLocal('tapete_crm_clients_cache');
   if(cache && cache.length) {
     clients = cache;
+    setTimeout(atualizarBadges, 300);
     if(curScreen==='home') renderHome();
     if(curScreen==='clientes') renderAllClients();
     window.syncShow?.offline();
@@ -1528,15 +1568,13 @@ function startRealtimeSync() {
     const localOnly = clients.filter(c => !filteredCloud.find(x => x.id === c.id) && !_crmTapDeletedIds[c.id]);
     if(filteredMax >= localMaxTime || localOnly.length === 0) {
       clients = [...filteredCloud, ...localOnly];
+      setTimeout(atualizarBadges, 300);
       saveLocal('tapete_crm_clients_cache', clients);
     }
     if(curScreen==='home') renderHome();
     if(curScreen==='clientes') renderAllClients();
     if(curScreen==='fila') renderFila();
-    const _filaCount=clients.filter(c=>c._naFila===true).length;
-    const _badge=_filaCount>0?` <span style="background:var(--danger);color:#fff;border-radius:50%;width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:800">${_filaCount}</span>`:'';
-    const _bnavFila=document.querySelector('#bnav-1');
-    if(_bnavFila) _bnavFila.innerHTML=`<span class="ico">📬</span>FILA${_badge}`;
+    atualizarBadges();
   }, async err => {
     console.warn('TAPETE-CRM onSnapshot offline:', err);
     await crmTapCarregarLocal();
@@ -1555,8 +1593,8 @@ async function syncPending() {
   const remaining = [];
   for(const op of pending) {
     try {
-      if(op.op==='add')    await setDoc(doc(db, COL_CLIENTS, op.data.id), op.data);
-      if(op.op==='update') await updateDoc(doc(db, COL_CLIENTS, op.id), op.fields);
+      if(op.op==='add')    await setDoc(doc(db, COL_CLIENTS, op.data.id), _stripImgsForFirebase(op.data));
+      if(op.op==='update') await updateDoc(doc(db, COL_CLIENTS, op.id), _stripImgsForFirebase(op.fields));
       if(op.op==='delete') await deleteDoc(doc(db, COL_CLIENTS, op.id));
     } catch(e) {
       remaining.push(op);
@@ -1584,14 +1622,22 @@ function showScreen(name, push=true){
     if(inv) inv.style.display='none';
     if(fs) fs.remove();
   }
-  const titles={home:'🏠 TAPETES CRM',clientes:'👥 CLIENTES',registrar:'📝 REGISTRAR',config:'⚙️ CONFIG',
-    fila:'📬 FILA DE ENVIO',
-    enviar:'📤 Enviar',timeline:'📋 Histórico',fechamento:'🎉 Fechar Venda',duvida:'💬 Dúvida'};
+  const titles={home:'TAPETES CRM',clientes:'CLIENTES',registrar:'REGISTRAR',config:'CONFIG',
+    fila:'FILA DE ENVIO',
+    enviar:'Enviar',timeline:'Histórico',fechamento:'Fechar Venda',duvida:'Dúvida'};
   document.getElementById('navTitle').textContent=titles[name]||'CRM';
   document.getElementById('navBack').style.display=ROOT_SCREENS.includes(name)?'none':'block';
   if(name==='home') renderHome();
   if(name==='clientes') renderAllClients();
-  if(name==='config') renderConfig();
+  if(name==='config'){
+    renderConfig();
+    setTimeout(()=>{ const r=document.getElementById('limpeza-fotos-resultado'); if(r){ r.style.display='none'; r.textContent=''; } },0);
+  }
+
+
+
+
+
   if(name==='fila') renderFila();
   if(name==='registrar'){
     const inp = document.getElementById('reg-nome-static');
@@ -1659,7 +1705,7 @@ function renderHome(){
   clients.filter(c=>c.status==='ativo'&&!c._naFila).forEach(c=>{
     const nd=nextDate(c); if(!nd) return;
     const diff=daysUntil(nd);
-    if(diff===7||diff===3||diff===1) alertas.push({c,diff,nd});
+    if(diff>=1&&diff<=7) alertas.push({c,diff,nd});
   });
   const aEl=document.getElementById('alertas-section');
   if(alertas.length){
@@ -1690,7 +1736,36 @@ function renderHome(){
   const el=document.getElementById('hoje-list');
   el.innerHTML=hj.length ? hj.map(c=>cardHtml(c,true)).join('') :
     `<div class="empty"><div class="ico">🎉</div><p>Nenhuma ação para hoje!</p></div>`;
+
+  // Badge no botão HOJE
+  const badgeHoje = hj.length > 0
+    ? `<span style="position:absolute;top:2px;right:6px;background:var(--danger);color:#fff;border-radius:50%;width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;pointer-events:none">${hj.length}</span>`
+    : '';
+  const bnavHoje = document.querySelector('#bnav-3');
+  if(bnavHoje) bnavHoje.innerHTML=`<span class="ico">🏠</span>HOJE${badgeHoje}`;
+
+  // Atualiza badge da FILA também (para aparecer correto no carregamento inicial)
+  atualizarBadges();
 }
+
+function atualizarBadges(){
+  const td=today();
+  const hjCount = clients.filter(c=>c.status==='ativo'&&!c._naFila&&nextDate(c)===td).length;
+  const filaCount = clients.filter(c=>c._naFila===true).length;
+  const badgeStyle='position:absolute;top:2px;right:6px;background:var(--danger);color:#fff;border-radius:50%;width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;pointer-events:none';
+  // Atualiza só o badge sem resetar o innerHTML inteiro (preserva onclick)
+  function setBadge(btn, count){
+    if(!btn) return;
+    let b = btn.querySelector('.nav-badge');
+    if(count>0){
+      if(!b){ b=document.createElement('span'); b.className='nav-badge'; b.style.cssText=badgeStyle; btn.appendChild(b); }
+      b.textContent=count;
+    } else { if(b) b.remove(); }
+  }
+  setBadge(document.querySelector('#bnav-1'), filaCount);
+  setBadge(document.querySelector('#bnav-3'), hjCount);
+}
+window.atualizarBadges = atualizarBadges;
 
 // ── CLIENTES ──────────────────────────────────────────────────────────────────
 function renderAllClients(){
@@ -1716,8 +1791,7 @@ function renderFila(){
   const fila=clients.filter(c=>c._naFila===true);
   const el=document.getElementById('fila-content'); if(!el) return;
   // Badge no nav
-  const badge=fila.length>0?` <span style="background:var(--danger);color:#fff;border-radius:50%;width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:800">${fila.length}</span>`:'';
-  document.querySelector('#bnav-1').innerHTML=`<span class="ico">📬</span>FILA${badge}`;
+  atualizarBadges();
 
   if(!fila.length){
     el.innerHTML=`<div class="empty"><div class="ico">📭</div><p>Fila vazia!<br><span style="font-size:12px">Clientes aparecem aqui após serem registrados.</span></p></div>`;
@@ -1735,7 +1809,7 @@ function renderFila(){
       ${c.imgIA
         ?`<div style="margin-top:10px"><img src="${c.imgIA}" style="width:100%;max-height:160px;object-fit:cover;border-radius:9px"></div>`
         :`<div style="margin-top:10px">
-            <label style="display:block;width:100%;padding:14px;border:2px dashed var(--primary);border-radius:12px;text-align:center;font-size:14px;font-weight:600;color:var(--primary);cursor:pointer">
+            <label style="display:block;width:100%;padding:14px;border:2px solid var(--primary);border-radius:12px;text-align:center;font-size:14px;font-weight:600;color:var(--primary);cursor:pointer">
               ➕ Adicionar simulação
               <input type="file" accept="image/*" style="display:none" onchange="filaAdicionarSimul(event,'${c.id}')">
             </label>
@@ -1758,15 +1832,20 @@ async function filaAdicionarSimul(e, id){
   const reader = new FileReader();
   reader.onload = ev => {
     const img = new Image();
-    img.onload = async () => {
+    img.onload = () => {
       const cv = document.createElement('canvas');
-      const max=900; let w=img.width,h=img.height;
+      const max=500; let w=img.width,h=img.height;
       if(w>max){h=h*max/w;w=max;}
       cv.width=w;cv.height=h;cv.getContext('2d').drawImage(img,0,0,w,h);
-      const imgIA = cv.toDataURL('image/jpeg',.8);
-      await fsUpdateClient(id,{imgIA, _aguardandoSimul:false});
-      toast('✅ Simulação adicionada! Agora pode enviar.');
+      const imgIA = cv.toDataURL('image/jpeg',.55);
+      // Atualiza memória imediatamente e re-renderiza — não espera o Firebase
+      const c = clients.find(x=>x.id===id);
+      if(c){ c.imgIA=imgIA; c._aguardandoSimul=false; }
+      saveLocal('tapete_crm_clients_cache', clients);
       renderFila();
+      toast('✅ Simulação adicionada! Agora pode enviar.');
+      // Sincroniza com Firebase em background
+      fsUpdateClient(id,{imgIA, _aguardandoSimul:false});
     };
     img.src = ev.target.result;
   };
@@ -1872,14 +1951,14 @@ const REG_STEPS = [
   { id:'tamanho', label:'📐 Tamanho do tapete',  type:'tamanho' },
   { id:'cor',     label:'🎨 Cor de fundo',       type:'cor' },
   { id:'borda',   label:'🔲 Tem borda?',          type:'choice', options:[
-      {v:'nao', label:'❌ Sem Borda'},
-      {v:'sim', label:'✅ Com Borda'}
+      {v:'nao', label:'💢 Sem Borda'},
+      {v:'sim', label:'💫 Com Borda'}
     ]},
   { id:'borda-cor', label:'🖌️ Cor da borda',    type:'cor', onlyIf:()=>REG_DATA.borda==='sim' },
   { id:'prazo',   label:'⏱️ Prazo de entrega',   type:'number', placeholder:'15', hint:'Altere se necessário — espaço ou Enter para avançar', default:'15', skip:true },
   { id:'preco',   label:'💰 Preço (R$)',          type:'preco' },
   { id:'obs',     label:'📝 Observação',          type:'text',   placeholder:'Detalhes extras...',  hint:'Opcional — Enter ou dois espaços para pular', optional:true },
-  { id:'imgia',   label:'🤖 Simulação do tapete', type:'simul' },
+  { id:'imgia',   label:'', type:'simul' },
 ];
 
 let regCurStep = 0;
@@ -1891,8 +1970,12 @@ function initForm(){
   Object.keys(REG_DATA).forEach(k=>delete REG_DATA[k]);
   regCurStep = 0;
   tempFoto = null; tempImgIA = null;
+  tempFotos = []; _regFotoQtd = 1; _regFotoIdx = 0; _regFotoEscolha = false; window._regRemoveBgUsado = false;
   window._regFezGemini = false;
+  _regParcelas = 0;
   _regPrecoBase = 0;
+  window._regTapetesExtras = [];
+  window._regCarrosselIdx = 0;
   curTipo = null; curBorda = 'nao'; curViu = 'nao';
   regResumoOpen = false;
   limparEstadoRegistrar();
@@ -1964,8 +2047,8 @@ function renderRegStep(){
     if(ghost) ghost.blur();
   }
 
-  if(s && s.type==='photo' && !tempFoto){
-    setTimeout(()=>{ document.getElementById('reg-foto-input')?.click(); }, 200);
+  if(s && s.type==='photo' && !_regFotoEscolha && tempFotos.length===0){
+    // Não abre câmera automaticamente - mostra escolha de quantidade primeiro
   }
 }
 window.renderRegStep = renderRegStep;
@@ -1998,11 +2081,10 @@ function renderStepInput(s){
     const mode = s.type==='tel'?'tel':s.type==='number'?'decimal':'text';
     const cur = REG_DATA[s.id] || s.default || '';
     const scanBtn = s.type==='tel' ? `<button type="button" onclick="window.location.href='intent://lens.google.com/#Intent;scheme=https;package=com.google.ar.lens;action=android.intent.action.VIEW;end'"
-      style="width:100%;margin-bottom:12px;padding:16px;border:2px dashed var(--primary);
+      style="width:100%;margin-bottom:12px;padding:16px;border:2px solid var(--primary);
       background:transparent;border-radius:14px;font-size:15px;font-weight:600;
       color:var(--primary);cursor:pointer">🔍 Abrir Google Lens</button>` : '';
-    return `${scanBtn}<input class="reg-step-input" id="reg-inp-${s.id}" type="text" inputmode="${mode}"
-      placeholder="${s.placeholder||''}" value="${esc(cur)}"
+    return `${scanBtn}<input class="reg-step-input" id="reg-inp-${s.id}" type="text" inputmode="${mode}" value="${esc(cur)}"
       oninput="regInputChange(this,'${s.id}')"
       onkeydown="regKeyDown(event,'${s.id}')">
       <div class="reg-step-hint">${s.hint||''}${s.optional?' · ou pule':''}</div>`;
@@ -2015,7 +2097,7 @@ function renderStepInput(s){
       </div>`).join('')}</div>`;
   }
   if(s.type==='tamanho'){
-    const sizes=['70x40','90x60','100x60','120x60','150x60','200x60','220x120'];
+    const sizes=['70x40','90x50','100x60','120x60','150x60','200x60','220x120'];
     const isManual = REG_DATA._tamanhoManual;
     return `<div style="display:flex;flex-direction:column;gap:10px;padding:4px 0 8px">
       ${sizes.map(sz=>`
@@ -2029,8 +2111,7 @@ function renderStepInput(s){
         style="text-align:left;padding:18px 20px;font-size:15px;border-radius:14px">
         ✏️ Manual
       </div>
-      ${isManual?`<input id="reg-tamanho-manual" class="reg-step-input" type="text" inputmode="text"
-        placeholder="Ex: 130x70" autocomplete="off" value="${REG_DATA.tamanho||''}"
+      ${isManual?`<input id="reg-tamanho-manual" class="reg-step-input" type="text" inputmode="text" autocomplete="off" value="${REG_DATA.tamanho||''}"
         oninput="regInputChange(this,'tamanho')"
         onkeydown="regKeyDown(event,'tamanho')"
         style="margin-top:4px">
@@ -2077,8 +2158,7 @@ function renderStepInput(s){
       return `<div>
         <div onclick="REG_DATA._precoManual=false;renderRegStep()"
           style="display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--primary);font-weight:600;margin-bottom:14px;cursor:pointer">← Voltar</div>
-        <input id="reg-preco-manual" class="reg-step-input" type="text" inputmode="decimal"
-          placeholder="Ex: 450" autocomplete="off" value="${REG_DATA.preco||''}"
+        <input id="reg-preco-manual" class="reg-step-input" type="text" inputmode="decimal" autocomplete="off" value="${REG_DATA.preco||''}"
           oninput="regInputChange(this,'preco')" onkeydown="regKeyDown(event,'preco')">
         <div class="reg-step-hint">Enter ou espaço para avançar</div>
       </div>`;
@@ -2100,59 +2180,207 @@ function renderStepInput(s){
     </div>`;
   }
   if(s.type==='photo'){
+    // ── Modo livre: sem pré-definir quantidade ──
+    // _regFotoQtd=0 significa modo livre (usuário decide quando parar)
+    const capturadas = tempFotos.length;
+    const modoLivre = (_regFotoQtd === -1);
+
+    // Tela inicial — nenhuma foto ainda
+    if(capturadas === 0){
+      return `<div>
+        <div style="margin-bottom:14px"></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <input type="file" id="reg-foto-input-s" accept="image/*" capture="environment" style="display:none" onchange="regHandlePhotoModo(event,false)">
+          <label for="reg-foto-input-s" class="reg-choice-btn" style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:22px 12px;font-size:1.6rem;cursor:pointer">
+            📷
+          </label>
+          <input type="file" id="reg-foto-input-m" accept="image/*" capture="environment" style="display:none" onchange="regHandlePhotoModo(event,true)">
+          <label for="reg-foto-input-m" class="reg-choice-btn" style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:22px 12px;font-size:1.6rem;cursor:pointer">
+            📸
+          </label>
+        </div>
+      </div>`;
+    }
+
+    // Modo "1 foto" — já foi capturada, avança sozinho (tratado no handlePhoto)
+    // Modo livre — mostra miniaturas, botão de mais uma foto e botão Próximo
+    const minifotos = `<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px">${tempFotos.map(f=>`<img src="${f}" style="width:60px;height:60px;object-fit:cover;border-radius:10px;border:2px solid #111">`).join('')}</div>`;
+    const inputId = 'reg-foto-input-cap'+capturadas;
     return `<div>
-      ${tempFoto?`<img class="reg-photo-preview" src="${tempFoto}" alt="Foto">`:''}
-      <button class="reg-photo-btn" onclick="document.getElementById('reg-foto-input').click()">
-        ${tempFoto?'🔄 Trocar foto':'📷 Bater foto'}
+      <div style="height:1rem;margin-bottom:10px"></div>
+      ${minifotos}
+      <input type="file" id="${inputId}" accept="image/*" capture="environment" style="display:none" onchange="regHandlePhoto(event)">
+      <label for="${inputId}" class="reg-photo-btn" style="display:flex;align-items:center;justify-content:center;gap:6px;cursor:pointer;margin-bottom:10px">
+        📷 Bater mais uma foto
+      </label>
+      ${!window._regRemoveBgUsado ? `<button class="reg-photo-btn" style="background:#6366f1;color:#fff;border:none;margin-bottom:10px" onclick="window._regRemoveBgUsado=true;window.open('https://www.remove.bg','_blank');renderRegStep()">
+        ✂️ Remove.bg
+      </button>` : ''}
+      <button class="reg-photo-btn" style="background:#111;color:#fff;border:none" onclick="regAdvance()">
+        Próximo →
       </button>
-      <input type="file" id="reg-foto-input" accept="image/*" capture="environment" style="display:none" onchange="regHandlePhoto(event)">
-      ${tempFoto?`<button class="reg-skip-btn" onclick="regAdvance()">Continuar →</button>`:''}
     </div>`;
   }
   if(s.type==='simul'){
     const fezGemini = !!window._regFezGemini;
     const temSimul  = !!tempImgIA;
 
-    // Bloco de preço/desconto — aparece sempre que tem preço
-    const mostrarPrecoAqui = !!REG_DATA.preco;
+    // ── Garante estado do carrossel ──
+    if(!window._regTapetesExtras) window._regTapetesExtras = [];
+    if(window._regCarrosselIdx === undefined) window._regCarrosselIdx = 0;
+    if(!_regPrecoBase && REG_DATA.preco) _regPrecoBase = parseInt(REG_DATA.preco)||0;
 
-    let blocoPreco = '';
-    if(mostrarPrecoAqui){
-      if(!_regPrecoBase || !REG_DATA._descontoAtivo) _regPrecoBase = parseInt(REG_DATA.preco);
-      const desconto = REG_DATA._desconto||0;
-      const valorFinal = desconto===10?Math.round(_regPrecoBase*0.9):desconto===30?Math.round(_regPrecoBase*0.7):_regPrecoBase;
-      const label = desconto===10?'com 10% de desconto':desconto===30?'com 30% de desconto':'';
-      blocoPreco = `
-        <div style="background:#f0f9f6;border:2px solid #2E7D32;border-radius:14px;padding:20px;text-align:center;margin-bottom:12px">
-          <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">💰 PREÇO (R$)</div>
-          <div style="font-size:34px;font-weight:800;color:#2E7D32">R$ ${valorFinal}</div>
-          ${label?`<div style="font-size:12px;color:#2E7D32;opacity:.7;margin-top:4px">${label}</div>`:''}
-        </div>
-        <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px">
-          ${desconto!==10?`<button class="reg-choice-btn" onclick="regAplicarDesconto(10)" style="padding:14px 20px;border-radius:12px">10% de desconto</button>`:''}
-          ${desconto!==30?`<button class="reg-choice-btn" onclick="regAplicarDesconto(30)" style="padding:14px 20px;border-radius:12px">30% de desconto</button>`:''}
-          ${desconto!==0?`<button class="reg-choice-btn" onclick="regAplicarDesconto(0)" style="padding:14px 20px;border-radius:12px">Remover desconto</button>`:''}
-        </div>
-      `;
+    // ── Monta lista unificada: tapete 0 = principal, 1..N = extras ──
+    const todos = [
+      { tamanho: REG_DATA.tamanho||'', _precoBase: _regPrecoBase||parseInt(REG_DATA.preco)||0, desconto: REG_DATA._desconto||0, _isTap1: true },
+      ...window._regTapetesExtras
+    ];
+    const idx = Math.min(window._regCarrosselIdx, todos.length-1);
+    const cur = todos[idx];
+
+    // ── Valor com desconto de cada tapete ──
+    function valorComDesc(t){
+      const base = t._precoBase || t.preco || 0;
+      const d = t.desconto||0;
+      return d===10?Math.round(base*0.9):d===30?Math.round(base*0.7):base;
     }
+    const totalGeral = todos.reduce((s,t)=>s+valorComDesc(t),0);
+    const curValor = valorComDesc(cur);
+    const curBase  = cur._precoBase || cur.preco || 0;
 
-    return `<div>
+    // ── Bloco do tapete atual (carrossel) ──
+    const descAtual = cur.desconto||0;
+    const ei = idx - 1; // índice no _regTapetesExtras (só válido se idx>0)
+    const isExtra = idx > 0;
+    const ROYAL = '#2B4FBF';
+    const ROYAL_BG = '#eef1fb'; // fundo azul bem suave
+    const ROYAL_LINE = '#c7d0f5'; // divisor suave
 
-      ${!fezGemini ? `
-        <div style="font-size:12px;color:var(--muted);margin-bottom:12px">
-          Toque para copiar o prompt e abrir o Gemini. Depois volte aqui e adicione a simulação.
-        </div>
-        <button class="btn btn-gemini" style="width:100%;margin-bottom:16px;padding:16px;font-size:15px"
-          onclick="regAbrirGeminiEFicar()">
-          🤖 Abrir no Gemini
+    // Navegação — sem medida, sem numeração
+    const navHtml = `
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+        <button onclick="regCarrosselNav(-1)" style="background:${idx>0?'#111':'#e5e7eb'};border:none;color:${idx>0?'#fff':'#9ca3af'};border-radius:8px;width:34px;height:34px;font-size:18px;cursor:${idx>0?'pointer':'default'};font-weight:700">‹</button>
+        <div></div>
+        <button onclick="regCarrosselNav(1)" style="background:${idx<todos.length-1?'#111':'#e5e7eb'};border:none;color:${idx<todos.length-1?'#fff':'#9ca3af'};border-radius:8px;width:34px;height:34px;font-size:18px;cursor:${idx<todos.length-1?'pointer':'default'};font-weight:700">›</button>
+      </div>`;
+
+    // Seletor de tamanho (só para extras sem tamanho ainda)
+    const seletorHtml = isExtra && !curBase ? `
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:8px">
+        ${['70x40','90x50','100x60','120x60','150x60','200x60','220x120'].map(sz=>`
+          <div onclick="regEscolheTamanhoExtra(${ei},'${sz}')"
+            style="padding:10px 4px;border-radius:10px;border:2px solid ${cur.tamanho===sz?'#111':'#e0e0e0'};
+            background:${cur.tamanho===sz?'#111':'#fff'};color:${cur.tamanho===sz?'#fff':'#333'};
+            text-align:center;font-size:12px;font-weight:700;cursor:pointer">${sz}</div>
+        `).join('')}
+        <div onclick="regTamanhoManualExtra(${ei})"
+          style="padding:10px 4px;border-radius:10px;border:2px solid ${cur._manual?'#111':'#e0e0e0'};
+          background:${cur._manual?'#111':'#fff'};color:${cur._manual?'#fff':'#333'};
+          text-align:center;font-size:12px;font-weight:700;cursor:pointer">✏️ Manual</div>
+      </div>
+      ${cur._manual?`
+        <input id="reg-extra-manual-${ei}" type="text" inputmode="text" value="${cur.tamanho||''}"
+          style="width:100%;padding:10px 12px;border:2px solid #111;border-radius:10px;
+          font-size:15px;font-weight:600;background:#fff;color:#111;box-sizing:border-box;margin-bottom:4px"
+          oninput="regExtraManualInput(${ei},this.value)"
+          onblur="regExtraManualConfirmar(${ei},this.value)"
+          onkeydown="if(event.key==='Enter'){event.preventDefault();regExtraManualConfirmar(${ei},this.value);this.blur();}">
+        <div id="reg-extra-preco-display-${ei}" style="font-size:12px;color:#16a34a;font-weight:700;margin-bottom:8px;text-align:center">${cur.preco?'R$ '+cur.preco+',00':''}</div>
+      `:''}
+      <div style="display:flex;align-items:center;gap:6px;margin-top:8px;justify-content:center">
+        <button onclick="regConfirmarRemoverExtra(${ei},'${cur.tamanho||'este tapete'}')" style="
+          background:none;border:none;padding:0;cursor:pointer;font-size:13px;line-height:1;color:#dc2626">🗑</button>
+        <span style="font-size:12px;color:#6b7280;font-weight:600">${cur.tamanho||'sem medida'}</span>
+      </div>
+    ` : '';
+
+    // Valor + desconto (quando há preço)
+    const parcelaAtual = _regParcelas;
+    const totalParaParcelar = todos.reduce((s,t)=>s+valorComDesc(t),0);
+    const valorParcela = parcelaAtual>=2 ? (totalParaParcelar/parcelaAtual) : 0;
+    const fmtParcela = v => v.toFixed(2).replace('.',',');
+    const parcelasHtml = parcelaAtual>=2
+      ? `<div style="text-align:center;margin-top:6px;margin-bottom:4px">
+          <span style="font-size:13px;font-weight:800;color:#2B4FBF;background:#eef1fb;border-radius:20px;padding:4px 14px">
+            💳 ${parcelaAtual}x de R$ ${fmtParcela(valorParcela)}
+            ${todos.length>1?`<span style="font-size:10px;font-weight:600;color:#6b7280"> (${todos.length} tapetes)</span>`:''}
+          </span>
+         </div>`
+      : '';
+    const valorHtml = curBase ? `
+      <div style="text-align:center;margin-bottom:8px;margin-top:0">
+        <div style="font-size:36px;font-weight:800;color:#5cb85c;line-height:1">R$ ${curValor}</div>
+        ${descAtual?`<div style="font-size:11px;color:#6b7280;margin-top:3px">${descAtual}% de desconto · base R$ ${curBase}</div>`:''}
+      </div>
+      <div style="display:flex;gap:8px;justify-content:center;margin-bottom:4px">
+        <button onclick="regToggleParcelas()" style="
+          flex:1;padding:5px 2px;border-radius:8px;font-size:11px;font-weight:700;
+          border:none;
+          box-shadow:0 2px 6px rgba(0,0,0,0.18);
+          background:${parcelaAtual>=2?'#dce4f5':'#fff'};
+          color:${parcelaAtual>=2?'#4a6096':'#6b7280'};cursor:pointer;
+          min-width:0;white-space:nowrap;box-sizing:border-box">
+          💳 ${parcelaAtual>=2?parcelaAtual+'x':''}
         </button>
-      ` : `
-        <div style="font-size:12px;color:var(--muted);margin-bottom:12px">
-          Adicione a foto da simulação gerada no Gemini:
+        <button onclick="regDescontoCarrossel(10)" style="
+          flex:1;padding:5px 2px;border-radius:8px;font-size:11px;font-weight:700;
+          border:none;
+          box-shadow:0 2px 6px rgba(0,0,0,0.18);
+          background:${descAtual===10?'#dce4f5':'#fff'};
+          color:${descAtual===10?'#4a6096':'#6b7280'};cursor:pointer;
+          min-width:0;box-sizing:border-box">
+          -10%
+        </button>
+        <button onclick="regDescontoCarrossel(30)" style="
+          flex:1;padding:5px 2px;border-radius:8px;font-size:11px;font-weight:700;
+          border:none;
+          box-shadow:0 2px 6px rgba(0,0,0,0.18);
+          background:${descAtual===30?'#dce4f5':'#fff'};
+          color:${descAtual===30?'#4a6096':'#6b7280'};cursor:pointer;
+          min-width:0;box-sizing:border-box">
+          -30%
+        </button>
+        ${descAtual?`<button onclick="regDescontoCarrossel(0)" style="
+          flex:none;padding:5px 6px;border-radius:8px;font-size:11px;font-weight:700;
+          border:none;box-shadow:0 2px 6px rgba(0,0,0,0.18);
+          background:#fef2f2;color:#dc2626;cursor:pointer">✕</button>`:''}
+      </div>
+      <div style="display:flex;align-items:center;gap:6px;margin-top:10px;justify-content:center">
+        <button onclick="${isExtra?`regConfirmarRemoverExtra(${ei},'${cur.tamanho||'este tapete'}')`:`regResetarTapete1()`}" style="
+          background:none;border:none;padding:0;cursor:pointer;font-size:13px;line-height:1;color:#dc2626">🗑</button>
+        <span style="font-size:12px;color:#6b7280;font-weight:600">${cur.tamanho||'sem medida'}</span>
+        ${parcelasHtml ? `<span style="font-size:14px;font-weight:800;color:#2B4FBF;background:#eef1fb;border-radius:20px;padding:4px 14px">💳 ${parcelaAtual}x R$ ${fmtParcela(valorParcela)}</span>` : ''}
+      </div>
+    ` : '';
+
+    // Total geral (quando há mais de 1 tapete)
+    const totalHtml = todos.length>1 ? `
+      <div style="border-top:1px solid #e5e7eb;margin-top:10px;padding-top:10px;text-align:left">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span style="font-size:12px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.4px">Total (${todos.length} tapetes)</span>
+          <span style="font-size:17px;font-weight:800;color:#5cb85c">R$ ${totalGeral}</span>
         </div>
+      </div>
+    ` : '';
 
+    const blocoCarrossel = `
+      <div style="background:#fff;border:none;border-radius:14px;padding:31px 16px 27px;margin-bottom:12px;box-shadow:0 4px 20px rgba(43,79,191,0.28),0 1px 6px rgba(43,79,191,0.15)">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:4px">
+          <button onclick="regCarrosselNav(-1)" style="background:${idx>0?'#111':'#e5e7eb'};border:none;color:${idx>0?'#fff':'#9ca3af'};border-radius:8px;width:34px;height:34px;font-size:18px;cursor:${idx>0?'pointer':'default'};font-weight:700;flex-shrink:0">‹</button>
+          <div style="flex:1;text-align:center">
+            ${seletorHtml}
+            ${valorHtml}
+            ${totalHtml}
+          </div>
+          <button onclick="regCarrosselNav(1)" style="background:${idx<todos.length-1?'#111':'#e5e7eb'};border:none;color:${idx<todos.length-1?'#fff':'#9ca3af'};border-radius:8px;width:34px;height:34px;font-size:18px;cursor:${idx<todos.length-1?'pointer':'default'};font-weight:700;flex-shrink:0">›</button>
+        </div>
+      </div>
+    `;
+
+    const simulHtml = `<div>
+
+      ${fezGemini ? `
         <input type="file" id="reg-simul-input" accept="image/*" style="display:none" onchange="regHandleImgIA(event)">
-
         ${temSimul ? `
           <div style="position:relative;margin-bottom:12px">
             <img src="${tempImgIA}" style="width:100%;border-radius:12px;border:2px solid #10b981;max-height:200px;object-fit:cover">
@@ -2163,57 +2391,84 @@ function renderStepInput(s){
           </div>
         ` : `
           <button onclick="document.getElementById('reg-simul-input').click()" style="
-            width:100%;padding:20px;border-radius:12px;border:2px dashed #d1d5db;
+            width:100%;padding:20px;border-radius:12px;border:2px solid #d1d5db;
             background:#f9fafb;color:#374151;font-size:14px;font-weight:800;
             font-family:inherit;cursor:pointer;margin-bottom:12px;
             display:flex;align-items:center;justify-content:center;gap:8px">
             📷 Adicionar foto da simulação
           </button>
         `}
-      `}
+      ` : ''}
 
-      ${blocoPreco}
+      ${blocoCarrossel}
 
       <div style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px;text-align:center">
         — Escolha para onde enviar: —
       </div>
 
-      <div style="display:flex;gap:10px;margin-bottom:12px">
-        <button onclick="regEnviarCRM()" style="
+      <div style="display:flex;gap:10px;margin-bottom:10px">
+        <button onclick="event.stopPropagation();regEnviarCRM(this)" style="
           flex:1;padding:14px 8px;border-radius:12px;border:2px solid #374151;
           background:#374151;color:#fff;font-size:13px;font-weight:800;
           font-family:inherit;cursor:pointer;display:flex;flex-direction:column;
           align-items:center;gap:4px;line-height:1.3">
           👥<span>Enviar pro CRM</span>
         </button>
-        <button onclick="regEnviarParaCadastro()" style="
-          flex:1;padding:14px 8px;border-radius:12px;border:2px solid #10b981;
-          background:#10b981;color:#fff;font-size:13px;font-weight:800;
+        <button onclick="event.stopPropagation();regEnviarParaCadastro()" style="
+          flex:1;padding:14px 8px;border-radius:12px;border:2px solid #2B4FBF;
+          background:#2B4FBF;color:#fff;font-size:13px;font-weight:800;
           font-family:inherit;cursor:pointer;display:flex;flex-direction:column;
           align-items:center;gap:4px;line-height:1.3">
           📦<span>Enviar pro Cadastro</span>
         </button>
       </div>
 
+      <button class="btn btn-gemini" style="width:100%;margin-bottom:10px;padding:14px;font-size:14px"
+        onclick="regAbrirGeminiEFicar()">
+        🤖 Abrir no Gemini
+      </button>
+
+      <button onclick="regAdicionarTapeteExtra()" style="
+        width:100%;padding:13px;border-radius:12px;border:2px solid #d1d5db;
+        background:#f9fafb;color:#374151;font-size:13px;font-weight:800;
+        font-family:inherit;cursor:pointer;display:flex;align-items:center;
+        justify-content:center;gap:8px">
+        ➕ Adicionar outro tapete
+      </button>
+
     </div>`;
+    return simulHtml;
   }
   return '';
 }
+
+// ── TAPETES EXTRAS (múltiplos tapetes no mesmo registro) ─────────────────────
+// Cada item: { tamanho: '100x60', preco: 408 }
+if(!window._regTapetesExtras) window._regTapetesExtras = [];
 
 let _regLastVal = {};
 function regInputChange(el, id){
   const v = el.value;
   _regLastVal[id] = v;
 
-  // Telefone: avança ao completar 11 dígitos — mesmo no modo edição
+  // Telefone: aplica máscara e avança ao completar 11 dígitos
   if(id==='tel'){
-    const digits = v.replace(/\D/g,'');
+    const digits = v.replace(/\D/g,'').slice(0,11);
+    // Aplica máscara: 48 9 9929-2683
+    let masked = '';
+    if(digits.length <= 2)       masked = digits;
+    else if(digits.length === 3) masked = digits.slice(0,2)+' '+digits.slice(2);
+    else if(digits.length <= 7)  masked = digits.slice(0,2)+' '+digits.slice(2,3)+' '+digits.slice(3);
+    else                         masked = digits.slice(0,2)+' '+digits.slice(2,3)+' '+digits.slice(3,7)+'-'+digits.slice(7);
+    el.value = masked;
+    _regLastVal[id] = masked;
     if(digits.length >= 11){
-      REG_DATA[id] = digits;
-      el.value = digits;
+      REG_DATA[id] = masked;
       regAdvance();
       return;
     }
+    REG_DATA[id] = digits;
+    return;
   }
 
   // Se está editando (veio do resumo), só avança com espaços
@@ -2255,8 +2510,8 @@ window.regKeyDown = regKeyDown;
 
 function regEscolheCanal(canal){
   const tabela = {
-    ONLINE:  {'220x120':'700','200x60':'450','150x60':'350','120x60':'300','100x60':'250','90x60':'200','70x40':'150'},
-    OFFLINE: {'220x120':'1200','200x60':'816','150x60':'612','120x60':'489','100x60':'408','90x60':'367','70x40':'190'},
+    ONLINE:  {'220x120':'700','200x60':'450','150x60':'350','120x60':'300','100x60':'250','90x50':'200','70x40':'150'},
+    OFFLINE: {'220x120':'1200','200x60':'816','150x60':'612','120x60':'489','100x60':'408','90x50':'306','70x40':'190'},
   };
   const tam = REG_DATA.tamanho||'';
   const val = tabela[canal][tam];
@@ -2304,6 +2559,167 @@ function regAplicarDesconto(pct){
 }
 window.regAplicarDesconto = regAplicarDesconto;
 
+// ── CARROSSEL DE TAPETES ──────────────────────────────────────────────────────
+if(!window._regTapetesExtras) window._regTapetesExtras = [];
+if(window._regCarrosselIdx === undefined) window._regCarrosselIdx = 0;
+
+window.regCarrosselNav = function(dir){
+  const total = 1 + (window._regTapetesExtras||[]).length;
+  window._regCarrosselIdx = Math.max(0, Math.min(total-1, (window._regCarrosselIdx||0)+dir));
+  renderRegStep();
+};
+
+window.regDescontoCarrossel = function(pct){
+  const idx = window._regCarrosselIdx||0;
+  if(idx === 0){
+    // Tapete principal
+    REG_DATA._desconto = pct;
+    REG_DATA._descontoAtivo = pct > 0;
+  } else {
+    const t = window._regTapetesExtras[idx-1];
+    if(t){ t.desconto = pct; }
+  }
+  renderRegStep();
+};
+
+// ── PARCELAMENTO ──────────────────────────────────────────────────────────────
+window.regToggleParcelas = function(){
+  // Monta overlay de escolha de parcelas
+  const todos = [
+    { _precoBase: _regPrecoBase||parseInt(REG_DATA.preco||0)||0, desconto: REG_DATA._desconto||0 },
+    ...(window._regTapetesExtras||[])
+  ];
+  function valorComDesc(t){ const b=t._precoBase||t.preco||0; const d=t.desconto||0; return d===10?Math.round(b*0.9):d===30?Math.round(b*0.7):b; }
+  const total = todos.reduce((s,t)=>s+valorComDesc(t),0);
+
+  const ov = document.createElement('div');
+  ov.id = 'parcelas-overlay';
+  ov.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:800;display:flex;align-items:flex-end;justify-content:center';
+  const fmtP = v => v.toFixed(2).replace('.',',');
+  const opcoes = [2,3,4,5,6].map(n => {
+    const val = total/n;
+    const ativo = _regParcelas===n;
+    return `<button onclick="regSelecionarParcela(${n})" style="
+      width:100%;padding:14px;border-radius:12px;border:2px solid ${ativo?'#2B4FBF':'#e5e7eb'};
+      background:${ativo?'#2B4FBF':'#f9fafb'};color:${ativo?'#fff':'#111'};
+      font-size:15px;font-weight:800;cursor:pointer;margin-bottom:8px;
+      font-family:inherit;display:flex;justify-content:space-between;align-items:center">
+      <span>${n}x sem juros</span>
+      <span>R$ ${fmtP(val)} cada</span>
+    </button>`;
+  }).join('');
+
+  ov.innerHTML = `<div style="background:#fff;border-radius:24px 24px 0 0;padding:20px 16px 36px;width:100%;max-width:520px">
+    <div style="font-size:16px;font-weight:800;color:#111;margin-bottom:4px">💳 Parcelamento no Cartão</div>
+    <div style="font-size:12px;color:#6b7280;margin-bottom:16px">Total: R$ ${fmtP(total)}${todos.length>1?' ('+todos.filter((_,i)=>i<todos.length).length+' tapetes)':''}</div>
+    ${opcoes}
+    ${_regParcelas>=2?`<button onclick="regSelecionarParcela(0)" style="width:100%;padding:12px;border-radius:12px;border:2px solid #dc2626;background:#fee2e2;color:#dc2626;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:8px;font-family:inherit">✕ Remover parcelamento</button>`:''}
+    <button onclick="document.getElementById('parcelas-overlay').remove()" style="width:100%;padding:12px;border-radius:12px;border:none;background:#f3f4f6;color:#555;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit">Cancelar</button>
+  </div>`;
+  document.body.appendChild(ov);
+  ov.onclick = e=>{ if(e.target===ov) ov.remove(); };
+};
+
+window.regSelecionarParcela = function(n){
+  _regParcelas = n;
+  const ov = document.getElementById('parcelas-overlay');
+  if(ov) ov.remove();
+  renderRegStep();
+};
+
+window.regAdicionarTapeteExtra = function(){
+  if(!window._regTapetesExtras) window._regTapetesExtras = [];
+  window._regTapetesExtras.push({ tamanho:'', _precoBase:0, preco:0, desconto:0, _manual:false });
+  // Navega para o novo tapete automaticamente
+  window._regCarrosselIdx = window._regTapetesExtras.length; // índice = tapete 1 + extras
+  renderRegStep();
+};
+
+window.regRemoverTapeteExtra = function(i){
+  window._regTapetesExtras.splice(i,1);
+  const total = 1 + window._regTapetesExtras.length;
+  window._regCarrosselIdx = Math.min(window._regCarrosselIdx||0, total-1);
+  renderRegStep();
+};
+
+window.regConfirmarRemoverExtra = function(i, medida){
+  if(confirm('Remover tapete ' + medida + '?')){
+    window.regRemoverTapeteExtra(i);
+  }
+};
+
+window.regResetarTapete1 = function(){
+  if(confirm('Resetar o Tapete 1 e escolher novo tamanho?')){
+    REG_DATA.tamanho = '';
+    REG_DATA.preco = '';
+    REG_DATA._desconto = 0;
+    REG_DATA._descontoAtivo = false;
+    REG_DATA._precoConfirmado = false;
+    REG_DATA._tamanhoManual = false;
+    _regPrecoBase = 0;
+    window._regCarrosselIdx = 0;
+    // Volta para o step de tamanho
+    const steps = regActiveSteps();
+    const tamIdx = steps.findIndex(s=>s.id==='tamanho');
+    if(tamIdx>=0) regCurStep = tamIdx;
+    renderRegStep();
+  }
+};
+
+window.regEscolheTamanhoExtra = function(i, sz){
+  const t = window._regTapetesExtras[i]; if(!t) return;
+  t.tamanho = sz;
+  t._manual = false;
+  const preco = calcPrecoAuto(sz)||0;
+  t._precoBase = preco;
+  t.preco = preco;
+  renderRegStep();
+};
+
+window.regTamanhoManualExtra = function(i){
+  const t = window._regTapetesExtras[i]; if(!t) return;
+  t._manual = true;
+  t.tamanho = '';
+  t._precoBase = 0;
+  t.preco = 0;
+  // Esconde o botão invisível para não interferir com o teclado
+  const inv = document.getElementById('reg-invisible-btn');
+  if(inv) inv.style.display = 'none';
+  renderRegStep();
+  setTimeout(()=>{
+    const inp = document.getElementById('reg-extra-manual-'+i);
+    if(inp){ inp.focus(); }
+  }, 150);
+};
+
+window.regExtraManualConfirmar = function(i, val){
+  const t = window._regTapetesExtras[i]; if(!t) return;
+  const v = val.trim();
+  if(!v) return;
+  t.tamanho = v;
+  t._manual = false; // marca como confirmado — igual a clicar num tamanho pronto
+  const preco = calcPrecoAuto(v)||0;
+  t._precoBase = preco;
+  t.preco = preco;
+  renderRegStep(); // agora sim renderiza — igual ao regEscolheTamanhoExtra
+};
+window.regExtraManualConfirmar = window.regExtraManualConfirmar;
+
+window.regExtraManualInput = function(i, val){
+  const t = window._regTapetesExtras[i]; if(!t) return;
+  t.tamanho = val.trim();
+  const preco = calcPrecoAuto(val.trim())||0;
+  t._precoBase = preco;
+  t.preco = preco;
+  // Não re-renderiza o DOM inteiro — só atualiza o display do preço sem destruir o input
+  const precoEl = document.getElementById('reg-extra-preco-display-'+i);
+  if(precoEl) precoEl.textContent = preco ? 'R$ '+preco+',00' : '';
+};
+
+// Funções legadas mantidas por compatibilidade
+window._renderTapetesExtras = function(){};
+
+
 function regConfirmarPreco(){
   const desconto = REG_DATA._desconto||0;
   const valorFinal = desconto===10?Math.round(_regPrecoBase*0.9):desconto===30?Math.round(_regPrecoBase*0.7):_regPrecoBase;
@@ -2346,11 +2762,14 @@ function regTamanhoManual(){
   REG_DATA.tamanho = '';
   REG_DATA.preco = '';
   REG_DATA._desconto = 0;
+  // Esconde o botão invisível para não interferir com o teclado
+  const inv = document.getElementById('reg-invisible-btn');
+  if(inv) inv.style.display = 'none';
   renderRegStep();
   setTimeout(()=>{
     const inp = document.getElementById('reg-tamanho-manual');
     if(inp) inp.focus();
-  }, 60);
+  }, 100);
 }
 window.regTamanhoManual = regTamanhoManual;
 
@@ -2365,32 +2784,95 @@ function regChoose(id, val, el){
 }
 window.regChoose = regChoose;
 
+function regHandlePhotoModo(e, modoLivre){
+  _regFotoQtd = modoLivre ? -1 : 1;
+  regHandlePhoto(e);
+}
+window.regHandlePhotoModo = regHandlePhotoModo;
+
 function regHandlePhoto(e){
   const file=e.target.files[0]; if(!file) return;
+  // Captura o modo AGORA, antes de qualquer coisa assíncrona
+  const modoLivreAgora = (_regFotoQtd === -1);
+  e.target.value='';
   const reader=new FileReader();
   reader.onload=ev=>{
     const img=new Image();
     img.onload=()=>{
       const cv=document.createElement('canvas');
-      const max=800; let w=img.width,h=img.height;
+      const max=500; let w=img.width,h=img.height;
       if(w>h&&w>max){h=h*max/w;w=max;}else if(h>max){w=w*max/h;h=max;}
       cv.width=w;cv.height=h;cv.getContext('2d').drawImage(img,0,0,w,h);
-      tempFoto=cv.toDataURL('image/jpeg',.75);
+      const dataUrl=cv.toDataURL('image/jpeg',.55);
+      tempFotos.push(dataUrl);
+      tempFoto=tempFotos[0];
       REG_DATA.foto=tempFoto;
-      // Copia foto para área de transferência
-      cv.toBlob(blob=>{
-        try{
-          navigator.clipboard.write([new ClipboardItem({'image/png':blob})]);
-        }catch(_){}
-      },'image/png');
+      // Salva na galeria do celular automaticamente
+      try{
+        const a=document.createElement('a');
+        a.href=dataUrl;
+        a.download='foto_cliente_'+(tempFotos.length)+'_'+Date.now()+'.jpg';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      }catch(_){}
+      if(tempFotos.length===1){
+        cv.toBlob(blob=>{
+          try{navigator.clipboard.write([new ClipboardItem({'image/png':blob})]);}catch(_){}
+        },'image/png');
+      }
+      // Garante que o modo livre persiste mesmo após salvarEstadoRegistrar
+      if(modoLivreAgora) _regFotoQtd = -1;
       salvarEstadoRegistrar();
-      regAdvance();
+      if(modoLivreAgora){
+        // Modo livre — volta pra tela para bater mais ou apertar Próximo
+        renderRegStep();
+      } else {
+        regAdvance();
+      }
     };
     img.src=ev.target.result;
   };
   reader.readAsDataURL(file);
 }
 window.regHandlePhoto = regHandlePhoto;
+
+// Atualiza só o visual da etapa foto sem recriar o input (necessário para reabrir câmera)
+function _regAtualizarVisualFoto(){
+  const total = _regFotoQtd;
+  const capturadas = tempFotos.length;
+  const progresso = total > 1
+    ? `<div id="reg-foto-prog" style="display:flex;gap:6px;justify-content:center;margin-bottom:12px">${Array.from({length:total},(_,i)=>`<div style="width:28px;height:6px;border-radius:3px;background:${i<capturadas?'#111':'#e0e0e0'}"></div>`).join('')}</div>`
+    : '';
+  const minifotos = tempFotos.length > 0
+    ? `<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">${tempFotos.map(f=>`<img src="${f}" style="width:56px;height:56px;object-fit:cover;border-radius:10px;border:2px solid #111">`).join('')}</div>`
+    : '';
+  const status = capturadas > 0 && capturadas < total
+    ? `<div style="font-size:.78rem;color:#6b7280;text-align:center;margin-top:8px">${capturadas} de ${total} foto(s) tirada(s)</div>`
+    : '';
+  // Atualiza só o div visual, sem mexer no input
+  const visel = document.getElementById('reg-foto-visual');
+  if(visel) visel.innerHTML = progresso + minifotos + status;
+}
+window._regAtualizarVisualFoto = _regAtualizarVisualFoto;
+
+// Escolhe quantidade de fotos e inicia captura
+window.regFotoEscolher = function(qtd){
+  _regFotoQtd = qtd;
+  _regFotoEscolha = false;
+  tempFotos = [];
+  tempFoto = null;
+  renderRegStep();
+  // Pequeno delay para renderizar antes de abrir câmera
+  setTimeout(()=>{
+    const inp=document.getElementById('reg-foto-input');
+    if(inp) inp.click();
+  }, 200);
+};
+window.regFotoMaisOpcoes = function(){
+  _regFotoEscolha = true;
+  renderRegStep();
+};
 
 function regHandleImgIA(e){
   const file=e.target.files[0]; if(!file) return;
@@ -2399,10 +2881,10 @@ function regHandleImgIA(e){
     const img=new Image();
     img.onload=()=>{
       const cv=document.createElement('canvas');
-      const max=900; let w=img.width,h=img.height;
+      const max=500; let w=img.width,h=img.height;
       if(w>max){h=h*max/w;w=max;}
       cv.width=w;cv.height=h;cv.getContext('2d').drawImage(img,0,0,w,h);
-      tempImgIA=cv.toDataURL('image/jpeg',.8);
+      tempImgIA=cv.toDataURL('image/jpeg',.55);
       REG_DATA.imgia=tempImgIA;
       salvarEstadoRegistrar();
       renderRegStep();
@@ -2561,7 +3043,9 @@ function regCopyPrompt(){
   const tam=REG_DATA.tamanho||''; const cor=REG_DATA.cor||'';
   if(!tam||!cor) return toast('⚠️ Tamanho e cor são necessários para o prompt');
   const borda=curBorda==='sim'?`Com borda. Cor da borda: ${REG_DATA['borda-cor']||'Preta'}.`:'Sem borda.';
-  const prompt=`${PROMPT_BASE}\n\n(ESPECIFICACOES: Tamanho do tapete: ${tam}. Cor de fundo do tapete: ${cor}. ${borda})`;
+  const obs=(REG_DATA.obs||'').trim();
+  const obsExtra = obs ? ` Observacao: ${obs}.` : '';
+  const prompt=`${PROMPT_BASE}\n\n(ESPECIFICACOES: Tamanho do tapete: ${tam}. Cor de fundo do tapete: ${cor}. ${borda}${obsExtra})`;
   copyText(prompt,'📋 Prompt copiado!');
 }
 window.regCopyPrompt = regCopyPrompt;
@@ -2576,7 +3060,7 @@ async function regSalvarNaFilaSemSimul(){
   regCopyPrompt();
   // Salva na fila sem imgIA
   const c={
-    id:'c_'+Date.now(), nome, telefone:tel, tipo:curTipo, foto:tempFoto||null, imgIA:null,
+    id:'c_'+Date.now(), nome, telefone:tel, tipo:curTipo, foto:tempFoto||null, imgIA:null, fotos:tempFotos.length>1?[...tempFotos]:undefined,
     tamanho:REG_DATA.tamanho||'', cor:REG_DATA.cor||'', borda:curBorda,
     bordaCor:REG_DATA['borda-cor']||'', prazo:REG_DATA.prazo||'15',
     preco:REG_DATA.preco||'', obs:REG_DATA.obs||'',
@@ -2612,33 +3096,81 @@ window.regAbrirGeminiEFicar = function(){
 };
 
 // ── ENVIAR PRO CRM (fluxo normal — igual ao salvarCliente) ───────────────────
-window.regEnviarCRM = async function(){
+let _regEnviandoCRM = false; // guard contra duplo clique
+window.regEnviarCRM = async function(btnEl){
+  // ── Guard: bloqueia enquanto já está processando ──────────────────────────
+  if(_regEnviandoCRM){ return; }
+  _regEnviandoCRM = true;
+  if(btnEl){ btnEl.disabled=true; btnEl.style.opacity='0.5'; }
+
   const nome=(REG_DATA.nome||'').trim();
   const tel=(REG_DATA.tel||'').replace(/\D/g,'').trim();
-  if(!nome||!tel){ toast('⚠️ Nome e telefone obrigatórios'); return; }
-  if(!curTipo){ toast('⚠️ Selecione o tipo de cliente'); return; }
-  if(!tempFoto){ toast('⚠️ Foto obrigatória'); return; }
-  // Aplica desconto caso tenha sido selecionado na tela de simulação e não confirmado ainda
-  if(_regPrecoBase && REG_DATA._descontoAtivo){
-    const d=REG_DATA._desconto||0;
-    REG_DATA.preco=String(d===10?Math.round(_regPrecoBase*0.9):d===30?Math.round(_regPrecoBase*0.7):_regPrecoBase);
+  if(!nome||!tel){ toast('⚠️ Nome e telefone obrigatórios'); _regEnviandoCRM=false; if(btnEl){btnEl.disabled=false;btnEl.style.opacity='1';} return; }
+  if(!curTipo){ toast('⚠️ Selecione o tipo de cliente'); _regEnviandoCRM=false; if(btnEl){btnEl.disabled=false;btnEl.style.opacity='1';} return; }
+  if(!tempFoto){ toast('⚠️ Foto obrigatória'); _regEnviandoCRM=false; if(btnEl){btnEl.disabled=false;btnEl.style.opacity='1';} return; }
+
+  function valorComDesc(base, d){
+    return d===10?Math.round(base*0.9):d===30?Math.round(base*0.7):base;
   }
+
+  // Tapete 1 com desconto
+  const base1 = _regPrecoBase||parseInt(REG_DATA.preco||0)||0;
+  const desc1  = REG_DATA._desconto||0;
+  const val1   = valorComDesc(base1, desc1);
+
+  // Tapetes extras com desconto individual
+  const extras = (window._regTapetesExtras||[]).filter(t=>t.tamanho&&(t._precoBase||t.preco)>0);
+  const totalGeral = val1 + extras.reduce((s,t)=>s+valorComDesc(t._precoBase||t.preco||0, t.desconto||0), 0);
+
+  // ── ID único com timestamp + random para evitar colisão de duplo clique ──
   const c={
-    id:'c_'+Date.now(), nome, telefone:tel, tipo:curTipo,
-    foto:tempFoto, imgIA:tempImgIA||null,
+    id:'c_'+Date.now()+'_'+Math.random().toString(36).slice(2,7),
+    nome, telefone:tel, tipo:curTipo,
+    foto:tempFoto, imgIA:tempImgIA||null, fotos:tempFotos.length>1?[...tempFotos]:undefined,
     tamanho:REG_DATA.tamanho||'', cor:REG_DATA.cor||'',
     borda:curBorda, bordaCor:REG_DATA['borda-cor']||'',
-    prazo:REG_DATA.prazo||'15', preco:REG_DATA.preco||'',
+    prazo:REG_DATA.prazo||'15', preco:String(val1),
     obs:REG_DATA.obs||'',
+    tapetesExtras: extras.map(t=>({medida:t.tamanho, valor:valorComDesc(t._precoBase||t.preco||0, t.desconto||0)})),
+    parcelas: _regParcelas>=2 ? _regParcelas : 0,
+    totalGeral: totalGeral,
     status:'ativo', dataRegistro:today(), respondeu:false, _naFila:true,
     sequencia:[...SEQ[curTipo].sem_resposta], sequenciaFase:'sem_resposta',
     historico:[], dataMarcada:null, jaViu:curViu, dataVisita:null
   };
-  await fsAddClient(c);
+  // Adiciona no cache local ANTES de navegar para renderFila ja ver o item
+  const payload = Object.assign({}, c, { updatedAt: Date.now() });
+  if(typeof clients !== 'undefined') clients.unshift(payload);
+
+  window._regTapetesExtras = [];
+  window._regCarrosselIdx = 0;
+  _regParcelas = 0;
   initForm();
   limparEstadoRegistrar();
-  toast('✅ Cliente enviado pro CRM!');
-  showScreen('fila'); setNav(1);
+  showScreen('fila');
+  setNav(1);
+  renderFila();
+  toast('Cliente enviado pro CRM!');
+  // Salva no Firebase em background sem bloquear
+  (async function(){
+    try{
+      saveLocal('tapete_crm_clients_cache', clients);
+      _crmTapBlockUntil = Date.now() + 5000;
+      window.syncShow && window.syncShow.syncing && window.syncShow.syncing();
+      // Envia sem base64 para o Firebase (fotos ficam só no cache local)
+      await setDoc(doc(db, COL_CLIENTS, payload.id), _stripImgsForFirebase(payload));
+      window.syncShow && window.syncShow.synced && window.syncShow.synced('Tapetes CRM');
+    }catch(e){
+      try{
+        var pending = JSON.parse(localStorage.getItem(LS_PENDING)||'[]');
+        pending.push({op:'add', data:_stripImgsForFirebase(payload)});
+        localStorage.setItem(LS_PENDING, JSON.stringify(pending));
+      }catch(_){}
+      window.syncShow && window.syncShow.offline && window.syncShow.offline();
+    }
+    _regEnviandoCRM = false;
+  })();
+  _regEnviandoCRM = false;
 };
 
 // ── ENVIAR PRO CADASTRO ──────────────────────────────────────────────────────
@@ -2646,35 +3178,54 @@ window.regEnviarParaCadastro = function(){
   const nome=(REG_DATA.nome||'').trim();
   const tel=(REG_DATA.tel||'').replace(/\D/g,'').trim();
   if(!nome||!tel){ toast('⚠️ Nome e telefone obrigatórios'); return; }
-  // Aplica desconto caso tenha sido selecionado na tela de simulação e não confirmado ainda
-  if(_regPrecoBase && REG_DATA._descontoAtivo){
-    const d=REG_DATA._desconto||0;
-    REG_DATA.preco=String(d===10?Math.round(_regPrecoBase*0.9):d===30?Math.round(_regPrecoBase*0.7):_regPrecoBase);
+
+  function valorComDesc(base, d){
+    return d===10?Math.round(base*0.9):d===30?Math.round(base*0.7):base;
   }
+
+  // Tapete 1 com desconto
+  const base1 = _regPrecoBase||parseInt(REG_DATA.preco||0)||0;
+  const desc1  = REG_DATA._desconto||0;
+  const val1   = valorComDesc(base1, desc1);
+
   // Formata telefone
   let telFmt=tel;
   if(tel.length===11) telFmt='('+tel.slice(0,2)+') '+tel.slice(2,7)+'-'+tel.slice(7);
   else if(tel.length===10) telFmt='('+tel.slice(0,2)+') '+tel.slice(2,6)+'-'+tel.slice(6);
 
-  // Guarda dados para injetar no modal
+  // Tapetes extras com desconto individual
+  const extras = (window._regTapetesExtras||[]).filter(t=>t.tamanho&&(t._precoBase||t.preco)>0);
+  const totalGeral = val1 + extras.reduce((s,t)=>s+valorComDesc(t._precoBase||t.preco||0, t.desconto||0), 0);
+
+  // Monta string de medidas
+  let medidaFinal = REG_DATA.tamanho||'';
+  if(extras.length > 0) medidaFinal += ' / ' + extras.map(t=>t.tamanho).join(' / ');
+
   window._cadInjecao = {
     nome, tel: telFmt,
-    medida: REG_DATA.tamanho||'',
+    medida: medidaFinal,
     cor: REG_DATA.cor||'',
     borda: REG_DATA.borda||'sem',
     bordaCor: REG_DATA['borda-cor']||'',
     prazo: REG_DATA.prazo||'',
-    preco: REG_DATA.preco||'',
+    preco: String(totalGeral||val1),
+    preco1: String(val1),
     obs: REG_DATA.obs||'',
     foto: tempFoto||null,
-    simul: tempImgIA||null
+    fotos: tempFotos.length>1 ? [...tempFotos] : undefined,
+    simul: tempImgIA||null,
+    tapetesExtras: extras.map(t=>({medida:t.tamanho, valor:valorComDesc(t._precoBase||t.preco||0, t.desconto||0)})),
+    parcelas: _regParcelas>=2 ? _regParcelas : 0,
+    totalGeral: totalGeral
   };
 
-  // Limpa o registrar e abre cadastro
+  window._regTapetesExtras = [];
+  window._regCarrosselIdx = 0;
+  _regParcelas = 0;
   initForm();
   limparEstadoRegistrar();
   showScreen('home'); setNav(3);
-  abrirModalCadastro();
+  setTimeout(function(){ abrirModalCadastro(); }, 100);
   toast('✅ Abrindo Cadastro com os dados!');
 };
 
@@ -2705,26 +3256,29 @@ function copyPromptRegistrar(){ regCopyPrompt(); }
 window.copyPromptRegistrar=copyPromptRegistrar;
 
 
+let _salvarClienteGuard = false;
 async function salvarCliente(){
+  if(_salvarClienteGuard) return;
+  _salvarClienteGuard = true;
   const nome=(REG_DATA.nome||'').trim();
   const tel=(REG_DATA.tel||'').replace(/\D/g,'').trim();
   const tam=(REG_DATA.tamanho||'').trim();
   const cor=(REG_DATA.cor||'').trim();
   const prazo=(REG_DATA.prazo||'').trim();
   const preco=(REG_DATA.preco||'').trim();
-  if(!nome) return toast('⚠️ Informe o nome');
-  if(!tel)  return toast('⚠️ Informe o telefone');
-  if(!tempFoto) return toast('⚠️ Foto obrigatória');
-  if(!curTipo)  return toast('⚠️ Selecione o tipo');
-  if(!tam)  return toast('⚠️ Informe o tamanho');
-  if(!cor)  return toast('⚠️ Informe a cor');
-  if(!prazo) return toast('⚠️ Informe o prazo');
-  if(!preco) return toast('⚠️ Informe o preço');
-  if(curBorda==='sim'&&!(REG_DATA['borda-cor']||'').trim()) return toast('⚠️ Informe a cor da borda');
-  if(clients.find(c=>cleanPhone(c.telefone)===cleanPhone(tel)&&c.status==='ativo')) return toast('⚠️ Telefone já cadastrado como ativo');
+  if(!nome){ _salvarClienteGuard=false; return toast('⚠️ Informe o nome'); }
+  if(!tel) { _salvarClienteGuard=false; return toast('⚠️ Informe o telefone'); }
+  if(!tempFoto){ _salvarClienteGuard=false; return toast('⚠️ Foto obrigatória'); }
+  if(!curTipo) { _salvarClienteGuard=false; return toast('⚠️ Selecione o tipo'); }
+  if(!tam) { _salvarClienteGuard=false; return toast('⚠️ Informe o tamanho'); }
+  if(!cor) { _salvarClienteGuard=false; return toast('⚠️ Informe a cor'); }
+  if(!prazo){ _salvarClienteGuard=false; return toast('⚠️ Informe o prazo'); }
+  if(!preco){ _salvarClienteGuard=false; return toast('⚠️ Informe o preço'); }
+  if(curBorda==='sim'&&!(REG_DATA['borda-cor']||'').trim()){ _salvarClienteGuard=false; return toast('⚠️ Informe a cor da borda'); }
+  if(clients.find(c=>cleanPhone(c.telefone)===cleanPhone(tel)&&c.status==='ativo')){ _salvarClienteGuard=false; return toast('⚠️ Telefone já cadastrado como ativo'); }
 
   const c={
-    id:'c_'+Date.now(), nome, telefone:tel, tipo:curTipo, foto:tempFoto, imgIA:tempImgIA||null,
+    id:'c_'+Date.now()+'_'+Math.random().toString(36).slice(2,7), nome, telefone:tel, tipo:curTipo, foto:tempFoto, imgIA:tempImgIA||null,
     tamanho:tam, cor, borda:curBorda, bordaCor:(REG_DATA['borda-cor']||'').trim(),
     prazo, preco, obs:(REG_DATA.obs||'').trim(),
     status:'ativo', dataRegistro:today(), respondeu:false, _naFila:true,
@@ -2735,8 +3289,9 @@ async function salvarCliente(){
   await fsAddClient(c);
   initForm();
   limparEstadoRegistrar();
+  _salvarClienteGuard = false;
   toast('✅ Cliente na fila de envio!');
-  showScreen('fila'); setNav(1);
+  showScreen('fila'); setNav(1); renderFila();
 }
 window.salvarCliente = salvarCliente;
 
@@ -2856,8 +3411,7 @@ async function confirmarEnvioRapido(){
     renderFila();
     // Atualiza badge
     const filaAtual=clients.filter(c=>c._naFila===true);
-    const badge=filaAtual.length>0?` <span style="background:var(--danger);color:#fff;border-radius:50%;width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:800">${filaAtual.length}</span>`:'';
-    document.querySelector('#bnav-1').innerHTML=`<span class="ico">📬</span>FILA${badge}`;
+    atualizarBadges();
   } else {
     if(curScreen==='clientes') renderAllClients();
     if(curScreen==='home') renderHome();
@@ -2880,7 +3434,29 @@ function buildMsgDia(c){
   const rawTxt=(msg.texto||'').replace(/\{nome\}/g, c.nome||'');
   if(d===1){
     const bt=c.borda==='sim'?`\nCor da Borda: ${c.bordaCor||'preta'}`:'';
-    const specs=`Medida: ${c.tamanho}\nCor de Fundo: ${c.cor}${bt}\nValor: R$ ${fmt(c.preco)}\nPrazo: ${c.prazo} dias\nPagamento: somente na entrega\nFormas: Pix · Cartão · Dinheiro${c.obs?'\nObs: '+c.obs:''}`;
+    const extras=c.tapetesExtras||[];
+    // Linha de parcelamento (se houver)
+    const parcelas=c.parcelas||0;
+    const totalGeral=c.totalGeral||0;
+    let parcelaLinha='';
+    if(parcelas>=2 && totalGeral>0){
+      const valParcela=(totalGeral/parcelas).toFixed(2).replace('.',',');
+      parcelaLinha=`\n💳 ${parcelas}x de R$ ${valParcela} no cartão (sem juros)`;
+    }
+    let specs;
+    if(extras.length>0){
+      // Tapete principal
+      let linhas=`📐 Tapete 1\nMedida: ${c.tamanho}\nCor de Fundo: ${c.cor}${bt}\nValor: R$ ${fmt(c.preco)}`;
+      // Tapetes extras
+      extras.forEach(function(t,i){
+        linhas+=`\n\n📐 Tapete ${i+2}\nMedida: ${t.medida||'—'}\nCor de Fundo: ${t.cor||c.cor||'—'}\nValor: R$ ${fmt(t.valor||0)}`;
+      });
+      // Prazo e pagamento uma única vez
+      linhas+=`\n\nPrazo de Entrega: ${c.prazo} dias\nPagamento: somente na entrega\nFormas: Pix · Cartão · Dinheiro${parcelaLinha}`;
+      specs=linhas;
+    } else {
+      specs=`Medida: ${c.tamanho}\nCor de Fundo: ${c.cor}${bt}\nValor: R$ ${fmt(c.preco)}\nPrazo: ${c.prazo} dias\nPagamento: somente na entrega\nFormas: Pix · Cartão · Dinheiro${parcelaLinha}`;
+    }
     return rawTxt?(rawTxt+'\n\n'+specs):specs;
   }
   return rawTxt; // Dia 2+ → só o texto da mensagem
@@ -2910,6 +3486,76 @@ function copyText(txt,msg){
   });
 }
 window.toast = toast;
+
+// ── LIMPEZA DE FOTOS ANTIGAS NO FIREBASE ──────────────────────────────────────
+window.limparFotosFirebase = async function(){
+  const res = document.getElementById('limpeza-fotos-resultado');
+  if(!res) return;
+
+  if(!confirm('Isso vai remover todas as fotos e simulações salvas na nuvem (Firebase).\n\nOs dados dos clientes (nome, telefone, sequência) NÃO serão apagados.\n\nContinuar?')) return;
+
+  res.style.display = 'block';
+  res.style.cssText = 'display:block;background:#f5f5f5;border-radius:9px;padding:12px;font-size:12px;color:#374151;margin-bottom:10px';
+  res.textContent = '⏳ Verificando clientes...';
+
+  if(!_firebaseOk || !db){
+    res.textContent = '⚠️ Firebase não conectado. Conecte à internet e tente novamente.';
+    return;
+  }
+
+  let total = 0, limpos = 0, erros = 0;
+  const camposFoto = ['foto','imgIA','fotos'];
+
+  try {
+    const snap = await getDocs(collection(db, COL_CLIENTS));
+    total = snap.size;
+    res.textContent = `⏳ Encontrados ${total} clientes. Limpando fotos...`;
+
+    for(const docSnap of snap.docs){
+      const data = docSnap.data();
+      const update = {};
+      let temFoto = false;
+
+      if(data.foto)  { update.foto  = null; temFoto = true; }
+      if(data.imgIA) { update.imgIA = null; temFoto = true; }
+      if(data.fotos && data.fotos.length) { update.fotos = []; temFoto = true; }
+
+      if(temFoto){
+        try{
+          await updateDoc(doc(db, COL_CLIENTS, docSnap.id), update);
+          // Atualiza o cache local também
+          const local = clients.find(c => c.id === docSnap.id);
+          if(local){ if('foto' in update) local.foto=null; if('imgIA' in update) local.imgIA=null; if('fotos' in update) local.fotos=[]; }
+          limpos++;
+        } catch(e){ erros++; }
+      }
+    }
+
+    // Também limpa fotos na coleção de tapetes (pedidos/gestão)
+    try {
+      const snapTap = await getDocs(collection(db, 'tapetes'));
+      for(const d of snapTap.docs){
+        const data = d.data();
+        if(data.fotos && data.fotos.length){
+          try{ await updateDoc(doc(db,'tapetes',d.id),{fotos:[]}); limpos++; }catch(e){ erros++; }
+        }
+      }
+    } catch(e){}
+
+    if(erros === 0){
+      res.style.background = '#e8f5e9'; res.style.color = '#2E7D32';
+      res.textContent = `✅ Limpeza concluída! ${limpos} clientes tiveram fotos removidas.`;
+    } else {
+      res.style.background = '#fff3e0'; res.style.color = '#E65100';
+      res.textContent = `⚠️ Concluído com erros. ${limpos} removidos, ${erros} com falha.`;
+    }
+
+    toast(`✅ ${limpos} fotos removidas do Firebase!`);
+  } catch(e){
+    res.style.background = '#fee2e2'; res.style.color = '#dc2626';
+    res.textContent = '❌ Erro ao acessar o Firebase. Tente novamente.';
+  }
+};
 
 window._toggleProxAcoes = function(){
   const aberto = localStorage.getItem('_proxAcoesAberto')==='true';
@@ -2951,7 +3597,25 @@ async function enviarMensagemDia(id){
   let txtCompleto = rawTxt;
   if(isFirstContact){
     const bt=c.borda==='sim'?`\nCor da Borda: ${c.bordaCor||'preta'}`:'';
-    const specs=`Medida: ${c.tamanho}\nCor de Fundo: ${c.cor}${bt}\nValor: R$ ${fmt(c.preco)}\nPrazo: ${c.prazo} dias\nPagamento: somente na entrega\nFormas: Pix · Cartão · Dinheiro${c.obs?'\nObs: '+c.obs:''}`;
+    const extras=c.tapetesExtras||[];
+    const parcelas=c.parcelas||0;
+    const totalGeral=c.totalGeral||0;
+    let parcelaLinha='';
+    if(parcelas>=2 && totalGeral>0){
+      const valParcela=(totalGeral/parcelas).toFixed(2).replace('.',',');
+      parcelaLinha=`\n💳 ${parcelas}x de R$ ${valParcela} no cartão (sem juros)`;
+    }
+    let specs;
+    if(extras.length>0){
+      let linhas=`📐 Tapete 1\nMedida: ${c.tamanho}\nCor de Fundo: ${c.cor}${bt}\nValor: R$ ${fmt(c.preco)}`;
+      extras.forEach(function(t,i){
+        linhas+=`\n\n📐 Tapete ${i+2}\nMedida: ${t.medida||'—'}\nCor de Fundo: ${t.cor||c.cor||'—'}\nValor: R$ ${fmt(t.valor||0)}`;
+      });
+      linhas+=`\n\nPrazo de Entrega: ${c.prazo} dias\nPagamento: somente na entrega\nFormas: Pix · Cartão · Dinheiro${parcelaLinha}`;
+      specs=linhas;
+    } else {
+      specs=`Medida: ${c.tamanho}\nCor de Fundo: ${c.cor}${bt}\nValor: R$ ${fmt(c.preco)}\nPrazo: ${c.prazo} dias\nPagamento: somente na entrega\nFormas: Pix · Cartão · Dinheiro${parcelaLinha}`;
+    }
     txtCompleto=(rawTxt?rawTxt+'\n\n':'')+specs;
   }
 
@@ -3007,10 +3671,10 @@ function handleImgIA(e){
     const img=new Image();
     img.onload=async ()=>{
       const cv=document.createElement('canvas');
-      const max=900;let w=img.width,h=img.height;
+      const max=500;let w=img.width,h=img.height;
       if(w>max){h=h*max/w;w=max;}
       cv.width=w;cv.height=h;cv.getContext('2d').drawImage(img,0,0,w,h);
-      const imgIA=cv.toDataURL('image/jpeg',.8);
+      const imgIA=cv.toDataURL('image/jpeg',.55);
       await fsUpdateClient(curCid, { imgIA });
       closeModal('modal-img-ia');
       toast('✅ Simulação salva!');
@@ -3040,30 +3704,100 @@ function openTimeline(id){
     </div>`;
   });
 
+  function row(icon, label, val){
+    return `<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #f1f5f9">
+      <span style="font-size:16px;width:22px;text-align:center;flex-shrink:0">${icon}</span>
+      <span style="font-size:.78rem;font-weight:700;color:#9ca3af;flex:1">${label}</span>
+      <span style="font-size:.85rem;font-weight:700;color:#111;text-align:right;max-width:60%;word-break:break-word">${val}</span>
+    </div>`;
+  }
+
   document.getElementById('timeline-content').innerHTML=`
-    <div class="form-card">
-      <div class="form-card-title">${te} ${esc(c.nome)} <span class="status-pill status-${c.status}" style="margin-left:8px">${esc(c.status)}</span>${c.respondeu?'<span style="margin-left:6px;font-size:12px">💬 Respondeu</span>':''}</div>
-      <div class="info-row"><span class="info-lbl">Cadastrado em</span><span class="info-val">${fmtDate(c.dataRegistro)}</span></div>
-      <div class="info-row"><span class="info-lbl">Tipo</span><span class="info-val">${esc(typeName(c.tipo))}</span></div>
-      <div class="info-row"><span class="info-lbl">Tapete</span><span class="info-val">${esc(c.tamanho)} · ${esc(c.cor)} · ${esc(bt)}</span></div>
-      <div class="info-row"><span class="info-lbl">Preço</span><span class="info-val">R$ ${fmt(c.preco)}</span></div>
-      <div class="info-row"><span class="info-lbl">Prazo</span><span class="info-val">${esc(String(c.prazo))} dias</span></div>
-      ${c.obs?`<div class="info-row"><span class="info-lbl">Obs</span><span class="info-val">${esc(c.obs)}</span></div>`:''}
-      <div class="info-row"><span class="info-lbl">Telefone</span><span class="info-val">${esc(c.telefone)}</span></div>
-    </div>
-    <div class="form-card" style="display:flex;gap:8px">
-      <a href="${waLink(c.telefone)}" target="_blank" style="flex:1;text-decoration:none"><button class="btn btn-whatsapp">💬 WhatsApp</button></a>
-      <a href="${telLink(c.telefone)}" style="flex:1;text-decoration:none"><button class="btn btn-call">📞 Ligar</button></a>
-    </div>
-    ${c.foto?`<div class="form-card"><div class="form-card-title">📸 Foto do Cliente</div><img src="${c.foto}" style="width:100%;border-radius:9px;max-height:200px;object-fit:cover" alt="Foto"></div>`:''}
-    ${c.imgIA?`<div class="form-card"><div class="form-card-title">🖼️ Simulação do Tapete</div><img src="${c.imgIA}" style="width:100%;border-radius:9px;max-height:220px;object-fit:cover" alt="Simulação"></div>`:''}
-    <div class="form-card"><div class="form-card-title">📅 Sequência</div>${tl}</div>
-    <div style="display:flex;flex-direction:column;gap:8px;padding-bottom:12px">
-      <button class="btn btn-ghost" onclick="openOpcoes('${c.id}')">⋮ Mais Opções</button>
+    <div style="padding:14px 14px 100px">
+
+      <!-- Header -->
+      <div style="background:linear-gradient(135deg,#1e293b,#334155);border-radius:18px;padding:18px;margin-bottom:12px;color:#fff">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">
+          <div style="font-size:1.2rem;font-weight:900">${te} ${esc(c.nome)}</div>
+          <span style="font-size:.7rem;opacity:.7">${fmtDate(c.dataRegistro)}</span>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <span style="background:rgba(255,255,255,.15);border-radius:20px;padding:3px 12px;font-size:.72rem;font-weight:700">${esc(c.status)}</span>
+          ${c.respondeu?'<span style="background:rgba(255,255,255,.15);border-radius:20px;padding:3px 12px;font-size:.72rem;font-weight:700">💬 Respondeu</span>':''}
+        </div>
+      </div>
+
+      <!-- Contato -->
+      <div style="display:flex;gap:8px;margin-bottom:12px">
+        <a href="${waLink(c.telefone)}" target="_blank" style="flex:1;text-decoration:none">
+          <button class="btn btn-whatsapp" style="border-radius:12px">💬 WhatsApp</button>
+        </a>
+        <a href="${telLink(c.telefone)}" style="flex:1;text-decoration:none">
+          <button class="btn btn-call" style="border-radius:12px">📞 Ligar</button>
+        </a>
+      </div>
+
+      <!-- Informações -->
+      <div style="background:#fff;border-radius:16px;padding:4px 16px;margin-bottom:12px;box-shadow:0 2px 8px rgba(0,0,0,.06)">
+        <div style="font-size:.65rem;font-weight:900;color:#94a3b8;text-transform:uppercase;letter-spacing:.06em;padding-top:12px;margin-bottom:4px">Informações</div>
+        ${row('🏷️','Tipo', esc(typeName(c.tipo)))}
+        ${row('📐','Medida', esc(c.tamanho))}
+        ${row('🎨','Cor', esc(c.cor))}
+        ${row('✨','Borda', c.borda==='sim'?(c.bordaCor||'Com borda'):'Sem borda')}
+        ${row('💰','Preço', 'R$ '+fmt(c.preco))}
+        ${row('⏱','Prazo', (c.prazo||'15')+' dias')}
+        ${row('📱','Telefone', esc(c.telefone))}
+        ${c.obs?row('📝','Obs', esc(c.obs)):''}
+      </div>
+
+      <!-- Foto do cliente -->
+      ${c.foto?`<div style="background:#fff;border-radius:16px;padding:14px;margin-bottom:12px;box-shadow:0 2px 8px rgba(0,0,0,.06)">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+          <div style="font-size:.78rem;font-weight:800;color:#111">📸 Foto do Cliente</div>
+          <button onclick="timelineApagarFoto('${c.id}')" style="background:#fee2e2;color:#dc2626;border:none;border-radius:8px;padding:4px 10px;font-size:.72rem;font-weight:800;cursor:pointer">🗑 Apagar</button>
+        </div>
+        <img src="${c.foto}" style="width:100%;border-radius:10px;max-height:220px;object-fit:cover">
+      </div>`:''}
+
+      <!-- Simulação -->
+      ${c.imgIA?`<div style="background:#fff;border-radius:16px;padding:14px;margin-bottom:12px;box-shadow:0 2px 8px rgba(0,0,0,.06)">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+          <div style="font-size:.78rem;font-weight:800;color:#111">🖼️ Simulação do Tapete</div>
+          <button onclick="timelineApagarSimulacao('${c.id}')" style="background:#fee2e2;color:#dc2626;border:none;border-radius:8px;padding:4px 10px;font-size:.72rem;font-weight:800;cursor:pointer">🗑 Apagar</button>
+        </div>
+        <img src="${c.imgIA}" style="width:100%;border-radius:10px;max-height:220px;object-fit:cover">
+      </div>`:''}
+
+      <!-- Sequência -->
+      <div style="background:#fff;border-radius:16px;padding:14px;margin-bottom:12px;box-shadow:0 2px 8px rgba(0,0,0,.06)">
+        <div style="font-size:.65rem;font-weight:900;color:#94a3b8;text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">📅 Sequência</div>
+        ${tl}
+      </div>
+
+      <!-- Opções -->
+      <button class="btn btn-ghost" style="border-radius:12px" onclick="openOpcoes('${c.id}')">⋮ Mais Opções</button>
     </div>`;
   showScreen('timeline');
 }
 window.openTimeline = openTimeline;
+
+window.timelineApagarFoto = async function(id){
+  if(!confirm('Apagar a foto do cliente?')) return;
+  const c = clients.find(x=>x.id===id); if(!c) return;
+  c.foto = null;
+  await fsUpdateClient(id, {foto:null});
+  openTimeline(id);
+  toast('🗑 Foto apagada');
+};
+window.timelineApagarSimulacao = async function(id){
+  if(!confirm('Apagar a simulação?')) return;
+  const c = clients.find(x=>x.id===id); if(!c) return;
+  c.imgIA = null;
+  await fsUpdateClient(id, {imgIA:null});
+  openTimeline(id);
+  toast('🗑 Simulação apagada');
+};
+
 
 function alertaAntecipar(id){
   const c = clients.find(x=>x.id===id); if(!c) return;
@@ -3079,7 +3813,7 @@ function alertaAntecipar(id){
       <div style="font-size:13px;color:#888;margin-bottom:20px">Dia ${d} previsto para ${fmtDate(nd)}</div>
       <button onclick="document.getElementById('alerta-overlay-${id}').remove();alertaConfirmarEnvio('${id}')" 
         style="width:100%;padding:16px;background:#111;color:#fff;border:none;border-radius:14px;font-size:15px;font-weight:700;cursor:pointer;margin-bottom:10px">
-        📤 Enviar agora e avançar para Dia ${d+1<=9?d+1:'próximo'}
+        📤 Enviar agora e avançar para Dia ${(()=>{const seq=c.sequencia||[];const idx=seq.findIndex(x=>x===d);return idx>=0&&seq[idx+1]?seq[idx+1]:'próximo';})()}
       </button>
       <button onclick="document.getElementById('alerta-overlay-${id}').remove();openTimeline('${id}')"
         style="width:100%;padding:14px;background:#f5f5f5;border:none;border-radius:14px;font-size:14px;font-weight:600;cursor:pointer;margin-bottom:10px">
@@ -3189,7 +3923,7 @@ function openFechamento(id){
         </div>
       </div>
       <div class="fg"><label>Data de Entrega</label><input type="date" id="fd"></div>
-      <div class="fg"><label>Observação</label><textarea id="fo" placeholder="Ex: 50% pago, restante na entrega"></textarea></div>
+      <div class="fg"><label>Observação</label><textarea id="fo"></textarea></div>
     </div>
     <div class="form-actions">
       <button class="btn btn-ghost" onclick="goBack()">❌ Cancelar</button>
@@ -3225,9 +3959,9 @@ function openDuvida(id){
   document.getElementById('duvida-content').innerHTML=`
     <div class="form-card">
       <div class="form-card-title">❓ ${esc(c.nome)}</div>
-      <div class="fg"><label>O que perguntou?</label><textarea id="dp" placeholder="Descreva..."></textarea></div>
+      <div class="fg"><label>O que perguntou?</label><textarea id="dp"></textarea></div>
       <div class="fg"><label>Quando responder?</label><div class="row2"><input type="date" id="dd"><input type="time" id="dh"></div></div>
-      <div class="fg"><label>Resposta pronta (opcional)</label><textarea id="dr" placeholder="Escreva para copiar na hora certa..."></textarea></div>
+      <div class="fg"><label>Resposta pronta (opcional)</label><textarea id="dr"></textarea></div>
     </div>
     <div class="form-actions">
       <button class="btn btn-ghost" onclick="goBack()">❌ Cancelar</button>
@@ -3278,7 +4012,7 @@ function renderDaysAccordion(){
       </div>
       <div class="acc-body">
         <div class="fg"><label>Texto da mensagem</label>
-          <textarea id="mt-${curCfgTipo}-${curSeqTab}-${d}" placeholder="Digite o texto...">${esc(m.texto||'')}</textarea></div>
+          <textarea id="mt-${curCfgTipo}-${curSeqTab}-${d}">${esc(m.texto||'')}</textarea></div>
         <div style="font-size:12px;color:var(--muted);margin-bottom:8px">Aplicar também em:</div>
         <div class="apply-checks">
           <div class="apply-check" id="ac-ne-${d}" onclick="toggleApply('nao-estava',${d},this)">🟢 N.Estava</div>
@@ -3478,12 +4212,46 @@ var cad_gpsCoords = {lat: null, lon: null};
 var cad_saveTimestamps = {};
 var cad_deletedIds = {};
 
+// Declaração antecipada necessária para abrirModalCadastro
+var cad_blocosIds = [];
+function cadCriarBlocoTapete(opts){
+  opts = opts || {};
+  var uid = 'tb_' + Date.now() + '_' + Math.random().toString(36).slice(2,6);
+  cad_blocosIds.push(uid);
+  var n = cad_blocosIds.length;
+  var div = document.createElement('div');
+  div.id = 'cad_bloco_' + uid;
+  div.dataset.uid = uid;
+  div.style.cssText = 'background:#f8fafc;border-radius:16px;padding:16px;margin-top:14px;border:2px solid #d1d5db';
+  div.innerHTML = '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">'
+    + '<span class="cad-bloco-titulo" style="font-size:.85rem;font-weight:900;color:#111;font-family:\'Nunito\',sans-serif">🪄 Tapete ' + n + '</span>'
+    + '<button style="flex-shrink:0;height:30px;width:30px;border-radius:7px;border:1.5px solid #d1d5db;background:#f3f4f6;color:#9ca3af;font-size:13px;cursor:pointer;font-weight:700;display:flex;align-items:center;justify-content:center" onclick="cadRemoverBloco(\''+uid+'\')">✕</button></div>'
+    + '<label style="font-size:.7rem;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.04em;margin-bottom:3px;display:block">MEDIDA DO TAPETE</label>'
+    + '<input type="text" id="cad_med_'+uid+'" class="cad-input" value="'+(opts.medida||'')+'" oninput="cadAtualizarMedidaTotal()">'
+    + '<label style="font-size:.7rem;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.04em;margin-bottom:3px;display:block">COR DE FUNDO</label>'
+    + '<input type="text" id="cad_cor_'+uid+'" class="cad-input" value="'+(opts.cor||'')+'">'
+    + '<label style="font-size:.7rem;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.04em;margin-bottom:3px;display:block">COR DA BORDA</label>'
+    + '<input type="text" id="cad_bcor_'+uid+'" class="cad-input" value="'+(opts.bcor||'')+'">'
+    + '<label style="font-size:.7rem;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.04em;margin-bottom:3px;display:block">VALOR (R$)</label>'
+    + '<input type="text" id="cad_val_'+uid+'" class="cad-input" inputmode="numeric" oninput="cadMascaraValor(this);cadRecalcularTotal()" value="'+(opts.valor||'')+'">';
+  var area = document.getElementById('cad_blocos_tapetes');
+  if(area) area.appendChild(div);
+  cadAtualizarNumeracao();
+  cadAtualizarBotaoAdicionar();
+  cadAtualizarMedidaTotal();
+}
+
 // Inicializa data de hoje e meses do select ao abrir
 window.abrirModalCadastro = function(){
   document.getElementById('cad-modal-main').style.display = 'flex';
   document.getElementById('cad_data').value = new Date().toISOString().split('T')[0];
   cadPreencherMeses();
   cadCarregarLocal().then(function(){ cadRenderP(); });
+
+  // Sempre limpa blocos anteriores
+  cad_blocosIds = [];
+  var area = document.getElementById('cad_blocos_tapetes');
+  if(area) area.innerHTML = '';
 
   // Injeta dados vindos do "Enviar pro Cadastro"
   var d = window._cadInjecao;
@@ -3493,19 +4261,19 @@ window.abrirModalCadastro = function(){
       var f = function(id, v){ var el=document.getElementById(id); if(el&&v) el.value=v; };
       f('cad_nome',   d.nome);
       f('cad_contato',d.tel);
-      f('cad_medida', d.medida);
-      f('cad_cor',    d.cor);
       f('cad_prazo',  d.prazo);
-      f('cad_obs',    d.obs);
+      // obs não vai pro cadastro — fica só no prompt do Gemini
 
-      // Valor (formata máscara)
+      // Valor (formata máscara) — se tiver parcelamento, usa valor da parcela
       if(d.preco){
         var vel = document.getElementById('cad_valor');
         if(vel){
-          // preco já é um número em reais (ex: 135), converte para centavos para a máscara
-          var num = parseFloat(d.preco.toString().replace(',','.'));
-          if(!isNaN(num) && num > 0){
-            var centavosTotal = Math.round(num * 100);
+          var numBase = parseFloat((d.totalGeral||d.preco).toString().replace(',','.'));
+          var parcelas = d.parcelas||0;
+          // Se tiver parcelamento, divide pelo número de parcelas
+          var numFinal = (parcelas>=2 && numBase>0) ? numBase/parcelas : parseFloat(d.preco.toString().replace(',','.'));
+          if(!isNaN(numFinal) && numFinal > 0){
+            var centavosTotal = Math.round(numFinal * 100);
             var reais = Math.floor(centavosTotal / 100);
             var cents = centavosTotal % 100;
             vel.value = 'R$ ' + reais.toLocaleString('pt-BR') + ',' + (cents < 10 ? '0' : '') + cents;
@@ -3516,10 +4284,13 @@ window.abrirModalCadastro = function(){
       // Borda
       var bel = document.getElementById('cad_borda');
       if(bel){
-        bel.value = d.borda==='sim' ? 'com' : 'sem';
+        var temBorda = d.borda==='sim' || d.borda==='com';
+        bel.value = temBorda ? 'com' : 'sem';
         var bdiv = document.getElementById('cad_bdiv');
-        if(bdiv) bdiv.style.display = d.borda==='sim' ? 'block' : 'none';
-        if(d.borda==='sim') f('cad_bcor', d.bordaCor);
+        var bbtn = document.getElementById('cad_borda_btn');
+        if(bdiv) bdiv.style.display = temBorda ? 'block' : 'none';
+        if(bbtn) bbtn.style.display = temBorda ? 'none' : 'flex';
+        if(temBorda) f('cad_bcor', d.bordaCor);
       }
 
       // Foto do cliente
@@ -3542,13 +4313,54 @@ window.abrirModalCadastro = function(){
           +'</div>';
       }
 
+      // Cria bloco Tapete 1 com dados do cálculo
+      function fmtValorBloco(v){
+        if(!v) return '';
+        var num = parseFloat(v.toString().replace(',','.'));
+        if(isNaN(num)||num<=0) return '';
+        var c = Math.round(num*100);
+        return 'R$ '+Math.floor(c/100).toLocaleString('pt-BR')+','+(c%100<10?'0':'')+c%100;
+      }
+      // medida do tapete 1 é a primeira parte (antes do primeiro /)
+      var med1 = d.medida ? d.medida.split('/')[0].trim() : '';
+      cadCriarBlocoTapete({ medida: med1, cor: d.cor||'', bcor: d.bordaCor||'', valor: fmtValorBloco(d.preco1||d.preco) });
+
+      // Tapetes extras — cria blocos adicionais
+      if(d.tapetesExtras && d.tapetesExtras.length > 0){
+        d.tapetesExtras.forEach(function(te){
+          cadCriarBlocoTapete({ medida: te.medida||'', cor: te.cor||'', bcor: te.bcor||'', valor: fmtValorBloco(te.valor) });
+        });
+      }
+      cadRecalcularTotal();
+      cadAtualizarMedidaTotal();
+
+      // Se tiver parcelamento, reaplicar valor da parcela
+      // (cadRecalcularTotal sobrescreve com o total cheio)
+      if(d.parcelas>=2){
+        var velP = document.getElementById('cad_valor');
+        if(velP){
+          var totalP = parseFloat((d.totalGeral||d.preco).toString().replace(',','.'));
+          var valParc = totalP / d.parcelas;
+          if(!isNaN(valParc) && valParc > 0){
+            var cP = Math.round(valParc * 100);
+            var parStr = Math.floor(cP/100).toLocaleString('pt-BR') + ',' + (cP%100 < 10 ? '0' : '') + cP%100;
+            velP.value = d.parcelas + 'x ' + parStr;
+          }
+        }
+      }
+
+      window._cadInjecaoAtiva = (d.parcelas>=2) ? {parcelas: d.parcelas} : null;
       window._cadInjecao = null;
     }, 150);
+  } else {
+    // Abertura manual — cria bloco Tapete 1 vazio
+    cadCriarBlocoTapete({});
   }
 };
 window.fecharModalCadastro = function(){
   document.getElementById('cad-modal-main').style.display = 'none';
   window._cadInjecao = null;
+  window._cadInjecaoAtiva = null;
 };
 
 // Máscaras
@@ -3573,8 +4385,21 @@ window.cadMascaraValor = function(el){
 };
 
 window.cadToggleBorda = function(){
-  document.getElementById('cad_bdiv').style.display =
-    document.getElementById('cad_borda').value === 'com' ? 'block' : 'none';
+  var select = document.getElementById('cad_borda');
+  var bdiv   = document.getElementById('cad_bdiv');
+  var btn    = document.getElementById('cad_borda_btn');
+  if(select.value === 'sem'){
+    // Ativar borda
+    select.value = 'com';
+    bdiv.style.display = 'block';
+    if(btn) btn.style.display = 'none';
+  } else {
+    // Remover borda
+    select.value = 'sem';
+    bdiv.style.display = 'none';
+    document.getElementById('cad_bcor').value = '';
+    if(btn) btn.style.display = 'flex';
+  }
 };
 
 // GPS
@@ -3600,11 +4425,11 @@ window.cadPreviewFoto = function(input){
   reader.onload = function(e){
     var img = new Image();
     img.onload = function(){
-      var canvas = document.createElement('canvas'), max = 800, w = img.width, h = img.height;
+      var canvas = document.createElement('canvas'), max = 500, w = img.width, h = img.height;
       if(w > max){ h = Math.round(h*max/w); w = max; }
       canvas.width = w; canvas.height = h;
       canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-      cadFotoBase64 = canvas.toDataURL('image/jpeg', 0.8);
+      cadFotoBase64 = canvas.toDataURL('image/jpeg', 0.55);
       document.getElementById('cad_foto_img').src = cadFotoBase64;
       document.getElementById('cad_foto_prev').style.display = 'block';
     };
@@ -3627,11 +4452,11 @@ window.cadPreviewSimul = function(input){
   reader.onload = function(e){
     var img = new Image();
     img.onload = function(){
-      var canvas = document.createElement('canvas'), max=900, w=img.width, h=img.height;
+      var canvas = document.createElement('canvas'), max=500, w=img.width, h=img.height;
       if(w>max){h=Math.round(h*max/w);w=max;}
       canvas.width=w; canvas.height=h;
       canvas.getContext('2d').drawImage(img,0,0,w,h);
-      cadSimulBase64 = canvas.toDataURL('image/jpeg',0.8);
+      cadSimulBase64 = canvas.toDataURL('image/jpeg',0.55);
       var area = document.getElementById('cad_simul_preview_area');
       if(area) area.innerHTML =
         '<div style="position:relative;margin-bottom:13px">'
@@ -3648,7 +4473,7 @@ window.cadRemoverSimul = function(){
   var area = document.getElementById('cad_simul_preview_area');
   if(area) area.innerHTML =
     '<button onclick="document.getElementById(\'cad_simul_input\').click()" style="'
-    +'width:100%;padding:16px;border-radius:12px;border:2px dashed #d1d5db;'
+    +'width:100%;padding:16px;border-radius:12px;border:2px solid #d1d5db;'
     +'background:#f9fafb;color:#374151;font-size:14px;font-weight:800;'
     +'font-family:\'Nunito\',system-ui,sans-serif;cursor:pointer;margin-bottom:13px;'
     +'display:flex;align-items:center;justify-content:center;gap:8px">'
@@ -3688,26 +4513,79 @@ window.cadAbrirEscolhaFotoDet = function(){
 };
 
 // Tapetes extras
+// ── BLOCOS DE TAPETES (unificado: tapete 1 + extras) ──────────────────────────
 window.cadAdicionarTapeteExtra = function(){
-  if(cad_tapeteExtraCount >= 4){ cadToast('Máximo de 4 tapetes adicionais'); return; }
-  cad_tapeteExtraCount++;
-  var n = cad_tapeteExtraCount + 1;
-  var div = document.createElement('div');
-  div.id = 'cad_tapete_extra_' + n;
-  div.style.cssText = 'background:#f8fafc;border-radius:16px;padding:16px;margin-top:14px;border:2px solid #d1d5db';
-  div.innerHTML = '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">'
-    + '<span style="font-size:.85rem;font-weight:900;color:#111;font-family:\'Nunito\',sans-serif">Tapete ' + n + '</span>'
-    + '<button class="cad-btn cad-btn-d cad-btn-xs" onclick="cadRemoverTapeteExtra('+n+')">Remover</button></div>'
-    + '<input type="text" id="cad_med_'+n+'" class="cad-input" placeholder="Medida (ex: 100x60 cm)">'
-    + '<input type="text" id="cad_val_'+n+'" class="cad-input" placeholder="Valor total (R$)" inputmode="numeric" oninput="cadMascaraValor(this)">';
-  document.getElementById('cad_tapetes_extras').appendChild(div);
-  if(cad_tapeteExtraCount >= 4) document.getElementById('cad_btn_add_tapete').style.display = 'none';
+  if(cad_blocosIds.length >= 5){ cadToast('Máximo de 5 tapetes'); return; }
+  cadCriarBlocoTapete({});
 };
-window.cadRemoverTapeteExtra = function(n){
-  var el = document.getElementById('cad_tapete_extra_' + n); if(el) el.remove();
-  cad_tapeteExtraCount--;
-  document.getElementById('cad_btn_add_tapete').style.display = 'inline-flex';
+
+window.cadRemoverBloco = function(uid){
+  var el = document.getElementById('cad_bloco_' + uid);
+  if(el) el.remove();
+  cad_blocosIds = cad_blocosIds.filter(function(x){ return x !== uid; });
+  cadAtualizarNumeracao();
+  cadAtualizarBotaoAdicionar();
+  cadRecalcularTotal();
+  cadAtualizarMedidaTotal();
 };
+
+function cadAtualizarNumeracao(){
+  var blocos = document.getElementById('cad_blocos_tapetes');
+  if(!blocos) return;
+  var divs = blocos.querySelectorAll('[data-uid]');
+  divs.forEach(function(div, idx){
+    var titulo = div.querySelector('.cad-bloco-titulo');
+    if(titulo) titulo.textContent = '🪄 Tapete ' + (idx+1);
+  });
+}
+
+function cadAtualizarBotaoAdicionar(){
+  var btn = document.getElementById('cad_btn_add_tapete');
+  if(!btn) return;
+  btn.style.display = cad_blocosIds.length >= 5 ? 'none' : 'inline-flex';
+}
+
+function cadAtualizarMedidaTotal(){
+  var medidas = [];
+  cad_blocosIds.forEach(function(uid){
+    var el = document.getElementById('cad_med_' + uid);
+    if(el && el.value.trim()) medidas.push(el.value.trim());
+  });
+  var cam = document.getElementById('cad_medida');
+  if(cam) cam.value = medidas.join(' / ');
+}
+
+function cadRecalcularTotal(){
+  var total = 0;
+  cad_blocosIds.forEach(function(uid){
+    var el = document.getElementById('cad_val_' + uid);
+    if(el && el.value){
+      var digits = el.value.replace(/\D/g,'');
+      if(digits) total += parseInt(digits, 10) / 100;
+    }
+  });
+  var velTotal = document.getElementById('cad_valor');
+  if(velTotal){
+    if(total > 0){
+      // Se tiver parcelamento ativo, mostrar Nx valor_parcela em vez do total
+      var inj = window._cadInjecaoAtiva;
+      if(inj && inj.parcelas>=2){
+        var valParc = total / inj.parcelas;
+        var cP = Math.round(valParc * 100);
+        var parStr = Math.floor(cP/100).toLocaleString('pt-BR') + ',' + (cP%100 < 10 ? '0' : '') + cP%100;
+        velTotal.value = inj.parcelas + 'x ' + parStr;
+      } else {
+        var centavos = Math.round(total * 100);
+        var reais = Math.floor(centavos/100), cents = centavos % 100;
+        velTotal.value = 'R$ ' + reais.toLocaleString('pt-BR') + ',' + (cents < 10 ? '0' : '') + cents;
+      }
+    } else {
+      velTotal.value = '';
+    }
+  }
+}
+
+window.cadRemoverTapeteExtra = function(n){ /* substituído por cadRemoverBloco */ };
 
 // Formatação utilitária
 function cadR(v){ return 'R$ ' + Number(v).toFixed(2).replace('.', ','); }
@@ -3776,24 +4654,44 @@ window.cadSalvarPedido = async function(){
   var end     = document.getElementById('cad_end').value.trim();
   var data    = document.getElementById('cad_data').value;
   var obs     = document.getElementById('cad_obs').value.trim();
-  var tapetesExtras = [];
-  for(var i=2; i<=5; i++){
-    var med = document.getElementById('cad_med_'+i);
-    var val = document.getElementById('cad_val_'+i);
-    if(med && val && med.value.trim() && val.value){
-      var _vd = val.value.replace(/\D/g,''); tapetesExtras.push({medida: med.value.trim(), valor: _vd ? parseInt(_vd,10)/100 : 0});
-    }
-  }
+  // Coletar dados dos blocos unificados
+  var blocos = [];
+  cad_blocosIds.forEach(function(uid){
+    var mEl = document.getElementById('cad_med_'+uid);
+    var cEl = document.getElementById('cad_cor_'+uid);
+    var bEl = document.getElementById('cad_bcor_'+uid);
+    var vEl = document.getElementById('cad_val_'+uid);
+    if(mEl) blocos.push({
+      medida: mEl ? mEl.value.trim() : '',
+      cor: cEl ? cEl.value.trim() : '',
+      bcor: bEl ? bEl.value.trim() : '',
+      valor: vEl ? (function(v){ var d=v.replace(/\D/g,''); return d?parseInt(d,10)/100:0; })(vEl.value) : 0
+    });
+  });
+  // Tapete 1 = primeiro bloco; restantes = extras
+  var bloco1 = blocos[0] || {};
+  medida = bloco1.medida || medida;
+  cor    = bloco1.cor || cor;
+  bcor   = bloco1.bcor || '';
+  borda  = bloco1.bcor ? 'com' : 'sem';
+  var tapetesExtras = blocos.slice(1);
+
+  // Calcula o total real somando todos os blocos (ignora o campo cad_valor que pode ter parcelamento)
+  var totalReal = blocos.reduce(function(s,b){ return s + (b.valor||0); }, 0);
+  if(totalReal > 0) valorRaw = totalReal.toFixed(2);
+  // Valor individual do tapete 1 (só o primeiro bloco)
+  var valorTap1 = bloco1.valor || 0;
+
   if(!nome || !contato || !valorRaw || !medida || !prazo){
     cadToast('⚠️ Preencha os campos obrigatórios'); return;
   }
   if(!cadFotoBase64){ cadToast('⚠️ Foto do cliente é obrigatória!'); return; }
   var custo = custoRaw !== '' ? parseFloat(custoRaw) : null;
   var pedido = {
-    nome, contato, medida, cor, valor: parseFloat(valorRaw), custo,
+    nome, contato, medida, cor, valor: valorTap1 || parseFloat(valorRaw), valorTotal: parseFloat(valorRaw), custo,
     prazo: parseInt(prazo), borda, bcor, endereco: end, dataVenda: data,
     completo: custo !== null, obs, tapetesExtras, categoria: 'Tapete',
-    criadoEm: new Date().toISOString(), fotos: [cadFotoBase64],
+    criadoEm: new Date().toISOString(), fotos: [cadFotoBase64], // fotos salvas apenas localmente
     updatedAt: Date.now()
   };
   // Salva local primeiro
@@ -3808,7 +4706,12 @@ window.cadSalvarPedido = async function(){
   // Tenta enviar para Firebase via refs globais expostas pelo módulo
   if(window._cadDB && window._cadCollection && window._cadAddDoc){
     try{
-      var ref = await window._cadAddDoc(window._cadCollection(window._cadDB,'tapetes'), Object.assign({}, pedido, {id:undefined}));
+      // Envia sem base64 para o Firebase
+      var pedidoSemFotos = Object.assign({}, pedido, {id:undefined});
+      var isB64 = function(v){ return typeof v === 'string' && v.startsWith('data:'); };
+      if(isB64(pedidoSemFotos.fotos && pedidoSemFotos.fotos[0])) pedidoSemFotos.fotos = [];
+      if(Array.isArray(pedidoSemFotos.fotos)) pedidoSemFotos.fotos = pedidoSemFotos.fotos.filter(function(f){ return !isB64(f); });
+      var ref = await window._cadAddDoc(window._cadCollection(window._cadDB,'tapetes'), pedidoSemFotos);
       var idx = cad_pedidosCache.findIndex(function(x){ return x.id === localId; });
       if(idx >= 0){ cad_pedidosCache[idx].id = ref.id; cadSalvarLocal(); }
     }catch(e){}
@@ -3820,11 +4723,13 @@ window.cadLimparForm = function(){
     var el=document.getElementById(id); if(el) el.value='';
   });
   document.getElementById('cad_borda').value = 'sem';
-  document.getElementById('cad_bdiv').style.display = 'none';
   document.getElementById('cad_data').value = new Date().toISOString().split('T')[0];
   document.getElementById('cad_geo_sc').textContent = '';
-  document.getElementById('cad_tapetes_extras').innerHTML = '';
-  cad_tapeteExtraCount = 0;
+  // Reinicia blocos de tapetes
+  cad_blocosIds = [];
+  var area = document.getElementById('cad_blocos_tapetes');
+  if(area) area.innerHTML = '';
+  cadCriarBlocoTapete({});
   document.getElementById('cad_btn_add_tapete').style.display = 'inline-flex';
   cadRemoverFoto();
   cadRemoverSimul();
@@ -3840,16 +4745,55 @@ window.cadRenderP = function(){
   if(q)   todos = todos.filter(function(p){ return (p.nome||'').toLowerCase().indexOf(q) >= 0 || (p.loja||'').toLowerCase().indexOf(q) >= 0; });
   var el = document.getElementById('cad_lp');
   if(!todos.length){ el.innerHTML = '<div class="cad-empty">📭 Nenhum pedido cadastrado</div>'; return; }
+
+  // Calcular totais globais
+  var totalVendas = 0, totalPedidos = todos.length, totalTapetes = 0;
+  todos.forEach(function(p){
+    totalVendas += (p.valorTotal || ((p.valor||0) + (p.tapetesExtras||[]).reduce(function(s,t){return s+(t.valor||0);},0)));
+    totalTapetes += 1 + ((p.tapetesExtras||[]).length);
+    (p.tapetesExtras||[]).forEach(function(t){ totalVendas += (t.valor||0); });
+  });
+
   var h = '';
+
   todos.slice().reverse().forEach(function(p){
     var s  = cadCalcSt(p.dataVenda, p.prazo);
     var sc = cadGetCusto(p) === null;
+    var extras = p.tapetesExtras || [];
+    var totalPedido = p.valorTotal || ((p.valor||0) + extras.reduce(function(acc,t){ return acc+(t.valor||0); }, 0));
     var foto = p.fotos && p.fotos.length > 0 ? '<img src="'+p.fotos[0]+'" style="width:44px;height:44px;border-radius:10px;object-fit:cover;float:right;margin-left:8px">' : '';
     h += '<div class="cad-vcard'+(sc?' cad-vcard-inc':'')+'">' + foto;
     h += '<div class="cad-vcard-nome">'+p.nome+'</div>';
-    if(p.loja) h += '<div style="font-size:.75rem;color:#6b7280;font-weight:600;margin-bottom:4px">'+p.loja+'</div>';
+    if(p.loja) h += '<div style="font-size:.75rem;color:#6b7280;font-weight:600;margin-bottom:6px">'+p.loja+'</div>';
+
+    // Tapete principal como bloco separado
+    h += '<div style="background:#f1f5f9;border-radius:10px;padding:10px;margin-bottom:6px;border-left:3px solid #111">';
+    h += '<div style="font-size:.68rem;font-weight:900;color:#374151;text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px">🪄 Tapete 1</div>';
     h += '<div class="cad-vcard-row"><span class="cad-vcard-key">Medida</span><span class="cad-vcard-val">'+p.medida+'</span></div>';
+    if(p.cor) h += '<div class="cad-vcard-row"><span class="cad-vcard-key">Cor fundo</span><span class="cad-vcard-val">'+p.cor+'</span></div>';
+    if(p.borda==='com'&&p.bcor) h += '<div class="cad-vcard-row"><span class="cad-vcard-key">Borda</span><span class="cad-vcard-val">'+p.bcor+'</span></div>';
     h += '<div class="cad-vcard-row"><span class="cad-vcard-key">Valor</span><span class="cad-vcard-val" style="color:#111">'+cadR(p.valor)+'</span></div>';
+    h += '</div>';
+
+    // Tapetes extras — cada um no seu bloco
+    extras.forEach(function(t, i){
+      h += '<div style="background:#f1f5f9;border-radius:10px;padding:10px;margin-bottom:6px;border-left:3px solid #6b7280">';
+      h += '<div style="font-size:.68rem;font-weight:900;color:#374151;text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px">🪄 Tapete '+(i+2)+'</div>';
+      h += '<div class="cad-vcard-row"><span class="cad-vcard-key">Medida</span><span class="cad-vcard-val">'+(t.medida||'—')+'</span></div>';
+      if(t.cor) h += '<div class="cad-vcard-row"><span class="cad-vcard-key">Cor fundo</span><span class="cad-vcard-val">'+t.cor+'</span></div>';
+      if(t.bcor) h += '<div class="cad-vcard-row"><span class="cad-vcard-key">Borda</span><span class="cad-vcard-val">'+t.bcor+'</span></div>';
+      h += '<div class="cad-vcard-row"><span class="cad-vcard-key">Valor</span><span class="cad-vcard-val" style="color:#111">'+cadR(t.valor||0)+'</span></div>';
+      h += '</div>';
+    });
+
+    // Total do pedido (só aparece se tiver mais de 1 tapete)
+    if(extras.length > 0){
+      h += '<div style="background:#ecfdf5;border-radius:10px;padding:8px 10px;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center">';
+      h += '<span style="font-size:.75rem;font-weight:900;color:#065f46">TOTAL DO PEDIDO</span>';
+      h += '<span style="font-size:.95rem;font-weight:900;color:#065f46">'+cadR(totalPedido)+'</span>';
+      h += '</div>';
+    }
+
     h += '<div class="cad-vcard-row"><span class="cad-vcard-key">Prazo</span><span class="cad-vcard-val">'+p.prazo+' dias &nbsp;<span class="cad-badge '+s.c+'">'+s.t+'</span></span></div>';
     if(sc) h += '<div style="margin-top:4px"><span class="cad-badge cad-bg-yellow">Sem custo informado</span></div>';
     h += '<div class="cad-vcard-footer">';
@@ -3888,12 +4832,7 @@ window.cadTransferirParaGestao = async function(id){
     return;
   }
 
-  // Segunda foto (fundo removido) obrigatória antes de transferir
-  if(!p.fotos || p.fotos.length < 2){
-    cadToast('⚠️ Adicione a foto com fundo removido antes de transferir!');
-    cadVerDet(id);
-    return;
-  }
+  // Imagem não é mais obrigatória para transferir
 
   var novoId = 'transf_' + Date.now() + '_' + Math.random().toString(36).slice(2);
   var transferido = {
@@ -3930,6 +4869,10 @@ window.cadTransferirParaGestao = async function(id){
   if(window._cadDB && window._cadCollection && window._cadAddDoc){
     try{
       var obj = Object.assign({}, transferido, {id:undefined, _localId:undefined});
+      // Remove base64 antes de enviar ao Firebase
+      var isB64x = function(v){ return typeof v === 'string' && v.startsWith('data:'); };
+      if(Array.isArray(obj.fotos)) obj.fotos = obj.fotos.filter(function(f){ return !isB64x(f); });
+      if(obj.fotos && obj.fotos.length === 0) delete obj.fotos;
       var ref = await window._cadAddDoc(window._cadCollection(window._cadDB,'tapetes'), obj);
       if(typeof window._gestGetCache === 'function'){
         var cache = window._gestGetCache();
@@ -3958,21 +4901,80 @@ window.cadTransferirParaGestao = async function(id){
 window.cadAbrirComp = function(id){
   cad_compId = id;
   var p = cad_pedidosCache.find(function(x){ return x.id === id; }); if(!p) return;
+  function row(icon,label,val){
+    return '<div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid #f1f5f9">'
+      +'<span style="font-size:15px;width:20px;text-align:center;flex-shrink:0">'+icon+'</span>'
+      +'<span style="font-size:.75rem;font-weight:700;color:#9ca3af;flex:1">'+label+'</span>'
+      +'<span style="font-size:.85rem;font-weight:800;color:#111">'+val+'</span>'
+      +'</div>';
+  }
   document.getElementById('cad_cinfo').innerHTML =
-    '<div class="cad-irow"><span class="cad-k">Cliente</span><span class="cad-v">'+p.nome+'</span></div>'
-    + '<div class="cad-irow"><span class="cad-k">Medida</span><span class="cad-v">'+p.medida+'</span></div>'
-    + '<div class="cad-irow"><span class="cad-k">Valor vendido</span><span class="cad-v">'+cadR(p.valor)+'</span></div>';
-  document.getElementById('cad_ccusto').value = '';
+    row('👤','Cliente',p.nome)
+    + row('📐','Medida',p.medida||'—')
+    + row('💵','Valor total',cadR(p.valorTotal||(p.valor||0)));
+
+  // Tabela de custos pré-definidos por medida
+  var _tabelaCusto = {
+    '70x40': 68.25, '90x50': 95.30, '100x60': 119.70,
+    '120x60': 141.65, '150x60': 152.28, '200x60': 181.33, '220x120': 364.10
+  };
+  function _custoAuto(medida){
+    if(!medida) return '';
+    var m = medida.trim().toLowerCase().replace(/\s/g,'');
+    for(var k in _tabelaCusto){ if(k.toLowerCase()===m) return _tabelaCusto[k]; }
+    return '';
+  }
+
+  // Monta campos de custo: 1 por tapete
+  var todos = [{medida: p.medida||'Tapete 1', valor: p.valor||0}];
+  (p.tapetesExtras||[]).forEach(function(t,i){ todos.push({medida: t.medida||('Tapete '+(i+2)), valor: t.valor||0}); });
+
+  var campos = '';
+  todos.forEach(function(t, i){
+    var custoAtual = '';
+    if(i===0 && p.custos && p.custos[0]!==undefined) custoAtual = p.custos[0];
+    else if(i>0 && p.custos && p.custos[i]!==undefined) custoAtual = p.custos[i];
+    else if(todos.length===1 && p.custo!==null && p.custo!==undefined) custoAtual = p.custo;
+    // Se não tiver custo salvo, tenta preencher automaticamente pela medida
+    if(custoAtual==='' || custoAtual===null || custoAtual===undefined){
+      var auto = _custoAuto(t.medida);
+      if(auto!=='') custoAtual = parseFloat(auto).toFixed(2);
+    }
+    var isAuto = custoAtual!=='' && !(p.custos && p.custos[i]!==undefined) && !(todos.length===1 && p.custo!==null && p.custo!==undefined);
+    campos += '<div style="margin-bottom:12px">'
+      + '<div style="font-size:.7rem;font-weight:800;color:#64748b;text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px">'
+      + t.medida + ' · Valor: ' + cadR(t.valor)
+      + ''
+      + '</div>'
+      + '<input type="number" id="cad_ccusto_'+i+'" step="0.01" placeholder="0,00" value="'+(custoAtual||'')+'"'
+      + ' style="width:100%;padding:12px 14px;border:2px solid '+(isAuto && custoAtual!==''?'#10b981':'#e2e8f0')+';border-radius:12px;font-size:1rem;font-weight:800;color:#111;background:#f8fafc;box-sizing:border-box;-webkit-appearance:none">'
+      + '</div>';
+  });
+  campos += '<button onclick="cadSalvarCusto()" style="width:100%;padding:15px;background:#111;color:#fff;border:none;border-radius:12px;font-size:.9rem;font-weight:800;cursor:pointer;margin-bottom:8px;font-family:inherit">✅ Salvar custos</button>';
+  campos += '<button onclick="cadFComp()" style="width:100%;padding:13px;background:#f1f5f9;color:#64748b;border:none;border-radius:12px;font-size:.85rem;font-weight:700;cursor:pointer;font-family:inherit">Cancelar</button>';
+  document.getElementById('cad_custo_campos').innerHTML = campos;
+  window._cadCustoQtd = todos.length;
   document.getElementById('cad-modal-custo').classList.add('open');
 };
 window.cadSalvarCusto = async function(){
   if(!cad_compId) return;
-  var v = document.getElementById('cad_ccusto').value; if(v===''){cadToast('⚠️ Digite o custo');return;}
   var p = cad_pedidosCache.find(function(x){ return x.id === cad_compId; }); if(!p) return;
-  p.custo = parseFloat(v); p.completo = true;
-  cadSalvarLocal(); cadFComp(); cadRenderP(); cadToast('✅ Custo salvo!');
+  var qtd = window._cadCustoQtd || 1;
+  var custos = [];
+  var custoTotal = 0;
+  for(var i=0; i<qtd; i++){
+    var el = document.getElementById('cad_ccusto_'+i);
+    var v = el ? parseFloat(el.value||0)||0 : 0;
+    custos.push(v);
+    custoTotal += v;
+  }
+  if(custoTotal===0){ cadToast('⚠️ Digite pelo menos um custo'); return; }
+  p.custo = custoTotal;
+  p.custos = custos;
+  p.completo = true;
+  cadSalvarLocal(); cadFComp(); cadRenderP(); cadToast('✅ Custos salvos!');
   if(window._cadDB && window._cadDoc && window._cadUpdateDoc){
-    try{ await window._cadUpdateDoc(window._cadDoc(window._cadDB,'tapetes',cad_compId),{custo:parseFloat(v),completo:true}); }catch(e){}
+    try{ await window._cadUpdateDoc(window._cadDoc(window._cadDB,'tapetes',cad_compId),{custo:custoTotal,custos:custos,completo:true}); }catch(e){}
   }
 };
 window.cadFComp = function(){
@@ -3983,27 +4985,82 @@ window.cadFComp = function(){
 window.cadVerDet = function(id){
   cad_detId = id;
   var p = cad_pedidosCache.find(function(x){ return x.id === id; }); if(!p) return;
-  var c = cadGetCusto(p), l = c!==null ? p.valor-c : null, s = cadCalcSt(p.dataVenda, p.prazo);
-  var h = '';
-  h += '<div class="cad-irow"><span class="cad-k">Cliente</span><span class="cad-v">'+p.nome+'</span></div>';
-  if(p.loja) h += '<div class="cad-irow"><span class="cad-k">Loja</span><span class="cad-v">'+p.loja+'</span></div>';
-  h += '<div class="cad-irow"><span class="cad-k">Contato</span><span class="cad-v"><div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end">'+cadWaLink(p.contato)+cadTelLink(p.contato)+'</div></span></div>';
-  h += '<div class="cad-irow"><span class="cad-k">Medida</span><span class="cad-v">'+p.medida+'</span></div>';
-  h += '<div class="cad-irow"><span class="cad-k">Borda</span><span class="cad-v">'+(p.borda==='com'?'Com borda '+(p.bcor||''):'Sem borda')+'</span></div>';
-  h += '<div class="cad-irow"><span class="cad-k">Data</span><span class="cad-v">'+p.dataVenda+'</span></div>';
-  h += '<div class="cad-irow"><span class="cad-k">Prazo</span><span class="cad-v">'+p.prazo+' dias</span></div>';
-  h += '<div class="cad-irow"><span class="cad-k">Status</span><span class="cad-v"><span class="cad-badge '+s.c+'">'+s.t+'</span></span></div>';
-  h += '<div class="cad-irow"><span class="cad-k">Valor</span><span class="cad-v">'+cadR(p.valor)+'</span></div>';
-  h += '<div class="cad-irow"><span class="cad-k">Custo</span><span class="cad-v">'+(c!==null?cadR(c):'<span class="cad-sc">Não informado</span>')+'</span></div>';
-  h += '<div class="cad-irow"><span class="cad-k">Lucro</span><span class="cad-v">'+(l!==null?'<span style="color:#10b981">'+cadR(l)+'</span>':'<span class="cad-sc">---</span>')+'</span></div>';
-  if(p.endereco) h += '<div class="cad-irow"><span class="cad-k">Endereço</span><span class="cad-v" style="font-size:.73rem;max-width:55%;word-break:break-word">'+p.endereco+'</span></div>';
-  if(p.obs) h += '<div class="cad-irow"><span class="cad-k">Obs</span><span class="cad-v" style="font-size:.78rem;max-width:55%;word-break:break-word">'+p.obs+'</span></div>';
-  if(p.tapetesExtras && p.tapetesExtras.length > 0){
-    p.tapetesExtras.forEach(function(t, i){
-      h += '<div class="cad-irow"><span class="cad-k">Tapete '+(i+2)+'</span><span class="cad-v">'+t.medida+' — '+cadR(t.valor)+'</span></div>';
-    });
+  var c = cadGetCusto(p), _totalDetalhes = p.valorTotal||(p.valor+(p.tapetesExtras||[]).reduce(function(a,t){return a+(t.valor||0);},0)), l = c!==null ? _totalDetalhes-c : null, s = cadCalcSt(p.dataVenda, p.prazo);
+
+  function row(icon, label, val, valStyle){
+    return '<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #f1f5f9">'
+      +'<span style="font-size:16px;width:22px;text-align:center;flex-shrink:0">'+icon+'</span>'
+      +'<span style="font-size:.78rem;font-weight:700;color:#9ca3af;flex:1">'+label+'</span>'
+      +'<span style="font-size:.85rem;font-weight:800;color:#111;text-align:right;max-width:58%;word-break:break-word'+(valStyle?';'+valStyle:'')+'">'+val+'</span>'
+      +'</div>';
   }
-  document.getElementById('cad_dtit').textContent = 'Detalhes — ' + p.nome;
+
+  var h = '';
+
+  // Header card com nome e status
+  h += '<div style="background:linear-gradient(135deg,#1e293b 0%,#334155 100%);border-radius:16px;padding:16px 18px;margin-bottom:14px;color:#fff">';
+  h += '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">';
+  h += '<div style="font-size:1.1rem;font-weight:900">'+p.nome+'</div>';
+  if(p.dataVenda) h += '<span style="font-size:.7rem;opacity:.7;white-space:nowrap;margin-left:8px;margin-top:2px">'+p.dataVenda.split('-').reverse().join('/')+'</span>';
+  h += '</div>';
+  h += '<span style="background:rgba(255,255,255,.15);border-radius:20px;padding:3px 10px;font-size:.72rem;font-weight:700">'+s.t+'</span>';
+  h += '</div>';
+
+  // Card contato
+  h += '<div style="background:#f8fafc;border-radius:14px;padding:12px 14px;margin-bottom:10px">';
+  h += '<div style="font-size:.65rem;font-weight:900;color:#94a3b8;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Contato</div>';
+  h += '<div style="display:flex;gap:8px;flex-wrap:wrap">'+cadWaLink(p.contato)+cadTelLink(p.contato)+'</div>';
+  h += '</div>';
+
+  // Card tapete(s)
+  var totalTodos = p.valorTotal || (p.valor + (p.tapetesExtras||[]).reduce(function(acc,t){return acc+(t.valor||0);},0));
+  var temExtras = p.tapetesExtras && p.tapetesExtras.length > 0;
+
+  h += '<div style="background:#f8fafc;border-radius:14px;padding:12px 14px;margin-bottom:10px">';
+  h += '<div style="font-size:.65rem;font-weight:900;color:#94a3b8;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">🪄 Tapete 1</div>';
+  if(p.medida) h += row('📐','Medida',p.medida);
+  if(p.borda==='com' && p.bcor) h += row('✨','Borda',p.bcor);
+  h += row('💰','Valor',cadR(p.valor),'color:#059669;font-size:.92rem');
+  h += '</div>';
+
+  if(temExtras){
+    p.tapetesExtras.forEach(function(t, i){
+      h += '<div style="background:#f8fafc;border-radius:14px;padding:12px 14px;margin-bottom:10px">';
+      h += '<div style="font-size:.65rem;font-weight:900;color:#94a3b8;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">🪄 Tapete '+(i+2)+'</div>';
+      h += row('📐','Medida',t.medida||'—');
+      if(t.cor)  h += row('🎨','Cor fundo',t.cor);
+      if(t.bcor) h += row('✨','Borda',t.bcor);
+      h += row('💰','Valor',cadR(t.valor||0),'color:#059669;font-size:.92rem');
+      h += '</div>';
+    });
+    h += '<div style="background:linear-gradient(135deg,#ecfdf5,#d1fae5);border-radius:14px;padding:14px 18px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center">';
+    h += '<span style="font-size:.8rem;font-weight:900;color:#065f46;text-transform:uppercase;letter-spacing:.04em">💵 Total Geral</span>';
+    h += '<span style="font-size:1.1rem;font-weight:900;color:#065f46">'+cadR(totalTodos)+'</span>';
+    h += '</div>';
+  }
+
+  // Card prazo e entrega
+  h += '<div style="background:#f8fafc;border-radius:14px;padding:12px 14px;margin-bottom:10px">';
+  h += '<div style="font-size:.65rem;font-weight:900;color:#94a3b8;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">Entrega</div>';
+  if(p.prazo) h += row('⏱','Prazo',p.prazo+' dias');
+  if(p.endereco) h += row('📍','Endereço',p.endereco);
+  h += '</div>';
+
+  // Card financeiro
+  h += '<div style="background:#f8fafc;border-radius:14px;padding:12px 14px;margin-bottom:10px">';
+  h += '<div style="font-size:.65rem;font-weight:900;color:#94a3b8;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">Financeiro</div>';
+  h += row('💸','Custo', c!==null ? cadR(c) : '<span style="color:#d1d5db;font-weight:600">Não informado</span>');
+  h += row('📈','Lucro', l!==null ? cadR(l) : '<span style="color:#d1d5db;font-weight:600">—</span>', l!==null?'color:#10b981':'');
+  h += '</div>';
+
+  if(p.obs){
+    h += '<div style="background:#fffbeb;border-radius:14px;padding:12px 14px;margin-bottom:10px">';
+    h += '<div style="font-size:.65rem;font-weight:900;color:#92400e;text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">📝 Observação</div>';
+    h += '<div style="font-size:.82rem;font-weight:600;color:#374151;line-height:1.5">'+p.obs+'</div>';
+    h += '</div>';
+  }
+
+  document.getElementById('cad_dtit').textContent = 'Pedido';
   document.getElementById('cad_dcorp').innerHTML = h;
   cadRenderFotosDet(p);
   document.getElementById('cad-modal-det').classList.add('open');
@@ -4026,11 +5083,11 @@ window.cadAdicionarFotoDet = function(input){
   reader.onload = function(e){
     var img = new Image();
     img.onload = function(){
-      var canvas = document.createElement('canvas'), max=800, w=img.width, h=img.height;
+      var canvas = document.createElement('canvas'), max=500, w=img.width, h=img.height;
       if(w>max){h=Math.round(h*max/w);w=max;}
       canvas.width=w; canvas.height=h;
       canvas.getContext('2d').drawImage(img,0,0,w,h);
-      var b64 = canvas.toDataURL('image/jpeg',0.8);
+      var b64 = canvas.toDataURL('image/jpeg',0.55);
       var p = cad_pedidosCache.find(function(x){ return x.id===cad_detId; }); if(!p) return;
       if(!p.fotos) p.fotos=[];
       p.fotos.push(b64);
@@ -4363,11 +5420,11 @@ window.previewFotoCadastro = function(input){
   reader.onload=function(e){
     var img=new Image();
     img.onload=function(){
-      var canvas=document.createElement('canvas'),max=800,w=img.width,h=img.height;
+      var canvas=document.createElement('canvas'),max=500,w=img.width,h=img.height;
       if(w>max){h=Math.round(h*max/w);w=max;}
       canvas.width=w;canvas.height=h;
       canvas.getContext('2d').drawImage(img,0,0,w,h);
-      fotoCadastroBase64=canvas.toDataURL('image/jpeg',0.8);
+      fotoCadastroBase64=canvas.toDataURL('image/jpeg',0.55);
       var ci=document.getElementById('c_foto_img'); if(ci) ci.src=fotoCadastroBase64;
       var cp=document.getElementById('c_foto_prev'); if(cp) cp.style.display='block';
     };
@@ -4390,11 +5447,11 @@ window.previewFotoPrompt = function(input){
   reader.onload=function(e){
     var img=new Image();
     img.onload=function(){
-      var canvas=document.createElement('canvas'),max=800,w=img.width,h=img.height;
+      var canvas=document.createElement('canvas'),max=500,w=img.width,h=img.height;
       if(w>max){h=Math.round(h*max/w);w=max;}
       canvas.width=w;canvas.height=h;
       canvas.getContext('2d').drawImage(img,0,0,w,h);
-      fotoPromptBase64=canvas.toDataURL('image/jpeg',0.8);
+      fotoPromptBase64=canvas.toDataURL('image/jpeg',0.55);
       var pi=document.getElementById('p_foto_img'); if(pi) pi.src=fotoPromptBase64;
       var pp=document.getElementById('p_foto_prev'); if(pp) pp.style.display='block';
     };
@@ -4439,7 +5496,7 @@ window.limparCalc = function(){
 function montarCards(lista,elId){
   var fat=0,custo=0,atr=0,hj=0,sc=0;
   lista.forEach(function(p){
-    fat+=p.valor;
+    fat+=(p.valorTotal||(p.valor||0));
     var c=getCusto(p);if(c!==null) custo+=c; else sc++;
     var s=calcSt(p.dataVenda,p.prazo);
     if(s.c==='tap-bg-red') atr++;
@@ -4469,7 +5526,7 @@ window.renderG = function(){
   if(!todos.length){el.innerHTML='<div class="tap-empty"><div class="ic">📊</div>Nenhuma venda</div>';return;}
   var h='';
   todos.slice().reverse().forEach(function(p){
-    var c=getCusto(p),l=c!==null?p.valor-c:null,s=calcSt(p.dataVenda,p.prazo);
+    var _totalDet=p.valorTotal||(p.valor+(p.tapetesExtras||[]).reduce(function(a,t){return a+(t.valor||0);},0)),c=getCusto(p),l=c!==null?_totalDet-c:null,s=calcSt(p.dataVenda,p.prazo);
     h+='<div class="tap-vcard"><div class="tap-vcard-nome">'+p.nome+(p.loja?' <span style="font-size:.75rem;color:#6b7280;font-weight:600">'+p.loja+'</span>':'')+'</div>';
     h+='<div style="margin-bottom:6px;display:flex;flex-direction:column;gap:4px">'+waLink(p.contato)+telLink(p.contato)+'</div>';
     h+='<div class="tap-vcard-row"><span class="tap-vcard-key">Medida</span><span class="tap-vcard-val">'+p.medida+'</span></div>';
@@ -4536,22 +5593,81 @@ window.verDet = function(id){
   detId=id;
   var p=pedidosCache.find(function(x){return x.id===id;});
   if(!p) return;
-  var c=getCusto(p),l=c!==null?p.valor-c:null,s=calcSt(p.dataVenda,p.prazo);
+  var _totalDet=p.valorTotal||(p.valor+(p.tapetesExtras||[]).reduce(function(a,t){return a+(t.valor||0);},0)),c=getCusto(p),l=c!==null?_totalDet-c:null,s=calcSt(p.dataVenda,p.prazo);
+
+  function row(icon,label,val,valStyle){
+    return '<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #f1f5f9">'
+      +'<span style="font-size:16px;width:22px;text-align:center;flex-shrink:0">'+icon+'</span>'
+      +'<span style="font-size:.78rem;font-weight:700;color:#9ca3af;flex:1">'+label+'</span>'
+      +'<span style="font-size:.85rem;font-weight:800;color:#111;text-align:right;max-width:58%;word-break:break-word'+(valStyle?';'+valStyle:'')+'">'+val+'</span>'
+      +'</div>';
+  }
+
   var h='';
-  h+='<div class="tap-irow"><span class="k">Cliente</span><span class="v">'+p.nome+'</span></div>';
-  if(p.loja) h+='<div class="tap-irow"><span class="k">Loja</span><span class="v">'+p.loja+'</span></div>';
-  h+='<div class="tap-irow"><span class="k">Contato</span><span class="v"><div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end">'+waLink(p.contato)+''+telLink(p.contato)+'</div></span></div>';
-  h+='<div class="tap-irow"><span class="k">Medida</span><span class="v">'+p.medida+'</span></div>';
-  h+='<div class="tap-irow"><span class="k">Borda</span><span class="v">'+(p.borda==='com'?'Com borda '+(p.bcor||''):'Sem borda')+'</span></div>';
-  h+='<div class="tap-irow"><span class="k">Data da venda</span><span class="v">'+p.dataVenda+'</span></div>';
-  h+='<div class="tap-irow"><span class="k">Prazo</span><span class="v">'+p.prazo+' dias</span></div>';
-  h+='<div class="tap-irow"><span class="k">Status</span><span class="v"><span class="tap-badge '+s.c+'">'+s.t+'</span></span></div>';
-  h+='<div class="tap-irow"><span class="k">Valor</span><span class="v">'+R(p.valor)+'</span></div>';
-  h+='<div class="tap-irow"><span class="k">Custo</span><span class="v">'+(c!==null?R(c):'<span class="tap-sc">Nao informado</span>')+'</span></div>';
-  h+='<div class="tap-irow"><span class="k">Lucro</span><span class="v">'+(l!==null?'<span style="color:#10b981">'+R(l)+'</span>':'<span class="tap-sc">---</span>')+'</span></div>';
-  if(p.endereco) h+='<div class="tap-irow"><span class="k">Endereco</span><span class="v" style="font-size:.73rem;max-width:55%;word-break:break-word">'+p.endereco+'</span></div>';
-  if(p.obs) h+='<div class="tap-irow"><span class="k">Observacao</span><span class="v" style="font-size:.78rem;max-width:55%;word-break:break-word">'+p.obs+'</span></div>';
-  var dt=document.getElementById('dtit'); if(dt) dt.textContent='Detalhes - '+p.nome;
+
+  // Header
+  h+='<div style="background:linear-gradient(135deg,#1e293b 0%,#334155 100%);border-radius:16px;padding:16px 18px;margin-bottom:14px;color:#fff">';
+  h+='<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">';
+  h+='<div style="font-size:1.1rem;font-weight:900">'+p.nome+(p.loja?' <span style="font-size:.8rem;opacity:.7">'+p.loja+'</span>':'')+'</div>';
+  if(p.dataVenda) h+='<span style="font-size:.7rem;opacity:.7;white-space:nowrap;margin-left:8px;margin-top:2px">'+p.dataVenda.split('-').reverse().join('/')+'</span>';
+  h+='</div>';
+  h+='<span style="background:rgba(255,255,255,.15);border-radius:20px;padding:3px 10px;font-size:.72rem;font-weight:700">'+s.t+'</span>';
+  h+='</div>';
+
+  // Contato
+  h+='<div style="background:#f8fafc;border-radius:14px;padding:12px 14px;margin-bottom:10px">';
+  h+='<div style="font-size:.65rem;font-weight:900;color:#94a3b8;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Contato</div>';
+  h+='<div style="display:flex;gap:8px;flex-wrap:wrap">'+waLink(p.contato)+telLink(p.contato)+'</div>';
+  h+='</div>';
+
+  // Tapete(s)
+  var totalTodos = p.valorTotal || (p.valor + (p.tapetesExtras||[]).reduce(function(acc,t){return acc+(t.valor||0);},0));
+  var temExtras = p.tapetesExtras && p.tapetesExtras.length > 0;
+
+  h+='<div style="background:#f8fafc;border-radius:14px;padding:12px 14px;margin-bottom:10px">';
+  h+='<div style="font-size:.65rem;font-weight:900;color:#94a3b8;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">🪄 Tapete 1</div>';
+  if(p.medida) h+=row('📐','Medida',p.medida);
+  if(p.borda==='sim' && p.bordaCor) h+=row('✨','Borda',p.bordaCor);
+  h+=row('💰','Valor',R(p.valor),'color:#059669;font-size:.92rem');
+  h+='</div>';
+
+  if(temExtras){
+    p.tapetesExtras.forEach(function(t,i){
+      h+='<div style="background:#f8fafc;border-radius:14px;padding:12px 14px;margin-bottom:10px">';
+      h+='<div style="font-size:.65rem;font-weight:900;color:#94a3b8;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">🪄 Tapete '+(i+2)+'</div>';
+      h+=row('📐','Medida',t.tamanho||t.medida||'—');
+      if(t.bordaCor) h+=row('✨','Borda',t.bordaCor);
+      h+=row('💰','Valor',R(t.valor||0),'color:#059669;font-size:.92rem');
+      h+='</div>';
+    });
+    h+='<div style="background:linear-gradient(135deg,#ecfdf5,#d1fae5);border-radius:14px;padding:14px 18px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center">';
+    h+='<span style="font-size:.8rem;font-weight:900;color:#065f46;text-transform:uppercase;letter-spacing:.04em">💵 Total Geral</span>';
+    h+='<span style="font-size:1.1rem;font-weight:900;color:#065f46">'+R(totalTodos)+'</span>';
+    h+='</div>';
+  }
+
+  // Entrega
+  h+='<div style="background:#f8fafc;border-radius:14px;padding:12px 14px;margin-bottom:10px">';
+  h+='<div style="font-size:.65rem;font-weight:900;color:#94a3b8;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">Entrega</div>';
+  if(p.prazo) h+=row('⏱','Prazo',p.prazo+' dias');
+  if(p.endereco) h+=row('📍','Endereço',p.endereco);
+  h+='</div>';
+
+  // Financeiro
+  h+='<div style="background:#f8fafc;border-radius:14px;padding:12px 14px;margin-bottom:10px">';
+  h+='<div style="font-size:.65rem;font-weight:900;color:#94a3b8;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">Financeiro</div>';
+  h+=row('💸','Custo',c!==null?R(c):'<span style="color:#d1d5db;font-weight:600">Não informado</span>');
+  h+=row('📈','Lucro',l!==null?R(l):'<span style="color:#d1d5db;font-weight:600">—</span>',l!==null?'color:#10b981':'');
+  h+='</div>';
+
+  if(p.obs){
+    h+='<div style="background:#fffbeb;border-radius:14px;padding:12px 14px;margin-bottom:10px">';
+    h+='<div style="font-size:.65rem;font-weight:900;color:#92400e;text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">📝 Observação</div>';
+    h+='<div style="font-size:.82rem;font-weight:600;color:#374151;line-height:1.5">'+p.obs+'</div>';
+    h+='</div>';
+  }
+
+  var dt=document.getElementById('dtit'); if(dt) dt.textContent='Detalhes';
   var dc=document.getElementById('dcorp'); if(dc) dc.innerHTML=h;
   renderFotosDet(p);
   document.getElementById('mdet').classList.add('open');
@@ -4574,17 +5690,18 @@ window.adicionarFotoDet = function(input){
   reader.onload=function(e){
     var img=new Image();
     img.onload=function(){
-      var canvas=document.createElement('canvas'),max=800,w=img.width,h=img.height;
+      var canvas=document.createElement('canvas'),max=500,w=img.width,h=img.height;
       if(w>max){h=Math.round(h*max/w);w=max;}
       canvas.width=w;canvas.height=h;
       canvas.getContext('2d').drawImage(img,0,0,w,h);
-      var b64=canvas.toDataURL('image/jpeg',0.8);
+      var b64=canvas.toDataURL('image/jpeg',0.55);
       var p=pedidosCache.find(function(x){return x.id===detId;});
       if(!p) return;
       if(!p.fotos) p.fotos=[];
       p.fotos.push(b64);
       salvarCacheLocal();
-      try{ updateDoc(doc(db,'tapetes',detId),{fotos:p.fotos}); } catch(e){}
+      // Não envia base64 para o Firebase; sincroniza só a contagem (sem imagem)
+      try{ updateDoc(doc(db,'tapetes',detId),{qtdFotos: p.fotos.length, updatedAt: Date.now()}); } catch(e){}
       renderFotosDet(p);toast('Foto adicionada!');
     };
     img.src=e.target.result;
@@ -4596,7 +5713,8 @@ window.delFotoDet = function(i){
   if(!p||!p.fotos) return;
   p.fotos.splice(i,1);
   salvarCacheLocal();
-  try{ updateDoc(doc(db,'tapetes',detId),{fotos:p.fotos}); } catch(e){}
+  // Não envia base64 para o Firebase; sincroniza só a contagem (sem imagem)
+  try{ updateDoc(doc(db,'tapetes',detId),{qtdFotos: p.fotos.length, updatedAt: Date.now()}); } catch(e){}
   renderFotosDet(p);
 };
 window.abrirFotoGrande = function(i){
@@ -4607,7 +5725,15 @@ window.abrirFotoGrande = function(i){
   document.getElementById('mfoto').classList.add('open');
 };
 window.fFoto = function(){document.getElementById('mfoto').classList.remove('open');};
-window.fDet = function(){document.getElementById('mdet').classList.remove('open');detId=null;};
+window.fDet = function(){
+  if(window._agVoltarAgenda){
+    window._agVoltarAgenda = false;
+    document.getElementById('mdet').classList.remove('open');
+    // Reabre modal agenda
+    var m = document.getElementById('modal-agenda');
+    if(m) m.style.display='flex';
+    return;
+  }document.getElementById('mdet').classList.remove('open');detId=null;};
 
 window.copiarFotoDet = function(){if(!fotoDetAtual){toast('Nenhuma foto selecionada','aviso');return;}copiarImgBase64(fotoDetAtual);};
 window.copiarFotoPrompt = function(){if(!fotoPromptBase64){toast('Tire uma foto primeiro','aviso');return;}copiarImgBase64(fotoPromptBase64);};
@@ -4753,7 +5879,39 @@ window.renderRC = function(){
   });el.innerHTML=h;
 };
 
-// ─── ABA 6 Agenda ────────────────────────────────────────────────────────────
+
+
+// ─── Agenda: botões Ver, Confirmar, Adiar ────────────────────────────────────
+window.agVerDet = function(id){
+  window._agVoltarAgenda = true;
+  verDet(id);
+};
+window.agConfirmar = function(id){
+  if(!confirm('Confirmar entrega realizada?')) return;
+  var idx=pedidosCache.findIndex(function(x){return x.id===id;});
+  if(idx<0) return;
+  pedidosCache[idx].completo=true;
+  pedidosCache[idx].updatedAt=Date.now();
+  salvarCacheLocal();
+  renderAgenda();
+  toast('✅ Entrega confirmada!');
+  try{if(window.db&&window.updateDoc&&window.doc)updateDoc(doc(db,'tapetes',id),{completo:true,updatedAt:Date.now()});}catch(e){}
+};
+window.agAdiar = function(id){
+  var p=pedidosCache.find(function(x){return x.id===id;}); if(!p) return;
+  var dias=prompt('Adiar por quantos dias?','3');
+  if(!dias||isNaN(parseInt(dias))) return;
+  var novo=parseInt(p.prazo||0)+parseInt(dias);
+  var idx=pedidosCache.findIndex(function(x){return x.id===id;});
+  if(idx<0) return;
+  pedidosCache[idx].prazo=String(novo);
+  pedidosCache[idx].updatedAt=Date.now();
+  salvarCacheLocal();
+  renderAgenda();
+  toast('⏰ Adiado '+dias+' dias!');
+  try{if(window.db&&window.updateDoc&&window.doc)updateDoc(doc(db,'tapetes',id),{prazo:String(novo),updatedAt:Date.now()});}catch(e){}
+};
+
 window.renderAgenda = function(){
   var todos=[...pedidosCache],hoje=new Date();hoje.setHours(0,0,0,0);
   var urgentes=[],proximos=[];
@@ -4771,12 +5929,16 @@ window.renderAgenda = function(){
       var h='';
       urgentes.forEach(function(item){
         var p=item.p,d=item.d,cls=d<0?'atrasado':'hoje',label=d<0?'Atrasado '+Math.abs(d)+' dia(s)':'Hoje!';
-        var maps=p.endereco?'<a href="https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(p.endereco)+'" target="_blank" style="display:inline-block;margin-top:6px;padding:5px 10px;background:#374151;color:#fff;border-radius:8px;font-size:.72rem;font-weight:800;text-decoration:none">📍 Abrir no Maps</a>':'';
-        h+='<div class="tap-entrega-card '+cls+'"><div class="tap-entrega-nome">'+p.nome+(p.loja?' - '+p.loja:'')+'</div>';
-        h+='<div class="tap-entrega-info" style="display:flex;flex-direction:column;gap:4px">'+waLink(p.contato)+telLink(p.contato)+'</div><div class="tap-entrega-info">'+p.medida+'</div>';
-        h+='<div class="tap-entrega-info" style="margin-top:4px"><span class="tap-badge '+(d<0?'tap-bg-red':'tap-bg-green')+'">'+label+'</span></div>';
-        if(p.endereco) h+='<div class="tap-entrega-info" style="margin-top:4px;font-size:.7rem">'+p.endereco+'</div>';
-        h+=maps+'</div>';
+        var maps=p.endereco?'<a href="https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(p.endereco)+'" target="_blank" style="display:inline-flex;align-items:center;gap:4px;padding:5px 10px;background:#374151;color:#fff;border-radius:8px;font-size:.72rem;font-weight:800;text-decoration:none">📍 Maps</a>':'';
+        h+='<div class="tap-entrega-card '+cls+'">';
+        h+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">';
+        h+='<div style="font-size:1rem;font-weight:900;color:#111">'+p.nome+(p.loja?' <span style="font-size:.75rem;color:#6b7280;font-weight:600">'+p.loja+'</span>':'')+'</div>';
+        h+='<span class="tap-badge '+(d<0?'tap-bg-red':'tap-bg-green')+'">'+label+'</span>';
+        h+='</div>';
+        h+='<div style="display:flex;flex-direction:column;gap:4px;margin-bottom:8px">'+waLink(p.contato)+telLink(p.contato)+'</div>';
+        h+='<div style="font-size:.78rem;font-weight:700;color:#374151;margin-bottom:6px">📐 '+p.medida+'</div>';
+        if(p.endereco) h+='<div style="font-size:.7rem;color:#6b7280;margin-bottom:6px">📍 '+p.endereco+'</div>';
+        h+=maps+'<div style="display:flex;gap:6px;margin-top:10px"><button onclick="agVerDet(\''+p.id+'\')" style="flex:1;padding:7px 4px;background:#f1f5f9;border:none;border-radius:8px;font-size:.72rem;font-weight:800;color:#374151;cursor:pointer">👁 Ver</button><button onclick="agConfirmar(\''+p.id+'\')" style="flex:1;padding:7px 4px;background:#10b981;border:none;border-radius:8px;font-size:.72rem;font-weight:800;color:#fff;cursor:pointer">✅ Confirmar</button><button onclick="agAdiar(\''+p.id+'\')" style="flex:1;padding:7px 4px;background:#f59e0b;border:none;border-radius:8px;font-size:.72rem;font-weight:800;color:#fff;cursor:pointer">⏰ Adiar</button></div></div>';
       });elU.innerHTML=h;
     }
   }
@@ -4787,12 +5949,16 @@ window.renderAgenda = function(){
       var h2='';
       proximos.forEach(function(item){
         var p=item.p,d=item.d,cls=d<=3?'tap-bg-orange':'tap-bg-blue';
-        var maps=p.endereco?'<a href="https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(p.endereco)+'" target="_blank" style="display:inline-block;margin-top:6px;padding:5px 10px;background:#374151;color:#fff;border-radius:8px;font-size:.72rem;font-weight:800;text-decoration:none">📍 Abrir no Maps</a>':'';
-        h2+='<div class="tap-entrega-card"><div class="tap-entrega-nome">'+p.nome+(p.loja?' - '+p.loja:'')+'</div>';
-        h2+='<div class="tap-entrega-info" style="display:flex;flex-direction:column;gap:4px">'+waLink(p.contato)+telLink(p.contato)+'</div><div class="tap-entrega-info">'+p.medida+'</div>';
-        h2+='<div class="tap-entrega-info" style="margin-top:4px"><span class="tap-badge '+cls+'">'+d+' dias</span></div>';
-        if(p.endereco) h2+='<div class="tap-entrega-info" style="margin-top:4px;font-size:.7rem">'+p.endereco+'</div>';
-        h2+=maps+'</div>';
+        var maps=p.endereco?'<a href="https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(p.endereco)+'" target="_blank" style="display:inline-flex;align-items:center;gap:4px;padding:5px 10px;background:#374151;color:#fff;border-radius:8px;font-size:.72rem;font-weight:800;text-decoration:none">📍 Maps</a>':'';
+        h2+='<div class="tap-entrega-card">';
+        h2+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">';
+        h2+='<div style="font-size:1rem;font-weight:900;color:#111">'+p.nome+(p.loja?' <span style="font-size:.75rem;color:#6b7280;font-weight:600">'+p.loja+'</span>':'')+'</div>';
+        h2+='<span class="tap-badge '+cls+'">'+d+' dias</span>';
+        h2+='</div>';
+        h2+='<div style="display:flex;flex-direction:column;gap:4px;margin-bottom:8px">'+waLink(p.contato)+telLink(p.contato)+'</div>';
+        h2+='<div style="font-size:.78rem;font-weight:700;color:#374151;margin-bottom:6px">📐 '+p.medida+'</div>';
+        if(p.endereco) h2+='<div style="font-size:.7rem;color:#6b7280;margin-bottom:6px">📍 '+p.endereco+'</div>';
+        h2+=maps+'<div style="display:flex;gap:6px;margin-top:10px"><button onclick="agVerDet(\''+p.id+'\')" style="flex:1;padding:7px 4px;background:#f1f5f9;border:none;border-radius:8px;font-size:.72rem;font-weight:800;color:#374151;cursor:pointer">👁 Ver</button><button onclick="agConfirmar(\''+p.id+'\')" style="flex:1;padding:7px 4px;background:#10b981;border:none;border-radius:8px;font-size:.72rem;font-weight:800;color:#fff;cursor:pointer">✅ Confirmar</button><button onclick="agAdiar(\''+p.id+'\')" style="flex:1;padding:7px 4px;background:#f59e0b;border:none;border-radius:8px;font-size:.72rem;font-weight:800;color:#fff;cursor:pointer">⏰ Adiar</button></div></div>';
       });elS.innerHTML=h2;
     }
   }
@@ -4830,7 +5996,7 @@ window.renderRel = function(per,diaEsp){
   if(!elRes||!elLista) return;
   if(!lista.length){elRes.style.display='none';elLista.innerHTML='<div class="tap-rel-vazio"><div class="ic">📭</div>Nenhuma venda neste periodo</div>';return;}
   var fat=0,custoT=0,sc=0;
-  lista.forEach(function(p){fat+=p.valor;var c=getCusto(p);if(c!==null) custoT+=c; else sc++;});
+  lista.forEach(function(p){fat+=(p.valorTotal||(p.valor||0));var c=getCusto(p);if(c!==null) custoT+=c; else sc++;});
   elRes.style.display='block';
   elRes.innerHTML='<div class="tap-sgrid" style="margin-bottom:0">'
     +'<div class="tap-scard la"><div class="lbl">Vendas</div><div class="num">'+lista.length+'</div></div>'
@@ -4840,7 +6006,7 @@ window.renderRel = function(per,diaEsp){
     +'</div>';
   var h='';
   lista.forEach(function(p){
-    var c=getCusto(p),l=c!==null?p.valor-c:null,s=calcSt(p.dataVenda,p.prazo);
+    var _totalDet=p.valorTotal||(p.valor+(p.tapetesExtras||[]).reduce(function(a,t){return a+(t.valor||0);},0)),c=getCusto(p),l=c!==null?_totalDet-c:null,s=calcSt(p.dataVenda,p.prazo);
     var n=(p.contato||'').replace(/\D/g,''),waHref=n?'https://wa.me/'+(n.startsWith('55')?n:'55'+n):'';
     h+='<div class="tap-vcard"><div class="tap-vcard-nome">'+p.nome+(p.loja?' <span style="font-size:.75rem;color:#6b7280;font-weight:600">'+p.loja+'</span>':'')+'</div>';
     if(waHref) h+='<a class="tap-walink" href="'+waHref+'" target="_blank" style="margin-bottom:8px;display:inline-flex">📲 '+p.contato+'</a>';
@@ -4918,6 +6084,9 @@ async function sincronizarPendentes(){
   for(var i=0;i<pedidosPendentes.length;i++){
     var obj=Object.assign({},pedidosPendentes[i]);
     var localId=obj.id;delete obj.pendingSync;delete obj._localId;delete obj.id;
+    // Remove base64 antes de enviar ao Firebase
+    var _isB64=function(v){return typeof v==='string'&&v.startsWith('data:');};
+    if(Array.isArray(obj.fotos)){obj.fotos=obj.fotos.filter(function(f){return !_isB64(f);});if(!obj.fotos.length)delete obj.fotos;}
     try{
       var docRef=await addDoc(collection(db,'tapetes'),obj);
       var idx=pedidosCache.findIndex(function(x){return x.id===localId;});
@@ -5018,4 +6187,4 @@ setTimeout(function(){
 }, 600);
 </script>
 </body>
-          </html>
+  </html>
