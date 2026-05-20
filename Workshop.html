@@ -144,7 +144,7 @@ body.editing .del-badge{display:flex;}
   z-index:5;cursor:pointer;
 }
 body.editing .edit-badge{display:flex;}
-body.editing .app-icon{animation:wiggle 0.6s ease-in-out infinite;}
+body.editing .app-icon{/* no wiggle */}
 @keyframes wiggle{
   0%,100%{transform:rotate(0deg);}
   25%{transform:rotate(-3deg);}
@@ -469,8 +469,8 @@ body.img-active .ck-wrap{z-index:9100 !important;}
 .fm-add-btn{
   background:#111111;
   border:none;border-radius:50px;color:#fff;
-  font-family:'Outfit',sans-serif;font-size:0.72rem;font-weight:600;
-  padding:0.32rem 0.6rem;cursor:pointer;white-space:nowrap;
+  font-family:'Outfit',sans-serif;font-size:0.78rem;font-weight:600;
+  padding:0.48rem 0.75rem;cursor:pointer;white-space:nowrap;
 }
 .fm-list{flex:1;overflow-y:auto;padding:1rem;}
 .fm-item{
@@ -967,14 +967,14 @@ body.img-active .ck-wrap{z-index:9100 !important;}
 /* ── BUSCA no FM ── */
 .fm-search-bar{
   display:none;padding:0.5rem 0.8rem 0.4rem;
-  background:rgba(10,10,18,0.98);
-  border-bottom:1px solid var(--border2);
+  background:#ffffff;
+  border-bottom:1px solid var(--border);
   flex-shrink:0;gap:6px;flex-direction:column;
 }
 .fm-search-bar.open{display:flex;}
 .fm-search-row{display:flex;gap:6px;align-items:center;}
 .fm-search-inp{
-  flex:1;background:rgba(255,255,255,0.07);
+  flex:1;background:#f5f5f5;
   border:1px solid var(--border2);border-radius:10px;
   padding:0.45rem 0.7rem;color:var(--text);
   font-family:'Outfit',sans-serif;font-size:0.8rem;outline:none;
@@ -1260,6 +1260,29 @@ body.img-active .ck-wrap{z-index:9100 !important;}
   padding-top: 0 !important;
   padding-bottom: 0 !important;
 }
+
+/* PIN button */
+.fm-pin-btn{
+  width:28px;height:28px;border-radius:50%;
+  border:1px solid rgba(0,0,0,0.10);background:#f5f5f5;
+  color:#aaa;font-size:0.8rem;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  transition:all 0.15s;
+}
+.fm-pin-btn.pinned{background:#fef9c3;border-color:#eab308;color:#eab308;}
+/* Pinned banner in FM header */
+.fm-pinned-bar{
+  display:none;padding:0.4rem 1rem;
+  background:#fef9c3;border-bottom:1px solid #fde047;
+  font-size:0.72rem;color:#854d0e;
+  align-items:center;gap:8px;flex-shrink:0;
+}
+.fm-pinned-bar.show{display:flex;}
+.fm-pinned-clear{
+  margin-left:auto;background:transparent;border:none;
+  color:#854d0e;font-size:0.75rem;cursor:pointer;
+  font-family:'Outfit',sans-serif;text-decoration:underline;
+}
 </style>
 </head>
 <body>
@@ -1269,15 +1292,23 @@ body.img-active .ck-wrap{z-index:9100 !important;}
     <button class="fm-back" id="fmBack" onclick="fmGoBack()">←</button>
     <span id="fmPath" style="display:none;"></span>
     <span style="flex:1;"></span>
-    <button onclick="fmToggleSearch()" style="background:var(--glass);border:1px solid var(--border2);border-radius:8px;color:var(--muted2);font-size:0.72rem;padding:0.32rem 0.6rem;cursor:pointer;" title="Buscar">🔍</button>
-    <button class="fm-sel-toggle" onclick="fmToggleSelMode()" style="background:var(--glass);border:1px solid var(--border2);border-radius:8px;color:var(--muted2);font-size:0.72rem;padding:0.32rem 0.6rem;cursor:pointer;font-family:'Outfit',sans-serif;white-space:nowrap;">☑ Sel</button>
-    <button onclick="openFmTrash()" style="background:var(--glass);border:1px solid var(--border2);border-radius:8px;color:var(--muted2);font-size:0.72rem;padding:0.32rem 0.6rem;cursor:pointer;" title="Lixeira">🗑️</button>
-    <button onclick="openAdPanel()" style="background:var(--glass);border:1px solid var(--border2);border-radius:8px;color:var(--muted2);font-size:0.72rem;padding:0.32rem 0.6rem;cursor:pointer;" title="Atalhos AnyDesk">⚡</button>
-    <button class="fm-sort-chip" data-sort="manual" id="fmSortManualBtn" style="background:var(--glass);border:1px solid var(--border2);border-radius:8px;color:#111111;font-size:0.72rem;padding:0.32rem 0.6rem;font-weight:700;font-family:'Outfit',sans-serif;white-space:nowrap;cursor:pointer;">↕ Manual</button>
+    <div style="display:flex;gap:1px;align-items:center;">
+      <button onclick="fmToggleSearch()" style="background:var(--glass);border:1px solid var(--border2);border-radius:8px;color:var(--muted2);font-size:0.82rem;padding:0.6rem 0.85rem;cursor:pointer;" title="Buscar">🔍</button>
+      <button class="fm-sel-toggle" onclick="fmToggleSelMode()" style="background:var(--glass);border:1px solid var(--border2);border-radius:8px;color:var(--muted2);font-size:0.82rem;padding:0.6rem 0.85rem;cursor:pointer;font-family:'Outfit',sans-serif;white-space:nowrap;">☑ Sel</button>
+      <button onclick="openFmTrash()" style="background:var(--glass);border:1px solid var(--border2);border-radius:8px;color:var(--muted2);font-size:0.82rem;padding:0.6rem 0.85rem;cursor:pointer;" title="Lixeira">🗑️</button>
+      <button onclick="openAdPanel()" style="background:var(--glass);border:1px solid var(--border2);border-radius:8px;color:var(--muted2);font-size:0.82rem;padding:0.6rem 0.85rem;cursor:pointer;" title="Atalhos AnyDesk">⚡</button>
+    </div>
+    <button class="fm-sort-chip" data-sort="manual" id="fmSortManualBtn" style="background:var(--glass);border:1px solid var(--border2);border-radius:8px;color:#111111;font-size:0.78rem;padding:0.48rem 0.75rem;font-weight:700;font-family:'Outfit',sans-serif;white-space:nowrap;cursor:pointer;">↕ Manual</button>
     <button class="fm-add-btn" onclick="openFmModal()">+ Novo</button>
   </div>
 
   <!-- BARRA DE BUSCA AVANÇADA -->
+  <!-- PINNED BAR -->
+  <div class="fm-pinned-bar" id="fmPinnedBar">
+    📌 <span id="fmPinnedName"></span>
+    <button class="fm-pinned-clear" onclick="fmClearPin()">Remover fixação</button>
+  </div>
+
   <div class="fm-search-bar" id="fmSearchBar">
     <div class="fm-search-row">
       <input class="fm-search-inp" id="fmSearchInp" placeholder="Buscar por nome ou conteúdo..." oninput="fmDoSearch()">
@@ -1891,6 +1922,69 @@ window.exitEdit = exitEdit;
 // Sai do modo edição se perder foco ou minimizar
 document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='hidden') exitEdit(); });
 
+
+// ── PIN / FIXAR ARQUIVO ──────────────────────────────────────────────
+function fmGetPin(){
+  try{ return JSON.parse(localStorage.getItem('fmPinnedFile')||'null'); }catch(e){return null;}
+}
+
+window.fmTogglePinCurrent = function(){
+  const pin = fmGetPin();
+  // If already pinned at current location, unpin
+  if(pin && JSON.stringify(pin.path) === JSON.stringify(fmPath) && !pin.key){
+    localStorage.removeItem('fmPinnedFile');
+    fmUpdatePinnedBar();
+    fmUpdateHeaderPin();
+    return;
+  }
+  // Pin current folder (no specific file)
+  localStorage.setItem('fmPinnedFile', JSON.stringify({path:[...fmPath], key:null}));
+  fmUpdatePinnedBar();
+  fmUpdateHeaderPin();
+};
+
+function fmUpdateHeaderPin(){
+  const btn = document.getElementById('fmHeaderPin');
+  if(!btn) return;
+  const pin = fmGetPin();
+  if(pin){
+    btn.style.background = '#fef9c3';
+    btn.style.borderColor = '#eab308';
+    btn.style.color = '#eab308';
+  } else {
+    btn.style.background = 'var(--glass)';
+    btn.style.borderColor = 'var(--border2)';
+    btn.style.color = 'var(--muted2)';
+  }
+}
+window.fmTogglePin = function(key){
+  const pin = fmGetPin();
+  if(pin && pin.key===key && JSON.stringify(pin.path)===JSON.stringify(fmPath)){
+    localStorage.removeItem('fmPinnedFile');
+  } else {
+    localStorage.setItem('fmPinnedFile', JSON.stringify({key, path:[...fmPath]}));
+  }
+  fmUpdatePinnedBar();
+  fmUpdateHeaderPin();
+  renderFm();
+};
+window.fmClearPin = function(){
+  localStorage.removeItem('fmPinnedFile');
+  fmUpdatePinnedBar();
+  renderFm();
+};
+function fmUpdatePinnedBar(){
+  const pin = fmGetPin();
+  const bar = document.getElementById('fmPinnedBar');
+  const name = document.getElementById('fmPinnedName');
+  if(pin && bar && name){
+    bar.classList.add('show');
+    name.textContent = pin.key;
+  } else if(bar){
+    bar.classList.remove('show');
+  }
+}
+
 function render(){
   const grid=document.getElementById('grid');
   if(!grid) return;
@@ -2416,9 +2510,26 @@ let fmTrash=[];
 let fmPendingFiles=[];
 let fmReadEditorPath=null;
 
+let fmPinOpened = false; // só abre o fixado uma vez por sessão
 setupSnapshot('launcher_fm', 'data', (data) => {
   fmFs = data ? (data.fs || fmFs) : fmFs;
   renderFm();
+  // Abre arquivo fixado só na primeira carga
+  if(!fmPinOpened){
+    const pin = fmGetPin();
+    if(pin && document.getElementById('fmOverlay').classList.contains('open')){
+      fmPinOpened = true;
+      fmPath = pin.path || [];
+      renderFm();
+      if(pin.key){
+        const folder = fmCurrentFolder();
+        if(folder && folder.children && folder.children[pin.key]){
+          fmOpenEditor(pin.key);
+        }
+      }
+      // If no key, just stays in the pinned folder
+    }
+  }
 });
 setupSnapshot('launcher_trash', 'data', (data) => {
   fmTrash = data ? (data.list || []) : [];
@@ -2456,12 +2567,17 @@ function fmPathLabel(){return fmPath.length===0?'🗂️':['🗂️',...fmPath].
 window.openFm = function(){
   fmSelMode=false;fmSelected.clear();
   var so=document.getElementById('fmSortOthers');if(so)so.style.display='none';
+  // Se tem arquivo fixado, prepara o caminho (snapshot abre o arquivo)
+  const pin = fmGetPin();
+  if(pin){
+    fmPath = pin.path || [];
+  }
   // Restaura posição anterior
   const nav = fmLoadNavState();
   if(nav && nav.path) fmPath = nav.path;
   renderFm();
   document.getElementById('fmOverlay').classList.add('open');
-  // Restaura arquivo/modo após dados carregarem
+  fmUpdatePinnedBar();
   if(nav && nav.openFile){
     setTimeout(function(){
       const folder = fmCurrentFolder();
@@ -2602,6 +2718,7 @@ function renderFm(){
   }
   pathEl.style.maxWidth = fmPath.length===0 ? 'none' : '100px';
   document.getElementById('fmBack').textContent = fmPath.length===0?'✕':'←';
+  fmUpdateHeaderPin();
   const list = document.getElementById('fmList');
   list.innerHTML = '';
 
@@ -2793,9 +2910,37 @@ function fmShowLongPressMenu(key, touch){
   btnMove.innerHTML = '📦 <span>Mover</span>';
   btnMove.addEventListener('click', ()=>{ menu.remove(); fmOpenMovePanel(key); });
 
+  // Botão Fixar
+  const sep2 = document.createElement('div');
+  sep2.style.cssText = 'height:1px;background:var(--border);margin:0.3rem 0;';
+  const btnPin = document.createElement('button');
+  btnPin.style.cssText = 'display:flex;align-items:center;gap:10px;width:100%;padding:0.65rem 0.9rem;border:none;background:transparent;color:var(--text);font-family:Outfit,sans-serif;font-size:0.85rem;border-radius:12px;cursor:pointer;';
+  const pin = fmGetPin();
+  const isCurrentPin = pin && pin.key===key && JSON.stringify(pin.path)===JSON.stringify(fmPath);
+  btnPin.innerHTML = isCurrentPin ? '📌 <span>Desafixar</span>' : '📌 <span>Fixar</span>';
+  btnPin.addEventListener('click', ()=>{
+    menu.remove();
+    const folder = fmCurrentFolder();
+    const item = folder && folder.children && folder.children[key];
+    if(isCurrentPin){
+      localStorage.removeItem('fmPinnedFile');
+    } else {
+      // Se for pasta, fixa a pasta (key=null, path inclui a pasta)
+      if(item && item.type === 'folder'){
+        localStorage.setItem('fmPinnedFile', JSON.stringify({key:null, path:[...fmPath, key]}));
+      } else {
+        localStorage.setItem('fmPinnedFile', JSON.stringify({key, path:[...fmPath]}));
+      }
+    }
+    fmUpdatePinnedBar();
+    renderFm();
+  });
+
   menu.appendChild(btnRename);
   menu.appendChild(sep);
   menu.appendChild(btnMove);
+  menu.appendChild(sep2);
+  menu.appendChild(btnPin);
 
   // Posiciona perto do toque
   const x = touch ? touch.clientX : window.innerWidth/2;
@@ -4946,6 +5091,39 @@ function navPush(tag) {
 
 // Botão voltar — sai direto para OUTROS.html
 window.addEventListener('popstate', function(e) {
+  // Fecha painéis abertos um por um, só sai quando tudo fechado
+  var panels = [
+    {id:'fmReadMode',   close: function(){ if(window.fmExitReadMode) fmExitReadMode(); }},
+    {id:'fmEditor',     close: function(){ if(window.closeFmEditor) closeFmEditor(); }},
+    {id:'fmViewer',     close: function(){ if(window.closeFmViewer) closeFmViewer(); }},
+    {id:'fmLinkEditorPanel', close: function(){ if(window.closeFmLinkEditor) closeFmLinkEditor(); }},
+    {id:'fmInfileSearch', close: function(){ if(window.closeFmInfileSearch) closeFmInfileSearch(); }},
+    {id:'fmTrashOverlay', close: function(){ if(window.closeFmTrash) closeFmTrash(); }},
+    {id:'adOverlay',    close: function(){ if(window.closeAdPanel) closeAdPanel(); }},
+    {id:'fmMoveOverlay',close: function(){ if(window.fmCloseMovePanel) fmCloseMovePanel(); }},
+    {id:'fmConfirmOverlay', close: function(){ if(window.fmConfirmCancel) fmConfirmCancel(); }},
+    {id:'fmModalOverlay', close: function(){ if(window.closeFmModal) closeFmModal(); }},
+  ];
+  for(var i=0; i<panels.length; i++){
+    var el = document.getElementById(panels[i].id);
+    if(el && el.classList.contains('open')){
+      panels[i].close();
+      history.pushState({}, ''); // reempilha pra próximo voltar
+      return;
+    }
+  }
+  // FM aberto mas sem painel — volta pra lista (fecha editor via fmGoBack se em subpasta, senão vai pro index)
+  var fmOv = document.getElementById('fmOverlay');
+  if(fmOv && fmOv.classList.contains('open')){
+    if(fmPath && fmPath.length > 0){
+      fmPath.pop(); renderFm();
+      history.pushState({}, '');
+      return;
+    }
+    // Na raiz do FM — sai pro index
+    window.location.href = 'index.html';
+    return;
+  }
   window.location.href = 'index.html';
 });
 
