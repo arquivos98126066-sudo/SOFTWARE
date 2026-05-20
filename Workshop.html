@@ -3,9 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>Meus Apps</title>
+<title>Workshop</title>
 <script src="https://arquivos98126066-sudo.github.io/SOFTWARE/sync-indicator.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
 <style>
 :root{
   --bg:#ffffff;
@@ -611,10 +612,10 @@ body.img-active .ck-wrap{z-index:9100 !important;}
 .fm-viewer-rich{font-size:0.9rem;line-height:1.4;color:var(--text);word-break:break-word;}
 .fm-viewer-rich b,.fm-viewer-rich strong{font-weight:700;color:#fff;}
 .fm-viewer-rich i,.fm-viewer-rich em{font-style:italic;color:var(--muted2);}
-.fm-viewer-rich ul{padding-left:1.2rem;margin:0.15rem 0;}
-.fm-viewer-rich ol{padding-left:1.2rem;margin:0.15rem 0;list-style-type:decimal;}
-.fm-viewer-rich li{margin:0.1rem 0;}
-.fm-viewer-rich p{margin:0.1rem 0;}
+.fm-viewer-rich ul{padding-left:1.2rem;margin:0;padding-top:0;padding-bottom:0;}
+.fm-viewer-rich ol{padding-left:1.2rem;margin:0;padding-top:0;padding-bottom:0;list-style-type:decimal;}
+.fm-viewer-rich li{margin:0;padding:0;}
+.fm-viewer-rich p{margin:0;padding:0;}
 .fm-viewer-rich h1{font-size:1.15rem;font-weight:700;margin:0.55rem 0 0.18rem;}
 .fm-viewer-rich h2{font-size:1.05rem;font-weight:700;margin:0.45rem 0 0.14rem;}
 .fm-viewer-rich h3{font-size:0.95rem;font-weight:600;margin:0.35rem 0 0.1rem;}
@@ -754,7 +755,7 @@ body.img-active .ck-wrap{z-index:9100 !important;}
 /* ── EDITOR TEXTO/MD — fundo branco ── */
 .fm-editable{
   min-height:100%;outline:none;
-  font-size:0.9rem;line-height:1.4;
+  font-size:0.9rem;line-height:1.25;
   color:#1a1a2e;background:#ffffff;
   word-break:break-word;caret-color:#7c6dfa;
   padding:0.8rem 1rem;
@@ -765,10 +766,11 @@ body.img-active .ck-wrap{z-index:9100 !important;}
 .fm-editable i,.fm-editable em{font-style:italic;color:#333;}
 .fm-editable u{text-decoration:underline;}
 .fm-editable s{text-decoration:line-through;color:#888;}
-.fm-editable ul{padding-left:1.4rem;margin:0.15rem 0;}
-.fm-editable ol{padding-left:1.4rem;margin:0.15rem 0;list-style-type:decimal;}
-.fm-editable li{margin:0.1rem 0;}
-.fm-editable p{margin:0.1rem 0;}
+.fm-editable ul{padding-left:1.2rem;margin:0;padding-top:0;padding-bottom:0;}
+.fm-editable ol{padding-left:1.2rem;margin:0;padding-top:0;padding-bottom:0;list-style-type:decimal;}
+.fm-editable li{margin:0;padding:0;}
+.fm-editable p{margin:0;padding:0;}
+.fm-editable div{margin:0;}
 .fm-editable br{display:block;content:'';margin-top:0;}
 /* Limita qualquer elemento filho que venha com font-size grande ao colar */
 .fm-editable *{max-font-size:1.2rem;}
@@ -829,17 +831,17 @@ body.img-active .ck-wrap{z-index:9100 !important;}
   max-width:720px;width:100%;margin:0 auto;
 }
 .fm-read-content{
-  font-size:0.9rem;line-height:1.4;color:#1a1a2e;
+  font-size:0.9rem;line-height:1.25;color:#1a1a2e;
   word-break:break-word;
 }
 .fm-read-content b,.fm-read-content strong{font-weight:700;color:#111;}
 .fm-read-content i,.fm-read-content em{font-style:italic;color:#444;}
 .fm-read-content u{text-decoration:underline;}
 .fm-read-content s{text-decoration:line-through;color:#888;}
-.fm-read-content ul{padding-left:1.4rem;margin:0.15rem 0;}
-.fm-read-content ol{padding-left:1.4rem;margin:0.15rem 0;list-style-type:decimal;}
-.fm-read-content li{margin:0.1rem 0;}
-.fm-read-content p{margin:0.1rem 0;}
+.fm-read-content ul{padding-left:1.2rem;margin:0;padding-top:0;padding-bottom:0;}
+.fm-read-content ol{padding-left:1.2rem;margin:0;padding-top:0;padding-bottom:0;list-style-type:decimal;}
+.fm-read-content li{margin:0;padding:0;}
+.fm-read-content p{margin:0;padding:0;}
 .fm-read-content h1{font-size:1.15rem;font-weight:700;color:#111;margin:0.55rem 0 0.18rem;border-bottom:2px solid #e5e7eb;padding-bottom:0.12rem;}
 .fm-read-content h2{font-size:1.05rem;font-weight:700;color:#222;margin:0.45rem 0 0.14rem;}
 .fm-read-content h3{font-size:0.95rem;font-weight:600;color:#333;margin:0.35rem 0 0.1rem;}
@@ -1251,96 +1253,18 @@ body.img-active .ck-wrap{z-index:9100 !important;}
 }
 .ad-feedback.show{opacity:1;}
 </style>
+
+/* Zero spacing for all block elements inside editor and read mode */
+.fm-editable > div, .fm-editable > p, .fm-editable > ul, .fm-editable > ol,
+.fm-read-content > div, .fm-read-content > p, .fm-read-content > ul, .fm-read-content > ol {
+  margin: 0 !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+</style>
 </head>
 <body>
 
-<div id="imgWallpaper"></div>
-
-<div class="header">
-  <div></div>
-  <button class="add-btn" onclick="openModal()">
-    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-    Adicionar
-  </button>
-</div>
-
-<div class="grid" id="grid"></div>
-
-<div class="edit-bar" id="editBar">
-  ✏️ Modo edição — arraste para reorganizar
-  <button class="edit-done" onclick="exitEdit()">Concluir</button>
-</div>
-
-<!-- MODAL -->
-<div class="overlay" id="overlay">
-  <div class="modal">
-    <div style="display:flex;align-items:center;gap:10px;margin-bottom:1rem;">
-      <button onclick="closeModal()" style="background:rgba(255,255,255,0.07);border:1px solid var(--border2);border-radius:10px;color:var(--muted2);font-size:0.85rem;padding:0.3rem 0.8rem;cursor:pointer;font-family:'Outfit',sans-serif;flex-shrink:0;">← Voltar</button>
-      <h2 style="margin-bottom:0;">➕ Novo atalho</h2>
-    </div>
-    <div class="type-sel">
-      <button class="type-btn active" id="type-site" onclick="setType('site')">🌐 Site</button>
-      <button class="type-btn" id="type-deep" onclick="setType('deep')">📲 App do celular</button>
-    </div>
-    <div class="field">
-      <label>Nome</label>
-      <input id="inp-name" type="text" placeholder="Ex: Claude, Netflix, Gmail..." autocomplete="off">
-    </div>
-    <div class="field" id="field-url">
-      <label>Link do site</label>
-      <input id="inp-url" type="url" placeholder="Ex: https://claude.ai" autocomplete="off">
-      <div class="hint">Cole o link do site. O ícone é carregado automaticamente.</div>
-    </div>
-    <div class="field" id="field-deep" style="display:none">
-      <label>Deep link do app</label>
-      <input id="inp-deep" type="text" placeholder="Ex: whatsapp://, youtube://, instagram://" autocomplete="off">
-      <div class="hint">Digite o esquema do app. Ex: <b>whatsapp://</b> abre o WhatsApp. Funciona se o app estiver instalado.</div>
-    </div>
-    <div class="field">
-      <label>Emoji (opcional)</label>
-      <div class="emoji-row" id="emojiRow"></div>
-      <div class="hint">Aparece se o site não tiver ícone</div>
-    </div>
-    <div class="modal-btns">
-      <button class="btn-c" onclick="closeModal()">Cancelar</button>
-      <button class="btn-s" onclick="saveApp()">Salvar</button>
-    </div>
-  </div>
-</div>
-
-
-<!-- TRANSCRIBER — canto direito -->
-<div class="t-wrap" id="tWrap">
-  <div class="t-panel hidden" id="tPanel">
-    <div class="t-head" id="tHead">
-      <div class="t-title">
-        <div class="rdot" id="rdot"></div>
-        Transcritor de Voz
-      </div>
-      <button class="hide-btn" onclick="togglePanel()">Ocultar</button>
-    </div>
-    <div class="t-body">
-      <div class="t-text" id="tText" contenteditable="true" spellcheck="false"></div>
-      <div class="t-actions">
-        <button class="tb primary" id="micBtn" onclick="toggleMic()">
-          🎙️ Falar
-        </button>
-        <button class="tb" onclick="copyText()">📋 Copiar</button>
-        <button class="tb danger" onclick="clearText()">🗑️ Limpar</button>
-      </div>
-      <div style="margin-top:8px;display:flex;gap:6px;">
-        <button class="tb" style="flex:1;gap:4px;" onclick="openGallery()">🖼️ Galeria</button>
-        <button class="tb" style="flex:1;gap:4px;" id="copyImgBtn" onclick="copyImage()" disabled>📸 CPA</button>
-        <button class="tb danger" id="removeImgBtn" style="display:none;flex:1;font-size:0.62rem;padding:0.45rem 0.2rem;" onclick="removeWallpaper()">✕ Remover</button>
-      </div>
-      <input type="file" id="galleryInput" accept="image/*" style="display:none" onchange="handleImageSelect(event)">
-    </div>
-  </div>
-  <button class="t-fab show" id="tFab" onclick="toggleMic2()">🎙️</button>
-  <button class="fm-fab" id="fmFab" onclick="openFm()">📁</button>
-</div>
-
-<!-- GERENCIADOR DE ARQUIVOS -->
 <div class="fm-overlay" id="fmOverlay">
   <div class="fm-header">
     <button class="fm-back" id="fmBack" onclick="fmGoBack()">←</button>
@@ -1594,7 +1518,7 @@ body.img-active .ck-wrap{z-index:9100 !important;}
     <div id="fmInpContentWrap">
       <div class="field">
         <label>Nome <span style="color:var(--muted);font-size:0.6rem;">(opcional)</span></label>
-        <input id="fmInpName" type="text" placeholder="Deixe vazio para gerar automaticamente..." autocomplete="off">
+        <input id="fmInpName" type="text" placeholder="Nome do arquivo..." autocomplete="off">
       </div>
       <div class="field">
         <label id="fmInpContentLabel">Conteúdo</label>
@@ -1760,6 +1684,7 @@ body.img-active .ck-wrap{z-index:9100 !important;}
 
 <!-- TOAST FEEDBACK -->
 <div class="ad-feedback" id="adFeedback">✓ Copiado!</div>
+
 
 <!-- ═══════════════════════════════════════════════════════ SCRIPTS ═══ -->
 <script type="module">
@@ -1969,6 +1894,7 @@ document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==
 
 function render(){
   const grid=document.getElementById('grid');
+  if(!grid) return;
   grid.innerHTML='';
   if(!apps.length){
     grid.innerHTML='<div class="empty"><div class="empty-icon">📱</div><p>Nenhum atalho ainda.<br>Toque em "Adicionar" para começar.</p></div>';
@@ -2171,12 +2097,14 @@ window.saveApp = function(){
   }
   saveApps();render();window.closeModal();
 };
-document.getElementById('overlay').addEventListener('click',e=>{
-  if(e.target===document.getElementById('overlay'))window.closeModal();
-});
+if(document.getElementById('overlay')){
+  document.getElementById('overlay').addEventListener('click',e=>{
+    if(e.target===document.getElementById('overlay'))window.closeModal();
+  });
+}
 document.addEventListener('keydown',e=>{
-  if(e.key==='Escape')window.closeModal();
-  if(e.key==='Enter'&&document.getElementById('overlay').classList.contains('open'))window.saveApp();
+  if(e.key==='Escape' && document.getElementById('overlay') && document.getElementById('overlay').classList.contains('open')) window.closeModal();
+  if(e.key==='Enter' && document.getElementById('overlay') && document.getElementById('overlay').classList.contains('open')) window.saveApp();
 });
 
 // ── TRANSCRIBER ───────────────────────────────────────────────────────
@@ -2259,7 +2187,7 @@ window.copyText = function(){
   const b=event.target.closest('button');const orig=b.textContent;b.textContent='✓ Copiado!';
   setTimeout(()=>b.textContent=orig,1500);
 };
-document.getElementById('tText').addEventListener('paste',e=>{
+if(document.getElementById('tText')) document.getElementById('tText').addEventListener('paste',e=>{
   e.preventDefault();const text=e.clipboardData.getData('text/plain');if(!text)return;
   document.execCommand('insertText',false,text);
 });
@@ -2527,13 +2455,30 @@ function fmCurrentFolder(){
 function fmPathLabel(){return fmPath.length===0?'🗂️':['🗂️',...fmPath].join(' › ');}
 
 window.openFm = function(){
-  fmPath=[];fmSelMode=false;fmSelected.clear();
+  // Restaura posição anterior se existir
+  const nav = fmLoadNavState();
+  fmPath = (nav && nav.path) ? nav.path : [];
+  fmSelMode=false;fmSelected.clear();
   var so=document.getElementById('fmSortOthers');if(so)so.style.display='none';
   renderFm();
   document.getElementById('fmOverlay').classList.add('open');
+  // Restaura arquivo/modo aberto
+  if(nav && nav.openFile){
+    setTimeout(function(){
+      const folder = fmCurrentFolder();
+      if(folder && folder.children && folder.children[nav.openFile]){
+        if(nav.mode === 'read'){
+          fmOpenEditor(nav.openFile);
+          setTimeout(function(){ if(window.fmEnterReadMode) fmEnterReadMode(); }, 200);
+        } else if(nav.mode === 'editor'){
+          fmOpenEditor(nav.openFile);
+        }
+      }
+    }, 500);
+  }
 };
 function closeFm(){document.getElementById('fmOverlay').classList.remove('open');}
-window.fmGoBack = function(){if(fmPath.length===0){closeFm();return;}fmPath.pop();fmSelected.clear();renderFm();};
+window.fmGoBack = function(){if(fmPath.length===0){closeFm();return;}fmPath.pop();fmSelected.clear();fmSaveNavState();renderFm();};
 
 window.fmToggleSelMode = function(){
   fmSelMode=!fmSelMode;fmSelected.clear();
@@ -2721,7 +2666,7 @@ function renderFm(){
         <div class="fm-item-info"><div class="fm-item-name">${key}</div><div class="fm-item-meta">${meta}</div></div>
         <div style="display:flex;gap:4px;flex-shrink:0;">
           <button class="fm-item-del" onclick="event.stopPropagation();fmDelete('${key}')">✕</button></div>`;
-      el.addEventListener('click',e=>{if(e.target.closest('.fm-item-del'))return;fmPath.push(key);renderFm();});
+      el.addEventListener('click',e=>{if(e.target.closest('.fm-item-del'))return;fmPath.push(key);fmSaveNavState();renderFm();});
     } else {
       const meta=item.type==='image'?'imagem':item.type==='pdf'?'PDF':item.type==='link-collection'?(item.links?.length||0)+' link(s)':(item.content?.length||0)+' chars';
       const dateStr = item.modifiedAt ? new Date(item.modifiedAt).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}) : '';
@@ -3215,8 +3160,16 @@ function fmNormalizeContent(html){
 // ── EDITOR ────────────────────────────────────────────────────────────
 let fmEditorCurrentType = 'txt';
 let fmAutosaveTimer = null;
-let fmEditorZoom = 1.0;
-let fmReadZoomLevel = 1.0;
+let fmEditorZoom = parseFloat(localStorage.getItem('fmEditorZoom') || '1.0');
+let fmReadZoomLevel = parseFloat(localStorage.getItem('fmReadZoomLevel') || '1.0');
+
+function fmSaveNavState(extra){
+  const state = { path: fmPath, ...(extra||{}) };
+  localStorage.setItem('fmNavState', JSON.stringify(state));
+}
+function fmLoadNavState(){
+  try { return JSON.parse(localStorage.getItem('fmNavState') || 'null'); } catch(e){ return null; }
+}
 
 function fmOpenEditor(key){
   fmEditorKey=key;
@@ -3248,11 +3201,13 @@ function fmOpenEditor(key){
   }
 
   document.getElementById('fmEditor').classList.add('open');
-  fmEditorZoom = 1.0;
-  document.getElementById('fmEditable').style.fontSize = '';
-  document.getElementById('fmEditable').style.fontFamily = '';
+  fmSaveNavState({ openFile: key, mode: 'editor' });
+  // Aplica zoom salvo ao abrir o editor
+  document.getElementById('fmEditable').style.fontSize = (fmEditorZoom * 0.9) + 'rem';
+  const savedEditorFont = localStorage.getItem('fmEditorFont') || '';
+  document.getElementById('fmEditable').style.fontFamily = savedEditorFont ? savedEditorFont + ', sans-serif' : '';
   const fontSel = document.getElementById('fmFontSelect');
-  if(fontSel) fontSel.value = '';
+  if(fontSel) fontSel.value = savedEditorFont;
   // Inicializa histórico com o conteúdo carregado
   fmHistoryInit(document.getElementById('fmEditable').innerHTML);
   // Ativa redimensionamento quando teclado abre
@@ -3507,6 +3462,7 @@ window.fmChangeFontSize = function(dir){
     // Sem seleção: zoom proporcional via font-size no elemento raiz
     fmEditorZoom = Math.max(0.5, Math.min(3.0, fmEditorZoom + dir * 0.1));
     el.style.fontSize = (fmEditorZoom * 0.9) + 'rem';
+    localStorage.setItem('fmEditorZoom', fmEditorZoom);
   } else {
     // Com seleção: aplica em span direto
     const sz = parseFloat(window.getComputedStyle(sel.anchorNode.parentElement || el).fontSize) || 14;
@@ -3529,6 +3485,7 @@ window.fmChangeFont = function(font){
     // Sem seleção: muda fonte de todo o editor
     el.querySelectorAll('*').forEach(e => { if(e.style.fontFamily) e.style.fontFamily = ''; });
     el.style.fontFamily = font + ', sans-serif';
+    localStorage.setItem('fmEditorFont', font);
   } else {
     // Com seleção: extrai o conteúdo, envolve em span e reinsere
     el.focus();
@@ -3551,12 +3508,14 @@ window.fmChangeFont = function(font){
 window.fmReadZoom = function(dir){
   fmReadZoomLevel = Math.max(0.5, Math.min(3.0, fmReadZoomLevel + dir * 0.1));
   document.getElementById('fmReadContent').style.fontSize = (fmReadZoomLevel * 0.9) + 'rem';
+  localStorage.setItem('fmReadZoomLevel', fmReadZoomLevel);
 };
 
 // ── TROCA DE FONTE NO MODO LEITURA ───────────────────────────────────
 window.fmReadChangeFont = function(font){
   if(!font) return;
   document.getElementById('fmReadContent').style.fontFamily = font + ', sans-serif';
+  localStorage.setItem('fmReadFont', font);
 };
 
 // ── HISTÓRICO MANUAL DE UNDO/REDO ────────────────────────────────────
@@ -4152,12 +4111,13 @@ window.fmExitReadModeToEditor = function(){
 };
 
 function fmOpenReadMode(){
-  fmReadZoomLevel = 1.0;
+  fmSaveNavState({ openFile: fmEditorKey, mode: 'read' });
   const content = document.getElementById('fmReadContent');
-  content.style.fontSize = '';
-  content.style.fontFamily = '';
+  content.style.fontSize = (fmReadZoomLevel * 0.9) + 'rem';
+  const savedReadFont = localStorage.getItem('fmReadFont') || '';
+  content.style.fontFamily = savedReadFont ? savedReadFont + ', sans-serif' : '';
   const rSel = document.getElementById('fmReadFontSelect');
-  if(rSel) rSel.value = '';
+  if(rSel) rSel.value = savedReadFont;
   document.getElementById('fmReadMode').classList.add('open');
 }
 // ── INSERIR IMAGEM NO CURSOR ─────────────────────────────────────────
@@ -4266,6 +4226,28 @@ function fmStartImgResize(e){
 }
 
 // Deselect ao clicar fora das imagens
+// Force Enter to insert <br> instead of creating new <div>
+document.getElementById('fmEditable').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    const sel = window.getSelection();
+    if (!sel || !sel.rangeCount) return;
+    const range = sel.getRangeAt(0);
+    range.deleteContents();
+    const br = document.createElement('br');
+    range.insertNode(br);
+    // Move cursor after the <br>
+    const after = document.createTextNode('​');
+    range.setStartAfter(br);
+    range.insertNode(after);
+    range.setStartAfter(after);
+    range.collapse(true);
+    sel.removeAllRanges();
+    sel.addRange(range);
+    fmTriggerAutosave();
+  }
+});
+
 document.getElementById('fmEditable').addEventListener('click', function(e){
   if(!e.target.closest('.fm-img-wrapper')){
     document.querySelectorAll('.fm-img-wrapper.selected').forEach(w=>w.classList.remove('selected'));
@@ -4963,149 +4945,10 @@ function navPush(tag) {
   history.pushState({ nav: tag }, '');
 }
 
-// Intercepta o botão físico de voltar — verifica do painel mais profundo ao mais raso
+// Botão voltar — sai direto para OUTROS.html
 window.addEventListener('popstate', function(e) {
-  // 1. ReadMode (mais profundo — z-index 9600)
-  var fmRM = document.getElementById('fmReadMode');
-  if (fmRM && fmRM.classList.contains('open')) {
-    fmExitReadMode(); return;
-  }
-  // 2. Editor rich text (z-index 9500)
-  var fmED = document.getElementById('fmEditor');
-  if (fmED && fmED.classList.contains('open')) {
-    closeFmEditor(); return;
-  }
-  // 3. Editor de coleção de links (z-index 9400)
-  var fmLE = document.getElementById('fmLinkEditorPanel');
-  if (fmLE && fmLE.classList.contains('open')) {
-    closeFmLinkEditor(); return;
-  }
-  // 4. Viewer (z-index 9000)
-  var fmVI = document.getElementById('fmViewer');
-  if (fmVI && fmVI.classList.contains('open')) {
-    closeFmViewer(); return;
-  }
-  // 5. Busca dentro do arquivo
-  var fmIS = document.getElementById('fmInfileSearch');
-  if (fmIS && fmIS.classList.contains('open')) {
-    closeFmInfileSearch(); return;
-  }
-  // 6. Lixeira
-  var fmTR = document.getElementById('fmTrashOverlay');
-  if (fmTR && fmTR.classList.contains('open')) {
-    closeFmTrash(); return;
-  }
-  // 7. Painel AnyDesk
-  var adOV = document.getElementById('adOverlay');
-  if (adOV && adOV.classList.contains('open')) {
-    closeAdPanel(); return;
-  }
-  // 8. Mover item
-  var fmMO = document.getElementById('fmMoveOverlay');
-  if (fmMO && fmMO.classList.contains('open')) {
-    fmCloseMovePanel(); return;
-  }
-  // 9. Confirmação
-  var fmCO = document.getElementById('fmConfirmOverlay');
-  if (fmCO && fmCO.classList.contains('open')) {
-    fmConfirmCancel(); return;
-  }
-  // 10. Modal novo item no FM
-  var fmMM = document.getElementById('fmModalOverlay');
-  if (fmMM && fmMM.classList.contains('open')) {
-    closeFmModal(); return;
-  }
-  // 11. Gerenciador de arquivos (navega pastas ou fecha)
-  var fmOV = document.getElementById('fmOverlay');
-  if (fmOV && fmOV.classList.contains('open')) {
-    window.fmGoBack(); return;
-  }
-  // 12. Modal adicionar app
-  var ovOV = document.getElementById('overlay');
-  if (ovOV && ovOV.classList.contains('open')) {
-    closeModal(); return;
-  }
-  // 13. Modal checklist
-  var ckOV = document.getElementById('ckOverlay');
-  if (ckOV && ckOV.classList.contains('open')) {
-    closeCkModal(); return;
-  }
-  // Nenhum painel aberto — reinjeta o estado base para nunca sair da página
-  history.replaceState({ _base: true }, '');
+  window.location.href = 'index.html';
 });
-
-// ── PATCH DE TODAS AS FUNÇÕES QUE ABREM PAINÉIS ──────────────────────
-(function patchOpenFunctions(){
-
-  // Gerenciador de arquivos (raiz)
-  var origOpenFm = window.openFm;
-  window.openFm = function(){ navPush('fm'); origOpenFm && origOpenFm.apply(this, arguments); };
-
-  // Modal novo item no FM
-  var origOpenFmModal = window.openFmModal;
-  window.openFmModal = function(){ navPush('fmModal'); origOpenFmModal && origOpenFmModal.apply(this, arguments); };
-
-  // Painel AnyDesk
-  var origOpenAdPanel = window.openAdPanel;
-  window.openAdPanel = function(){ navPush('ad'); origOpenAdPanel && origOpenAdPanel.apply(this, arguments); };
-
-  // Lixeira
-  var origOpenFmTrash = window.openFmTrash;
-  window.openFmTrash = function(){ navPush('trash'); origOpenFmTrash && origOpenFmTrash.apply(this, arguments); };
-
-  // Mover item (chamado via fmOpenMovePanel e também via fmOpenMovePanelFor → fmSelMoveAll)
-  var origFmOpenMovePanel = window.fmOpenMovePanel;
-  window.fmOpenMovePanel = function(){ navPush('move'); origFmOpenMovePanel && origFmOpenMovePanel.apply(this, arguments); };
-
-  // fmSelMoveAll chama fmOpenMovePanelFor diretamente — patch aqui também
-  var origFmSelMoveAll = window.fmSelMoveAll;
-  window.fmSelMoveAll = function(){ navPush('move'); origFmSelMoveAll && origFmSelMoveAll.apply(this, arguments); };
-
-  // Modal adicionar app
-  var origOpenModal = window.openModal;
-  window.openModal = function(){ navPush('modal'); origOpenModal && origOpenModal.apply(this, arguments); };
-
-  // Modal checklist
-  var origOpenCkModal = window.openCkModal;
-  window.openCkModal = function(){ navPush('ckModal'); origOpenCkModal && origOpenCkModal.apply(this, arguments); };
-
-  // Editor rich text (fmOpenEditor + fmOpenEditorFromPath)
-  var origFmOpenEditor = window.fmOpenEditor || fmOpenEditor;
-  var _patchedFmOpenEditor = function(){ navPush('editor'); origFmOpenEditor && origFmOpenEditor.apply(this, arguments); };
-  window.fmOpenEditor = _patchedFmOpenEditor;
-  // fmOpenEditorFromPath chama fmOpenEditor internamente após atribuir ao window — sem patch extra necessário
-
-  // Viewer (fmView, fmViewLinkCollection, fmViewFromSearch)
-  var origFmView = window.fmView;
-  window.fmView = function(){ navPush('viewer'); origFmView && origFmView.apply(this, arguments); };
-
-  var origFmViewLinkCollection = window.fmViewLinkCollection;
-  window.fmViewLinkCollection = function(){ navPush('viewer'); origFmViewLinkCollection && origFmViewLinkCollection.apply(this, arguments); };
-
-  var origFmViewFromSearch = window.fmViewFromSearch;
-  window.fmViewFromSearch = function(){ navPush('viewer'); origFmViewFromSearch && origFmViewFromSearch.apply(this, arguments); };
-
-  // Editor de coleção de links
-  var origFmEditLinkCollection = window.fmEditLinkCollection;
-  window.fmEditLinkCollection = function(){ navPush('linkEditor'); origFmEditLinkCollection && origFmEditLinkCollection.apply(this, arguments); };
-
-  // Busca dentro do arquivo (fmQMenuSearch abre fmInfileSearch)
-  var origFmQMenuSearch = window.fmQMenuSearch;
-  window.fmQMenuSearch = function(){ navPush('infileSearch'); origFmQMenuSearch && origFmQMenuSearch.apply(this, arguments); };
-
-  // Modo leitura (fmEnterReadMode, fmQMenuView e fmOpenInfileResult chamam fmOpenReadMode)
-  // Patcha fmEnterReadMode e fmQMenuView pois são os pontos de entrada externos
-  var origFmEnterReadMode = window.fmEnterReadMode;
-  window.fmEnterReadMode = function(){ navPush('readMode'); origFmEnterReadMode && origFmEnterReadMode.apply(this, arguments); };
-
-  var origFmQMenuView = window.fmQMenuView;
-  window.fmQMenuView = function(){ navPush('readMode'); origFmQMenuView && origFmQMenuView.apply(this, arguments); };
-
-  // Confirmação (fmConfirm abre fmConfirmOverlay)
-  var origFmConfirm = window.fmConfirm;
-  window.fmConfirm = function(){ navPush('confirm'); origFmConfirm && origFmConfirm.apply(this, arguments); };
-
-})();
 
 // Teclado desktop: Alt+Left = voltar 1 passo
 document.addEventListener('keydown', function(e) {
@@ -5115,6 +4958,21 @@ document.addEventListener('keydown', function(e) {
   }
 });
 </script>
-<!-- VOLTAR DESKTOP --><style>@media(max-width:768px){#__btn-voltar{display:none!important}}#__btn-voltar{position:fixed;bottom:22px;left:22px;z-index:99999;background:#13131a;border:1px solid #2a2a4a;color:#a0a0c0;text-decoration:none;padding:10px 18px;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;transition:all .2s;box-shadow:0 2px 12px rgba(0,0,0,.4)}#__btn-voltar:hover{background:#7c6aff;border-color:#7c6aff;color:#fff}</style><a id="__btn-voltar" href="OUTROS.html">← Outros</a><!-- FIM VOLTAR DESKTOP -->
+
+<script>
+window.addEventListener('load', function() {
+  // Empilha estado do FM no history para o botão voltar funcionar
+  history.replaceState({ _base: true }, '');
+  history.pushState({ nav: 'fm' }, '');
+  if (window.openFm) {
+    // Abre direto sem empilhar de novo (já empilhamos acima)
+    var origOpenFm = window.openFm;
+    document.getElementById('fmOverlay').classList.add('open');
+  } else {
+    document.getElementById('fmOverlay').classList.add('open');
+  }
+});
+</script>
+
 </body>
 </html>
