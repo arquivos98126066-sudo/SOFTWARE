@@ -523,23 +523,26 @@
   .cf label {
     display: block;
     font-size: 11px;
+    font-weight: 600;
     color: var(--text3);
     text-transform: uppercase;
     letter-spacing: 0.06em;
     margin-bottom: 4px;
+    opacity: 0.6;
   }
 
   .cf input {
     width: 100%;
     border: none;
+    border-top: 1px solid var(--border);
     background: transparent;
     font-family: 'Inter', sans-serif;
     font-size: 13.5px;
     color: var(--text);
     outline: none;
+    padding-top: 8px;
+    display: block;
   }
-
-  .cf input::placeholder { color: var(--text3); }
 
   .clause {
     margin-bottom: 14px;
@@ -725,6 +728,56 @@
     .nav, .btn-row, .drawer, .drawer-overlay, #toast, #secao-salvos { display: none; }
     body { background: white; }
   }
+
+  .modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:500;align-items:flex-end;justify-content:center;}
+  .modal-bg.open{display:flex;}
+  .modal-box{background:var(--surface);border-radius:16px 16px 0 0;width:100%;max-width:720px;max-height:82vh;overflow-y:auto;padding:24px 20px 44px;animation:slideUp .22s ease;}
+  @keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+  .modal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+  .modal-title{font-size:15px;font-weight:600;color:var(--text);}
+  .modal-close{background:var(--surface2);border:none;cursor:pointer;width:28px;height:28px;border-radius:50%;font-size:15px;color:var(--text2);display:flex;align-items:center;justify-content:center;}
+  .modal-body{font-size:13.5px;color:var(--text2);line-height:1.75;}
+  .modal-body strong{color:var(--text);}
+  .modal-body ul{padding-left:18px;margin-top:6px;}
+  .modal-body li{margin-bottom:6px;}
+  .exemplo{background:var(--surface2);border-radius:var(--radius-sm);padding:12px 14px;margin-top:12px;font-size:13px;border-left:2px solid #534AB7;}
+  .exemplo-titulo{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:#534AB7;margin-bottom:6px;}
+  .xbtn{cursor:pointer;user-select:none;-webkit-tap-highlight-color:transparent;transition:opacity .15s;}
+  .xbtn:active{opacity:.65;}
+  #plano-overlay{display:none;position:fixed;inset:0;background:var(--bg);z-index:200;overflow-y:auto;-webkit-overflow-scrolling:touch;}
+  #plano-overlay.open{display:block;}
+  .pnav{position:sticky;top:0;z-index:210;background:rgba(249,249,248,.95);backdrop-filter:blur(8px);border-bottom:.5px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 20px;height:56px;}
+  .pnav-brand{font-size:14px;font-weight:600;color:var(--text);text-transform:uppercase;letter-spacing:.04em;}
+  .pback{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:500;color:var(--text2);background:none;border:none;cursor:pointer;padding:6px;border-radius:6px;}
+  .pback:hover{background:var(--surface2);}
+  .pdrawer-ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.18);z-index:299;}
+  .pdrawer-ov.open{display:block;}
+  .pdrawer{position:fixed;top:0;right:-260px;width:240px;height:100%;background:var(--surface);border-left:.5px solid var(--border);z-index:300;transition:right .22s ease;padding:20px 0;display:flex;flex-direction:column;}
+  .pdrawer.open{right:0;}
+  .pdrawer-hdr{display:flex;align-items:center;justify-content:space-between;padding:0 20px 16px;border-bottom:.5px solid var(--border);margin-bottom:8px;}
+  .pdrawer-hdr span{font-size:13px;font-weight:600;color:var(--text);}
+  .pdrawer-close{background:none;border:none;cursor:pointer;color:var(--text2);font-size:18px;padding:2px 4px;line-height:1;}
+  .pdrawer a{display:flex;align-items:center;gap:10px;font-size:13.5px;color:var(--text2);text-decoration:none;padding:11px 20px;transition:background .1s,color .1s;}
+  .pdrawer a:hover{background:var(--surface2);color:var(--text);}
+  .pdrawer a i{font-size:15px;width:18px;}
+  .phbg{background:none;border:none;cursor:pointer;padding:6px;display:flex;flex-direction:column;gap:5px;border-radius:6px;}
+  .phbg span{display:block;width:20px;height:1.5px;background:var(--text);border-radius:2px;transition:all .2s;}
+  .phbg.open span:nth-child(1){transform:translateY(6.5px) rotate(45deg);}
+  .phbg.open span:nth-child(2){opacity:0;}
+  .phbg.open span:nth-child(3){transform:translateY(-6.5px) rotate(-45deg);}
+  .field-block{background:var(--surface);border:.5px solid var(--border);border-radius:var(--radius-sm);padding:10px 14px;margin-bottom:8px;}
+  .field-block label{display:block;font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;opacity:0.6;}
+  .field-block input,.field-block textarea{width:100%;border:none;border-top:1px solid var(--border);background:transparent;font-family:Inter,sans-serif;font-size:13.5px;color:var(--text);outline:none;resize:none;line-height:1.6;padding-top:8px;display:block;}
+  .field-block textarea{min-height:48px;}
+  .rbloco{margin-bottom:16px;}
+  .rtitulo{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-bottom:8px;display:flex;align-items:center;gap:6px;}
+  .ritem{display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:.5px solid var(--border);}
+  .ritem:last-child{border-bottom:none;}
+  .rcheck{width:18px;height:18px;border-radius:4px;border:1px solid var(--border);background:var(--surface2);flex-shrink:0;margin-top:1px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:11px;transition:all .15s;}
+  .rcheck.done{background:#111110;border-color:#111110;color:#fff;}
+  .rtext{font-size:13px;color:var(--text2);line-height:1.5;}
+  .rtext.done{text-decoration:line-through;color:var(--text3);}
+
 </style>
 </head>
 <body>
@@ -739,6 +792,7 @@
     <button class="drawer-close" onclick="closeDrawer()">✕</button>
   </div>
   <a href="#proposito" onclick="closeDrawer()"><i class="ti ti-target"></i> Propósito</a>
+  <a href="#" onclick="abrirPlano();closeDrawer()"><i class="ti ti-rocket"></i> Plano 30K/mês</a>
   <a href="#metodo" onclick="closeDrawer()"><i class="ti ti-list-check"></i> Método</a>
   <a href="#receita" onclick="closeDrawer()"><i class="ti ti-currency-dollar"></i> Formas de ganho</a>
   <a href="#entrega" onclick="closeDrawer()"><i class="ti ti-package"></i> Como entregar</a>
@@ -771,6 +825,10 @@
         À medida que a carteira de clientes cresce, o plano é escalar: contratar pessoas para prospectar, para vender e para desenvolver as soluções. Assim libero tempo para gerir o negócio, fechar contratos maiores e expandir para novos segmentos — sem depender de fazer tudo sozinho.
       </p>
     </div>
+
+    <a href="#" onclick="abrirPlano();return false;" style="text-decoration:none;display:block;margin-bottom:8px;"><div class="card" style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;"><div style="display:flex;align-items:center;gap:10px;"><i class="ti ti-rocket" style="font-size:15px;color:#534AB7;"></i><div><div style="font-size:14px;font-weight:500;color:var(--text);">Plano 30K/mês</div><div style="font-size:12px;color:var(--text3);margin-top:1px;">Meta, mentalidade, estratégia SaaS e rotina diária</div></div></div><i class="ti ti-chevron-right" style="font-size:15px;color:var(--text3);"></i></div></a>
+
+    <a href="#" onclick="abrirProcesso();return false;" style="text-decoration:none;display:block;margin-bottom:8px;"><div class="card" style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;"><div style="display:flex;align-items:center;gap:10px;"><i class="ti ti-git-branch" style="font-size:15px;color:#534AB7;"></i><div><div style="font-size:14px;font-weight:500;color:var(--text);">Meu Processo</div><div style="font-size:12px;color:var(--text3);margin-top:1px;">Etapas visuais do processo de venda</div></div></div><i class="ti ti-chevron-right" style="font-size:15px;color:var(--text3);"></i></div></a>
 
     <p class="label" style="margin-top:20px;">O Porquê</p>
     <div class="card">
@@ -1010,20 +1068,20 @@
     <p class="label">Segmentos principais</p>
     <div class="grid2">
       <div class="metric">
-        <p class="metric-label">🍕 Alimentação</p>
-        <p class="metric-desc">Lanchonetes, pizzarias, restaurantes, hamburguerias, delivery e food service em geral.</p>
+        <p class="metric-label">🍕 Pizzarias</p>
+        <p class="metric-desc">Pizzarias físicas e delivery, com gestão de pedidos, cardápio e integração com iFood.</p>
       </div>
       <div class="metric">
-        <p class="metric-label">🚗 Automotivo</p>
-        <p class="metric-desc">Oficinas mecânicas, borracharias, autopeças, lava-rápidos e serviços relacionados a veículos.</p>
+        <p class="metric-label">🍔 Restaurantes</p>
+        <p class="metric-desc">Restaurantes, lanchonetes e hamburguerias com presença no iFood ou delivery próprio.</p>
       </div>
       <div class="metric">
-        <p class="metric-label">🔧 Prestação de serviços</p>
-        <p class="metric-desc">Qualquer negócio que presta serviços ao cliente final e precisa organizar agendamentos, ordens de serviço ou equipe.</p>
+        <p class="metric-label">🍦 Açaiterias e Sorveterias</p>
+        <p class="metric-desc">Açaiterias e sorveterias que vendem pelo iFood ou balcão, precisando controlar estoque e pedidos.</p>
       </div>
       <div class="metric">
-        <p class="metric-label">🏥 Saúde</p>
-        <p class="metric-desc">Clínicas, consultórios médicos, odontológicos, psicólogos e outros profissionais da área da saúde.</p>
+        <p class="metric-label">🛵 Delivery / iFood</p>
+        <p class="metric-desc">Qualquer negócio de alimentação que opera via iFood ou app próprio de entrega.</p>
       </div>
     </div>
   </div>
@@ -1035,20 +1093,31 @@
     <p class="label">Script de vendas</p>
 
     <div class="script-section">
-      <p class="script-tag">Abertura</p>
+      <p class="script-tag">Sondagem — perguntas de abertura</p>
       <div class="quote">
-        "Bom dia, quem aqui seria o responsável pelo estabelecimento?"<br><br>
-        "Pedro, vou ser bem curto e objetivo no que vou falar — posso falar?"<br><br>
-        "Eu consigo aumentar os seus lucros com previsibilidade, consigo fazer com que você tenha mais tempo com a família ou para gerir outras áreas do seu negócio, e consigo fazer com que você elimine a dor de cabeça que você às vezes costuma ter para gerir seu negócio como um todo.<br><br>
-        Digo isso porque eu passei por esses três desafios, e hoje a cada dia meu lucro aumenta, tenho cada vez mais tempo, e fica bem mais fácil e simples gerir o meu negócio.<br><br>
-        Isso significa que se você me der 30 minutos do seu tempo, eu não vou mostrar — eu vou te provar que posso fazer o mesmo por você."
+        "Atualmente quantos sistemas pagos você utiliza para gerenciar seu negócio como um todo?"<br><br>
+        "Nesses sistemas tem tudo o que você precisa, ou tem funcionalidades específicas que você desejaria mas não tem no momento?"
+      </div>
+    </div>
+
+    <div class="script-section">
+      <p class="script-tag">Afirmação — após ouvir as respostas</p>
+      <div class="quote">
+        "<strong>[Nome do cliente]</strong>, eu consigo criar sistemas melhores do que o seu. Digo isso porque os seus sistemas foram pensados para atender várias pessoas — o que eu crio é pensado exclusivamente nas suas necessidades específicas. Isso faz com que você gere muito mais resultados do que o seu sistema atual."
+      </div>
+    </div>
+
+    <div class="script-section">
+      <p class="script-tag">Fechamento da abordagem</p>
+      <div class="quote">
+        "Vim perguntar se você tem interesse em criar sistemas personalizados para as suas necessidades."
       </div>
     </div>
 
     <div class="script-section">
       <p class="script-tag">Agendamento — perguntas em sequência</p>
       <div class="quote">
-        "Agora me diz — fica melhor fazermos essa reunião hoje ou em um dia específico da semana?"<br><br>
+        "Fica melhor fazermos essa reunião hoje ou em um dia específico da semana?"<br><br>
         "Fica melhor sábado ou segunda?"<br><br>
         "Qual o melhor período — tarde, manhã ou noite?"<br><br>
         "Qual o melhor horário?"<br><br>
@@ -1091,16 +1160,16 @@
     </div>
 
     <div class="contract-fields">
-      <div class="cf"><label>Nome do contratante (cliente)</label><input type="text" id="ct_contratante" placeholder="Nome completo ou razão social"></div>
-      <div class="cf"><label>CPF / CNPJ do contratante</label><input type="text" id="ct_cpf_contratante" placeholder="000.000.000-00"></div>
-      <div class="cf"><label>Nome do contratado (você)</label><input type="text" id="ct_contratado" placeholder="Seu nome completo"></div>
-      <div class="cf"><label>CPF / CNPJ do contratado</label><input type="text" id="ct_cpf_contratado" placeholder="000.000.000-00"></div>
-      <div class="cf"><label>Descrição do projeto</label><input type="text" id="ct_projeto" placeholder="Ex: Sistema de gestão de agendamentos"></div>
-      <div class="cf"><label>Prazo de entrega</label><input type="text" id="ct_prazo" placeholder="Ex: 30 dias corridos após assinatura"></div>
-      <div class="cf"><label>Valor da implementação (R$)</label><input type="text" id="ct_valor_impl" placeholder="R$ 0,00"></div>
-      <div class="cf"><label>Valor da mensalidade (R$)</label><input type="text" id="ct_mensalidade" placeholder="R$ 0,00 / mês"></div>
-      <div class="cf"><label>Início da mensalidade</label><input type="text" id="ct_inicio" placeholder="Após aprovação do sistema"></div>
-      <div class="cf"><label>Local e data</label><input type="text" id="ct_local_data" placeholder="Cidade, DD/MM/AAAA"></div>
+      <div class="cf"><label>Nome do contratante (cliente)</label><input type="text" id="ct_contratante"></div>
+      <div class="cf"><label>CPF / CNPJ do contratante</label><input type="text" id="ct_cpf_contratante"></div>
+      <div class="cf"><label>Nome do contratado (você)</label><input type="text" id="ct_contratado"></div>
+      <div class="cf"><label>CPF / CNPJ do contratado</label><input type="text" id="ct_cpf_contratado"></div>
+      <div class="cf"><label>Descrição do projeto</label><input type="text" id="ct_projeto"></div>
+      <div class="cf"><label>Prazo de entrega</label><input type="text" id="ct_prazo"></div>
+      <div class="cf"><label>Valor da implementação (R$)</label><input type="text" id="ct_valor_impl"></div>
+      <div class="cf"><label>Valor da mensalidade (R$)</label><input type="text" id="ct_mensalidade"></div>
+      <div class="cf"><label>Início da mensalidade</label><input type="text" id="ct_inicio"></div>
+      <div class="cf"><label>Local e data</label><input type="text" id="ct_local_data"></div>
     </div>
 
     <div class="btn-row" style="margin-top:0;margin-bottom:16px;">
@@ -1524,6 +1593,58 @@ function iniciarListeners() {
 });
 }
 
+// ─── Plano 30K — sync nuvem ───────────────────────────────────────────────────
+async function salvarPlanoNuvem() {
+  try {
+    var dados = {};
+    var PCAMPOS_=['pc1','pc2','pm1','pm4a','pm4b','pm5','pm9','pm13','pe1a','pe1b','pe2a','pe2b','pe3a','pe3b','pe4','pe5bp','pe5bd','pe5mp','pe5md','pe5ap','pe5ad','pe6a','pe6b','pn1','pn2','pn3','pn4','pn5','pn6','pg1','pg2','pg3','pg4','pg5','pg6','pg7','pg8','pg9','pg10','pg11','pg12'];
+    PCAMPOS_.forEach(function(id){var e=document.getElementById(id);if(e)dados[id]=e.value;});
+    // usa doc fixo "plano30k" para sempre sobrescrever o mesmo
+    var { setDoc, doc: fsDoc } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js');
+    await setDoc(fsDoc(db, 'doa_plano30k', 'plano30k'), { campos: dados, atualizadoEm: Date.now() });
+  } catch(e) { console.warn('Plano 30K nuvem:', e); }
+}
+
+async function carregarPlanoNuvem() {
+  try {
+    var { getDoc, doc: fsDoc } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js');
+    var snap = await getDoc(fsDoc(db, 'doa_plano30k', 'plano30k'));
+    if (snap.exists()) {
+      var dados = snap.data().campos || {};
+      Object.keys(dados).forEach(function(id){
+        var e=document.getElementById(id);
+        if(e){e.value=dados[id];if(e.tagName==='TEXTAREA'){e.style.height='auto';e.style.height=e.scrollHeight+'px';}}
+      });
+    }
+  } catch(e) { console.warn('Carregar Plano 30K nuvem:', e); }
+}
+
+window._salvarPlanoNuvem = salvarPlanoNuvem;
+window._carregarPlanoNuvem = carregarPlanoNuvem;
+
+// ─── Processo — sync nuvem ────────────────────────────────────────────────────
+async function salvarProcessoNuvem(steps) {
+  try {
+    var { setDoc, doc: fsDoc } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js');
+    await setDoc(fsDoc(db, 'doa_processo', 'steps'), { steps: steps, atualizadoEm: Date.now() });
+  } catch(e) { console.warn('Processo nuvem:', e); }
+}
+
+async function carregarProcessoNuvem() {
+  try {
+    var { getDoc, doc: fsDoc } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js');
+    var snap = await getDoc(fsDoc(db, 'doa_processo', 'steps'));
+    if (snap.exists()) return snap.data().steps || null;
+  } catch(e) { console.warn('Carregar Processo nuvem:', e); }
+  return null;
+}
+
+window._salvarProcessoNuvem = salvarProcessoNuvem;
+window._carregarProcessoNuvem = carregarProcessoNuvem;
+
+// Carrega Plano 30K da nuvem ao iniciar (complementa o localStorage)
+carregarPlanoNuvem();
+
 // ─── INIT ─────────────────────────────────────────────────────────────────────
 carregarLixeiraLocal();
 doaSyncPending();
@@ -1648,13 +1769,10 @@ update();
 // ─── Copiar script ────────────────────────────────────────────────────────────
 window.copyScript = function() {
   var txt = 'SCRIPT DE VENDAS\n\n' +
-    'ABERTURA — ABORDAGEM PRESENCIAL OU POR TELEFONE:\n"Bom dia, quem aqui seria o responsável pelo estabelecimento?"\n[Após identificar o dono]: "Pedro, vou ser bem curto e objetivo — posso falar?"\n"Eu consigo aumentar os seus lucros com previsibilidade, fazer com que você tenha mais tempo — e eliminar a dor de cabeça de gerir o negócio. Me dá 30 minutos e eu não vou mostrar, vou provar."\n\n' +
-    'ABORDAGEM POR OBSERVAÇÃO (alternativa):\n"Deve ser um desafio né, cuidar de uma pizzaria dessas..."\nA partir desse gancho, conduzir para o agendamento.\n\n' +
-    'AGENDAMENTO:\n1. "Fica melhor hoje ou em outro dia da semana?"\n2. "Sábado ou segunda?"\n3. "Tarde, manhã ou noite?"\n4. "Qual o melhor horário?"\n"Certo — espero você nessa reunião. O que tenho pra mostrar é algo surpreendente."\n\n' +
-    'SONDAGEM NA REUNIÃO:\n"Você já usa algum sistema para gerenciar o seu negócio?"\nSe SIM: "Está satisfeito? Tem alguma coisa que falta ou que queria diferente?"\nSe NÃO: "Tudo no papel ou no WhatsApp? Isso já te causou algum problema?"\n\n' +
-    'OFERTA:\n"Eu desenvolvo sistemas personalizados — feito do zero para o seu negócio. Do jeito que você funciona. Qualquer funcionalidade nova, eu implemento. E o mais importante: você não paga nada adiantado. Só paga quando o sistema estiver pronto e você aprovar."\n\n' +
-    'FECHAMENTO:\n"No dia seguinte trago uma proposta personalizada pra você ver como ficaria. Sem compromisso nenhum da sua parte."\n\n' +
-    'OBJEÇÕES:\n"Já tenho sistema" → "Tem alguma funcionalidade que falta?"\n"Quanto custa?" → "A mensalidade fica no mesmo valor ou menos que você já paga hoje."\n"Sem tempo" → "Eu cuido de tudo. Posso mandar resumo no WhatsApp?"\n"Como sei que vai entregar?" → "Você não paga nada antes. O contrato garante isso."\n"Deixa eu pensar" → "O que você precisaria ver para se sentir confortável em avançar?"';
+    'SONDAGEM:\n"Atualmente quantos sistemas pagos você utiliza para gerenciar seu negócio como um todo?"\n"Nesses sistemas tem tudo o que você precisa, ou tem funcionalidades específicas que você desejaria mas não tem no momento?"\n\n' +
+    'AFIRMAÇÃO (após ouvir as respostas):\n"[Nome], eu consigo criar sistemas melhores do que o seu. Digo isso porque os seus sistemas foram pensados para atender várias pessoas — o que eu crio é pensado exclusivamente nas suas necessidades específicas. Isso faz com que você gere muito mais resultados do que o seu sistema atual."\n\n' +
+    'FECHAMENTO DA ABORDAGEM:\n"Vim perguntar se você tem interesse em criar sistemas personalizados para as suas necessidades."\n\n' +
+    'AGENDAMENTO:\n"Fica melhor fazermos essa reunião hoje ou em um dia específico da semana?"\n"Fica melhor sábado ou segunda?"\n"Qual o melhor período — tarde, manhã ou noite?"\n"Qual o melhor horário?"\n"Certinho — espero que você apareça nessa reunião, porque o que tenho para mostrar é algo surpreendente."';
 
   navigator.clipboard.writeText(txt).then(function() { toast('Script copiado!'); });
 };
@@ -1756,5 +1874,994 @@ function simCalc() {
 }
 </script>
 <style>@media(max-width:768px){#__btn-voltar{display:none!important}}#__btn-voltar{position:fixed;bottom:22px;left:22px;z-index:99999;background:#13131a;border:1px solid #2a2a4a;color:#a0a0c0;text-decoration:none;padding:10px 18px;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;transition:all .2s;box-shadow:0 2px 12px rgba(0,0,0,.4)}#__btn-voltar:hover{background:#7c6aff;border-color:#7c6aff;color:#fff}</style><a id="__btn-voltar" href="OUTROS.html">← Outros</a><!-- FIM VOLTAR DESKTOP -->
+<!-- MODAL -->
+<div class="modal-bg" id="mexp-bg" onclick="if(event.target===this)fecharM()">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div class="modal-title" id="mexp-title"></div>
+      <button class="modal-close" onclick="fecharM()">&#x2715;</button>
+    </div>
+    <div class="modal-body" id="mexp-body"></div>
+  </div>
+</div>
+
+<!-- PLANO OVERLAY -->
+<div id="plano-overlay">
+  <div class="pdrawer-ov" id="pdov" onclick="fecharPD()"></div>
+  <div class="pdrawer" id="pdrawer">
+    <div class="pdrawer-hdr">
+      <span>Menu</span>
+      <button class="pdrawer-close" onclick="fecharPD()">&#x2715;</button>
+    </div>
+    <a href="#pc" onclick="fecharPD()"><i class="ti ti-id"></i> Meu Cartão</a>
+    <a href="#pm" onclick="fecharPD()"><i class="ti ti-brain"></i> Mentalidade</a>
+    <a href="#pe" onclick="fecharPD()"><i class="ti ti-rocket"></i> Estratégia SaaS</a>
+    <a href="#pn" onclick="fecharPD()"><i class="ti ti-calculator"></i> Meus Números</a>
+    <a href="#pr" onclick="fecharPD()"><i class="ti ti-calendar-check"></i> Rotina Diária</a>
+    <a href="#pg" onclick="fecharPD()"><i class="ti ti-chart-line"></i> Crescimento</a>
+  </div>
+  <nav class="pnav">
+    <button class="pback" onclick="fecharPlano()"><i class="ti ti-arrow-left" style="font-size:15px;"></i> Voltar</button>
+    <div class="pnav-brand">Plano 30K/mês</div>
+    <button class="phbg" id="phbg" onclick="togglePD()"><span></span><span></span><span></span></button>
+  </nav>
+  <div class="page">
+
+    <!-- CARTÃO -->
+    <div id="pc">
+      <p class="label">Meu Cartão Diário</p>
+      <div class="quote">"Eu recebo R$ 30.000 todo mês de forma recorrente até 31 de dezembro de 2026. Em troca, entrego softwares que resolvem problemas reais melhor do que qualquer concorrente. Eu acredito nisso com toda a minha força. Começo hoje."</div>
+      <div class="card" style="background:var(--surface2);border:none;"><p class="card-body" style="font-size:12px;">Leia em voz alta com emoção — toda manhã antes do celular e toda noite antes de dormir.</p></div>
+      <div style="margin-top:12px;">
+        <div class="field-block"><label>Por que PRECISO dos R$ 30.000/mês?</label><textarea rows="3" id="pc1"></textarea></div>
+        <div class="field-block"><label>O que vou dar em troca (minha ação principal)</label><textarea rows="2" id="pc2"></textarea></div>
+      </div>
+    </div>
+    <hr>
+
+    <!-- MENTALIDADE -->
+    <div id="pm">
+      <p class="label">Mentalidade — 13 Princípios de Napoleon Hill</p>
+
+      <div class="card"><p class="card-title"><span class="badge bb xbtn" onclick="abrirM('p1')">1</span> Desejo Ardente</p><p class="card-body">Não é querer. É obsessão. Tão forte que não sai da cabeça quando você deita, acorda, está no chuveiro.</p></div>
+      <div class="field-block"><label>Meu porquê ardente</label><textarea rows="2" id="pm1"></textarea></div>
+<div class="card"><p class="card-title"><span class="badge bb xbtn" onclick="abrirM('p2')">2</span> Fé</p><p class="card-body">Agir como se o resultado já fosse certo. Diga todo dia: <em>"Eu vou chegar lá. Não tenho dúvida."</em></p></div>
+
+      <div class="card"><p class="card-title"><span class="badge bb xbtn" onclick="abrirM('p3')">3</span> Autosugestão</p><p class="card-body">Repetir o cartão toda manhã e toda noite com emoção. Quanto mais lê, mais acredita. Quanto mais acredita, mais age.</p></div>
+
+      <div class="card"><p class="card-title"><span class="badge bb xbtn" onclick="abrirM('p4')">4</span> Conhecimento Especializado</p><p class="card-body">Você já sabe programar. Agora aprenda a vender, precificar e reter clientes. 20 minutos por dia muda tudo.</p></div>
+      <div class="field-block"><label>O que preciso aprender agora</label><input type="text" id="pm4a"></div>
+      <div class="field-block"><label>Livro ou curso atual</label><input type="text" id="pm4b"></div>
+<div class="card"><p class="card-title"><span class="badge bb xbtn" onclick="abrirM('p5')">5</span> Imaginação</p><p class="card-body">Todo dia, 1 minuto: feche os olhos e se veja com R$ 30.000 na conta. Pergunte: <em>"Como fazer meu software valer mais?"</em></p></div>
+      <div class="field-block"><label>Minha ideia de melhoria desta semana</label><input type="text" id="pm5"></div>
+<div class="card"><p class="card-title"><span class="badge bb xbtn" onclick="abrirM('p6')">6</span> Planejamento Organizado</p><p class="card-body">Desejo sem plano é só sonho. Saiba exatamente quantos clientes precisa, a que preço, para chegar nos R$ 30.000.</p></div>
+
+      <div class="card"><p class="card-title"><span class="badge bb xbtn" onclick="abrirM('p7')">7</span> Decisão</p><p class="card-body">Decida rápido. Ajuste no caminho. Indecisão é o maior inimigo do crescimento.</p></div>
+
+      <div class="card"><p class="card-title"><span class="badge bg xbtn" onclick="abrirM('p8')">8</span> Persistência</p><p class="card-body">Cliente cancelou? Analisa e continua. Ninguém respondeu? Muda a abordagem e continua. <strong>Eu não paro. Eu só ajusto o caminho.</strong></p></div>
+
+      <div class="card"><p class="card-title"><span class="badge bb xbtn" onclick="abrirM('p9')">9</span> Mastermind</p><p class="card-body">Cerque-se de pelo menos uma pessoa que também quer crescer. Fuja de quem sempre tem um motivo para você não tentar.</p></div>
+      <div class="field-block"><label>Pessoa que vou buscar como referência</label><input type="text" id="pm9"></div>
+<div class="card"><p class="card-title"><span class="badge ba xbtn" onclick="abrirM('p10')">10</span> Controle das Emoções</p><p class="card-body">Medo de cobrar caro? Lembre: cliente barato dá mais trabalho. Ansiedade? Foque só no que pode fazer hoje.</p></div>
+
+      <div class="card"><p class="card-title"><span class="badge bb xbtn" onclick="abrirM('p11')">11</span> Subconsciente</p><p class="card-body">Antes de dormir, pergunte em voz alta: <em>"Como posso fechar mais um cliente esta semana?"</em></p></div>
+
+      <div class="card"><p class="card-title"><span class="badge bb xbtn" onclick="abrirM('p12')">12</span> O Cérebro</p><p class="card-body">Alimente sua mente com conteúdo de qualidade. Quando uma ideia boa aparecer, anote na hora.</p></div>
+
+      <div class="card"><p class="card-title"><span class="badge bp xbtn" onclick="abrirM('p13')">13</span> Sexto Sentido</p><p class="card-body">Com a mente focada, você percebe oportunidades invisíveis. Reclamações sobre software são oportunidades.</p></div>
+      <div class="field-block"><label>Ideia ou oportunidade percebida esta semana</label><input type="text" id="pm13"></div>
+    </div>
+    <hr>
+
+    <!-- ESTRATÉGIA -->
+    <div id="pe">
+      <p class="label">Estratégia Moderna de SaaS — 2025/2026</p>
+      <div class="card"><p class="card-title xbtn" onclick="abrirM('e1')"><i class="ti ti-coin"></i> 1. Precificação por Valor</p><p class="card-body">Pare de cobrar pelo tempo. Cobre pelo resultado que o software gera para o cliente.</p></div>
+      <div class="grid2">
+        <div class="field-block"><label>Meu software gera ou economiza por mês</label><input type="text" id="pe1a"></div>
+        <div class="field-block"><label>Meu preço justo com base nisso</label><input type="text" id="pe1b"></div>
+      </div>
+      <div class="card"><p class="card-title xbtn" onclick="abrirM('e2')"><i class="ti ti-crosshair"></i> 2. Nicho Específico</p><p class="card-body">SaaS nichado vence SaaS genérico. Mais específico = menos concorrência e mais fácil de vender.</p></div>
+      <div class="field-block"><label>Meu nicho definido</label><input type="text" id="pe2a"></div>
+      <div class="field-block"><label>O problema específico que resolvo</label><textarea rows="2" id="pe2b"></textarea></div>
+<div class="card"><p class="card-title xbtn" onclick="abrirM('e3')"><i class="ti ti-door-exit"></i> 3. Reduzir Churn</p><p class="card-body">Churn é o maior inimigo do SaaS. Onboarding ativo e check-in mensal são a defesa.</p></div>
+      <div class="grid2">
+        <div class="field-block"><label>Meu churn atual</label><input type="text" id="pe3a"></div>
+        <div class="field-block"><label>Ação para reduzir</label><input type="text" id="pe3b"></div>
+      </div>
+      <div class="card"><p class="card-title xbtn" onclick="abrirM('e4')"><i class="ti ti-share"></i> 4. Crescimento por Indicação</p><p class="card-body">Clientes indicados pagam mais, cancelam menos. Pergunte sempre: <em>"Quem mais você conhece com esse problema?"</em></p></div>
+      <div class="field-block"><label>Meta de indicações por mês</label><input type="text" id="pe4"></div>
+<div class="card"><p class="card-title xbtn" onclick="abrirM('e5')"><i class="ti ti-arrow-up-circle"></i> 5. Upsell — 3 Planos de Preço</p><p class="card-body">Crie plano básico, intermediário e avançado. O intermediário deve ser o mais atrativo.</p></div>
+      <div class="card" style="padding:6px 16px;"><div class="steps">
+        <div class="step"><div class="step-num">B</div><div style="flex:1"><div class="step-title">Plano Básico</div>
+
+</div></div>
+        <div class="step"><div class="step-num">M</div><div style="flex:1"><div class="step-title">Plano Intermediário</div>
+
+</div></div>
+        <div class="step"><div class="step-num">A</div><div style="flex:1"><div class="step-title">Plano Avançado</div>
+
+</div></div>
+      </div></div>
+      <div class="card"><p class="card-title xbtn" onclick="abrirM('e6')"><i class="ti ti-pencil"></i> 6. Conteúdo de Posicionamento</p><p class="card-body">Fale sobre o problema que você resolve, não sobre o software. 2x por semana.</p></div>
+      <div class="grid2">
+        <div class="field-block"><label>Canal principal</label><input type="text" id="pe6a"></div>
+        <div class="field-block"><label>Frequência</label><input type="text" id="pe6b"></div>
+      </div>
+      <div class="card"><p class="card-title xbtn" onclick="abrirM('e7')"><i class="ti ti-clock"></i> 7. Período de Teste</p><p class="card-body">7 ou 14 dias com acompanhamento ativo. No último dia: <em>"O que achou? Vamos continuar?"</em></p></div>
+    </div>
+    <hr>
+
+    <!-- NÚMEROS -->
+    <div id="pn">
+      <p class="label">Meus Números — MRR</p>
+      
+      <div class="card" style="background:var(--surface2);border:none;"><p class="card-body" style="font-size:12px;"><strong>Referência:</strong> R$ 500 → 60 clientes | R$ 1.000 → 30 | R$ 2.000 → 15 | R$ 3.000 → 10</p></div>
+    </div>
+    <hr>
+
+    <!-- ROTINA -->
+    <div id="pr">
+      <p class="label">Rotina Diária</p>
+      <div class="card" style="padding:6px 16px;">
+        <div class="rbloco" style="padding-top:10px;">
+          <div class="rtitulo"><i class="ti ti-sunrise" style="font-size:14px;"></i> De manhã — antes do celular</div>
+          <div class="ritem"><div class="rcheck" onclick="togR(this)"></div><div class="rtext">Ler o cartão em voz alta com emoção</div></div>
+          <div class="ritem"><div class="rcheck" onclick="togR(this)"></div><div class="rtext">Fechar os olhos 1 min e se ver com R$ 30.000 na conta</div></div>
+          <div class="ritem"><div class="rcheck" onclick="togR(this)"></div><div class="rtext">Escrever UMA ação de hoje em direção à meta</div></div>
+          <div class="ritem"><div class="rcheck" onclick="togR(this)"></div><div class="rtext">Verificar o MRR atual</div></div>
+        </div>
+        <div class="rbloco">
+          <div class="rtitulo"><i class="ti ti-sun" style="font-size:14px;"></i> Durante o dia</div>
+          <div class="ritem"><div class="rcheck" onclick="togR(this)"></div><div class="rtext">Executar a ação definida de manhã</div></div>
+          <div class="ritem"><div class="rcheck" onclick="togR(this)"></div><div class="rtext">20 minutos estudando vendas, SaaS ou negócio</div></div>
+          <div class="ritem"><div class="rcheck" onclick="togR(this)"></div><div class="rtext">Falar com pelo menos 1 cliente atual ou potencial</div></div>
+          <div class="ritem"><div class="rcheck" onclick="togR(this)"></div><div class="rtext">Anotar qualquer ideia que aparecer</div></div>
+        </div>
+        <div class="rbloco">
+          <div class="rtitulo"><i class="ti ti-moon" style="font-size:14px;"></i> À noite — antes de dormir</div>
+          <div class="ritem"><div class="rcheck" onclick="togR(this)"></div><div class="rtext">Ler o cartão de novo em voz alta</div></div>
+          <div class="ritem"><div class="rcheck" onclick="togR(this)"></div><div class="rtext">Avaliar: fiz a ação do dia?</div></div>
+          <div class="ritem"><div class="rcheck" onclick="togR(this)"></div><div class="rtext">Perguntar em voz alta: "Como fechar mais um cliente esta semana?"</div></div>
+          <div class="ritem"><div class="rcheck" onclick="togR(this)"></div><div class="rtext">Pensar na meta por 2 minutos antes de fechar os olhos</div></div>
+        </div>
+      </div>
+      <button class="btn" style="margin-top:8px;width:100%;" onclick="rstR()">Resetar checklist</button>
+    </div>
+    <hr>
+
+    <!-- CRESCIMENTO -->
+    <div id="pg">
+      <p class="label">Plano de Crescimento — Mês a Mês</p>
+      <div class="card" style="padding:6px 16px;"><div class="steps">
+        <div class="step"><div class="step-num" style="background:#111;color:#fff;border-color:#111;">Jun</div><div style="flex:1"><div class="step-title">Definir nicho e preço</div>
+</div></div>
+        <div class="step"><div class="step-num">Jul</div><div style="flex:1"><div class="step-title">Primeiros 3 clientes</div>
+</div></div>
+        <div class="step"><div class="step-num">Ago</div><div style="flex:1"><div class="step-title">Programa de indicação ativo</div>
+</div></div>
+        <div class="step"><div class="step-num">Set</div><div style="flex:1"><div class="step-title">Criar os 3 planos de preço</div>
+</div></div>
+        <div class="step"><div class="step-num">Out</div><div style="flex:1"><div class="step-title">Conteúdo de posicionamento</div>
+</div></div>
+        <div class="step"><div class="step-num">Nov</div><div style="flex:1"><div class="step-title">Reduzir churn abaixo de 5%</div>
+</div></div>
+        <div class="step"><div class="step-num">Dez</div><div style="flex:1"><div class="step-title">Revisão anual e ajuste</div>
+</div></div>
+        <div class="step"><div class="step-num">Jan</div><div style="flex:1"><div class="step-title">Escalar o que funcionou</div>
+</div></div>
+        <div class="step"><div class="step-num">Fev</div><div style="flex:1"><div class="step-title">Upsell para base atual</div>
+</div></div>
+        <div class="step"><div class="step-num">Mar</div><div style="flex:1"><div class="step-title">Novo canal de aquisição</div>
+</div></div>
+        <div class="step"><div class="step-num">Abr</div><div style="flex:1"><div class="step-title">Automatizar processos</div>
+</div></div>
+        <div class="step"><div class="step-num">Mai</div><div style="flex:1"><div class="step-title">Sprint final de crescimento</div>
+</div></div>
+        <div class="step" style="background:var(--surface2);border-radius:var(--radius-sm);padding:14px;border:none;"><div class="step-num" style="background:#111;color:#fff;border-color:#111;">Dez</div><div><div class="step-title">🎯 META BATIDA — R$ 30.000/mês</div><div class="step-body">31 de dezembro de 2026.</div></div></div>
+      </div></div>
+      <div class="card" style="margin-top:12px;background:var(--surface2);border:none;"><p class="card-title" style="font-size:13px;"><i class="ti ti-lock"></i> Regra de Ouro</p><p class="card-body">Não fale dos seus planos para qualquer pessoa. Quem fala muito faz pouco.</p></div>
+      
+    </div>
+
+  </div>
+</div>
+
+<script>
+
+// ── MODAL ────────────────────────────────────────────────────────────────────
+var EXP = {
+  p1:{t:"Desejo Ardente — Como aplicar",b:"<p><strong>O que é:</strong> Não é querer fraco. É uma obsessão que não sai da cabeça.</p><p style='margin-top:10px'><strong>Como aplicar:</strong></p><ul><li>Escreva sua meta com número e data: R$ 30.000/mês até 31/12/2026</li><li>Conecte a meta a um motivo emocional forte: família, liberdade, segurança</li><li>Releia o porquê toda vez que bater o desânimo</li></ul><div class='exemplo'><div class='exemplo-titulo'>Exemplo real</div>Bob Proctor escreveu 'Terei $25.000 até 1970' num cartão em 1960, ganhando $4.000 e devendo $6.000. Um ano depois ganhava $175.000. O desejo ardente manteve ele na direção certa quando tudo indicava desistir.</div>"},
+  p2:{t:"Fé — Como aplicar",b:"<p><strong>O que é:</strong> Fé não é esperar sentado. É agir como se o resultado já fosse garantido.</p><p style='margin-top:10px'><strong>Como aplicar:</strong></p><ul><li>Toda manhã diga em voz alta: 'Eu vou chegar nos R$ 30.000/mês. Não tenho dúvida.'</li><li>Quando vier 'não vou conseguir', substitua: 'Outros partiram do zero e chegaram. Eu também chego.'</li><li>Aja como se já fosse verdade: prepare seu preço e processo como quem já está chegando lá</li></ul><div class='exemplo'><div class='exemplo-titulo'>Exemplo real</div>Um dev que cobra R$ 300/mês age com insegurança no preço. Um que age com fé cobra R$ 2.000 com naturalidade — e o cliente sente isso. A fé muda sua postura. A postura muda o resultado da negociação.</div>"},
+  p3:{t:"Autosugestão — Como aplicar",b:"<p><strong>O que é:</strong> Repetir algo para si mesmo até que a mente acredite de verdade. O cartão diário é a sua ferramenta.</p><p style='margin-top:10px'><strong>Como aplicar:</strong></p><ul><li>Leia o cartão em voz alta toda manhã — com emoção, não como robô</li><li>Leia de novo toda noite antes de dormir</li><li>Feche os olhos 30 segundos depois e se imagine com o dinheiro já na conta</li></ul><div class='exemplo'><div class='exemplo-titulo'>Exemplo real</div>Bob Proctor lia o cartão no banheiro e no semáforo. Os colegas riram. Ele parou de ler na frente deles — mas não parou de ler. A repetição cria crença. A crença cria ação. A ação cria resultado.</div>"},
+  p4:{t:"Conhecimento Especializado — Como aplicar",b:"<p><strong>O que é:</strong> Você já sabe programar. O que falta é o lado comercial: vender, precificar bem e reter cliente.</p><p style='margin-top:10px'><strong>Como aplicar:</strong></p><ul><li>20 minutos por dia estudando: precificação SaaS, vendas consultivas, retenção de clientes</li><li>Estude um concorrente por semana: como ele vende, quanto cobra, o que entrega</li><li>Aplique o que aprender imediatamente — conhecimento sem ação não vale nada</li></ul><div class='exemplo'><div class='exemplo-titulo'>Exemplo real</div>Um dev aprende precificação por valor e descobre que o cliente economiza R$ 8.000/mês. No próximo cliente cobra R$ 1.500 com confiança e fecha. O conhecimento certo dobra o preço sem perder o cliente.</div>"},
+  p5:{t:"Imaginação — Como aplicar",b:"<p><strong>O que é:</strong> A imaginação transforma desejo em plano. Tudo que existe foi primeiro uma ideia na cabeça de alguém.</p><p style='margin-top:10px'><strong>Como aplicar:</strong></p><ul><li>Todo dia, 1 minuto: feche os olhos e se veja com R$ 30.000 na conta todo mês</li><li>Pergunte: 'Como posso fazer meu software valer mais para o cliente?'</li><li>Toda semana: 'Que funcionalidade nova resolveria uma dor que meu cliente ainda tem?'</li></ul><div class='exemplo'><div class='exemplo-titulo'>Exemplo real</div>Um dev imaginou lembretes automáticos por WhatsApp para clientes de agendamento. Adicionou a funcionalidade e cobrou R$ 200 a mais por mês. Com 15 clientes, foram R$ 3.000 extras por mês — só com uma ideia imaginada no banho.</div>"},
+  p6:{t:"Planejamento Organizado — Como aplicar",b:"<p><strong>O que é:</strong> Desejo sem plano é só sonho. Você precisa saber exatamente quantos clientes precisa e o que vai fazer todo dia.</p><p style='margin-top:10px'><strong>Como aplicar:</strong></p><ul><li>Calcule: se cobra R$ 1.000/mês, precisa de 30 clientes. Quanto tempo leva?</li><li>Divida em ações mensais e semanais — pense no próximo passo</li><li>Toda manhã escreva UMA ação que vai executar hoje em direção à meta</li></ul><div class='exemplo'><div class='exemplo-titulo'>Exemplo real</div>Meta: 30 clientes a R$ 1.000. Prazo: 18 meses. Isso é menos de 2 clientes novos por mês. Se você prospectar 10 empresas por semana e converter 5%, fecha 2 clientes por mês. O plano torna o impossível em passos simples.</div>"},
+  p7:{t:"Decisão — Como aplicar",b:"<p><strong>O que é:</strong> Pessoas bem-sucedidas decidem rápido e mudam de ideia devagar. Indecisão é literalmente dinheiro perdido.</p><p style='margin-top:10px'><strong>Como aplicar:</strong></p><ul><li>Quando aparecer uma oportunidade, decida em menos de 24 horas</li><li>Defina seu preço hoje — não 'quando tiver mais experiência'</li><li>Toda vez que adiar uma decisão, escreva: 'Estou escolhendo ficar parado.'</li></ul><div class='exemplo'><div class='exemplo-titulo'>Exemplo real</div>Um dev ficou 3 meses pensando se subia o preço de R$ 500 para R$ 900. Quando decidiu, fechou o próximo cliente sem objeção. Os 3 meses de indecisão custaram R$ 400 por cliente por todo esse tempo.</div>"},
+  p8:{t:"Persistência — Como aplicar",b:"<p><strong>O que é:</strong> Continuar mesmo quando dói, quando é lento e quando ninguém acredita. É o princípio que separa quem chega de quem desiste na curva.</p><p style='margin-top:10px'><strong>Como aplicar:</strong></p><ul><li>Quando um cliente cancelar: pergunte o motivo e use para melhorar</li><li>Quando ninguém responder: mude a abordagem, não desista do objetivo</li><li>Cole em algum lugar visível: 'Eu não paro. Eu só ajusto o caminho.'</li><li>Só desista de uma estratégia após testar por pelo menos 30 dias</li></ul><div class='exemplo'><div class='exemplo-titulo'>Exemplo real</div>Edison tentou mais de 1.000 materiais antes de criar a lâmpada. No SaaS: o dev que persiste nos primeiros 6 meses difíceis é o mesmo que tem 20 clientes no mês 12. A maioria desiste no mês 2.</div>"},
+  p9:{t:"Mastermind — Como aplicar",b:"<p><strong>O que é:</strong> Ninguém chega longe sozinho. As pessoas certas multiplicam sua velocidade. As erradas te freiam sem você perceber.</p><p style='margin-top:10px'><strong>Como aplicar:</strong></p><ul><li>Encontre pelo menos uma pessoa que já fatura o que você quer e aprenda com ela</li><li>Entre em comunidades de SaaS, desenvolvimento de produto ou empreendedorismo</li><li>Fuja de pessoas que sempre têm um motivo para você não tentar</li></ul><div class='exemplo'><div class='exemplo-titulo'>Exemplo real</div>Ray Stanford sentou com Bob Proctor quando ele era quebrado e mudou toda a trajetória dele. Um mentor certo encurta em anos o caminho que você levaria sozinho.</div>"},
+  p10:{t:"Controle das Emoções — Como aplicar",b:"<p><strong>O que é:</strong> Medo, preguiça, ansiedade e desânimo não somem. Você aprende a não obedecer eles.</p><p style='margin-top:10px'><strong>Como aplicar:</strong></p><ul><li>Medo de cobrar caro: lembre que cliente barato dá mais trabalho e cancela mais</li><li>Ansiedade: foque só no que pode fazer hoje, não em tudo de uma vez</li><li>Preguiça: faça uma coisa pequena — o movimento quebra o bloqueio</li></ul><div class='exemplo'><div class='exemplo-titulo'>Exemplo real</div>Um dev com medo de cobrar R$ 1.500 aceita R$ 600 para não perder o cliente. O cliente que pagaria R$ 1.500 vai embora porque sentiu insegurança no preço. Controlar o medo de cobrar caro vale dinheiro todo mês.</div>"},
+  p11:{t:"Subconsciente — Como aplicar",b:"<p><strong>O que é:</strong> Sua mente continua trabalhando enquanto você dorme. Você pode usar isso alimentando ela com as perguntas certas.</p><p style='margin-top:10px'><strong>Como aplicar:</strong></p><ul><li>Antes de dormir pergunte em voz alta: 'Como posso fechar mais um cliente esta semana?'</li><li>Não consuma conteúdo negativo antes de dormir</li><li>Ao acordar, antes do celular, leia o cartão</li><li>Anote qualquer ideia que vier na cabeça ao acordar</li></ul><div class='exemplo'><div class='exemplo-titulo'>Exemplo real</div>Muitos devs relatam que acordam com soluções de código que não conseguiam resolver na véspera. O subconsciente trabalhando. A mesma coisa acontece com ideias de negócio se você alimentar a mente com as perguntas certas antes de dormir.</div>"},
+  p12:{t:"O Cérebro — Como aplicar",b:"<p><strong>O que é:</strong> Seu cérebro é uma máquina que trabalha 24h. Quanto mais você alimenta ele com informação de qualidade, mais ideias boas ele produz.</p><p style='margin-top:10px'><strong>Como aplicar:</strong></p><ul><li>Leia pelo menos 10 páginas por dia de um livro sobre negócio, vendas ou SaaS</li><li>Quando uma ideia boa aparecer, anote na hora — não confie na memória</li><li>Reduza o tempo consumindo conteúdo inútil</li></ul><div class='exemplo'><div class='exemplo-titulo'>Exemplo real</div>Um dev que lê 10 páginas por dia sobre precificação em 30 dias leu um livro inteiro. Em 3 meses, absorveu mais sobre negócio do que a maioria aprende em anos. Esse conhecimento cria intuições que parecem sorte para quem está de fora.</div>"},
+  p13:{t:"Sexto Sentido — Como aplicar",b:"<p><strong>O que é:</strong> Quando sua mente está focada numa meta, você começa a perceber oportunidades que antes passavam invisíveis.</p><p style='margin-top:10px'><strong>Como aplicar:</strong></p><ul><li>Fique atento às reclamações sobre softwares ao seu redor — cada reclamação é uma oportunidade</li><li>Quando algo chamar sua atenção de forma estranha, investigue antes de descartar</li><li>Mantenha um arquivo no celular chamado 'Ideias' e anote tudo que parecer relevante</li></ul><div class='exemplo'><div class='exemplo-titulo'>Exemplo real</div>Um dev ouviu um dono de clínica reclamar que perdia clientes por esquecer de ligar para confirmar consultas. Criou confirmação automática por WhatsApp. Virou o diferencial do software — e mais 8 clínicas compraram só por causa disso.</div>"},
+  e1:{t:"Precificação por Valor — Como aplicar",b:"<p><strong>O que é:</strong> Você para de cobrar pelo tempo e começa a cobrar pelo resultado que entrega.</p><p style='margin-top:10px'><strong>Como aplicar:</strong></p><ul><li>Pergunte ao cliente: 'Quanto você gasta hoje com esse problema? Quanto tempo perde?'</li><li>Calcule: se economiza R$ 5.000/mês, cobrar R$ 1.000 é barato — é 20% do benefício</li><li>Nunca comece pelo preço — comece pela dor e pelo resultado</li></ul><div class='exemplo'><div class='exemplo-titulo'>Exemplo real</div>Dev A cobra R$ 400/mês por um sistema de estoque. Dev B, com o mesmo sistema, descobre que o cliente perdia R$ 3.000/mês em erros. Cobra R$ 1.200. O cliente fecha na hora. Mesmo software, preço 3x maior — só porque um entendeu o valor.</div>"},
+  e2:{t:"Nicho Específico — Como aplicar",b:"<p><strong>O que é:</strong> Quanto mais específico o problema que você resolve, menos concorrência e mais fácil de vender.</p><p style='margin-top:10px'><strong>Como aplicar:</strong></p><ul><li>Escolha um segmento específico: não 'qualquer empresa', mas 'clínicas odontológicas de até 3 dentistas'</li><li>Aprenda as dores desse nicho até conhecer melhor que o próprio dono</li><li>Crie cases nesse nicho — um case real vale mais que qualquer argumento de venda</li></ul><div class='exemplo'><div class='exemplo-titulo'>Exemplo real</div>Um dev genérico compete com centenas de outros. Um especializado em 'sistema para borracharias' é o único que fala a língua daquele dono. Vende mais fácil, cobra mais caro e tem menos churn.</div>"},
+  e3:{t:"Reduzir Churn — Como aplicar",b:"<p><strong>O que é:</strong> Churn é a % de clientes que cancela por mês. Um churn de 10% significa que você perde toda a base em 10 meses.</p><p style='margin-top:10px'><strong>Como aplicar:</strong></p><ul><li>Onboarding ativo: nos primeiros 7 dias, entre em contato pelo menos 2 vezes</li><li>Check-in mensal: ligue ou mande mensagem para cada cliente todo mês</li><li>Se um cliente parou de usar, entre em contato antes que ele cancele</li><li>Quando cancelar, pergunte o motivo real — é sua fonte de melhoria gratuita</li></ul><div class='exemplo'><div class='exemplo-titulo'>Exemplo real</div>Um dev com 20 clientes e 10% de churn perde 2 por mês e precisa fechar 2 só para ficar no mesmo lugar. Com 5% de churn, cada novo cliente vira crescimento real. Reduzir de 10% para 5% dobra a velocidade de crescimento.</div>"},
+  e4:{t:"Crescimento por Indicação — Como aplicar",b:"<p><strong>O que é:</strong> Clientes que vêm por indicação pagam mais, cancelam menos e fecham mais rápido.</p><p style='margin-top:10px'><strong>Como aplicar:</strong></p><ul><li>Nos primeiros 30 dias de um cliente novo, pergunte: 'Você conhece mais alguém com esse problema?'</li><li>Crie um programa: cliente que indica ganha 1 mês grátis ou desconto</li><li>Peça sempre depois de uma vitória — quando o cliente comemorar um resultado</li></ul><div class='exemplo'><div class='exemplo-titulo'>Exemplo real</div>Um dev com 10 clientes satisfeitos pede indicação para cada um. 4 indicam alguém. Desses 4, 2 fecham. Sem gastar um centavo em marketing, cresceu 20% naquele mês.</div>"},
+  e5:{t:"Upsell — Como aplicar",b:"<p><strong>O que é:</strong> Vender mais para quem já é seu cliente é muito mais fácil do que conquistar um novo.</p><p style='margin-top:10px'><strong>Como aplicar:</strong></p><ul><li>Crie 3 planos: básico, intermediário e avançado</li><li>O intermediário deve ser o mais atrativo — coloque o melhor custo-benefício nele</li><li>Quando um cliente pedir funcionalidade nova, ofereça como upgrade de plano</li></ul><div class='exemplo'><div class='exemplo-titulo'>Exemplo real</div>Dev tem 15 clientes no plano básico de R$ 800. Lança plano intermediário a R$ 1.400 com relatórios automáticos. 6 clientes migram. MRR sobe de R$ 12.000 para R$ 15.600 — sem fechar um cliente novo.</div>"},
+  e6:{t:"Conteúdo de Posicionamento — Como aplicar",b:"<p><strong>O que é:</strong> Conteúdo que mostra sua autoridade no nicho. Clientes que pagam bem vêm de quem eles já conhecem e confiam.</p><p style='margin-top:10px'><strong>Como aplicar:</strong></p><ul><li>Publique 2x por semana sobre o PROBLEMA que você resolve — não sobre o software</li><li>Mostre casos reais: 'Meu cliente X reduziu Y horas de trabalho usando o sistema'</li><li>Escolha um canal e seja consistente — presença constante vale mais que viral esporádico</li></ul><div class='exemplo'><div class='exemplo-titulo'>Exemplo real</div>Um dev posta todo mês um case: 'Como a Pizzaria do João reduziu o desperdício em 30%'. Donos de outras pizzarias veem, reconhecem o problema e entram em contato. Sem anúncio pago, sem prospecção fria.</div>"},
+  e7:{t:"Período de Teste — Como aplicar",b:"<p><strong>O que é:</strong> Deixar o cliente experimentar antes de pagar aumenta muito a conversão e reduz o churn.</p><p style='margin-top:10px'><strong>Como aplicar:</strong></p><ul><li>Ofereça 7 ou 14 dias de teste — tempo suficiente para ver valor, curto para criar urgência</li><li>No 3º dia entre em contato: 'Conseguiu configurar tudo? Posso ajudar?'</li><li>No último dia, mensagem direta: 'O que achou? Vamos continuar?'</li><li>Nunca ofereça teste sem acompanhamento — cliente abandonado no teste cancela</li></ul><div class='exemplo'><div class='exemplo-titulo'>Exemplo real</div>Dev oferece 14 dias de teste para 10 empresas. Sem acompanhamento: 2 convertem. Com acompanhamento ativo nos dias 3, 7 e 14: 7 convertem. O acompanhamento durante o teste é o que faz a diferença.</div>"}
+};
+
+function abrirM(k){
+  var e=EXP[k];if(!e)return;
+  document.getElementById('mexp-title').textContent=e.t;
+  document.getElementById('mexp-body').innerHTML=e.b;
+  document.getElementById('mexp-bg').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function fecharM(){
+  document.getElementById('mexp-bg').classList.remove('open');
+  document.body.style.overflow='';
+}
+
+// ── PLANO ─────────────────────────────────────────────────────────────────────
+function abrirPlano(){
+  document.getElementById('plano-overlay').classList.add('open');
+  document.getElementById('plano-overlay').scrollTop=0;
+  carregarP();
+}
+function fecharPlano(){
+  document.getElementById('plano-overlay').classList.remove('open');
+}
+function togglePD(){
+  var d=document.getElementById('pdrawer'),o=document.getElementById('pdov'),h=document.getElementById('phbg');
+  var op=d.classList.contains('open');
+  d.classList.toggle('open',!op);o.classList.toggle('open',!op);h.classList.toggle('open',!op);
+}
+function fecharPD(){
+  document.getElementById('pdrawer').classList.remove('open');
+  document.getElementById('pdov').classList.remove('open');
+  document.getElementById('phbg').classList.remove('open');
+}
+function togR(el){
+  el.classList.toggle('done');
+  var t=el.nextElementSibling;t.classList.toggle('done');
+  el.textContent=el.classList.contains('done')?'✓':'';
+}
+function rstR(){
+  document.querySelectorAll('#plano-overlay .rcheck').forEach(function(e){e.classList.remove('done');e.textContent='';});
+  document.querySelectorAll('#plano-overlay .rtext').forEach(function(e){e.classList.remove('done');});
+  toast('Checklist resetado!');
+}
+
+var PCAMPOS=['pc1','pc2','pm1','pm4a','pm4b','pm5','pm9','pm13','pe1a','pe1b','pe2a','pe2b','pe3a','pe3b','pe4','pe5bp','pe5bd','pe5mp','pe5md','pe5ap','pe5ad','pe6a','pe6b','pn1','pn2','pn3','pn4','pn5','pn6','pg1','pg2','pg3','pg4','pg5','pg6','pg7','pg8','pg9','pg10','pg11','pg12'];
+
+function salvarP(){
+  PCAMPOS.forEach(function(id){var e=document.getElementById(id);if(e)localStorage.setItem('p30_'+id,e.value);});
+  if(window._salvarPlanoNuvem) window._salvarPlanoNuvem();
+  toast('Plano salvo! ✔');
+}
+function limparP(){
+  if(!confirm('Apagar tudo do Plano 30K?'))return;
+  PCAMPOS.forEach(function(id){var e=document.getElementById(id);if(e){e.value='';localStorage.removeItem('p30_'+id);}});
+  toast('Tudo limpo.');
+}
+function carregarP(){
+  PCAMPOS.forEach(function(id){
+    var e=document.getElementById(id),v=localStorage.getItem('p30_'+id);
+    if(e&&v){e.value=v;if(e.tagName==='TEXTAREA'){e.style.height='auto';e.style.height=e.scrollHeight+'px';}}
+  });
+}
+document.addEventListener('DOMContentLoaded',function(){
+  PCAMPOS.forEach(function(id){
+    var e=document.getElementById(id);
+    if(e){e.addEventListener('input',function(){
+      localStorage.setItem('p30_'+id,e.value);
+      if(e.tagName==='TEXTAREA'){e.style.height='auto';e.style.height=e.scrollHeight+'px';}
+    });}
+  });
+});
+
+
+</script>
+
+<!-- ══ PROCESSO OVERLAY ══════════════════════════════════════════════════════ -->
+
+<style>
+/* ── Processo: classes próprias no tema DOA ── */
+#processo-overlay {
+  position:fixed;inset:0;z-index:500;
+  background:#f9f9f8;
+  transform:translateX(100%);
+  transition:transform 0.28s cubic-bezier(.4,0,.2,1);
+  display:flex;flex-direction:column;
+  font-family:'Inter',sans-serif;
+  user-select:none;
+  -webkit-user-select:none;
+  -webkit-touch-callout:none;
+}
+#processo-overlay.popen { transform:translateX(0); }
+
+.p-topbar {
+  position:sticky;top:0;z-index:10;
+  background:rgba(249,249,248,0.95);
+  backdrop-filter:blur(8px);
+  border-bottom:0.5px solid rgba(0,0,0,0.09);
+  display:flex;align-items:center;gap:12px;
+  padding:0 20px;height:56px;flex-shrink:0;
+}
+.p-topbar-title { font-size:14px;font-weight:600;color:#111110;flex:1; }
+.p-back { background:none;border:none;cursor:pointer;color:#6b6b68;font-size:20px;padding:4px 6px 4px 0;line-height:1;display:flex;align-items:center; }
+
+#p-canvas {
+  flex:1;overflow-y:auto;overflow-x:hidden;
+  padding:20px 20px 140px;
+  position:relative;
+}
+#p-linesSvg { position:absolute;top:0;left:0;width:100%;overflow:visible;pointer-events:none;z-index:0; }
+#p-flow { position:relative;z-index:1;display:flex;flex-direction:column;gap:0; }
+
+.p-f-row { display:flex;animation:pfadeUp .25s ease; }
+@keyframes pfadeUp{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:none;}}
+.p-f-row.ltr { justify-content:flex-start;padding-left:18vw; }
+.p-f-row.rtl { justify-content:flex-end;padding-right:18vw; }
+
+.p-step-card {
+  width:fit-content;max-width:62vw;
+  background:#ffffff;
+  border:1.5px solid #e0e0dc;
+  border-radius:12px;padding:10px 16px;
+  cursor:pointer;
+  box-shadow:0 1px 4px rgba(0,0,0,0.06);
+  transition:border-color .2s,box-shadow .2s,transform .15s,opacity .15s;
+  touch-action:none;position:relative;
+  display:inline-flex;flex-direction:column;gap:0;
+}
+.p-step-card.active {
+  background:#ffffff;
+  border-color:transparent;
+  box-shadow:0 4px 20px rgba(0,0,0,0.18);
+  transform:scale(1.03);
+}
+.p-step-card.dragging { opacity:.35;border-color:#534AB7; }
+.p-step-card.drag-over-top,
+.p-step-card.drag-over-bottom { border-color:#534AB7;box-shadow:0 0 0 3px rgba(83,74,183,0.2); }
+
+.p-s-word { font-size:.85rem;font-weight:600;line-height:1.3;white-space:nowrap;color:#111110;overflow:hidden;text-overflow:ellipsis;max-width:100%; }
+.p-step-card.active .p-s-word { color:#111110; }
+
+.p-s-detail {
+  display:none;margin-top:6px;font-size:.75rem;line-height:1.5;
+  color:#6b6b68;
+  border-top:1px solid #e8e8e4;padding-top:6px;
+  white-space:normal;word-break:break-word;overflow-wrap:break-word;
+  max-width:58vw;
+}
+.p-step-card.active .p-s-detail { display:block;color:#6b6b68;border-top-color:#e8e8e4; }
+
+.p-row-spacer { height:48px;position:relative; }
+
+.p-empty {
+  text-align:center;padding:60px 20px;color:#a0a09e;font-size:13px;font-style:italic;
+  border:0.5px dashed rgba(0,0,0,0.12);border-radius:10px;
+}
+
+/* FAB speed dial — controlled by JS */
+#p-fab { transition:transform .2s,background .2s; }
+#p-fab:active { transform:scale(.9) !important; }
+
+/* Ghost drag */
+.p-drag-ghost {
+  position:fixed;z-index:700;pointer-events:none;
+  width:fit-content;min-width:80px;max-width:60vw;
+  background:#ffffff;border:1.5px solid #534AB7;
+  border-radius:10px;padding:10px 14px;
+  box-shadow:0 20px 50px rgba(0,0,0,.15);
+  opacity:.95;transform:rotate(1.5deg) scale(1.03);
+  font-family:'Inter',sans-serif;font-size:.85rem;font-weight:600;color:#111110;
+}
+
+/* Modals */
+.p-overlay {
+  position:fixed;inset:0;z-index:800;
+  background:rgba(0,0,0,0.3);backdrop-filter:blur(4px);
+  display:flex;align-items:flex-end;justify-content:center;
+  opacity:0;pointer-events:none;transition:opacity .25s;
+}
+.p-overlay.open { opacity:1;pointer-events:all; }
+.p-modal {
+  background:#ffffff;
+  border:0.5px solid rgba(0,0,0,0.09);
+  border-radius:16px 16px 0 0;
+  padding:22px 20px 40px;
+  width:100%;max-width:500px;
+  transform:translateY(50px);transition:transform .3s ease;
+  display:flex;flex-direction:column;gap:14px;
+}
+.p-overlay.open .p-modal { transform:translateY(0); }
+.p-modal-title { font-size:14px;font-weight:600;color:#111110; }
+.p-modal label {
+  font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;
+  color:#a0a09e;display:block;margin-bottom:5px;
+}
+.p-modal input,.p-modal textarea {
+  width:100%;background:#f4f4f2;
+  border:0.5px solid rgba(0,0,0,0.09);border-radius:8px;
+  padding:11px 14px;color:#111110;
+  font-family:'Inter',sans-serif;font-size:13.5px;
+  outline:none;resize:none;-webkit-appearance:none;transition:border-color .2s;
+}
+.p-modal input:focus,.p-modal textarea:focus { border-color:rgba(0,0,0,0.3); }
+.p-modal input::placeholder,.p-modal textarea::placeholder { color:#a0a09e; }
+.p-btn-ok {
+  width:100%;background:#111110;color:#fff;
+  font-family:'Inter',sans-serif;font-weight:600;font-size:13.5px;
+  border:none;border-radius:8px;padding:14px;cursor:pointer;
+  margin-top:2px;transition:opacity .15s;
+}
+.p-btn-ok:active { opacity:.8; }
+</style>
+
+<div id="processo-overlay">
+  <div class="p-topbar">
+    <button class="p-back" onclick="fecharProcesso()"><i class="ti ti-arrow-left"></i></button>
+    <div style="flex:1;display:flex;align-items:center;gap:8px;min-width:0;">
+      <span class="p-topbar-title" id="p-proc-title" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:140px;cursor:pointer;" onclick="p_openSelectProc()" title="Trocar processo">Meu Processo</span>
+      <button onclick="p_openSelectProc()" style="background:none;border:none;cursor:pointer;color:#a0a09e;font-size:13px;padding:2px 4px;border-radius:4px;flex-shrink:0;" title="Trocar processo"><i class="ti ti-chevron-down"></i></button>
+    </div>
+    <button onclick="p_openRenameProc()" style="background:none;border:none;cursor:pointer;color:#a0a09e;font-size:18px;padding:4px 6px;line-height:1;" title="Renomear / excluir"><i class="ti ti-dots"></i></button>
+  </div>
+  <div id="p-canvas">
+    <svg id="p-linesSvg"></svg>
+    <div id="p-flow"></div>
+  </div>
+</div>
+
+<!-- FAB speed dial -->
+<div id="p-fab-wrap" style="position:fixed;bottom:28px;right:24px;z-index:600;display:none;flex-direction:column;align-items:flex-end;gap:10px;">
+  <!-- opção 2: novo processo -->
+  <div id="p-fab-opt2" style="display:none;align-items:center;gap:8px;animation:pfadeUp .18s ease;">
+    <span style="background:#fff;border:0.5px solid rgba(0,0,0,0.12);border-radius:20px;padding:6px 14px;font-size:12.5px;font-weight:500;color:#111110;white-space:nowrap;box-shadow:0 2px 10px rgba(0,0,0,0.1);">Novo processo</span>
+    <button onclick="p_openNewProc()" style="width:42px;height:42px;border-radius:50%;background:#534AB7;border:none;color:#fff;font-size:1.1rem;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 4px 16px rgba(83,74,183,0.35);"><i class="ti ti-git-branch" style="font-size:16px;"></i></button>
+  </div>
+  <!-- opção 1: nova etapa -->
+  <div id="p-fab-opt1" style="display:none;align-items:center;gap:8px;animation:pfadeUp .18s ease;">
+    <span style="background:#fff;border:0.5px solid rgba(0,0,0,0.12);border-radius:20px;padding:6px 14px;font-size:12.5px;font-weight:500;color:#111110;white-space:nowrap;box-shadow:0 2px 10px rgba(0,0,0,0.1);">Nova etapa</span>
+    <button onclick="p_fabEtapa()" style="width:42px;height:42px;border-radius:50%;background:#111110;border:none;color:#fff;font-size:1.1rem;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,0.2);"><i class="ti ti-plus" style="font-size:16px;"></i></button>
+  </div>
+  <!-- botão principal -->
+  <button id="p-fab" onclick="p_fabToggle()" style="width:52px;height:52px;border-radius:50%;background:#111110;border:none;font-size:1.5rem;color:#fff;font-weight:700;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 6px 24px rgba(0,0,0,0.2);transition:transform .2s,background .2s;">＋</button>
+</div>
+<!-- overlay para fechar speed dial -->
+<div id="p-fab-overlay" onclick="p_fabClose()" style="display:none;position:fixed;inset:0;z-index:599;"></div>
+
+<!-- Modal adicionar -->
+<div class="p-overlay" id="p-overlay" onclick="p_bgClick(event)">
+  <div class="p-modal">
+    <div class="p-modal-title">Nova etapa</div>
+    <div>
+      <label>Palavra-chave</label>
+      <input id="p-inp-word" type="text" placeholder="ex: Descobrir" maxlength="30">
+    </div>
+    <div>
+      <label>Descrição (toque para ver)</label>
+      <textarea id="p-inp-detail" rows="2" placeholder="ex: Perguntar quem é o proprietário"></textarea>
+    </div>
+    <button class="p-btn-ok" onclick="p_addStep()">Adicionar</button>
+  </div>
+</div>
+
+<!-- Modal editar etapa -->
+<div class="p-overlay" id="p-edit-overlay" onclick="p_editBgClick(event)">
+  <div class="p-modal">
+    <div class="p-modal-title">Editar etapa</div>
+    <div>
+      <label>Palavra-chave</label>
+      <input id="p-edit-word" type="text" maxlength="30">
+    </div>
+    <div>
+      <label>Descrição</label>
+      <textarea id="p-edit-detail" rows="2"></textarea>
+    </div>
+    <div style="display:flex;gap:8px;">
+      <button class="p-btn-ok" style="background:#fee8e8;color:#8b1a1a;flex:0 0 44px;font-size:1.1rem;" onclick="p_deleteStep()">🗑</button>
+      <button class="p-btn-ok" style="flex:1;" onclick="p_saveEdit()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal selecionar processo -->
+<div class="p-overlay" id="p-select-overlay" onclick="if(event.target===this)p_closeSelectProc()">
+  <div class="p-modal">
+    <div class="p-modal-title">Meus Processos</div>
+    <div id="p-proc-list" style="display:flex;flex-direction:column;gap:6px;max-height:45vh;overflow-y:auto;"></div>
+    <button class="p-btn-ok" style="background:#f4f4f2;color:#111110;margin-top:4px;" onclick="p_closeSelectProc()">Fechar</button>
+  </div>
+</div>
+
+<!-- Modal novo processo -->
+<div class="p-overlay" id="p-newproc-overlay" onclick="if(event.target===this)p_closeNewProc()">
+  <div class="p-modal">
+    <div class="p-modal-title">Novo processo</div>
+    <div>
+      <label>Nome do processo</label>
+      <input id="p-newproc-name" type="text" placeholder="ex: Processo de Entrega" maxlength="40">
+    </div>
+    <button class="p-btn-ok" onclick="p_createProc()">Criar</button>
+  </div>
+</div>
+
+<!-- Modal renomear / excluir processo -->
+<div class="p-overlay" id="p-rename-overlay" onclick="if(event.target===this)p_closeRenameProc()">
+  <div class="p-modal">
+    <div class="p-modal-title">Editar processo</div>
+    <div>
+      <label>Nome</label>
+      <input id="p-rename-inp" type="text" maxlength="40">
+    </div>
+    <div style="display:flex;gap:8px;">
+      <button id="p-rename-del" class="p-btn-ok" style="background:#fee8e8;color:#8b1a1a;flex:0 0 44px;font-size:1.1rem;" onclick="p_deleteProc()">🗑</button>
+      <button class="p-btn-ok" style="flex:1;" onclick="p_saveRenameProc()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+let p_justDragged = false;
+
+// ══ MULTI-PROCESSO: estado global ══
+var p_procs   = [];  // [{id, name, steps:[]}]
+var p_procIdx = 0;   // índice do processo ativo
+var p_steps   = [];  // alias: p_procs[p_procIdx].steps
+var p_fabOpen = false;
+
+// ── Persistência ──
+function p_salvarTudo(){
+  try { localStorage.setItem('doa_processos_v2', JSON.stringify(p_procs)); } catch(e){}
+  if(window._salvarProcessoNuvem) window._salvarProcessoNuvem(p_steps);
+}
+function p_salvarSteps(){
+  if(p_procs[p_procIdx]) p_procs[p_procIdx].steps = p_steps;
+  p_salvarTudo();
+}
+function p_stepsDefault(){
+  return [
+    {word:'Descobrir',detail:'Perguntar quem é o proprietário do estabelecimento'},
+    {word:'Nome',detail:'Anotar o nome do responsável'},
+    {word:'Apresentar',detail:'Me apresentar e explicar o motivo da visita'},
+  ];
+}
+function p_syncAlias(){
+  p_steps = p_procs[p_procIdx] ? p_procs[p_procIdx].steps : [];
+  var titleEl = document.getElementById('p-proc-title');
+  if(titleEl) titleEl.textContent = p_procs[p_procIdx] ? p_procs[p_procIdx].name : 'Meu Processo';
+}
+async function p_carregarSteps(){
+  try {
+    var saved = JSON.parse(localStorage.getItem('doa_processos_v2'));
+    if(saved && saved.length){ p_procs=saved; p_procIdx=0; p_syncAlias(); return; }
+  } catch(e){}
+  try {
+    var local = JSON.parse(localStorage.getItem('doa_processo_steps'));
+    if(local && local.length){
+      p_procs=[{id:Date.now(),name:'Meu Processo',steps:local}];
+      p_procIdx=0; p_syncAlias(); p_salvarTudo(); return;
+    }
+  } catch(e){}
+  if(window._carregarProcessoNuvem){
+    var nuvem = await window._carregarProcessoNuvem();
+    if(nuvem && nuvem.length){
+      p_procs=[{id:Date.now(),name:'Meu Processo',steps:nuvem}];
+      p_procIdx=0; p_syncAlias(); p_salvarTudo(); return;
+    }
+  }
+  p_procs=[{id:Date.now(),name:'Meu Processo',steps:p_stepsDefault()}];
+  p_procIdx=0; p_syncAlias();
+}
+
+// ── FAB speed dial ──
+function p_fabToggle(){
+  p_fabOpen = !p_fabOpen;
+  document.getElementById('p-fab-opt1').style.display = p_fabOpen ? 'flex' : 'none';
+  document.getElementById('p-fab-opt2').style.display = p_fabOpen ? 'flex' : 'none';
+  document.getElementById('p-fab').style.transform    = p_fabOpen ? 'rotate(45deg)' : '';
+  document.getElementById('p-fab').style.background   = p_fabOpen ? '#534AB7' : '#111110';
+  document.getElementById('p-fab-overlay').style.display = p_fabOpen ? 'block' : 'none';
+}
+function p_fabClose(){
+  p_fabOpen = false;
+  document.getElementById('p-fab-opt1').style.display='none';
+  document.getElementById('p-fab-opt2').style.display='none';
+  document.getElementById('p-fab').style.transform='';
+  document.getElementById('p-fab').style.background='#111110';
+  document.getElementById('p-fab-overlay').style.display='none';
+}
+function p_fabEtapa(){ p_fabClose(); p_openModal(); }
+
+// ── Selecionar processo ──
+function p_openSelectProc(){
+  var list = document.getElementById('p-proc-list');
+  list.innerHTML='';
+  p_procs.forEach(function(proc,i){
+    var btn = document.createElement('button');
+    btn.style.cssText='width:100%;text-align:left;background:'+(i===p_procIdx?'#111110':'#f4f4f2')+';color:'+(i===p_procIdx?'#fff':'#111110')+';border:0.5px solid rgba(0,0,0,0.09);border-radius:8px;padding:12px 14px;font-family:Inter,sans-serif;font-size:13.5px;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:8px;';
+    btn.innerHTML='<span>'+proc.name+'</span><span style="font-size:11px;opacity:0.5;">'+proc.steps.length+' etapa'+(proc.steps.length!==1?'s':'')+'</span>';
+    btn.onclick=function(){ p_switchProc(i); p_closeSelectProc(); };
+    list.appendChild(btn);
+  });
+  document.getElementById('p-select-overlay').classList.add('open');
+}
+function p_closeSelectProc(){ document.getElementById('p-select-overlay').classList.remove('open'); }
+function p_switchProc(idx){ p_procIdx=idx; p_syncAlias(); p_activeIdx=null; p_render(); }
+
+// ── Novo processo ──
+function p_openNewProc(){ p_fabClose(); document.getElementById('p-newproc-overlay').classList.add('open'); setTimeout(function(){ document.getElementById('p-newproc-name').focus(); },300); }
+function p_closeNewProc(){ document.getElementById('p-newproc-overlay').classList.remove('open'); document.getElementById('p-newproc-name').value=''; }
+function p_createProc(){
+  var name = document.getElementById('p-newproc-name').value.trim();
+  if(!name) return;
+  p_procs.push({id:Date.now(),name:name,steps:[]});
+  p_procIdx = p_procs.length-1;
+  p_syncAlias(); p_activeIdx=null;
+  p_closeNewProc(); p_render(); p_salvarTudo();
+  toast('Processo criado! ✔');
+}
+document.addEventListener('DOMContentLoaded',function(){
+  var ni=document.getElementById('p-newproc-name');
+  if(ni) ni.addEventListener('keydown',function(e){ if(e.key==='Enter') p_createProc(); });
+  var ri=document.getElementById('p-rename-inp');
+  if(ri) ri.addEventListener('keydown',function(e){ if(e.key==='Enter') p_saveRenameProc(); });
+});
+
+// ── Renomear / excluir processo ──
+function p_openRenameProc(){
+  document.getElementById('p-rename-inp').value = p_procs[p_procIdx] ? p_procs[p_procIdx].name : '';
+  document.getElementById('p-rename-del').style.display = p_procs.length > 1 ? 'flex' : 'none';
+  document.getElementById('p-rename-overlay').classList.add('open');
+  setTimeout(function(){ document.getElementById('p-rename-inp').focus(); },300);
+}
+function p_closeRenameProc(){ document.getElementById('p-rename-overlay').classList.remove('open'); }
+function p_saveRenameProc(){
+  var name = document.getElementById('p-rename-inp').value.trim();
+  if(!name) return;
+  if(p_procs[p_procIdx]) p_procs[p_procIdx].name = name;
+  p_syncAlias(); p_closeRenameProc(); p_salvarTudo(); toast('Renomeado! ✔');
+}
+function p_deleteProc(){
+  if(p_procs.length <= 1){ alert('Não é possível excluir o único processo.'); return; }
+  if(!confirm('Excluir "'+p_procs[p_procIdx].name+'"?')) return;
+  p_procs.splice(p_procIdx,1);
+  p_procIdx = Math.max(0, p_procIdx-1);
+  p_syncAlias(); p_activeIdx=null;
+  p_closeRenameProc(); p_render(); p_salvarTudo(); toast('Processo excluído.');
+}
+
+var p_activeIdx=null;
+let p_editIdx=null;
+let p_dragIdx=null;
+let p_ghostEl=null;
+let p_dragOffX=0,p_dragOffY=0;
+let p_dropTargetIdx=null;
+let p_dropPos=null;
+
+const p_flowEl=document.getElementById('p-flow');
+const p_svgEl=document.getElementById('p-linesSvg');
+const p_canvasEl=document.getElementById('p-canvas');
+
+// abrir / fechar
+function abrirProcesso(){
+  const overlay=document.getElementById('processo-overlay');
+  overlay.classList.add('popen');
+  document.getElementById('p-fab-wrap').style.display='flex';
+  p_fabClose();
+  p_canvasEl.scrollTop=0;
+  p_carregarSteps().then(()=>{
+    p_render();
+    function onEnd(e){
+      if(e.propertyName==='transform'){
+        overlay.removeEventListener('transitionend',onEnd);
+        p_drawLines();
+      }
+    }
+    overlay.addEventListener('transitionend',onEnd);
+    setTimeout(p_drawLines,450);
+  });
+}
+function fecharProcesso(){
+  document.getElementById('processo-overlay').classList.remove('popen');
+  document.getElementById('p-fab-wrap').style.display='none';
+  p_fabClose();
+}
+
+// modal add
+function p_openModal(){
+  document.getElementById('p-overlay').classList.add('open');
+  setTimeout(()=>document.getElementById('p-inp-word').focus(),300);
+}
+function p_closeModal(){document.getElementById('p-overlay').classList.remove('open');}
+function p_bgClick(e){if(e.target===document.getElementById('p-overlay'))p_closeModal();}
+function p_addStep(){
+  const w=document.getElementById('p-inp-word').value.trim();
+  const d=document.getElementById('p-inp-detail').value.trim();
+  if(!w)return;
+  p_steps.push({word:w,detail:d});
+  document.getElementById('p-inp-word').value='';
+  document.getElementById('p-inp-detail').value='';
+  p_activeIdx=null;p_closeModal();p_render();p_salvarSteps();
+}
+document.getElementById('p-inp-word').addEventListener('keydown',e=>{if(e.key==='Enter')p_addStep();});
+
+// modal edit
+function p_openEdit(i){
+  p_editIdx=i;
+  document.getElementById('p-edit-word').value=p_steps[i].word;
+  document.getElementById('p-edit-detail').value=p_steps[i].detail||'';
+  document.getElementById('p-edit-overlay').classList.add('open');
+  setTimeout(()=>document.getElementById('p-edit-word').focus(),300);
+}
+function p_closeEdit(){document.getElementById('p-edit-overlay').classList.remove('open');p_editIdx=null;}
+function p_editBgClick(e){if(e.target===document.getElementById('p-edit-overlay'))p_closeEdit();}
+function p_saveEdit(){
+  if(p_editIdx===null)return;
+  const w=document.getElementById('p-edit-word').value.trim();
+  const d=document.getElementById('p-edit-detail').value.trim();
+  if(!w)return;
+  p_steps[p_editIdx]={word:w,detail:d};
+  p_activeIdx=null;p_closeEdit();p_render();p_salvarSteps();
+}
+function p_deleteStep(){
+  if(p_editIdx===null)return;
+  p_steps.splice(p_editIdx,1);
+  if(p_activeIdx===p_editIdx)p_activeIdx=null;
+  else if(p_activeIdx>p_editIdx)p_activeIdx--;
+  p_closeEdit();p_render();p_salvarSteps();
+}
+document.getElementById('p-edit-word').addEventListener('keydown',e=>{if(e.key==='Enter')p_saveEdit();});
+
+// render
+function p_render(){
+  p_flowEl.innerHTML='';
+  p_svgEl.innerHTML='';
+  p_svgEl.style.height='0';
+
+  if(!p_steps.length){
+    p_flowEl.innerHTML='<div class="p-empty">Nenhuma etapa.<br>Toque ＋ para começar</div>';
+    return;
+  }
+
+  p_steps.forEach((s,i)=>{
+    const row=document.createElement('div');
+    row.className='p-f-row '+(i%2===0?'ltr':'rtl');
+    row.dataset.idx=i;
+
+    const card=document.createElement('div');
+    card.className='p-step-card'+(p_activeIdx===i?' active':'');
+    card.dataset.idx=i;
+
+    card.innerHTML=`
+      <div class="p-s-word">${s.word}</div>
+      ${s.detail?`<div class="p-s-detail">${s.detail}</div>`:''}
+    `;
+
+    card.addEventListener('click',e=>{
+      if(p_dragIdx!==null||p_justDragged)return;
+      if(p_activeIdx===i){ p_openEdit(i); }
+      else { p_activeIdx=i;p_render(); }
+    });
+
+    p_setupDrag(card,i);
+    row.appendChild(card);
+    p_flowEl.appendChild(row);
+
+    if(i<p_steps.length-1){
+      const sp=document.createElement('div');
+      sp.className='p-row-spacer';
+      p_flowEl.appendChild(sp);
+    }
+  });
+
+  // Aguarda o layout estabilizar completamente antes de desenhar as linhas
+  setTimeout(p_drawLines, 80);
+}
+
+// SVG lines — lógica idêntica ao original
+function p_drawLines(){
+  p_svgEl.innerHTML='';
+  const rows=[...p_flowEl.querySelectorAll('.p-f-row')];
+  if(!rows.length)return;
+
+  const canvasRect=p_canvasEl.getBoundingClientRect();
+  const scrollTop=p_canvasEl.scrollTop;
+  const totalH=p_flowEl.scrollHeight;
+  p_svgEl.setAttribute('height',totalH);
+  p_svgEl.style.height=totalH+'px';
+
+  const defs=document.createElementNS('http://www.w3.org/2000/svg','defs');
+  p_svgEl.appendChild(defs);
+
+  rows.forEach((row,i)=>{
+    if(i>=rows.length-1)return;
+    const card=row.querySelector('.p-step-card');
+    const nextCard=rows[i+1].querySelector('.p-step-card');
+    if(!card||!nextCard)return;
+
+    const r1=card.getBoundingClientRect();
+    const r2=nextCard.getBoundingClientRect();
+
+    // coordenadas relativas ao topo do canvas + scroll
+    const x1=r1.left+(r1.width/2)-canvasRect.left;
+    const y1=r1.bottom-canvasRect.top+scrollTop;
+    const x2=r2.left+(r2.width/2)-canvasRect.left;
+    const y2=r2.top-canvasRect.top+scrollTop;
+    const cy=(y1+y2)/2;
+
+    const gradId='pg_'+Date.now()+'_'+i;
+    const grad=document.createElementNS('http://www.w3.org/2000/svg','linearGradient');
+    grad.setAttribute('id',gradId);
+    grad.setAttribute('x1','0%');grad.setAttribute('y1','0%');
+    grad.setAttribute('x2','0%');grad.setAttribute('y2','100%');
+    const st1=document.createElementNS('http://www.w3.org/2000/svg','stop');
+    st1.setAttribute('offset','0%');st1.setAttribute('stop-color','#111110');
+    const st2=document.createElementNS('http://www.w3.org/2000/svg','stop');
+    st2.setAttribute('offset','100%');st2.setAttribute('stop-color','#534AB7');
+    grad.appendChild(st1);grad.appendChild(st2);
+    defs.appendChild(grad);
+
+    const path=document.createElementNS('http://www.w3.org/2000/svg','path');
+    path.setAttribute('d',`M${x1},${y1} C${x1},${cy} ${x2},${cy} ${x2},${y2}`);
+    path.setAttribute('fill','none');
+    path.setAttribute('stroke',`url(#${gradId})`);
+    path.setAttribute('stroke-width','2');
+    p_svgEl.appendChild(path);
+  });
+}
+
+// ── DRAG & DROP — reescrito do zero ──────────────────────────────────────────
+// Regra: só troca se arrastar o dedo DE um card ATÉ outro card.
+// Clique simples nunca muda a ordem.
+
+let p_dragSrcIdx = null;   // card que está sendo arrastado
+let p_dragOver   = null;   // card que está sendo sobreposto
+
+function p_setupDrag(card, idx){
+  let touchId    = null;
+  let pressing   = false;
+  let didDrag    = false;
+  let startX, startY;
+  const MOVE_THRESHOLD = 12; // px mínimos para considerar que arrastou
+
+  // ── TOUCH ──
+  card.addEventListener('touchstart', e=>{
+    const t = e.touches[0];
+    touchId  = t.identifier;
+    pressing = true;
+    didDrag  = false;
+    startX   = t.clientX;
+    startY   = t.clientY;
+  }, {passive:true});
+
+  card.addEventListener('touchmove', e=>{
+    if(!pressing) return;
+    const t = [...e.changedTouches].find(x=>x.identifier===touchId);
+    if(!t) return;
+
+    const dx = Math.abs(t.clientX - startX);
+    const dy = Math.abs(t.clientY - startY);
+
+    // Só ativa drag depois de mover o suficiente
+    if(!didDrag && (dx > MOVE_THRESHOLD || dy > MOVE_THRESHOLD)){
+      didDrag = true;
+      p_dragSrcIdx = idx;
+      card.classList.add('dragging');
+      navigator.vibrate && navigator.vibrate(30);
+    }
+
+    if(didDrag){
+      e.preventDefault(); // evita scroll enquanto arrasta
+      // Descobre qual card está embaixo do dedo
+      card.style.pointerEvents = 'none';
+      const el = document.elementFromPoint(t.clientX, t.clientY);
+      card.style.pointerEvents = '';
+      const target = el ? el.closest('.p-step-card') : null;
+      const targetIdx = target ? parseInt(target.dataset.idx) : null;
+
+      // Highlight no alvo
+      p_flowEl.querySelectorAll('.drag-over-top').forEach(c=>c.classList.remove('drag-over-top'));
+      if(target && targetIdx !== idx){
+        target.classList.add('drag-over-top');
+        p_dragOver = targetIdx;
+      } else {
+        p_dragOver = null;
+      }
+    }
+  }, {passive:false});
+
+  card.addEventListener('touchend', e=>{
+    pressing = false;
+    card.classList.remove('dragging');
+    p_flowEl.querySelectorAll('.drag-over-top').forEach(c=>c.classList.remove('drag-over-top'));
+
+    if(didDrag && p_dragSrcIdx !== null && p_dragOver !== null && p_dragOver !== p_dragSrcIdx){
+      // Swap simples entre os dois cards
+      const tmp = p_steps[p_dragSrcIdx];
+      p_steps[p_dragSrcIdx] = p_steps[p_dragOver];
+      p_steps[p_dragOver]   = tmp;
+      p_activeIdx = null;
+      p_render();
+      p_salvarSteps();
+      // Só bloqueia click se realmente arrastou
+      p_justDragged = true;
+      setTimeout(()=>{ p_justDragged = false; }, 300);
+    }
+
+    p_dragSrcIdx = null;
+    p_dragOver   = null;
+    didDrag      = false;
+  }, {passive:true});
+}
+
+// Listeners globais de mouse — apenas para desktop
+(function(){
+  let mDragging = false;
+  let mSrcCard  = null;
+  let mSrcIdx   = null;
+  let mStartX, mStartY;
+  const THRESHOLD = 12;
+
+  document.addEventListener('mousedown', e=>{
+    const card = e.target.closest('.p-step-card');
+    if(!card) return;
+    mSrcCard  = card;
+    mSrcIdx   = parseInt(card.dataset.idx);
+    mDragging = false;
+    mStartX   = e.clientX;
+    mStartY   = e.clientY;
+  });
+
+  document.addEventListener('mousemove', e=>{
+    if(mSrcIdx === null) return;
+    const dx = Math.abs(e.clientX - mStartX);
+    const dy = Math.abs(e.clientY - mStartY);
+    if(!mDragging && (dx > THRESHOLD || dy > THRESHOLD)){
+      mDragging = true;
+      mSrcCard && mSrcCard.classList.add('dragging');
+    }
+    if(mDragging){
+      mSrcCard && (mSrcCard.style.pointerEvents = 'none');
+      const el = document.elementFromPoint(e.clientX, e.clientY);
+      mSrcCard && (mSrcCard.style.pointerEvents = '');
+      const target = el ? el.closest('.p-step-card') : null;
+      p_flowEl.querySelectorAll('.drag-over-top').forEach(c=>c.classList.remove('drag-over-top'));
+      if(target && parseInt(target.dataset.idx) !== mSrcIdx){
+        target.classList.add('drag-over-top');
+        p_dragOver = parseInt(target.dataset.idx);
+      } else {
+        p_dragOver = null;
+      }
+    }
+  });
+
+  document.addEventListener('mouseup', e=>{
+    if(mSrcCard) mSrcCard.classList.remove('dragging');
+    p_flowEl.querySelectorAll('.drag-over-top').forEach(c=>c.classList.remove('drag-over-top'));
+    if(mDragging && mSrcIdx !== null && p_dragOver !== null && p_dragOver !== mSrcIdx){
+      const tmp = p_steps[mSrcIdx];
+      p_steps[mSrcIdx]  = p_steps[p_dragOver];
+      p_steps[p_dragOver] = tmp;
+      p_activeIdx = null;
+      p_render();
+      p_salvarSteps();
+    }
+    mDragging = false; mSrcCard = null; mSrcIdx = null; p_dragOver = null;
+  });
+})();
+
+p_canvasEl.addEventListener('scroll',()=>requestAnimationFrame(p_drawLines));
+p_canvasEl.addEventListener('contextmenu',e=>e.preventDefault());
+p_canvasEl.addEventListener('click',e=>{
+  if(!e.target.closest('.p-step-card')&&p_activeIdx!==null){p_activeIdx=null;p_render();}
+});
+</script>
 </body>
-     </html>
+</html>
