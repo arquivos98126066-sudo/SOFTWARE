@@ -97,12 +97,24 @@ body::after {
   color: var(--muted);
 }
 
-/* 2-column grid */
+/* Cards largura total (DOA e Estudo) */
+.full-row {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 0 12px;
+  max-width: 480px;
+  margin: 0 auto;
+  width: 100%;
+  position: relative; z-index: 1;
+}
+
+/* 2-column grid para os demais */
 .grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 8px;
-  padding: 0 12px;
+  padding: 8px 12px 0;
   max-width: 480px;
   margin: 0 auto;
   width: 100%;
@@ -190,6 +202,26 @@ body::after {
   box-shadow: 0 2px 8px rgba(0,0,0,0.18);
 }
 
+/* Tamanhos maiores para os cards full-width */
+.full-row .card {
+  padding: 22px 20px 20px;
+  gap: 10px;
+}
+.full-row .card-icon {
+  width: 38px; height: 38px; border-radius: 10px;
+  font-size: 19px;
+}
+.full-row .card-name {
+  font-size: 15px; font-weight: 700; letter-spacing: -.3px;
+}
+.full-row .card-desc {
+  font-size: 12px;
+}
+.full-row .card-arrow {
+  width: 26px; height: 26px; border-radius: 7px;
+  font-size: 13px;
+}
+
 .footer {
   text-align: center;
   color: var(--muted2);
@@ -204,19 +236,22 @@ body::after {
   to   { opacity: 1; transform: translateY(0); }
 }
 .card { animation: fadeUp .36s cubic-bezier(.22,.68,0,1.1) both; }
-.card:nth-child(1) { animation-delay: .04s; }
-.card:nth-child(2) { animation-delay: .08s; }
-.card:nth-child(3) { animation-delay: .12s; }
-.card:nth-child(4) { animation-delay: .16s; }
-.card:nth-child(5) { animation-delay: .20s; }
-.card:nth-child(6) { animation-delay: .24s; }
-.card:nth-child(7) { animation-delay: .28s; }
-.card:nth-child(8) { animation-delay: .32s; }
+.full-row .card:nth-child(1) { animation-delay: .04s; }
+.full-row .card:nth-child(2) { animation-delay: .08s; }
+.grid .card:nth-child(1) { animation-delay: .12s; }
+.grid .card:nth-child(2) { animation-delay: .16s; }
+.grid .card:nth-child(3) { animation-delay: .20s; }
+.grid .card:nth-child(4) { animation-delay: .24s; }
+.grid .card:nth-child(5) { animation-delay: .28s; }
+.grid .card:nth-child(6) { animation-delay: .32s; }
 
 @media (max-width: 360px) {
-  .grid { gap: 7px; padding: 0 10px; }
+  .full-row { gap: 7px; padding: 0 10px; }
+  .grid { gap: 7px; padding: 7px 10px 0; }
   .card { padding: 13px 11px 12px; }
   .card-name { font-size: 13px; }
+  .full-row .card { padding: 18px 16px 16px; }
+  .full-row .card-name { font-size: 17px; }
 }
 </style>
 </head>
@@ -232,6 +267,26 @@ body::after {
     <div class="identity-dot"></div>
   </div>
 
+  <!-- DOA e Estudo: largura total, um abaixo do outro -->
+  <div class="full-row">
+
+    <a class="card" href="DOA.html">
+      <div class="card-icon">🤝</div>
+      <span class="card-name">DOA</span>
+      <span class="card-desc">Doações e apoio</span>
+      <span class="card-arrow">↗</span>
+    </a>
+
+    <a class="card" href="ESTUDO.html">
+      <div class="card-icon">📚</div>
+      <span class="card-name">Estudo</span>
+      <span class="card-desc">Aprendizado</span>
+      <span class="card-arrow">↗</span>
+    </a>
+
+  </div>
+
+  <!-- Demais cards: grid 2 colunas -->
   <div class="grid">
 
     <a class="card" href="PRE-VENDA.html">
@@ -266,20 +321,6 @@ body::after {
       <div class="card-icon">💰</div>
       <span class="card-name">Rico</span>
       <span class="card-desc">Finanças e riqueza</span>
-      <span class="card-arrow">↗</span>
-    </a>
-
-    <a class="card" href="DOA.html">
-      <div class="card-icon">🤝</div>
-      <span class="card-name">DOA</span>
-      <span class="card-desc">Doações e apoio</span>
-      <span class="card-arrow">↗</span>
-    </a>
-
-    <a class="card" href="ESTUDO.html">
-      <div class="card-icon">📚</div>
-      <span class="card-name">Estudo</span>
-      <span class="card-desc">Aprendizado</span>
       <span class="card-arrow">↗</span>
     </a>
 
