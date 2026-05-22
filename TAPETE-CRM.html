@@ -51,7 +51,7 @@
     .alerta-info{flex:1;min-width:0}
     .alerta-titulo{font-size:13px;font-weight:700}
     .alerta-sub{font-size:11px;color:var(--muted);margin-top:2px}
-    .alerta-dias{background:#111111;color:#fff;border-radius:20px;padding:2px 10px;font-size:11px;font-weight:800;flex-shrink:0}
+    .alerta-dias{background:#fff;color:#111;border:1.5px solid #d1d5db;border-radius:20px;padding:2px 10px;font-size:11px;font-weight:800;flex-shrink:0}
 
     .filter-dropdown{position:relative;margin-bottom:12px;z-index:50}
     .filter-trigger{width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:10px;
@@ -150,17 +150,7 @@
     .img-slot img{width:100%;max-height:220px;object-fit:cover;border-radius:9px;display:block}
     .contato-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px}
 
-    #screen-registrar #reg-fab{position:fixed;bottom:76px;left:16px;z-index:200;background:var(--primary);color:#fff;border-radius:50%;width:52px;height:52px;align-items:center;justify-content:center;font-size:22px;box-shadow:0 4px 16px rgba(0,150,136,.35);cursor:pointer}
-    #screen-registrar #reg-resumo-panel{position:fixed;bottom:138px;left:16px;z-index:300;background:#fff;border-radius:20px;box-shadow:0 8px 32px rgba(0,0,0,.18);padding:0;width:270px;max-height:65vh;overflow:hidden;display:flex;flex-direction:column}
-    .resumo-header{padding:14px 16px 10px;border-bottom:1px solid #f0f0f0;display:flex;align-items:center;justify-content:space-between}
-    .resumo-header b{font-size:14px;color:var(--text)}
-    .resumo-list{overflow-y:auto;padding:8px 0}
-    .resumo-item{display:flex;align-items:center;gap:10px;padding:9px 16px;cursor:pointer;transition:.12s}
-    .resumo-item:active{background:#f5f5f5}
-    .resumo-item-ico{font-size:18px;width:28px;text-align:center}
-    .resumo-item-val{font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-    .resumo-item-lbl{font-size:10px;color:var(--muted)}
-    .resumo-edit{font-size:11px;color:var(--primary);margin-left:auto;padding-left:6px}
+
 
     /* ── REGISTRAR STEPS ── */
     .reg-step{animation:stepIn .28s cubic-bezier(.4,0,.2,1);padding:20px 16px 12px}
@@ -348,11 +338,11 @@
   background:#1A1A1A;color:#fff;padding:9px 16px;border-radius:22px;font-size:13px;font-weight:600;
   z-index:9999;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap;max-width:60vw;text-align:center"></div>
 
-<div class="nav">
+<div class="nav" id="nav-bar">
   <button class="nav-back" id="navBack" style="display:none" onclick="goBack()">←</button>
   <span class="nav-title" id="navTitle">TAPETES CRM</span>
   <div style="position:relative;flex-shrink:0;z-index:200">
-    <button id="btn-cloud-menu" onclick="toggleCloudMenu()" title="Ferramentas"
+    <button id="btn-cloud-menu" onclick="toggleCloudMenu()" ontouchstart="mrqIniciarSegura()" ontouchend="mrqCancelarSegura()" ontouchcancel="mrqCancelarSegura()" onmousedown="mrqIniciarSegura()" onmouseup="mrqCancelarSegura()" onmouseleave="mrqCancelarSegura()" title="Ferramentas"
       style="background:linear-gradient(135deg,#e0eaff 0%,#c7d9ff 50%,#dce8ff 100%);
              border:1.5px solid #a8c4ff;border-radius:50%;width:38px;height:38px;
              display:flex;align-items:center;justify-content:center;
@@ -865,15 +855,26 @@
     <input id="reg-nome-static" class="reg-step-input" type="text" inputmode="text" autocomplete="off"
       oninput="regInputChange(this,'nome')"
       onkeydown="regKeyDown(event,'nome')">
-    <div class="reg-step-hint">Digite e dê um espaço ou Enter para avançar</div>
+    <div class="reg-step-hint">Opcional — deixe em branco se não souber</div>
+    <div style="display:flex;gap:10px;margin-top:16px;padding-bottom:8px;position:relative;z-index:10">
+      <button onclick="regVoltar()" style="flex:1;min-height:52px;border-radius:14px;border:2px solid #e5e7eb;
+        background:#f3f4f6;color:#111;font-size:15px;font-weight:700;
+        font-family:inherit;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px">
+        ← Voltar
+      </button>
+      <button onclick="regNomeAvancar()" style="flex:2;min-height:52px;border-radius:14px;border:none;
+        background:#111;color:#fff;font-size:15px;font-weight:700;
+        font-family:inherit;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px">
+        Próximo →
+      </button>
+    </div>
   </div>
   <div id="reg-steps-container"></div>
-  <div id="reg-fab" onclick="toggleRegResumo();event.stopPropagation()" style="display:none"></div>
-  <div id="reg-resumo-panel" style="display:none"></div>
-  <!-- Botão invisível cobre tela toda para abrir teclado -->
+
+  <!-- Botão invisível para abrir teclado no primeiro toque -->
   <div id="reg-invisible-btn"
     onclick="regFocusActive();this.style.display='none'"
-    style="position:fixed;inset:0;bottom:65px;top:56px;z-index:100;background:transparent;cursor:pointer"></div>
+    style="display:none;position:fixed;inset:0;bottom:140px;top:56px;z-index:5;background:transparent;cursor:pointer"></div>
 </div>
 
 <!-- ── CONFIG ── -->
@@ -966,12 +967,12 @@
 <!-- ── BOTTOM NAV ── -->
 <div class="bottom-nav">
   <button class="bnav-btn active" id="bnav-0"
-    ontouchend="event.preventDefault();document.getElementById('reg-nome-static').focus();showScreen('registrar');setNav(0);initForm()"
-    onclick="document.getElementById('reg-nome-static').focus();showScreen('registrar');setNav(0);initForm()"><span class="ico">➕</span>REGISTRAR</button>
-  <button class="bnav-btn" id="bnav-1" onclick="showScreen('fila');setNav(1);renderFila()"><span class="ico">📬</span>FILA</button>
-  <button class="bnav-btn" id="bnav-2" onclick="showScreen('clientes');setNav(2)"><span class="ico">👥</span>CLIENTES</button>
-  <button class="bnav-btn" id="bnav-3" onclick="showScreen('home');setNav(3)"><span class="ico">🏠</span>HOJE</button>
-  <button class="bnav-btn" id="bnav-4" onclick="showScreen('config');setNav(4)"><span class="ico">⚙️</span>CONFIG</button>
+    ontouchend="event.preventDefault();voltarRegistrar()"
+    onclick="voltarRegistrar()"><span class="ico">➕</span>REGISTRAR</button>
+  <button class="bnav-btn" id="bnav-1" onclick="sairDoRegistrar();showScreen('fila');setNav(1);renderFila()"><span class="ico">📬</span>FILA</button>
+  <button class="bnav-btn" id="bnav-2" onclick="sairDoRegistrar();showScreen('clientes');setNav(2)"><span class="ico">👥</span>CLIENTES</button>
+  <button class="bnav-btn" id="bnav-3" onclick="sairDoRegistrar();showScreen('home');setNav(3)"><span class="ico">🏠</span>HOJE</button>
+  <button class="bnav-btn" id="bnav-4" onclick="sairDoRegistrar();showScreen('config');setNav(4)"><span class="ico">⚙️</span>CONFIG</button>
 </div>
 
 <!-- MODAL OPÇÕES -->
@@ -1241,7 +1242,7 @@ function regDeleteLocal() {
 // ── SALVAR ESTADO ─────────────────────────────────────────────────────────────
 function salvarEstadoRegistrar() {
   // Formulário vazio — limpa estado salvo
-  if (!REG_DATA.nome && regCurStep === 0) {
+  if (!REG_DATA.nome && !REG_DATA.tel && regCurStep === 0) {
     regDeleteLocal();
     return;
   }
@@ -1270,7 +1271,7 @@ async function restaurarEstadoRegistrar() {
     return false;
   }
   // Sem dados úteis
-  if (!estado.REG_DATA || !estado.REG_DATA.nome) return false;
+  if (!estado.REG_DATA) return false;
 
   // Restaura tudo
   Object.keys(REG_DATA).forEach(k => delete REG_DATA[k]);
@@ -1298,7 +1299,7 @@ function limparEstadoRegistrar() {
 document.addEventListener('visibilitychange', function() {
   if (document.visibilityState !== 'visible') return;
   regLoadLocal().then(function(estado) {
-    if (!estado || !estado.REG_DATA || !estado.REG_DATA.nome) return;
+    if (!estado || !estado.REG_DATA) return;
     if (!estado.updatedAt || Date.now() - estado.updatedAt > REG_STATE_MAX_AGE) return;
 
     if (curScreen !== 'registrar') {
@@ -1308,7 +1309,7 @@ document.addEventListener('visibilitychange', function() {
           showScreen('registrar', false);
           setNav(0);
           renderRegStep();
-          toast('✅ Voltou! Continue de onde parou.');
+
         }
       });
     } else {
@@ -1381,20 +1382,40 @@ function marcarDeletadoCrmTap(id) {
   try { localStorage.setItem('tapete_crm_deleted_ids', JSON.stringify(_crmTapDeletedIds)); } catch(_) {}
 }
 
+// ── Remove campos de imagem base64 antes de enviar ao Firebase ───────────────
+// As fotos ficam apenas no cache local (localStorage). O Firebase só guarda
+// metadados de texto. Isso evita documentos pesados e quota esgotada.
+function _stripImgsForFirebase(obj) {
+  const out = { ...obj };
+  // Remove campos que contêm strings base64 longas
+  const isBase64 = v => typeof v === 'string' && v.startsWith('data:');
+  if (isBase64(out.foto))   delete out.foto;
+  if (isBase64(out.imgIA))  delete out.imgIA;
+  if (Array.isArray(out.fotos)) {
+    const filtered = out.fotos.filter(f => !isBase64(f));
+    // Se ficou vazio após filtrar, remove o campo completamente
+    if (filtered.length === 0) delete out.fotos;
+    else out.fotos = filtered;
+  }
+  return out;
+}
+
 async function fsAddClient(c) {
   const payload = { ...c, updatedAt: Date.now() };
-  // Atualiza local e memória imediatamente
+  // Atualiza local e memória imediatamente (com fotos, para exibição)
   clients.unshift(payload);
   saveLocal('tapete_crm_clients_cache', clients);
   _crmTapBlockUntil = Date.now() + 5000;
   if(curScreen==='home') renderHome();
   window.syncShow?.syncing();
   try {
-    await setDoc(doc(db, COL_CLIENTS, payload.id), payload);
+    // Envia sem base64 para o Firebase (fotos ficam só no cache local)
+    await setDoc(doc(db, COL_CLIENTS, payload.id), _stripImgsForFirebase(payload));
     window.syncShow?.synced('Tapetes CRM');
   } catch(e) {
     const pending = JSON.parse(localStorage.getItem(LS_PENDING)||'[]');
-    pending.push({op:'add', data:payload});
+    // Guarda versão sem base64 na fila de pendentes também
+    pending.push({op:'add', data:_stripImgsForFirebase(payload)});
     localStorage.setItem(LS_PENDING, JSON.stringify(pending));
     window.syncShow?.offline();
     toast('⚠️ Salvo local, sincronizará depois');
@@ -1410,11 +1431,12 @@ async function fsUpdateClient(id, fields) {
   _crmTapBlockUntil = Date.now() + 5000;
   window.syncShow?.syncing();
   try {
-    await updateDoc(doc(db, COL_CLIENTS, id), withTs);
+    // Envia sem base64 para o Firebase (fotos ficam só no cache local)
+    await updateDoc(doc(db, COL_CLIENTS, id), _stripImgsForFirebase(withTs));
     window.syncShow?.synced('Tapetes CRM');
   } catch(e) {
     const pending = JSON.parse(localStorage.getItem(LS_PENDING)||'[]');
-    pending.push({op:'update', id, fields:withTs});
+    pending.push({op:'update', id, fields:_stripImgsForFirebase(withTs)});
     localStorage.setItem(LS_PENDING, JSON.stringify(pending));
     window.syncShow?.offline();
   }
@@ -1572,8 +1594,8 @@ async function syncPending() {
   const remaining = [];
   for(const op of pending) {
     try {
-      if(op.op==='add')    await setDoc(doc(db, COL_CLIENTS, op.data.id), op.data);
-      if(op.op==='update') await updateDoc(doc(db, COL_CLIENTS, op.id), op.fields);
+      if(op.op==='add')    await setDoc(doc(db, COL_CLIENTS, op.data.id), _stripImgsForFirebase(op.data));
+      if(op.op==='update') await updateDoc(doc(db, COL_CLIENTS, op.id), _stripImgsForFirebase(op.fields));
       if(op.op==='delete') await deleteDoc(doc(db, COL_CLIENTS, op.id));
     } catch(e) {
       remaining.push(op);
@@ -1592,12 +1614,8 @@ function showScreen(name, push=true){
   curScreen=name;
   // Always hide FAB/panel when not on registrar
   if(name!=='registrar'){
-    const fab=document.getElementById('reg-fab');
-    const panel=document.getElementById('reg-resumo-panel');
     const inv=document.getElementById('reg-invisible-btn');
     const fs=document.getElementById('reg-resumo-fullscreen');
-    if(fab) fab.style.display='none';
-    if(panel) panel.style.display='none';
     if(inv) inv.style.display='none';
     if(fs) fs.remove();
   }
@@ -1642,6 +1660,42 @@ window.goBack = goBack;
 
 function setNav(i){ document.querySelectorAll('.bnav-btn').forEach((b,j)=>b.classList.toggle('active',i===j)); }
 window.setNav = setNav;
+
+// ── Sai do registrar salvando o estado ───────────────────────────────────────
+function sairDoRegistrar(){
+  if(typeof curScreen !== 'undefined' && curScreen === 'registrar'){
+    salvarEstadoRegistrar();
+  }
+}
+window.sairDoRegistrar = sairDoRegistrar;
+
+// ── Volta pro registrar: restaura se tiver dados, inicia novo se não tiver ───
+function voltarRegistrar(){
+  if(typeof curScreen !== 'undefined' && curScreen === 'registrar') return;
+  regLoadLocal().then(function(estado){
+    if(estado && estado.REG_DATA &&
+       estado.updatedAt && Date.now() - estado.updatedAt < REG_STATE_MAX_AGE && estado.regCurStep > 0){
+      restaurarEstadoRegistrar().then(function(ok){
+        showScreen('registrar', false);
+        setNav(0);
+        if(ok){
+          renderRegStep();
+        }
+      });
+    } else {
+      showScreen('registrar', false);
+      setNav(0);
+      initForm();
+      setTimeout(function(){ document.getElementById('reg-nome-static') && document.getElementById('reg-nome-static').focus(); }, 100);
+    }
+  }).catch(function(){
+    showScreen('registrar', false);
+    setNav(0);
+    initForm();
+  });
+}
+window.voltarRegistrar = voltarRegistrar;
+
 
 function openModal(id){ document.getElementById(id).classList.add('open'); }
 function closeModal(id){ document.getElementById(id).classList.remove('open'); }
@@ -1689,7 +1743,7 @@ function renderHome(){
   const aEl=document.getElementById('alertas-section');
   if(alertas.length){
     const tipoIcon = t => t==='nao-estava'?'🟢':t==='interessado'?'🔵':'🔴';
-    const _proxAberto = localStorage.getItem('_proxAcoesAberto')==='true';
+    const _proxAberto = localStorage.getItem('_proxAcoesAberto')!=='false';
     const _proxCards = alertas.sort((a,b)=>a.diff-b.diff).map(({c,diff})=>`
         <div class="alerta-card" onclick="alertaAntecipar('${c.id}')">
           <div class="alerta-icon">${tipoIcon(c.tipo)}</div>
@@ -1697,7 +1751,7 @@ function renderHome(){
             <div class="alerta-titulo">${esc(c.nome)}</div>
             <div class="alerta-sub">Dia ${curDay(c)} da sequência · ${fmtDate(nextDate(c))}</div>
           </div>
-          <div class="alerta-dias">${diff}d</div>
+          <div class="alerta-dias">${diff===1?'Amanhã':diff+' dias'}</div>
         </div>`).join('');
     if(_proxAberto){
       aEl.innerHTML=`<div class="sec-title" onclick="window._toggleProxAcoes()" style="cursor:pointer;display:flex;align-items:center;justify-content:space-between;user-select:none"><span>⏰ PRÓXIMAS AÇÕES</span><span style="font-size:13px;background:#111;color:#fff;border-radius:20px;padding:3px 12px;font-weight:700">▼ recolher</span></div><div id="prox-acoes-lista">${_proxCards}</div>`;
@@ -1706,12 +1760,12 @@ function renderHome(){
     }
   } else { aEl.innerHTML=''; }
 
-  // Oculta/mostra seção HOJE conforme estado das próximas ações
-  const _proxOpen = localStorage.getItem('_proxAcoesAberto')==='true';
-  const _hojeSection = document.getElementById('hoje-list');
+  // Mostrar/esconder seção HOJE conforme próximas ações abertas
+  const _proxOpen2 = localStorage.getItem('_proxAcoesAberto')!=='false';
+  const _hojeList = document.getElementById('hoje-list');
   const _hojeTitles = document.querySelectorAll('.sec-title');
-  if(_hojeSection) _hojeSection.style.display = _proxOpen ? 'none' : '';
-  _hojeTitles.forEach(t=>{ if(t.textContent.includes('AÇÕES DE HOJE')) t.style.display = _proxOpen ? 'none' : ''; });
+  if(_hojeList) _hojeList.style.display = _proxOpen2 ? 'none' : '';
+  _hojeTitles.forEach(t=>{ if(t.textContent.includes('AÇÕES DE HOJE')) t.style.display = _proxOpen2 ? 'none' : ''; });
   const el=document.getElementById('hoje-list');
   el.innerHTML=hj.length ? hj.map(c=>cardHtml(c,true)).join('') :
     `<div class="empty"><div class="ico">🎉</div><p>Nenhuma ação para hoje!</p></div>`;
@@ -1776,8 +1830,11 @@ function renderFila(){
     el.innerHTML=`<div class="empty"><div class="ico">📭</div><p>Fila vazia!<br><span style="font-size:12px">Clientes aparecem aqui após serem registrados.</span></p></div>`;
     return;
   }
-  el.innerHTML=fila.map(c=>`
+  el.innerHTML=fila.map(c=>{
+    const fotoSrc = (c.fotos && c.fotos.length ? c.fotos[0] : null) || c.foto || null;
+    return `
     <div class="client-card ${c.tipo}" style="margin-bottom:10px">
+      ${fotoSrc ? `<img src="${fotoSrc}" style="width:100%;max-height:180px;object-fit:cover;border-radius:9px 9px 0 0;margin-bottom:10px">` : ''}
       <div class="card-row">
         <div>
           <div class="card-name">${esc(c.nome)}</div>
@@ -1802,7 +1859,8 @@ function renderFila(){
           :`<button class="btn btn-ghost" onclick="filaExcluir('${c.id}')">🗑️</button>`
         }
       </div>
-    </div>`).join('');
+    </div>`;
+  }).join('');
 }
 window.renderFila = renderFila;
 
@@ -1915,7 +1973,7 @@ function cardHtml(c,showEnviar=false){
 // ── FORM ──────────────────────────────────────────────────────────────────────
 // ── REGISTRAR POR ETAPAS ──────────────────────────────────────────────────────
 const REG_DATA = {};
-let regResumoOpen = false;
+
 let _regPrecoBase = 0; // base price for discount calc - global like TAPETES calcBase
 
 const REG_STEPS = [
@@ -1937,7 +1995,8 @@ const REG_STEPS = [
   { id:'prazo',   label:'⏱️ Prazo de entrega',   type:'number', placeholder:'15', hint:'Altere se necessário — espaço ou Enter para avançar', default:'15', skip:true },
   { id:'preco',   label:'💰 Preço (R$)',          type:'preco' },
   { id:'obs',     label:'📝 Observação',          type:'text',   placeholder:'Detalhes extras...',  hint:'Opcional — Enter ou dois espaços para pular', optional:true },
-  { id:'imgia',   label:'', type:'simul' },
+  { id:'imgia',   label:'🤖 Simulação do Tapete', type:'gemini' },
+  { id:'envio',   label:'📤 Enviar', type:'simul' },
 ];
 
 let regCurStep = 0;
@@ -1951,16 +2010,15 @@ function initForm(){
   tempFoto = null; tempImgIA = null;
   tempFotos = []; _regFotoQtd = 1; _regFotoIdx = 0; _regFotoEscolha = false; window._regRemoveBgUsado = false;
   window._regFezGemini = false;
+  window._regPromptCopiado = false;
+  window._regFotosCopiadasFlags = {};
+  window._regIAClicks = null; // recarrega do localStorage no próximo render
   _regParcelas = 0;
   _regPrecoBase = 0;
   window._regTapetesExtras = [];
   window._regCarrosselIdx = 0;
   curTipo = null; curBorda = 'nao'; curViu = 'nao';
-  regResumoOpen = false;
   limparEstadoRegistrar();
-  const fab = document.getElementById('reg-fab');
-  if(fab) fab.style.display='none';
-  document.getElementById('reg-resumo-panel').style.display='none';
   document.getElementById('reg-steps-container').innerHTML='';
   const nomeBlock = document.getElementById('reg-nome-initial');
   if(nomeBlock) nomeBlock.style.display='block';
@@ -2000,23 +2058,47 @@ function renderRegStep(){
 
   const s = steps[regCurStep];
   if(s && s.default && !REG_DATA[s.id]) REG_DATA[s.id] = s.default;
+
+  // Botões de navegação — uniformes em todos os steps
+  const podeVoltar = regCurStep > 1;
+  const stepId = s ? s.id : '';
+  const idxImgia = steps.findIndex(x=>x.id==='imgia');
+  const idxTel   = steps.findIndex(x=>x.id==='tel');
+  const atalhoSegura = stepId==='tel'
+    ? `ontouchstart="regSeguraProximo('imgia')" ontouchend="regSoltaProximo()" ontouchcancel="regSoltaProximo()" onmousedown="regSeguraProximo('imgia')" onmouseup="regSoltaProximo()" onmouseleave="regSoltaProximo()"`
+    : stepId==='imgia'
+    ? `ontouchstart="regSeguraProximo('tel')" ontouchend="regSoltaProximo()" ontouchcancel="regSoltaProximo()" onmousedown="regSeguraProximo('tel')" onmouseup="regSoltaProximo()" onmouseleave="regSoltaProximo()"`
+    : '';
+  const labelProximo = (stepId==='tel' || stepId==='imgia') ? '' : 'Próximo →';
+  const NAV = `<div style="display:flex;gap:10px;margin-top:16px;padding-bottom:8px;position:relative;z-index:10">
+    <button onclick="regVoltar()" style="flex:1;min-height:52px;border-radius:14px;border:2px solid #e5e7eb;
+      background:#f3f4f6;color:#111;font-size:15px;font-weight:700;
+      font-family:inherit;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px">
+      ← Voltar
+    </button>
+    <button onclick="regAdvanceProxy()" ${atalhoSegura} style="flex:2;min-height:52px;border-radius:14px;border:none;
+      background:#111;color:#fff;font-size:15px;font-weight:700;
+      font-family:inherit;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px">
+      ${labelProximo}
+    </button>
+  </div>`;
+
   let curHtml = '';
   if(s){
     curHtml = `<div class="reg-step" id="reg-step-active">
       <div class="reg-step-label">${s.label}</div>
       ${renderStepInput(s)}
+      ${NAV}
     </div>`;
   } else {
     curHtml = `<div class="reg-step">
       <div class="reg-step-label">✅ Tudo pronto!</div>
       <button class="reg-save-btn" onclick="salvarCliente()">✅ Salvar e ir para Fila</button>
       <button class="btn btn-ghost" style="width:100%;margin:0 0 16px" onclick="showScreen('home');setNav(3)">❌ Cancelar</button>
+      ${NAV}
     </div>`;
   }
   container.innerHTML = curHtml;
-
-  const fab = document.getElementById('reg-fab');
-  if(fab) fab.style.display = regCurStep > 0 ? 'flex' : 'none';
 
   if(s && (s.type==='text'||s.type==='tel'||s.type==='number')){
     const inp = document.getElementById('reg-inp-'+s.id);
@@ -2076,7 +2158,7 @@ function renderStepInput(s){
       </div>`).join('')}</div>`;
   }
   if(s.type==='tamanho'){
-    const sizes=['70x40','90x50','100x60','120x60','150x60','200x60','220x120'];
+    const sizes=['80x50','70x40','90x60','100x60','120x60','150x60','200x60','200x120','220x120'];
     const isManual = REG_DATA._tamanhoManual;
     return `<div style="display:flex;flex-direction:column;gap:10px;padding:4px 0 8px">
       ${sizes.map(sz=>`
@@ -2178,15 +2260,17 @@ function renderStepInput(s){
             📸
           </label>
         </div>
-        <button onclick="regAdvance()" style="width:100%;margin-top:14px;padding:16px;background:#1a6fd4;color:#fff;border:none;border-radius:14px;font-size:1rem;font-weight:800;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:8px;touch-action:manipulation;min-height:52px">
-          Próximo →
-        </button>
+  
       </div>`;
     }
 
     // Modo "1 foto" — já foi capturada, avança sozinho (tratado no handlePhoto)
     // Modo livre — mostra miniaturas, botão de mais uma foto e botão Próximo
-    const minifotos = `<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px">${tempFotos.map(f=>`<img src="${f}" style="width:60px;height:60px;object-fit:cover;border-radius:10px;border:2px solid #111">`).join('')}</div>`;
+    const minifotos = `<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px">${tempFotos.map((f,i)=>`
+      <div style="position:relative;width:60px;height:60px;flex-shrink:0">
+        <img src="${f}" style="width:60px;height:60px;object-fit:cover;border-radius:10px;border:2px solid #111">
+        <div onclick="regRemoverFoto(${i})" style="position:absolute;top:-6px;left:-6px;width:20px;height:20px;background:#dc2626;color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;cursor:pointer;line-height:1;box-shadow:0 1px 4px rgba(0,0,0,.3)">×</div>
+      </div>`).join('')}</div>`;
     const inputId = 'reg-foto-input-cap'+capturadas;
     return `<div>
       <div style="height:1rem;margin-bottom:10px"></div>
@@ -2198,15 +2282,115 @@ function renderStepInput(s){
       ${!window._regRemoveBgUsado ? `<button class="reg-photo-btn" style="background:#6366f1;color:#fff;border:none;margin-bottom:10px" onclick="window._regRemoveBgUsado=true;window.open('https://www.remove.bg','_blank');renderRegStep()">
         ✂️ Remove.bg
       </button>` : ''}
-      <button class="reg-photo-btn" style="background:#111;color:#fff;border:none" onclick="regAdvance()">
-        Próximo →
-      </button>
     </div>`;
   }
-  if(s.type==='simul'){
-    const fezGemini = !!window._regFezGemini;
-    const temSimul  = !!tempImgIA;
+  // ── ABA GEMINI: prompt + fotos + IAs ───────────────────────────────────────
+  if(s.type==='gemini'){
+    const temSimul = !!tempImgIA;
+    // Contadores persistentes
+    const _savedClicks = JSON.parse(localStorage.getItem('tapete_ia_clicks')||'{}');
+    if(!window._regIAClicks) window._regIAClicks = {
+      gemini: _savedClicks.gemini||0,
+      perplexity: _savedClicks.perplexity||0,
+      copilot: _savedClicks.copilot||0,
+      chatgpt: _savedClicks.chatgpt||0
+    };
+    const c = window._regIAClicks;
+    const promptCopiado = !!window._regPromptCopiado;
+    // Fotos disponíveis para copiar
+    const fotosDisponiveis = tempFotos.length > 0 ? [...tempFotos] : (tempFoto ? [tempFoto] : []);
+    const totalFotos = fotosDisponiveis.length;
+    if(!window._regFotosCopiadasFlags) window._regFotosCopiadasFlags = {};
+    const todasFotosCopiadasFlag = totalFotos === 0 || Object.keys(window._regFotosCopiadasFlags).length >= totalFotos;
+    // Trava: prompt → fotos → IAs
+    const travadoFotos = !promptCopiado;
+    const travadoIA = !promptCopiado || (totalFotos > 0 && !todasFotosCopiadasFlag);
 
+    function iaBadge(n){ return n>0 ? `<span style="position:absolute;top:5px;left:6px;background:rgba(0,0,0,0.5);color:#fff;border-radius:8px;padding:1px 5px;font-size:10px;font-weight:800;line-height:1.4">${n}x</span>` : ''; }
+    function iaBtnStyle(cor1, cor2, cliques, trav){
+      if(trav) return `position:relative;padding:14px 8px;border-radius:12px;border:none;background:#e5e7eb;color:#9ca3af;font-size:13px;font-weight:800;font-family:inherit;cursor:not-allowed;display:flex;flex-direction:column;align-items:center;gap:4px;line-height:1.3;opacity:0.55`;
+      if(cliques>0) return `position:relative;padding:14px 8px;border-radius:12px;border:none;background:${cor2};color:#fff;font-size:13px;font-weight:800;font-family:inherit;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;line-height:1.3;box-shadow:0 0 0 3px ${cor2}55`;
+      return `position:relative;padding:14px 8px;border-radius:12px;border:none;background:linear-gradient(135deg,${cor1},${cor2});color:#fff;font-size:13px;font-weight:800;font-family:inherit;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;line-height:1.3`;
+    }
+    function fotoCopiada(i){ return !!window._regFotosCopiadasFlags[i]; }
+
+    // Monta botões de copiar foto
+    const fotoBtns = totalFotos > 0 ? fotosDisponiveis.map((f, i) => {
+      const copiada = fotoCopiada(i);
+      const travF = travadoFotos;
+      return `
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;opacity:${travF?0.5:1}">
+          <img src="${f}" style="width:56px;height:56px;object-fit:cover;border-radius:10px;border:2px solid ${copiada?'#10b981':'#d1d5db'};flex-shrink:0">
+          <button onclick="${travF?`toast('⚠️ Copie o prompt primeiro!')`:`regCopiarFoto(${i})`}" style="
+            flex:1;padding:12px;border-radius:10px;border:none;
+            background:${copiada?'#10b981':travF?'#e5e7eb':'#374151'};
+            color:${travF?'#9ca3af':'#fff'};font-size:13px;font-weight:800;
+            font-family:inherit;cursor:${travF?'not-allowed':'pointer'};
+            display:flex;align-items:center;justify-content:center;gap:6px">
+            ${copiada ? '✅ Foto '+(i+1)+' Copiada!' : '📋 Copiar Foto '+(totalFotos>1?i+1:'')}
+          </button>
+        </div>`;
+    }).join('') : '';
+
+    return `<div>
+      <div style="font-size:12px;color:#6b7280;margin-bottom:12px;line-height:1.7">
+        <span style="font-weight:800;color:${promptCopiado?'#10b981':'#111'}">1.</span> Copie o prompt
+        ${totalFotos>0 ? `· <span style="font-weight:800;color:${!travadoFotos&&!todasFotosCopiadasFlag?'#111':todasFotosCopiadasFlag?'#10b981':'#9ca3af'}">2.</span> Copie a${totalFotos>1?'s':''} foto${totalFotos>1?'s':''}` : ''}
+        · <span style="font-weight:800;color:${!travadoIA?'#111':'#9ca3af'}">3.</span> Abra uma IA
+      </div>
+
+      <button onclick="regCopyPromptRegistrar()" style="
+        width:100%;padding:14px;border-radius:12px;border:2px solid ${promptCopiado?'#10b981':'#374151'};
+        background:${promptCopiado?'#10b981':'#374151'};color:#fff;font-size:14px;font-weight:800;
+        font-family:inherit;cursor:pointer;margin-bottom:12px;
+        display:flex;align-items:center;justify-content:center;gap:8px">
+        ${promptCopiado ? '✅ Prompt Copiado!' : '📋 Copiar Prompt'}
+      </button>
+
+      ${fotoBtns}
+
+      ${travadoIA ? `<div style="text-align:center;font-size:11px;font-weight:700;color:#6b7280;margin-bottom:8px;background:#f3f4f6;border-radius:8px;padding:6px">
+        🔒 ${!promptCopiado ? 'Copie o prompt primeiro' : 'Copie a'+( totalFotos>1?'s fotos':' foto')+' antes de abrir uma IA'}
+      </div>` : ''}
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
+        <button ${travadoIA ? `onclick="toast('⚠️ ${!promptCopiado?'Copie o prompt primeiro!':'Copie a foto primeiro!'}')"` : `onclick="regAbrirIA('gemini')" ontouchstart="regSeguraIA('gemini',this)" ontouchend="regSoltaIA()" ontouchcancel="regSoltaIA()" onmousedown="regSeguraIA('gemini',this)" onmouseup="regSoltaIA()" onmouseleave="regSoltaIA()"`} style="${iaBtnStyle('#4285F4','#0a7a3f',c.gemini,travadoIA)}">
+          🤖<span>Gemini${iaBadge(c.gemini)}</span>
+        </button>
+        <button ${travadoIA ? `onclick="toast('⚠️ ${!promptCopiado?'Copie o prompt primeiro!':'Copie a foto primeiro!'}')"` : `onclick="regAbrirIA('perplexity')" ontouchstart="regSeguraIA('perplexity',this)" ontouchend="regSoltaIA()" ontouchcancel="regSoltaIA()" onmousedown="regSeguraIA('perplexity',this)" onmouseup="regSoltaIA()" onmouseleave="regSoltaIA()"`} style="${iaBtnStyle('#20b2aa','#0d6b5e',c.perplexity,travadoIA)}">
+          🔍<span>Perplexity${iaBadge(c.perplexity)}</span>
+        </button>
+        <button ${travadoIA ? `onclick="toast('⚠️ ${!promptCopiado?'Copie o prompt primeiro!':'Copie a foto primeiro!'}')"` : `onclick="regAbrirIA('copilot')" ontouchstart="regSeguraIA('copilot',this)" ontouchend="regSoltaIA()" ontouchcancel="regSoltaIA()" onmousedown="regSeguraIA('copilot',this)" onmouseup="regSoltaIA()" onmouseleave="regSoltaIA()"`} style="${iaBtnStyle('#0078D4','#1a4fa8',c.copilot,travadoIA)}">
+          🪟<span>Copilot${iaBadge(c.copilot)}</span>
+        </button>
+        <button ${travadoIA ? `onclick="toast('⚠️ ${!promptCopiado?'Copie o prompt primeiro!':'Copie a foto primeiro!'}')"` : `onclick="regAbrirIA('chatgpt')" ontouchstart="regSeguraIA('chatgpt',this)" ontouchend="regSoltaIA()" ontouchcancel="regSoltaIA()" onmousedown="regSeguraIA('chatgpt',this)" onmouseup="regSoltaIA()" onmouseleave="regSoltaIA()"`} style="${iaBtnStyle('#10a37f','#0d7a5f',c.chatgpt,travadoIA)}">
+          💬<span>ChatGPT${iaBadge(c.chatgpt)}</span>
+        </button>
+      </div>
+
+      <input type="file" id="reg-simul-input" accept="image/*" style="display:none" onchange="regHandleImgIA(event)">
+      ${temSimul ? `
+        <div style="position:relative;margin-bottom:12px">
+          <img src="${tempImgIA}" style="width:100%;border-radius:12px;border:2px solid #10b981;max-height:200px;object-fit:cover">
+          <button onclick="window.tempImgIA=null;REG_DATA.imgia=null;renderRegStep()" style="
+            position:absolute;top:6px;right:6px;background:rgba(0,0,0,.55);border:none;
+            color:#fff;border-radius:50%;width:28px;height:28px;font-size:14px;cursor:pointer;
+            display:flex;align-items:center;justify-content:center">✕</button>
+        </div>
+      ` : `
+        <button onclick="document.getElementById('reg-simul-input').click()" style="
+          width:100%;padding:16px;border-radius:12px;border:2px solid #d1d5db;
+          background:#f9fafb;color:#374151;font-size:14px;font-weight:800;
+          font-family:inherit;cursor:pointer;margin-bottom:12px;
+          display:flex;align-items:center;justify-content:center;gap:8px">
+          📷 Salvar simulação gerada
+        </button>
+      `}
+
+    </div>`;
+  }
+
+  if(s.type==='simul'){
     // ── Garante estado do carrossel ──
     if(!window._regTapetesExtras) window._regTapetesExtras = [];
     if(window._regCarrosselIdx === undefined) window._regCarrosselIdx = 0;
@@ -2249,7 +2433,7 @@ function renderStepInput(s){
     // Seletor de tamanho (só para extras sem tamanho ainda)
     const seletorHtml = isExtra && !curBase ? `
       <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:8px">
-        ${['70x40','90x50','100x60','120x60','150x60','200x60','220x120'].map(sz=>`
+        ${['80x50','70x40','90x60','100x60','120x60','150x60','200x60','200x120','220x120'].map(sz=>`
           <div onclick="regEscolheTamanhoExtra(${ei},'${sz}')"
             style="padding:10px 4px;border-radius:10px;border:2px solid ${cur.tamanho===sz?'#111':'#e0e0e0'};
             background:${cur.tamanho===sz?'#111':'#fff'};color:${cur.tamanho===sz?'#fff':'#333'};
@@ -2359,28 +2543,16 @@ function renderStepInput(s){
       </div>
     `;
 
+    // Simulação feita? Mostra preview pequeno
+    const simulPreview = tempImgIA ? `
+      <div style="position:relative;margin-bottom:14px">
+        <img src="${tempImgIA}" style="width:100%;border-radius:12px;border:2px solid #10b981;max-height:160px;object-fit:cover">
+        <span style="position:absolute;top:6px;left:8px;background:#10b981;color:#fff;font-size:10px;font-weight:800;padding:2px 8px;border-radius:20px">✅ Simulação</span>
+      </div>` : '';
+
     const simulHtml = `<div>
 
-      ${fezGemini ? `
-        <input type="file" id="reg-simul-input" accept="image/*" style="display:none" onchange="regHandleImgIA(event)">
-        ${temSimul ? `
-          <div style="position:relative;margin-bottom:12px">
-            <img src="${tempImgIA}" style="width:100%;border-radius:12px;border:2px solid #10b981;max-height:200px;object-fit:cover">
-            <button onclick="window.tempImgIA=null;REG_DATA.imgia=null;renderRegStep()" style="
-              position:absolute;top:6px;right:6px;background:rgba(0,0,0,.55);border:none;
-              color:#fff;border-radius:50%;width:28px;height:28px;font-size:14px;cursor:pointer;
-              display:flex;align-items:center;justify-content:center">✕</button>
-          </div>
-        ` : `
-          <button onclick="document.getElementById('reg-simul-input').click()" style="
-            width:100%;padding:20px;border-radius:12px;border:2px solid #d1d5db;
-            background:#f9fafb;color:#374151;font-size:14px;font-weight:800;
-            font-family:inherit;cursor:pointer;margin-bottom:12px;
-            display:flex;align-items:center;justify-content:center;gap:8px">
-            📷 Adicionar foto da simulação
-          </button>
-        `}
-      ` : ''}
+      ${simulPreview}
 
       ${blocoCarrossel}
 
@@ -2388,27 +2560,22 @@ function renderStepInput(s){
         — Escolha para onde enviar: —
       </div>
 
-      <div style="display:flex;gap:10px;margin-bottom:10px">
+      <div style="display:flex;gap:10px;margin-bottom:14px">
         <button onclick="event.stopPropagation();regEnviarCRM(this)" style="
-          flex:1;padding:14px 8px;border-radius:12px;border:2px solid #374151;
-          background:#374151;color:#fff;font-size:13px;font-weight:800;
+          flex:1;padding:16px 8px;border-radius:12px;border:2px solid #374151;
+          background:#374151;color:#fff;font-size:14px;font-weight:800;
           font-family:inherit;cursor:pointer;display:flex;flex-direction:column;
           align-items:center;gap:4px;line-height:1.3">
           👥<span>Enviar pro CRM</span>
         </button>
         <button onclick="event.stopPropagation();regEnviarParaCadastro()" style="
-          flex:1;padding:14px 8px;border-radius:12px;border:2px solid #2B4FBF;
-          background:#2B4FBF;color:#fff;font-size:13px;font-weight:800;
+          flex:1;padding:16px 8px;border-radius:12px;border:2px solid #2B4FBF;
+          background:#2B4FBF;color:#fff;font-size:14px;font-weight:800;
           font-family:inherit;cursor:pointer;display:flex;flex-direction:column;
           align-items:center;gap:4px;line-height:1.3">
           📦<span>Enviar pro Cadastro</span>
         </button>
       </div>
-
-      <button class="btn btn-gemini" style="width:100%;margin-bottom:10px;padding:14px;font-size:14px"
-        onclick="regAbrirGeminiEFicar()">
-        🤖 Abrir no Gemini
-      </button>
 
       <button onclick="regAdicionarTapeteExtra()" style="
         width:100%;padding:13px;border-radius:12px;border:2px solid #d1d5db;
@@ -2481,8 +2648,6 @@ function regKeyDown(e, id){
   if(e.key==='Enter'){
     const el=document.getElementById('reg-inp-'+id);
     const v=(el?.value||'').trim();
-    const step=REG_STEPS.find(s=>s.id===id);
-    if(!v && !step?.optional) return toast('⚠️ Preencha este campo');
     REG_DATA[id]=id==='tel'?v.replace(/\D/g,''):v;
     regAdvance();
   }
@@ -2492,8 +2657,8 @@ window.regKeyDown = regKeyDown;
 
 function regEscolheCanal(canal){
   const tabela = {
-    ONLINE:  {'220x120':'700','200x60':'450','150x60':'350','120x60':'300','100x60':'250','90x50':'200','70x40':'150'},
-    OFFLINE: {'220x120':'1200','200x60':'816','150x60':'612','120x60':'489','100x60':'408','90x50':'306','70x40':'190'},
+    ONLINE:  {'220x120':'700','200x120':'650','200x60':'450','150x60':'350','120x60':'300','100x60':'250','90x60':'200','80x50':'190','70x40':'150'},
+    OFFLINE: {'220x120':'1200','200x120':'1080','200x60':'816','150x60':'612','120x60':'489','100x60':'408','90x60':'306','80x50':'272','70x40':'190'},
   };
   const tam = REG_DATA.tamanho||'';
   const val = tabela[canal][tam];
@@ -2733,8 +2898,14 @@ window.calcPrecoAuto = calcPrecoAuto;
 function regEscolheTamanho(sz){
   REG_DATA.tamanho = sz;
   REG_DATA._tamanhoManual = false;
-  const auto = calcPrecoAuto(sz);
-  if(auto) REG_DATA.preco = String(auto);
+  // Reseta tudo que depende do tamanho para forçar recalculo
+  REG_DATA.preco = '';
+  REG_DATA._precoConfirmado = false;
+  REG_DATA._precoManual = false;
+  REG_DATA._precoCanal = null;
+  REG_DATA._desconto = 0;
+  REG_DATA._descontoAtivo = false;
+  _regPrecoBase = 0;
   regAdvance();
 }
 window.regEscolheTamanho = regEscolheTamanho;
@@ -2798,11 +2969,7 @@ function regHandlePhoto(e){
         a.click();
         document.body.removeChild(a);
       }catch(_){}
-      if(tempFotos.length===1){
-        cv.toBlob(blob=>{
-          try{navigator.clipboard.write([new ClipboardItem({'image/png':blob})]);}catch(_){}
-        },'image/png');
-      }
+      // cópia automática removida
       // Garante que o modo livre persiste mesmo após salvarEstadoRegistrar
       if(modoLivreAgora) _regFotoQtd = -1;
       salvarEstadoRegistrar();
@@ -2837,6 +3004,27 @@ function _regAtualizarVisualFoto(){
   if(visel) visel.innerHTML = progresso + minifotos + status;
 }
 window._regAtualizarVisualFoto = _regAtualizarVisualFoto;
+
+// Remove uma foto específica pelo índice
+function regRemoverFoto(idx){
+  tempFotos.splice(idx, 1);
+  tempFoto = tempFotos.length > 0 ? tempFotos[0] : null;
+  REG_DATA.foto = tempFoto;
+  renderRegStep();
+}
+window.regRemoverFoto = regRemoverFoto;
+
+// Descarta todas as fotos e volta para tela inicial de captura
+function regDescartarFotos(){
+  tempFotos = [];
+  tempFoto = null;
+  REG_DATA.foto = null;
+  _regFotoQtd = 1;
+  _regFotoEscolha = false;
+  window._regRemoveBgUsado = false;
+  renderRegStep();
+}
+window.regDescartarFotos = regDescartarFotos;
 
 // Escolhe quantidade de fotos e inicia captura
 window.regFotoEscolher = function(qtd){
@@ -2884,13 +3072,14 @@ function regAdvance(){
     const el=document.getElementById('reg-inp-'+s.id);
     if(el){
       const v=el.value.replace(/\s+$/,'').trim();
-      if(!v && !s.optional){ toast('⚠️ Preencha este campo'); el.focus(); return; }
       REG_DATA[s.id]=s.type==='tel'?v.replace(/\D/g,''):v;
     }
   }
   // Tamanho manual: auto-calcula preço e pula tela de preço direto para simulação
   if(s && s.id==='tamanho' && REG_DATA._tamanhoManual){
     const auto = calcPrecoAuto(REG_DATA.tamanho||'');
+    // Reseta preço antigo antes de definir o novo
+    REG_DATA.preco = ''; REG_DATA._precoConfirmado = false; REG_DATA._precoManual = false; REG_DATA._precoCanal = null;
     if(auto){ REG_DATA.preco = String(auto); _regPrecoBase = auto; REG_DATA._desconto=0; REG_DATA._descontoAtivo=false; REG_DATA._precoConfirmado=true; }
   }
   // Se estava editando um campo, volta para onde estava
@@ -2907,13 +3096,47 @@ function regAdvance(){
 }
 window.regAdvance = regAdvance;
 
+// Avança do step nome (step 0)
+function regNomeAvancar(){
+  const inp = document.getElementById('reg-nome-static');
+  REG_DATA.nome = inp ? inp.value.trim() : '';
+  const nomeBlock = document.getElementById('reg-nome-initial');
+  if(nomeBlock) nomeBlock.style.display = 'none';
+  regCurStep = 1;
+  salvarEstadoRegistrar();
+  renderRegStep();
+}
+window.regNomeAvancar = regNomeAvancar;
+
+function regVoltar(){
+  if(regCurStep <= 0) return;
+  regCurStep--;
+  // Se voltou pro step 0, mostra o bloco do nome e limpa tudo
+  if(regCurStep === 0){
+    const container = document.getElementById('reg-steps-container');
+    if(container) container.innerHTML = '';
+    const nomeBlock = document.getElementById('reg-nome-initial');
+    if(nomeBlock) nomeBlock.style.display = 'block';
+    const inp = document.getElementById('reg-nome-static');
+    if(inp){
+      inp.value = REG_DATA.nome || '';
+      setTimeout(()=>inp.focus(), 100);
+    }
+    salvarEstadoRegistrar();
+    return;
+  }
+  // Pula steps que não devem aparecer (onlyIf false)
+  const steps = regActiveSteps();
+  while(regCurStep > 1 && !steps[regCurStep]) regCurStep--;
+  salvarEstadoRegistrar();
+  renderRegStep();
+}
+window.regVoltar = regVoltar;
+
 let regReturnStep = null; // onde voltar após editar
 
 function regEditarCampo(i){
   // Fecha overlay primeiro
-  const fs = document.getElementById('reg-resumo-fullscreen');
-  if(fs) fs.remove();
-  regResumoOpen = false;
   // Guarda onde voltar
   regReturnStep = regCurStep;
   // Vai para o campo
@@ -2932,9 +3155,6 @@ function regJumpTo(i){
   }
   regReturnStep = regCurStep; // guarda onde estava
   regCurStep = i;
-  regResumoOpen = false;
-  const fs = document.getElementById('reg-resumo-fullscreen');
-  if(fs) fs.remove();
   renderRegStep();
 }
 window.regJumpTo = regJumpTo;
@@ -2951,75 +3171,7 @@ function regDoneLabel(s){
   return REG_DATA[s.id]||'—';
 }
 
-function toggleRegResumo(){
-  regResumoOpen = !regResumoOpen;
-  const old = document.getElementById('reg-resumo-fullscreen');
-  if(old) old.remove();
-  if(!regResumoOpen) return;
 
-  const steps = regActiveSteps();
-  const icons = {'nome':'👤','tel':'📱','foto':'📸','tipo':'🏷️','tamanho':'📐','cor':'🎨',
-    'borda':'🔲','borda-cor':'🖌️','preco':'💰','obs':'📝','imgia':'🤖'};
-
-  // Cores para preview
-  const coresMap = {'Amarelo':'#F5C518','Marrom':'#5C3317','Preto':'#1a1a1a','Rosa Claro':'#F4A7B9',
-    'Limão':'#8BC34A','Marinho':'#1A237E','Ouro':'#C9A84C','Royal':'#2B4FBF','Grafite':'#4A4A4A',
-    'Roxo':'#6A0DAD','Laranja':'#E65100','Cinza':'#9E9E9E','Bege':'#C8A96E','Branco':'#F5F5F5',
-    'Musgo':'#2E4A1E','Pink':'#E91E8C','Vermelho':'#C62828','Bandeira':'#2E7D32',
-    'Náutico':'#64B5F6','Bordô':'#6D1A1A','Preateado':'#D4D0C8'};
-
-  // Mostra todos os campos que têm valor — não depende de regCurStep
-  const items = steps.map((s,i) => {
-    const filled = s.type==='photo'?tempFoto : s.type==='simul'?tempImgIA : REG_DATA[s.id];
-    if(!filled) return ''; // não mostra campos vazios
-    const isFoto = s.type==='photo' && tempFoto;
-    const isImgIA = s.type==='simul' && tempImgIA;
-    const isCor = (s.type==='cor') && coresMap[REG_DATA[s.id]];
-    const label = s.label.replace(/^[^\s]+\s/,'').toUpperCase();
-    const val = regDoneLabel(s);
-
-    let valueHtml = '';
-    if(isFoto) valueHtml = `<img src="${tempFoto}" style="height:40px;width:40px;border-radius:8px;object-fit:cover">`;
-    else if(isImgIA) valueHtml = `<img src="${tempImgIA}" style="height:40px;width:40px;border-radius:8px;object-fit:cover">`;
-    else if(isCor) valueHtml = `<div style="display:flex;align-items:center;gap:8px">
-      <div style="width:24px;height:24px;border-radius:50%;background:${coresMap[REG_DATA[s.id]]};border:2px solid rgba(0,0,0,.1)"></div>
-      <span style="font-size:15px;font-weight:700;color:#111">${val}</span></div>`;
-    else valueHtml = `<div style="font-size:15px;font-weight:700;color:#111">${val}</div>`;
-
-    return `<div onclick="regEditarCampo(${i})"
-      style="display:flex;align-items:center;gap:12px;padding:14px 16px;
-      background:#fff;border-radius:16px;margin:0 12px 8px;
-      box-shadow:0 1px 4px rgba(0,0,0,.07);cursor:pointer;position:relative"
-      ontouchstart="this.style.opacity='.7'" ontouchend="this.style.opacity='1'">
-      <div style="font-size:22px;width:30px;text-align:center">${icons[s.id]||'•'}</div>
-      <div style="flex:1;min-width:0">
-        <div style="font-size:10px;color:#aaa;letter-spacing:.06em;margin-bottom:3px">${label}</div>
-        ${valueHtml}
-      </div>
-      <div style="position:absolute;top:8px;right:10px;font-size:12px;opacity:.4">✏️</div>
-    </div>`;
-  }).join('');
-
-  const overlay = document.createElement('div');
-  overlay.id = 'reg-resumo-fullscreen';
-  overlay.style.cssText = 'position:fixed;inset:0;z-index:500;background:#f2f2f7;display:flex;flex-direction:column;animation:stepIn .22s ease';
-  overlay.innerHTML = `
-    <div style="background:#fff;padding:20px;display:flex;align-items:center;justify-content:space-between;
-      box-shadow:0 1px 0 rgba(0,0,0,.06)">
-      <div>
-        <div style="font-size:20px;font-weight:800;color:#111">📋 Resumo</div>
-        <div style="font-size:12px;color:#aaa;margin-top:2px">Toque para editar qualquer campo</div>
-      </div>
-      <div onclick="toggleRegResumo()"
-        style="background:#f2f2f7;border-radius:50%;width:36px;height:36px;display:flex;
-        align-items:center;justify-content:center;font-size:16px;cursor:pointer;font-weight:700;color:#555">✕</div>
-    </div>
-    <div style="flex:1;overflow-y:auto;padding:16px 0 24px">
-      ${items||'<div style="padding:32px;text-align:center;color:#aaa">Nenhum campo preenchido ainda</div>'}
-    </div>`;
-  document.body.appendChild(overlay);
-}
-window.toggleRegResumo = toggleRegResumo;
 
 function regCopyPrompt(){
   const tam=REG_DATA.tamanho||''; const cor=REG_DATA.cor||'';
@@ -3062,7 +3214,129 @@ async function regSalvarNaFilaSemSimul(){
 }
 window.regSalvarNaFilaSemSimul = regSalvarNaFilaSemSimul;
 
-// ── ABRIR GEMINI SEM SAIR DA TELA ────────────────────────────────────────────
+// ── ABRIR IA E CONTAR ACESSOS ────────────────────────────────────────────────
+// Segurar botão de IA → ajustar contador
+var _regSeguraIATimer = null;
+var _regSeguraIAAtivo = false;
+function regSeguraIA(ia, btn){
+  _regSeguraIAAtivo = false;
+  _regSeguraIATimer = setTimeout(function(){
+    _regSeguraIAAtivo = true;
+    if(navigator.vibrate) navigator.vibrate(40);
+    abrirAjusteContadorIA(ia);
+  }, 600);
+}
+function regSoltaIA(){
+  clearTimeout(_regSeguraIATimer);
+}
+function abrirAjusteContadorIA(ia){
+  if(!window._regIAClicks) window._regIAClicks = {gemini:0,perplexity:0,copilot:0,chatgpt:0};
+  var atual = window._regIAClicks[ia] || 0;
+  var nomes = {gemini:'🤖 Gemini', perplexity:'🔍 Perplexity', copilot:'🪟 Copilot', chatgpt:'💬 ChatGPT'};
+  var ov = document.createElement('div');
+  ov.id = 'modal-ajuste-ia';
+  ov.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:10200;display:flex;align-items:center;justify-content:center;padding:20px';
+  ov.innerHTML = `
+    <div style="background:#fff;border-radius:20px;padding:22px 20px;width:100%;max-width:320px;text-align:center">
+      <div style="font-size:18px;font-weight:800;color:#111;margin-bottom:4px">${nomes[ia]}</div>
+      <div style="font-size:12px;color:#6b7280;margin-bottom:18px">Ajustar contador de usos</div>
+      <div style="display:flex;align-items:center;justify-content:center;gap:16px;margin-bottom:20px">
+        <button onclick="ajusteIADelta(-1)" style="width:44px;height:44px;border-radius:50%;border:2px solid #e5e7eb;background:#f3f4f6;font-size:22px;font-weight:900;cursor:pointer;display:flex;align-items:center;justify-content:center">−</button>
+        <input id="ajuste-ia-val" type="number" min="0" value="${atual}"
+          style="width:70px;text-align:center;font-size:28px;font-weight:900;border:2px solid #e5e7eb;border-radius:12px;padding:8px 4px;outline:none;font-family:inherit">
+        <button onclick="ajusteIADelta(1)" style="width:44px;height:44px;border-radius:50%;border:2px solid #e5e7eb;background:#f3f4f6;font-size:22px;font-weight:900;cursor:pointer;display:flex;align-items:center;justify-content:center">+</button>
+      </div>
+      <button onclick="confirmarAjusteIA('${ia}')"
+        style="width:100%;padding:13px;background:#111;color:#fff;border:none;border-radius:14px;font-size:15px;font-weight:800;font-family:inherit;cursor:pointer;margin-bottom:8px">
+        ✓ Salvar
+      </button>
+      <button onclick="document.getElementById('modal-ajuste-ia').remove()"
+        style="width:100%;padding:11px;background:#f3f4f6;color:#374151;border:none;border-radius:14px;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer">
+        Cancelar
+      </button>
+    </div>`;
+  ov.addEventListener('click', function(e){ if(e.target===ov) ov.remove(); });
+  document.body.appendChild(ov);
+}
+function ajusteIADelta(d){
+  var inp = document.getElementById('ajuste-ia-val');
+  if(!inp) return;
+  var v = parseInt(inp.value)||0;
+  v = Math.max(0, v+d);
+  inp.value = v;
+}
+function confirmarAjusteIA(ia){
+  var v = Math.max(0, parseInt(document.getElementById('ajuste-ia-val').value)||0);
+  if(!window._regIAClicks) window._regIAClicks = {gemini:0,perplexity:0,copilot:0,chatgpt:0};
+  window._regIAClicks[ia] = v;
+  try{ localStorage.setItem('tapete_ia_clicks', JSON.stringify(window._regIAClicks)); }catch(_){}
+  renderRegStep();
+  document.getElementById('modal-ajuste-ia').remove();
+}
+window.regSeguraIA = regSeguraIA;
+window.regSoltaIA = regSoltaIA;
+window.abrirAjusteContadorIA = abrirAjusteContadorIA;
+window.ajusteIADelta = ajusteIADelta;
+window.confirmarAjusteIA = confirmarAjusteIA;
+
+var _regProximoTimer = null;
+var _regProximoBloqueado = false;
+function regSeguraProximo(destino){
+  _regProximoTimer = setTimeout(function(){
+    if(navigator.vibrate) navigator.vibrate(40);
+    _regProximoBloqueado = true;
+    regIrPara(destino);
+    setTimeout(function(){ _regProximoBloqueado = false; }, 800);
+  }, 700);
+}
+function regSoltaProximo(){
+  clearTimeout(_regProximoTimer);
+}
+// Wrapper que o onclick chama
+function regAdvanceProxy(){
+  if(!_regProximoBloqueado) regAdvance();
+}
+window.regSeguraProximo = regSeguraProximo;
+window.regSoltaProximo = regSoltaProximo;
+window.regAdvanceProxy = regAdvanceProxy;
+
+function regIrPara(stepId){
+  var steps = regActiveSteps();
+  var idx = steps.findIndex(x=>x.id===stepId);
+  if(idx>=0){ regCurStep=idx; renderRegStep(); }
+}
+window.regIrPara = regIrPara;
+
+window.regAbrirIA = function(ia){
+  if(!window._regPromptCopiado){ toast('⚠️ Copie o prompt primeiro!'); return; }
+  if(!window._regIAClicks) window._regIAClicks = {gemini:0, perplexity:0, copilot:0, chatgpt:0};
+  window._regIAClicks[ia] = (window._regIAClicks[ia]||0) + 1;
+  // Salva contador no localStorage — persiste após fechar o app
+  try{ localStorage.setItem('tapete_ia_clicks', JSON.stringify(window._regIAClicks)); }catch(_){}
+  window._regFezGemini = true;
+  salvarEstadoRegistrar();
+  renderRegStep();
+  // Abre o app nativo — tenta scheme do app, fallback pro site
+  var _iaLinks = {
+    gemini:     { scheme: 'com.google.android.apps.bard',  fallback: 'https://gemini.google.com' },
+    perplexity: { scheme: 'ai.perplexity.app.android',     fallback: 'https://www.perplexity.ai' },
+    copilot:    { scheme: 'com.microsoft.copilot',         fallback: 'https://copilot.microsoft.com' },
+    chatgpt:    { scheme: 'com.openai.chatgpt',            fallback: 'https://chat.openai.com' }
+  };
+  var _link = _iaLinks[ia] || _iaLinks.gemini;
+  setTimeout(function(){
+    // Cria link <a> com target _blank para forçar o Android a perguntar qual app usar
+    var a = document.createElement('a');
+    a.href = _link.fallback;
+    a.target = '_blank';
+    a.rel = 'noopener';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  }, 300);
+};
+
+// ── ABRIR GEMINI SEM SAIR DA TELA (legacy alias) ─────────────────────────────
 window.regAbrirGeminiEFicar = function(){
   // Copia o prompt
   regCopyPrompt();
@@ -3087,8 +3361,9 @@ window.regEnviarCRM = async function(btnEl){
 
   const nome=(REG_DATA.nome||'').trim();
   const tel=(REG_DATA.tel||'').replace(/\D/g,'').trim();
-  if(!nome||!tel){ toast('⚠️ Nome e telefone obrigatórios'); _regEnviandoCRM=false; if(btnEl){btnEl.disabled=false;btnEl.style.opacity='1';} return; }
+  if(!tel){ toast('⚠️ Informe o telefone'); _regEnviandoCRM=false; if(btnEl){btnEl.disabled=false;btnEl.style.opacity='1';} return; }
   if(!curTipo){ toast('⚠️ Selecione o tipo de cliente'); _regEnviandoCRM=false; if(btnEl){btnEl.disabled=false;btnEl.style.opacity='1';} return; }
+
   function valorComDesc(base, d){
     return d===10?Math.round(base*0.9):d===30?Math.round(base*0.7):base;
   }
@@ -3137,12 +3412,13 @@ window.regEnviarCRM = async function(btnEl){
       saveLocal('tapete_crm_clients_cache', clients);
       _crmTapBlockUntil = Date.now() + 5000;
       window.syncShow && window.syncShow.syncing && window.syncShow.syncing();
-      await setDoc(doc(db, COL_CLIENTS, payload.id), payload);
+      // Envia sem base64 para o Firebase (fotos ficam só no cache local)
+      await setDoc(doc(db, COL_CLIENTS, payload.id), _stripImgsForFirebase(payload));
       window.syncShow && window.syncShow.synced && window.syncShow.synced('Tapetes CRM');
     }catch(e){
       try{
         var pending = JSON.parse(localStorage.getItem(LS_PENDING)||'[]');
-        pending.push({op:'add', data:payload});
+        pending.push({op:'add', data:_stripImgsForFirebase(payload)});
         localStorage.setItem(LS_PENDING, JSON.stringify(pending));
       }catch(_){}
       window.syncShow && window.syncShow.offline && window.syncShow.offline();
@@ -3233,6 +3509,36 @@ function removeRegImgIA(){ tempImgIA=null; renderRegStep(); }
 window.removeRegImgIA=removeRegImgIA;
 function copyPromptRegistrar(){ regCopyPrompt(); }
 window.copyPromptRegistrar=copyPromptRegistrar;
+// ── COPIAR FOTO PARA CLIPBOARD ───────────────────────────────────────────────
+window.regCopiarFoto = async function(idx){
+  const fotos = tempFotos.length > 0 ? [...tempFotos] : (tempFoto ? [tempFoto] : []);
+  const foto = fotos[idx];
+  if(!foto){ toast('⚠️ Foto não encontrada'); return; }
+  try{
+    var arr = foto.split(','), mime = arr[0].match(/:(.*?);/)[1];
+    var bstr = atob(arr[1]), n = bstr.length, u8 = new Uint8Array(n);
+    for(var i=0;i<n;i++) u8[i] = bstr.charCodeAt(i);
+    var blob = new Blob([u8], {type:'image/png'});
+    if(navigator.clipboard && navigator.clipboard.write){
+      await navigator.clipboard.write([new ClipboardItem({'image/png': blob})]);
+      if(!window._regFotosCopiadasFlags) window._regFotosCopiadasFlags = {};
+      window._regFotosCopiadasFlags[idx] = true;
+      toast('✅ Foto '+(idx+1)+' copiada!');
+      renderRegStep();
+    } else {
+      toast('⚠️ Segure a imagem para copiar manualmente');
+    }
+  } catch(e){
+    toast('⚠️ Erro ao copiar foto — segure a imagem');
+  }
+};
+
+function regCopyPromptRegistrar(){
+  regCopyPrompt();
+  window._regPromptCopiado = true;
+  renderRegStep();
+}
+window.regCopyPromptRegistrar=regCopyPromptRegistrar;
 
 
 let _salvarClienteGuard = false;
@@ -3247,6 +3553,7 @@ async function salvarCliente(){
   const preco=(REG_DATA.preco||'').trim();
   if(!nome){ _salvarClienteGuard=false; return toast('⚠️ Informe o nome'); }
   if(!tel) { _salvarClienteGuard=false; return toast('⚠️ Informe o telefone'); }
+  if(!tempFoto){ _salvarClienteGuard=false; return toast('⚠️ Foto obrigatória'); }
   if(!curTipo) { _salvarClienteGuard=false; return toast('⚠️ Selecione o tipo'); }
   if(!tam) { _salvarClienteGuard=false; return toast('⚠️ Informe o tamanho'); }
   if(!cor) { _salvarClienteGuard=false; return toast('⚠️ Informe a cor'); }
@@ -3409,7 +3716,7 @@ function buildMsgDia(c){
   const d=curDay(c);
   const fase=c.sequenciaFase||'sem_resposta';
   const msg=((messages[c.tipo]||{})[fase]||{})[d]||{};
-  const rawTxt=(msg.texto||'').replace(/\{nome\}/g, c.nome||'');
+  const rawTxt=(msg.texto||'').replace(/\{nome\}/g, c.nome||'Opa!');
   if(d===1){
     const bt=c.borda==='sim'?`\nCor da Borda: ${c.bordaCor||'preta'}`:'';
     const extras=c.tapetesExtras||[];
@@ -3421,19 +3728,22 @@ function buildMsgDia(c){
       const valParcela=(totalGeral/parcelas).toFixed(2).replace('.',',');
       parcelaLinha=`\n💳 ${parcelas}x de R$ ${valParcela} no cartão (sem juros)`;
     }
+    const _L = (label, val) => val ? `${label}: ${val}` : '';
+    const _preco = (v) => { const n=parseFloat(String(v).replace(',','.')); return (n&&n>0) ? `R$ ${fmt(v)}` : ''; };
     let specs;
     if(extras.length>0){
-      // Tapete principal
-      let linhas=`📐 Tapete 1\nMedida: ${c.tamanho}\nCor de Fundo: ${c.cor}${bt}\nValor: R$ ${fmt(c.preco)}`;
-      // Tapetes extras
+      const l1 = [_L('Medida',c.tamanho), _L('Cor de Fundo',c.cor), bt?bt.trim():'', _L('Valor',_preco(c.preco))].filter(Boolean).join('\n');
+      let linhas=`📐 Tapete 1\n${l1}`;
       extras.forEach(function(t,i){
-        linhas+=`\n\n📐 Tapete ${i+2}\nMedida: ${t.medida||'—'}\nCor de Fundo: ${t.cor||c.cor||'—'}\nValor: R$ ${fmt(t.valor||0)}`;
+        const lx=[_L('Medida',t.medida), _L('Cor de Fundo',t.cor||c.cor), _L('Valor',_preco(t.valor||0))].filter(Boolean).join('\n');
+        linhas+=`\n\n📐 Tapete ${i+2}\n${lx}`;
       });
-      // Prazo e pagamento uma única vez
-      linhas+=`\n\nPrazo de Entrega: ${c.prazo} dias\nPagamento: somente na entrega\nFormas: Pix · Cartão · Dinheiro${parcelaLinha}`;
+      const prazoLinha = c.prazo ? `\nPrazo de Entrega: ${c.prazo} dias` : '';
+      linhas+=`${prazoLinha}\nPagamento: somente na entrega\nFormas: Pix · Cartão · Dinheiro${parcelaLinha}`;
       specs=linhas;
     } else {
-      specs=`Medida: ${c.tamanho}\nCor de Fundo: ${c.cor}${bt}\nValor: R$ ${fmt(c.preco)}\nPrazo: ${c.prazo} dias\nPagamento: somente na entrega\nFormas: Pix · Cartão · Dinheiro${parcelaLinha}`;
+      const linhas=[_L('Medida',c.tamanho), _L('Cor de Fundo',c.cor), bt?bt.trim():'', _L('Valor',_preco(c.preco)), c.prazo?`Prazo: ${c.prazo} dias`:'', 'Pagamento: somente na entrega', `Formas: Pix · Cartão · Dinheiro${parcelaLinha}`].filter(Boolean).join('\n');
+      specs=linhas;
     }
     return rawTxt?(rawTxt+'\n\n'+specs):specs;
   }
@@ -3569,7 +3879,7 @@ async function enviarMensagemDia(id){
   const d=curDay(c);
   const fase=c.sequenciaFase||'sem_resposta';
   const msg=((messages[c.tipo]||{})[fase]||{})[d]||{};
-  const rawTxt=(msg.texto||'').replace(/\{nome\}/g, c.nome||'');
+  const rawTxt=(msg.texto||'').replace(/\{nome\}/g, c.nome||'Opa!');
   // Specs só no Dia 1 — do Dia 2 em diante o cliente já recebeu antes
   const isFirstContact = d===1;
   let txtCompleto = rawTxt;
@@ -3583,16 +3893,22 @@ async function enviarMensagemDia(id){
       const valParcela=(totalGeral/parcelas).toFixed(2).replace('.',',');
       parcelaLinha=`\n💳 ${parcelas}x de R$ ${valParcela} no cartão (sem juros)`;
     }
+    const _L2 = (label, val) => val ? `${label}: ${val}` : '';
+    const _preco2 = (v) => { const n=parseFloat(String(v).replace(',','.')); return (n&&n>0) ? `R$ ${fmt(v)}` : ''; };
     let specs;
     if(extras.length>0){
-      let linhas=`📐 Tapete 1\nMedida: ${c.tamanho}\nCor de Fundo: ${c.cor}${bt}\nValor: R$ ${fmt(c.preco)}`;
+      const l1=[_L2('Medida',c.tamanho),_L2('Cor de Fundo',c.cor),bt?bt.trim():'',_L2('Valor',_preco2(c.preco))].filter(Boolean).join('\n');
+      let linhas=`📐 Tapete 1\n${l1}`;
       extras.forEach(function(t,i){
-        linhas+=`\n\n📐 Tapete ${i+2}\nMedida: ${t.medida||'—'}\nCor de Fundo: ${t.cor||c.cor||'—'}\nValor: R$ ${fmt(t.valor||0)}`;
+        const lx=[_L2('Medida',t.medida),_L2('Cor de Fundo',t.cor||c.cor),_L2('Valor',_preco2(t.valor||0))].filter(Boolean).join('\n');
+        linhas+=`\n\n📐 Tapete ${i+2}\n${lx}`;
       });
-      linhas+=`\n\nPrazo de Entrega: ${c.prazo} dias\nPagamento: somente na entrega\nFormas: Pix · Cartão · Dinheiro${parcelaLinha}`;
+      const prazoLinha2 = c.prazo ? `\nPrazo de Entrega: ${c.prazo} dias` : '';
+      linhas+=`${prazoLinha2}\nPagamento: somente na entrega\nFormas: Pix · Cartão · Dinheiro${parcelaLinha}`;
       specs=linhas;
     } else {
-      specs=`Medida: ${c.tamanho}\nCor de Fundo: ${c.cor}${bt}\nValor: R$ ${fmt(c.preco)}\nPrazo: ${c.prazo} dias\nPagamento: somente na entrega\nFormas: Pix · Cartão · Dinheiro${parcelaLinha}`;
+      const linhas2=[_L2('Medida',c.tamanho),_L2('Cor de Fundo',c.cor),bt?bt.trim():'',_L2('Valor',_preco2(c.preco)),c.prazo?`Prazo: ${c.prazo} dias`:'','Pagamento: somente na entrega',`Formas: Pix · Cartão · Dinheiro${parcelaLinha}`].filter(Boolean).join('\n');
+      specs=linhas2;
     }
     txtCompleto=(rawTxt?rawTxt+'\n\n':'')+specs;
   }
@@ -4663,12 +4979,13 @@ window.cadSalvarPedido = async function(){
   if(!nome || !contato || !valorRaw || !medida || !prazo){
     cadToast('⚠️ Preencha os campos obrigatórios'); return;
   }
+  if(!cadFotoBase64){ cadToast('⚠️ Foto do cliente é obrigatória!'); return; }
   var custo = custoRaw !== '' ? parseFloat(custoRaw) : null;
   var pedido = {
     nome, contato, medida, cor, valor: valorTap1 || parseFloat(valorRaw), valorTotal: parseFloat(valorRaw), custo,
     prazo: parseInt(prazo), borda, bcor, endereco: end, dataVenda: data,
     completo: custo !== null, obs, tapetesExtras, categoria: 'Tapete',
-    criadoEm: new Date().toISOString(), fotos: cadFotoBase64 ? [cadFotoBase64] : [],
+    criadoEm: new Date().toISOString(), fotos: [cadFotoBase64], // fotos salvas apenas localmente
     updatedAt: Date.now()
   };
   // Salva local primeiro
@@ -4683,7 +5000,12 @@ window.cadSalvarPedido = async function(){
   // Tenta enviar para Firebase via refs globais expostas pelo módulo
   if(window._cadDB && window._cadCollection && window._cadAddDoc){
     try{
-      var ref = await window._cadAddDoc(window._cadCollection(window._cadDB,'tapetes'), Object.assign({}, pedido, {id:undefined}));
+      // Envia sem base64 para o Firebase
+      var pedidoSemFotos = Object.assign({}, pedido, {id:undefined});
+      var isB64 = function(v){ return typeof v === 'string' && v.startsWith('data:'); };
+      if(isB64(pedidoSemFotos.fotos && pedidoSemFotos.fotos[0])) pedidoSemFotos.fotos = [];
+      if(Array.isArray(pedidoSemFotos.fotos)) pedidoSemFotos.fotos = pedidoSemFotos.fotos.filter(function(f){ return !isB64(f); });
+      var ref = await window._cadAddDoc(window._cadCollection(window._cadDB,'tapetes'), pedidoSemFotos);
       var idx = cad_pedidosCache.findIndex(function(x){ return x.id === localId; });
       if(idx >= 0){ cad_pedidosCache[idx].id = ref.id; cadSalvarLocal(); }
     }catch(e){}
@@ -4841,6 +5163,10 @@ window.cadTransferirParaGestao = async function(id){
   if(window._cadDB && window._cadCollection && window._cadAddDoc){
     try{
       var obj = Object.assign({}, transferido, {id:undefined, _localId:undefined});
+      // Remove base64 antes de enviar ao Firebase
+      var isB64x = function(v){ return typeof v === 'string' && v.startsWith('data:'); };
+      if(Array.isArray(obj.fotos)) obj.fotos = obj.fotos.filter(function(f){ return !isB64x(f); });
+      if(obj.fotos && obj.fotos.length === 0) delete obj.fotos;
       var ref = await window._cadAddDoc(window._cadCollection(window._cadDB,'tapetes'), obj);
       if(typeof window._gestGetCache === 'function'){
         var cache = window._gestGetCache();
@@ -4883,8 +5209,8 @@ window.cadAbrirComp = function(id){
 
   // Tabela de custos pré-definidos por medida
   var _tabelaCusto = {
-    '70x40': 68.25, '90x50': 95.30, '100x60': 119.70,
-    '120x60': 141.65, '150x60': 152.28, '200x60': 181.33, '220x120': 364.10
+    '80x50': 84.33, '70x40': 76.82, '90x60': 93.10, '100x60': 94.53,
+    '120x60': 113.99, '150x60': 129.49, '200x60': 184.54, '200x120': 314.53, '220x120': 364.10
   };
   function _custoAuto(medida){
     if(!medida) return '';
@@ -5668,7 +5994,8 @@ window.adicionarFotoDet = function(input){
       if(!p.fotos) p.fotos=[];
       p.fotos.push(b64);
       salvarCacheLocal();
-      try{ updateDoc(doc(db,'tapetes',detId),{fotos:p.fotos}); } catch(e){}
+      // Não envia base64 para o Firebase; sincroniza só a contagem (sem imagem)
+      try{ updateDoc(doc(db,'tapetes',detId),{qtdFotos: p.fotos.length, updatedAt: Date.now()}); } catch(e){}
       renderFotosDet(p);toast('Foto adicionada!');
     };
     img.src=e.target.result;
@@ -5680,7 +6007,8 @@ window.delFotoDet = function(i){
   if(!p||!p.fotos) return;
   p.fotos.splice(i,1);
   salvarCacheLocal();
-  try{ updateDoc(doc(db,'tapetes',detId),{fotos:p.fotos}); } catch(e){}
+  // Não envia base64 para o Firebase; sincroniza só a contagem (sem imagem)
+  try{ updateDoc(doc(db,'tapetes',detId),{qtdFotos: p.fotos.length, updatedAt: Date.now()}); } catch(e){}
   renderFotosDet(p);
 };
 window.abrirFotoGrande = function(i){
@@ -6050,6 +6378,9 @@ async function sincronizarPendentes(){
   for(var i=0;i<pedidosPendentes.length;i++){
     var obj=Object.assign({},pedidosPendentes[i]);
     var localId=obj.id;delete obj.pendingSync;delete obj._localId;delete obj.id;
+    // Remove base64 antes de enviar ao Firebase
+    var _isB64=function(v){return typeof v==='string'&&v.startsWith('data:');};
+    if(Array.isArray(obj.fotos)){obj.fotos=obj.fotos.filter(function(f){return !_isB64(f);});if(!obj.fotos.length)delete obj.fotos;}
     try{
       var docRef=await addDoc(collection(db,'tapetes'),obj);
       var idx=pedidosCache.findIndex(function(x){return x.id===localId;});
@@ -6128,11 +6459,178 @@ window.addEventListener('online',function(){
 
 iniciarListeners();
 
+// ── MODAL MENSAGEM RÁPIDA (duplo toque na nav) ───────────────────────────────
+var _navLastTap = 0;
+(function(){
+  var nav = document.getElementById('nav-bar');
+  if(!nav) return;
+  nav.addEventListener('touchend', function(e){
+    // Ignora se tocou no botão da nuvem
+    if(e.target.closest('#btn-cloud-menu')) return;
+    var now = Date.now();
+    if(now - _navLastTap < 380){
+      _navLastTap = 0;
+      e.preventDefault();
+      e.stopPropagation();
+      abrirModalMsgRapida();
+    } else {
+      _navLastTap = now;
+    }
+  }, {passive: false});
+})();
+
+function abrirModalMsgRapida(){
+  // Tira foco de qualquer campo ativo primeiro
+  if(document.activeElement && document.activeElement.blur) document.activeElement.blur();
+  var msgFixa = localStorage.getItem('tap_msg_rapida') || '';
+  var overlay = document.createElement('div');
+  overlay.id = 'modal-msg-rapida';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9000;display:flex;align-items:flex-end;justify-content:center;padding:80px 20px 0';
+  overlay.innerHTML = `
+    <div id="mrq-box" style="background:#fff;border-radius:20px 20px 0 0;padding:18px 16px 20px;width:100%;animation:up .22s;overflow-y:auto;-webkit-overflow-scrolling:touch">
+      <div style="font-size:17px;font-weight:800;color:#111;margin-bottom:16px">💬 Mensagem Rápida</div>
+
+      <div style="font-size:11px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px">Nome da pessoa</div>
+      <input id="mrq-nome" type="text" inputmode="text"
+        style="width:100%;padding:12px;border:1.5px solid #d1d5db;border-radius:10px;font-size:15px;font-family:inherit;margin-bottom:14px;outline:none"
+        placeholder="Ex: João">
+
+      <div style="font-size:11px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px">Número do WhatsApp</div>
+      <input id="mrq-tel" type="tel" inputmode="numeric"
+        style="width:100%;padding:12px;border:1.5px solid #d1d5db;border-radius:10px;font-size:15px;font-family:inherit;margin-bottom:20px;outline:none"
+        placeholder="Ex: 85999990000">
+
+      <button onclick="enviarMsgRapida()"
+        style="width:100%;padding:16px;background:#25D366;color:#fff;border:none;border-radius:14px;font-size:16px;font-weight:800;font-family:inherit;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:10px">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="#fff"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.123 1.534 5.857L.057 23.516a.75.75 0 00.927.927l5.659-1.477A11.943 11.943 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.907 0-3.693-.507-5.234-1.394l-.374-.217-3.878 1.013 1.013-3.878-.217-.374A9.953 9.953 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>
+        Enviar no WhatsApp
+      </button>
+      <button onclick="document.getElementById('modal-msg-rapida').remove()"
+        style="width:100%;padding:13px;background:#f3f4f6;color:#374151;border:none;border-radius:14px;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer">
+        Cancelar
+      </button>
+    </div>`;
+  document.body.appendChild(overlay);
+  overlay.addEventListener('click', function(e){ if(e.target===overlay) overlay.remove(); });
+
+  // Sobe o modal quando o teclado abre
+  function ajustarComTeclado(){
+    if(!document.getElementById('mrq-box')) return;
+    if(window.visualViewport){
+      var vv = window.visualViewport;
+      overlay.style.height = vv.height + 'px';
+      overlay.style.top = vv.offsetTop + 'px';
+    }
+  }
+  if(window.visualViewport){
+    window.visualViewport.addEventListener('resize', ajustarComTeclado);
+    window.visualViewport.addEventListener('scroll', ajustarComTeclado);
+  }
+}
+window.abrirModalMsgRapida = abrirModalMsgRapida;
+
+// Segurar nuvenzinha do header → editar mensagem personalizada
+var _mrqSeguraTimer = null;
+function mrqIniciarSegura(){
+  _mrqSeguraTimer = setTimeout(function(){
+    // Vibra se disponível
+    if(navigator.vibrate) navigator.vibrate(40);
+    abrirEditorMsgPersonalizada();
+  }, 600);
+}
+function mrqCancelarSegura(){
+  clearTimeout(_mrqSeguraTimer);
+}
+function abrirEditorMsgPersonalizada(){
+  var msgAtual = localStorage.getItem('tap_msg_rapida') || '';
+  var ov = document.createElement('div');
+  ov.id = 'modal-editor-msg';
+  ov.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:10100;display:flex;align-items:flex-end;justify-content:center;padding:80px 20px 0';
+  ov.innerHTML = `
+    <div style="background:#fff;border-radius:20px 20px 0 0;padding:18px 16px 24px;width:100%;animation:up .22s">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+        <svg width="22" height="16" viewBox="0 0 22 16" fill="none"><ellipse cx="8.5" cy="10" rx="5.5" ry="4.5" fill="#7aadff" opacity=".9"/><ellipse cx="14" cy="10.5" rx="6" ry="4" fill="#5c9bff" opacity=".85"/><ellipse cx="10" cy="8" rx="4" ry="3.5" fill="#a8c8ff" opacity=".95"/><ellipse cx="15" cy="7.5" rx="4.5" ry="3.5" fill="#7aadff" opacity=".9"/><ellipse cx="11.5" cy="6" rx="3.5" ry="3" fill="#c7dcff"/></svg>
+        <div style="font-size:17px;font-weight:800;color:#111">Mensagem personalizada</div>
+      </div>
+      <div style="font-size:12px;color:#6b7280;margin-bottom:8px">Essa mensagem vai junto em todo envio pelo WhatsApp</div>
+      <textarea id="editor-msg-txt" rows="4"
+        style="width:100%;padding:12px;border:1.5px solid #0ea5e9;border-radius:12px;font-size:14px;font-family:inherit;resize:none;outline:none;box-sizing:border-box;margin-bottom:12px"
+        placeholder="Ex: tudo bem? Vi que você tem interesse em nossos tapetes!">${msgAtual}</textarea>
+      <button onclick="salvarMsgPersonalizada()"
+        style="width:100%;padding:14px;background:#111;color:#fff;border:none;border-radius:14px;font-size:15px;font-weight:800;font-family:inherit;cursor:pointer;margin-bottom:8px">
+        ✓ Salvar
+      </button>
+      <button onclick="document.getElementById('modal-editor-msg').remove()"
+        style="width:100%;padding:12px;background:#f3f4f6;color:#374151;border:none;border-radius:14px;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer">
+        Cancelar
+      </button>
+    </div>`;
+  ov.addEventListener('click', function(e){ if(e.target===ov) ov.remove(); });
+  document.body.appendChild(ov);
+  setTimeout(function(){ var ta=document.getElementById('editor-msg-txt'); if(ta) ta.focus(); }, 80);
+}
+function salvarMsgPersonalizada(){
+  var val = (document.getElementById('editor-msg-txt').value || '').trim();
+  if(val) localStorage.setItem('tap_msg_rapida', val);
+  document.getElementById('modal-editor-msg').remove();
+  toast('✅ Mensagem salva!');
+}
+window.mrqIniciarSegura = mrqIniciarSegura;
+window.mrqCancelarSegura = mrqCancelarSegura;
+window.abrirEditorMsgPersonalizada = abrirEditorMsgPersonalizada;
+window.salvarMsgPersonalizada = salvarMsgPersonalizada;
+
+// Nuvenzinha — segurar para editar
+var _mrqTimer = null;
+function mrqSeguraNuvem(){
+  _mrqTimer = setTimeout(function(){
+    var ed = document.getElementById('mrq-nuvem-editor');
+    var btn = document.getElementById('mrq-nuvem-btn');
+    if(ed){ ed.style.display='block'; }
+    if(btn){ btn.style.background='#e0f2fe'; }
+    setTimeout(function(){
+      var ta = document.getElementById('mrq-msg');
+      if(ta) ta.focus();
+    }, 50);
+  }, 500);
+}
+function mrqSoltaNuvem(){
+  clearTimeout(_mrqTimer);
+}
+function mrqFecharEditor(){
+  var ta = document.getElementById('mrq-msg');
+  var preview = document.getElementById('mrq-nuvem-preview');
+  var btn = document.getElementById('mrq-nuvem-btn');
+  var ed = document.getElementById('mrq-nuvem-editor');
+  var val = ta ? ta.value.trim() : '';
+  if(val) localStorage.setItem('tap_msg_rapida', val);
+  if(preview) preview.textContent = val || 'Segure para editar...';
+  if(ed) ed.style.display='none';
+  if(btn) btn.style.background='#f0f9ff';
+}
+window.mrqSeguraNuvem = mrqSeguraNuvem;
+window.mrqSoltaNuvem = mrqSoltaNuvem;
+window.mrqFecharEditor = mrqFecharEditor;
+
+function enviarMsgRapida(){
+  var msg  = localStorage.getItem('tap_msg_rapida') || '';
+  var nome = (document.getElementById('mrq-nome').value || '').trim();
+  var tel  = (document.getElementById('mrq-tel').value  || '').replace(/\D/g,'');
+  if(!tel){ toast('Coloque o número do WhatsApp!'); return; }
+  var texto = nome ? 'Olá ' + nome + ', ' + msg : msg;
+  var url = 'https://wa.me/55' + tel + '?text=' + encodeURIComponent(texto);
+  document.getElementById('modal-msg-rapida').remove();
+  window.open(url, '_blank');
+}
+window.enviarMsgRapida = enviarMsgRapida;
+
+
+
 // ── RESTAURAR ESTADO DO REGISTRAR SE O APP FOI MORTO ─────────────────────────
 // Mesma estratégia do ESTUDO: IndexedDB primeiro, localStorage como fallback
 setTimeout(function(){
   regLoadLocal().then(function(estado) {
-    if (!estado || !estado.REG_DATA || !estado.REG_DATA.nome) return;
+    if (!estado || !estado.REG_DATA) return;
     if (!estado.updatedAt || Date.now() - estado.updatedAt > REG_STATE_MAX_AGE) {
       regDeleteLocal();
       return;
@@ -6143,11 +6641,11 @@ setTimeout(function(){
         showScreen('registrar', false);
         setNav(0);
         renderRegStep();
-        toast('✅ Continuando de onde você parou!');
+
       }
     });
   }).catch(function(){});
 }, 600);
 </script>
 </body>
-  </html>
+</html>
