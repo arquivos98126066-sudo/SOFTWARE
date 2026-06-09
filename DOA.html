@@ -8,6 +8,95 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+<script>
+function parseMarkdown(t){
+  if(!t)return'';
+
+  var lines=t.split('\n');
+  var out=[], inList=false, inOl=false;
+
+  for(var i=0;i<lines.length;i++){
+    var l=lines[i];
+
+    // Check marcado - [x]
+    var chkDone=l.match(/^-\s+\[x\]\s*(.*)/i);
+    // Check vazio - [ ]
+    var chkOpen=l.match(/^-\s+\[ \]\s*(.*)/);
+    // Lista numerada
+    var isNum=l.match(/^(\d+)\.\s+(.*)/);
+    // Lista bullet
+    var isBullet=l.match(/^[-•]\s+(.*)/);
+
+    function esc(s){
+      return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+              .replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>')
+              .replace(/\*([^*\n]+)\*/g,'<em>$1</em>');
+    }
+
+    if(chkDone||chkOpen){
+      if(inList){out.push('</ul>');inList=false;}
+      if(inOl){out.push('</ol>');inOl=false;}
+      var txt=esc(chkDone?chkDone[1]:chkOpen[1]);
+      var done=!!chkDone;
+      var uid='chk_'+i+'_'+Math.random().toString(36).slice(2,6);
+      out.push('<label class="p-chk-item"><input type="checkbox" id="'+uid+'"'+(done?' checked':'')+' onchange="p_toggleCheck(this)"><span class="p-chk-txt">'+txt+'</span></label>');
+    } else if(isNum){
+      if(inList){out.push('</ul>');inList=false;}
+      if(!inOl){out.push('<ol>');inOl=true;}
+      out.push('<li>'+esc(isNum[2])+'</li>');
+    } else if(isBullet){
+      if(inOl){out.push('</ol>');inOl=false;}
+      if(!inList){out.push('<ul>');inList=true;}
+      out.push('<li>'+esc(isBullet[1])+'</li>');
+    } else if(l.match(/^---+\s*$/)){
+      if(inList){out.push('</ul>');inList=false;}
+      if(inOl){out.push('</ol>');inOl=false;}
+      out.push('<hr style="border:none;border-top:1px solid #e8e8e4;margin:8px 0;">');
+    } else if(l.match(/^#{1,4}\s+/)){
+      if(inList){out.push('</ul>');inList=false;}
+      if(inOl){out.push('</ol>');inOl=false;}
+      var hm=l.match(/^(#{1,4})\s+(.*)/);
+      var hlvl=hm[1].length;
+      var hsize=hlvl<=2?'.85rem':'.78rem';
+      out.push('<div style="font-size:'+hsize+';font-weight:700;color:#111110;margin:10px 0 3px;">'+esc(hm[2])+'</div>');
+    } else {
+      if(inList){out.push('</ul>');inList=false;}
+      if(inOl){out.push('</ol>');inOl=false;}
+      if(l.trim()===''){
+        out.push('<div style="height:6px"></div>');
+      } else {
+        out.push('<div>'+esc(l)+'</div>');
+      }
+    }
+  }
+  if(inList)out.push('</ul>');
+  if(inOl)out.push('</ol>');
+  return out.join('');
+}
+
+function p_toggleCheck(input){
+  var done=input.checked;
+  var label=input.closest('label');
+  var txtEl=label.querySelector('.p-chk-txt');
+  var txt=txtEl.textContent;
+  var card=input.closest('.p-step-card');
+  if(!card)return;
+  var idx=parseInt(card.dataset.idx);
+  if(isNaN(idx))return;
+  var escaped=txt.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+  var re=new RegExp('- \\[[ xX]\\] '+escaped);
+  p_steps[idx].detail=p_steps[idx].detail.replace(re,(done?'- [x] ':'- [ ] ')+txt);
+  p_salvarSteps();
+}
+window.p_toggleCheck=p_toggleCheck;
+
+// Impede que clique no label/checkbox propague para o card
+document.addEventListener('click',function(e){
+  if(e.target.closest('.p-chk-item')){
+    e.stopPropagation();
+  }
+},true);
+</script>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -2206,6 +2295,8 @@ document.addEventListener('DOMContentLoaded',function(){
 @keyframes pfadeUp{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:none;}}
 .p-f-row.ltr { justify-content:flex-start;padding-left:18vw; }
 .p-f-row.rtl { justify-content:flex-end;padding-right:18vw; }
+.p-f-row.ltr:has(.p-step-card.active) { padding-left:4vw; }
+.p-f-row.rtl:has(.p-step-card.active) { padding-right:4vw; }
 
 .p-step-card {
   width:fit-content;max-width:62vw;
@@ -2215,30 +2306,62 @@ document.addEventListener('DOMContentLoaded',function(){
   cursor:pointer;
   box-shadow:0 1px 4px rgba(0,0,0,0.06);
   transition:border-color .2s,box-shadow .2s,transform .15s,opacity .15s;
-  touch-action:none;position:relative;
+  touch-action:pan-y;position:relative;
   display:inline-flex;flex-direction:column;gap:0;
 }
 .p-step-card.active {
   background:#ffffff;
   border-color:transparent;
   box-shadow:0 4px 20px rgba(0,0,0,0.18);
-  transform:scale(1.03);
+  transform:none;
+  max-width:calc(100vw - 56px);
+  width:fit-content;
+  min-width:120px;
 }
 .p-step-card.dragging { opacity:.35;border-color:#534AB7; }
 .p-step-card.drag-over-top,
 .p-step-card.drag-over-bottom { border-color:#534AB7;box-shadow:0 0 0 3px rgba(83,74,183,0.2); }
 
-.p-s-word { font-size:.85rem;font-weight:600;line-height:1.3;white-space:nowrap;color:#111110;overflow:hidden;text-overflow:ellipsis;max-width:100%; }
+/* Checkbox no card — removido do canto, agora só na descrição */
+
+.p-s-word { font-size:.85rem;font-weight:700;line-height:1.3;color:#111110;overflow:hidden;text-overflow:ellipsis;max-width:100%; }
 .p-step-card.active .p-s-word { color:#111110; }
 
 .p-s-detail {
-  display:none;margin-top:6px;font-size:.75rem;line-height:1.5;
+  display:none;margin-top:10px;font-size:.75rem;line-height:1.65;
   color:#6b6b68;
-  border-top:1px solid #e8e8e4;padding-top:6px;
-  white-space:normal;word-break:break-word;overflow-wrap:break-word;
-  max-width:58vw;
+  border-top:2px solid #e8e8e4;padding-top:10px;
+  word-break:break-word;overflow-wrap:break-word;
+  max-width:100%;
 }
 .p-step-card.active .p-s-detail { display:block;color:#6b6b68;border-top-color:#e8e8e4; }
+
+/* Markdown renderizado dentro do card */
+.p-s-detail p { margin:0 0 6px; }
+.p-s-detail p:last-child { margin-bottom:0; }
+.p-s-detail strong { font-weight:700;color:#111110; }
+.p-s-detail em { font-style:italic; }
+.p-s-detail ul,.p-s-detail ol { padding-left:16px;margin:4px 0 6px; }
+.p-s-detail li { margin-bottom:2px; }
+.p-s-detail h1,.p-s-detail h2,.p-s-detail h3 { font-size:.8rem;font-weight:700;color:#111110;margin:8px 0 4px; }
+.p-s-detail code { background:#f0f0ee;border-radius:3px;padding:1px 5px;font-size:.72rem;font-family:monospace; }
+
+/* Checks clicáveis na descrição */
+.p-chk-item {
+  display:flex;align-items:flex-start;gap:8px;
+  padding:3px 0;cursor:pointer;
+  user-select:none;
+}
+.p-chk-item input[type=checkbox] {
+  width:16px;height:16px;
+  border-radius:50%;
+  flex-shrink:0;margin-top:2px;
+  accent-color:#3ddc84;
+  cursor:pointer;
+}
+.p-chk-item input[type=checkbox]:checked + .p-chk-txt {
+  text-decoration:line-through;color:#a0a09e;
+}
 
 .p-row-spacer { height:48px;position:relative; }
 
@@ -2276,6 +2399,7 @@ document.addEventListener('DOMContentLoaded',function(){
   border-radius:16px 16px 0 0;
   padding:22px 20px 40px;
   width:100%;max-width:500px;
+  max-height:92vh;overflow-y:auto;
   transform:translateY(50px);transition:transform .3s ease;
   display:flex;flex-direction:column;gap:14px;
 }
@@ -2301,6 +2425,17 @@ document.addEventListener('DOMContentLoaded',function(){
   margin-top:2px;transition:opacity .15s;
 }
 .p-btn-ok:active { opacity:.8; }
+
+.p-fmt-bar {
+  display:flex;gap:6px;margin-bottom:6px;
+}
+.p-fmt-bar button {
+  background:#f4f4f2;border:0.5px solid rgba(0,0,0,0.12);
+  border-radius:6px;padding:5px 12px;
+  font-family:'Inter',sans-serif;font-size:13px;color:#111110;
+  cursor:pointer;line-height:1;
+}
+.p-fmt-bar button:active { background:#e8e8e4; }
 </style>
 
 <div id="processo-overlay">
@@ -2346,7 +2481,14 @@ document.addEventListener('DOMContentLoaded',function(){
     </div>
     <div>
       <label>Descrição (toque para ver)</label>
-      <textarea id="p-inp-detail" rows="2" placeholder="ex: Perguntar quem é o proprietário"></textarea>
+      <div class="p-fmt-bar">
+        <button type="button" onclick="p_fmt('p-inp-detail','bold')" title="Negrito"><b>N</b></button>
+        <button type="button" onclick="p_fmt('p-inp-detail','italic')" title="Itálico"><i>I</i></button>
+        <button type="button" onclick="p_fmt('p-inp-detail','list')" title="Lista">☰</button>
+        <button type="button" onclick="p_fmt('p-inp-detail','check')" title="Check">○</button>
+        <button type="button" onclick="p_fmt('p-inp-detail','num')" title="Numerado">1.</button>
+      </div>
+      <textarea id="p-inp-detail" rows="8" placeholder="ex: Perguntar quem é o proprietário&#10;&#10;Use **negrito** ou - lista ou - [ ] check" style="min-height:160px;" oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'"></textarea>
     </div>
     <button class="p-btn-ok" onclick="p_addStep()">Adicionar</button>
   </div>
@@ -2362,7 +2504,14 @@ document.addEventListener('DOMContentLoaded',function(){
     </div>
     <div>
       <label>Descrição</label>
-      <textarea id="p-edit-detail" rows="2"></textarea>
+      <div class="p-fmt-bar">
+        <button type="button" onclick="p_fmt('p-edit-detail','bold')" title="Negrito"><b>N</b></button>
+        <button type="button" onclick="p_fmt('p-edit-detail','italic')" title="Itálico"><i>I</i></button>
+        <button type="button" onclick="p_fmt('p-edit-detail','list')" title="Lista">☰</button>
+        <button type="button" onclick="p_fmt('p-edit-detail','check')" title="Check">○</button>
+        <button type="button" onclick="p_fmt('p-edit-detail','num')" title="Numerado">1.</button>
+      </div>
+      <textarea id="p-edit-detail" rows="8" style="min-height:320px;" oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'"></textarea>
     </div>
     <div style="display:flex;gap:8px;">
       <button class="p-btn-ok" style="background:#fee8e8;color:#8b1a1a;flex:0 0 44px;font-size:1.1rem;" onclick="p_deleteStep()">🗑</button>
@@ -2592,6 +2741,45 @@ function p_addStep(){
 }
 document.getElementById('p-inp-word').addEventListener('keydown',e=>{if(e.key==='Enter')p_addStep();});
 
+// Auto-continuar listas nos textareas
+function p_listEnter(e){
+  if(e.key!=='Enter')return;
+  const el=e.target;
+  const pos=el.selectionStart;
+  const val=el.value;
+  const lineStart=val.lastIndexOf('\n',pos-1)+1;
+  const line=val.substring(lineStart,pos);
+
+  // Lista numerada: "1. " → próxima "2. "
+  const numMatch=line.match(/^(\d+)\.\s+(.+)/);
+  if(numMatch){
+    e.preventDefault();
+    const nextNum=parseInt(numMatch[1])+1;
+    const ins='\n'+nextNum+'. ';
+    el.setRangeText(ins,pos,pos,'end');
+    el.dispatchEvent(new Event('input'));
+    return;
+  }
+  // Lista com check: "- [ ] " ou "- [x] "
+  const chkMatch=line.match(/^-\s+\[[ x]\]\s+(.+)/i);
+  if(chkMatch){
+    e.preventDefault();
+    el.setRangeText('\n- [ ] ',pos,pos,'end');
+    el.dispatchEvent(new Event('input'));
+    return;
+  }
+  // Lista bullet: "- "
+  const bulletMatch=line.match(/^[-•]\s+(.+)/);
+  if(bulletMatch){
+    e.preventDefault();
+    el.setRangeText('\n- ',pos,pos,'end');
+    el.dispatchEvent(new Event('input'));
+    return;
+  }
+}
+document.getElementById('p-inp-detail').addEventListener('keydown',p_listEnter);
+document.getElementById('p-edit-detail').addEventListener('keydown',p_listEnter);
+
 // modal edit
 function p_openEdit(i){
   p_editIdx=i;
@@ -2636,13 +2824,15 @@ function p_render(){
     row.dataset.idx=i;
 
     const card=document.createElement('div');
-    card.className='p-step-card'+(p_activeIdx===i?' active':'');
+    card.className='p-step-card'+(p_activeIdx===i?' active':'')+(s.done?' done':'');
     card.dataset.idx=i;
 
     card.innerHTML=`
-      <div class="p-s-word">${s.word}</div>
-      ${s.detail?`<div class="p-s-detail">${s.detail}</div>`:''}
+      <div class="p-s-word" style="padding-right:22px">${s.word}</div>
+      ${s.detail?`<div class="p-s-detail">${parseMarkdown(s.detail)}</div>`:''}
     `;
+
+    // Checkbox click removido — checks agora ficam na descrição
 
     card.addEventListener('click',e=>{
       if(p_dragIdx!==null||p_justDragged)return;
@@ -2733,6 +2923,7 @@ function p_setupDrag(card, idx){
 
   // ── TOUCH ──
   card.addEventListener('touchstart', e=>{
+    if(card.classList.contains('active')) return;
     const t = e.touches[0];
     touchId  = t.identifier;
     pressing = true;
@@ -2742,6 +2933,7 @@ function p_setupDrag(card, idx){
   }, {passive:true});
 
   card.addEventListener('touchmove', e=>{
+    if(card.classList.contains('active')){ return; }
     if(!pressing) return;
     const t = [...e.changedTouches].find(x=>x.identifier===touchId);
     if(!t) return;
@@ -2749,24 +2941,28 @@ function p_setupDrag(card, idx){
     const dx = Math.abs(t.clientX - startX);
     const dy = Math.abs(t.clientY - startY);
 
-    // Só ativa drag depois de mover o suficiente
     if(!didDrag && (dx > MOVE_THRESHOLD || dy > MOVE_THRESHOLD)){
-      didDrag = true;
-      p_dragSrcIdx = idx;
-      card.classList.add('dragging');
-      navigator.vibrate && navigator.vibrate(30);
+      // Só inicia drag se movimento for mais horizontal que vertical
+      if(dx > dy){
+        didDrag = true;
+        p_dragSrcIdx = idx;
+        card.classList.add('dragging');
+        navigator.vibrate && navigator.vibrate(30);
+      } else {
+        // movimento vertical — deixa scrollar, cancela drag
+        pressing = false;
+        return;
+      }
     }
 
     if(didDrag){
-      e.preventDefault(); // evita scroll enquanto arrasta
-      // Descobre qual card está embaixo do dedo
+      e.preventDefault();
       card.style.pointerEvents = 'none';
       const el = document.elementFromPoint(t.clientX, t.clientY);
       card.style.pointerEvents = '';
       const target = el ? el.closest('.p-step-card') : null;
       const targetIdx = target ? parseInt(target.dataset.idx) : null;
 
-      // Highlight no alvo
       p_flowEl.querySelectorAll('.drag-over-top').forEach(c=>c.classList.remove('drag-over-top'));
       if(target && targetIdx !== idx){
         target.classList.add('drag-over-top');
@@ -2862,6 +3058,52 @@ p_canvasEl.addEventListener('contextmenu',e=>e.preventDefault());
 p_canvasEl.addEventListener('click',e=>{
   if(!e.target.closest('.p-step-card')&&p_activeIdx!==null){p_activeIdx=null;p_render();}
 });
+
+// Formatação inline no textarea
+function p_fmt(id, type){
+  const el=document.getElementById(id);
+  if(!el)return;
+  const start=el.selectionStart, end=el.selectionEnd;
+  const sel=el.value.substring(start,end);
+  let wrap='';
+  if(type==='bold') wrap='**';
+  if(type==='italic') wrap='*';
+  if(type==='list'){
+    if(sel){
+      const lined=sel.split('\n').map(l=>l.startsWith('- ')?l:'- '+l).join('\n');
+      el.setRangeText(lined,start,end,'select');
+    } else {
+      el.setRangeText('\n- ',start,end,'end');
+    }
+    el.focus();return;
+  }
+  if(type==='check'){
+    if(sel){
+      const lined=sel.split('\n').map(l=>'- [ ] '+l.replace(/^[-•]\s*/,'')).join('\n');
+      el.setRangeText(lined,start,end,'select');
+    } else {
+      el.setRangeText('\n- [ ] ',start,end,'end');
+    }
+    el.focus();return;
+  }
+  if(type==='num'){
+    if(sel){
+      const lined=sel.split('\n').map((l,i)=>(i+1)+'. '+l.replace(/^\d+\.\s*/,'')).join('\n');
+      el.setRangeText(lined,start,end,'select');
+    } else {
+      el.setRangeText('\n1. ',start,end,'end');
+    }
+    el.focus();return;
+  }
+  if(sel){
+    el.setRangeText(wrap+sel+wrap,start,end,'select');
+  } else {
+    el.setRangeText(wrap+wrap,start,end,'end');
+    el.selectionStart=el.selectionEnd=start+wrap.length;
+  }
+  el.focus();
+}
+window.p_fmt=p_fmt;
 </script>
 </body>
-</html>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               </html>
