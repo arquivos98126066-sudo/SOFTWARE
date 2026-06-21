@@ -4,7 +4,17 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Meu Plano — Modelo de Negócio</title>
-<script src="https://arquivos98126066-sudo.github.io/SOFTWARE/sync-indicator.js"></script>
+<script>
+// Carrega sync-indicator de forma não-bloqueante — se falhar, não quebra nada
+(function(){
+  var s=document.createElement('script');
+  s.src='https://arquivos98126066-sudo.github.io/SOFTWARE/sync-indicator.js';
+  s.async=true;
+  s.defer=true;
+  s.onerror=function(){ console.warn('sync-indicator.js não carregou — modo offline ativo.'); };
+  document.head.appendChild(s);
+})();
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
@@ -2565,15 +2575,118 @@ var p_procIdx = 0;   // índice do processo ativo
 var p_steps   = [];  // alias: p_procs[p_procIdx].steps
 var p_fabOpen = false;
 
-// ── Persistência ──
-function p_salvarTudo(){
-  try { localStorage.setItem('doa_processos_v2', JSON.stringify(p_procs)); } catch(e){}
-  if(window._salvarProcessoNuvem) window._salvarProcessoNuvem(p_steps);
+// ── Persistência: IndexedDB (local) + Firebase (nuvem) ──
+// Espelho exato do padrão usado no Administração.html
+
+// ── IndexedDB ──
+var _p_idb = null;
+function p_idbOpen(){
+  return new Promise(function(resolve){
+    if(_p_idb){ resolve(_p_idb); return; }
+    var req = indexedDB.open('doa_processo_db', 1);
+    req.onupgradeneeded = function(e){ e.target.result.createObjectStore('kv'); };
+    req.onsuccess = function(e){ _p_idb = e.target.result; resolve(_p_idb); };
+    req.onerror = function(){ resolve(null); };
+  });
 }
+function p_idbSet(key, val){
+  p_idbOpen().then(function(db){
+    if(!db){ localStorage.setItem(key, JSON.stringify(val)); return; }
+    var tx = db.transaction('kv','readwrite');
+    tx.objectStore('kv').put(JSON.stringify(val), key);
+  });
+}
+function p_idbGet(key){
+  return p_idbOpen().then(function(db){
+    if(!db){
+      try{ return JSON.parse(localStorage.getItem(key)); } catch(e){ return null; }
+    }
+    return new Promise(function(resolve){
+      var tx = db.transaction('kv','readonly');
+      var req = tx.objectStore('kv').get(key);
+      req.onsuccess = function(){ try{ resolve(req.result ? JSON.parse(req.result) : null); } catch(e){ resolve(null); } };
+      req.onerror = function(){ resolve(null); };
+    });
+  });
+}
+
+// ── Firebase (lazy init via módulo ES) ──
+var _p_db = null;
+var _p_docRef = null;
+var _p_fbReady = false;
+
+async function p_initFirebase(){
+  try {
+    const { initializeApp, getApps } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js');
+    const { getFirestore, doc, getDoc, setDoc, onSnapshot } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js');
+    const { getAuth, signInAnonymously, onAuthStateChanged } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js');
+
+    const cfg = {
+      apiKey: "AIzaSyDPJvM-XZWfa8HQ7h8v0Usb1Hf3q8sDqpg",
+      authDomain: "meus-apps-8ca76.firebaseapp.com",
+      projectId: "meus-apps-8ca76",
+      storageBucket: "meus-apps-8ca76.firebasestorage.app",
+      messagingSenderId: "768854372271",
+      appId: "1:768854372271:web:467b541baf3c513f03095a"
+    };
+
+    const apps = getApps();
+    const app = apps.length ? apps[0] : initializeApp(cfg);
+    _p_db = getFirestore(app);
+    const auth = getAuth(app);
+
+    await new Promise(function(resolve){
+      onAuthStateChanged(auth, function(user){ if(user) resolve(user); });
+      signInAnonymously(auth).catch(function(e){ console.warn('Auth erro:', e); resolve(null); });
+    });
+
+    _p_docRef = doc(_p_db, 'doa', 'processos');
+    _p_fbReady = true;
+
+    // Escuta mudanças na nuvem em tempo real
+    onSnapshot(_p_docRef, async function(snap){
+      if(!snap.exists()) return;
+      var nuvem = snap.data().procs || [];
+      if(!nuvem.length) return;
+      // Salva no IndexedDB como cache
+      p_idbSet('doa_procs', nuvem);
+      // Atualiza estado se não há edição ativa
+      p_procs = nuvem;
+      p_syncAlias();
+      p_render();
+    }, function(e){ console.warn('Snapshot erro:', e); });
+
+  } catch(e){
+    console.warn('Firebase indisponível:', e);
+    _p_fbReady = false;
+  }
+}
+
+// ── Salvar: IndexedDB primeiro, Firebase depois ──
+async function p_salvarTudo(){
+  // 1. Salva local imediatamente
+  p_idbSet('doa_procs', p_procs);
+  if(window.syncShow) window.syncShow.syncing();
+  // 2. Tenta Firebase
+  if(_p_fbReady && _p_docRef){
+    try {
+      const { setDoc } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js');
+      await setDoc(_p_docRef, { procs: p_procs, _t: Date.now() });
+      if(window.syncShow) window.syncShow.synced('Processo');
+    } catch(e){
+      console.warn('Erro Firebase, salvo local:', e);
+      if(window.syncShow) window.syncShow.offline();
+    }
+  } else {
+    if(window.syncShow) window.syncShow.local();
+  }
+}
+
 function p_salvarSteps(){
   if(p_procs[p_procIdx]) p_procs[p_procIdx].steps = p_steps;
   p_salvarTudo();
 }
+
 function p_stepsDefault(){
   return [
     {word:'Descobrir',detail:'Perguntar quem é o proprietário do estabelecimento'},
@@ -2581,32 +2694,32 @@ function p_stepsDefault(){
     {word:'Apresentar',detail:'Me apresentar e explicar o motivo da visita'},
   ];
 }
+
 function p_syncAlias(){
   p_steps = p_procs[p_procIdx] ? p_procs[p_procIdx].steps : [];
   var titleEl = document.getElementById('p-proc-title');
   if(titleEl) titleEl.textContent = p_procs[p_procIdx] ? p_procs[p_procIdx].name : 'Meu Processo';
 }
+
 async function p_carregarSteps(){
-  try {
-    var saved = JSON.parse(localStorage.getItem('doa_processos_v2'));
-    if(saved && saved.length){ p_procs=saved; p_procIdx=0; p_syncAlias(); return; }
-  } catch(e){}
-  try {
-    var local = JSON.parse(localStorage.getItem('doa_processo_steps'));
-    if(local && local.length){
-      p_procs=[{id:Date.now(),name:'Meu Processo',steps:local}];
-      p_procIdx=0; p_syncAlias(); p_salvarTudo(); return;
-    }
-  } catch(e){}
-  if(window._carregarProcessoNuvem){
-    var nuvem = await window._carregarProcessoNuvem();
-    if(nuvem && nuvem.length){
-      p_procs=[{id:Date.now(),name:'Meu Processo',steps:nuvem}];
-      p_procIdx=0; p_syncAlias(); p_salvarTudo(); return;
-    }
+  // 1. Carrega IndexedDB primeiro — aparece na tela imediatamente
+  var local = await p_idbGet('doa_procs');
+  if(local && local.length){
+    p_procs = local; p_procIdx = 0; p_syncAlias();
+  } else {
+    // Fallback: localStorage legado
+    try {
+      var leg = JSON.parse(localStorage.getItem('doa_processos_v2'));
+      if(leg && leg.length){ p_procs = leg; p_procIdx = 0; p_syncAlias(); p_idbSet('doa_procs', leg); }
+    } catch(e){}
   }
-  p_procs=[{id:Date.now(),name:'Meu Processo',steps:p_stepsDefault()}];
-  p_procIdx=0; p_syncAlias();
+  // Se ainda vazio, cria padrão
+  if(!p_procs.length){
+    p_procs = [{id:Date.now(), name:'Meu Processo', steps:p_stepsDefault()}];
+    p_procIdx = 0; p_syncAlias();
+  }
+  // 2. Inicia Firebase em paralelo (não bloqueia a UI)
+  p_initFirebase();
 }
 
 // ── FAB speed dial ──
@@ -2737,7 +2850,11 @@ function p_addStep(){
   p_steps.push({word:w,detail:d});
   document.getElementById('p-inp-word').value='';
   document.getElementById('p-inp-detail').value='';
-  p_activeIdx=null;p_closeModal();p_render();p_salvarSteps();
+  p_activeIdx=null;
+  p_salvarSteps(); // salva ANTES de renderizar
+  p_closeModal();
+  p_render();
+  toast('Etapa salva ✔');
 }
 document.getElementById('p-inp-word').addEventListener('keydown',e=>{if(e.key==='Enter')p_addStep();});
 
@@ -2788,7 +2905,21 @@ function p_openEdit(i){
   document.getElementById('p-edit-overlay').classList.add('open');
   setTimeout(()=>document.getElementById('p-edit-word').focus(),300);
 }
-function p_closeEdit(){document.getElementById('p-edit-overlay').classList.remove('open');p_editIdx=null;}
+function p_closeEdit(){
+  if(p_editIdx!==null){
+    const w=document.getElementById('p-edit-word').value.trim();
+    const d=document.getElementById('p-edit-detail').value.trim();
+    if(w && (w!==p_steps[p_editIdx].word || d!==(p_steps[p_editIdx].detail||''))){
+      p_steps[p_editIdx]={word:w,detail:d};
+      p_activeIdx=null;
+      p_salvarSteps();
+      p_render();
+      toast('Etapa salva automaticamente ✔');
+    }
+  }
+  document.getElementById('p-edit-overlay').classList.remove('open');
+  p_editIdx=null;
+}
 function p_editBgClick(e){if(e.target===document.getElementById('p-edit-overlay'))p_closeEdit();}
 function p_saveEdit(){
   if(p_editIdx===null)return;
@@ -2796,7 +2927,11 @@ function p_saveEdit(){
   const d=document.getElementById('p-edit-detail').value.trim();
   if(!w)return;
   p_steps[p_editIdx]={word:w,detail:d};
-  p_activeIdx=null;p_closeEdit();p_render();p_salvarSteps();
+  p_activeIdx=null;
+  p_salvarSteps(); // salva ANTES de renderizar
+  p_closeEdit();
+  p_render();
+  toast('Etapa salva ✔');
 }
 function p_deleteStep(){
   if(p_editIdx===null)return;
@@ -3106,4 +3241,4 @@ function p_fmt(id, type){
 window.p_fmt=p_fmt;
 </script>
 </body>
-        </html>
+  </html>
