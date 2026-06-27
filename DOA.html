@@ -2265,10 +2265,26 @@ document.addEventListener('DOMContentLoaded',function(){
 
 </script>
 
+<!-- ══ LISTAGEM DE PROCESSOS (abre ao clicar em "Meu Processo" na home) ══ -->
+<div id="proc-list-overlay">
+  <div class="pl-topbar">
+    <button class="pl-back" onclick="pl_fechar()"><i class="ti ti-arrow-left"></i></button>
+    <span class="pl-topbar-title">Meus Processos</span>
+  </div>
+  <div class="pl-body">
+    <div id="pl-breadcrumb"></div>
+    <button id="pl-back-btn" onclick="pl_navGoBack()">
+      <i class="ti ti-arrow-left" style="font-size:13px;"></i> Voltar
+    </button>
+    <div id="pl-list"></div>
+  </div>
+</div>
+
 <!-- ══ PROCESSO OVERLAY ══════════════════════════════════════════════════════ -->
 
 <style>
 /* ── Processo: classes próprias no tema DOA ── */
+#p-proc-list::-webkit-scrollbar { display: none; }
 #processo-overlay {
   position:fixed;inset:0;z-index:500;
   background:#f9f9f8;
@@ -2305,8 +2321,8 @@ document.addEventListener('DOMContentLoaded',function(){
 @keyframes pfadeUp{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:none;}}
 .p-f-row.ltr { justify-content:flex-start;padding-left:18vw; }
 .p-f-row.rtl { justify-content:flex-end;padding-right:18vw; }
-.p-f-row.ltr:has(.p-step-card.active) { padding-left:4vw; }
-.p-f-row.rtl:has(.p-step-card.active) { padding-right:4vw; }
+.p-f-row.ltr:has(.p-step-card.active),.p-f-row.ltr:has(.p-step-card.inline-editing) { padding-left:4vw; }
+.p-f-row.rtl:has(.p-step-card.active),.p-f-row.rtl:has(.p-step-card.inline-editing) { padding-right:4vw; }
 
 .p-step-card {
   width:fit-content;max-width:62vw;
@@ -2331,6 +2347,26 @@ document.addEventListener('DOMContentLoaded',function(){
 .p-step-card.dragging { opacity:.35;border-color:#534AB7; }
 .p-step-card.drag-over-top,
 .p-step-card.drag-over-bottom { border-color:#534AB7;box-shadow:0 0 0 3px rgba(83,74,183,0.2); }
+
+/* Card em edição inline (1 clique) — mesmo "expandido" do .active,
+   mas com o textarea sempre visível em vez do detalhe estático. */
+.p-step-card.inline-editing {
+  background:#ffffff;
+  border-color:#534AB7;
+  box-shadow:0 4px 20px rgba(0,0,0,0.18);
+  width:calc(100vw - 56px);
+  max-width:calc(100vw - 56px);
+  min-width:220px;
+  cursor:default;
+}
+.p-s-inline-edit {
+  display:block;width:100%;margin-top:10px;font-size:.75rem;line-height:1.65;
+  color:#111110;font-family:'Inter',sans-serif;
+  border:none;border-top:2px solid #534AB7;padding-top:10px;
+  background:transparent;outline:none;resize:none;
+  word-break:break-word;overflow-wrap:break-word;
+  min-height:60px;
+}
 
 /* Checkbox no card — removido do canto, agora só na descrição */
 
@@ -2409,7 +2445,7 @@ document.addEventListener('DOMContentLoaded',function(){
   border-radius:16px 16px 0 0;
   padding:22px 20px 40px;
   width:100%;max-width:500px;
-  max-height:92vh;overflow-y:auto;
+  max-height:var(--p-modal-maxh, 92vh);overflow-y:auto;
   transform:translateY(50px);transition:transform .3s ease;
   display:flex;flex-direction:column;gap:14px;
 }
@@ -2446,6 +2482,61 @@ document.addEventListener('DOMContentLoaded',function(){
   cursor:pointer;line-height:1;
 }
 .p-fmt-bar button:active { background:#e8e8e4; }
+
+/* ── Tela de listagem de processos (abre ao clicar em "Meu Processo" na home) ── */
+#proc-list-overlay {
+  display:none;
+  position:fixed;inset:0;z-index:490;
+  background:#f9f9f8;
+  flex-direction:column;
+  font-family:'Inter',sans-serif;
+  overflow:hidden;
+}
+#proc-list-overlay.pl-open { display:flex; }
+
+.pl-topbar {
+  position:sticky;top:0;z-index:10;
+  background:rgba(249,249,248,0.95);
+  backdrop-filter:blur(8px);
+  border-bottom:0.5px solid rgba(0,0,0,0.09);
+  display:flex;align-items:center;gap:12px;
+  padding:0 20px;height:56px;flex-shrink:0;
+}
+.pl-topbar-title {
+  font-size:14px;font-weight:600;color:#111110;flex:1;
+  text-transform:uppercase;letter-spacing:0.04em;
+}
+.pl-back {
+  background:none;border:none;cursor:pointer;
+  color:#6b6b68;font-size:20px;padding:4px 6px 4px 0;
+  line-height:1;display:flex;align-items:center;
+}
+.pl-body {
+  flex:1;overflow-y:auto;overflow-x:hidden;
+  padding:16px 20px 40px;
+  display:flex;flex-direction:column;
+  -webkit-overflow-scrolling:touch;
+}
+#pl-breadcrumb {
+  display:none;flex-shrink:0;
+  font-size:13.5px;color:#111110;font-weight:500;
+  padding:12px 14px;background:#f4f4f2;
+  border-radius:8px;border:0.5px solid rgba(0,0,0,0.09);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  margin-bottom:8px;
+}
+#pl-back-btn {
+  display:none;align-items:center;gap:6px;
+  background:#f4f4f2;border:0.5px solid rgba(0,0,0,0.09);
+  border-radius:8px;padding:9px 14px;
+  font-family:Inter,sans-serif;font-size:13px;font-weight:500;
+  color:#111110;cursor:pointer;width:100%;
+  margin-bottom:8px;flex-shrink:0;
+}
+#pl-list {
+  flex:1;display:flex;flex-direction:column;gap:6px;
+  touch-action:pan-y;
+}
 </style>
 
 <div id="processo-overlay">
@@ -2465,6 +2556,11 @@ document.addEventListener('DOMContentLoaded',function(){
 
 <!-- FAB speed dial -->
 <div id="p-fab-wrap" style="position:fixed;bottom:28px;right:24px;z-index:600;display:none;flex-direction:column;align-items:flex-end;gap:10px;">
+  <!-- opção 3: nova pasta -->
+  <div id="p-fab-opt3" style="display:none;align-items:center;gap:8px;animation:pfadeUp .18s ease;">
+    <span style="background:#fff;border:0.5px solid rgba(0,0,0,0.12);border-radius:20px;padding:6px 14px;font-size:12.5px;font-weight:500;color:#111110;white-space:nowrap;box-shadow:0 2px 10px rgba(0,0,0,0.1);">Nova pasta</span>
+    <button onclick="p_openNewFolder()" style="width:42px;height:42px;border-radius:50%;background:#b07e00;border:none;color:#fff;font-size:1.1rem;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 4px 16px rgba(176,126,0,0.35);"><i class="ti ti-folder-plus" style="font-size:16px;"></i></button>
+  </div>
   <!-- opção 2: novo processo -->
   <div id="p-fab-opt2" style="display:none;align-items:center;gap:8px;animation:pfadeUp .18s ease;">
     <span style="background:#fff;border:0.5px solid rgba(0,0,0,0.12);border-radius:20px;padding:6px 14px;font-size:12.5px;font-weight:500;color:#111110;white-space:nowrap;box-shadow:0 2px 10px rgba(0,0,0,0.1);">Novo processo</span>
@@ -2498,7 +2594,7 @@ document.addEventListener('DOMContentLoaded',function(){
         <button type="button" onclick="p_fmt('p-inp-detail','check')" title="Check">○</button>
         <button type="button" onclick="p_fmt('p-inp-detail','num')" title="Numerado">1.</button>
       </div>
-      <textarea id="p-inp-detail" rows="8" placeholder="ex: Perguntar quem é o proprietário&#10;&#10;Use **negrito** ou - lista ou - [ ] check" style="min-height:160px;" oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'"></textarea>
+      <textarea id="p-inp-detail" rows="8" placeholder="ex: Perguntar quem é o proprietário&#10;&#10;Use **negrito** ou - lista ou - [ ] check" style="min-height:160px;" oninput="p_autoGrow(this)"></textarea>
     </div>
     <button class="p-btn-ok" onclick="p_addStep()">Adicionar</button>
   </div>
@@ -2521,7 +2617,7 @@ document.addEventListener('DOMContentLoaded',function(){
         <button type="button" onclick="p_fmt('p-edit-detail','check')" title="Check">○</button>
         <button type="button" onclick="p_fmt('p-edit-detail','num')" title="Numerado">1.</button>
       </div>
-      <textarea id="p-edit-detail" rows="8" style="min-height:320px;" oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'"></textarea>
+      <textarea id="p-edit-detail" rows="8" style="min-height:320px;" oninput="p_autoGrow(this)"></textarea>
     </div>
     <div style="display:flex;gap:8px;">
       <button class="p-btn-ok" style="background:#fee8e8;color:#8b1a1a;flex:0 0 44px;font-size:1.1rem;" onclick="p_deleteStep()">🗑</button>
@@ -2530,12 +2626,16 @@ document.addEventListener('DOMContentLoaded',function(){
   </div>
 </div>
 
-<!-- Modal selecionar processo -->
-<div class="p-overlay" id="p-select-overlay" onclick="if(event.target===this)p_closeSelectProc()">
-  <div class="p-modal">
-    <div class="p-modal-title">Meus Processos</div>
-    <div id="p-proc-list" style="display:flex;flex-direction:column;gap:6px;max-height:45vh;overflow-y:auto;"></div>
-    <button class="p-btn-ok" style="background:#f4f4f2;color:#111110;margin-top:4px;" onclick="p_closeSelectProc()">Fechar</button>
+<!-- Modal selecionar processo / navegar pastas -->
+<div id="p-select-overlay" style="display:none;position:fixed;inset:0;z-index:800;background:rgba(0,0,0,0.3);" onclick="p_closeSelectProc()">
+  <div onclick="event.stopPropagation()" style="position:absolute;bottom:0;left:0;right:0;max-width:500px;margin:0 auto;background:#fff;border-radius:16px 16px 0 0;height:82vh;display:flex;flex-direction:column;padding:22px 16px 0;box-sizing:border-box;overflow:hidden;">
+    <div style="font-size:14px;font-weight:600;color:#111110;flex-shrink:0;margin-bottom:10px;">Meus Processos</div>
+    <div id="p-select-breadcrumb" style="display:none;flex-shrink:0;font-size:13.5px;color:#111110;font-weight:500;padding:12px 14px;background:#f4f4f2;border-radius:8px;border:0.5px solid rgba(0,0,0,0.09);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:8px;"></div>
+    <button id="p-select-back" onclick="p_navGoBack()" style="display:none;flex-shrink:0;align-items:center;gap:6px;background:#f4f4f2;border:0.5px solid rgba(0,0,0,0.09);border-radius:8px;padding:9px 14px;font-family:Inter,sans-serif;font-size:13px;font-weight:500;color:#111110;cursor:pointer;width:100%;margin-bottom:8px;"><i class="ti ti-arrow-left" style="font-size:13px;"></i> Voltar</button>
+    <div id="p-proc-list" style="flex:1;min-height:0;overflow-y:scroll;overflow-x:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;display:flex;flex-direction:column;gap:6px;padding:0 4px 8px;touch-action:pan-y;scrollbar-width:none;-ms-overflow-style:none;"></div>
+    <div style="flex-shrink:0;padding:12px 0 20px;">
+      <button onclick="p_closeSelectProc()" style="width:100%;background:#f4f4f2;color:#111110;font-family:Inter,sans-serif;font-weight:600;font-size:13.5px;border:none;border-radius:8px;padding:14px;cursor:pointer;">Fechar</button>
+    </div>
   </div>
 </div>
 
@@ -2551,6 +2651,35 @@ document.addEventListener('DOMContentLoaded',function(){
   </div>
 </div>
 
+<!-- Modal nova pasta -->
+<div class="p-overlay" id="p-newfolder-overlay" onclick="if(event.target===this)p_closeNewFolder()">
+  <div class="p-modal">
+    <div class="p-modal-title" id="p-newfolder-title">Nova pasta</div>
+
+    <!-- Etapa 1: escolher destino -->
+    <div id="p-newfolder-step-dest">
+      <button class="p-btn-ok" style="background:#f4f4f2;color:#111110;margin-bottom:8px;display:flex;align-items:center;gap:10px;justify-content:flex-start;" onclick="p_newFolderChooseRoot()">
+        <i class="ti ti-home" style="font-size:16px;opacity:0.6;"></i> Criar na raiz
+      </button>
+      <button class="p-btn-ok" style="background:#f4f4f2;color:#111110;margin-bottom:4px;display:flex;align-items:center;gap:10px;justify-content:flex-start;" onclick="p_newFolderShowDestList()">
+        <i class="ti ti-folder-symlink" style="font-size:16px;color:#c49a00;"></i> Criar dentro de uma pasta
+      </button>
+    </div>
+
+    <!-- Etapa 1b: lista de pastas existentes (destino) -->
+    <div id="p-newfolder-dest-list" style="display:none;flex-direction:column;gap:6px;max-height:50vh;overflow-y:auto;margin-bottom:8px;"></div>
+    <button id="p-newfolder-back-btn" class="p-btn-ok" style="display:none;background:#f4f4f2;color:#111110;margin-bottom:8px;" onclick="p_newFolderBackToDest()">← Voltar</button>
+
+    <!-- Etapa 2: nome da pasta -->
+    <div id="p-newfolder-step-name" style="display:none;">
+      <div id="p-newfolder-dest-label" style="font-size:12px;color:#a0a09e;margin-bottom:10px;"></div>
+      <label>Nome da pasta</label>
+      <input id="p-newfolder-name" type="text" placeholder="ex: Vendas, Marketing..." maxlength="40">
+    </div>
+    <button id="p-newfolder-create-btn" class="p-btn-ok" style="display:none;" onclick="p_createFolder()">Criar pasta</button>
+  </div>
+</div>
+
 <!-- Modal renomear / excluir processo -->
 <div class="p-overlay" id="p-rename-overlay" onclick="if(event.target===this)p_closeRenameProc()">
   <div class="p-modal">
@@ -2559,6 +2688,7 @@ document.addEventListener('DOMContentLoaded',function(){
       <label>Nome</label>
       <input id="p-rename-inp" type="text" maxlength="40">
     </div>
+    <button class="p-btn-ok" style="background:#e8f1fc;color:#1a4fa0;margin-bottom:6px;" onclick="p_openMoveProc()"><i class="ti ti-folder-symlink" style="font-size:14px;vertical-align:-2px;margin-right:6px;"></i>Mover para pasta...</button>
     <div style="display:flex;gap:8px;">
       <button id="p-rename-del" class="p-btn-ok" style="background:#fee8e8;color:#8b1a1a;flex:0 0 44px;font-size:1.1rem;" onclick="p_deleteProc()">🗑</button>
       <button class="p-btn-ok" style="flex:1;" onclick="p_saveRenameProc()">Salvar</button>
@@ -2566,14 +2696,42 @@ document.addEventListener('DOMContentLoaded',function(){
   </div>
 </div>
 
+<!-- Modal renomear / excluir pasta -->
+<div class="p-overlay" id="p-renamefolder-overlay" onclick="if(event.target===this)p_closeRenameFolder()">
+  <div class="p-modal">
+    <div class="p-modal-title">Editar pasta</div>
+    <div>
+      <label>Nome da pasta</label>
+      <input id="p-renamefolder-inp" type="text" maxlength="40">
+    </div>
+    <div style="display:flex;gap:8px;">
+      <button class="p-btn-ok" style="background:#fee8e8;color:#8b1a1a;flex:0 0 44px;font-size:1.1rem;" onclick="p_deleteFolderById()">🗑</button>
+      <button class="p-btn-ok" style="flex:1;" onclick="p_saveRenameFolder()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal mover processo para pasta -->
+<div class="p-overlay" id="p-move-overlay" onclick="if(event.target===this)p_closeMoveProc()">
+  <div class="p-modal">
+    <div class="p-modal-title">Mover para...</div>
+    <div style="font-size:12px;color:#a0a09e;margin-bottom:6px;" id="p-move-item-name"></div>
+    <div id="p-move-breadcrumb" style="font-size:12.5px;color:#6b6b69;margin-bottom:10px;display:flex;align-items:center;gap:4px;flex-wrap:wrap;"></div>
+    <div id="p-move-list" style="display:flex;flex-direction:column;gap:6px;max-height:42vh;overflow-y:auto;"></div>
+    <button id="p-move-here-btn" class="p-btn-ok" style="margin-top:10px;display:none;" onclick="p_moveItemHere()">Mover para esta pasta</button>
+    <button class="p-btn-ok" style="background:#f4f4f2;color:#111110;margin-top:8px;" onclick="p_closeMoveProc()">Cancelar</button>
+  </div>
+</div>
+
 <script>
 let p_justDragged = false;
 
 // ══ MULTI-PROCESSO: estado global ══
-var p_procs   = [];  // [{id, name, steps:[]}]
-var p_procIdx = 0;   // índice do processo ativo
+var p_procs   = [];  // [{id, type, name, parentId, order, steps:[]}]
+var p_procIdx = 0;   // índice do processo ativo (dentro de p_procs)
 var p_steps   = [];  // alias: p_procs[p_procIdx].steps
 var p_fabOpen = false;
+var p_currentFolderId = null; // pasta atual na navegação (null = raiz)
 
 // ── Persistência: IndexedDB (local) + Firebase (nuvem) ──
 // Espelho exato do padrão usado no Administração.html
@@ -2618,7 +2776,7 @@ var _p_fbReady = false;
 async function p_initFirebase(){
   try {
     const { initializeApp, getApps } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js');
-    const { getFirestore, doc, getDoc, setDoc, onSnapshot } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js');
+    const { initializeFirestore, persistentLocalCache, persistentSingleTabManager, getFirestore, doc, getDoc, setDoc, onSnapshot } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js');
     const { getAuth, signInAnonymously, onAuthStateChanged } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js');
 
     const cfg = {
@@ -2632,7 +2790,19 @@ async function p_initFirebase(){
 
     const apps = getApps();
     const app = apps.length ? apps[0] : initializeApp(cfg);
-    _p_db = getFirestore(app);
+
+    // Ativa cache persistente no IndexedDB do browser
+    // Na segunda visita em diante, onSnapshot entrega dados do cache LOCAL instantaneamente
+    // sem esperar a rede — elimina a tela em branco
+    try {
+      _p_db = initializeFirestore(app, {
+        localCache: persistentLocalCache({ tabManager: persistentSingleTabManager() })
+      });
+    } catch(e2){
+      // Se já foi inicializado (ex: hot reload), usa o existente
+      _p_db = getFirestore(app);
+    }
+
     const auth = getAuth(app);
 
     await new Promise(function(resolve){
@@ -2643,17 +2813,22 @@ async function p_initFirebase(){
     _p_docRef = doc(_p_db, 'doa', 'processos');
     _p_fbReady = true;
 
-    // Escuta mudanças na nuvem em tempo real
+    // Escuta mudanças — na 1ª visita vem da rede, nas seguintes vem do cache local imediatamente
     onSnapshot(_p_docRef, async function(snap){
       if(!snap.exists()) return;
       var nuvem = snap.data().procs || [];
       if(!nuvem.length) return;
-      // Salva no IndexedDB como cache
-      p_idbSet('doa_procs', nuvem);
-      // Atualiza estado se não há edição ativa
       p_procs = nuvem;
+      var migrou = p_migrateIfNeeded();
+      p_idbSet('doa_procs', p_procs);
+      if(migrou){ p_salvarTudo(); }
       p_syncAlias();
-      p_render();
+      // Renderiza se a tela de processo estiver aberta
+      var overlay = document.getElementById('processo-overlay');
+      if(overlay && overlay.classList.contains('popen')){
+        p_render();
+        requestAnimationFrame(p_drawLines);
+      }
     }, function(e){ console.warn('Snapshot erro:', e); });
 
   } catch(e){
@@ -2664,8 +2839,12 @@ async function p_initFirebase(){
 
 // ── Salvar: IndexedDB primeiro, Firebase depois ──
 async function p_salvarTudo(){
-  // 1. Salva local imediatamente
+  // 1. Salva local imediatamente — inclui o id do processo ativo
   p_idbSet('doa_procs', p_procs);
+  var activeItem = p_procs[p_procIdx];
+  if(activeItem && activeItem.type === 'process'){
+    localStorage.setItem('doa_active_proc_id', String(activeItem.id));
+  }
   if(window.syncShow) window.syncShow.syncing();
   // 2. Tenta Firebase
   if(_p_fbReady && _p_docRef){
@@ -2696,29 +2875,64 @@ function p_stepsDefault(){
 }
 
 function p_syncAlias(){
-  p_steps = p_procs[p_procIdx] ? p_procs[p_procIdx].steps : [];
+  // p_procIdx pode apontar para processo ou pasta; garante que aponta para processo válido
+  var item = p_procs[p_procIdx];
+  if(!item || item.type === 'folder'){
+    // Encontra o primeiro processo na raiz ou qualquer processo
+    var firstProc = p_procs.find(function(x){ return x.type === 'process'; });
+    if(firstProc){ p_procIdx = p_procs.indexOf(firstProc); item = firstProc; }
+    else { p_steps = []; var t=document.getElementById('p-proc-title'); if(t) t.textContent='Meu Processo'; return; }
+  }
+  p_steps = item.steps || [];
   var titleEl = document.getElementById('p-proc-title');
-  if(titleEl) titleEl.textContent = p_procs[p_procIdx] ? p_procs[p_procIdx].name : 'Meu Processo';
+  if(titleEl) titleEl.textContent = item.name || 'Meu Processo';
+}
+
+function p_migrateIfNeeded(){
+  var needsMigration = false;
+  p_procs.forEach(function(item, i){
+    if(!item.type){
+      item.type = 'process';
+      needsMigration = true;
+    }
+    // Normaliza parentId — trata undefined, null, '', 'null', 'undefined' como null
+    var pid = p_normId(item.parentId);
+    if(item.parentId !== pid){
+      item.parentId = pid;
+      needsMigration = true;
+    }
+    if(item.order === undefined || item.order === null){
+      item.order = i;
+      needsMigration = true;
+    }
+  });
+  return needsMigration;
 }
 
 async function p_carregarSteps(){
-  // 1. Carrega IndexedDB primeiro — aparece na tela imediatamente
   var local = await p_idbGet('doa_procs');
   if(local && local.length){
-    p_procs = local; p_procIdx = 0; p_syncAlias();
+    p_procs = local; p_procIdx = 0;
   } else {
-    // Fallback: localStorage legado
     try {
       var leg = JSON.parse(localStorage.getItem('doa_processos_v2'));
-      if(leg && leg.length){ p_procs = leg; p_procIdx = 0; p_syncAlias(); p_idbSet('doa_procs', leg); }
+      if(leg && leg.length){ p_procs = leg; p_procIdx = 0; p_idbSet('doa_procs', leg); }
     } catch(e){}
   }
-  // Se ainda vazio, cria padrão
   if(!p_procs.length){
-    p_procs = [{id:Date.now(), name:'Meu Processo', steps:p_stepsDefault()}];
-    p_procIdx = 0; p_syncAlias();
+    p_procs = [{id:Date.now(), type:'process', name:'Meu Processo', parentId:null, order:0, steps:p_stepsDefault()}];
+    p_procIdx = 0;
   }
-  // 2. Inicia Firebase em paralelo (não bloqueia a UI)
+  // Restaura o último processo ativo pelo id salvo
+  var savedId = localStorage.getItem('doa_active_proc_id');
+  if(savedId){
+    var savedNum = parseInt(savedId);
+    var savedItem = p_procs.find(function(x){ return x.id === savedNum && x.type === 'process'; });
+    if(savedItem) p_procIdx = p_procs.indexOf(savedItem);
+  }
+  // Migração automática de dados antigos
+  if(p_migrateIfNeeded()){ p_salvarTudo(); }
+  p_syncAlias();
   p_initFirebase();
 }
 
@@ -2727,6 +2941,7 @@ function p_fabToggle(){
   p_fabOpen = !p_fabOpen;
   document.getElementById('p-fab-opt1').style.display = p_fabOpen ? 'flex' : 'none';
   document.getElementById('p-fab-opt2').style.display = p_fabOpen ? 'flex' : 'none';
+  document.getElementById('p-fab-opt3').style.display = p_fabOpen ? 'flex' : 'none';
   document.getElementById('p-fab').style.transform    = p_fabOpen ? 'rotate(45deg)' : '';
   document.getElementById('p-fab').style.background   = p_fabOpen ? '#534AB7' : '#111110';
   document.getElementById('p-fab-overlay').style.display = p_fabOpen ? 'block' : 'none';
@@ -2735,51 +2950,493 @@ function p_fabClose(){
   p_fabOpen = false;
   document.getElementById('p-fab-opt1').style.display='none';
   document.getElementById('p-fab-opt2').style.display='none';
+  document.getElementById('p-fab-opt3').style.display='none';
   document.getElementById('p-fab').style.transform='';
   document.getElementById('p-fab').style.background='#111110';
   document.getElementById('p-fab-overlay').style.display='none';
 }
 function p_fabEtapa(){ p_fabClose(); p_openModal(); }
 
-// ── Selecionar processo ──
-function p_openSelectProc(){
-  var list = document.getElementById('p-proc-list');
-  list.innerHTML='';
-  p_procs.forEach(function(proc,i){
-    var btn = document.createElement('button');
-    btn.style.cssText='width:100%;text-align:left;background:'+(i===p_procIdx?'#111110':'#f4f4f2')+';color:'+(i===p_procIdx?'#fff':'#111110')+';border:0.5px solid rgba(0,0,0,0.09);border-radius:8px;padding:12px 14px;font-family:Inter,sans-serif;font-size:13.5px;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:8px;';
-    btn.innerHTML='<span>'+proc.name+'</span><span style="font-size:11px;opacity:0.5;">'+proc.steps.length+' etapa'+(proc.steps.length!==1?'s':'')+'</span>';
-    btn.onclick=function(){ p_switchProc(i); p_closeSelectProc(); };
-    list.appendChild(btn);
-  });
-  document.getElementById('p-select-overlay').classList.add('open');
+// ── Selecionar processo / navegar pastas ──
+// Normaliza qualquer variação de "sem pasta" para null
+function p_normId(v){
+  if(v === undefined || v === null || v === '' || v === 'null' || v === 'undefined') return null;
+  return v;
 }
-function p_closeSelectProc(){ document.getElementById('p-select-overlay').classList.remove('open'); }
-function p_switchProc(idx){ p_procIdx=idx; p_syncAlias(); p_activeIdx=null; p_render(); }
 
-// ── Novo processo ──
+function p_getItemsAt(folderId){
+  var target = p_normId(folderId);
+  var all = p_procs.filter(function(x){
+    return p_normId(x.parentId) === target;
+  });
+  // Pastas primeiro, depois processos — cada grupo ordenado por order
+  var folders = all.filter(function(x){ return x.type === 'folder'; })
+                   .sort(function(a,b){ return (a.order||0)-(b.order||0); });
+  var procs   = all.filter(function(x){ return x.type !== 'folder'; })
+                   .sort(function(a,b){ return (a.order||0)-(b.order||0); });
+  return folders.concat(procs);
+}
+
+function p_getBreadcrumb(folderId){
+  var crumbs = [];
+  var cur = folderId;
+  while(cur !== null && cur !== undefined){
+    var item = p_procs.find(function(x){ return x.id === cur; });
+    if(!item) break;
+    crumbs.unshift(item.name);
+    cur = item.parentId;
+  }
+  return crumbs;
+}
+
+function p_renderNavList(){
+  var list = document.getElementById('p-proc-list');
+  list.innerHTML = '';
+
+  // Breadcrumb
+  var bc = document.getElementById('p-select-breadcrumb');
+  var crumbs = p_getBreadcrumb(p_currentFolderId);
+  if(bc){
+    if(crumbs.length > 0){
+      bc.textContent = '📁 ' + crumbs.join(' › ');
+      bc.style.display = 'block';
+    } else {
+      bc.style.display = 'none';
+    }
+  }
+
+  // Botão voltar
+  var backBtn = document.getElementById('p-select-back');
+  if(backBtn){
+    backBtn.style.display = (p_currentFolderId !== null) ? 'flex' : 'none';
+  }
+
+  var items = p_getItemsAt(p_currentFolderId);
+
+  if(items.length === 0){
+    var emptyDiv = document.createElement('div');
+    emptyDiv.style.cssText = 'color:#a0a09e;font-size:13px;text-align:center;padding:20px 0;';
+    emptyDiv.textContent = 'Pasta vazia';
+    list.appendChild(emptyDiv);
+    return;
+  }
+
+  items.forEach(function(item){
+    var row = document.createElement('div');
+    row.dataset.itemId = item.id;
+    row.style.cssText = item.type === 'folder'
+      ? 'display:grid;grid-template-columns:1fr auto;border-radius:8px;border:0.5px solid rgba(0,0,0,0.09);user-select:none;-webkit-user-select:none;overflow:hidden;'
+      : 'display:grid;grid-template-columns:1fr;border-radius:8px;border:0.5px solid rgba(0,0,0,0.09);user-select:none;-webkit-user-select:none;overflow:hidden;';
+
+    var isActive = (item.type === 'process' && p_procs.indexOf(item) === p_procIdx);
+    var bg = isActive ? '#111110' : '#f4f4f2';
+    var fg = isActive ? '#fff' : '#111110';
+
+    var subCount = '';
+    if(item.type === 'folder'){
+      var inside = p_procs.filter(function(x){ return x.parentId === item.id; }).length;
+      subCount = inside + ' item' + (inside !== 1 ? 's' : '');
+    } else {
+      var steps = item.steps ? item.steps.length : 0;
+      subCount = steps + ' etapa' + (steps !== 1 ? 's' : '');
+    }
+
+    var icon = item.type === 'folder'
+      ? '<i class="ti ti-folder" style="font-size:15px;margin-right:6px;color:#c49a00;"></i>'
+      : '<i class="ti ti-git-branch" style="font-size:15px;margin-right:6px;color:#534AB7;opacity:0.7;"></i>';
+
+    var btnRadius = item.type === 'folder' ? '8px 0 0 8px' : '8px';
+
+    row.innerHTML =
+      '<button style="text-align:left;background:'+bg+';color:'+fg+';border:none;border-radius:'+btnRadius+';padding:12px 14px;font-family:Inter,sans-serif;font-size:13.5px;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;touch-action:manipulation;">'+
+        '<span style="display:flex;align-items:center;color:'+fg+';font-size:13.5px;font-weight:500;">'+icon+'<span style="color:'+fg+';font-size:13.5px;font-weight:500;">'+item.name+'</span></span>'+
+        '<span style="font-size:11px;color:'+fg+';opacity:0.5;">'+subCount+(item.type==='folder'?' <i class="ti ti-chevron-right" style="font-size:11px;vertical-align:-1px;"></i>':'')+'</span>'+
+      '</button>'+
+      (item.type==='folder'
+        ? '<button class="p-folder-edit-btn" data-fid="'+item.id+'" style="background:'+bg+';border:none;border-left:0.5px solid '+(isActive?'rgba(255,255,255,0.12)':'rgba(0,0,0,0.07)')+';border-radius:0 8px 8px 0;cursor:pointer;color:'+(isActive?'rgba(255,255,255,0.5)':'#a0a09e')+';font-size:17px;padding:0 14px;touch-action:manipulation;display:flex;align-items:center;justify-content:center;" title="Editar pasta"><i class="ti ti-dots-vertical"></i></button>'
+        : '');
+
+    var btn = row.querySelector('button');
+    if(item.type === 'folder'){
+      btn.onclick = function(e){
+        e.stopPropagation();
+        p_currentFolderId = item.id;
+        p_renderNavList();
+      };
+      var editBtn = row.querySelector('.p-folder-edit-btn');
+      if(editBtn){
+        editBtn.onclick = function(e){
+          e.stopPropagation();
+          p_openRenameFolder(item.id);
+        };
+      }
+    } else {
+      btn.onclick = function(e){
+        e.stopPropagation();
+        p_switchProc(item.id);
+        p_closeSelectProc();
+      };
+    }
+
+    list.appendChild(row);
+  });
+
+  // Setup drag na lista de navegação
+  p_setupNavDrag(list);
+}
+
+function p_openSelectProc(keepLevel){
+  if(!keepLevel) p_currentFolderId = null;
+  p_renderNavList();
+  document.getElementById('p-select-overlay').style.display = 'flex';
+  // Trava o scroll do body (fix Android + iOS Safari)
+  document.body.style.overflow = 'hidden';
+  document.body.style.position = 'fixed';
+  document.body.style.width = '100%';
+}
+function p_closeSelectProc(){
+  document.getElementById('p-select-overlay').style.display = 'none';
+  // Restaura o scroll do body
+  document.body.style.overflow = '';
+  document.body.style.position = '';
+  document.body.style.width = '';
+}
+
+// p_switchProc agora recebe o ID do processo (não o índice)
+function p_switchProc(procId){
+  var item = p_procs.find(function(x){ return x.id === procId && x.type === 'process'; });
+  if(!item) return;
+  p_procIdx = p_procs.indexOf(item);
+  localStorage.setItem('doa_active_proc_id', String(item.id));
+  p_syncAlias(); p_activeIdx = null; p_render();
+}
+
+// Voltar um nível na navegação de pastas
+function p_navGoBack(){
+  if(p_normId(p_currentFolderId) === null) return;
+  var cur = p_procs.find(function(x){ return x.id === p_currentFolderId; });
+  p_currentFolderId = cur ? p_normId(cur.parentId) : null;
+  p_renderNavList();
+}
+
+// ── Drag-and-drop de reordenação na lista de navegação ──
+function p_setupNavDrag(list){
+  var rows = Array.from(list.querySelectorAll('[data-item-id]'));
+  if(rows.length < 2) return;
+
+  rows.forEach(function(row){
+    var isDragging = false;
+    var ghostEl = null;
+    var srcId = null;
+    var startY = 0;
+    var lastOver = null;
+    var longPressTimer = null;
+    var activated = false;
+    var touchId = null;
+
+    function startDrag(clientY){
+      if(activated) return;
+      activated = true;
+      isDragging = true;
+      srcId = parseInt(row.dataset.itemId);
+      startY = clientY;
+      row.style.opacity = '0.4';
+      navigator.vibrate && navigator.vibrate(40);
+
+      // Ghost
+      ghostEl = row.cloneNode(true);
+      ghostEl.style.cssText = 'position:fixed;left:20px;right:20px;z-index:9999;pointer-events:none;opacity:0.9;border-radius:8px;box-shadow:0 8px 32px rgba(0,0,0,0.18);background:#fff;';
+      var rect = row.getBoundingClientRect();
+      ghostEl.style.top = rect.top + 'px';
+      ghostEl.style.width = rect.width + 'px';
+      document.body.appendChild(ghostEl);
+    }
+
+    function moveDrag(clientY){
+      if(!isDragging) return;
+      var rect = row.parentElement.getBoundingClientRect();
+      ghostEl.style.top = Math.max(rect.top, Math.min(rect.bottom - 50, clientY - 24)) + 'px';
+
+      list.querySelectorAll('[data-item-id]').forEach(function(r){
+        r.classList.remove('drag-over-top');
+        r.style.borderTop = '';
+      });
+      var el = document.elementFromPoint(row.getBoundingClientRect().left + 10, clientY);
+      var targetRow = el ? el.closest('[data-item-id]') : null;
+      if(targetRow && targetRow !== row){
+        targetRow.style.borderTop = '2px solid #534AB7';
+        lastOver = parseInt(targetRow.dataset.itemId);
+      } else {
+        lastOver = null;
+      }
+    }
+
+    function endDrag(){
+      if(!isDragging){ activated = false; return; }
+      isDragging = false;
+      activated = false;
+      row.style.opacity = '';
+      if(ghostEl){ ghostEl.remove(); ghostEl = null; }
+      list.querySelectorAll('[data-item-id]').forEach(function(r){ r.style.borderTop = ''; });
+
+      if(lastOver !== null && lastOver !== srcId){
+        var levelItems = p_getItemsAt(p_currentFolderId);
+        var srcItem = p_procs.find(function(x){ return x.id === srcId; });
+        var dstItem = p_procs.find(function(x){ return x.id === lastOver; });
+        if(srcItem && dstItem){
+          var srcPos = levelItems.indexOf(srcItem);
+          var dstPos = levelItems.indexOf(dstItem);
+          if(srcPos !== -1 && dstPos !== -1){
+            levelItems.splice(srcPos, 1);
+            levelItems.splice(dstPos, 0, srcItem);
+            levelItems.forEach(function(it, i){ it.order = i; });
+            p_salvarTudo();
+            p_renderNavList();
+          }
+        }
+      }
+      lastOver = null;
+    }
+
+    // Touch — long press de 500ms ativa o drag
+    row.addEventListener('touchstart', function(e){
+      // Ignora clique no botão de editar pasta
+      if(e.target.closest('.p-folder-edit-btn')) return;
+      var t = e.touches[0];
+      touchId = t.identifier;
+      startY = t.clientY;
+      longPressTimer = setTimeout(function(){ startDrag(startY); }, 500);
+    }, {passive:true});
+
+    row.addEventListener('touchmove', function(e){
+      if(!isDragging){
+        // Cancela long press se usuário está scrollando (movimento > 10px)
+        var t = Array.from(e.changedTouches).find(function(x){ return x.identifier === touchId; });
+        if(t && Math.abs(t.clientY - startY) > 10){
+          clearTimeout(longPressTimer);
+        }
+        return;
+      }
+      e.preventDefault();
+      var t = Array.from(e.changedTouches).find(function(x){ return x.identifier === touchId; });
+      if(t) moveDrag(t.clientY);
+    }, {passive:false});
+
+    row.addEventListener('touchend', function(e){
+      clearTimeout(longPressTimer);
+      endDrag();
+    }, {passive:true});
+
+    row.addEventListener('touchcancel', function(){
+      clearTimeout(longPressTimer);
+      endDrag();
+    }, {passive:true});
+
+    // Mouse — clique + arraste imediato
+    row.addEventListener('mousedown', function(e){
+      if(e.target.closest('.p-folder-edit-btn')) return;
+      if(e.target.closest('button')) return; // não interfere em cliques normais
+      e.preventDefault();
+      longPressTimer = setTimeout(function(){ startDrag(e.clientY); }, 500);
+      function onMove(ev){
+        if(!isDragging){ clearTimeout(longPressTimer); return; }
+        moveDrag(ev.clientY);
+      }
+      function onUp(){ clearTimeout(longPressTimer); endDrag(); document.removeEventListener('mousemove', onMove); document.removeEventListener('mouseup', onUp); }
+      document.addEventListener('mousemove', onMove);
+      document.addEventListener('mouseup', onUp);
+    });
+  });
+}
+
 function p_openNewProc(){ p_fabClose(); document.getElementById('p-newproc-overlay').classList.add('open'); setTimeout(function(){ document.getElementById('p-newproc-name').focus(); },300); }
 function p_closeNewProc(){ document.getElementById('p-newproc-overlay').classList.remove('open'); document.getElementById('p-newproc-name').value=''; }
 function p_createProc(){
   var name = document.getElementById('p-newproc-name').value.trim();
   if(!name) return;
-  p_procs.push({id:Date.now(),name:name,steps:[]});
+  var levelItems = p_getItemsAt(p_currentFolderId);
+  var maxOrder = levelItems.reduce(function(m,x){ return Math.max(m, x.order||0); }, -1);
+  p_procs.push({id:Date.now(), type:'process', name:name, parentId:p_currentFolderId, order:maxOrder+1, steps:[]});
   p_procIdx = p_procs.length-1;
   p_syncAlias(); p_activeIdx=null;
   p_closeNewProc(); p_render(); p_salvarTudo();
   toast('Processo criado! ✔');
+}
+
+// ── Nova Pasta ──
+var p_newFolderTargetParent = null; // pasta-mãe escolhida para a nova pasta (null = raiz)
+
+function p_openNewFolder(){
+  p_fabClose();
+  p_newFolderTargetParent = null;
+  // Reseta para a etapa 1 (escolher destino)
+  document.getElementById('p-newfolder-step-dest').style.display = 'block';
+  document.getElementById('p-newfolder-dest-list').style.display = 'none';
+  document.getElementById('p-newfolder-back-btn').style.display = 'none';
+  document.getElementById('p-newfolder-step-name').style.display = 'none';
+  document.getElementById('p-newfolder-create-btn').style.display = 'none';
+  document.getElementById('p-newfolder-title').textContent = 'Nova pasta';
+  document.getElementById('p-newfolder-overlay').classList.add('open');
+}
+
+function p_closeNewFolder(){
+  document.getElementById('p-newfolder-overlay').classList.remove('open');
+  document.getElementById('p-newfolder-name').value='';
+}
+
+// Usuário escolheu "Criar na raiz" → vai direto pro nome
+function p_newFolderChooseRoot(){
+  p_newFolderTargetParent = null;
+  p_newFolderGoToNameStep();
+}
+
+// Usuário escolheu "Criar dentro de uma pasta" → mostra lista de pastas existentes
+function p_newFolderShowDestList(){
+  var list = document.getElementById('p-newfolder-dest-list');
+  list.innerHTML = '';
+
+  var folders = p_procs.filter(function(x){ return x.type === 'folder'; })
+                        .sort(function(a,b){ return (a.order||0)-(b.order||0); });
+
+  if(folders.length === 0){
+    var noFolders = document.createElement('div');
+    noFolders.style.cssText = 'color:#a0a09e;font-size:13px;text-align:center;padding:16px 0;';
+    noFolders.textContent = 'Nenhuma pasta criada ainda.';
+    list.appendChild(noFolders);
+  } else {
+    folders.forEach(function(folder){
+      var path = p_getBreadcrumb(folder.id);
+      path.push(folder.name);
+
+      var btn = document.createElement('button');
+      btn.style.cssText = 'width:100%;text-align:left;background:#f4f4f2;color:#111110;border:0.5px solid rgba(0,0,0,0.09);border-radius:8px;padding:12px 14px;font-family:Inter,sans-serif;font-size:13.5px;font-weight:500;cursor:pointer;display:flex;align-items:center;gap:10px;';
+      btn.innerHTML =
+        '<i class="ti ti-folder" style="font-size:15px;color:#c49a00;flex-shrink:0;"></i>' +
+        '<span style="flex:1;">' + path.join(' › ') + '</span>';
+      btn.onclick = function(){
+        p_newFolderTargetParent = folder.id;
+        p_newFolderGoToNameStep();
+      };
+      list.appendChild(btn);
+    });
+  }
+
+  document.getElementById('p-newfolder-step-dest').style.display = 'none';
+  list.style.display = 'flex';
+  document.getElementById('p-newfolder-back-btn').style.display = 'block';
+  document.getElementById('p-newfolder-title').textContent = 'Escolha a pasta de destino';
+}
+
+// Volta da lista de destino para a etapa 1
+function p_newFolderBackToDest(){
+  document.getElementById('p-newfolder-dest-list').style.display = 'none';
+  document.getElementById('p-newfolder-back-btn').style.display = 'none';
+  document.getElementById('p-newfolder-step-name').style.display = 'none';
+  document.getElementById('p-newfolder-create-btn').style.display = 'none';
+  document.getElementById('p-newfolder-step-dest').style.display = 'block';
+  document.getElementById('p-newfolder-title').textContent = 'Nova pasta';
+}
+
+// Avança para a etapa de digitar o nome, já com o destino escolhido
+function p_newFolderGoToNameStep(){
+  document.getElementById('p-newfolder-step-dest').style.display = 'none';
+  document.getElementById('p-newfolder-dest-list').style.display = 'none';
+  document.getElementById('p-newfolder-back-btn').style.display = 'none';
+
+  var label = document.getElementById('p-newfolder-dest-label');
+  if(p_newFolderTargetParent === null){
+    label.textContent = 'Local: Raiz (sem pasta)';
+  } else {
+    var folder = p_procs.find(function(x){ return x.id === p_newFolderTargetParent; });
+    var path = folder ? p_getBreadcrumb(folder.id).concat([folder.name]) : [];
+    label.textContent = 'Local: ' + path.join(' › ');
+  }
+
+  document.getElementById('p-newfolder-step-name').style.display = 'block';
+  document.getElementById('p-newfolder-create-btn').style.display = 'block';
+  document.getElementById('p-newfolder-title').textContent = 'Nome da pasta';
+  setTimeout(function(){ document.getElementById('p-newfolder-name').focus(); }, 200);
+}
+
+function p_createFolder(){
+  var name = document.getElementById('p-newfolder-name').value.trim();
+  if(!name) return;
+  var parentId = p_newFolderTargetParent;
+  var levelItems = p_getItemsAt(parentId);
+  var maxOrder = levelItems.reduce(function(m,x){ return Math.max(m, x.order||0); }, -1);
+  p_procs.push({id:Date.now(), type:'folder', name:name, parentId:parentId, order:maxOrder+1});
+  p_closeNewFolder();
+  p_salvarTudo();
+  // Reabre o modal de navegação mostrando o nível onde a pasta foi criada
+  p_currentFolderId = parentId;
+  p_openSelectProc(true);
+  toast('Pasta "'+name+'" criada! 📁 Toque nela para entrar e mover processos.');
 }
 document.addEventListener('DOMContentLoaded',function(){
   var ni=document.getElementById('p-newproc-name');
   if(ni) ni.addEventListener('keydown',function(e){ if(e.key==='Enter') p_createProc(); });
   var ri=document.getElementById('p-rename-inp');
   if(ri) ri.addEventListener('keydown',function(e){ if(e.key==='Enter') p_saveRenameProc(); });
+  var fi=document.getElementById('p-newfolder-name');
+  if(fi) fi.addEventListener('keydown',function(e){ if(e.key==='Enter') p_createFolder(); });
+  var rfi=document.getElementById('p-renamefolder-inp');
+  if(rfi) rfi.addEventListener('keydown',function(e){ if(e.key==='Enter') p_saveRenameFolder(); });
+
+  // Pré-carrega dados em background assim que a página abre
+  // Quando o usuário clicar em "Meu Processo" os dados já estão prontos
+  p_carregarSteps();
 });
 
-// ── Renomear / excluir processo ──
+// ── Renomear / excluir pasta (pelo botão ⋯ na lista) ──
+var _p_editFolderId = null;
+function p_openRenameFolder(folderId){
+  _p_editFolderId = folderId;
+  var folder = p_procs.find(function(x){ return x.id === folderId && x.type === 'folder'; });
+  if(!folder) return;
+  document.getElementById('p-renamefolder-inp').value = folder.name;
+  document.getElementById('p-renamefolder-overlay').classList.add('open');
+  setTimeout(function(){ document.getElementById('p-renamefolder-inp').focus(); }, 300);
+}
+function p_closeRenameFolder(){
+  document.getElementById('p-renamefolder-overlay').classList.remove('open');
+  _p_editFolderId = null;
+}
+function p_saveRenameFolder(){
+  var name = document.getElementById('p-renamefolder-inp').value.trim();
+  if(!name) return;
+  var folder = p_procs.find(function(x){ return x.id === _p_editFolderId && x.type === 'folder'; });
+  if(!folder) return;
+  folder.name = name;
+  p_closeRenameFolder();
+  p_salvarTudo();
+  p_renderNavList();
+  if(document.getElementById('proc-list-overlay').classList.contains('pl-open')) pl_renderList();
+  toast('Pasta renomeada! ✔');
+}
+function p_deleteFolderById(){
+  var folder = p_procs.find(function(x){ return x.id === _p_editFolderId && x.type === 'folder'; });
+  if(!folder) return;
+  var inside = p_procs.filter(function(x){ return x.parentId === folder.id; });
+  if(inside.length > 0){
+    alert('A pasta "'+folder.name+'" tem '+inside.length+' item(ns) dentro. Esvazie-a antes de excluir.');
+    return;
+  }
+  if(!confirm('Excluir pasta "'+folder.name+'"?')) return;
+  var idx = p_procs.indexOf(folder);
+  if(idx !== -1) p_procs.splice(idx, 1);
+  p_closeRenameFolder();
+  p_salvarTudo();
+  p_renderNavList();
+  if(document.getElementById('proc-list-overlay').classList.contains('pl-open')) pl_renderList();
+  toast('Pasta excluída.');
+}
+
+// ── Renomear / excluir processo ou pasta ──
 function p_openRenameProc(){
-  document.getElementById('p-rename-inp').value = p_procs[p_procIdx] ? p_procs[p_procIdx].name : '';
-  document.getElementById('p-rename-del').style.display = p_procs.length > 1 ? 'flex' : 'none';
+  var item = p_procs[p_procIdx];
+  document.getElementById('p-rename-inp').value = item ? item.name : '';
+  var allProcs = p_procs.filter(function(x){ return x.type === 'process'; });
+  document.getElementById('p-rename-del').style.display = (allProcs.length > 1) ? 'flex' : 'none';
   document.getElementById('p-rename-overlay').classList.add('open');
   setTimeout(function(){ document.getElementById('p-rename-inp').focus(); },300);
 }
@@ -2791,15 +3448,137 @@ function p_saveRenameProc(){
   p_syncAlias(); p_closeRenameProc(); p_salvarTudo(); toast('Renomeado! ✔');
 }
 function p_deleteProc(){
-  if(p_procs.length <= 1){ alert('Não é possível excluir o único processo.'); return; }
-  if(!confirm('Excluir "'+p_procs[p_procIdx].name+'"?')) return;
-  p_procs.splice(p_procIdx,1);
-  p_procIdx = Math.max(0, p_procIdx-1);
-  p_syncAlias(); p_activeIdx=null;
+  var item = p_procs[p_procIdx];
+  if(!item) return;
+  if(item.type === 'folder'){
+    var inside = p_procs.filter(function(x){ return x.parentId === item.id; });
+    if(inside.length > 0){ alert('A pasta "'+item.name+'" tem '+inside.length+' item(ns) dentro. Esvazie-a antes de excluir.'); return; }
+    if(!confirm('Excluir pasta "'+item.name+'"?')) return;
+    p_procs.splice(p_procIdx, 1);
+    p_procIdx = 0; p_syncAlias(); p_activeIdx = null;
+    p_closeRenameProc(); p_salvarTudo(); toast('Pasta excluída.');
+    return;
+  }
+  var allProcs = p_procs.filter(function(x){ return x.type === 'process'; });
+  if(allProcs.length <= 1){ alert('Não é possível excluir o único processo.'); return; }
+  if(!confirm('Excluir "'+item.name+'"?')) return;
+  p_procs.splice(p_procIdx, 1);
+  p_procIdx = Math.max(0, p_procIdx - 1);
+  // Garante que p_procIdx aponta para um processo
+  if(p_procs[p_procIdx] && p_procs[p_procIdx].type === 'folder'){
+    var fp = p_procs.find(function(x){ return x.type === 'process'; });
+    p_procIdx = fp ? p_procs.indexOf(fp) : 0;
+  }
+  p_syncAlias(); p_activeIdx = null;
   p_closeRenameProc(); p_render(); p_salvarTudo(); toast('Processo excluído.');
 }
 
-var p_activeIdx=null;
+// ── Mover processo/pasta para outra pasta ──
+var p_moveCurrentFolder = null; // pasta sendo visualizada dentro do modal "Mover para..."
+
+function p_openMoveProc(){
+  var item = p_procs[p_procIdx];
+  if(!item) return;
+
+  var nameEl = document.getElementById('p-move-item-name');
+  nameEl.textContent = 'Movendo: "' + item.name + '"';
+
+  p_moveCurrentFolder = null; // sempre começa na raiz
+  p_renderMoveLevel();
+
+  document.getElementById('p-move-overlay').classList.add('open');
+}
+
+// Renderiza o nível atual de navegação dentro do modal "Mover para..."
+function p_renderMoveLevel(){
+  var item = p_procs[p_procIdx];
+  if(!item) return;
+
+  // Breadcrumb clicável
+  var bc = document.getElementById('p-move-breadcrumb');
+  bc.innerHTML = '';
+  var rootCrumb = document.createElement('span');
+  rootCrumb.style.cssText = 'cursor:pointer;display:flex;align-items:center;gap:3px;' + (p_moveCurrentFolder===null?'font-weight:600;color:#111110;':'color:#a0a09e;');
+  rootCrumb.innerHTML = '<i class="ti ti-home" style="font-size:13px;"></i> Raiz';
+  rootCrumb.onclick = function(){ p_moveCurrentFolder = null; p_renderMoveLevel(); };
+  bc.appendChild(rootCrumb);
+
+  if(p_moveCurrentFolder !== null){
+    var chain = [];
+    var cur = p_procs.find(function(x){ return x.id === p_moveCurrentFolder; });
+    while(cur){ chain.unshift(cur); cur = p_procs.find(function(x){ return x.id === cur.parentId; }); }
+    chain.forEach(function(folder){
+      var sep = document.createElement('span');
+      sep.textContent = '›';
+      sep.style.opacity = '0.5';
+      bc.appendChild(sep);
+      var crumb = document.createElement('span');
+      var isLast = (folder.id === p_moveCurrentFolder);
+      crumb.style.cssText = 'cursor:pointer;' + (isLast ? 'font-weight:600;color:#111110;' : 'color:#a0a09e;');
+      crumb.textContent = folder.name;
+      crumb.onclick = function(){ p_moveCurrentFolder = folder.id; p_renderMoveLevel(); };
+      bc.appendChild(crumb);
+    });
+  }
+
+  // Lista do nível atual: só as subpastas diretas (exceto a própria, se for pasta)
+  var list = document.getElementById('p-move-list');
+  list.innerHTML = '';
+  var folders = p_procs.filter(function(x){
+    return x.type === 'folder' && p_normId(x.parentId) === p_normId(p_moveCurrentFolder) && x.id !== item.id;
+  }).sort(function(a,b){ return (a.order||0)-(b.order||0); });
+
+  if(folders.length === 0){
+    var noFolders = document.createElement('div');
+    noFolders.style.cssText = 'color:#a0a09e;font-size:13px;text-align:center;padding:16px 0;';
+    noFolders.textContent = 'Nenhuma subpasta aqui.';
+    list.appendChild(noFolders);
+  } else {
+    folders.forEach(function(folder){
+      var btn = document.createElement('button');
+      btn.style.cssText = 'width:100%;text-align:left;background:#f4f4f2;color:#111110;border:0.5px solid rgba(0,0,0,0.09);border-radius:8px;padding:12px 14px;font-family:Inter,sans-serif;font-size:13.5px;font-weight:500;cursor:pointer;display:flex;align-items:center;gap:10px;';
+      btn.innerHTML =
+        '<i class="ti ti-folder" style="font-size:15px;color:#c49a00;flex-shrink:0;"></i>' +
+        '<span style="flex:1;">' + folder.name + '</span>' +
+        '<i class="ti ti-chevron-right" style="font-size:14px;opacity:0.5;"></i>';
+      btn.onclick = function(){ p_moveCurrentFolder = folder.id; p_renderMoveLevel(); };
+      list.appendChild(btn);
+    });
+  }
+
+  // Botão "Mover para esta pasta" — esconde se o destino já é o local atual do item
+  var hereBtn = document.getElementById('p-move-here-btn');
+  var isAlreadyHere = (p_normId(item.parentId) === p_normId(p_moveCurrentFolder));
+  if(isAlreadyHere){
+    hereBtn.style.display = 'none';
+  } else {
+    hereBtn.style.display = 'block';
+    hereBtn.textContent = p_moveCurrentFolder === null ? 'Mover para a Raiz' : 'Mover para esta pasta';
+  }
+}
+
+function p_closeMoveProc(){
+  document.getElementById('p-move-overlay').classList.remove('open');
+}
+
+function p_moveItemHere(){
+  p_moveItemTo(p_moveCurrentFolder);
+}
+
+function p_moveItemTo(targetFolderId){
+  var item = p_procs[p_procIdx];
+  if(!item) return;
+  item.parentId = p_normId(targetFolderId);
+  var levelItems = p_getItemsAt(item.parentId);
+  var maxOrder = levelItems.reduce(function(m,x){ return x.id !== item.id ? Math.max(m, x.order||0) : m; }, -1);
+  item.order = maxOrder + 1;
+  p_closeMoveProc();
+  p_closeRenameProc();
+  p_salvarTudo();
+  var destName = item.parentId === null ? 'Raiz' : (p_procs.find(function(x){ return x.id === item.parentId; }) || {name:'?'}).name;
+  toast('Movido para "' + destName + '" ✔');
+}
+var p_inlineEditIdx=null; // índice do card em edição inline (1 clique), null = nenhum
 let p_editIdx=null;
 let p_dragIdx=null;
 let p_ghostEl=null;
@@ -2811,24 +3590,25 @@ const p_flowEl=document.getElementById('p-flow');
 const p_svgEl=document.getElementById('p-linesSvg');
 const p_canvasEl=document.getElementById('p-canvas');
 
-// abrir / fechar
-function abrirProcesso(){
+// abrir / fechar canvas direto (usado internamente e pelo p-select-overlay)
+function _abrirProcessoCanvas(){
   const overlay=document.getElementById('processo-overlay');
   overlay.classList.add('popen');
   document.getElementById('p-fab-wrap').style.display='flex';
   p_fabClose();
   p_canvasEl.scrollTop=0;
-  p_carregarSteps().then(()=>{
-    p_render();
-    function onEnd(e){
-      if(e.propertyName==='transform'){
-        overlay.removeEventListener('transitionend',onEnd);
-        p_drawLines();
-      }
+
+  p_syncAlias();
+  p_render();
+
+  function onEnd(e){
+    if(e.propertyName==='transform'){
+      overlay.removeEventListener('transitionend',onEnd);
+      p_drawLines();
     }
-    overlay.addEventListener('transitionend',onEnd);
-    setTimeout(p_drawLines,450);
-  });
+  }
+  overlay.addEventListener('transitionend',onEnd);
+  setTimeout(p_drawLines, 450);
 }
 function fecharProcesso(){
   document.getElementById('processo-overlay').classList.remove('popen');
@@ -2836,9 +3616,248 @@ function fecharProcesso(){
   p_fabClose();
 }
 
+// ── Tela de listagem de processos (home → "Meu Processo") ──
+var _pl_currentFolderId = null;
+
+function abrirProcesso(){
+  _pl_currentFolderId = null;
+  pl_renderList();
+  document.getElementById('proc-list-overlay').classList.add('pl-open');
+  document.body.style.overflow = 'hidden';
+  document.body.style.position = 'fixed';
+  document.body.style.width = '100%';
+}
+
+function pl_fechar(){
+  document.getElementById('proc-list-overlay').classList.remove('pl-open');
+  document.body.style.overflow = '';
+  document.body.style.position = '';
+  document.body.style.width = '';
+}
+
+function pl_navGoBack(){
+  if(_pl_currentFolderId === null) return;
+  var cur = p_procs.find(function(x){ return x.id === _pl_currentFolderId; });
+  _pl_currentFolderId = cur ? p_normId(cur.parentId) : null;
+  pl_renderList();
+}
+
+function pl_renderList(){
+  var list = document.getElementById('pl-list');
+  list.innerHTML = '';
+
+  // Breadcrumb
+  var bc = document.getElementById('pl-breadcrumb');
+  var crumbs = p_getBreadcrumb(_pl_currentFolderId);
+  if(crumbs.length > 0){
+    bc.textContent = '📁 ' + crumbs.join(' › ');
+    bc.style.display = 'block';
+  } else {
+    bc.style.display = 'none';
+  }
+
+  // Botão voltar de nível
+  var backBtn = document.getElementById('pl-back-btn');
+  backBtn.style.display = (_pl_currentFolderId !== null) ? 'flex' : 'none';
+
+  var items = p_getItemsAt(_pl_currentFolderId);
+
+  if(items.length === 0){
+    var empty = document.createElement('div');
+    empty.style.cssText = 'color:#a0a09e;font-size:13px;text-align:center;padding:40px 0;font-style:italic;';
+    empty.textContent = 'Pasta vazia';
+    list.appendChild(empty);
+    return;
+  }
+
+  items.forEach(function(item){
+    var row = document.createElement('div');
+    row.dataset.plItemId = item.id;
+    // grid: 1fr para o botão principal, auto para o ⋯ (só pastas)
+    // O grid garante altura igual em todas as células sem hacks de height
+    row.style.cssText = item.type === 'folder'
+      ? 'display:grid;grid-template-columns:1fr auto;border-radius:8px;border:0.5px solid rgba(0,0,0,0.09);user-select:none;-webkit-user-select:none;overflow:hidden;'
+      : 'display:grid;grid-template-columns:1fr;border-radius:8px;border:0.5px solid rgba(0,0,0,0.09);user-select:none;-webkit-user-select:none;overflow:hidden;';
+
+    var isActive = (item.type === 'process' && p_procs.indexOf(item) === p_procIdx);
+    var bg = isActive ? '#111110' : '#f4f4f2';
+    var fg = isActive ? '#fff' : '#111110';
+
+    var subCount = '';
+    if(item.type === 'folder'){
+      var inside = p_procs.filter(function(x){ return x.parentId === item.id; }).length;
+      subCount = inside + ' item' + (inside !== 1 ? 's' : '');
+    } else {
+      var steps = item.steps ? item.steps.length : 0;
+      subCount = steps + ' etapa' + (steps !== 1 ? 's' : '');
+    }
+
+    var icon = item.type === 'folder'
+      ? '<i class="ti ti-folder" style="font-size:15px;margin-right:6px;color:#c49a00;"></i>'
+      : '<i class="ti ti-git-branch" style="font-size:15px;margin-right:6px;color:#534AB7;opacity:0.7;"></i>';
+
+    var btnRadius = item.type === 'folder' ? '8px 0 0 8px' : '8px';
+
+    row.innerHTML =
+      '<button style="text-align:left;background:'+bg+';color:'+fg+';border:none;border-radius:'+btnRadius+';padding:12px 14px;font-family:Inter,sans-serif;font-size:13.5px;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;touch-action:manipulation;">'+
+        '<span style="display:flex;align-items:center;color:'+fg+';font-size:13.5px;font-weight:500;">'+icon+'<span style="color:'+fg+';font-size:13.5px;font-weight:500;">'+item.name+'</span></span>'+
+        '<span style="font-size:11px;color:'+fg+';opacity:0.5;">'+subCount+(item.type==='folder'?' <i class="ti ti-chevron-right" style="font-size:11px;vertical-align:-1px;"></i>':'')+'</span>'+
+      '</button>'+
+      (item.type==='folder'
+        ? '<button class="pl-folder-edit-btn" data-fid="'+item.id+'" style="background:'+bg+';border:none;border-left:0.5px solid '+(isActive?'rgba(255,255,255,0.12)':'rgba(0,0,0,0.07)')+';border-radius:0 8px 8px 0;cursor:pointer;color:'+(isActive?'rgba(255,255,255,0.5)':'#a0a09e')+';font-size:17px;padding:0 14px;cursor:pointer;touch-action:manipulation;display:flex;align-items:center;justify-content:center;" title="Editar pasta"><i class="ti ti-dots-vertical"></i></button>'
+        : '');
+
+    var btn = row.querySelector('button');
+    if(item.type === 'folder'){
+      btn.onclick = function(e){
+        e.stopPropagation();
+        _pl_currentFolderId = item.id;
+        pl_renderList();
+      };
+      var editBtn = row.querySelector('.pl-folder-edit-btn');
+      if(editBtn){
+        editBtn.onclick = function(e){
+          e.stopPropagation();
+          p_openRenameFolder(item.id);
+        };
+      }
+    } else {
+      btn.onclick = function(e){
+        e.stopPropagation();
+        pl_fechar();
+        p_procIdx = p_procs.indexOf(item);
+        localStorage.setItem('doa_active_proc_id', String(item.id));
+        p_syncAlias();
+        p_activeIdx = null;
+        _abrirProcessoCanvas();
+      };
+    }
+
+    list.appendChild(row);
+  });
+
+  // Drag-and-drop de reordenação (long press 500ms) — mesma lógica do p_setupNavDrag
+  pl_setupDrag(list);
+}
+
+function pl_setupDrag(list){
+  var rows = Array.from(list.querySelectorAll('[data-pl-item-id]'));
+  if(rows.length < 2) return;
+
+  rows.forEach(function(row){
+    var isDragging = false;
+    var ghostEl = null;
+    var srcId = null;
+    var startY = 0;
+    var lastOver = null;
+    var longPressTimer = null;
+    var activated = false;
+    var touchId = null;
+
+    function startDrag(clientY){
+      if(activated) return;
+      activated = true;
+      isDragging = true;
+      srcId = parseInt(row.dataset.plItemId);
+      startY = clientY;
+      row.style.opacity = '0.4';
+      navigator.vibrate && navigator.vibrate(40);
+
+      ghostEl = row.cloneNode(true);
+      ghostEl.style.cssText = 'position:fixed;left:20px;right:20px;z-index:9999;pointer-events:none;opacity:0.9;border-radius:8px;box-shadow:0 8px 32px rgba(0,0,0,0.18);background:#fff;';
+      var rect = row.getBoundingClientRect();
+      ghostEl.style.top = rect.top + 'px';
+      ghostEl.style.width = rect.width + 'px';
+      document.body.appendChild(ghostEl);
+    }
+
+    function moveDrag(clientY){
+      if(!isDragging) return;
+      var rect = row.parentElement.getBoundingClientRect();
+      ghostEl.style.top = Math.max(rect.top, Math.min(rect.bottom - 50, clientY - 24)) + 'px';
+
+      list.querySelectorAll('[data-pl-item-id]').forEach(function(r){
+        r.style.borderTop = '';
+      });
+      var el = document.elementFromPoint(row.getBoundingClientRect().left + 10, clientY);
+      var targetRow = el ? el.closest('[data-pl-item-id]') : null;
+      if(targetRow && targetRow !== row){
+        targetRow.style.borderTop = '2px solid #534AB7';
+        lastOver = parseInt(targetRow.dataset.plItemId);
+      } else {
+        lastOver = null;
+      }
+    }
+
+    function endDrag(){
+      if(!isDragging){ activated = false; return; }
+      isDragging = false;
+      activated = false;
+      row.style.opacity = '';
+      if(ghostEl){ ghostEl.remove(); ghostEl = null; }
+      list.querySelectorAll('[data-pl-item-id]').forEach(function(r){ r.style.borderTop = ''; });
+
+      if(lastOver !== null && lastOver !== srcId){
+        var levelItems = p_getItemsAt(_pl_currentFolderId);
+        var srcItem = p_procs.find(function(x){ return x.id === srcId; });
+        var dstItem = p_procs.find(function(x){ return x.id === lastOver; });
+        if(srcItem && dstItem){
+          var srcPos = levelItems.indexOf(srcItem);
+          var dstPos = levelItems.indexOf(dstItem);
+          if(srcPos !== -1 && dstPos !== -1){
+            levelItems.splice(srcPos, 1);
+            levelItems.splice(dstPos, 0, srcItem);
+            levelItems.forEach(function(it, i){ it.order = i; });
+            p_salvarTudo();
+            pl_renderList();
+          }
+        }
+      }
+      lastOver = null;
+    }
+
+    // Touch — long press de 500ms ativa drag
+    row.addEventListener('touchstart', function(e){
+      if(e.target.closest('.pl-folder-edit-btn')) return;
+      var t = e.touches[0];
+      touchId = t.identifier;
+      startY = t.clientY;
+      longPressTimer = setTimeout(function(){ startDrag(startY); }, 500);
+    }, {passive:true});
+
+    row.addEventListener('touchmove', function(e){
+      if(!isDragging){
+        var t = Array.from(e.changedTouches).find(function(x){ return x.identifier === touchId; });
+        if(t && Math.abs(t.clientY - startY) > 10){ clearTimeout(longPressTimer); }
+        return;
+      }
+      e.preventDefault();
+      var t = Array.from(e.changedTouches).find(function(x){ return x.identifier === touchId; });
+      if(t) moveDrag(t.clientY);
+    }, {passive:false});
+
+    row.addEventListener('touchend', function(){ clearTimeout(longPressTimer); endDrag(); }, {passive:true});
+    row.addEventListener('touchcancel', function(){ clearTimeout(longPressTimer); endDrag(); }, {passive:true});
+
+    // Mouse — long press de 500ms
+    row.addEventListener('mousedown', function(e){
+      if(e.target.closest('.pl-folder-edit-btn')) return;
+      if(e.target.closest('button')) return;
+      e.preventDefault();
+      longPressTimer = setTimeout(function(){ startDrag(e.clientY); }, 500);
+      function onMove(ev){ if(!isDragging){ clearTimeout(longPressTimer); return; } moveDrag(ev.clientY); }
+      function onUp(){ clearTimeout(longPressTimer); endDrag(); document.removeEventListener('mousemove', onMove); document.removeEventListener('mouseup', onUp); }
+      document.addEventListener('mousemove', onMove);
+      document.addEventListener('mouseup', onUp);
+    });
+  });
+}
+
 // modal add
 function p_openModal(){
   document.getElementById('p-overlay').classList.add('open');
+  const detEl=document.getElementById('p-inp-detail');
+  detEl.style.height='';
   setTimeout(()=>document.getElementById('p-inp-word').focus(),300);
 }
 function p_closeModal(){document.getElementById('p-overlay').classList.remove('open');}
@@ -2850,6 +3869,7 @@ function p_addStep(){
   p_steps.push({word:w,detail:d});
   document.getElementById('p-inp-word').value='';
   document.getElementById('p-inp-detail').value='';
+  document.getElementById('p-inp-detail').style.height='';
   p_activeIdx=null;
   p_salvarSteps(); // salva ANTES de renderizar
   p_closeModal();
@@ -2898,12 +3918,23 @@ document.getElementById('p-inp-detail').addEventListener('keydown',p_listEnter);
 document.getElementById('p-edit-detail').addEventListener('keydown',p_listEnter);
 
 // modal edit
-function p_openEdit(i){
+function p_openEdit(i, caretPos){
   p_editIdx=i;
   document.getElementById('p-edit-word').value=p_steps[i].word;
-  document.getElementById('p-edit-detail').value=p_steps[i].detail||'';
+  const detEl=document.getElementById('p-edit-detail');
+  detEl.value=p_steps[i].detail||'';
+  detEl.style.height='';
+  detEl.style.height=detEl.scrollHeight+'px';
   document.getElementById('p-edit-overlay').classList.add('open');
-  setTimeout(()=>document.getElementById('p-edit-word').focus(),300);
+  if(caretPos!==null && caretPos!==undefined){
+    // Abre com o foco e o cursor exatamente onde o usuário tocou no texto.
+    setTimeout(()=>{
+      detEl.focus();
+      detEl.selectionStart=detEl.selectionEnd=Math.min(caretPos, detEl.value.length);
+    },300);
+  } else {
+    setTimeout(()=>document.getElementById('p-edit-word').focus(),300);
+  }
 }
 function p_closeEdit(){
   if(p_editIdx!==null){
@@ -2912,6 +3943,7 @@ function p_closeEdit(){
     if(w && (w!==p_steps[p_editIdx].word || d!==(p_steps[p_editIdx].detail||''))){
       p_steps[p_editIdx]={word:w,detail:d};
       p_activeIdx=null;
+      p_inlineEditIdx=null;
       p_salvarSteps();
       p_render();
       toast('Etapa salva automaticamente ✔');
@@ -2928,6 +3960,7 @@ function p_saveEdit(){
   if(!w)return;
   p_steps[p_editIdx]={word:w,detail:d};
   p_activeIdx=null;
+  p_inlineEditIdx=null;
   p_salvarSteps(); // salva ANTES de renderizar
   p_closeEdit();
   p_render();
@@ -2938,9 +3971,108 @@ function p_deleteStep(){
   p_steps.splice(p_editIdx,1);
   if(p_activeIdx===p_editIdx)p_activeIdx=null;
   else if(p_activeIdx>p_editIdx)p_activeIdx--;
-  p_closeEdit();p_render();p_salvarSteps();
+  if(p_inlineEditIdx===p_editIdx)p_inlineEditIdx=null;
+  else if(p_inlineEditIdx>p_editIdx)p_inlineEditIdx--;
+  // Fecha o modal diretamente (sem passar por p_closeEdit, que reaproveitaria
+  // o texto ainda preenchido no campo e recriaria a etapa recém-excluída).
+  document.getElementById('p-edit-overlay').classList.remove('open');
+  p_editIdx=null;
+  p_render();
+  p_salvarSteps();
 }
 document.getElementById('p-edit-word').addEventListener('keydown',e=>{if(e.key==='Enter')p_saveEdit();});
+
+// ── Edição inline (1 clique no card) ─────────────────────────────────────
+// Salva o que foi digitado no textarea inline e volta o card ao modo leitura.
+function p_commitInlineEdit(i){
+  if(p_inlineEditIdx!==i)return; // já saiu desse modo por outro caminho
+  const el=document.getElementById('p-inline-detail-'+i);
+  if(!el)return;
+  const d=el.value.trim();
+  if(d!==(p_steps[i].detail||'')){
+    p_steps[i]={word:p_steps[i].word, detail:d};
+    p_salvarSteps();
+  }
+  p_inlineEditIdx=null;
+  p_render();
+}
+
+// Converte a coordenada (clientX, clientY) de um toque/clique na posição
+// correspondente de caractere dentro do valor de um campo de texto, usando
+// a API nativa do navegador para textareas/divs (caretRangeFromPoint /
+// caretPositionFromPoint). Retorna null se não for possível calcular —
+// nesse caso o modal abre normalmente, sem cursor pré-posicionado.
+function p_caretPosFromPoint(el, x, y){
+  try{
+    if(el.tagName==='TEXTAREA'){
+      // Em textareas não há range nativo; aproxima usando um elemento
+      // espelho invisível com o mesmo texto e estilo para medir a posição.
+      return p_caretPosInTextarea(el, x, y);
+    }
+    // Para elementos renderizados (divs com HTML), usa a API de range do navegador.
+    let range=null;
+    if(document.caretRangeFromPoint){
+      range=document.caretRangeFromPoint(x,y);
+    } else if(document.caretPositionFromPoint){
+      const pos=document.caretPositionFromPoint(x,y);
+      if(pos){ range=document.createRange(); range.setStart(pos.offsetNode,pos.offset); }
+    }
+    if(!range)return null;
+    // Mapeia o nó/offset do range de volta para um índice no texto plano
+    // (markdown original), comparando contra o texto visível do elemento.
+    const pre=document.createRange();
+    pre.selectNodeContents(el);
+    pre.setEnd(range.startContainer, range.startOffset);
+    return pre.toString().length;
+  }catch(err){
+    return null;
+  }
+}
+
+// Aproxima a posição do caractere tocado dentro de um <textarea>, usando um
+// <div> espelho (mesma fonte/tamanho/largura) só para medir — nunca exibido.
+// Calcula por linha (rápido, O(linhas)) e depois por coluna dentro da linha
+// encontrada, em vez de testar caractere por caractere — importante para
+// textos longos, onde a versão ingênua ficaria lenta.
+function p_caretPosInTextarea(textarea, x, y){
+  const style=getComputedStyle(textarea);
+  const lineHeight=parseFloat(style.lineHeight)||(parseFloat(style.fontSize)*1.4);
+  const rect=textarea.getBoundingClientRect();
+  const relX=x-rect.left-textarea.clientLeft+textarea.scrollLeft;
+  const relY=y-rect.top-textarea.clientTop+textarea.scrollTop;
+
+  const lines=textarea.value.split('\n');
+  const lineIdx=Math.max(0, Math.min(lines.length-1, Math.floor(relY/lineHeight)));
+
+  // Soma o tamanho das linhas anteriores (+1 por cada \n) para achar o offset inicial da linha.
+  let baseOffset=0;
+  for(let i=0;i<lineIdx;i++) baseOffset += lines[i].length+1;
+
+  const lineText=lines[lineIdx];
+  if(!lineText) return baseOffset;
+
+  // Mede a linha encontrada com um espelho de uma linha só, testando cada
+  // caractere dessa linha — bem mais barato que percorrer o texto inteiro.
+  const mirror=document.createElement('span');
+  ['fontFamily','fontSize','fontWeight','letterSpacing']
+    .forEach(p=>{ mirror.style[p]=style[p]; });
+  mirror.style.position='absolute';
+  mirror.style.visibility='hidden';
+  mirror.style.whiteSpace='pre';
+  document.body.appendChild(mirror);
+
+  let bestCol=lineText.length;
+  let bestDist=Infinity;
+  for(let col=0;col<=lineText.length;col++){
+    mirror.textContent=lineText.slice(0,col);
+    const w=mirror.getBoundingClientRect().width;
+    const dist=Math.abs(w-relX);
+    if(dist<bestDist){ bestDist=dist; bestCol=col; }
+  }
+  document.body.removeChild(mirror);
+
+  return baseOffset+bestCol;
+}
 
 // render
 function p_render(){
@@ -2959,23 +4091,75 @@ function p_render(){
     row.dataset.idx=i;
 
     const card=document.createElement('div');
-    card.className='p-step-card'+(p_activeIdx===i?' active':'')+(s.done?' done':'');
+    card.className='p-step-card'+(p_activeIdx===i?' active':'')+(s.done?' done':'')+(p_inlineEditIdx===i?' inline-editing':'');
     card.dataset.idx=i;
 
-    card.innerHTML=`
-      <div class="p-s-word">${s.word}</div>
-      ${s.detail?`<div class="p-s-detail">${parseMarkdown(s.detail)}</div>`:''}
-    `;
+    if(p_inlineEditIdx===i){
+      // Modo edição inline: descrição vira textarea editável no próprio card.
+      card.innerHTML=`
+        <div class="p-s-word">${s.word}</div>
+        <textarea class="p-s-inline-edit" id="p-inline-detail-${i}" oninput="p_autoGrow(this)">${s.detail||''}</textarea>
+      `;
+    } else {
+      card.innerHTML=`
+        <div class="p-s-word">${s.word}</div>
+        ${s.detail?`<div class="p-s-detail">${parseMarkdown(s.detail)}</div>`:''}
+      `;
+    }
 
     // Checkbox click removido — checks agora ficam na descrição
 
-    card.addEventListener('click',e=>{
-      if(p_dragIdx!==null||p_justDragged)return;
-      if(p_activeIdx===i){ p_openEdit(i); }
-      else { p_activeIdx=i;p_render(); }
-    });
+    if(p_inlineEditIdx===i){
+      // No modo inline: 1 clique no textarea NÃO abre o modal — só edita ali.
+      // 2 cliques (duplo toque) no texto abre o modal tradicional, posicionando
+      // o cursor no ponto exato onde o usuário tocou.
+      const inlineEl=card.querySelector('.p-s-inline-edit');
+      inlineEl.addEventListener('blur',()=>{ p_commitInlineEdit(i); });
+      inlineEl.addEventListener('dblclick',e=>{
+        e.preventDefault();
+        const caretPos=p_caretPosFromPoint(inlineEl,e.clientX,e.clientY);
+        p_commitInlineEdit(i);
+        p_openEdit(i, caretPos);
+      });
+      card.addEventListener('click',e=>{ e.stopPropagation(); });
+    } else {
+      // 3 estados por clique simples: fechado → leitura (active) → inline.
+      // Duplo-clique, em qualquer um dos dois primeiros estados, vai direto
+      // ao modal tradicional, com o cursor na posição tocada.
+      let clickTimer=null;
+      card.addEventListener('click',e=>{
+        if(p_dragIdx!==null||p_justDragged)return;
+        if(clickTimer){ clearTimeout(clickTimer); clickTimer=null; return; } // é o 2º clique de um duplo-clique — ignora aqui, dblclick trata
+        clickTimer=setTimeout(()=>{
+          clickTimer=null;
+          if(p_activeIdx===i){
+            // já estava em modo leitura → avança para edição inline.
+            if(s.detail!==undefined){
+              p_activeIdx=null;
+              p_inlineEditIdx=i;
+              p_render();
+            } else {
+              // sem descrição, não há o que editar inline — vai direto ao modal.
+              p_openEdit(i);
+            }
+          } else {
+            // card fechado → abre modo leitura (bonito, expandido).
+            p_activeIdx=i;
+            p_render();
+          }
+        },250);
+      });
+      card.addEventListener('dblclick',e=>{
+        e.preventDefault();
+        const detailEl=card.querySelector('.p-s-detail');
+        const caretPos=detailEl?p_caretPosFromPoint(detailEl,e.clientX,e.clientY):null;
+        p_openEdit(i, caretPos);
+      });
+    }
 
-    p_setupDrag(card,i);
+    if(p_inlineEditIdx!==i){
+      p_setupDrag(card,i);
+    }
     row.appendChild(card);
     p_flowEl.appendChild(row);
 
@@ -2985,6 +4169,20 @@ function p_render(){
       p_flowEl.appendChild(sp);
     }
   });
+
+  // Foca automaticamente o textarea inline, se algum card estiver nesse modo,
+  // posicionando o cursor no final do texto (edição contínua mais natural).
+  if(p_inlineEditIdx!==null){
+    const inlineEl=document.getElementById('p-inline-detail-'+p_inlineEditIdx);
+    if(inlineEl){
+      setTimeout(()=>{
+        inlineEl.focus();
+        inlineEl.selectionStart=inlineEl.selectionEnd=inlineEl.value.length;
+        inlineEl.style.height='';
+        inlineEl.style.height=inlineEl.scrollHeight+'px';
+      },50);
+    }
+  }
 
   // Aguarda o layout estabilizar completamente antes de desenhar as linhas
   setTimeout(p_drawLines, 80);
@@ -3191,7 +4389,10 @@ function p_setupDrag(card, idx){
 p_canvasEl.addEventListener('scroll',()=>requestAnimationFrame(p_drawLines));
 p_canvasEl.addEventListener('contextmenu',e=>e.preventDefault());
 p_canvasEl.addEventListener('click',e=>{
-  if(!e.target.closest('.p-step-card')&&p_activeIdx!==null){p_activeIdx=null;p_render();}
+  if(!e.target.closest('.p-step-card')){
+    if(p_inlineEditIdx!==null) p_commitInlineEdit(p_inlineEditIdx);
+    else if(p_activeIdx!==null){p_activeIdx=null;p_render();}
+  }
 });
 
 // Formatação inline no textarea
@@ -3239,6 +4440,33 @@ function p_fmt(id, type){
   el.focus();
 }
 window.p_fmt=p_fmt;
+
+// ── Auto-grow do textarea sem resetar height a cada tecla ──
+// O padrão antigo (height='auto' a cada input) força um reflow que faz o
+// Chrome mobile perder a posição de scroll e "saltar" para outro ponto do
+// modal enquanto o usuário digita. Aqui só aumentamos a altura quando o
+// conteúdo realmente excede a altura atual — nunca resetamos antes de medir.
+function p_autoGrow(el){
+  if(el.scrollHeight > el.clientHeight){
+    el.style.height = el.scrollHeight + 'px';
+  }
+}
+window.p_autoGrow = p_autoGrow;
+
+// ── Correção: --p-modal-maxh sincronizado com a altura real visível (sem o
+// teclado), em vez de usar 92vh fixo, que ignora o espaço ocupado pelo teclado.
+(function(){
+  function p_updateModalMaxH(){
+    var vh = (window.visualViewport && window.visualViewport.height) || window.innerHeight;
+    document.documentElement.style.setProperty('--p-modal-maxh', (vh*0.92)+'px');
+  }
+  p_updateModalMaxH();
+  if(window.visualViewport){
+    window.visualViewport.addEventListener('resize', p_updateModalMaxH);
+  } else {
+    window.addEventListener('resize', p_updateModalMaxH);
+  }
+})();
 </script>
 </body>
   </html>
