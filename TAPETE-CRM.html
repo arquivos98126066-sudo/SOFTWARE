@@ -45,13 +45,14 @@
 
     .sec-title{font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin:4px 0 10px}
 
-    .alerta-card{background:var(--card);border-radius:var(--r);padding:13px;margin-bottom:8px;
-      box-shadow:var(--shadow);border-left:4px solid var(--primary);display:flex;align-items:center;gap:10px}
-    .alerta-icon{font-size:22px;flex-shrink:0}
+    .alerta-card{background:var(--card);border-radius:14px;padding:16px;margin-bottom:10px;
+      box-shadow:var(--shadow);border-left:4px solid var(--primary);display:flex;align-items:center;gap:12px}
+    .alerta-icon{flex-shrink:0;display:flex;align-items:center;justify-content:center;width:22px;height:22px}
     .alerta-info{flex:1;min-width:0}
-    .alerta-titulo{font-size:13px;font-weight:700}
-    .alerta-sub{font-size:11px;color:var(--muted);margin-top:2px}
-    .alerta-dias{background:#fff;color:#111;border:1.5px solid #d1d5db;border-radius:20px;padding:2px 10px;font-size:11px;font-weight:800;flex-shrink:0}
+    .alerta-titulo{font-size:15px;font-weight:800;color:#111;line-height:1.3}
+    .alerta-sub{font-size:12.5px;color:var(--muted);margin-top:5px;font-weight:600}
+    .alerta-nota{font-size:12px;color:#9ca3af;margin-top:6px;padding-top:6px;border-top:1px solid #f1f5f9;font-style:italic;line-height:1.4}
+    .alerta-dias{background:#fff;color:#111;border:1.5px solid #d1d5db;border-radius:20px;padding:4px 12px;font-size:11.5px;font-weight:800;flex-shrink:0}
 
     .filter-dropdown{position:relative;margin-bottom:12px;z-index:50}
     .filter-trigger{width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:10px;
@@ -171,11 +172,10 @@
 
     .bottom-nav{position:fixed;bottom:0;left:0;right:0;background:var(--card);
       display:flex;box-shadow:0 -2px 8px rgba(0,0,0,.08);z-index:150;padding-bottom:env(safe-area-inset-bottom)}
-    .bnav-btn{flex:1;padding:10px 4px 9px;border:none;background:none;cursor:pointer;position:relative;
+  .bnav-btn{flex:1;padding:18px 4px 20px;border:none;background:none;cursor:pointer;position:relative;
       font-size:10px;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:3px;min-width:0;position:relative;}
-    .bnav-btn .ico{font-size:22px}
+    .bnav-btn .ico{font-size:27px}
     .bnav-btn.active{color:#111111;font-weight:800;}
-    .bnav-btn.active::after{content:'';position:absolute;bottom:0;left:20%;right:20%;height:3px;background:#111111;border-radius:4px 4px 0 0;}
 
     .status-pill{padding:3px 9px;border-radius:20px;font-size:10px;font-weight:800;text-transform:uppercase;white-space:nowrap;flex-shrink:0}
     .status-ativo{background:#f5f5f5;color:#374151}
@@ -186,8 +186,8 @@
     .tl-item{display:flex;gap:11px;padding-bottom:14px;position:relative}
     .tl-item:not(:last-child)::before{content:'';position:absolute;left:13px;top:28px;bottom:0;width:2px;background:var(--border)}
     .tl-dot{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0}
-    .tl-dot.sent{background:#e8f5e9}
-    .tl-dot.pending{background:#fff8e1}
+    .tl-dot.sent{background:#e8f5e9;color:#22c55e}
+    .tl-dot.pending{background:#fff8e1;color:#ca8a04}
     .tl-ttl{font-weight:700;font-size:13px}
     .tl-sub{font-size:11px;color:var(--muted);margin-top:2px}
 
@@ -484,7 +484,7 @@
       <div style="margin-bottom:13px"></div>
 
       <!-- campos ocultos tapete 1 para compatibilidade com salvamento -->
-      <label class="cad-label-field">MEDIDA DO TAPETE</label>
+      <label class="cad-label-field">PRODUTO / MEDIDA</label>
       <input type="text" id="cad_medida" class="tap-input" readonly style="background:#f0f4ff;color:#374151;font-weight:700">
       <input type="text" id="cad_cor" style="display:none">
 
@@ -570,7 +570,7 @@
   <div class="cad-mbox" onclick="event.stopPropagation()" style="max-height:80vh;border-radius:24px 24px 0 0;padding:0;overflow:hidden">
     <!-- Header -->
     <div style="background:linear-gradient(135deg,#1e293b,#334155);padding:18px 20px 16px;color:#fff;display:flex;justify-content:space-between;align-items:center">
-      <div style="font-size:1rem;font-weight:900">💰 Informar Custo</div>
+      <div style="font-size:1rem;font-weight:900">Informar Custo</div>
       <button onclick="cadFComp()" style="background:rgba(255,255,255,.15);border:none;color:#fff;border-radius:50%;width:30px;height:30px;font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center">✕</button>
     </div>
     <!-- Info do pedido -->
@@ -587,13 +587,13 @@
     <div class="cad-mtitle" id="cad_dtit">Detalhes</div>
     <div id="cad_dcorp"></div>
     <div class="cad-divider"></div>
-    <div class="cad-stitle" style="font-size:.82rem">📸 Fotos do Cliente</div>
+    <div class="cad-stitle" style="font-size:.82rem">Fotos do Cliente</div>
     <div id="cad_det_fotos"></div>
     <input type="file" id="cad_det_foto_input" accept="image/*" capture="environment" style="display:none" onchange="cadAdicionarFotoDet(this)">
     <input type="file" id="cad_det_galeria_input" accept="image/*" style="display:none" onchange="cadAdicionarFotoDet(this)">
-    <button class="cad-btn cad-btn-s" style="margin-top:10px" onclick="cadAbrirEscolhaFotoDet()">➕ Adicionar foto</button>
+    <button class="cad-btn cad-btn-s" style="margin-top:10px" onclick="cadAbrirEscolhaFotoDet()">Adicionar foto</button>
     <div class="cad-divider"></div>
-    <button class="cad-btn cad-btn-g" style="font-size:.82rem" onclick="cadCopiarCmdRemover()">📝 Copiar comando (remover fundo)</button>
+    <button class="cad-btn cad-btn-g" style="font-size:.82rem" onclick="cadCopiarCmdRemover()">Copiar comando (remover fundo)</button>
     <button class="cad-btn cad-btn-g" onclick="cadFDet()">Fechar</button>
   </div>
 </div>
@@ -774,14 +774,14 @@
     <div class="tap-mtitle" id="dtit">Detalhes</div>
     <div id="dcorp"></div>
     <div class="tap-div"></div>
-    <div class="tap-stitle" style="font-size:.82rem">📸 Fotos do Cliente</div>
+    <div class="tap-stitle" style="font-size:.82rem">Fotos do Cliente</div>
     <div id="det_fotos"></div>
     <input type="file" id="det_foto_input" accept="image/*" capture="environment" style="display:none" onchange="adicionarFotoDet(this)">
     <input type="file" id="det_galeria_input" accept="image/*" style="display:none" onchange="adicionarFotoDet(this)">
-    <button class="tap-btn tap-btn-s tap-btn-full" style="margin-top:10px" onclick="abrirEscolhaFoto('det')">➕ Adicionar foto</button>
+    <button class="tap-btn tap-btn-s tap-btn-full" style="margin-top:10px" onclick="abrirEscolhaFoto('det')">Adicionar foto</button>
     <div class="tap-div"></div>
-    <button class="tap-btn tap-btn-g tap-btn-full" style="margin-top:8px;font-size:.82rem" onclick="copiarCmdDet()">📝 Copiar comando (remover fundo)</button>
-    <button class="tap-ext-btn tap-ext-copilot" onclick="abrirCopilot()">🤖 Abrir Copilot</button>
+    <button class="tap-btn tap-btn-g tap-btn-full" style="margin-top:8px;font-size:.82rem" onclick="copiarCmdDet()">Copiar comando (remover fundo)</button>
+    <button class="tap-ext-btn tap-ext-copilot" onclick="abrirCopilot()">Abrir Copilot</button>
     <div class="tap-brow"><button class="tap-btn tap-btn-g tap-btn-sm" onclick="fDet()">Fechar</button></div>
   </div>
 </div>
@@ -816,8 +816,6 @@
     <div class="metric-card"><div class="val" id="m-hoje">0</div><div class="lbl">Hoje</div></div>
   </div>
   <div id="alertas-section"></div>
-  <div class="sec-title">📋 AÇÕES DE HOJE</div>
-  <div id="hoje-list"></div>
 </div>
 
 <!-- ── CLIENTES ── -->
@@ -850,25 +848,6 @@
   <input id="reg-ghost-input" type="text" inputmode="text"
     style="position:absolute;opacity:0;pointer-events:none;width:1px;height:1px;top:60px;left:0"
     onkeydown="regKeyDown(event,'__ghost')" oninput="regGhostInput(this)">
-  <div id="reg-nome-initial" class="reg-step">
-    <div class="reg-step-label">👤 Nome do cliente</div>
-    <input id="reg-nome-static" class="reg-step-input" type="text" inputmode="text" autocomplete="off"
-      oninput="regInputChange(this,'nome')"
-      onkeydown="regKeyDown(event,'nome')">
-    <div class="reg-step-hint">Opcional — deixe em branco se não souber</div>
-    <div style="display:flex;gap:10px;margin-top:16px;padding-bottom:8px;position:relative;z-index:10">
-      <button onclick="regVoltar()" style="flex:1;min-height:52px;border-radius:14px;border:2px solid #e5e7eb;
-        background:#f3f4f6;color:#111;font-size:15px;font-weight:700;
-        font-family:inherit;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px">
-        ← Voltar
-      </button>
-      <button onclick="regNomeAvancar()" style="flex:2;min-height:52px;border-radius:14px;border:none;
-        background:#111;color:#fff;font-size:15px;font-weight:700;
-        font-family:inherit;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px">
-        Próximo →
-      </button>
-    </div>
-  </div>
   <div id="reg-steps-container"></div>
 
   <!-- Botão invisível para abrir teclado no primeiro toque -->
@@ -931,7 +910,7 @@
 <div class="screen" id="screen-lixeira">
   <div style="padding:16px;">
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
-      <button onclick="showScreen('home');setNav(2)" style="background:none;border:none;font-size:22px;cursor:pointer;color:var(--primary);">←</button>
+      <button onclick="showScreen('home');setNav(1)" style="background:none;border:none;font-size:22px;cursor:pointer;color:var(--primary);">←</button>
       <div style="font-size:18px;font-weight:700;color:var(--text);">🗑️ Lixeira</div>
     </div>
     <div id="lixeira-tapete-lista"></div>
@@ -969,10 +948,7 @@
   <button class="bnav-btn active" id="bnav-0"
     ontouchend="event.preventDefault();voltarRegistrar()"
     onclick="voltarRegistrar()"><span class="ico">➕</span>REGISTRAR</button>
-  <button class="bnav-btn" id="bnav-1" onclick="sairDoRegistrar();showScreen('fila');setNav(1);renderFila()"><span class="ico">📬</span>FILA</button>
-  <button class="bnav-btn" id="bnav-2" onclick="sairDoRegistrar();showScreen('clientes');setNav(2)"><span class="ico">👥</span>CLIENTES</button>
-  <button class="bnav-btn" id="bnav-3" onclick="sairDoRegistrar();showScreen('home');setNav(3)"><span class="ico">🏠</span>HOJE</button>
-  <button class="bnav-btn" id="bnav-4" onclick="sairDoRegistrar();showScreen('config');setNav(4)"><span class="ico">⚙️</span>CONFIG</button>
+  <button class="bnav-btn" id="bnav-1" onclick="sairDoRegistrar();showScreen('home');setNav(1)"><span class="ico" style="position:relative;display:inline-flex;font-size:22px">🏠</span>HOJE</button>
 </div>
 
 <!-- MODAL OPÇÕES -->
@@ -1169,6 +1145,44 @@ let _regFotoQtd=1; // quantas fotos devem ser capturadas
 let _regFotoIdx=0; // qual foto está sendo capturada agora (0-based)
 let _regFotoEscolha=false; // se true, está mostrando o modal de escolha de quantidade
 
+// ── VENDA DE PRODUTOS (fluxo alternativo, sem foto/tamanho/cor de tapete) ─────
+const PRODUTO_CATEGORIAS = [
+  { id:'capilares', label:'Capilares', produtos:[
+      {nome:'Nutrafit', valor:157.90},
+      {nome:'SOS Crescimento', valor:197.00},
+      {nome:'Hidraliso', valor:147.00}
+    ]},
+  { id:'cuidados', label:'Cuidados', produtos:[
+      {nome:'Gel tira dor', valor:29.00},
+      {nome:'Sabonete íntimo', valor:24.00},
+      {nome:'Xarope', valor:24.00}
+    ]},
+  { id:'perfumes', label:'Perfumes', produtos:[
+      {nome:'Latitude Stamina', valor:169.00},
+      {nome:'Latitude Ultra', valor:169.00},
+      {nome:'Pérola Ela', valor:169.00}
+    ]},
+  { id:'digitais', label:'Digitais', produtos:[
+      {nome:'Criação de SaaS', valor:597.00},
+      {nome:'Criação de site', valor:497.00},
+      {nome:'Tráfego pago', valor:0} // valor calculado à parte (min(50% investimento, 1500))
+    ]}
+];
+window.PRODUTO_CATEGORIAS = PRODUTO_CATEGORIAS;
+let _regProdutoCatAberta = null; // id da categoria com lista de produtos aberta
+const PRODUTO_CATEGORIA_ICONS = {
+  capilares: '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2c-3.5 4.5-6 8.2-6 11.2A6 6 0 0 0 12 19a6 6 0 0 0 6-5.8C18 10.2 15.5 6.5 12 2z"/><path d="M9.5 14c0 1.4 1.1 2.5 2.5 2.5"/></svg>',
+  cuidados:  '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20.5 6.5a4.5 4.5 0 0 0-8.5-2 4.5 4.5 0 0 0-8.5 2c0 5 8.5 12.5 8.5 12.5s8.5-7.5 8.5-12.5z"/><path d="M12 8v5M9.5 10.5h5"/></svg>',
+  perfumes:  '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2h4M11 2v3.2c0 .5-.2.9-.6 1.2C9 7.4 8 9 8 11v8a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2v-8c0-2-1-3.6-2.4-4.6-.4-.3-.6-.7-.6-1.2V2"/><path d="M8 13h8"/></svg>',
+  digitais:  '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/></svg>'
+};
+const PRODUTO_CATEGORIA_COR = {
+  capilares: '#16a34a',
+  cuidados:  '#db2777',
+  perfumes:  '#7c3aed',
+  digitais:  '#2563eb'
+};
+
 // ── PERSISTÊNCIA DO ESTADO DO REGISTRAR (IndexedDB + localStorage fallback) ───
 // Mesma estratégia do ESTUDO.html: dual-layer, merge por updatedAt, block guard
 
@@ -1225,24 +1239,30 @@ function regLoadLocal() {
 }
 
 function regDeleteLocal() {
-  // Remove do IndexedDB
-  try {
-    const req = indexedDB.open('meus_apps_backup', 1);
-    req.onsuccess = e => {
-      try {
-        const tx = e.target.result.transaction('data', 'readwrite');
-        tx.objectStore('data').delete(REG_STATE_KEY);
-      } catch(_) {}
-    };
-  } catch(_) {}
-  // Remove do localStorage
-  try { localStorage.removeItem(REG_STATE_KEY); } catch(_) {}
+  return new Promise(resolve => {
+    // Remove do localStorage imediatamente (síncrono)
+    try { localStorage.removeItem(REG_STATE_KEY); } catch(_) {}
+    // Remove do IndexedDB e só resolve quando a operação terminar de fato
+    try {
+      const req = indexedDB.open('meus_apps_backup', 1);
+      req.onupgradeneeded = e => e.target.result.createObjectStore('data');
+      req.onsuccess = e => {
+        try {
+          const tx = e.target.result.transaction('data', 'readwrite');
+          const del = tx.objectStore('data').delete(REG_STATE_KEY);
+          del.onsuccess = () => resolve();
+          del.onerror = () => resolve();
+        } catch(_) { resolve(); }
+      };
+      req.onerror = () => resolve();
+    } catch(_) { resolve(); }
+  });
 }
 
 // ── SALVAR ESTADO ─────────────────────────────────────────────────────────────
 function salvarEstadoRegistrar() {
   // Formulário vazio — limpa estado salvo
-  if (!REG_DATA.nome && !REG_DATA.tel && regCurStep === 0) {
+  if (regCurStep === 0 && !tempFoto) {
     regDeleteLocal();
     return;
   }
@@ -1286,6 +1306,11 @@ async function restaurarEstadoRegistrar() {
   _regFotoQtd = (estado._regFotoQtd !== undefined && estado._regFotoQtd !== null) ? estado._regFotoQtd : 1;
   tempImgIA = estado.tempImgIA || null;
   window._regFezGemini = !!estado._regFezGemini;
+  // Estado de uma estrutura de formulário antiga/incompatível — descarta com segurança
+  if (regCurStep > regActiveSteps().length) {
+    regDeleteLocal();
+    return false;
+  }
   return true;
 }
 
@@ -1301,6 +1326,7 @@ document.addEventListener('visibilitychange', function() {
   regLoadLocal().then(function(estado) {
     if (!estado || !estado.REG_DATA) return;
     if (!estado.updatedAt || Date.now() - estado.updatedAt > REG_STATE_MAX_AGE) return;
+    if (estado.REG_DATA._modoProduto) return; // nunca restaura produto travado aqui
 
     if (curScreen !== 'registrar') {
       // Estava em outra tela — navega de volta e restaura
@@ -1605,7 +1631,7 @@ async function syncPending() {
 }
 
 // ── NAV ───────────────────────────────────────────────────────────────────────
-const ROOT_SCREENS = ['registrar','fila','clientes','home','config'];
+const ROOT_SCREENS = ['registrar','home'];
 
 function showScreen(name, push=true){
   if(push && curScreen!==name) stack.push(curScreen);
@@ -1637,12 +1663,8 @@ function showScreen(name, push=true){
 
   if(name==='fila') renderFila();
   if(name==='registrar'){
-    const inp = document.getElementById('reg-nome-static');
-    if(inp && regCurStep===0) inp.focus();
-    else {
-      const ghost=document.getElementById('reg-ghost-input');
-      if(ghost){ ghost.value=''; ghost.focus(); }
-    }
+    const ghost=document.getElementById('reg-ghost-input');
+    if(ghost){ ghost.value=''; ghost.focus(); }
   }
 }
 window.showScreen = showScreen;
@@ -1673,6 +1695,16 @@ window.sairDoRegistrar = sairDoRegistrar;
 function voltarRegistrar(){
   if(typeof curScreen !== 'undefined' && curScreen === 'registrar') return;
   regLoadLocal().then(function(estado){
+    // Nunca restaura automaticamente um cadastro de PRODUTO travado —
+    // isso protege o fluxo de tapete de ser contaminado por _modoProduto.
+    if(estado && estado.REG_DATA && estado.REG_DATA._modoProduto){
+      regDeleteLocal();
+      showScreen('registrar', false);
+      setNav(0);
+      initForm();
+      renderRegStep();
+      return;
+    }
     if(estado && estado.REG_DATA &&
        estado.updatedAt && Date.now() - estado.updatedAt < REG_STATE_MAX_AGE && estado.regCurStep > 0){
       restaurarEstadoRegistrar().then(function(ok){
@@ -1686,12 +1718,13 @@ function voltarRegistrar(){
       showScreen('registrar', false);
       setNav(0);
       initForm();
-      setTimeout(function(){ document.getElementById('reg-nome-static') && document.getElementById('reg-nome-static').focus(); }, 100);
+      renderRegStep();
     }
   }).catch(function(){
     showScreen('registrar', false);
     setNav(0);
     initForm();
+    renderRegStep();
   });
 }
 window.voltarRegistrar = voltarRegistrar;
@@ -1734,69 +1767,80 @@ function renderHome(){
   document.getElementById('m-fechados').textContent=fechados;
   document.getElementById('m-hoje').textContent=hj.length;
 
-  const alertas=[];
-  clients.filter(c=>c.status==='ativo'&&!c._naFila).forEach(c=>{
-    const nd=nextDate(c); if(!nd) return;
-    const diff=daysUntil(nd);
-    if(diff>=1&&diff<=7) alertas.push({c,diff,nd});
-  });
+  let _proxFiltro;
+  try { _proxFiltro = JSON.parse(localStorage.getItem('_proxFiltro')||'"semana"'); } catch(_){ _proxFiltro = 'semana'; }
+  const todosComData = clients.filter(c=>c.status==='ativo'&&!c._naFila).map(c=>{
+    const nd=nextDate(c); return nd ? {c, nd, diff:daysUntil(nd)} : null;
+  }).filter(Boolean);
+
+  let alertas;
+  if(_proxFiltro==='hoje'){
+    alertas = todosComData.filter(x=>x.diff===0);
+  } else if(_proxFiltro==='semana'){
+    alertas = todosComData.filter(x=>x.diff>=0&&x.diff<=7);
+  } else if(_proxFiltro && _proxFiltro.mes!==undefined){
+    alertas = todosComData.filter(x=>{
+      const d=new Date(x.nd+'T00:00:00');
+      return d.getFullYear()===_proxFiltro.ano && d.getMonth()===_proxFiltro.mes;
+    });
+  } else if(_proxFiltro && _proxFiltro.ano!==undefined){
+    alertas = todosComData.filter(x=>new Date(x.nd+'T00:00:00').getFullYear()===_proxFiltro.ano);
+  } else {
+    alertas = todosComData.filter(x=>x.diff>=0&&x.diff<=7);
+  }
+
   const aEl=document.getElementById('alertas-section');
+  const MESES=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+  const isMes = _proxFiltro && _proxFiltro.mes!==undefined;
+  const isAno = _proxFiltro && _proxFiltro.ano!==undefined && _proxFiltro.mes===undefined;
+  const labelMes = isMes ? MESES[_proxFiltro.mes]+'/'+_proxFiltro.ano : 'Mês';
+  const labelAno = isAno ? String(_proxFiltro.ano) : 'Ano';
+  const _filtroBar = `<div style="display:flex;gap:8px;margin-bottom:14px">
+    ${[['hoje','Hoje',_proxFiltro==='hoje'],['semana','Semana',_proxFiltro==='semana'],['mes',labelMes,isMes],['ano',labelAno,isAno]].map(([k,label,ativo])=>`
+      <button onclick="window._proxFiltroClick('${k}')" style="flex:1;padding:8px 8px;border-radius:20px;border:1.5px solid ${ativo?'#111':'#e5e7eb'};background:${ativo?'#111':'#fff'};color:${ativo?'#fff':'#6b7280'};font-size:12.5px;font-weight:700;font-family:inherit;cursor:pointer;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${label}</button>
+    `).join('')}
+  </div>`;
+  const _tituloBar = `<div class="sec-title">⏰ PRÓXIMAS AÇÕES</div>`;
   if(alertas.length){
-    const tipoIcon = t => t==='nao-estava'?'🟢':t==='interessado'?'🔵':'🔴';
-    const _proxAberto = localStorage.getItem('_proxAcoesAberto')!=='false';
-    const _proxCards = alertas.sort((a,b)=>a.diff-b.diff).map(({c,diff})=>`
-        <div class="alerta-card" onclick="alertaAntecipar('${c.id}')">
-          <div class="alerta-icon">${tipoIcon(c.tipo)}</div>
+    const _proxCards = alertas.sort((a,b)=>a.diff-b.diff).map(({c,diff})=>{
+      const dataHora = fmtDate(nextDate(c));
+      const notaLine = c.notaMarcada ? `<div class="alerta-nota">"${esc(c.notaMarcada)}"</div>` : '';
+      const diasLabel = diff===0?'Hoje':diff===1?'Amanhã':diff<0?fmtDate(nextDate(c)):diff+' dias';
+      const horaLine = c.horaMarcada ? `<div style="position:absolute;top:10px;right:14px;font-size:11px;color:#9ca3af;font-weight:700">${esc(c.horaMarcada)}</div>` : '';
+      return `<div class="alerta-card" style="position:relative" onclick="alertaAntecipar('${c.id}')">
+          ${horaLine}
           <div class="alerta-info">
             <div class="alerta-titulo">${esc(c.nome)}</div>
-            <div class="alerta-sub">Dia ${curDay(c)} da sequência · ${fmtDate(nextDate(c))}</div>
+            <div class="alerta-sub">${dataHora}</div>
+            ${notaLine}
           </div>
-          <div class="alerta-dias">${diff===1?'Amanhã':diff+' dias'}</div>
-        </div>`).join('');
-    if(_proxAberto){
-      aEl.innerHTML=`<div class="sec-title" onclick="window._toggleProxAcoes()" style="cursor:pointer;display:flex;align-items:center;justify-content:space-between;user-select:none"><span>⏰ PRÓXIMAS AÇÕES</span><span style="font-size:13px;background:#111;color:#fff;border-radius:20px;padding:3px 12px;font-weight:700">▼ recolher</span></div><div id="prox-acoes-lista">${_proxCards}</div>`;
-    } else {
-      aEl.innerHTML=`<div style="margin-bottom:20px"><button onclick="window._toggleProxAcoes()" style="background:#f3f4f6;border:1.5px solid #e5e7eb;border-radius:10px;padding:8px 16px;font-size:13px;font-weight:700;color:#374151;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:8px">▶ PRÓXIMAS AÇÕES <span style="background:#111;color:#fff;border-radius:20px;padding:1px 8px;font-size:11px">${alertas.length}</span></button></div>`;
-    }
-  } else { aEl.innerHTML=''; }
+          <div class="alerta-dias">${diasLabel}</div>
+        </div>`;
+    }).join('');
+    aEl.innerHTML=`${_tituloBar}${_filtroBar}<div id="prox-acoes-lista">${_proxCards}</div>`;
+  } else {
+    aEl.innerHTML = `${_tituloBar}${_filtroBar}<div style="padding:20px 0;text-align:center;color:#9ca3af;font-size:13px">Nada por aqui neste período</div>`;
+  }
 
-  // Mostrar/esconder seção HOJE conforme próximas ações abertas
-  const _proxOpen2 = localStorage.getItem('_proxAcoesAberto')!=='false';
-  const _hojeList = document.getElementById('hoje-list');
-  const _hojeTitles = document.querySelectorAll('.sec-title');
-  if(_hojeList) _hojeList.style.display = _proxOpen2 ? 'none' : '';
-  _hojeTitles.forEach(t=>{ if(t.textContent.includes('AÇÕES DE HOJE')) t.style.display = _proxOpen2 ? 'none' : ''; });
-  const el=document.getElementById('hoje-list');
-  el.innerHTML=hj.length ? hj.map(c=>cardHtml(c,true)).join('') :
-    `<div class="empty"><div class="ico">🎉</div><p>Nenhuma ação para hoje!</p></div>`;
-
-  // Badge no botão HOJE
-  const badgeHoje = hj.length > 0
-    ? `<span style="position:absolute;top:2px;right:6px;background:var(--danger);color:#fff;border-radius:50%;width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;pointer-events:none">${hj.length}</span>`
-    : '';
-  const bnavHoje = document.querySelector('#bnav-3');
-  if(bnavHoje) bnavHoje.innerHTML=`<span class="ico">🏠</span>HOJE${badgeHoje}`;
-
-  // Atualiza badge da FILA também (para aparecer correto no carregamento inicial)
+  // Atualiza badge do botão HOJE
   atualizarBadges();
 }
 
 function atualizarBadges(){
   const td=today();
   const hjCount = clients.filter(c=>c.status==='ativo'&&!c._naFila&&nextDate(c)===td).length;
-  const filaCount = clients.filter(c=>c._naFila===true).length;
-  const badgeStyle='position:absolute;top:2px;right:6px;background:var(--danger);color:#fff;border-radius:50%;width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;pointer-events:none';
+  const badgeStyle='position:absolute;top:-6px;right:-8px;background:var(--danger);color:#fff;border-radius:50%;width:16px;height:16px;display:inline-flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;pointer-events:none';
   // Atualiza só o badge sem resetar o innerHTML inteiro (preserva onclick)
   function setBadge(btn, count){
     if(!btn) return;
-    let b = btn.querySelector('.nav-badge');
+    const icoEl = btn.querySelector('.ico') || btn;
+    let b = icoEl.querySelector('.nav-badge');
     if(count>0){
-      if(!b){ b=document.createElement('span'); b.className='nav-badge'; b.style.cssText=badgeStyle; btn.appendChild(b); }
+      if(!b){ b=document.createElement('span'); b.className='nav-badge'; b.style.cssText=badgeStyle; icoEl.appendChild(b); }
       b.textContent=count;
     } else { if(b) b.remove(); }
   }
-  setBadge(document.querySelector('#bnav-1'), filaCount);
-  setBadge(document.querySelector('#bnav-3'), hjCount);
+  setBadge(document.querySelector('#bnav-1'), hjCount);
 }
 window.atualizarBadges = atualizarBadges;
 
@@ -1838,7 +1882,7 @@ function renderFila(){
       <div class="card-row">
         <div>
           <div class="card-name">${esc(c.nome)}</div>
-          <div class="card-sub" style="font-size:11px;color:var(--muted);margin-top:3px">📅 ${fmtDate(c.dataRegistro)} · 📐 ${esc(c.tamanho)} · R$ ${fmt(c.preco)}</div>
+          <div class="card-sub" style="font-size:11px;color:var(--muted);margin-top:3px">📅 ${fmtDate(c.dataRegistro)} · ${c.produto?'📦':''} ${esc(c.tamanho)} · R$ ${fmt(c.preco)}</div>
         </div>
         <span class="badge ${c.tipo}">${esc(typeName(c.tipo))}</span>
       </div>
@@ -1977,34 +2021,28 @@ const REG_DATA = {};
 let _regPrecoBase = 0; // base price for discount calc - global like TAPETES calcBase
 
 const REG_STEPS = [
-  { id:'nome',    label:'👤 Nome do cliente',    type:'text',   placeholder:'Ex: Maria Silva',       hint:'Digite e dê um espaço ou Enter para avançar' },
-  { id:'tel',     label:'📱 Telefone',           type:'tel',    placeholder:'79 9 9999-9999',         hint:'Digite os 11 números — avança automático' },
   { id:'foto',    label:'📸 Foto do cliente',    type:'photo' },
   { id:'tipo',    label:'🏷️ Tipo de cliente',   type:'choice', options:[
       {v:'nao-estava', label:'🟢 Não Estava Lá'},
       {v:'interessado', label:'🔵 Interessado'},
       {v:'super-quente', label:'🔴 Super Quente'}
-    ]},
-  { id:'tamanho', label:'📐 Tamanho do tapete',  type:'tamanho' },
-  { id:'cor',     label:'🎨 Cor de fundo',       type:'cor' },
-  { id:'borda',   label:'🔲 Tem borda?',          type:'choice', options:[
-      {v:'nao', label:'💢 Sem Borda'},
-      {v:'sim', label:'💫 Com Borda'}
-    ]},
-  { id:'borda-cor', label:'🖌️ Cor da borda',    type:'cor', onlyIf:()=>REG_DATA.borda==='sim' },
-  { id:'prazo',   label:'⏱️ Prazo de entrega',   type:'number', placeholder:'15', hint:'Altere se necessário — espaço ou Enter para avançar', default:'15', skip:true },
-  { id:'preco',   label:'💰 Preço (R$)',          type:'preco' },
-  { id:'obs',     label:'📝 Observação',          type:'text',   placeholder:'Detalhes extras...',  hint:'Opcional — Enter ou dois espaços para pular', optional:true },
-  { id:'imgia',   label:'🤖 Simulação do Tapete', type:'gemini' },
+    ], default:'nao-estava', skip:true },
+  { id:'tamanho', label:'Tamanho do tapete',  type:'tamanho', onlyIf:()=>!REG_DATA._modoProduto },
+  { id:'cor',     label:'🎨 Cor de fundo',       type:'cor', onlyIf:()=>!REG_DATA._modoProduto },
+  { id:'borda-cor', label:'🖌️ Cor da borda',    type:'cor', onlyIf:()=>!REG_DATA._modoProduto },
+  { id:'prazo',   label:'⏱️ Prazo de entrega',   type:'number', placeholder:'15', hint:'Altere se necessário — espaço ou Enter para avançar', default:'15', skip:true, onlyIf:()=>!REG_DATA._modoProduto },
+  { id:'preco',   label:'💰 Preço (R$)',          type:'preco', skip:true, onlyIf:()=>!REG_DATA._modoProduto },
+  { id:'obs',     label:'📝 Observação',          type:'text',   placeholder:'Detalhes extras...',  hint:'Opcional — Enter ou dois espaços para pular', optional:true, skip:true },
+  { id:'preco-preview', label:'💰 Valor do tapete', type:'preco-preview' },
+  { id:'nome',    label:'👤 Nome do cliente',    type:'text',   placeholder:'Ex: Maria Silva',       hint:'Digite e dê um espaço ou Enter para avançar', optional:true },
+  { id:'tel',     label:'📱 Telefone',           type:'tel',    placeholder:'79 9 9999-9999',         hint:'Digite os 11 números — avança automático' },
+  { id:'agendamento', label:'📅 Agendar mensagem?', type:'agendamento' },
   { id:'envio',   label:'📤 Enviar', type:'simul' },
 ];
 
 let regCurStep = 0;
 
 function initForm(){
-  const inp = document.getElementById('reg-nome-static');
-  if(inp){ inp.value=''; }
-
   Object.keys(REG_DATA).forEach(k=>delete REG_DATA[k]);
   regCurStep = 0;
   tempFoto = null; tempImgIA = null;
@@ -2017,11 +2055,20 @@ function initForm(){
   _regPrecoBase = 0;
   window._regTapetesExtras = [];
   window._regCarrosselIdx = 0;
-  curTipo = null; curBorda = 'nao'; curViu = 'nao';
+  curTipo = 'nao-estava'; curBorda = 'sim'; curViu = 'nao';
+  REG_DATA._tamanhoManual = true;
+  _regProdutoCatAberta = null;
+  REG_DATA._modoProduto = false;
+  REG_DATA._produtoNome = null;
+  REG_DATA._produtoQtd = 1;
+  REG_DATA._trafegoInvestimento = 0;
+  REG_DATA._trafegoInvestimentoRaw = '';
+  REG_DATA._agendaData = null;
+  REG_DATA._agendaHora = null;
+  REG_DATA._agendaNota = null;
+  REG_DATA._agendaAtivo = false;
   limparEstadoRegistrar();
   document.getElementById('reg-steps-container').innerHTML='';
-  const nomeBlock = document.getElementById('reg-nome-initial');
-  if(nomeBlock) nomeBlock.style.display='block';
   // Mostra botão invisível para capturar primeiro toque
   const inv = document.getElementById('reg-invisible-btn');
   if(inv) inv.style.display='block';
@@ -2041,64 +2088,73 @@ function renderRegStep(){
   const container = document.getElementById('reg-steps-container');
   if(!container) return;
 
-  // Esconde o campo de nome estático quando avançou
-  const nomeBlock = document.getElementById('reg-nome-initial');
-  if(nomeBlock) nomeBlock.style.display = regCurStep === 0 ? 'block' : 'none';
   // Esconde botão invisível quando teclado já está ativo
   const inv = document.getElementById('reg-invisible-btn');
   if(inv) inv.style.display = 'none';
-
-  // Se ainda estamos no step 0, foca o input estático
-  if(regCurStep === 0){
-    container.innerHTML = '';
-    const inp = document.getElementById('reg-nome-static');
-    if(inp) requestAnimationFrame(()=>inp.focus());
-    return;
-  }
 
   const s = steps[regCurStep];
   if(s && s.default && !REG_DATA[s.id]) REG_DATA[s.id] = s.default;
 
   // Botões de navegação — uniformes em todos os steps
-  const podeVoltar = regCurStep > 1;
+  const podeVoltar = regCurStep > 0;
   const stepId = s ? s.id : '';
-  const idxImgia = steps.findIndex(x=>x.id==='imgia');
-  const idxTel   = steps.findIndex(x=>x.id==='tel');
-  const atalhoSegura = stepId==='tel'
-    ? `ontouchstart="regSeguraProximo('imgia')" ontouchend="regSoltaProximo()" ontouchcancel="regSoltaProximo()" onmousedown="regSeguraProximo('imgia')" onmouseup="regSoltaProximo()" onmouseleave="regSoltaProximo()"`
-    : stepId==='imgia'
-    ? `ontouchstart="regSeguraProximo('tel')" ontouchend="regSoltaProximo()" ontouchcancel="regSoltaProximo()" onmousedown="regSeguraProximo('tel')" onmouseup="regSoltaProximo()" onmouseleave="regSoltaProximo()"`
-    : '';
-  const labelProximo = (stepId==='tel' || stepId==='imgia') ? '' : 'Próximo →';
-  const NAV = `<div style="display:flex;gap:10px;margin-top:16px;padding-bottom:8px;position:relative;z-index:10">
+  const atalhoSegura = '';
+  const labelProximo = stepId==='envio' ? '' : 'Próximo →';
+  const promptCopiadoBtn = stepId==='borda-cor' ? `<button onclick="regCopyPromptRegistrar()" style="
+      width:100%;padding:14px;border-radius:12px;border:2px solid ${window._regPromptCopiado?'#10b981':'#374151'};
+      background:${window._regPromptCopiado?'#10b981':'#374151'};color:#fff;font-size:14px;font-weight:800;
+      font-family:inherit;cursor:pointer;margin-top:16px;
+      display:flex;align-items:center;justify-content:center;gap:8px">
+      ${window._regPromptCopiado ? '✅ Prompt Copiado!' : '📋 Copiar Prompt'}
+    </button>` : '';
+  const corCatGeral = (REG_DATA._modoProduto || _regProdutoCatAberta) ? (PRODUTO_CATEGORIA_COR[_regProdutoCatAberta]||'#111') : '#111';
+  const NAV = `${promptCopiadoBtn}<div style="display:flex;gap:10px;margin-top:${stepId==='borda-cor'?'10px':'16px'};padding-bottom:8px;position:relative;z-index:10">
     <button onclick="regVoltar()" style="flex:1;min-height:52px;border-radius:14px;border:2px solid #e5e7eb;
       background:#f3f4f6;color:#111;font-size:15px;font-weight:700;
       font-family:inherit;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px">
       ← Voltar
     </button>
-    <button onclick="regAdvanceProxy()" ${atalhoSegura} style="flex:2;min-height:52px;border-radius:14px;border:none;
-      background:#111;color:#fff;font-size:15px;font-weight:700;
-      font-family:inherit;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px">
+    <button onclick="${stepId==='envio' ? '' : 'regAdvanceProxy()'}" ${atalhoSegura} style="flex:2;min-height:52px;border-radius:14px;border:none;
+      background:${stepId==='envio' ? 'transparent' : corCatGeral};color:#fff;font-size:15px;font-weight:700;
+      font-family:inherit;cursor:${stepId==='envio' ? 'default' : 'pointer'};display:flex;align-items:center;justify-content:center;gap:6px;pointer-events:${stepId==='envio' ? 'none' : 'auto'}">
       ${labelProximo}
     </button>
   </div>`;
 
   let curHtml = '';
   if(s){
+    const stepLabel = (s.id==='preco-preview' && REG_DATA._modoProduto) ? '💰 Valor do produto' : (s.id==='foto' && _regProdutoCatAberta) ? '🛍️ Escolha o produto' : s.label;
+    const dentroDeProdutoEscolhido = s.id==='foto' && _regProdutoCatAberta && REG_DATA._produtoNome;
+    const naListaDeProdutos = s.id==='foto' && _regProdutoCatAberta && !REG_DATA._produtoNome;
+    const NAV_SO_VOLTAR = `<div style="display:flex;gap:10px;margin-top:16px;padding-bottom:8px;position:relative;z-index:10">
+      <button onclick="regVoltar()" style="flex:1;min-height:52px;border-radius:14px;border:2px solid #e5e7eb;
+        background:#f3f4f6;color:#111;font-size:15px;font-weight:700;
+        font-family:inherit;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px">
+        ← Voltar
+      </button>
+    </div>`;
     curHtml = `<div class="reg-step" id="reg-step-active">
-      <div class="reg-step-label">${s.label}</div>
+      <div class="reg-step-label">${esc(stepLabel)}</div>
       ${renderStepInput(s)}
-      ${NAV}
+      ${dentroDeProdutoEscolhido ? '' : (naListaDeProdutos ? NAV_SO_VOLTAR : NAV)}
     </div>`;
   } else {
     curHtml = `<div class="reg-step">
-      <div class="reg-step-label">✅ Tudo pronto!</div>
-      <button class="reg-save-btn" onclick="salvarCliente()">✅ Salvar e ir para Fila</button>
-      <button class="btn btn-ghost" style="width:100%;margin:0 0 16px" onclick="showScreen('home');setNav(3)">❌ Cancelar</button>
-      ${NAV}
+      <div class="reg-step-label">⚠️ Escolha uma opção</div>
+      <div style="background:#fff7ed;border-radius:12px;padding:14px;margin-bottom:16px;border-left:4px solid #f97316;font-size:13px;color:#9a3412;line-height:1.5">
+        Volte e use um dos botões acima — "Enviar pro CRM" ou "Enviar pro Cadastro" — para salvar o cliente.
+      </div>
+      <button onclick="regVoltar()" style="width:100%;min-height:52px;border-radius:14px;border:2px solid #e5e7eb;
+        background:#f3f4f6;color:#111;font-size:15px;font-weight:700;
+        font-family:inherit;cursor:pointer">
+        ← Voltar
+      </button>
     </div>`;
   }
   container.innerHTML = curHtml;
+
+  const trafegoInp = document.getElementById('reg-trafego-investimento');
+  if(trafegoInp) regTrafegoPreviewUpdate(trafegoInp.value);
 
   if(s && (s.type==='text'||s.type==='tel'||s.type==='number')){
     const inp = document.getElementById('reg-inp-'+s.id);
@@ -2118,8 +2174,8 @@ window.renderRegStep = renderRegStep;
 function regFocusActive(){
   const steps = regActiveSteps();
   const s = steps[regCurStep];
-  if(regCurStep === 0){
-    document.getElementById('reg-nome-static')?.focus();
+  if(s && s.type==='tamanho'){
+    document.getElementById('reg-tamanho-manual')?.focus();
   } else if(s && (s.type==='text'||s.type==='tel'||s.type==='number')){
     document.getElementById('reg-inp-'+s.id)?.focus();
   }
@@ -2136,6 +2192,184 @@ function regGhostInput(el){
   if(inp){ inp.value = el.value; inp.focus(); el.value=''; }
 }
 window.regGhostInput = regGhostInput;
+
+// ── VENDA DE PRODUTOS: seletor de categoria → produto → quantidade ───────────
+function renderProdutoPicker(){
+  if(REG_DATA._produtoNome){
+    // ── Tráfego pago: fluxo especial — valor investido em vez de quantidade ──
+    if(REG_DATA._produtoNome==='Tráfego pago'){
+      const investRaw = REG_DATA._trafegoInvestimentoRaw||'';
+      return `<div style="margin-top:18px;padding-top:16px;border-top:1px solid #e5e7eb">
+        <div style="background:#fff;border-radius:16px;padding:18px;margin-bottom:14px;box-shadow:0 2px 10px rgba(0,0,0,.06);border:1.5px solid #eef2ff">
+          <div style="font-size:15px;font-weight:800;color:#111;margin-bottom:4px">📈 Tráfego pago</div>
+          <div style="font-size:12px;color:#6b7280;margin-bottom:14px">Valor que o cliente vai investir em anúncios (R$)</div>
+          <input id="reg-trafego-investimento" type="text" inputmode="decimal" autocomplete="off" value="${esc(investRaw)}"
+            oninput="regTrafegoPreviewUpdate(this.value)"
+            style="width:100%;padding:16px;border:2px solid #e5e7eb;border-radius:12px;font-size:20px;font-weight:800;text-align:center;box-sizing:border-box;font-family:inherit;color:#111">
+          <div id="reg-trafego-preview" style="text-align:center;margin-top:14px;display:none"></div>
+        </div>
+        <div style="display:flex;gap:10px">
+          <button onclick="regVoltar()" style="flex:1;min-height:52px;border-radius:14px;border:2px solid #e5e7eb;background:#f3f4f6;color:#111;font-size:15px;font-weight:700;cursor:pointer">
+            ← Voltar
+          </button>
+          <button id="reg-trafego-proximo" onclick="regConfirmarProduto()" disabled style="flex:2;min-height:52px;border-radius:14px;border:none;background:#d1d5db;color:#fff;font-size:15px;font-weight:700;cursor:not-allowed">
+            Próximo →
+          </button>
+        </div>
+      </div>`;
+    }
+    // Produto já escolhido — mostra seletor de quantidade
+    const cat = PRODUTO_CATEGORIAS.find(c=>c.id===_regProdutoCatAberta);
+    const prod = cat?.produtos.find(p=>p.nome===REG_DATA._produtoNome);
+    const qtd = REG_DATA._produtoQtd||1;
+    const corCat = PRODUTO_CATEGORIA_COR[_regProdutoCatAberta] || '#111';
+    const totalProd = (prod?.valor||0) * qtd;
+    return `<div style="margin-top:18px;padding-top:16px;border-top:1px solid #e5e7eb">
+      <div style="background:#fff;border-radius:16px;padding:20px;margin-bottom:14px;box-shadow:0 2px 10px rgba(0,0,0,.06);border:1.5px solid #eef2ff;text-align:center">
+        <div style="font-size:15px;font-weight:800;color:#111;margin-bottom:2px">${esc(prod?.nome||'')}</div>
+        <div style="font-size:12px;color:#6b7280;margin-bottom:18px">R$ ${fmt(prod?.valor||0)} cada</div>
+        <div style="display:flex;align-items:center;justify-content:center;gap:20px;margin-bottom:16px">
+          <button onclick="regProdutoQtd(-1)" style="width:48px;height:48px;border-radius:14px;border:none;background:#f3f4f6;color:#374151;font-size:22px;font-weight:800;cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,.1)">−</button>
+          <div style="font-size:28px;font-weight:800;min-width:36px;text-align:center;color:#111">${qtd}</div>
+          <button onclick="regProdutoQtd(1)" style="width:48px;height:48px;border-radius:14px;border:none;background:${corCat};color:#fff;font-size:22px;font-weight:800;cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,.15)">+</button>
+        </div>
+        <div style="display:inline-block;background:#f0fdf4;border-radius:14px;padding:10px 20px;border:1.5px solid #bbf7d0">
+          <div style="font-size:24px;font-weight:800;color:#16a34a;line-height:1">R$ ${fmt(totalProd)}</div>
+          <div style="font-size:11px;color:#6b7280;margin-top:3px">total</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:10px">
+        <button onclick="regVoltar()" style="flex:1;min-height:52px;border-radius:14px;border:2px solid #e5e7eb;background:#f3f4f6;color:#111;font-size:15px;font-weight:700;cursor:pointer">
+          ← Voltar
+        </button>
+        <button onclick="regConfirmarProduto()" style="flex:2;min-height:52px;border-radius:14px;border:none;background:${corCat};color:#fff;font-size:15px;font-weight:700;cursor:pointer">
+          Próximo →
+        </button>
+      </div>
+    </div>`;
+  }
+  if(_regProdutoCatAberta){
+    const cat = PRODUTO_CATEGORIAS.find(c=>c.id===_regProdutoCatAberta);
+    return `<div style="margin-top:18px;padding-top:16px;border-top:1px solid #e5e7eb">
+      <div style="display:flex;flex-direction:column;gap:10px">
+        ${cat.produtos.map(p=>`
+          <div onclick="regEscolherProduto('${esc(p.nome)}')" style="padding:16px 18px;border-radius:14px;border:2px solid #e5e7eb;background:#fafafa;cursor:pointer;display:flex;justify-content:space-between;align-items:center">
+            <span style="font-size:14px;font-weight:600">${esc(p.nome)}</span>
+            <span style="font-size:14px;font-weight:800;color:#5cb85c">${p.valor?'R$ '+fmt(p.valor):'a calcular'}</span>
+          </div>`).join('')}
+      </div>
+    </div>`;
+  }
+  return `<div style="margin-top:18px;padding-top:16px;border-top:1px solid #e5e7eb">
+    <div style="font-size:12px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.4px;margin-bottom:10px">Ou venda um produto</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      ${PRODUTO_CATEGORIAS.map(c=>`
+        <div onclick="regAbrirCategoria('${c.id}')" style="padding:14px 10px;border-radius:14px;border:2px solid #e5e7eb;background:#fafafa;text-align:center;font-size:13px;font-weight:700;color:#374151;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:6px">
+          ${PRODUTO_CATEGORIA_ICONS[c.id]||''}
+          <span>${c.label}</span>
+        </div>`).join('')}
+    </div>
+  </div>`;
+}
+window.renderProdutoPicker = renderProdutoPicker;
+
+function regAbrirCategoria(id){
+  _regProdutoCatAberta = id;
+  renderRegStep();
+}
+window.regAbrirCategoria = regAbrirCategoria;
+
+function regVoltarCategorias(){
+  _regProdutoCatAberta = null;
+  renderRegStep();
+}
+window.regVoltarCategorias = regVoltarCategorias;
+
+function regEscolherProduto(nome){
+  REG_DATA._produtoNome = nome;
+  REG_DATA._produtoQtd = 1;
+  REG_DATA._trafegoInvestimento = 0;
+  REG_DATA._trafegoInvestimentoRaw = '';
+  renderRegStep();
+}
+window.regEscolherProduto = regEscolherProduto;
+
+function regAgendaToggle(val){
+  REG_DATA._agendaAtivo = val;
+  if(!val){
+    REG_DATA._agendaData = null;
+    REG_DATA._agendaHora = null;
+    REG_DATA._agendaNota = null;
+  }
+  renderRegStep();
+}
+window.regAgendaToggle = regAgendaToggle;
+
+function regTrocarProduto(){
+  REG_DATA._produtoNome = null;
+  REG_DATA._produtoQtd = 1;
+  REG_DATA._trafegoInvestimento = 0;
+  REG_DATA._trafegoInvestimentoRaw = '';
+  renderRegStep();
+}
+window.regTrocarProduto = regTrocarProduto;
+
+function regProdutoQtd(delta){
+  const nova = (REG_DATA._produtoQtd||1) + delta;
+  REG_DATA._produtoQtd = Math.max(1, nova);
+  renderRegStep();
+}
+window.regProdutoQtd = regProdutoQtd;
+
+function regTrafegoPreviewUpdate(val){
+  REG_DATA._trafegoInvestimentoRaw = val;
+  const n = parseFloat(String(val).replace(',','.'))||0;
+  REG_DATA._trafegoInvestimento = n;
+  const cobranca = Math.min(n*0.5, 1500);
+  const preview = document.getElementById('reg-trafego-preview');
+  if(preview){
+    preview.style.display = n>0 ? 'block' : 'none';
+    if(n>0) preview.innerHTML = `
+      <div style="display:inline-block;background:#f0fdf4;border-radius:14px;padding:12px 20px;border:1.5px solid #bbf7d0">
+        <div style="font-size:30px;font-weight:800;color:#16a34a;line-height:1">R$ ${fmt(cobranca)}</div>
+        <div style="font-size:11px;color:#6b7280;margin-top:4px">sua cobrança (50% do investimento, até R$ 1.500)</div>
+      </div>`;
+  }
+  const btn = document.getElementById('reg-trafego-proximo');
+  if(btn){
+    btn.disabled = n<=0;
+    btn.style.background = n>0 ? (PRODUTO_CATEGORIA_COR.digitais||'#111') : '#d1d5db';
+    btn.style.cursor = n>0 ? 'pointer' : 'not-allowed';
+  }
+}
+window.regTrafegoPreviewUpdate = regTrafegoPreviewUpdate;
+
+function regConfirmarProduto(){
+  REG_DATA._modoProduto = true;
+  if(REG_DATA._produtoNome==='Tráfego pago'){
+    const invest = REG_DATA._trafegoInvestimento||0;
+    if(invest<=0) return;
+    const cobranca = Math.min(invest*0.5, 1500);
+    REG_DATA.preco = String(cobranca);
+    REG_DATA.tamanho = `Tráfego pago (investimento R$ ${fmt(invest)})`;
+    _regPrecoBase = cobranca;
+    REG_DATA._desconto = 0; REG_DATA._descontoAtivo = false;
+    REG_DATA._precoConfirmado = true;
+    regAdvance();
+    return;
+  }
+  const cat = PRODUTO_CATEGORIAS.find(c=>c.id===_regProdutoCatAberta);
+  const prod = cat?.produtos.find(p=>p.nome===REG_DATA._produtoNome);
+  const qtd = REG_DATA._produtoQtd||1;
+  const total = Math.round(((prod?.valor||0) * qtd) * 100) / 100;
+  REG_DATA.preco = String(total);
+  REG_DATA.tamanho = `${prod?.nome||''}${qtd>1?' (x'+qtd+')':''}`;
+  _regPrecoBase = total;
+  REG_DATA._desconto = 0; REG_DATA._descontoAtivo = false;
+  REG_DATA._precoConfirmado = true;
+  regAdvance();
+}
+window.regConfirmarProduto = regConfirmarProduto;
 
 function renderStepInput(s){
   if(s.type==='text'||s.type==='tel'||s.type==='number'){
@@ -2158,25 +2392,11 @@ function renderStepInput(s){
       </div>`).join('')}</div>`;
   }
   if(s.type==='tamanho'){
-    const sizes=['80x50','70x40','90x60','100x60','120x60','150x60','200x60','200x120','220x120'];
-    const isManual = REG_DATA._tamanhoManual;
     return `<div style="display:flex;flex-direction:column;gap:10px;padding:4px 0 8px">
-      ${sizes.map(sz=>`
-        <div class="reg-choice-btn ${REG_DATA.tamanho===sz&&!isManual?'sel':''}"
-          onclick="regEscolheTamanho('${sz}')"
-          style="text-align:left;padding:18px 20px;font-size:15px;border-radius:14px">
-          📐 ${sz}
-        </div>`).join('')}
-      <div class="reg-choice-btn ${isManual?'sel':''}"
-        onclick="regTamanhoManual()"
-        style="text-align:left;padding:18px 20px;font-size:15px;border-radius:14px">
-        ✏️ Manual
-      </div>
-      ${isManual?`<input id="reg-tamanho-manual" class="reg-step-input" type="text" inputmode="text" autocomplete="off" value="${REG_DATA.tamanho||''}"
+      <input id="reg-tamanho-manual" class="reg-step-input" type="text" inputmode="text" autocomplete="off" value="${esc(REG_DATA.tamanho||'')}"
         oninput="regInputChange(this,'tamanho')"
-        onkeydown="regKeyDown(event,'tamanho')"
-        style="margin-top:4px">
-        <div class="reg-step-hint">Enter ou dois espaços para avançar</div>`:''}
+        onkeydown="regKeyDown(event,'tamanho')">
+      <div class="reg-step-hint">Enter ou dois espaços para avançar</div>
     </div>`;
   }
   if(s.type==='cor'){
@@ -2203,52 +2423,190 @@ function renderStepInput(s){
         </div>`).join('')}
     </div>`;
   }
-  if(s.type==='preco'){
-    const isManual = REG_DATA._precoManual;
-    const autoPreco = REG_DATA.preco && REG_DATA._tamanhoManual;
+  if(s.type==='preco-preview'){
+    // ── Garante estado do carrossel ──
+    if(!window._regTapetesExtras) window._regTapetesExtras = [];
+    if(window._regCarrosselIdx === undefined) window._regCarrosselIdx = 0;
+    if(!_regPrecoBase && REG_DATA.preco) _regPrecoBase = parseInt(REG_DATA.preco)||0;
 
-    // Tamanho manual com preço calculado: pula direto para simulação, sem mostrar tela de preço
-    if(autoPreco && !isManual){
-      REG_DATA._precoConfirmado = true;
-      setTimeout(()=>regAdvance(), 0);
-      return '';
-    }
+    // ── Monta lista unificada: tapete 0 = principal, 1..N = extras ──
+    const todos = [
+      { tamanho: REG_DATA.tamanho||'', _precoBase: _regPrecoBase||parseInt(REG_DATA.preco)||0, desconto: REG_DATA._desconto||0, _isTap1: true },
+      ...window._regTapetesExtras
+    ];
+    const idx = Math.min(window._regCarrosselIdx, todos.length-1);
+    const cur = todos[idx];
 
-    // Manual: campo livre
-    if(isManual){
-      return `<div>
-        <div onclick="REG_DATA._precoManual=false;renderRegStep()"
-          style="display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--primary);font-weight:600;margin-bottom:14px;cursor:pointer">← Voltar</div>
-        <input id="reg-preco-manual" class="reg-step-input" type="text" inputmode="decimal" autocomplete="off" value="${REG_DATA.preco||''}"
-          oninput="regInputChange(this,'preco')" onkeydown="regKeyDown(event,'preco')">
-        <div class="reg-step-hint">Enter ou espaço para avançar</div>
-      </div>`;
+    // ── Valor com desconto de cada tapete ──
+    function valorComDesc(t){
+      const base = t._precoBase || t.preco || 0;
+      const d = t.desconto||0;
+      const v = d===10?base*0.9:d===30?base*0.7:base;
+      return Math.round(v*100)/100;
     }
-    // Escolha do canal
-    return `<div style="display:flex;flex-direction:column;gap:12px;padding:4px 0 8px">
-      <div class="reg-choice-btn" onclick="regEscolheCanal('ONLINE')"
-        style="text-align:left;padding:20px;border-radius:14px;display:flex;align-items:center;gap:14px">
-        🌐 <span><div style="font-size:16px;font-weight:700">ONLINE</div>
-        <div style="font-size:12px;color:#888;margin-top:2px">R$ 150 – R$ 700</div></span>
+    const totalGeral = todos.reduce((s,t)=>s+valorComDesc(t),0);
+    const curValor = valorComDesc(cur);
+    const curBase  = cur._precoBase || cur.preco || 0;
+
+    // ── Bloco do tapete atual (carrossel) ──
+    const descAtual = cur.desconto||0;
+    const ei = idx - 1; // índice no _regTapetesExtras (só válido se idx>0)
+    const isExtra = idx > 0;
+
+    // Seletor de tamanho (só para extras sem tamanho ainda)
+    const seletorHtml = isExtra && !curBase ? `
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:8px">
+        ${['80x50','70x40','90x60','100x60','120x60','150x60','200x60','200x120','220x120'].map(sz=>`
+          <div onclick="regEscolheTamanhoExtra(${ei},'${sz}')"
+            style="padding:10px 4px;border-radius:10px;border:2px solid ${cur.tamanho===sz?'#111':'#e0e0e0'};
+            background:${cur.tamanho===sz?'#111':'#fff'};color:${cur.tamanho===sz?'#fff':'#333'};
+            text-align:center;font-size:12px;font-weight:700;cursor:pointer">${sz}</div>
+        `).join('')}
+        <div onclick="regTamanhoManualExtra(${ei})"
+          style="padding:10px 4px;border-radius:10px;border:2px solid ${cur._manual?'#111':'#e0e0e0'};
+          background:${cur._manual?'#111':'#fff'};color:${cur._manual?'#fff':'#333'};
+          text-align:center;font-size:12px;font-weight:700;cursor:pointer">✏️ Manual</div>
       </div>
-      <div class="reg-choice-btn" onclick="regEscolheCanal('OFFLINE')"
-        style="text-align:left;padding:20px;border-radius:14px;display:flex;align-items:center;gap:14px">
-        🏪 <span><div style="font-size:16px;font-weight:700">OFFLINE</div>
-        <div style="font-size:12px;color:#888;margin-top:2px">R$ 190 – R$ 1.200</div></span>
+      ${cur._manual?`
+        <input id="reg-extra-manual-${ei}" type="text" inputmode="text" value="${cur.tamanho||''}"
+          style="width:100%;padding:10px 12px;border:2px solid #111;border-radius:10px;
+          font-size:15px;font-weight:600;background:#fff;color:#111;box-sizing:border-box;margin-bottom:4px"
+          oninput="regExtraManualInput(${ei},this.value)"
+          onblur="regExtraManualConfirmar(${ei},this.value)"
+          onkeydown="if(event.key==='Enter'){event.preventDefault();regExtraManualConfirmar(${ei},this.value);this.blur();}">
+        <div id="reg-extra-preco-display-${ei}" style="font-size:12px;color:#16a34a;font-weight:700;margin-bottom:8px;text-align:center">${cur.preco?'R$ '+cur.preco+',00':''}</div>
+      `:''}
+      <div style="display:flex;align-items:center;gap:6px;margin-top:8px;justify-content:center">
+        <button onclick="regConfirmarRemoverExtra(${ei},'${cur.tamanho||'este tapete'}')" style="
+          background:none;border:none;padding:0;cursor:pointer;font-size:13px;line-height:1;color:#dc2626">🗑</button>
+        <span style="font-size:12px;color:#6b7280;font-weight:600">${cur.tamanho||'sem medida'}</span>
       </div>
-      <div class="reg-choice-btn" onclick="regPrecoManual()"
-        style="text-align:left;padding:20px;border-radius:14px">✏️ Manual</div>
+    ` : '';
+
+    // Valor + desconto (quando há preço)
+    const parcelaAtual = _regParcelas;
+    const totalParaParcelar = todos.reduce((s,t)=>s+valorComDesc(t),0);
+    const valorParcela = parcelaAtual>=2 ? (totalParaParcelar/parcelaAtual) : 0;
+    const fmtParcela = v => v.toFixed(2).replace('.',',');
+    const parcelasHtml = parcelaAtual>=2
+      ? `<div style="text-align:center;margin-top:6px;margin-bottom:4px">
+          <span style="font-size:13px;font-weight:800;color:#2B4FBF;background:#eef1fb;border-radius:20px;padding:4px 14px">
+            💳 ${parcelaAtual}x de R$ ${fmtParcela(valorParcela)}
+            ${todos.length>1?`<span style="font-size:10px;font-weight:600;color:#6b7280"> (${todos.length} tapetes)</span>`:''}
+          </span>
+         </div>`
+      : '';
+    const valorHtml = curBase ? `
+      <div style="text-align:center;margin-bottom:8px;margin-top:0">
+        <div style="font-size:36px;font-weight:800;color:#5cb85c;line-height:1">R$ ${fmt(curValor)}</div>
+        ${descAtual?`<div style="font-size:11px;color:#6b7280;margin-top:3px">${descAtual}% de desconto · base R$ ${fmt(curBase)}</div>`:''}
+      </div>
+      <div style="display:flex;gap:8px;justify-content:center;margin-bottom:4px">
+        <button onclick="regToggleParcelas()" style="
+          flex:1;padding:5px 2px;border-radius:8px;font-size:11px;font-weight:700;
+          border:none;
+          box-shadow:0 2px 6px rgba(0,0,0,0.18);
+          background:${parcelaAtual>=2?'#dce4f5':'#fff'};
+          color:${parcelaAtual>=2?'#4a6096':'#6b7280'};cursor:pointer;
+          min-width:0;white-space:nowrap;box-sizing:border-box">
+          💳 ${parcelaAtual>=2?parcelaAtual+'x':''}
+        </button>
+        <button onclick="regDescontoCarrossel(10)" style="
+          flex:1;padding:5px 2px;border-radius:8px;font-size:11px;font-weight:700;
+          border:none;
+          box-shadow:0 2px 6px rgba(0,0,0,0.18);
+          background:${descAtual===10?'#dce4f5':'#fff'};
+          color:${descAtual===10?'#4a6096':'#6b7280'};cursor:pointer;
+          min-width:0;box-sizing:border-box">
+          -10%
+        </button>
+        <button onclick="regDescontoCarrossel(30)" style="
+          flex:1;padding:5px 2px;border-radius:8px;font-size:11px;font-weight:700;
+          border:none;
+          box-shadow:0 2px 6px rgba(0,0,0,0.18);
+          background:${descAtual===30?'#dce4f5':'#fff'};
+          color:${descAtual===30?'#4a6096':'#6b7280'};cursor:pointer;
+          min-width:0;box-sizing:border-box">
+          -30%
+        </button>
+        ${descAtual?`<button onclick="regDescontoCarrossel(0)" style="
+          flex:none;padding:5px 6px;border-radius:8px;font-size:11px;font-weight:700;
+          border:none;box-shadow:0 2px 6px rgba(0,0,0,0.18);
+          background:#fef2f2;color:#dc2626;cursor:pointer">✕</button>`:''}
+      </div>
+      <div style="display:flex;align-items:center;gap:6px;margin-top:10px;justify-content:center">
+        <button onclick="${isExtra?`regConfirmarRemoverExtra(${ei},'${cur.tamanho||'este tapete'}')`:`regResetarTapete1()`}" style="
+          background:none;border:none;padding:0;cursor:pointer;font-size:13px;line-height:1;color:#dc2626">🗑</button>
+        <span style="font-size:12px;color:#6b7280;font-weight:600">${cur.tamanho||'sem medida'}</span>
+        ${parcelasHtml ? `<span style="font-size:14px;font-weight:800;color:#2B4FBF;background:#eef1fb;border-radius:20px;padding:4px 14px">💳 ${parcelaAtual}x R$ ${fmtParcela(valorParcela)}</span>` : ''}
+      </div>
+    ` : '';
+
+    // Total geral (quando há mais de 1 tapete)
+    const totalHtml = todos.length>1 ? `
+      <div style="border-top:1px solid #e5e7eb;margin-top:10px;padding-top:10px;text-align:left">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span style="font-size:12px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.4px">Total (${todos.length} tapetes)</span>
+          <span style="font-size:17px;font-weight:800;color:#5cb85c">R$ ${totalGeral}</span>
+        </div>
+      </div>
+    ` : '';
+
+    const blocoCarrossel = `
+      <div style="background:#fff;border:none;border-radius:14px;padding:31px 16px 27px;margin-bottom:12px;box-shadow:0 4px 20px rgba(43,79,191,0.28),0 1px 6px rgba(43,79,191,0.15)">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:4px">
+          <button onclick="regCarrosselNav(-1)" style="background:${idx>0?'#111':'#e5e7eb'};border:none;color:${idx>0?'#fff':'#9ca3af'};border-radius:8px;width:34px;height:34px;font-size:18px;cursor:${idx>0?'pointer':'default'};font-weight:700;flex-shrink:0">‹</button>
+          <div style="flex:1;text-align:center">
+            ${seletorHtml}
+            ${valorHtml}
+            ${totalHtml}
+          </div>
+          <button onclick="regCarrosselNav(1)" style="background:${idx<todos.length-1?'#111':'#e5e7eb'};border:none;color:${idx<todos.length-1?'#fff':'#9ca3af'};border-radius:8px;width:34px;height:34px;font-size:18px;cursor:${idx<todos.length-1?'pointer':'default'};font-weight:700;flex-shrink:0">›</button>
+        </div>
+      </div>
+    `;
+
+    return `<div>
+      ${blocoCarrossel}
+      ${REG_DATA._modoProduto ? `<button onclick="regAbrirSeletorProdutoExtra()" style="
+        width:100%;padding:13px;border-radius:12px;border:2px solid #d1d5db;
+        background:#f9fafb;color:#374151;font-size:13px;font-weight:800;
+        font-family:inherit;cursor:pointer;display:flex;align-items:center;
+        justify-content:center;gap:8px">
+        ➕ Adicionar outro produto
+      </button>` : `<button onclick="regAdicionarTapeteExtra()" style="
+        width:100%;padding:13px;border-radius:12px;border:2px solid #d1d5db;
+        background:#f9fafb;color:#374151;font-size:13px;font-weight:800;
+        font-family:inherit;cursor:pointer;display:flex;align-items:center;
+        justify-content:center;gap:8px">
+        ➕ Adicionar outro tapete
+      </button>`}
     </div>`;
+  }
+  if(s.type==='preco'){
+    // Preço sempre calculado automaticamente a partir da medida — etapa nunca aparece
+    if(!REG_DATA.preco){
+      const auto = calcPrecoAuto(REG_DATA.tamanho||'') || 0;
+      REG_DATA.preco = String(auto);
+      _regPrecoBase = auto;
+      REG_DATA._desconto = 0; REG_DATA._descontoAtivo = false;
+    }
+    REG_DATA._precoConfirmado = true;
+    setTimeout(()=>regAdvance(), 0);
+    return '';
   }
   if(s.type==='photo'){
     // ── Modo livre: sem pré-definir quantidade ──
+    // (renderProdutoPicker é definida abaixo do bloco photo)
     // _regFotoQtd=0 significa modo livre (usuário decide quando parar)
     const capturadas = tempFotos.length;
     const modoLivre = (_regFotoQtd === -1);
 
     // Tela inicial — nenhuma foto ainda
     if(capturadas === 0){
+      const dentroDeProduto = !!_regProdutoCatAberta;
       return `<div>
+        ${dentroDeProduto ? '' : `
         <div style="margin-bottom:14px"></div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
           <input type="file" id="reg-foto-input-s" accept="image/*" capture="environment" style="display:none" onchange="regHandlePhotoModo(event,false)">
@@ -2259,8 +2617,8 @@ function renderStepInput(s){
           <label for="reg-foto-input-m" class="reg-choice-btn" style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:22px 12px;font-size:1.6rem;cursor:pointer">
             📸
           </label>
-        </div>
-  
+        </div>`}
+        ${renderProdutoPicker()}
       </div>`;
     }
 
@@ -2390,159 +2748,59 @@ function renderStepInput(s){
     </div>`;
   }
 
-  if(s.type==='simul'){
-    // ── Garante estado do carrossel ──
-    if(!window._regTapetesExtras) window._regTapetesExtras = [];
-    if(window._regCarrosselIdx === undefined) window._regCarrosselIdx = 0;
-    if(!_regPrecoBase && REG_DATA.preco) _regPrecoBase = parseInt(REG_DATA.preco)||0;
-
-    // ── Monta lista unificada: tapete 0 = principal, 1..N = extras ──
-    const todos = [
-      { tamanho: REG_DATA.tamanho||'', _precoBase: _regPrecoBase||parseInt(REG_DATA.preco)||0, desconto: REG_DATA._desconto||0, _isTap1: true },
-      ...window._regTapetesExtras
-    ];
-    const idx = Math.min(window._regCarrosselIdx, todos.length-1);
-    const cur = todos[idx];
-
-    // ── Valor com desconto de cada tapete ──
-    function valorComDesc(t){
-      const base = t._precoBase || t.preco || 0;
-      const d = t.desconto||0;
-      return d===10?Math.round(base*0.9):d===30?Math.round(base*0.7):base;
-    }
-    const totalGeral = todos.reduce((s,t)=>s+valorComDesc(t),0);
-    const curValor = valorComDesc(cur);
-    const curBase  = cur._precoBase || cur.preco || 0;
-
-    // ── Bloco do tapete atual (carrossel) ──
-    const descAtual = cur.desconto||0;
-    const ei = idx - 1; // índice no _regTapetesExtras (só válido se idx>0)
-    const isExtra = idx > 0;
-    const ROYAL = '#2B4FBF';
-    const ROYAL_BG = '#eef1fb'; // fundo azul bem suave
-    const ROYAL_LINE = '#c7d0f5'; // divisor suave
-
-    // Navegação — sem medida, sem numeração
-    const navHtml = `
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
-        <button onclick="regCarrosselNav(-1)" style="background:${idx>0?'#111':'#e5e7eb'};border:none;color:${idx>0?'#fff':'#9ca3af'};border-radius:8px;width:34px;height:34px;font-size:18px;cursor:${idx>0?'pointer':'default'};font-weight:700">‹</button>
-        <div></div>
-        <button onclick="regCarrosselNav(1)" style="background:${idx<todos.length-1?'#111':'#e5e7eb'};border:none;color:${idx<todos.length-1?'#fff':'#9ca3af'};border-radius:8px;width:34px;height:34px;font-size:18px;cursor:${idx<todos.length-1?'pointer':'default'};font-weight:700">›</button>
-      </div>`;
-
-    // Seletor de tamanho (só para extras sem tamanho ainda)
-    const seletorHtml = isExtra && !curBase ? `
-      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:8px">
-        ${['80x50','70x40','90x60','100x60','120x60','150x60','200x60','200x120','220x120'].map(sz=>`
-          <div onclick="regEscolheTamanhoExtra(${ei},'${sz}')"
-            style="padding:10px 4px;border-radius:10px;border:2px solid ${cur.tamanho===sz?'#111':'#e0e0e0'};
-            background:${cur.tamanho===sz?'#111':'#fff'};color:${cur.tamanho===sz?'#fff':'#333'};
-            text-align:center;font-size:12px;font-weight:700;cursor:pointer">${sz}</div>
-        `).join('')}
-        <div onclick="regTamanhoManualExtra(${ei})"
-          style="padding:10px 4px;border-radius:10px;border:2px solid ${cur._manual?'#111':'#e0e0e0'};
-          background:${cur._manual?'#111':'#fff'};color:${cur._manual?'#fff':'#333'};
-          text-align:center;font-size:12px;font-weight:700;cursor:pointer">✏️ Manual</div>
+  if(s.type==='agendamento'){
+    const tem = !!REG_DATA._agendaAtivo;
+    const corCatAgenda = REG_DATA._modoProduto ? (PRODUTO_CATEGORIA_COR[_regProdutoCatAberta]||'#111') : '#111';
+    return `<div>
+      <div style="background:#f0f9ff;border-radius:12px;padding:12px 14px;margin-bottom:16px;border-left:4px solid #0ea5e9">
+        <div style="font-size:12px;color:#0369a1;line-height:1.5">Se você já combinou um contato futuro com o cliente, agende aqui — ele vai aparecer na aba HOJE na data escolhida.</div>
       </div>
-      ${cur._manual?`
-        <input id="reg-extra-manual-${ei}" type="text" inputmode="text" value="${cur.tamanho||''}"
-          style="width:100%;padding:10px 12px;border:2px solid #111;border-radius:10px;
-          font-size:15px;font-weight:600;background:#fff;color:#111;box-sizing:border-box;margin-bottom:4px"
-          oninput="regExtraManualInput(${ei},this.value)"
-          onblur="regExtraManualConfirmar(${ei},this.value)"
-          onkeydown="if(event.key==='Enter'){event.preventDefault();regExtraManualConfirmar(${ei},this.value);this.blur();}">
-        <div id="reg-extra-preco-display-${ei}" style="font-size:12px;color:#16a34a;font-weight:700;margin-bottom:8px;text-align:center">${cur.preco?'R$ '+cur.preco+',00':''}</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
+        <button onclick="regAgendaToggle(false)" style="padding:14px 8px;border-radius:12px;border:2px solid ${tem?'#e5e7eb':corCatAgenda};background:${tem?'#fafafa':corCatAgenda};color:${tem?'#374151':'#fff'};font-size:14px;font-weight:800;font-family:inherit;cursor:pointer">
+          Não tem
+        </button>
+        <button onclick="regAgendaToggle(true)" style="padding:14px 8px;border-radius:12px;border:2px solid ${tem?corCatAgenda:'#e5e7eb'};background:${tem?corCatAgenda:'#fafafa'};color:${tem?'#fff':'#374151'};font-size:14px;font-weight:800;font-family:inherit;cursor:pointer">
+          Agendar
+        </button>
+      </div>
+      ${tem?`
+      <label style="display:block;font-size:11px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.4px;margin-bottom:5px">DATA DO CONTATO</label>
+      <input type="date" id="reg-agenda-data" value="${esc(REG_DATA._agendaData||'')}" oninput="REG_DATA._agendaData=this.value" onchange="REG_DATA._agendaData=this.value"
+        style="width:100%;padding:14px;border:2px solid #d1d5db;border-radius:12px;font-size:16px;font-family:inherit;font-weight:600;background:#f9fafb;color:#111;margin-bottom:14px;box-sizing:border-box;-webkit-appearance:none">
+      <label style="display:block;font-size:11px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.4px;margin-bottom:5px">HORA (opcional)</label>
+      <input type="time" id="reg-agenda-hora" value="${esc(REG_DATA._agendaHora||'')}" oninput="REG_DATA._agendaHora=this.value" onchange="REG_DATA._agendaHora=this.value"
+        style="width:100%;padding:14px;border:2px solid #d1d5db;border-radius:12px;font-size:16px;font-family:inherit;font-weight:600;background:#f9fafb;color:#111;margin-bottom:14px;box-sizing:border-box;-webkit-appearance:none">
+      <label style="display:block;font-size:11px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.4px;margin-bottom:5px">O QUE FOI COMBINADO (opcional)</label>
+      <input type="text" id="reg-agenda-nota" value="${esc(REG_DATA._agendaNota||'')}" oninput="REG_DATA._agendaNota=this.value" onchange="REG_DATA._agendaNota=this.value"
+        style="width:100%;padding:14px;border:2px solid #d1d5db;border-radius:12px;font-size:15px;font-family:inherit;font-weight:500;background:#f9fafb;color:#111;margin-bottom:6px;box-sizing:border-box">
       `:''}
-      <div style="display:flex;align-items:center;gap:6px;margin-top:8px;justify-content:center">
-        <button onclick="regConfirmarRemoverExtra(${ei},'${cur.tamanho||'este tapete'}')" style="
-          background:none;border:none;padding:0;cursor:pointer;font-size:13px;line-height:1;color:#dc2626">🗑</button>
-        <span style="font-size:12px;color:#6b7280;font-weight:600">${cur.tamanho||'sem medida'}</span>
-      </div>
-    ` : '';
+    </div>`;
+  }
 
-    // Valor + desconto (quando há preço)
-    const parcelaAtual = _regParcelas;
-    const totalParaParcelar = todos.reduce((s,t)=>s+valorComDesc(t),0);
-    const valorParcela = parcelaAtual>=2 ? (totalParaParcelar/parcelaAtual) : 0;
-    const fmtParcela = v => v.toFixed(2).replace('.',',');
-    const parcelasHtml = parcelaAtual>=2
-      ? `<div style="text-align:center;margin-top:6px;margin-bottom:4px">
-          <span style="font-size:13px;font-weight:800;color:#2B4FBF;background:#eef1fb;border-radius:20px;padding:4px 14px">
-            💳 ${parcelaAtual}x de R$ ${fmtParcela(valorParcela)}
-            ${todos.length>1?`<span style="font-size:10px;font-weight:600;color:#6b7280"> (${todos.length} tapetes)</span>`:''}
-          </span>
-         </div>`
-      : '';
-    const valorHtml = curBase ? `
-      <div style="text-align:center;margin-bottom:8px;margin-top:0">
-        <div style="font-size:36px;font-weight:800;color:#5cb85c;line-height:1">R$ ${curValor}</div>
-        ${descAtual?`<div style="font-size:11px;color:#6b7280;margin-top:3px">${descAtual}% de desconto · base R$ ${curBase}</div>`:''}
-      </div>
-      <div style="display:flex;gap:8px;justify-content:center;margin-bottom:4px">
-        <button onclick="regToggleParcelas()" style="
-          flex:1;padding:5px 2px;border-radius:8px;font-size:11px;font-weight:700;
-          border:none;
-          box-shadow:0 2px 6px rgba(0,0,0,0.18);
-          background:${parcelaAtual>=2?'#dce4f5':'#fff'};
-          color:${parcelaAtual>=2?'#4a6096':'#6b7280'};cursor:pointer;
-          min-width:0;white-space:nowrap;box-sizing:border-box">
-          💳 ${parcelaAtual>=2?parcelaAtual+'x':''}
-        </button>
-        <button onclick="regDescontoCarrossel(10)" style="
-          flex:1;padding:5px 2px;border-radius:8px;font-size:11px;font-weight:700;
-          border:none;
-          box-shadow:0 2px 6px rgba(0,0,0,0.18);
-          background:${descAtual===10?'#dce4f5':'#fff'};
-          color:${descAtual===10?'#4a6096':'#6b7280'};cursor:pointer;
-          min-width:0;box-sizing:border-box">
-          -10%
-        </button>
-        <button onclick="regDescontoCarrossel(30)" style="
-          flex:1;padding:5px 2px;border-radius:8px;font-size:11px;font-weight:700;
-          border:none;
-          box-shadow:0 2px 6px rgba(0,0,0,0.18);
-          background:${descAtual===30?'#dce4f5':'#fff'};
-          color:${descAtual===30?'#4a6096':'#6b7280'};cursor:pointer;
-          min-width:0;box-sizing:border-box">
-          -30%
-        </button>
-        ${descAtual?`<button onclick="regDescontoCarrossel(0)" style="
-          flex:none;padding:5px 6px;border-radius:8px;font-size:11px;font-weight:700;
-          border:none;box-shadow:0 2px 6px rgba(0,0,0,0.18);
-          background:#fef2f2;color:#dc2626;cursor:pointer">✕</button>`:''}
-      </div>
-      <div style="display:flex;align-items:center;gap:6px;margin-top:10px;justify-content:center">
-        <button onclick="${isExtra?`regConfirmarRemoverExtra(${ei},'${cur.tamanho||'este tapete'}')`:`regResetarTapete1()`}" style="
-          background:none;border:none;padding:0;cursor:pointer;font-size:13px;line-height:1;color:#dc2626">🗑</button>
-        <span style="font-size:12px;color:#6b7280;font-weight:600">${cur.tamanho||'sem medida'}</span>
-        ${parcelasHtml ? `<span style="font-size:14px;font-weight:800;color:#2B4FBF;background:#eef1fb;border-radius:20px;padding:4px 14px">💳 ${parcelaAtual}x R$ ${fmtParcela(valorParcela)}</span>` : ''}
-      </div>
-    ` : '';
-
-    // Total geral (quando há mais de 1 tapete)
-    const totalHtml = todos.length>1 ? `
-      <div style="border-top:1px solid #e5e7eb;margin-top:10px;padding-top:10px;text-align:left">
-        <div style="display:flex;justify-content:space-between;align-items:center">
-          <span style="font-size:12px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.4px">Total (${todos.length} tapetes)</span>
-          <span style="font-size:17px;font-weight:800;color:#5cb85c">R$ ${totalGeral}</span>
+  if(s.type==='simul'){
+    if(REG_DATA._modoProduto){
+      return `<div>
+        <div style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px;text-align:center">
+          — Escolha para onde enviar: —
         </div>
-      </div>
-    ` : '';
-
-    const blocoCarrossel = `
-      <div style="background:#fff;border:none;border-radius:14px;padding:31px 16px 27px;margin-bottom:12px;box-shadow:0 4px 20px rgba(43,79,191,0.28),0 1px 6px rgba(43,79,191,0.15)">
-        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:4px">
-          <button onclick="regCarrosselNav(-1)" style="background:${idx>0?'#111':'#e5e7eb'};border:none;color:${idx>0?'#fff':'#9ca3af'};border-radius:8px;width:34px;height:34px;font-size:18px;cursor:${idx>0?'pointer':'default'};font-weight:700;flex-shrink:0">‹</button>
-          <div style="flex:1;text-align:center">
-            ${seletorHtml}
-            ${valorHtml}
-            ${totalHtml}
-          </div>
-          <button onclick="regCarrosselNav(1)" style="background:${idx<todos.length-1?'#111':'#e5e7eb'};border:none;color:${idx<todos.length-1?'#fff':'#9ca3af'};border-radius:8px;width:34px;height:34px;font-size:18px;cursor:${idx<todos.length-1?'pointer':'default'};font-weight:700;flex-shrink:0">›</button>
+        <div style="display:flex;gap:10px;margin-bottom:14px">
+          <button onclick="event.stopPropagation();regEnviarCRM(this)" style="
+            flex:1;padding:16px 8px;border-radius:12px;border:2px solid #374151;
+            background:#374151;color:#fff;font-size:14px;font-weight:800;
+            font-family:inherit;cursor:pointer;display:flex;flex-direction:column;
+            align-items:center;gap:4px;line-height:1.3">
+            👥<span>Enviar pro CRM</span>
+          </button>
+          <button onclick="event.stopPropagation();regEnviarParaCadastro()" style="
+            flex:1;padding:16px 8px;border-radius:12px;border:2px solid #2B4FBF;
+            background:#2B4FBF;color:#fff;font-size:14px;font-weight:800;
+            font-family:inherit;cursor:pointer;display:flex;flex-direction:column;
+            align-items:center;gap:4px;line-height:1.3">
+            📦<span>Enviar pro Cadastro</span>
+          </button>
         </div>
-      </div>
-    `;
-
+      </div>`;
+    }
     // Simulação feita? Mostra preview pequeno
     const simulPreview = tempImgIA ? `
       <div style="position:relative;margin-bottom:14px">
@@ -2553,8 +2811,6 @@ function renderStepInput(s){
     const simulHtml = `<div>
 
       ${simulPreview}
-
-      ${blocoCarrossel}
 
       <div style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px;text-align:center">
         — Escolha para onde enviar: —
@@ -2576,14 +2832,6 @@ function renderStepInput(s){
           📦<span>Enviar pro Cadastro</span>
         </button>
       </div>
-
-      <button onclick="regAdicionarTapeteExtra()" style="
-        width:100%;padding:13px;border-radius:12px;border:2px solid #d1d5db;
-        background:#f9fafb;color:#374151;font-size:13px;font-weight:800;
-        font-family:inherit;cursor:pointer;display:flex;align-items:center;
-        justify-content:center;gap:8px">
-        ➕ Adicionar outro tapete
-      </button>
 
     </div>`;
     return simulHtml;
@@ -2646,7 +2894,7 @@ window.regInputChange = regInputChange;
 
 function regKeyDown(e, id){
   if(e.key==='Enter'){
-    const el=document.getElementById('reg-inp-'+id);
+    const el=document.getElementById(id==='tamanho'?'reg-tamanho-manual':'reg-inp-'+id);
     const v=(el?.value||'').trim();
     REG_DATA[id]=id==='tel'?v.replace(/\D/g,''):v;
     regAdvance();
@@ -2782,6 +3030,51 @@ window.regAdicionarTapeteExtra = function(){
   renderRegStep();
 };
 
+window.regAbrirSeletorProdutoExtra = function(){
+  const overlay = document.createElement('div');
+  overlay.id = 'produto-extra-overlay';
+  overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:600;display:flex;align-items:flex-end';
+  function renderCategorias(){
+    overlay.innerHTML = `<div style="background:#fff;width:100%;border-radius:20px 20px 0 0;padding:20px 16px 32px">
+      <div style="font-size:16px;font-weight:800;margin-bottom:16px">Adicionar outro produto</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
+        ${PRODUTO_CATEGORIAS.map(c=>`
+          <div onclick="window._produtoExtraCat('${c.id}')" style="padding:14px 10px;border-radius:14px;border:2px solid #e5e7eb;background:#fafafa;text-align:center;font-size:13px;font-weight:700;color:#374151;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:6px">
+            ${PRODUTO_CATEGORIA_ICONS[c.id]||''}
+            <span>${c.label}</span>
+          </div>`).join('')}
+      </div>
+      <button onclick="document.getElementById('produto-extra-overlay').remove()" style="width:100%;padding:13px;background:#f3f4f6;border:none;border-radius:12px;font-size:14px;font-weight:700;color:#555;cursor:pointer">Cancelar</button>
+    </div>`;
+  }
+  function renderProdutos(catId){
+    const cat = PRODUTO_CATEGORIAS.find(c=>c.id===catId);
+    overlay.innerHTML = `<div style="background:#fff;width:100%;border-radius:20px 20px 0 0;padding:20px 16px 32px">
+      <div style="font-size:16px;font-weight:800;margin-bottom:16px">${cat.label}</div>
+      <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:14px">
+        ${cat.produtos.filter(p=>p.nome!=='Tráfego pago').map(p=>`
+          <div onclick="window._produtoExtraEscolher('${esc(p.nome)}',${p.valor})" style="padding:16px 18px;border-radius:14px;border:2px solid #e5e7eb;background:#fafafa;cursor:pointer;display:flex;justify-content:space-between;align-items:center">
+            <span style="font-size:14px;font-weight:600">${esc(p.nome)}</span>
+            <span style="font-size:14px;font-weight:800;color:#5cb85c">R$ ${fmt(p.valor)}</span>
+          </div>`).join('')}
+      </div>
+      <button onclick="window._produtoExtraVoltarCategorias()" style="width:100%;padding:13px;background:#f3f4f6;border:none;border-radius:12px;font-size:14px;font-weight:700;color:#555;cursor:pointer">← Voltar</button>
+    </div>`;
+  }
+  window._produtoExtraCat = function(catId){ renderProdutos(catId); };
+  window._produtoExtraVoltarCategorias = function(){ renderCategorias(); };
+  window._produtoExtraEscolher = function(nome, valor){
+    if(!window._regTapetesExtras) window._regTapetesExtras = [];
+    window._regTapetesExtras.push({ tamanho: nome, _precoBase: valor, preco: valor, desconto: 0, _manual: true });
+    window._regCarrosselIdx = window._regTapetesExtras.length;
+    overlay.remove();
+    renderRegStep();
+  };
+  renderCategorias();
+  document.body.appendChild(overlay);
+  overlay.onclick = e => { if(e.target===overlay) overlay.remove(); };
+};
+
 window.regRemoverTapeteExtra = function(i){
   window._regTapetesExtras.splice(i,1);
   const total = 1 + window._regTapetesExtras.length;
@@ -2802,7 +3095,11 @@ window.regResetarTapete1 = function(){
     REG_DATA._desconto = 0;
     REG_DATA._descontoAtivo = false;
     REG_DATA._precoConfirmado = false;
-    REG_DATA._tamanhoManual = false;
+    REG_DATA._precoManual = false;
+    REG_DATA._precoCanal = null;
+    // O step de tamanho é sempre preenchido manualmente (input livre),
+    // então essa flag precisa continuar true para o preço recalcular ao avançar.
+    REG_DATA._tamanhoManual = true;
     _regPrecoBase = 0;
     window._regCarrosselIdx = 0;
     // Volta para o step de tamanho
@@ -2886,12 +3183,20 @@ function regMostrarOpcoesPreco(){
 window.regMostrarOpcoesPreco = regMostrarOpcoesPreco;
 
 function calcPrecoAuto(tam){
-  const pts = tam.toLowerCase().split('x');
+  const norm = tam.toLowerCase().replace(/×/g,'x').replace(/\s*por\s*/g,'x').replace(/\s+/g,'');
+  const pts = norm.split('x');
   if(pts.length !== 2) return null;
-  const l = parseFloat(pts[0].replace(',','.'))/100;
-  const c = parseFloat(pts[1].replace(',','.'))/100;
-  if(isNaN(l)||isNaN(c)||l<=0||c<=0) return null;
-  return Math.round(l * c * 680);
+  const parseNum = (s) => {
+    s = s.trim().replace(',','.');
+    const n = parseFloat(s);
+    if(isNaN(n)) return null;
+    // Com parte decimal, já está em metros; senão, é centímetros.
+    return s.includes('.') ? n : n/100;
+  };
+  const l = parseNum(pts[0]);
+  const c = parseNum(pts[1]);
+  if(l==null||c==null||l<=0||c<=0) return null;
+  return Math.round(l * c * 580);
 }
 window.calcPrecoAuto = calcPrecoAuto;
 
@@ -3075,6 +3380,19 @@ function regAdvance(){
       REG_DATA[s.id]=s.type==='tel'?v.replace(/\D/g,''):v;
     }
   }
+  if(s && s.type==='tamanho'){
+    const el=document.getElementById('reg-tamanho-manual');
+    if(el) REG_DATA.tamanho = el.value.trim();
+  }
+  if(s && s.type==='agendamento' && REG_DATA._agendaAtivo){
+    const dataEl=document.getElementById('reg-agenda-data');
+    if(dataEl) REG_DATA._agendaData = dataEl.value;
+    if(!REG_DATA._agendaData){ toast('⚠️ Escolha uma data ou selecione "Não tem"'); return; }
+    const horaEl=document.getElementById('reg-agenda-hora');
+    const notaEl=document.getElementById('reg-agenda-nota');
+    if(horaEl) REG_DATA._agendaHora = horaEl.value;
+    if(notaEl) REG_DATA._agendaNota = notaEl.value.trim();
+  }
   // Tamanho manual: auto-calcula preço e pula tela de preço direto para simulação
   if(s && s.id==='tamanho' && REG_DATA._tamanhoManual){
     const auto = calcPrecoAuto(REG_DATA.tamanho||'');
@@ -3096,38 +3414,26 @@ function regAdvance(){
 }
 window.regAdvance = regAdvance;
 
-// Avança do step nome (step 0)
-function regNomeAvancar(){
-  const inp = document.getElementById('reg-nome-static');
-  REG_DATA.nome = inp ? inp.value.trim() : '';
-  const nomeBlock = document.getElementById('reg-nome-initial');
-  if(nomeBlock) nomeBlock.style.display = 'none';
-  regCurStep = 1;
-  salvarEstadoRegistrar();
-  renderRegStep();
-}
-window.regNomeAvancar = regNomeAvancar;
-
 function regVoltar(){
+  const steps = regActiveSteps();
+  const stepAtual = steps[regCurStep];
+  // Esses desvios de navegação (categoria/produto) só se aplicam dentro do step de foto/produto
+  if(stepAtual && stepAtual.id==='foto'){
+    // Se um produto já foi escolhido dentro da categoria, volta pra lista de produtos
+    if(REG_DATA._produtoNome){
+      regTrocarProduto();
+      return;
+    }
+    // Se uma categoria está aberta (mas nenhum produto escolhido ainda), volta pra lista de categorias
+    if(_regProdutoCatAberta){
+      regVoltarCategorias();
+      return;
+    }
+  }
   if(regCurStep <= 0) return;
   regCurStep--;
-  // Se voltou pro step 0, mostra o bloco do nome e limpa tudo
-  if(regCurStep === 0){
-    const container = document.getElementById('reg-steps-container');
-    if(container) container.innerHTML = '';
-    const nomeBlock = document.getElementById('reg-nome-initial');
-    if(nomeBlock) nomeBlock.style.display = 'block';
-    const inp = document.getElementById('reg-nome-static');
-    if(inp){
-      inp.value = REG_DATA.nome || '';
-      setTimeout(()=>inp.focus(), 100);
-    }
-    salvarEstadoRegistrar();
-    return;
-  }
   // Pula steps que não devem aparecer (onlyIf false)
-  const steps = regActiveSteps();
-  while(regCurStep > 1 && !steps[regCurStep]) regCurStep--;
+  while(regCurStep > 0 && !steps[regCurStep]) regCurStep--;
   salvarEstadoRegistrar();
   renderRegStep();
 }
@@ -3198,7 +3504,7 @@ async function regSalvarNaFilaSemSimul(){
     tamanho:REG_DATA.tamanho||'', cor:REG_DATA.cor||'', borda:curBorda,
     bordaCor:REG_DATA['borda-cor']||'', prazo:REG_DATA.prazo||'15',
     preco:REG_DATA.preco||'', obs:REG_DATA.obs||'',
-    status:'ativo', dataRegistro:today(), respondeu:false, _naFila:true,
+    status:'ativo', dataRegistro:today(), respondeu:false, _naFila:false,
     _aguardandoSimul:true,
     sequencia:[...SEQ[curTipo].sem_resposta], sequenciaFase:'sem_resposta', historico:[],
     dataMarcada:null, jaViu:curViu, dataVisita:null
@@ -3210,7 +3516,7 @@ async function regSalvarNaFilaSemSimul(){
   setTimeout(()=>{
     window.location.href='intent://gemini.google.com/#Intent;scheme=https;package=com.google.android.apps.bard;action=android.intent.action.VIEW;end';
   }, 400);
-  showScreen('fila'); setNav(1);
+  showScreen('home'); setNav(1);
 }
 window.regSalvarNaFilaSemSimul = regSalvarNaFilaSemSimul;
 
@@ -3378,7 +3684,19 @@ window.regEnviarCRM = async function(btnEl){
   const totalGeral = val1 + extras.reduce((s,t)=>s+valorComDesc(t._precoBase||t.preco||0, t.desconto||0), 0);
 
   // ── ID único com timestamp + random para evitar colisão de duplo clique ──
-  const c={
+  const modoProdutoCRM = !!REG_DATA._modoProduto;
+  const c=modoProdutoCRM ? {
+    id:'c_'+Date.now()+'_'+Math.random().toString(36).slice(2,7),
+    nome, telefone:tel, tipo:curTipo, foto:null, imgIA:null,
+    tamanho:REG_DATA.tamanho||'', produto:true, qtd:REG_DATA._produtoQtd||1, cor:'', borda:'nao', bordaCor:'',
+    prazo:'', preco:String(val1), obs:REG_DATA.obs||'',
+    tapetesExtras: extras.map(t=>({medida:t.tamanho, valor:valorComDesc(t._precoBase||t.preco||0, t.desconto||0)})),
+    parcelas: _regParcelas>=2 ? _regParcelas : 0,
+    totalGeral: totalGeral,
+    status:'ativo', dataRegistro:today(), respondeu:false, _naFila:false,
+    sequencia:[...SEQ[curTipo].sem_resposta], sequenciaFase:'sem_resposta',
+    historico:[], dataMarcada:REG_DATA._agendaData||null, horaMarcada:REG_DATA._agendaHora||null, notaMarcada:REG_DATA._agendaNota||null, jaViu:curViu, dataVisita:null
+  } : {
     id:'c_'+Date.now()+'_'+Math.random().toString(36).slice(2,7),
     nome, telefone:tel, tipo:curTipo,
     foto:tempFoto, imgIA:tempImgIA||null, fotos:tempFotos.length>1?[...tempFotos]:undefined,
@@ -3389,9 +3707,9 @@ window.regEnviarCRM = async function(btnEl){
     tapetesExtras: extras.map(t=>({medida:t.tamanho, valor:valorComDesc(t._precoBase||t.preco||0, t.desconto||0)})),
     parcelas: _regParcelas>=2 ? _regParcelas : 0,
     totalGeral: totalGeral,
-    status:'ativo', dataRegistro:today(), respondeu:false, _naFila:true,
+    status:'ativo', dataRegistro:today(), respondeu:false, _naFila:false,
     sequencia:[...SEQ[curTipo].sem_resposta], sequenciaFase:'sem_resposta',
-    historico:[], dataMarcada:null, jaViu:curViu, dataVisita:null
+    historico:[], dataMarcada:REG_DATA._agendaData||null, horaMarcada:REG_DATA._agendaHora||null, notaMarcada:REG_DATA._agendaNota||null, jaViu:curViu, dataVisita:null
   };
   // Adiciona no cache local ANTES de navegar para renderFila ja ver o item
   const payload = Object.assign({}, c, { updatedAt: Date.now() });
@@ -3402,9 +3720,8 @@ window.regEnviarCRM = async function(btnEl){
   _regParcelas = 0;
   initForm();
   limparEstadoRegistrar();
-  showScreen('fila');
+  showScreen('home');
   setNav(1);
-  renderFila();
   toast('Cliente enviado pro CRM!');
   // Salva no Firebase em background sem bloquear
   (async function(){
@@ -3471,7 +3788,11 @@ window.regEnviarParaCadastro = function(){
     simul: tempImgIA||null,
     tapetesExtras: extras.map(t=>({medida:t.tamanho, valor:valorComDesc(t._precoBase||t.preco||0, t.desconto||0)})),
     parcelas: _regParcelas>=2 ? _regParcelas : 0,
-    totalGeral: totalGeral
+    totalGeral: totalGeral,
+    dataMarcada: REG_DATA._agendaData||null,
+    horaMarcada: REG_DATA._agendaHora||null,
+    notaMarcada: REG_DATA._agendaNota||null,
+    tipo: curTipo
   };
 
   window._regTapetesExtras = [];
@@ -3479,7 +3800,7 @@ window.regEnviarParaCadastro = function(){
   _regParcelas = 0;
   initForm();
   limparEstadoRegistrar();
-  showScreen('home'); setNav(3);
+  showScreen('home'); setNav(1);
   setTimeout(function(){ abrirModalCadastro(); }, 100);
   toast('✅ Abrindo Cadastro com os dados!');
 };
@@ -3551,32 +3872,44 @@ async function salvarCliente(){
   const cor=(REG_DATA.cor||'').trim();
   const prazo=(REG_DATA.prazo||'').trim();
   const preco=(REG_DATA.preco||'').trim();
+  const modoProduto = !!REG_DATA._modoProduto;
   if(!nome){ _salvarClienteGuard=false; return toast('⚠️ Informe o nome'); }
   if(!tel) { _salvarClienteGuard=false; return toast('⚠️ Informe o telefone'); }
-  if(!tempFoto){ _salvarClienteGuard=false; return toast('⚠️ Foto obrigatória'); }
-  if(!curTipo) { _salvarClienteGuard=false; return toast('⚠️ Selecione o tipo'); }
-  if(!tam) { _salvarClienteGuard=false; return toast('⚠️ Informe o tamanho'); }
-  if(!cor) { _salvarClienteGuard=false; return toast('⚠️ Informe a cor'); }
-  if(!prazo){ _salvarClienteGuard=false; return toast('⚠️ Informe o prazo'); }
+  if(!modoProduto){
+    if(!tempFoto){ _salvarClienteGuard=false; return toast('⚠️ Foto obrigatória'); }
+    if(!curTipo) { _salvarClienteGuard=false; return toast('⚠️ Selecione o tipo'); }
+    if(!tam) { _salvarClienteGuard=false; return toast('⚠️ Informe o tamanho'); }
+    if(!cor) { _salvarClienteGuard=false; return toast('⚠️ Informe a cor'); }
+    if(!prazo){ _salvarClienteGuard=false; return toast('⚠️ Informe o prazo'); }
+    if(curBorda==='sim'&&!(REG_DATA['borda-cor']||'').trim()){ _salvarClienteGuard=false; return toast('⚠️ Informe a cor da borda'); }
+  }
   if(!preco){ _salvarClienteGuard=false; return toast('⚠️ Informe o preço'); }
-  if(curBorda==='sim'&&!(REG_DATA['borda-cor']||'').trim()){ _salvarClienteGuard=false; return toast('⚠️ Informe a cor da borda'); }
   if(clients.find(c=>cleanPhone(c.telefone)===cleanPhone(tel)&&c.status==='ativo')){ _salvarClienteGuard=false; return toast('⚠️ Telefone já cadastrado como ativo'); }
 
-  const c={
+  const c=modoProduto ? {
+    id:'c_'+Date.now()+'_'+Math.random().toString(36).slice(2,7), nome, telefone:tel, tipo:curTipo, foto:null, imgIA:null,
+    tamanho:tam, produto:true, cor:'', borda:'nao', bordaCor:'',
+    prazo:'', preco, obs:(REG_DATA.obs||'').trim(),
+    status:'ativo', dataRegistro:today(), respondeu:false, _naFila:false,
+    sequencia:[...SEQ[curTipo].sem_resposta], sequenciaFase:'sem_resposta', historico:[],
+    dataMarcada:REG_DATA._agendaData||null, horaMarcada:REG_DATA._agendaHora||null, notaMarcada:REG_DATA._agendaNota||null,
+    jaViu:curViu, dataVisita:null
+  } : {
     id:'c_'+Date.now()+'_'+Math.random().toString(36).slice(2,7), nome, telefone:tel, tipo:curTipo, foto:tempFoto, imgIA:tempImgIA||null,
     tamanho:tam, cor, borda:curBorda, bordaCor:(REG_DATA['borda-cor']||'').trim(),
     prazo, preco, obs:(REG_DATA.obs||'').trim(),
-    status:'ativo', dataRegistro:today(), respondeu:false, _naFila:true,
+    status:'ativo', dataRegistro:today(), respondeu:false, _naFila:false,
     sequencia:[...SEQ[curTipo].sem_resposta], sequenciaFase:'sem_resposta', historico:[],
-    dataMarcada:null, jaViu:curViu, dataVisita:null
+    dataMarcada:REG_DATA._agendaData||null, horaMarcada:REG_DATA._agendaHora||null, notaMarcada:REG_DATA._agendaNota||null,
+    jaViu:curViu, dataVisita:null
   };
 
   await fsAddClient(c);
   initForm();
   limparEstadoRegistrar();
   _salvarClienteGuard = false;
-  toast('✅ Cliente na fila de envio!');
-  showScreen('fila'); setNav(1); renderFila();
+  toast('✅ Cliente salvo!');
+  showScreen('home'); setNav(1);
 }
 window.salvarCliente = salvarCliente;
 
@@ -3733,10 +4066,10 @@ function buildMsgDia(c){
     let specs;
     if(extras.length>0){
       const l1 = [_L('Medida',c.tamanho), _L('Cor de Fundo',c.cor), bt?bt.trim():'', _L('Valor',_preco(c.preco))].filter(Boolean).join('\n');
-      let linhas=`📐 Tapete 1\n${l1}`;
+      let linhas=`Tapete 1\n${l1}`;
       extras.forEach(function(t,i){
         const lx=[_L('Medida',t.medida), _L('Cor de Fundo',t.cor||c.cor), _L('Valor',_preco(t.valor||0))].filter(Boolean).join('\n');
-        linhas+=`\n\n📐 Tapete ${i+2}\n${lx}`;
+        linhas+=`\n\nTapete ${i+2}\n${lx}`;
       });
       const prazoLinha = c.prazo ? `\nPrazo de Entrega: ${c.prazo} dias` : '';
       linhas+=`${prazoLinha}\nPagamento: somente na entrega\nFormas: Pix · Cartão · Dinheiro${parcelaLinha}`;
@@ -3845,9 +4178,68 @@ window.limparFotosFirebase = async function(){
   }
 };
 
-window._toggleProxAcoes = function(){
-  const aberto = localStorage.getItem('_proxAcoesAberto')==='true';
-  localStorage.setItem('_proxAcoesAberto', aberto?'false':'true');
+window._proxFiltroClick = function(k){
+  if(k==='hoje' || k==='semana'){
+    localStorage.setItem('_proxFiltro', JSON.stringify(k));
+    renderHome();
+    return;
+  }
+  if(k==='mes'){
+    const MESES=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+    const hoje = new Date();
+    let state = {mes: hoje.getMonth(), ano: hoje.getFullYear()};
+    const overlay = document.createElement('div');
+    overlay.id = 'mes-picker-overlay';
+    overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:600;display:flex;align-items:flex-end';
+    function render(){
+      overlay.innerHTML = `<div style="background:#fff;width:100%;border-radius:20px 20px 0 0;padding:22px 20px 32px">
+        <div style="font-size:14px;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:.4px;margin-bottom:18px;text-align:center">Escolha o mês</div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px">
+          <button onclick="window._mesPickerNav(-1)" style="width:44px;height:44px;border-radius:50%;border:none;background:#f3f4f6;font-size:18px;font-weight:800;color:#111;cursor:pointer">‹</button>
+          <div style="font-size:22px;font-weight:800;color:#111">${MESES[state.mes]} ${state.ano}</div>
+          <button onclick="window._mesPickerNav(1)" style="width:44px;height:44px;border-radius:50%;border:none;background:#f3f4f6;font-size:18px;font-weight:800;color:#111;cursor:pointer">›</button>
+        </div>
+        <button onclick="window._proxFiltroSetMes(${state.mes},${state.ano})" style="width:100%;padding:15px;background:#111;color:#fff;border:none;border-radius:14px;font-size:15px;font-weight:800;cursor:pointer;margin-bottom:10px">Confirmar</button>
+        <button onclick="document.getElementById('mes-picker-overlay').remove()" style="width:100%;padding:13px;background:#f3f4f6;border:none;border-radius:12px;font-size:14px;font-weight:700;color:#555;cursor:pointer">Cancelar</button>
+      </div>`;
+    }
+    window._mesPickerNav = function(delta){
+      state.mes += delta;
+      if(state.mes<0){ state.mes=11; state.ano--; }
+      if(state.mes>11){ state.mes=0; state.ano++; }
+      render();
+    };
+    render();
+    document.body.appendChild(overlay);
+    overlay.onclick = e => { if(e.target===overlay) overlay.remove(); };
+    return;
+  }
+  if(k==='ano'){
+    const anosComData = [...new Set(clients.filter(c=>c.status==='ativo'&&!c._naFila).map(c=>{
+      const nd=nextDate(c); return nd ? new Date(nd+'T00:00:00').getFullYear() : null;
+    }).filter(Boolean))].sort();
+    const overlay = document.createElement('div');
+    overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:600;display:flex;align-items:flex-end';
+    overlay.innerHTML = `<div style="background:#fff;width:100%;border-radius:20px 20px 0 0;padding:20px 16px 32px">
+      <div style="font-size:16px;font-weight:800;margin-bottom:14px">Escolha o ano</div>
+      ${anosComData.length ? anosComData.map(ano=>`
+        <button onclick="window._proxFiltroSetAno(${ano})" style="width:100%;text-align:left;padding:13px 12px;border:none;background:none;border-bottom:1px solid #f1f5f9;font-size:15px;font-weight:600;color:#111;cursor:pointer">${ano}</button>
+      `).join('') : `<div style="padding:13px 12px;color:#9ca3af;font-size:14px">Nenhum cliente com data agendada ainda</div>`}
+      <button onclick="this.closest('div[style*=fixed]').remove()" style="width:100%;margin-top:14px;padding:13px;background:#f3f4f6;border:none;border-radius:12px;font-size:14px;font-weight:700;color:#555;cursor:pointer">Cancelar</button>
+    </div>`;
+    document.body.appendChild(overlay);
+    overlay.onclick = e => { if(e.target===overlay) overlay.remove(); };
+    return;
+  }
+};
+window._proxFiltroSetMes = function(mes, ano){
+  localStorage.setItem('_proxFiltro', JSON.stringify({mes, ano}));
+  document.querySelectorAll('div[style*="position:fixed"]').forEach(el=>{ if(el.style.zIndex==='600') el.remove(); });
+  renderHome();
+};
+window._proxFiltroSetAno = function(ano){
+  localStorage.setItem('_proxFiltro', JSON.stringify({ano}));
+  document.querySelectorAll('div[style*="position:fixed"]').forEach(el=>{ if(el.style.zIndex==='600') el.remove(); });
   renderHome();
 };
 window.copyText = copyText;
@@ -3898,10 +4290,10 @@ async function enviarMensagemDia(id){
     let specs;
     if(extras.length>0){
       const l1=[_L2('Medida',c.tamanho),_L2('Cor de Fundo',c.cor),bt?bt.trim():'',_L2('Valor',_preco2(c.preco))].filter(Boolean).join('\n');
-      let linhas=`📐 Tapete 1\n${l1}`;
+      let linhas=`Tapete 1\n${l1}`;
       extras.forEach(function(t,i){
         const lx=[_L2('Medida',t.medida),_L2('Cor de Fundo',t.cor||c.cor),_L2('Valor',_preco2(t.valor||0))].filter(Boolean).join('\n');
-        linhas+=`\n\n📐 Tapete ${i+2}\n${lx}`;
+        linhas+=`\n\nTapete ${i+2}\n${lx}`;
       });
       const prazoLinha2 = c.prazo ? `\nPrazo de Entrega: ${c.prazo} dias` : '';
       linhas+=`${prazoLinha2}\nPagamento: somente na entrega\nFormas: Pix · Cartão · Dinheiro${parcelaLinha}`;
@@ -3984,25 +4376,12 @@ window.handleImgIA = handleImgIA;
 function openTimeline(id){
   const c=clients.find(x=>x.id===id); if(!c) return;
   curCid=id;
-  const te={'nao-estava':'🟢','interessado':'🔵','super-quente':'🔴'}[c.tipo]||'';
   const bt=c.borda==='sim'?`Com borda ${c.bordaCor||'preta'}`:'Sem borda';
-  let tl='';
-  (c.sequencia||[]).forEach(d=>{
-    const sent=(c.historico||[]).find(h=>h.dia===d&&h.tipo==='enviado');
-    const base=new Date(c.dataRegistro+'T00:00:00');
-    base.setDate(base.getDate()+d-1);
-    tl+=`<div class="tl-item">
-      <div class="tl-dot ${sent?'sent':'pending'}">${sent?'✅':'⏳'}</div>
-      <div><div class="tl-ttl">Dia ${d} — ${sent?'Enviado':'Pendente'}</div>
-      <div class="tl-sub">${sent?'em '+fmtDate(sent.data):fmtDate(base.toISOString().split('T')[0])}</div></div>
-    </div>`;
-  });
-
   function row(icon, label, val){
     return `<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #f1f5f9">
-      <span style="font-size:16px;width:22px;text-align:center;flex-shrink:0">${icon}</span>
+      <span style="width:22px;height:22px;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:#6b7280">${icon}</span>
       <span style="font-size:.78rem;font-weight:700;color:#9ca3af;flex:1">${label}</span>
-      <span style="font-size:.85rem;font-weight:700;color:#111;text-align:right;max-width:60%;word-break:break-word">${val}</span>
+      <span style="font-size:.85rem;font-weight:700;color:#9ca3af;text-align:right;max-width:60%;word-break:break-word">${val}</span>
     </div>`;
   }
 
@@ -4012,8 +4391,13 @@ function openTimeline(id){
       <!-- Header -->
       <div style="background:linear-gradient(135deg,#1e293b,#334155);border-radius:18px;padding:18px;margin-bottom:12px;color:#fff">
         <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">
-          <div style="font-size:1.2rem;font-weight:900">${te} ${esc(c.nome)}</div>
-          <span style="font-size:.7rem;opacity:.7">${fmtDate(c.dataRegistro)}</span>
+          <div style="font-size:1.2rem;font-weight:900">${esc(c.nome)}</div>
+          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">
+            <span style="font-size:.7rem;opacity:.7">${fmtDate(c.dataRegistro)}</span>
+            <button onclick="excluir('${c.id}')" style="background:rgba(239,68,68,.2);border:none;border-radius:8px;padding:5px 8px;cursor:pointer;line-height:0" title="Excluir">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#f87171" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+            </button>
+          </div>
         </div>
         <div style="display:flex;gap:8px;flex-wrap:wrap">
           <span style="background:rgba(255,255,255,.15);border-radius:20px;padding:3px 12px;font-size:.72rem;font-weight:700">${esc(c.status)}</span>
@@ -4034,14 +4418,20 @@ function openTimeline(id){
       <!-- Informações -->
       <div style="background:#fff;border-radius:16px;padding:4px 16px;margin-bottom:12px;box-shadow:0 2px 8px rgba(0,0,0,.06)">
         <div style="font-size:.65rem;font-weight:900;color:#94a3b8;text-transform:uppercase;letter-spacing:.06em;padding-top:12px;margin-bottom:4px">Informações</div>
-        ${row('🏷️','Tipo', esc(typeName(c.tipo)))}
-        ${row('📐','Medida', esc(c.tamanho))}
-        ${row('🎨','Cor', esc(c.cor))}
-        ${row('✨','Borda', c.borda==='sim'?(c.bordaCor||'Com borda'):'Sem borda')}
-        ${row('💰','Preço', 'R$ '+fmt(c.preco))}
-        ${row('⏱','Prazo', (c.prazo||'15')+' dias')}
-        ${row('📱','Telefone', esc(c.telefone))}
-        ${c.obs?row('📝','Obs', esc(c.obs)):''}
+        ${c.produto ? `
+        ${row('<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.91 8.84 8.56 2.23a1.93 1.93 0 0 0-1.81 0L3.1 4.13a2.12 2.12 0 0 0-.05 3.69l12.22 6.93a2 2 0 0 0 1.94 0L21 12.51a2.12 2.12 0 0 0-.09-3.67Z"/><path d="m3.09 8.84 12.35-6.61a1.93 1.93 0 0 1 1.81 0l3.65 1.9a2.12 2.12 0 0 1 .05 3.69L8.73 14.75a2 2 0 0 1-1.94 0L3 12.51a2.12 2.12 0 0 1 .09-3.67Z"/><line x1="12" y1="22" x2="12" y2="13"/><path d="M20 13.5v3.37a2.06 2.06 0 0 1-1.11 1.83l-6 3.08a1.93 1.93 0 0 1-1.78 0l-6-3.08A2.06 2.06 0 0 1 4 16.87V13.5"/></svg>','Produto', esc(c.tamanho))}
+        ${row('<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9h6v6H9z"/></svg>','Quantidade', String(c.qtd||1))}
+        ${row('<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M14.5 9.5a2.5 2.5 0 0 0-2.5-1.5c-1.5 0-2.5.8-2.5 2s1 1.6 2.5 2 2.5.8 2.5 2-1 2-2.5 2a2.5 2.5 0 0 1-2.5-1.5"/><path d="M12 6.5v11"/></svg>','Valor', 'R$ '+fmt(c.preco))}
+        ` : `
+        ${row('<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 20 9-16 9 16z"/><path d="M8 16h8"/></svg>','Medida', esc(c.tamanho))}
+        ${row('<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="13.5" cy="6.5" r=".5"/><circle cx="17.5" cy="10.5" r=".5"/><circle cx="8.5" cy="7.5" r=".5"/><circle cx="6.5" cy="12.5" r=".5"/><path d="M12 2a10 10 0 1 0 0 20 3 3 0 0 0 3-3 2 2 0 0 1 2-2h1a5 5 0 0 0 5-5c0-6-5-10-11-10z"/></svg>','Cor de fundo', esc(c.cor))}
+        ${row('<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>','Borda', c.borda==='sim'?'Com borda':'Sem borda')}
+        ${c.borda==='sim'?row('<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="13.5" cy="6.5" r=".5"/><circle cx="17.5" cy="10.5" r=".5"/><circle cx="8.5" cy="7.5" r=".5"/><circle cx="6.5" cy="12.5" r=".5"/><path d="M12 2a10 10 0 1 0 0 20 3 3 0 0 0 3-3 2 2 0 0 1 2-2h1a5 5 0 0 0 5-5c0-6-5-10-11-10z"/></svg>','Cor da borda', esc(c.bordaCor||'Preta')):''}
+        ${row('<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M14.5 9.5a2.5 2.5 0 0 0-2.5-1.5c-1.5 0-2.5.8-2.5 2s1 1.6 2.5 2 2.5.8 2.5 2-1 2-2.5 2a2.5 2.5 0 0 1-2.5-1.5"/><path d="M12 6.5v11"/></svg>','Preço', 'R$ '+fmt(c.preco))}
+        `}
+        ${row('<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l3 2"/><path d="M9 2h6M12 2v3"/></svg>','Prazo', (c.prazo||'15')+' dias')}
+        ${row('<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="2" width="12" height="20" rx="2"/><path d="M12 18h.01"/></svg>','Telefone', esc(c.telefone))}
+        ${c.obs?row('<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>','Obs', esc(c.obs)):''}
       </div>
 
       <!-- Foto do cliente -->
@@ -4061,15 +4451,6 @@ function openTimeline(id){
         </div>
         <img src="${c.imgIA}" style="width:100%;border-radius:10px;max-height:220px;object-fit:cover">
       </div>`:''}
-
-      <!-- Sequência -->
-      <div style="background:#fff;border-radius:16px;padding:14px;margin-bottom:12px;box-shadow:0 2px 8px rgba(0,0,0,.06)">
-        <div style="font-size:.65rem;font-weight:900;color:#94a3b8;text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">📅 Sequência</div>
-        ${tl}
-      </div>
-
-      <!-- Opções -->
-      <button class="btn btn-ghost" style="border-radius:12px" onclick="openOpcoes('${c.id}')">⋮ Mais Opções</button>
     </div>`;
   showScreen('timeline');
 }
@@ -4094,45 +4475,9 @@ window.timelineApagarSimulacao = async function(id){
 
 
 function alertaAntecipar(id){
-  const c = clients.find(x=>x.id===id); if(!c) return;
-  const d = curDay(c);
-  const nd = nextDate(c);
-  // Modal de confirmação
-  const overlay = document.createElement('div');
-  overlay.id = `alerta-overlay-${id}`;
-  overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:600;display:flex;align-items:flex-end';
-  overlay.innerHTML=`
-    <div style="background:#fff;width:100%;border-radius:20px 20px 0 0;padding:24px 20px 32px">
-      <div style="font-size:17px;font-weight:800;margin-bottom:6px">${esc(c.nome)}</div>
-      <div style="font-size:13px;color:#888;margin-bottom:20px">Dia ${d} previsto para ${fmtDate(nd)}</div>
-      <button onclick="document.getElementById('alerta-overlay-${id}').remove();alertaConfirmarEnvio('${id}')" 
-        style="width:100%;padding:16px;background:#111;color:#fff;border:none;border-radius:14px;font-size:15px;font-weight:700;cursor:pointer;margin-bottom:10px">
-        📤 Enviar agora e avançar para Dia ${(()=>{const seq=c.sequencia||[];const idx=seq.findIndex(x=>x===d);return idx>=0&&seq[idx+1]?seq[idx+1]:'próximo';})()}
-      </button>
-      <button onclick="document.getElementById('alerta-overlay-${id}').remove();openTimeline('${id}')"
-        style="width:100%;padding:14px;background:#f5f5f5;border:none;border-radius:14px;font-size:14px;font-weight:600;cursor:pointer;margin-bottom:10px">
-        📋 Ver histórico
-      </button>
-      <button onclick="document.getElementById('alerta-overlay-${id}').remove()"
-        style="width:100%;padding:14px;background:transparent;border:none;font-size:14px;color:#888;cursor:pointer">
-        Cancelar
-      </button>
-    </div>`;
-  document.body.appendChild(overlay);
-  overlay.onclick = e => { if(e.target===overlay) overlay.remove(); };
+  openTimeline(id);
 }
 window.alertaAntecipar = alertaAntecipar;
-
-async function alertaConfirmarEnvio(id){
-  const c = clients.find(x=>x.id===id); if(!c) return;
-  copyText(buildMsgDia(c),'✅ Texto copiado!');
-  const tel=c.telefone.replace(/\D/g,'');
-  window.open(`https://wa.me/55${tel}`,'_blank');
-  await marcarEnviado(id);
-  toast(`✅ Enviado! Avançou para Dia ${curDay(clients.find(x=>x.id===id))}`);
-  renderHome();
-}
-window.alertaConfirmarEnvio = alertaConfirmarEnvio;
 
 // ── OPÇÕES ────────────────────────────────────────────────────────────────────
 function openOpcoes(id){
@@ -4184,20 +4529,20 @@ window.pararResponder = pararResponder;
 
 async function encerrar(id){
   await fsUpdateClient(id, { status:'parou' });
-  toast('🚫 Fluxo encerrado'); showScreen('home');setNav(2);
+  toast('🚫 Fluxo encerrado'); showScreen('home');setNav(1);
 }
 window.encerrar = encerrar;
 
 async function arquivar(id){
   await fsUpdateClient(id, { status:'arquivado' });
-  toast('🗄️ Arquivado'); showScreen('home');setNav(2);
+  toast('🗄️ Arquivado'); showScreen('home');setNav(1);
 }
 window.arquivar = arquivar;
 
 async function excluir(id){
   if(!confirm('Excluir este cliente?')) return;
   await fsDeleteClient(id);
-  toast('❌ Excluído'); showScreen('home');setNav(2);
+  toast('❌ Excluído'); showScreen('home');setNav(1);
 }
 window.excluir = excluir;
 
@@ -4242,7 +4587,7 @@ async function confirmarVenda(id){
     obsFechamento: document.getElementById('fo').value.trim(),
     historico: hist
   });
-  toast('🎉 Venda confirmada!'); showScreen('home');setNav(2);
+  toast('🎉 Venda confirmada!'); showScreen('home');setNav(1);
 }
 window.confirmarVenda = confirmarVenda;
 
@@ -4431,17 +4776,29 @@ window.addEventListener('DOMContentLoaded', async () => {
 
   // Restaura estado do formulário se estava em REGISTRAR
   const saved = (() => { try{ return JSON.parse(sessionStorage.getItem('_regState')||'null'); }catch(_){return null;} })();
+  let restaurou = false;
   if(saved && saved.curScreen === 'registrar' && saved.regCurStep > 0){
-    Object.assign(REG_DATA, saved.regData||{});
-    regCurStep = saved.regCurStep||0;
-    curTipo = saved.curTipo||null;
-    curBorda = saved.curBorda||'nao';
-    tempFoto = saved.tempFoto||null;
-    tempImgIA = saved.tempImgIA||null;
-    showScreen('registrar'); setNav(0);
-    renderRegStep();
-  } else {
-    showScreen('registrar'); setNav(0); initForm();
+    try{
+      Object.assign(REG_DATA, saved.regData||{});
+      regCurStep = saved.regCurStep||0;
+      curTipo = saved.curTipo||null;
+      curBorda = saved.curBorda||'nao';
+      tempFoto = saved.tempFoto||null;
+      tempImgIA = saved.tempImgIA||null;
+      const stepsAtuais = regActiveSteps();
+      // Estado salvo de uma estrutura antiga/incompatível — não confia nele
+      if(regCurStep > stepsAtuais.length){
+        throw new Error('estado incompatível com a estrutura atual do formulário');
+      }
+      showScreen('registrar'); setNav(0);
+      renderRegStep();
+      restaurou = true;
+    }catch(_){
+      restaurou = false;
+    }
+  }
+  if(!restaurou){
+    showScreen('registrar'); setNav(0); initForm(); renderRegStep();
   }
 });
 
@@ -4517,15 +4874,23 @@ function cadCriarBlocoTapete(opts){
   div.id = 'cad_bloco_' + uid;
   div.dataset.uid = uid;
   div.style.cssText = 'background:#f8fafc;border-radius:16px;padding:16px;margin-top:14px;border:2px solid #d1d5db';
+  var temCor = !!(opts.cor || opts.bcor);
+  var medidaInicial = (opts.medida||'').trim();
+  var tituloInicial = (medidaInicial && !cadPareceMedidaTapete(medidaInicial)) ? (medidaInicial) : ('Tapete ' + n);
   div.innerHTML = '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">'
-    + '<span class="cad-bloco-titulo" style="font-size:.85rem;font-weight:900;color:#111;font-family:\'Nunito\',sans-serif">🪄 Tapete ' + n + '</span>'
+    + '<span class="cad-bloco-titulo" style="font-size:.85rem;font-weight:900;color:#111;font-family:\'Nunito\',sans-serif">' + tituloInicial + '</span>'
     + '<button style="flex-shrink:0;height:30px;width:30px;border-radius:7px;border:1.5px solid #d1d5db;background:#f3f4f6;color:#9ca3af;font-size:13px;cursor:pointer;font-weight:700;display:flex;align-items:center;justify-content:center" onclick="cadRemoverBloco(\''+uid+'\')">✕</button></div>'
-    + '<label style="font-size:.7rem;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.04em;margin-bottom:3px;display:block">MEDIDA DO TAPETE</label>'
-    + '<input type="text" id="cad_med_'+uid+'" class="cad-input" value="'+(opts.medida||'')+'" oninput="cadAtualizarMedidaTotal()">'
+    + '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:3px">'
+    + '<label style="font-size:.7rem;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.04em;display:block">PRODUTO / MEDIDA</label>'
+    + '<button type="button" id="cad_cores_toggle_'+uid+'" title="Adicionar cor de fundo/borda" aria-label="Adicionar cor de fundo/borda" style="display:'+(temCor?'none':'inline-flex')+';align-items:center;justify-content:center;width:26px;height:26px;flex-shrink:0;background:none;border:none;padding:0;cursor:pointer;color:#6b7280" onclick="cadMostrarCoresBloco(\''+uid+'\')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C6.48 2 2 6.48 2 12c0 4.42 2.87 7.5 6.5 7.5.83 0 1.5-.67 1.5-1.5 0-.39-.15-.74-.39-1.01-.23-.26-.38-.61-.38-.99 0-.83.67-1.5 1.5-1.5H12c4.42 0 8-3.58 8-8 0-4.13-3.87-7.5-8-7.5z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><circle cx="6.5" cy="11.5" r="1.3" fill="currentColor"/><circle cx="9.5" cy="7.5" r="1.3" fill="currentColor"/><circle cx="14.5" cy="7.5" r="1.3" fill="currentColor"/><circle cx="17.2" cy="11.5" r="1.3" fill="currentColor"/></svg></button>'
+    + '</div>'
+    + '<input type="text" id="cad_med_'+uid+'" class="cad-input" value="'+(opts.medida||'')+'" oninput="cadAtualizarMedidaTotal();cadAtualizarTituloBloco(\''+uid+'\')">'
+    + '<div id="cad_cores_'+uid+'" style="display:'+(temCor?'block':'none')+'">'
     + '<label style="font-size:.7rem;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.04em;margin-bottom:3px;display:block">COR DE FUNDO</label>'
     + '<input type="text" id="cad_cor_'+uid+'" class="cad-input" value="'+(opts.cor||'')+'">'
     + '<label style="font-size:.7rem;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.04em;margin-bottom:3px;display:block">COR DA BORDA</label>'
     + '<input type="text" id="cad_bcor_'+uid+'" class="cad-input" value="'+(opts.bcor||'')+'">'
+    + '</div>'
     + '<label style="font-size:.7rem;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.04em;margin-bottom:3px;display:block">VALOR (R$)</label>'
     + '<input type="text" id="cad_val_'+uid+'" class="cad-input" inputmode="numeric" oninput="cadMascaraValor(this);cadRecalcularTotal()" value="'+(opts.valor||'')+'">';
   var area = document.getElementById('cad_blocos_tapetes');
@@ -4534,6 +4899,60 @@ function cadCriarBlocoTapete(opts){
   cadAtualizarBotaoAdicionar();
   cadAtualizarMedidaTotal();
 }
+
+// Mostra os campos de cor de fundo/borda de um bloco (usado quando o produto é um tapete)
+function cadMostrarCoresBloco(uid){
+  var box = document.getElementById('cad_cores_'+uid);
+  var btn = document.getElementById('cad_cores_toggle_'+uid);
+  if(box) box.style.display = 'block';
+  if(btn) btn.style.display = 'none';
+}
+window.cadMostrarCoresBloco = cadMostrarCoresBloco;
+
+// Detecta se o texto digitado parece uma medida de tapete (ex: "200x120", "1,50 x 2,00", "90 X 60cm").
+// Padrão: número (com opcional vírgula/ponto decimal) + "x" + número, com espaços/unidades opcionais.
+function cadPareceMedidaTapete(texto){
+  if(!texto) return false;
+  return /^\s*\d+([.,]\d+)?\s*[xX]\s*\d+([.,]\d+)?\s*(cm|m)?\s*$/.test(texto.trim());
+}
+window.cadPareceMedidaTapete = cadPareceMedidaTapete;
+
+// Descobre a categoria (label) de um produto pelo nome, buscando em PRODUTO_CATEGORIAS.
+// Retorna null se não encontrar (ex: quando o texto é uma medida de tapete, não um produto).
+function cadCategoriaDoProduto(nomeProduto){
+  if(!nomeProduto) return null;
+  var lista = window.PRODUTO_CATEGORIAS || [];
+  var alvo = nomeProduto.trim().toLowerCase();
+  for(var i=0;i<lista.length;i++){
+    var cat = lista[i];
+    for(var j=0;j<cat.produtos.length;j++){
+      if(cat.produtos[j].nome.trim().toLowerCase() === alvo) return cat.label;
+    }
+  }
+  return null;
+}
+window.cadCategoriaDoProduto = cadCategoriaDoProduto;
+
+// Atualiza o título do bloco em tempo real conforme o produto/medida é digitado.
+// Se o texto parecer uma medida de tapete (ex: "200x120"), o título fica fixo em "Tapete N".
+// Se for outro produto (ex: "Sabonete íntimo"), o título passa a ser o próprio nome digitado.
+// Campo vazio também cai no padrão "Tapete N".
+function cadAtualizarTituloBloco(uid){
+  var input = document.getElementById('cad_med_'+uid);
+  var div = document.getElementById('cad_bloco_'+uid);
+  if(!input || !div) return;
+  var titulo = div.querySelector('.cad-bloco-titulo');
+  if(!titulo) return;
+  var texto = input.value.trim();
+  var idx = cad_blocosIds.indexOf(uid);
+  var n = idx >= 0 ? (idx+1) : cad_blocosIds.length;
+  if(texto && !cadPareceMedidaTapete(texto)){
+    titulo.textContent = texto;
+  } else {
+    titulo.textContent = 'Tapete ' + n;
+  }
+}
+window.cadAtualizarTituloBloco = cadAtualizarTituloBloco;
 
 // Inicializa data de hoje e meses do select ao abrir
 window.abrirModalCadastro = function(){
@@ -4828,8 +5247,13 @@ function cadAtualizarNumeracao(){
   if(!blocos) return;
   var divs = blocos.querySelectorAll('[data-uid]');
   divs.forEach(function(div, idx){
+    var uid = div.dataset.uid;
+    var input = document.getElementById('cad_med_'+uid);
     var titulo = div.querySelector('.cad-bloco-titulo');
-    if(titulo) titulo.textContent = '🪄 Tapete ' + (idx+1);
+    if(!titulo) return;
+    var texto = input ? input.value.trim() : '';
+    // Só usa numeração padrão se vazio OU se o texto for uma medida de tapete (ex: 200x120)
+    if(!texto || cadPareceMedidaTapete(texto)) titulo.textContent = 'Tapete ' + (idx+1);
   });
 }
 
@@ -4896,14 +5320,14 @@ function cadGetCusto(p){ return (p.custo!==null && p.custo!==undefined && p.cust
 function cadWaLink(c){
   var n=(c||'').replace(/\D/g,''); if(!n) return '---';
   var num=n.startsWith('55')?n:'55'+n;
-  return '<a class="cad-walink" href="https://wa.me/'+num+'" target="_blank">📲 '+c+'</a>';
+  return '<a class="cad-walink" href="https://wa.me/'+num+'" target="_blank">'+c+'</a>';
 }
 function cadTelLink(c){
   var n=(c||'').replace(/[^0-9]/g,''); if(!n) return '';
   var local=n; if(n.startsWith('55')&&n.length>=12) local=n.slice(2);
   var ddd=local.slice(0,2), num=local.slice(2);
   var fmt='(0'+ddd+') '; if(num.length===9) fmt+=num.slice(0,5)+'-'+num.slice(5); else fmt+=num.slice(0,4)+'-'+num.slice(4);
-  return '<a class="cad-tellink" href="tel:0'+ddd+num+'">📞 '+fmt+'</a>';
+  return '<a class="cad-tellink" href="tel:0'+ddd+num+'">'+fmt+'</a>';
 }
 
 // Toast (usa o do CRM)
@@ -4979,13 +5403,12 @@ window.cadSalvarPedido = async function(){
   if(!nome || !contato || !valorRaw || !medida || !prazo){
     cadToast('⚠️ Preencha os campos obrigatórios'); return;
   }
-  if(!cadFotoBase64){ cadToast('⚠️ Foto do cliente é obrigatória!'); return; }
   var custo = custoRaw !== '' ? parseFloat(custoRaw) : null;
   var pedido = {
     nome, contato, medida, cor, valor: valorTap1 || parseFloat(valorRaw), valorTotal: parseFloat(valorRaw), custo,
     prazo: parseInt(prazo), borda, bcor, endereco: end, dataVenda: data,
     completo: custo !== null, obs, tapetesExtras, categoria: 'Tapete',
-    criadoEm: new Date().toISOString(), fotos: [cadFotoBase64], // fotos salvas apenas localmente
+    criadoEm: new Date().toISOString(), fotos: cadFotoBase64 ? [cadFotoBase64] : [], // fotos salvas apenas localmente
     updatedAt: Date.now()
   };
   // Salva local primeiro
@@ -5055,15 +5478,17 @@ window.cadRenderP = function(){
     var sc = cadGetCusto(p) === null;
     var extras = p.tapetesExtras || [];
     var totalPedido = p.valorTotal || ((p.valor||0) + extras.reduce(function(acc,t){ return acc+(t.valor||0); }, 0));
-    var foto = p.fotos && p.fotos.length > 0 ? '<img src="'+p.fotos[0]+'" style="width:44px;height:44px;border-radius:10px;object-fit:cover;float:right;margin-left:8px">' : '';
+    var foto = p.fotos && p.fotos.length > 0 && p.fotos[0] ? '<img src="'+p.fotos[0]+'" style="width:44px;height:44px;border-radius:10px;object-fit:cover;float:right;margin-left:8px">' : '';
     h += '<div class="cad-vcard'+(sc?' cad-vcard-inc':'')+'">' + foto;
     h += '<div class="cad-vcard-nome">'+p.nome+'</div>';
     if(p.loja) h += '<div style="font-size:.75rem;color:#6b7280;font-weight:600;margin-bottom:6px">'+p.loja+'</div>';
 
     // Tapete principal como bloco separado
     h += '<div style="background:#f1f5f9;border-radius:10px;padding:10px;margin-bottom:6px;border-left:3px solid #111">';
-    h += '<div style="font-size:.68rem;font-weight:900;color:#374151;text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px">🪄 Tapete 1</div>';
-    h += '<div class="cad-vcard-row"><span class="cad-vcard-key">Medida</span><span class="cad-vcard-val">'+p.medida+'</span></div>';
+    var isProdutoP = p.medida && !cadPareceMedidaTapete(p.medida);
+    var catP = isProdutoP ? cadCategoriaDoProduto(p.medida) : null;
+    h += '<div style="font-size:.68rem;font-weight:900;color:#374151;text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px">'+(isProdutoP ? (catP || p.medida) : 'Tapete 1')+'</div>';
+    h += '<div class="cad-vcard-row"><span class="cad-vcard-key">'+(isProdutoP ? 'Produto' : 'Medida')+'</span><span class="cad-vcard-val">'+p.medida+'</span></div>';
     if(p.cor) h += '<div class="cad-vcard-row"><span class="cad-vcard-key">Cor fundo</span><span class="cad-vcard-val">'+p.cor+'</span></div>';
     if(p.borda==='com'&&p.bcor) h += '<div class="cad-vcard-row"><span class="cad-vcard-key">Borda</span><span class="cad-vcard-val">'+p.bcor+'</span></div>';
     h += '<div class="cad-vcard-row"><span class="cad-vcard-key">Valor</span><span class="cad-vcard-val" style="color:#111">'+cadR(p.valor)+'</span></div>';
@@ -5072,8 +5497,10 @@ window.cadRenderP = function(){
     // Tapetes extras — cada um no seu bloco
     extras.forEach(function(t, i){
       h += '<div style="background:#f1f5f9;border-radius:10px;padding:10px;margin-bottom:6px;border-left:3px solid #6b7280">';
-      h += '<div style="font-size:.68rem;font-weight:900;color:#374151;text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px">🪄 Tapete '+(i+2)+'</div>';
-      h += '<div class="cad-vcard-row"><span class="cad-vcard-key">Medida</span><span class="cad-vcard-val">'+(t.medida||'—')+'</span></div>';
+      var isProdutoT = t.medida && !cadPareceMedidaTapete(t.medida);
+      var catT = isProdutoT ? cadCategoriaDoProduto(t.medida) : null;
+      h += '<div style="font-size:.68rem;font-weight:900;color:#374151;text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px">'+(isProdutoT ? (catT || t.medida) : ('Tapete '+(i+2)))+'</div>';
+      h += '<div class="cad-vcard-row"><span class="cad-vcard-key">'+(isProdutoT ? 'Produto' : 'Medida')+'</span><span class="cad-vcard-val">'+(t.medida||'—')+'</span></div>';
       if(t.cor) h += '<div class="cad-vcard-row"><span class="cad-vcard-key">Cor fundo</span><span class="cad-vcard-val">'+t.cor+'</span></div>';
       if(t.bcor) h += '<div class="cad-vcard-row"><span class="cad-vcard-key">Borda</span><span class="cad-vcard-val">'+t.bcor+'</span></div>';
       h += '<div class="cad-vcard-row"><span class="cad-vcard-key">Valor</span><span class="cad-vcard-val" style="color:#111">'+cadR(t.valor||0)+'</span></div>';
@@ -5197,15 +5624,15 @@ window.cadAbrirComp = function(id){
   var p = cad_pedidosCache.find(function(x){ return x.id === id; }); if(!p) return;
   function row(icon,label,val){
     return '<div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid #f1f5f9">'
-      +'<span style="font-size:15px;width:20px;text-align:center;flex-shrink:0">'+icon+'</span>'
+      +(icon?'<span style="font-size:15px;width:20px;text-align:center;flex-shrink:0">'+icon+'</span>':'')
       +'<span style="font-size:.75rem;font-weight:700;color:#9ca3af;flex:1">'+label+'</span>'
       +'<span style="font-size:.85rem;font-weight:800;color:#111">'+val+'</span>'
       +'</div>';
   }
   document.getElementById('cad_cinfo').innerHTML =
-    row('👤','Cliente',p.nome)
-    + row('📐','Medida',p.medida||'—')
-    + row('💵','Valor total',cadR(p.valorTotal||(p.valor||0)));
+    row('','Cliente',p.nome)
+    + row('',(p.medida && !cadPareceMedidaTapete(p.medida) ? 'Produto' : 'Medida'),p.medida||'—')
+    + row('','Valor total',cadR(p.valorTotal||(p.valor||0)));
 
   // Tabela de custos pré-definidos por medida
   var _tabelaCusto = {
@@ -5244,7 +5671,7 @@ window.cadAbrirComp = function(id){
       + ' style="width:100%;padding:12px 14px;border:2px solid '+(isAuto && custoAtual!==''?'#10b981':'#e2e8f0')+';border-radius:12px;font-size:1rem;font-weight:800;color:#111;background:#f8fafc;box-sizing:border-box;-webkit-appearance:none">'
       + '</div>';
   });
-  campos += '<button onclick="cadSalvarCusto()" style="width:100%;padding:15px;background:#111;color:#fff;border:none;border-radius:12px;font-size:.9rem;font-weight:800;cursor:pointer;margin-bottom:8px;font-family:inherit">✅ Salvar custos</button>';
+  campos += '<button onclick="cadSalvarCusto()" style="width:100%;padding:15px;background:#111;color:#fff;border:none;border-radius:12px;font-size:.9rem;font-weight:800;cursor:pointer;margin-bottom:8px;font-family:inherit">Salvar custos</button>';
   campos += '<button onclick="cadFComp()" style="width:100%;padding:13px;background:#f1f5f9;color:#64748b;border:none;border-radius:12px;font-size:.85rem;font-weight:700;cursor:pointer;font-family:inherit">Cancelar</button>';
   document.getElementById('cad_custo_campos').innerHTML = campos;
   window._cadCustoQtd = todos.length;
@@ -5283,10 +5710,19 @@ window.cadVerDet = function(id){
 
   function row(icon, label, val, valStyle){
     return '<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #f1f5f9">'
-      +'<span style="font-size:16px;width:22px;text-align:center;flex-shrink:0">'+icon+'</span>'
+      +(icon?'<span style="font-size:16px;width:22px;text-align:center;flex-shrink:0">'+icon+'</span>':'')
       +'<span style="font-size:.78rem;font-weight:700;color:#9ca3af;flex:1">'+label+'</span>'
       +'<span style="font-size:.85rem;font-weight:800;color:#111;text-align:right;max-width:58%;word-break:break-word'+(valStyle?';'+valStyle:'')+'">'+val+'</span>'
       +'</div>';
+  }
+
+  // Decide o rótulo do campo (Medida x Produto) e o título do bloco (Tapete N x nome do produto).
+  function rotuloCampo(texto){
+    return (texto && !cadPareceMedidaTapete(texto)) ? 'Produto' : 'Medida';
+  }
+  function tituloBloco(texto, n){
+    if(texto && !cadPareceMedidaTapete(texto)) return cadCategoriaDoProduto(texto) || texto;
+    return 'Tapete ' + n;
   }
 
   var h = '';
@@ -5311,24 +5747,24 @@ window.cadVerDet = function(id){
   var temExtras = p.tapetesExtras && p.tapetesExtras.length > 0;
 
   h += '<div style="background:#f8fafc;border-radius:14px;padding:12px 14px;margin-bottom:10px">';
-  h += '<div style="font-size:.65rem;font-weight:900;color:#94a3b8;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">🪄 Tapete 1</div>';
-  if(p.medida) h += row('📐','Medida',p.medida);
-  if(p.borda==='com' && p.bcor) h += row('✨','Borda',p.bcor);
-  h += row('💰','Valor',cadR(p.valor),'color:#059669;font-size:.92rem');
+  h += '<div style="font-size:.65rem;font-weight:900;color:#94a3b8;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">'+tituloBloco(p.medida,1)+'</div>';
+  if(p.medida) h += row('',rotuloCampo(p.medida),p.medida);
+  if(p.borda==='com' && p.bcor) h += row('','Borda',p.bcor);
+  h += row('','Valor',cadR(p.valor),'color:#059669;font-size:.92rem');
   h += '</div>';
 
   if(temExtras){
     p.tapetesExtras.forEach(function(t, i){
       h += '<div style="background:#f8fafc;border-radius:14px;padding:12px 14px;margin-bottom:10px">';
-      h += '<div style="font-size:.65rem;font-weight:900;color:#94a3b8;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">🪄 Tapete '+(i+2)+'</div>';
-      h += row('📐','Medida',t.medida||'—');
-      if(t.cor)  h += row('🎨','Cor fundo',t.cor);
-      if(t.bcor) h += row('✨','Borda',t.bcor);
-      h += row('💰','Valor',cadR(t.valor||0),'color:#059669;font-size:.92rem');
+      h += '<div style="font-size:.65rem;font-weight:900;color:#94a3b8;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">'+tituloBloco(t.medida,i+2)+'</div>';
+      h += row('',rotuloCampo(t.medida),t.medida||'—');
+      if(t.cor)  h += row('','Cor fundo',t.cor);
+      if(t.bcor) h += row('','Borda',t.bcor);
+      h += row('','Valor',cadR(t.valor||0),'color:#059669;font-size:.92rem');
       h += '</div>';
     });
     h += '<div style="background:linear-gradient(135deg,#ecfdf5,#d1fae5);border-radius:14px;padding:14px 18px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center">';
-    h += '<span style="font-size:.8rem;font-weight:900;color:#065f46;text-transform:uppercase;letter-spacing:.04em">💵 Total Geral</span>';
+    h += '<span style="font-size:.8rem;font-weight:900;color:#065f46;text-transform:uppercase;letter-spacing:.04em">Total Geral</span>';
     h += '<span style="font-size:1.1rem;font-weight:900;color:#065f46">'+cadR(totalTodos)+'</span>';
     h += '</div>';
   }
@@ -5336,20 +5772,20 @@ window.cadVerDet = function(id){
   // Card prazo e entrega
   h += '<div style="background:#f8fafc;border-radius:14px;padding:12px 14px;margin-bottom:10px">';
   h += '<div style="font-size:.65rem;font-weight:900;color:#94a3b8;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">Entrega</div>';
-  if(p.prazo) h += row('⏱','Prazo',p.prazo+' dias');
-  if(p.endereco) h += row('📍','Endereço',p.endereco);
+  if(p.prazo) h += row('','Prazo',p.prazo+' dias');
+  if(p.endereco) h += row('','Endereço',p.endereco);
   h += '</div>';
 
   // Card financeiro
   h += '<div style="background:#f8fafc;border-radius:14px;padding:12px 14px;margin-bottom:10px">';
   h += '<div style="font-size:.65rem;font-weight:900;color:#94a3b8;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">Financeiro</div>';
-  h += row('💸','Custo', c!==null ? cadR(c) : '<span style="color:#d1d5db;font-weight:600">Não informado</span>');
-  h += row('📈','Lucro', l!==null ? cadR(l) : '<span style="color:#d1d5db;font-weight:600">—</span>', l!==null?'color:#10b981':'');
+  h += row('','Custo', c!==null ? cadR(c) : '<span style="color:#d1d5db;font-weight:600">Não informado</span>');
+  h += row('','Lucro', l!==null ? cadR(l) : '<span style="color:#d1d5db;font-weight:600">—</span>', l!==null?'color:#10b981':'');
   h += '</div>';
 
   if(p.obs){
     h += '<div style="background:#fffbeb;border-radius:14px;padding:12px 14px;margin-bottom:10px">';
-    h += '<div style="font-size:.65rem;font-weight:900;color:#92400e;text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">📝 Observação</div>';
+    h += '<div style="font-size:.65rem;font-weight:900;color:#92400e;text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">Observação</div>';
     h += '<div style="font-size:.82rem;font-weight:600;color:#374151;line-height:1.5">'+p.obs+'</div>';
     h += '</div>';
   }
@@ -5361,8 +5797,8 @@ window.cadVerDet = function(id){
 };
 
 function cadRenderFotosDet(p){
-  var fotos = p.fotos || [];
-  if(!fotos.length){ document.getElementById('cad_det_fotos').innerHTML = '<p style="font-size:.75rem;color:#6b7280;margin-top:6px;font-family:\'Nunito\',sans-serif">Nenhuma foto</p>'; return; }
+  var fotos = (p.fotos || []).filter(function(f){ return f && f.trim && f.trim() !== ''; });
+  if(!fotos.length){ document.getElementById('cad_det_fotos').innerHTML = '<p style="font-size:.75rem;color:#6b7280;margin-top:6px;font-family:\'Nunito\',sans-serif">Nenhuma foto adicionada</p>'; return; }
   var h = '<div class="cad-fotos-grid">';
   fotos.forEach(function(f, i){
     h += '<div class="cad-foto-item"><img src="'+f+'" onclick="cadAbrirFotoGrande('+i+')"><button class="cad-foto-del" onclick="cadDelFotoDet('+i+')">X</button></div>';
@@ -5675,7 +6111,8 @@ window.waLink = function(c){
   return '<a class="tap-walink" href="https://wa.me/'+num+'" target="_blank">'+fmt+'</a>';
 };
 function R(v){return 'R$ '+Number(v).toFixed(2).replace('.',',');}
-function calcSt(dataVenda,prazo){
+function calcSt(dataVenda,prazo,entregue){
+  if(entregue) return {t:'Entregue',c:'tap-bg-green'};
   var hoje=new Date();hoje.setHours(0,0,0,0);
   var e=new Date(dataVenda+'T00:00:00');e.setDate(e.getDate()+parseInt(prazo||0));
   var d=Math.round((e-hoje)/86400000);
@@ -5792,7 +6229,7 @@ function montarCards(lista,elId){
   lista.forEach(function(p){
     fat+=(p.valorTotal||(p.valor||0));
     var c=getCusto(p);if(c!==null) custo+=c; else sc++;
-    var s=calcSt(p.dataVenda,p.prazo);
+    var s=calcSt(p.dataVenda,p.prazo,p.entregue);
     if(s.c==='tap-bg-red') atr++;
     if(s.t==='Hoje!') hj++;
   });
@@ -5811,7 +6248,7 @@ function montarCards(lista,elId){
 window.renderG = function(){
   var fq=document.getElementById('f3q'); var q=(fq?fq.value:'').toLowerCase();
   var fm=document.getElementById('f3mes'); var mes=fm?fm.value:'';
-  var todos=[...pedidosCache];
+  var todos=[...pedidosCache].filter(function(p){return !p.entregue;});
   montarCards(filtroPer(todos,'g'),'gc');
   if(mes) todos=todos.filter(function(p){return p.dataVenda&&p.dataVenda.startsWith(mes);});
   if(q) todos=todos.filter(function(p){return (p.nome||'').toLowerCase().indexOf(q)>=0||(p.loja||'').toLowerCase().indexOf(q)>=0;});
@@ -5820,7 +6257,7 @@ window.renderG = function(){
   if(!todos.length){el.innerHTML='<div class="tap-empty"><div class="ic">📊</div>Nenhuma venda</div>';return;}
   var h='';
   todos.slice().reverse().forEach(function(p){
-    var _totalDet=p.valorTotal||(p.valor+(p.tapetesExtras||[]).reduce(function(a,t){return a+(t.valor||0);},0)),c=getCusto(p),l=c!==null?_totalDet-c:null,s=calcSt(p.dataVenda,p.prazo);
+    var _totalDet=p.valorTotal||(p.valor+(p.tapetesExtras||[]).reduce(function(a,t){return a+(t.valor||0);},0)),c=getCusto(p),l=c!==null?_totalDet-c:null,s=calcSt(p.dataVenda,p.prazo,p.entregue);
     h+='<div class="tap-vcard"><div class="tap-vcard-nome">'+p.nome+(p.loja?' <span style="font-size:.75rem;color:#6b7280;font-weight:600">'+p.loja+'</span>':'')+'</div>';
     h+='<div style="margin-bottom:6px;display:flex;flex-direction:column;gap:4px">'+waLink(p.contato)+telLink(p.contato)+'</div>';
     h+='<div class="tap-vcard-row"><span class="tap-vcard-key">Medida</span><span class="tap-vcard-val">'+p.medida+'</span></div>';
@@ -5887,14 +6324,24 @@ window.verDet = function(id){
   detId=id;
   var p=pedidosCache.find(function(x){return x.id===id;});
   if(!p) return;
-  var _totalDet=p.valorTotal||(p.valor+(p.tapetesExtras||[]).reduce(function(a,t){return a+(t.valor||0);},0)),c=getCusto(p),l=c!==null?_totalDet-c:null,s=calcSt(p.dataVenda,p.prazo);
+  var _totalDet=p.valorTotal||(p.valor+(p.tapetesExtras||[]).reduce(function(a,t){return a+(t.valor||0);},0)),c=getCusto(p),l=c!==null?_totalDet-c:null,s=calcSt(p.dataVenda,p.prazo,p.entregue);
 
   function row(icon,label,val,valStyle){
     return '<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #f1f5f9">'
-      +'<span style="font-size:16px;width:22px;text-align:center;flex-shrink:0">'+icon+'</span>'
+      +(icon?'<span style="font-size:16px;width:22px;text-align:center;flex-shrink:0">'+icon+'</span>':'')
       +'<span style="font-size:.78rem;font-weight:700;color:#9ca3af;flex:1">'+label+'</span>'
       +'<span style="font-size:.85rem;font-weight:800;color:#111;text-align:right;max-width:58%;word-break:break-word'+(valStyle?';'+valStyle:'')+'">'+val+'</span>'
       +'</div>';
+  }
+
+  // Decide o rótulo do campo (Medida x Produto) e o título do bloco (Tapete N x nome do produto)
+  // reaproveitando a mesma lógica já usada no cadastro (cadPareceMedidaTapete).
+  function rotuloCampo(texto){
+    return (texto && !cadPareceMedidaTapete(texto)) ? 'Produto' : 'Medida';
+  }
+  function tituloBloco(texto, n){
+    if(texto && !cadPareceMedidaTapete(texto)) return cadCategoriaDoProduto(texto) || texto;
+    return 'Tapete ' + n;
   }
 
   var h='';
@@ -5919,23 +6366,23 @@ window.verDet = function(id){
   var temExtras = p.tapetesExtras && p.tapetesExtras.length > 0;
 
   h+='<div style="background:#f8fafc;border-radius:14px;padding:12px 14px;margin-bottom:10px">';
-  h+='<div style="font-size:.65rem;font-weight:900;color:#94a3b8;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">🪄 Tapete 1</div>';
-  if(p.medida) h+=row('📐','Medida',p.medida);
-  if(p.borda==='sim' && p.bordaCor) h+=row('✨','Borda',p.bordaCor);
-  h+=row('💰','Valor',R(p.valor),'color:#059669;font-size:.92rem');
+  h+='<div style="font-size:.65rem;font-weight:900;color:#94a3b8;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">'+tituloBloco(p.medida,1)+'</div>';
+  if(p.medida) h+=row('',rotuloCampo(p.medida),p.medida);
+  if(p.borda==='sim' && p.bordaCor) h+=row('','Borda',p.bordaCor);
+  h+=row('','Valor',R(p.valor),'color:#059669;font-size:.92rem');
   h+='</div>';
 
   if(temExtras){
     p.tapetesExtras.forEach(function(t,i){
       h+='<div style="background:#f8fafc;border-radius:14px;padding:12px 14px;margin-bottom:10px">';
-      h+='<div style="font-size:.65rem;font-weight:900;color:#94a3b8;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">🪄 Tapete '+(i+2)+'</div>';
-      h+=row('📐','Medida',t.tamanho||t.medida||'—');
-      if(t.bordaCor) h+=row('✨','Borda',t.bordaCor);
-      h+=row('💰','Valor',R(t.valor||0),'color:#059669;font-size:.92rem');
+      h+='<div style="font-size:.65rem;font-weight:900;color:#94a3b8;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">'+tituloBloco(t.tamanho||t.medida,i+2)+'</div>';
+      h+=row('',rotuloCampo(t.tamanho||t.medida),t.tamanho||t.medida||'—');
+      if(t.bordaCor) h+=row('','Borda',t.bordaCor);
+      h+=row('','Valor',R(t.valor||0),'color:#059669;font-size:.92rem');
       h+='</div>';
     });
     h+='<div style="background:linear-gradient(135deg,#ecfdf5,#d1fae5);border-radius:14px;padding:14px 18px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center">';
-    h+='<span style="font-size:.8rem;font-weight:900;color:#065f46;text-transform:uppercase;letter-spacing:.04em">💵 Total Geral</span>';
+    h+='<span style="font-size:.8rem;font-weight:900;color:#065f46;text-transform:uppercase;letter-spacing:.04em">Total Geral</span>';
     h+='<span style="font-size:1.1rem;font-weight:900;color:#065f46">'+R(totalTodos)+'</span>';
     h+='</div>';
   }
@@ -5943,20 +6390,20 @@ window.verDet = function(id){
   // Entrega
   h+='<div style="background:#f8fafc;border-radius:14px;padding:12px 14px;margin-bottom:10px">';
   h+='<div style="font-size:.65rem;font-weight:900;color:#94a3b8;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">Entrega</div>';
-  if(p.prazo) h+=row('⏱','Prazo',p.prazo+' dias');
-  if(p.endereco) h+=row('📍','Endereço',p.endereco);
+  if(p.prazo) h+=row('','Prazo',p.prazo+' dias');
+  if(p.endereco) h+=row('','Endereço',p.endereco);
   h+='</div>';
 
   // Financeiro
   h+='<div style="background:#f8fafc;border-radius:14px;padding:12px 14px;margin-bottom:10px">';
   h+='<div style="font-size:.65rem;font-weight:900;color:#94a3b8;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">Financeiro</div>';
-  h+=row('💸','Custo',c!==null?R(c):'<span style="color:#d1d5db;font-weight:600">Não informado</span>');
-  h+=row('📈','Lucro',l!==null?R(l):'<span style="color:#d1d5db;font-weight:600">—</span>',l!==null?'color:#10b981':'');
+  h+=row('','Custo',c!==null?R(c):'<span style="color:#d1d5db;font-weight:600">Não informado</span>');
+  h+=row('','Lucro',l!==null?R(l):'<span style="color:#d1d5db;font-weight:600">—</span>',l!==null?'color:#10b981':'');
   h+='</div>';
 
   if(p.obs){
     h+='<div style="background:#fffbeb;border-radius:14px;padding:12px 14px;margin-bottom:10px">';
-    h+='<div style="font-size:.65rem;font-weight:900;color:#92400e;text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">📝 Observação</div>';
+    h+='<div style="font-size:.65rem;font-weight:900;color:#92400e;text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">Observação</div>';
     h+='<div style="font-size:.82rem;font-weight:600;color:#374151;line-height:1.5">'+p.obs+'</div>';
     h+='</div>';
   }
@@ -5967,10 +6414,10 @@ window.verDet = function(id){
   document.getElementById('mdet').classList.add('open');
 };
 function renderFotosDet(p){
-  var fotos=p.fotos||[];
+  var fotos=(p.fotos||[]).filter(function(f){ return f && f.trim && f.trim() !== ''; });
   var df=document.getElementById('det_fotos');
   if(!df) return;
-  if(!fotos.length){df.innerHTML='<p style="font-size:.75rem;color:#6b7280;margin-top:6px">Nenhuma foto</p>';return;}
+  if(!fotos.length){df.innerHTML='<p style="font-size:.75rem;color:#6b7280;margin-top:6px">Nenhuma foto adicionada</p>';return;}
   var h='<div class="tap-fotos-grid">';
   fotos.forEach(function(f,i){
     h+='<div class="tap-foto-item"><img src="'+f+'" onclick="abrirFotoGrande('+i+')"><button class="tap-foto-del" onclick="delFotoDet('+i+')">X</button></div>';
@@ -6131,7 +6578,7 @@ window.apagarTodasR = async function(){
 window.renderC = function(){
   var fq=document.getElementById('f5q'); var q=(fq?fq.value:'').toLowerCase();
   var fm=document.getElementById('f5mes'); var mes=fm?fm.value:'';
-  var todos=[...pedidosCache];
+  var todos=[...pedidosCache].filter(function(p){return !!p.entregue;});
   montarCards(filtroPer(todos,'g5'),'g5c');
   if(mes) todos=todos.filter(function(p){return p.dataVenda&&p.dataVenda.startsWith(mes);});
   if(q) todos=todos.filter(function(p){return (p.nome||'').toLowerCase().indexOf(q)>=0||(p.loja||'').toLowerCase().indexOf(q)>=0;});
@@ -6140,7 +6587,7 @@ window.renderC = function(){
   if(!todos.length){el.innerHTML='<div class="tap-empty"><div class="ic">📦</div>Nenhuma venda</div>';return;}
   var h='';
   todos.slice().reverse().forEach(function(p){
-    var c=getCusto(p),l=c!==null?p.valor-c:null,s=calcSt(p.dataVenda,p.prazo),sc=c===null;
+    var c=getCusto(p),l=c!==null?p.valor-c:null,s=calcSt(p.dataVenda,p.prazo,p.entregue),sc=c===null;
     h+='<div class="tap-vcard'+(sc?' tap-vcard-inc':'')+'"><div class="tap-vcard-nome">'+p.nome+(p.loja?' <span style="font-size:.75rem;color:#6b7280;font-weight:600">'+p.loja+'</span>':'')+'</div>';
     h+='<div style="margin-bottom:6px;display:flex;flex-direction:column;gap:4px">'+waLink(p.contato)+telLink(p.contato)+'</div>';
     h+='<div class="tap-vcard-row"><span class="tap-vcard-key">Medida</span><span class="tap-vcard-val">'+p.medida+'</span></div>';
@@ -6152,6 +6599,7 @@ window.renderC = function(){
     h+='<div style="flex:1"><div class="tap-vcard-key">Lucro</div><div style="font-weight:900;color:#10b981">'+(l!==null?R(l):'<span class="tap-sc">---</span>')+'</div></div></div>';
     h+='<div style="margin-top:8px;display:flex;gap:6px"><button class="tap-btn tap-btn-g tap-btn-xs" onclick="verDet(\''+p.id+'\')">Ver</button>';
     if(sc) h+=' <button class="tap-btn tap-btn-p tap-btn-xs" onclick="abrirComp(\''+p.id+'\')">Custo</button>';
+    h+=' <button class="tap-btn tap-btn-d tap-btn-xs" onclick="agExcluir(\''+p.id+'\')">🗑 Excluir</button>';
     h+='</div></div>';
   });el.innerHTML=h;
 };
@@ -6184,12 +6632,26 @@ window.agConfirmar = function(id){
   if(!confirm('Confirmar entrega realizada?')) return;
   var idx=pedidosCache.findIndex(function(x){return x.id===id;});
   if(idx<0) return;
-  pedidosCache[idx].completo=true;
+  pedidosCache[idx].entregue=true;
+  pedidosCache[idx].dataEntrega=new Date().toISOString().split('T')[0];
   pedidosCache[idx].updatedAt=Date.now();
   salvarCacheLocal();
   renderAgenda();
+  if(typeof renderG==='function') renderG();
+  if(typeof renderC==='function') renderC();
   toast('✅ Entrega confirmada!');
-  try{if(window.db&&window.updateDoc&&window.doc)updateDoc(doc(db,'tapetes',id),{completo:true,updatedAt:Date.now()});}catch(e){}
+  try{if(window.db&&window.updateDoc&&window.doc)updateDoc(doc(db,'tapetes',id),{entregue:true,dataEntrega:pedidosCache[idx].dataEntrega,updatedAt:Date.now()});}catch(e){}
+};
+window.agExcluir = async function(id){
+  if(!confirm('Excluir este pedido? Esta ação não pode ser desfeita.')) return;
+  pedidosCache=pedidosCache.filter(function(p){return p.id!==id;});
+  marcarDeletadoPedido(id);
+  salvarCacheLocal();
+  if(typeof renderAgenda==='function') renderAgenda();
+  if(typeof renderG==='function') renderG();
+  if(typeof renderC==='function') renderC();
+  toast('🗑 Excluído');
+  try{ await deleteDoc(doc(db,'tapetes',id)); } catch(e){}
 };
 window.agAdiar = function(id){
   var p=pedidosCache.find(function(x){return x.id===id;}); if(!p) return;
@@ -6207,7 +6669,7 @@ window.agAdiar = function(id){
 };
 
 window.renderAgenda = function(){
-  var todos=[...pedidosCache],hoje=new Date();hoje.setHours(0,0,0,0);
+  var todos=[...pedidosCache].filter(function(p){return !p.entregue;}),hoje=new Date();hoje.setHours(0,0,0,0);
   var urgentes=[],proximos=[];
   todos.forEach(function(p){
     var e=new Date(p.dataVenda+'T00:00:00');e.setDate(e.getDate()+parseInt(p.prazo||0));
@@ -6230,9 +6692,9 @@ window.renderAgenda = function(){
         h+='<span class="tap-badge '+(d<0?'tap-bg-red':'tap-bg-green')+'">'+label+'</span>';
         h+='</div>';
         h+='<div style="display:flex;flex-direction:column;gap:4px;margin-bottom:8px">'+waLink(p.contato)+telLink(p.contato)+'</div>';
-        h+='<div style="font-size:.78rem;font-weight:700;color:#374151;margin-bottom:6px">📐 '+p.medida+'</div>';
+        h+='<div style="font-size:.78rem;font-weight:700;color:#374151;margin-bottom:6px">'+p.medida+'</div>';
         if(p.endereco) h+='<div style="font-size:.7rem;color:#6b7280;margin-bottom:6px">📍 '+p.endereco+'</div>';
-        h+=maps+'<div style="display:flex;gap:6px;margin-top:10px"><button onclick="agVerDet(\''+p.id+'\')" style="flex:1;padding:7px 4px;background:#f1f5f9;border:none;border-radius:8px;font-size:.72rem;font-weight:800;color:#374151;cursor:pointer">👁 Ver</button><button onclick="agConfirmar(\''+p.id+'\')" style="flex:1;padding:7px 4px;background:#10b981;border:none;border-radius:8px;font-size:.72rem;font-weight:800;color:#fff;cursor:pointer">✅ Confirmar</button><button onclick="agAdiar(\''+p.id+'\')" style="flex:1;padding:7px 4px;background:#f59e0b;border:none;border-radius:8px;font-size:.72rem;font-weight:800;color:#fff;cursor:pointer">⏰ Adiar</button></div></div>';
+        h+=maps+'<div style="display:flex;gap:6px;margin-top:10px"><button onclick="agVerDet(\''+p.id+'\')" style="flex:1;padding:7px 4px;background:#f1f5f9;border:none;border-radius:8px;font-size:.72rem;font-weight:800;color:#374151;cursor:pointer">👁 Ver</button><button onclick="agConfirmar(\''+p.id+'\')" style="flex:1;padding:7px 4px;background:#10b981;border:none;border-radius:8px;font-size:.72rem;font-weight:800;color:#fff;cursor:pointer">✅ Confirmar</button><button onclick="agAdiar(\''+p.id+'\')" style="flex:1;padding:7px 4px;background:#f59e0b;border:none;border-radius:8px;font-size:.72rem;font-weight:800;color:#fff;cursor:pointer">⏰ Adiar</button><button onclick="agExcluir(\''+p.id+'\')" style="flex:0 0 auto;padding:7px 10px;background:#fee2e2;border:none;border-radius:8px;font-size:.72rem;font-weight:800;color:#dc2626;cursor:pointer">🗑</button></div></div>';
       });elU.innerHTML=h;
     }
   }
@@ -6250,9 +6712,9 @@ window.renderAgenda = function(){
         h2+='<span class="tap-badge '+cls+'">'+d+' dias</span>';
         h2+='</div>';
         h2+='<div style="display:flex;flex-direction:column;gap:4px;margin-bottom:8px">'+waLink(p.contato)+telLink(p.contato)+'</div>';
-        h2+='<div style="font-size:.78rem;font-weight:700;color:#374151;margin-bottom:6px">📐 '+p.medida+'</div>';
+        h2+='<div style="font-size:.78rem;font-weight:700;color:#374151;margin-bottom:6px">'+p.medida+'</div>';
         if(p.endereco) h2+='<div style="font-size:.7rem;color:#6b7280;margin-bottom:6px">📍 '+p.endereco+'</div>';
-        h2+=maps+'<div style="display:flex;gap:6px;margin-top:10px"><button onclick="agVerDet(\''+p.id+'\')" style="flex:1;padding:7px 4px;background:#f1f5f9;border:none;border-radius:8px;font-size:.72rem;font-weight:800;color:#374151;cursor:pointer">👁 Ver</button><button onclick="agConfirmar(\''+p.id+'\')" style="flex:1;padding:7px 4px;background:#10b981;border:none;border-radius:8px;font-size:.72rem;font-weight:800;color:#fff;cursor:pointer">✅ Confirmar</button><button onclick="agAdiar(\''+p.id+'\')" style="flex:1;padding:7px 4px;background:#f59e0b;border:none;border-radius:8px;font-size:.72rem;font-weight:800;color:#fff;cursor:pointer">⏰ Adiar</button></div></div>';
+        h2+=maps+'<div style="display:flex;gap:6px;margin-top:10px"><button onclick="agVerDet(\''+p.id+'\')" style="flex:1;padding:7px 4px;background:#f1f5f9;border:none;border-radius:8px;font-size:.72rem;font-weight:800;color:#374151;cursor:pointer">👁 Ver</button><button onclick="agConfirmar(\''+p.id+'\')" style="flex:1;padding:7px 4px;background:#10b981;border:none;border-radius:8px;font-size:.72rem;font-weight:800;color:#fff;cursor:pointer">✅ Confirmar</button><button onclick="agAdiar(\''+p.id+'\')" style="flex:1;padding:7px 4px;background:#f59e0b;border:none;border-radius:8px;font-size:.72rem;font-weight:800;color:#fff;cursor:pointer">⏰ Adiar</button><button onclick="agExcluir(\''+p.id+'\')" style="flex:0 0 auto;padding:7px 10px;background:#fee2e2;border:none;border-radius:8px;font-size:.72rem;font-weight:800;color:#dc2626;cursor:pointer">🗑</button></div></div>';
       });elS.innerHTML=h2;
     }
   }
@@ -6279,7 +6741,7 @@ window.selRelDia = function(dia){
   relPeriodo='dia';renderRel('dia',dia);
 };
 window.renderRel = function(per,diaEsp){
-  var todos=[...pedidosCache],hoje=new Date();hoje.setHours(0,0,0,0);var lista=[];
+  var todos=[...pedidosCache].filter(function(p){return !!p.entregue;}),hoje=new Date();hoje.setHours(0,0,0,0);var lista=[];
   if(per==='hoje'){var s=hoje.toISOString().split('T')[0];lista=todos.filter(function(p){return p.dataVenda===s;});}
   else if(per==='semana'){var ini=new Date(hoje);ini.setDate(ini.getDate()-6);lista=todos.filter(function(p){var d=new Date(p.dataVenda+'T00:00:00');return d>=ini&&d<=hoje;});}
   else if(per==='mes'){var m=hoje.toISOString().split('T')[0].slice(0,7);lista=todos.filter(function(p){return p.dataVenda&&p.dataVenda.startsWith(m);});}
@@ -6300,7 +6762,7 @@ window.renderRel = function(per,diaEsp){
     +'</div>';
   var h='';
   lista.forEach(function(p){
-    var _totalDet=p.valorTotal||(p.valor+(p.tapetesExtras||[]).reduce(function(a,t){return a+(t.valor||0);},0)),c=getCusto(p),l=c!==null?_totalDet-c:null,s=calcSt(p.dataVenda,p.prazo);
+    var _totalDet=p.valorTotal||(p.valor+(p.tapetesExtras||[]).reduce(function(a,t){return a+(t.valor||0);},0)),c=getCusto(p),l=c!==null?_totalDet-c:null,s=calcSt(p.dataVenda,p.prazo,p.entregue);
     var n=(p.contato||'').replace(/\D/g,''),waHref=n?'https://wa.me/'+(n.startsWith('55')?n:'55'+n):'';
     h+='<div class="tap-vcard"><div class="tap-vcard-nome">'+p.nome+(p.loja?' <span style="font-size:.75rem;color:#6b7280;font-weight:600">'+p.loja+'</span>':'')+'</div>';
     if(waHref) h+='<a class="tap-walink" href="'+waHref+'" target="_blank" style="margin-bottom:8px;display:inline-flex">📲 '+p.contato+'</a>';
@@ -6648,4 +7110,4 @@ setTimeout(function(){
 }, 600);
 </script>
 </body>
-</html>
+        </html>
