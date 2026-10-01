@@ -23,16 +23,20 @@
     --sys-accent2: #c96dfa;
     --sys-green-r: #3ddc84;
     --sys-red-r: #f87171;
-    /* ── Tema RICO ── */
-    --gold: #111111;
-    --gold-light: #d1d5db;
-    --dark: #141414;
-    --cream: #ffffff;
-    --mid: #f5f5f5;
-    --text: #2d2d2d;
-    --muted: #999;
-    --border: rgba(0,0,0,0.10);
-    --accent: #333333;
+    /* ── Tema RICO (navy + dourado + creme) ── */
+    --gold: #e0b54a;
+    --gold-light: #f0d795;
+    --gold-deep: #8a6212;
+    --dark: #0f1b2d;
+    --dark2: #16263d;
+    --dark3: #0b1524;
+    --line-dark: #2f4666;
+    --cream: #fbf8f1;
+    --mid: #f1ece0;
+    --text: #1f2937;
+    --muted: #6b7280;
+    --border: rgba(15,27,45,0.14);
+    --accent: #0f1b2d;
   }
 
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -66,7 +70,7 @@
     content: '';
     position: absolute;
     inset: 0;
-    background: radial-gradient(ellipse at 50% 30%, rgba(255,255,255,.04) 0%, transparent 65%);
+    background: radial-gradient(ellipse at 50% 30%, rgba(224,181,74,.10) 0%, transparent 65%);
     pointer-events: none;
   }
   .cover-ornament {
@@ -86,7 +90,7 @@
     line-height: 1.05;
     margin-bottom: 8px;
   }
-  .cover h1 span { color: #ffffff; }
+  .cover h1 span { color: var(--gold); }
   .cover-line {
     width: 50px; height: 1px;
     background: var(--gold);
@@ -104,7 +108,7 @@
   .cover-author {
     font-size: 10px;
     letter-spacing: 3px;
-    color: #666;
+    color: #9aa6b8;
     text-transform: uppercase;
     font-weight: 400;
   }
@@ -113,7 +117,7 @@
     bottom: 32px;
     font-size: 10px;
     letter-spacing: 4px;
-    color: #444;
+    color: #8a96a8;
     text-transform: uppercase;
     animation: bounce 2.2s ease-in-out infinite;
   }
@@ -131,13 +135,13 @@
     align-items: center;
     justify-content: center;
     padding: 13px 20px;
-    border-bottom: 1px solid #222;
+    border-bottom: 1px solid var(--line-dark);
   }
   .nav-title {
     font-family: 'Cormorant Garamond', serif;
     font-size: 1.1rem;
     font-weight: 700;
-    color: #ffffff;
+    color: var(--gold);
     letter-spacing: 2px;
   }
 
@@ -155,7 +159,7 @@
     font-size: 9px;
     letter-spacing: 5px;
     text-transform: uppercase;
-    color: var(--gold);
+    color: var(--gold-deep);
     margin-bottom: 10px;
     font-weight: 600;
   }
@@ -168,7 +172,7 @@
     line-height: 1.15;
   }
   .section-text {
-    color: #5a5a5a;
+    color: #3f4756;
     margin-bottom: 16px;
     font-size: 14px;
     line-height: 1.75;
@@ -176,7 +180,7 @@
 
   /* ── QUOTE ── */
   .quote-block {
-    border-left: 2px solid var(--gold);
+    border-left: 3px solid var(--gold);
     padding: 14px 20px;
     margin: 24px 0;
     background: var(--mid);
@@ -186,7 +190,7 @@
     font-family: 'Cormorant Garamond', serif;
     font-style: italic;
     font-size: 1rem;
-    color: #3a3a3a;
+    color: #1f2937;
     line-height: 1.65;
   }
   .quote-block cite {
@@ -194,11 +198,11 @@
     font-size: 10px;
     letter-spacing: 2px;
     text-transform: uppercase;
-    color: var(--gold);
+    color: var(--gold-deep);
     margin-top: 10px;
     font-style: normal;
     font-family: 'DM Sans', sans-serif;
-    font-weight: 500;
+    font-weight: 600;
   }
 
   /* ── CONCEPT BOX ── */
@@ -217,7 +221,7 @@
     font-weight: 600;
     letter-spacing: 0.3px;
   }
-  .concept-box p { font-size: 13px; color: #ccc; line-height: 1.75; }
+  .concept-box p { font-size: 13px; color: #d6dde8; line-height: 1.75; }
 
   /* ── QUESTION CARD ── */
   .question-card {
@@ -226,7 +230,7 @@
     border-radius: 10px;
     margin: 18px 0;
     overflow: hidden;
-    box-shadow: 0 1px 6px rgba(0,0,0,.04);
+    box-shadow: 0 1px 6px rgba(15,27,45,.06);
   }
   .question-header {
     display: flex;
@@ -275,14 +279,14 @@
     font-family: 'DM Sans', sans-serif;
     -webkit-tap-highlight-color: transparent;
   }
-  .hint-btn:active { border-color: #111111; color: #111111; background: #f5f5f5; }
-  .hint-btn.active { background: #111111; color: #ffffff; border-color: #111111; }
+  .hint-btn:active { border-color: #0f1b2d; color: #0f1b2d; background: #f1ece0; }
+  .hint-btn.active { background: #0f1b2d; color: #ffffff; border-color: #0f1b2d; }
 
   .hint-panel {
     display: none;
     padding: 12px 16px 14px 56px;
-    background: #f9f9f9;
-    border-top: 1px solid rgba(0,0,0,0.08);
+    background: #f6f1e4;
+    border-top: 1px solid rgba(15,27,45,0.10);
     font-size: 13px;
     color: #374151;
     line-height: 1.7;
@@ -303,7 +307,7 @@
     gap: 6px;
     cursor: pointer;
     font-size: 13px;
-    color: #444;
+    color: #374151;
     padding: 6px 13px;
     border: 1px solid var(--border);
     border-radius: 20px;
@@ -313,7 +317,7 @@
     font-family: 'DM Sans', sans-serif;
   }
   .choice-label input { display: none; }
-  .choice-label.selected { background: #111111; color: #ffffff; border-color: #111111; font-weight: 600; }
+  .choice-label.selected { background: #0f1b2d; color: #ffffff; border-color: #0f1b2d; font-weight: 600; }
 
   /* textarea / inputs */
   .answer-area {
@@ -338,7 +342,7 @@
   }
   .answer-area input[type=text] { min-height: unset; height: 42px; resize: none; }
   .answer-area textarea:focus,
-  .answer-area input[type=text]:focus { border-color: #111111; background: #fff; }
+  .answer-area input[type=text]:focus { border-color: #0f1b2d; background: #fff; }
 
   /* list fields */
   .list-fields { padding: 0 16px 16px 56px; display: flex; flex-direction: column; gap: 8px; }
@@ -369,7 +373,7 @@
     -webkit-appearance: none;
     border-radius: 0;
   }
-  .list-field-row input:focus { border-bottom-color: #111111; }
+  .list-field-row input:focus { border-bottom-color: #0f1b2d; }
 
   /* two-col table */
   .two-col-fields { padding: 0 16px 16px 16px; display: flex; flex-direction: column; gap: 10px; }
@@ -387,16 +391,16 @@
     border-radius: 0;
     width: 100%;
   }
-  .two-col-row input:focus { border-bottom-color: #111111; }
+  .two-col-row input:focus { border-bottom-color: #0f1b2d; }
   .col-header { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 0 16px 8px 16px; }
-  .col-header span { font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: #6b7280; font-weight: 700; font-family: 'DM Sans', sans-serif; }
+  .col-header span { font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: #4b5563; font-weight: 700; font-family: 'DM Sans', sans-serif; }
 
   /* save button */
   .save-btn {
     display: inline-flex;
     align-items: center;
     gap: 7px;
-    background: #111111;
+    background: #0f1b2d;
     color: #ffffff;
     border: none;
     border-radius: 6px;
@@ -410,11 +414,11 @@
     -webkit-tap-highlight-color: transparent;
     font-weight: 500;
   }
-  .save-btn:active { background: #333; }
+  .save-btn:active { background: #1e3350; }
   .save-btn .check { display: none; }
   .save-btn.saved .label { display: none; }
   .save-btn.saved .check { display: inline; }
-  .save-btn.saved { background: #2d5a27; color: #a8d5a2; }
+  .save-btn.saved { background: #1f6b3a; color: #e4f7ea; }
 
   .answer-footer {
     display: flex;
@@ -443,20 +447,20 @@
   }
   .commitment-block p {
     font-size: 13px;
-    color: #bbb;
+    color: #c9d2e0;
     margin-bottom: 14px;
     line-height: 1.7;
   }
   .commitment-block textarea,
   .commitment-block input[type=text] {
     width: 100%;
-    background: #222;
-    border: 1px solid #3a3a3a;
+    background: var(--dark2);
+    border: 1px solid var(--line-dark);
     border-radius: 7px;
     padding: 12px;
     font-family: 'DM Sans', sans-serif;
     font-size: 14px;
-    color: #eee;
+    color: #f1f4f9;
     outline: none;
     transition: border-color .2s;
     -webkit-appearance: none;
@@ -464,22 +468,22 @@
   .commitment-block textarea { resize: vertical; min-height: 120px; }
   .commitment-block input[type=text] { height: 44px; }
   .commitment-block textarea:focus,
-  .commitment-block input[type=text]:focus { border-color: #ffffff; }
+  .commitment-block input[type=text]:focus { border-color: var(--gold); }
 
   .sig-line {
     display: flex;
     align-items: center;
     gap: 12px;
     margin-top: 18px;
-    border-top: 1px solid #2a2a2a;
+    border-top: 1px solid var(--line-dark);
     padding-top: 16px;
   }
-  .sig-line label { font-size: 11px; color: #777; letter-spacing: 1px; white-space: nowrap; font-family: 'DM Sans', sans-serif; }
+  .sig-line label { font-size: 11px; color: #9aa6b8; letter-spacing: 1px; white-space: nowrap; font-family: 'DM Sans', sans-serif; }
   .sig-line input {
     flex: 1;
     background: transparent;
     border: none;
-    border-bottom: 1px solid #444;
+    border-bottom: 1px solid #4a6082;
     padding: 6px 4px;
     font-family: 'Cormorant Garamond', serif;
     font-style: italic;
@@ -549,13 +553,13 @@
     font-family: 'DM Sans', sans-serif;
   }
   .mind-top { background: var(--gold); color: var(--dark); border-bottom: 2px solid var(--dark); }
-  .mind-bottom { background: #e0d8c8; color: #444; }
+  .mind-bottom { background: #e6dcc3; color: #1f2937; }
   .mind-body-circle {
     width: 68px;
     height: 68px;
     border: 2px solid var(--dark);
     border-radius: 50%;
-    background: #f5f0e8;
+    background: #fbf8f1;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -563,7 +567,7 @@
     font-weight: 700;
     letter-spacing: 1px;
     text-transform: uppercase;
-    color: #444;
+    color: #1f2937;
     margin-top: 8px;
     font-family: 'DM Sans', sans-serif;
   }
@@ -578,7 +582,7 @@
     font-family: 'DM Sans', sans-serif;
   }
   .planes-table td:first-child { font-weight: 600; background: var(--mid); width: 42%; }
-  .planes-table td:last-child { color: #666; }
+  .planes-table td:last-child { color: #3f4756; }
 
   /* cycle */
   .cycle-block {
@@ -597,13 +601,13 @@
     justify-content: center;
   }
   .cycle-item {
-    background: #222;
-    border: 1px solid #3a3a3a;
+    background: var(--dark2);
+    border: 1px solid var(--line-dark);
     border-radius: 20px;
     padding: 6px 12px;
     font-size: 11.5px;
     letter-spacing: 0.5px;
-    color: #ddd;
+    color: #e6ebf3;
     font-family: 'DM Sans', sans-serif;
   }
   .cycle-arrow { color: var(--gold); font-size: 14px; }
@@ -611,17 +615,17 @@
   /* sep */
   .sep {
     text-align: center;
-    color: var(--gold);
+    color: var(--gold-deep);
     font-size: 16px;
     letter-spacing: 10px;
     padding: 10px 0;
-    opacity: .4;
+    opacity: .6;
   }
 
   /* footer */
   footer {
     background: var(--dark);
-    color: #555;
+    color: #9aa6b8;
     text-align: center;
     padding: 32px 20px;
     font-size: 10px;
@@ -637,8 +641,8 @@
     bottom: 24px;
     left: 50%;
     transform: translateX(-50%) translateY(70px);
-    background: #2d5a27;
-    color: #a8d5a2;
+    background: #1f6b3a;
+    color: #e4f7ea;
     padding: 10px 22px;
     border-radius: 20px;
     font-size: 11px;
@@ -735,12 +739,12 @@
     <p>Pensa e raciocina. Pode aceitar ou rejeitar qualquer ideia. Nenhuma pessoa ou circunstância pode te fazer pensar pensamentos que você não escolhe. Os pensamentos que você escolhe determinarão seus resultados na vida.</p>
   </div>
 
-  <div class="concept-box" style="margin-top:10px; background:#1e1e1e;">
+  <div class="concept-box" style="margin-top:10px; background:#16263d;">
     <h4>💡 Mente Subconsciente — "O Centro de Poder"</h4>
     <p>Funciona em cada célula do seu corpo. Não tem a capacidade de rejeitar — aceita tudo que a mente consciente imprime. Ideias fixas continuam se expressando sem assistência consciente até serem substituídas. Essas ideias fixas são chamadas de hábitos.</p>
   </div>
 
-  <div class="concept-box" style="margin-top:10px; background:#121212;">
+  <div class="concept-box" style="margin-top:10px; background:#0b1524;">
     <h4>💡 Corpo — "O Instrumento da Mente"</h4>
     <p>É a apresentação física de você. Pensamentos e imagens escolhidos conscientemente, impressos no subconsciente, devem mover seu corpo para a ação. Ações determinam resultados.<br><br><strong style="color:var(--gold)">Pensamentos → Sentimentos → Ações → Resultados</strong></p>
   </div>
@@ -1440,10 +1444,10 @@
 
   <div class="concept-box">
     <h4>🌟 Afirmação para Liberar Ressentimento e Culpa</h4>
-    <p style="font-family:'Cormorant Garamond',serif; font-style:italic; font-size:1rem; margin-bottom:12px; color:#eee; line-height:1.7;">
+    <p style="font-family:'Cormorant Garamond',serif; font-style:italic; font-size:1rem; margin-bottom:12px; color:#f1f4f9; line-height:1.7;">
       "Libero voluntariamente os pensamentos e as coisas que agitaram minha mente. Libero ____________ para seu maior bem, felicidade, saúde e riqueza — e a mim para o meu."
     </p>
-    <p style="font-size:12px; color:#888;">(Faça esta afirmação com emoção genuína.)</p>
+    <p style="font-size:12px; color:#9aa6b8;">(Faça esta afirmação com emoção genuína.)</p>
   </div>
 
   <div class="question-card" data-qid="q_liberacao">
@@ -1465,7 +1469,7 @@
   </div>
 
   <div style="text-align:center; padding: 36px 0 20px;">
-    <div style="font-family:'Cormorant Garamond',serif; font-size:2.2rem; color:var(--gold); margin-bottom:10px; font-weight:700; letter-spacing:2px;">I AM PROSPEROUS</div>
+    <div style="font-family:'Cormorant Garamond',serif; font-size:2.2rem; color:var(--gold-deep); margin-bottom:10px; font-weight:700; letter-spacing:2px;">I AM PROSPEROUS</div>
     <div style="font-size:10px; letter-spacing:5px; text-transform:uppercase; color:var(--muted); font-family:'DM Sans',sans-serif;">I Was Born Rich</div>
   </div>
 </div>
@@ -1473,7 +1477,7 @@
 <!-- FOOTER -->
 <footer>
   <span>Born Rich</span> — Proctor Gallagher Institute<br>
-  <span style="color:#3a3a3a; font-size:9px; letter-spacing:1px; margin-top:6px; display:block;">Material de estudo pessoal · Todas as respostas são suas</span>
+  <span style="color:#7d8aa0; font-size:9px; letter-spacing:1px; margin-top:6px; display:block;">Material de estudo pessoal · Todas as respostas são suas</span>
 </footer>
 
 <!-- TOAST -->
@@ -1530,8 +1534,8 @@ var lixeiraRico = (function(){ try{return JSON.parse(localStorage.getItem('rico_
 window.showToast = function(msg, cor) {
   var t = document.getElementById('toast');
   t.textContent = msg || '✓ Resposta salva';
-  t.style.background = cor || '#2d5a27';
-  t.style.color = cor ? '#fff' : '#a8d5a2';
+  t.style.background = cor || '#1f6b3a';
+  t.style.color = cor ? '#fff' : '#e4f7ea';
   t.classList.add('show');
   setTimeout(function() { t.classList.remove('show'); }, 2200);
 };
@@ -1616,7 +1620,7 @@ async function salvarNoFirebase() {
     if (window.syncShow) window.syncShow.synced('Born Rich');
   } catch(e) {
     if (window.syncShow) window.syncShow.local();
-    showToast('Salvo localmente (offline)', '#f59e0b');
+    showToast('Salvo localmente (offline)', '#b45309');
   }
 }
 
@@ -1669,7 +1673,7 @@ async function carregarDados() {
     if (local) {
       respostasCache = local.dados || {};
       preencherDados(respostasCache);
-      showToast('Dados carregados localmente', '#f59e0b');
+      showToast('Dados carregados localmente', '#b45309');
     }
     if (window.syncShow) window.syncShow.offline();
   }
@@ -1728,6 +1732,6 @@ window.addEventListener('online', function() {
     if (counter) counter.textContent = el.value.length + ' caracteres';
   }
 </script>
-<!-- VOLTAR DESKTOP --><style>@media(max-width:768px){#__btn-voltar{display:none!important}}#__btn-voltar{position:fixed;bottom:22px;left:22px;z-index:99999;background:#13131a;border:1px solid #2a2a4a;color:#a0a0c0;text-decoration:none;padding:10px 18px;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;transition:all .2s;box-shadow:0 2px 12px rgba(0,0,0,.4)}#__btn-voltar:hover{background:#7c6aff;border-color:#7c6aff;color:#fff}</style><a id="__btn-voltar" href="OUTROS.html">← Outros</a><!-- FIM VOLTAR DESKTOP -->
+<!-- VOLTAR DESKTOP --><style>@media(max-width:768px){#__btn-voltar{display:none!important}}#__btn-voltar{position:fixed;bottom:22px;left:22px;z-index:99999;background:#0f1b2d;border:1px solid #2f4666;color:#d6dde8;text-decoration:none;padding:10px 18px;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;transition:all .2s;box-shadow:0 2px 12px rgba(0,0,0,.4)}#__btn-voltar:hover{background:#e0b54a;border-color:#e0b54a;color:#0f1b2d}</style><a id="__btn-voltar" href="OUTROS.html">← Outros</a><!-- FIM VOLTAR DESKTOP -->
 </body>
 </html>
