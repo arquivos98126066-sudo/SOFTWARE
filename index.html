@@ -390,6 +390,36 @@ body::after {
 #app-content.show .card:nth-child(3) { animation-delay: .12s; }
 #app-content.show .card:nth-child(4) { animation-delay: .16s; }
 #app-content.show .card:nth-child(5) { animation-delay: .20s; }
+
+/* Sair escondido: aparece segurando o dedo em "Workspace" */
+.logout-btn { display: none; }
+.logout-btn.show { display: block; animation: fadeUp .25s ease both; }
+.identity { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+
+/* ===== Visual profissional: ícones SVG em gradiente ===== */
+.card-icon {
+  width: 62px; height: 62px; border-radius: 18px; border: 0;
+  background: linear-gradient(145deg, var(--c1), var(--c2));
+  box-shadow: 0 8px 18px -7px var(--sh), inset 0 1px 0 rgba(255,255,255,.38), inset 0 -2px 0 rgba(0,0,0,.08);
+}
+.card-icon svg {
+  width: 34px; height: 34px; fill: none; stroke: #fff; stroke-width: 1.8;
+  stroke-linecap: round; stroke-linejoin: round; filter: drop-shadow(0 1px 1px rgba(0,0,0,.16));
+}
+.card:active .card-icon, .card:hover .card-icon {
+  background: linear-gradient(145deg, var(--c1), var(--c2)); border: 0; filter: brightness(1.06);
+  box-shadow: 0 8px 18px -7px var(--sh), inset 0 1px 0 rgba(255,255,255,.38), inset 0 -2px 0 rgba(0,0,0,.08);
+}
+.card-name { font-size: 20px; letter-spacing: -.3px; }
+.card-desc { font-size: 12px; }
+.card-arrow { width: 32px; height: 32px; border-radius: 50%; }
+.card-arrow svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+.identity{min-height:36px;padding:0 20px 6px}
+
+/* ===== Versão sem título: margens iguais em cima e embaixo, cartões distribuídos ===== */
+.identity { min-height: 28px; padding: 0; }
+.app-wrap { padding-top: max(0px, env(safe-area-inset-top, 0px)); padding-bottom: max(28px, env(safe-area-inset-bottom, 28px)); }
+.grid { gap: 10px; }
 </style>
 </head>
 <body>
@@ -420,62 +450,56 @@ body::after {
   <button class="logout-btn" onclick="fazerLogout()">Sair</button>
   <div class="app-wrap">
 
-    <div class="identity">
-      <div class="identity-dot"></div>
-      <span class="identity-label">Workspace</span>
-      <div class="identity-dot"></div>
-    </div>
+    <div class="identity" aria-hidden="true"></div>
 
     <div class="grid">
 
       <a class="card" href="TAPETE-CRM.html">
-        <div class="card-icon" style="background:#e11d48; border-color:#be123c;">📋</div>
+        <div class="card-icon" style="--c1:#fb7185; --c2:#be123c; --sh:rgba(225,29,72,.45);"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="4.5" width="14" height="17" rx="2.6"/><rect x="9" y="2.5" width="6" height="4" rx="1.3"/><path d="M8.7 11.2l1.3 1.3 2.2-2.5M8.7 16.5h6.6"/></svg></div>
         <div class="card-text">
           <div class="card-name">Tapete CRM</div>
           <div class="card-desc">Clientes e registros</div>
         </div>
-        <span class="card-arrow">↗</span>
-      </a>
-
-      <a class="card" href="Workshop.html">
-        <div class="card-icon" style="background:#eab308; border-color:#ca8a04;">🛠️</div>
-        <div class="card-text">
-          <div class="card-name">Workshop</div>
-          <div class="card-desc">Oficina e projetos</div>
-        </div>
-        <span class="card-arrow">↗</span>
+        <span class="card-arrow"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></span>
       </a>
 
       <a class="card" href="MEU-CRM.html">
-        <div class="card-icon" style="background:#16a34a; border-color:#15803d;">👥</div>
+        <div class="card-icon" style="--c1:#34d399; --c2:#047857; --sh:rgba(4,120,87,.45);"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8.3" r="3.1"/><path d="M3.2 19.2c0-3.2 2.6-5.3 5.8-5.3s5.8 2.1 5.8 5.3"/><circle cx="17.2" cy="9.4" r="2.4"/><path d="M16.4 14.1c2.9-.4 5.2 1.3 5.2 4.2"/></svg></div>
         <div class="card-text">
           <div class="card-name">Meu CRM</div>
           <div class="card-desc">Gestão de clientes</div>
         </div>
-        <span class="card-arrow">↗</span>
+        <span class="card-arrow"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></span>
       </a>
 
-      <a class="card" href="METODO-OPA.html">
-        <div class="card-icon" style="background:#2563eb; border-color:#1d4ed8;">🎯</div>
+      <a class="card" href="DOA.html">
+        <div class="card-icon" style="--c1:#3f3f46; --c2:#050505; --sh:rgba(0,0,0,.5);"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5.5" width="16" height="15" rx="2.8"/><path d="M8 3.5v4M16 3.5v4M4 10.5h16"/><path d="M9 15.4l2.1 2.1 3.9-4"/></svg></div>
         <div class="card-text">
-          <div class="card-name">Método OPA</div>
-          <div class="card-desc">Processo de vendas</div>
+          <div class="card-name">PLANO</div>
+          <div class="card-desc">Planejamento</div>
         </div>
-        <span class="card-arrow">↗</span>
+        <span class="card-arrow"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></span>
       </a>
 
-      <a class="card" href="OUTROS.html">
-        <div class="card-icon" style="background:#111111; border-color:#000000;">🗃️</div>
+      <a class="card" href="ADM.html">
+        <div class="card-icon" style="--c1:#94a3b8; --c2:#334155; --sh:rgba(51,65,85,.45);"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h8.5M17.5 7H20M4 12h3.5M12.5 12H20M4 17h9.5M18.5 17H20"/><circle cx="15" cy="7" r="2.5"/><circle cx="10" cy="12" r="2.5"/><circle cx="16" cy="17" r="2.5"/></svg></div>
         <div class="card-text">
-          <div class="card-name">Outros</div>
-          <div class="card-desc">Rico, Workshop, DOA, Estudo e Código</div>
+          <div class="card-name">ADM</div>
+          <div class="card-desc">Painel administrativo</div>
         </div>
-        <span class="card-arrow">↗</span>
+        <span class="card-arrow"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></span>
+      </a>
+
+      <a class="card" href="RICO.html">
+        <div class="card-icon" style="--c1:#fcd34d; --c2:#b45309; --sh:rgba(180,83,9,.45);"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 17l5.2-5.2 3.6 3.6L20 8"/><path d="M15 8h5v5"/><path d="M4 21h16"/></svg></div>
+        <div class="card-text">
+          <div class="card-name">Rico</div>
+          <div class="card-desc">Finanças e riqueza</div>
+        </div>
+        <span class="card-arrow"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></span>
       </a>
 
     </div>
-
-    <div class="footer">arquivos98126066-sudo · software</div>
   </div>
 
   <div id="pwa-banner">
@@ -568,5 +592,20 @@ body::after {
   });
 </script>
 
+<script>
+(function () {
+  var id = document.querySelector('.identity'), btn = document.querySelector('.logout-btn'), t = null, h = null;
+  if (!id || !btn) return;
+  function mostrar() {
+    btn.classList.add('show');
+    if (navigator.vibrate) { try { navigator.vibrate(25); } catch (e) {} }
+    clearTimeout(h); h = setTimeout(function () { btn.classList.remove('show'); }, 6000);
+  }
+  function cancelar() { clearTimeout(t); t = null; }
+  id.addEventListener('pointerdown', function () { cancelar(); t = setTimeout(mostrar, 600); });
+  ['pointerup', 'pointercancel', 'pointerleave'].forEach(function (e) { id.addEventListener(e, cancelar); });
+  id.addEventListener('contextmenu', function (e) { e.preventDefault(); });
+})();
+</script>
 </body>
 </html>
