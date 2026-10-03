@@ -50,6 +50,7 @@
     font-size: 15px;
     line-height: 1.75;
     -webkit-font-smoothing: antialiased;
+    font-variant-numeric: lining-nums;
   }
 
   /* ── COVER ── */
@@ -62,7 +63,7 @@
     align-items: center;
     justify-content: center;
     text-align: center;
-    padding: 56px 28px 80px;
+    padding: 56px 28px;
     position: relative;
     overflow: hidden;
   }
@@ -75,12 +76,12 @@
   }
   .cover-ornament {
     font-family: 'DM Sans', sans-serif;
-    font-size: 10px;
-    letter-spacing: 6px;
+    font-size: 9px;
+    letter-spacing: 5px;
     color: var(--gold);
     text-transform: uppercase;
     margin-bottom: 28px;
-    font-weight: 500;
+    font-weight: 600;
   }
   .cover h1 {
     font-family: 'Cormorant Garamond', serif;
@@ -102,7 +103,7 @@
     font-style: italic;
     font-size: 1.1rem;
     color: var(--gold-light);
-    margin-bottom: 36px;
+    margin-bottom: 0;
     font-weight: 400;
   }
   .cover-author {
@@ -187,19 +188,20 @@
     border-radius: 0 6px 6px 0;
   }
   .quote-block p {
-    font-family: 'Cormorant Garamond', serif;
-    font-style: italic;
-    font-size: 1rem;
+    font-family: 'DM Sans', sans-serif;
+    font-style: normal;
+    font-size: 15px;
+    font-weight: 400;
     color: #1f2937;
-    line-height: 1.65;
+    line-height: 1.7;
   }
   .quote-block cite {
     display: block;
-    font-size: 10px;
-    letter-spacing: 2px;
+    font-size: 9px;
+    letter-spacing: 4px;
     text-transform: uppercase;
     color: var(--gold-deep);
-    margin-top: 10px;
+    margin-top: 12px;
     font-style: normal;
     font-family: 'DM Sans', sans-serif;
     font-weight: 600;
@@ -344,6 +346,72 @@
   .answer-area textarea:focus,
   .answer-area input[type=text]:focus { border-color: #0f1b2d; background: #fff; }
 
+
+  /* campo de valor centralizado: R$ + valor + texto fixo */
+  .money-field {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: center;
+    column-gap: 10px;
+    row-gap: 2px;
+    margin-left: -40px;
+    padding: 14px 16px 12px;
+    border: 1px solid rgba(138,98,18,.35);
+    border-radius: 12px;
+    background: var(--cream);
+    text-align: center;
+    transition: border-color .2s, box-shadow .2s, background .2s;
+  }
+  .money-field:focus-within {
+    border-color: var(--gold-deep);
+    background: #fff;
+    box-shadow: 0 0 0 3px rgba(224,181,74,.25);
+  }
+  .money-field span {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--gold-deep);
+    line-height: 1.2;
+  }
+  .money-field span.sfx {
+    flex-basis: 100%;
+    font-size: 1rem;
+    font-weight: 400;
+    font-style: italic;
+    color: var(--muted);
+    letter-spacing: .3px;
+  }
+  .answer-area .money-field input[type=text] {
+    flex: 0 1 190px;
+    width: auto;
+    min-width: 0;
+    height: auto;
+    min-height: 0;
+    padding: 2px 4px !important;
+    border: none !important;
+    border-bottom: 2px solid var(--gold) !important;
+    background: transparent !important;
+    border-radius: 0 !important;
+    text-align: center;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--dark);
+    font-variant-numeric: lining-nums tabular-nums;
+  }
+
+  /* caixa de texto que cresce conforme o conteúdo */
+  .answer-area textarea.auto-grow {
+    min-height: 48px;
+    padding: 12px;
+    line-height: 22px;
+    resize: none;
+    overflow: hidden;
+    display: block;
+  }
+
   /* list fields */
   .list-fields { padding: 0 16px 16px 56px; display: flex; flex-direction: column; gap: 8px; }
   .list-field-row {
@@ -374,6 +442,298 @@
     border-radius: 0;
   }
   .list-field-row input:focus { border-bottom-color: #0f1b2d; }
+
+  /* botão para adicionar nova linha na lista */
+  .add-row-btn {
+    align-self: flex-start;
+    margin: 6px 0 0 28px;
+    padding: 8px 18px;
+    background: none;
+    border: 1px dashed var(--gold-deep);
+    border-radius: 20px;
+    color: var(--gold-deep);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: background .2s, color .2s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .add-row-btn:active { background: var(--gold); color: var(--dark); border-color: var(--gold); }
+
+  /* linha de lista que quebra para baixo quando o texto é grande */
+  .list-field-row.multi { align-items: flex-start; }
+  .list-field-row.multi .list-num { padding-top: 9px; }
+  .list-field-row textarea.list-ta,
+  .two-col-row textarea.list-ta {
+    flex: 1;
+    min-width: 0;
+    border: none;
+    border-bottom: 1px solid var(--border);
+    border-radius: 0;
+    padding: 8px 4px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13.5px;
+    line-height: 1.5;
+    background: transparent;
+    color: var(--text);
+    outline: none;
+    resize: none;
+    overflow: hidden;
+    display: block;
+    transition: border-color .2s;
+    -webkit-appearance: none;
+  }
+  .list-field-row textarea.list-ta:focus,
+  .two-col-row textarea.list-ta:focus { border-bottom-color: #0f1b2d; }
+  .two-col-fields .add-row-btn { margin-left: 0; }
+
+  /* objetivos: objetivo + por quê + ações */
+  .metas { margin: 18px 0; }
+  .meta-block {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--gold);
+    border-radius: 12px;
+    padding: 18px 16px 16px;
+    box-shadow: 0 1px 6px rgba(15,27,45,.06);
+  }
+  .meta-block + .meta-block { margin-top: 16px; }
+  .meta-block.principal {
+    background: var(--cream);
+    border-color: rgba(138,98,18,.35);
+    border-left-color: var(--gold-deep);
+    box-shadow: 0 2px 12px rgba(138,98,18,.12);
+  }
+  .meta-head { display: flex; align-items: center; margin-bottom: 12px; }
+  .meta-badge {
+    background: var(--gold);
+    color: var(--dark);
+    font-weight: 700;
+    font-size: 12px;
+    min-width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .meta-field + .meta-field { margin-top: 16px; }
+  .meta-label {
+    display: block;
+    font-size: 9px;
+    letter-spacing: 5px;
+    text-transform: uppercase;
+    font-weight: 600;
+    color: var(--gold-deep);
+    margin-bottom: 6px;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .meta-ta {
+    display: block;
+    width: 100%;
+    min-height: 46px;
+    padding: 12px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--cream);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    line-height: 22px;
+    color: var(--text);
+    outline: none;
+    resize: none;
+    overflow: hidden;
+    -webkit-appearance: none;
+    transition: border-color .2s, background .2s;
+  }
+  .meta-block.principal .meta-ta { background: #fff; }
+  .meta-ta:focus { border-color: #0f1b2d; background: #fff; }
+  .meta-block .list-fields { padding: 0; }
+  .area-block .list-fields { gap: 4px; }
+  .area-block .list-num { min-width: 22px; text-align: left; }
+  .area-block .add-row-btn {
+    margin: 10px 0 0 0;
+    padding: 5px 14px;
+    font-size: 11px;
+    letter-spacing: .8px;
+  }
+  .area-block .meta-field + .meta-field {
+    margin-top: 26px;
+    padding-top: 22px;
+    border-top: 1px solid var(--border);
+  }
+  .area-block + .area-block { margin-top: 20px; }
+
+  /* hábitos */
+  .habito-block + .habito-block { margin-top: 20px; }
+  .hab-horario { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .hab-horario span { font-size: 13px; color: var(--muted); font-family: 'DM Sans', sans-serif; }
+  .hab-time {
+    width: 132px; padding: 10px 10px; border: 1px solid var(--border); border-radius: 8px;
+    background: var(--cream); font-family: 'DM Sans', sans-serif; font-size: 15px; color: var(--text);
+    outline: none; -webkit-appearance: none; appearance: none; min-height: 44px;
+  }
+  .hab-time:focus { border-color: #0f1b2d; background: #fff; }
+  .hab-progresso { margin-top: 26px; padding-top: 22px; border-top: 1px solid var(--border); }
+  .hab-stats { display: flex; gap: 12px; margin-bottom: 14px; }
+  .hab-info {
+    margin-left: auto; padding: 4px 11px; background: transparent; border: 1px solid rgba(138,98,18,.3);
+    border-radius: 999px; color: rgba(138,98,18,.75); font-family: 'DM Sans', sans-serif; font-size: 10px;
+    font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .hab-info.on { background: rgba(224,181,74,.18); color: var(--gold-deep); }
+  .hab-stat { flex: 1; text-align: center; background: var(--cream); border: 1px solid var(--border); border-radius: 10px; padding: 10px 6px; }
+  .hab-stat b { display: block; font-family: 'DM Sans', sans-serif; font-size: 24px; font-weight: 700; line-height: 1.2; color: var(--dark); font-variant-numeric: lining-nums tabular-nums; }
+  .hab-stat small { display: block; font-size: 9px; letter-spacing: 2px; text-transform: uppercase; font-weight: 700; color: var(--gold-deep); margin-top: 2px; font-family: 'DM Sans', sans-serif; }
+  .hab-acoes { display: flex; gap: 10px; margin-top: 16px; }
+  .hab-acoes button {
+    flex: 1; padding: 13px 10px; border-radius: 10px; background: #fff; font-family: 'DM Sans', sans-serif;
+    font-size: 13px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; cursor: pointer;
+    -webkit-tap-highlight-color: transparent; transition: background .15s, color .15s;
+  }
+  .hab-acoes button { border: 1.5px solid var(--gold-deep); color: var(--gold-deep); }
+  .hab-acoes button.on { background: rgba(224,181,74,.38) !important; border-color: var(--gold-deep); color: var(--dark); }
+  .hab-aviso { margin: 12px 0 0; font-size: 12.5px; line-height: 1.5; color: #8a3b12; }
+  .hab-trilha { display: grid; grid-template-columns: repeat(7, 1fr); gap: 12px 0; margin: 22px 0 0; }
+  .hab-trilha[hidden] { display: none; }
+  .hab-trilha i {
+    display: flex; align-items: center; justify-content: center; width: 34px; height: 34px; margin: 0 auto;
+    border-radius: 50%; font-style: normal; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 700;
+    line-height: 1; color: #9aa6b8; background: transparent; border: 1px dashed #c5cdd9;
+  }
+  .hab-trilha i.feito { color: #7a5510; background: rgba(224,181,74,.28); border: 1px solid rgba(224,181,74,.65); }
+  .hab-trilha i.falta { color: #3f4859; background: rgba(93,104,121,.2); border: 1px solid rgba(93,104,121,.45); }
+  .hab-trilha i.novo { animation: habPop .45s ease; }
+  @keyframes habPop { 0% { transform: scale(.4); } 60% { transform: scale(1.3); } 100% { transform: scale(1); } }
+
+  .hab-dur { display: flex; align-items: center; gap: 10px; }
+  .hab-mm {
+    width: 44px; height: 44px; border-radius: 50%; border: 1.5px solid var(--gold-deep); background: none;
+    color: var(--gold-deep); font-size: 22px; font-weight: 600; line-height: 1; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; -webkit-tap-highlight-color: transparent;
+  }
+  .hab-mm:active { background: var(--gold); border-color: var(--gold); color: var(--dark); }
+  .hab-min {
+    width: 72px; height: 44px; text-align: center; border: 1px solid var(--border); border-radius: 8px;
+    background: var(--cream); font-family: 'DM Sans', sans-serif; font-size: 18px; font-weight: 700; color: var(--dark);
+    outline: none; -moz-appearance: textfield; appearance: textfield;
+  }
+  .hab-min::-webkit-outer-spin-button, .hab-min::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+  .hab-min:focus { border-color: #0f1b2d; background: #fff; }
+  .hab-dur span { font-size: 13px; color: var(--muted); font-family: 'DM Sans', sans-serif; }
+
+  .hab-start {
+    display: block; width: 100%; margin-bottom: 10px; padding: 13px 16px; border: 1.5px solid var(--gold-deep);
+    border-radius: 10px; background: rgba(224,181,74,.16); color: var(--gold-deep); font-family: 'DM Sans', sans-serif;
+    font-size: 13px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .hab-start:active { background: var(--gold); border-color: var(--gold); color: var(--dark); }
+  .hab-run { margin-bottom: 10px; padding: 18px 16px 12px; border-radius: 12px; background: rgba(224,181,74,.16); border: 1px solid rgba(138,98,18,.28); text-align: center; }
+  .hab-run[hidden] { display: none; }
+  .hab-tempo { font-family: 'DM Sans', sans-serif; font-size: 40px; font-weight: 600; line-height: 1; letter-spacing: 2px; color: var(--dark); font-variant-numeric: lining-nums tabular-nums; }
+  .hab-barra { height: 4px; border-radius: 2px; background: rgba(138,98,18,.16); margin: 14px 0; overflow: hidden; }
+  .hab-barra i { display: block; height: 100%; width: 0; background: var(--gold-deep); }
+  .hab-ntfy { margin: 0 0 8px; font-size: 11.5px; color: var(--gold-deep); }
+  .hab-ntfy.erro { color: #8a3b12; }
+  .hab-vibaviso { margin: 0 0 8px; font-size: 11.5px; color: #8a3b12; }
+  .hab-cancel { border: none; background: none; color: var(--gold-deep); font-family: 'DM Sans', sans-serif; font-size: 12px; letter-spacing: 2px; text-transform: uppercase; font-weight: 700; padding: 6px 12px; cursor: pointer; }
+  .hab-run.fim .hab-tempo { font-size: 26px; }
+  .meta-ta.area-nome { text-align: center; margin-left: auto; margin-right: auto; }
+
+  .como-funciona {
+    background: #fff;
+    border: 1px solid rgba(138,98,18,.22);
+    border-radius: 14px;
+    padding: 22px 20px 20px;
+    margin: 0 0 22px;
+  }
+  .cf-tag {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 5px;
+    text-transform: uppercase;
+    color: var(--gold-deep);
+    margin: 0 0 14px;
+  }
+  .cf-intro {
+    font-size: 15px;
+    line-height: 1.65;
+    color: var(--text);
+    margin: 0 0 18px;
+  }
+  .cf-step {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    padding: 14px 0;
+    border-top: 1px solid rgba(138,98,18,.16);
+  }
+  .cf-step p {
+    margin: 0;
+    font-size: 14.5px;
+    line-height: 1.6;
+    color: var(--text);
+  }
+  .cf-n {
+    flex: 0 0 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: var(--gold);
+    color: var(--dark);
+    font-size: 13px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 1px;
+  }
+  .cf-fim {
+    margin: 4px 0 0;
+    padding-top: 18px;
+    border-top: 1px solid rgba(138,98,18,.16);
+  }
+
+  .add-meta-btn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: fit-content;
+    margin: 0 auto;
+    padding: 8px 20px 8px 8px;
+    background: rgba(224,181,74,.18);
+    border: none;
+    border-radius: 999px;
+    color: var(--gold-deep);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    box-shadow: none;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    transition: background .15s;
+  }
+  .add-meta-btn .plus {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--gold);
+    color: var(--dark);
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 1;
+  }
+  .add-meta-btn:active { background: rgba(224,181,74,.36); }
 
   /* two-col table */
   .two-col-fields { padding: 0 16px 16px 16px; display: flex; flex-direction: column; gap: 10px; }
@@ -466,9 +826,18 @@
     -webkit-appearance: none;
   }
   .commitment-block textarea { resize: vertical; min-height: 120px; }
-  .commitment-block input[type=text] { height: 44px; }
+  .commitment-block input[type=text] { height: 44px; max-width: 100%; }
   .commitment-block textarea:focus,
   .commitment-block input[type=text]:focus { border-color: var(--gold); }
+
+  .commitment-block textarea.auto-grow {
+    min-height: 48px;
+    padding: 12px;
+    line-height: 22px;
+    resize: none;
+    overflow: hidden;
+    display: block;
+  }
 
   .sig-line {
     display: flex;
@@ -485,9 +854,8 @@
     border: none;
     border-bottom: 1px solid #4a6082;
     padding: 6px 4px;
-    font-family: 'Cormorant Garamond', serif;
-    font-style: italic;
-    font-size: 1.15rem;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 1rem;
     color: #fff;
     outline: none;
     -webkit-appearance: none;
@@ -628,12 +996,41 @@
     color: #9aa6b8;
     text-align: center;
     padding: 32px 20px;
-    font-size: 10px;
-    letter-spacing: 2px;
+    font-size: 9px;
+    letter-spacing: 3px;
+    font-weight: 600;
     text-transform: uppercase;
     font-family: 'DM Sans', sans-serif;
   }
   footer span { color: var(--gold); }
+
+  /* menu hambúrguer */
+  .menu-btn {
+    position: absolute; top: 14px; right: 14px; z-index: 99990; width: 42px; height: 42px; padding: 0;
+    border: none; border-radius: 12px; background: rgba(15,27,45,.88); cursor: pointer;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+    box-shadow: 0 2px 10px rgba(0,0,0,.25); -webkit-tap-highlight-color: transparent;
+  }
+  .menu-btn span { display: block; width: 18px; height: 2px; border-radius: 2px; background: var(--gold); transition: transform .2s, opacity .2s; }
+  .menu-btn.open span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+  .menu-btn.open span:nth-child(2) { opacity: 0; }
+  .menu-btn.open span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+  .menu-overlay { position: fixed; inset: 0; z-index: 99980; background: transparent; }
+  .menu-overlay[hidden], .menu-panel[hidden] { display: none; }
+  .menu-panel {
+    position: absolute; top: 64px; right: 14px; z-index: 99985; width: min(290px, calc(100vw - 28px));
+    background: #fff; border: 1px solid rgba(138,98,18,.25);
+    border-radius: 14px; padding: 6px 0; box-shadow: 0 8px 28px rgba(15,27,45,.25);
+  }
+  .menu-item {
+    display: block; width: 100%; text-align: left; padding: 11px 18px; border: none; background: none;
+    font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600; color: var(--dark); cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .menu-item small { display: block; margin-top: 2px; font-size: 9px; letter-spacing: 3px; text-transform: uppercase; font-weight: 600; color: var(--gold-deep); }
+  .menu-item:active { background: rgba(224,181,74,.18); }
+  .menu-item + .menu-item { border-top: 1px solid rgba(138,98,18,.1); }
+  .section, .cover { scroll-margin-top: 0; }
 
   /* toast */
   .toast {
@@ -664,28 +1061,34 @@
     .list-fields { padding: 0 14px 14px 14px; }
     .hint-panel { padding-left: 16px; }
     .choice-row { padding-left: 16px; }
-    .two-col-row { grid-template-columns: 1fr; }
-    .col-header { display: none; }
     .question-header { padding: 14px 14px 12px; }
+    .money-field { margin-left: 0; }
   }
 </style>
 </head>
 <body>
+<button type="button" class="menu-btn" id="menuBtn" aria-label="Menu" onclick="toggleMenu()"><span></span><span></span><span></span></button>
+<div class="menu-overlay" id="menuOverlay" hidden onclick="fecharMenu()"></div>
+<nav class="menu-panel" id="menuPanel" hidden>
+  <button type="button" class="menu-item" onclick="irPara('intro')">Introdução</button>
+  <button type="button" class="menu-item" onclick="irPara('mente')">Como funciona sua mente</button>
+  <button type="button" class="menu-item" onclick="irPara('dinheiro')">Eu e o dinheiro</button>
+  <button type="button" class="menu-item" onclick="irPara('suficiente')">Quanto é suficiente?</button>
+  <button type="button" class="menu-item" onclick="irPara('imagem')">O criador de imagens</button>
+  <button type="button" class="menu-item" onclick="irPara('abundancia')">Espere uma abundância</button>
+  <button type="button" class="menu-item" onclick="irPara('vibracao')">Vibração e atração</button>
+  <button type="button" class="menu-item" onclick="irPara('risco')">Os tomadores de risco</button>
+  <button type="button" class="menu-item" onclick="irPara('vacuo')">A lei do vácuo</button>
+  <button type="button" class="menu-item" onclick="irPara('habitos')">Criação de hábitos</button>
+</nav>
 
 <!-- COVER -->
-<div class="cover">
+<div class="cover" id="topo">
   <p class="cover-ornament">Proctor Gallagher Institute</p>
   <h1>I Was<br><span>Born Rich</span></h1>
   <div class="cover-line"></div>
   <p class="cover-sub">Caderno de Atividades — Bob Proctor</p>
-  <p class="cover-author">Suas respostas · Sua jornada · Sua riqueza</p>
-  <p class="cover-scroll">↓ começar</p>
 </div>
-
-<!-- NAV -->
-<nav class="nav-bar">
-  <span class="nav-title">Born Rich</span>
-</nav>
 
 <!-- ══════════════════════════════════════════ -->
 <!-- INTRODUÇÃO -->
@@ -702,7 +1105,7 @@
   <p class="section-text">Este programa parte de uma premissa: você possui recursos ricos dormentes dentro de si, esperando para serem desenvolvidos. Cada exercício é direcionado a alterar sua <strong>mente condicionada</strong> — que controla seu estado material.</p>
 
   <div class="concept-box">
-    <h4>🔑 Premissa Central</h4>
+    <h4>Premissa Central</h4>
     <p>A riqueza material é um estado normal e natural para você viver. Falta e limitação só existem quando abrimos espaço para elas em nossa mente. A consciência de prosperidade não conhece falta nem limitação.</p>
   </div>
 </div>
@@ -711,23 +1114,22 @@
 <!-- A MENTE -->
 <!-- ══════════════════════════════════════════ -->
 <div class="section" id="mente">
-  <p class="section-tag">Módulo 1</p>
   <h2 class="section-title">Como Funciona Sua Mente</h2>
 
   <p class="section-text">Você vive simultaneamente em três planos distintos de ser:</p>
 
   <table class="planes-table">
-    <tr><td>1. Espiritual</td><td>Energia de pensamento — não-físico</td></tr>
-    <tr><td>2. Intelectual</td><td>Ideias</td></tr>
-    <tr><td>3. Físico</td><td>Coisas ou Resultados</td></tr>
+    <tr><td>Espiritual</td><td>Pensamento</td></tr>
+    <tr><td>Intelectual</td><td>Ideias</td></tr>
+    <tr><td>Físico</td><td>Resultado</td></tr>
   </table>
 
   <div class="diagram-card">
-    <h4>O Modelo Mente–Corpo (Dr. Thurman Fleet, 1934)</h4>
+    <h4>O Modelo Mente–Corpo</h4>
     <div class="mind-model">
       <div class="mind-circle">
         <div class="mind-top">Mente Consciente</div>
-        <div class="mind-bottom">Mente Subconsciente</div>
+        <div class="mind-bottom">Coração</div>
       </div>
       <div class="mind-connector"></div>
       <div class="mind-body-circle">Corpo</div>
@@ -735,29 +1137,18 @@
   </div>
 
   <div class="concept-box">
-    <h4>💡 Mente Consciente — "A Mente Pensante"</h4>
-    <p>Pensa e raciocina. Pode aceitar ou rejeitar qualquer ideia. Nenhuma pessoa ou circunstância pode te fazer pensar pensamentos que você não escolhe. Os pensamentos que você escolhe determinarão seus resultados na vida.</p>
+    <h4>Mente Consciente — A Mente Pensante</h4>
+    <p>A mente consciente é a parte do eu responsável pelos pensamentos, razão e decisões conscientes, pelas ideias, pelos pensamentos passados e futuros, e é a parte que tem o poder de mudar o que está no coração, para que assim mudemos os nossos resultados, pois eles dependem do que está dentro do coração.</p>
   </div>
 
   <div class="concept-box" style="margin-top:10px; background:#16263d;">
-    <h4>💡 Mente Subconsciente — "O Centro de Poder"</h4>
-    <p>Funciona em cada célula do seu corpo. Não tem a capacidade de rejeitar — aceita tudo que a mente consciente imprime. Ideias fixas continuam se expressando sem assistência consciente até serem substituídas. Essas ideias fixas são chamadas de hábitos.</p>
+    <h4>Coração — Centro de Controle</h4>
+    <p>O coração é onde moram os nossos hábitos, crenças, valores, princípios, desejos bons e ruins, expectativa e condicionamento. Essa é a parte onde mora o nosso caráter, é responsável pelos resultados que temos em nossas vidas, sejam bons ou ruins, e ela também influencia o que pensamos em nossa mente consciente.</p>
   </div>
 
   <div class="concept-box" style="margin-top:10px; background:#0b1524;">
-    <h4>💡 Corpo — "O Instrumento da Mente"</h4>
-    <p>É a apresentação física de você. Pensamentos e imagens escolhidos conscientemente, impressos no subconsciente, devem mover seu corpo para a ação. Ações determinam resultados.<br><br><strong style="color:var(--gold)">Pensamentos → Sentimentos → Ações → Resultados</strong></p>
-  </div>
-
-  <div class="sep">· · ·</div>
-
-  <h3 style="font-family:'Cormorant Garamond',serif; margin: 20px 0 12px; font-size:1.2rem; font-weight:700; color:var(--dark);">Raciocínio Dedutivo vs. Indutivo</h3>
-  <p class="section-text">Seu <strong>Fator de Raciocínio Indutivo</strong> é seu "PENSADOR" — separa você do resto do reino animal. Ele pode questionar cada ideia que entra na mente consciente e decidir se ela é BOA ou MÁ para você.</p>
-  <p class="section-text">Seu <strong>Fator de Raciocínio Dedutivo</strong> não tem a capacidade de rejeitar — aceita tudo e entrega ao subconsciente.</p>
-
-  <div class="quote-block">
-    <p>"Esta ideia vai melhorar a qualidade da minha vida?"</p>
-    <cite>— A pergunta-chave do Raciocínio Indutivo</cite>
+    <h4>Corpo — O Instrumento da Mente</h4>
+    <p>É a apresentação física de você. Pensamentos e imagens escolhidos conscientemente, impressos no coração, devem mover seu corpo para a ação. Ações determinam resultados.</p>
   </div>
 </div>
 
@@ -765,7 +1156,6 @@
 <!-- EU E O DINHEIRO -->
 <!-- ══════════════════════════════════════════ -->
 <div class="section" id="dinheiro">
-  <p class="section-tag">Módulo 2</p>
   <h2 class="section-title">Eu e o Dinheiro</h2>
 
   <p class="section-text">Você deve começar a ver o dinheiro como um <strong>servo obediente e diligente</strong> que você pode empregar para ganhar mais dinheiro. Sinta-se confortável ao falar sobre dinheiro — você verdadeiramente nasceu rico.</p>
@@ -780,7 +1170,7 @@
       <strong>Como responder:</strong> Escreva um valor aproximado em reais (R$). Seja honesto — este é seu ponto de partida, não seu destino.
     </div>
     <div class="answer-area">
-      <input type="text" placeholder="R$ _________ por mês" oninput="agendarSalvamento(this)">
+      <div class="money-field"><span>R$</span><input type="text" oninput="agendarSalvamento(this)"></div>
     </div>
   </div>
 
@@ -794,7 +1184,7 @@
       <strong>Como responder:</strong> Faça um cálculo aproximado somando sua renda ao longo dos anos de trabalho. Não precisa ser exato — uma estimativa honesta já serve.
     </div>
     <div class="answer-area">
-      <input type="text" placeholder="R$ _________ (aproximadamente)" oninput="agendarSalvamento(this)">
+      <div class="money-field"><span>R$</span><input type="text" oninput="agendarSalvamento(this)"></div>
     </div>
   </div>
 
@@ -808,7 +1198,7 @@
       <strong>Como responder:</strong> Some o valor de seus bens e subtraia todas as dívidas. Este número revela seu patrimônio líquido real.
     </div>
     <div class="answer-area">
-      <input type="text" placeholder="R$ _________ (aproximadamente)" oninput="agendarSalvamento(this)">
+      <div class="money-field"><span>R$</span><input type="text" oninput="agendarSalvamento(this)"></div>
     </div>
   </div>
 
@@ -822,104 +1212,35 @@
       <strong>Como responder:</strong> Lembre do seu ano de maior renda — pode incluir bônus, projetos extras, herança.
     </div>
     <div class="answer-area">
-      <input type="text" placeholder="R$ _________ (aproximadamente)" oninput="agendarSalvamento(this)">
-    </div>
-  </div>
-
-  <div class="question-card" data-qid="q_milionario">
-    <div class="question-header">
-      <span class="q-number">5</span>
-      <span class="q-text">Você acredita que qualquer pessoa pode valer um milhão de dólares por ano? Por quê / Por que não?</span>
-      <button class="hint-btn" onclick="toggleHint(this)" title="Ver dica">?</button>
-    </div>
-    <div class="hint-panel">
-      <strong>Como responder:</strong> Reflita honestamente sobre suas crenças a respeito do valor humano. Sua resposta revelará crenças limitantes ou expansivas.
-    </div>
-    <div class="choice-row">
-      <label class="choice-label" onclick="selectChoice(this, 'q5')"><input type="radio" name="q5">Sim, acredito</label>
-      <label class="choice-label" onclick="selectChoice(this, 'q5')"><input type="radio" name="q5">Não acredito</label>
-      <label class="choice-label" onclick="selectChoice(this, 'q5')"><input type="radio" name="q5">Depende da pessoa</label>
-    </div>
-    <div class="answer-area">
-      <textarea placeholder="Explique seu raciocínio aqui..." rows="3" oninput="updateChar(this);agendarSalvamento(this)"></textarea>
-    </div>
-    <div class="answer-footer">
-      <span class="char-count"></span>
-      <button class="save-btn" onclick="saveAnswer(this)"><span class="label">Salvar</span><span class="check">✓ Salvo</span></button>
-    </div>
-  </div>
-
-  <div class="question-card" data-qid="q_valor_proprio">
-    <div class="question-header">
-      <span class="q-number">6</span>
-      <span class="q-text">Quanto você acha que vale por ano? Por quê?</span>
-      <button class="hint-btn" onclick="toggleHint(this)" title="Ver dica">?</button>
-    </div>
-    <div class="hint-panel">
-      <strong>Como responder:</strong> Pense no valor que você entrega ao mundo, seus talentos, habilidades, experiência.
-    </div>
-    <div class="answer-area">
-      <input type="text" placeholder="R$ _________ por ano" style="margin-bottom:8px" oninput="agendarSalvamento(this)">
-      <textarea placeholder="Por quê esse valor? Qual crença está por trás disso?" rows="3" oninput="updateChar(this);agendarSalvamento(this)"></textarea>
-    </div>
-    <div class="answer-footer">
-      <span class="char-count"></span>
-      <button class="save-btn" onclick="saveAnswer(this)"><span class="label">Salvar</span><span class="check">✓ Salvo</span></button>
+      <div class="money-field"><span>R$</span><input type="text" oninput="agendarSalvamento(this)"></div>
     </div>
   </div>
 
   <div class="question-card" data-qid="q_renda_anual">
     <div class="question-header">
-      <span class="q-number">7</span>
+      <span class="q-number">5</span>
       <span class="q-text">Quanto você ganha atualmente por ano?</span>
       <button class="hint-btn" onclick="toggleHint(this)" title="Ver dica">?</button>
     </div>
     <div class="hint-panel">
-      <strong>Como responder:</strong> Escreva sua renda anual atual. Compare com sua resposta à questão 6 — a diferença é o "gap de consciência" que este programa quer fechar.
+      <strong>Como responder:</strong> Escreva sua renda anual atual.
     </div>
     <div class="answer-area">
-      <input type="text" placeholder="R$ _________ por ano (aproximadamente)" oninput="agendarSalvamento(this)">
-    </div>
-  </div>
-
-  <div class="question-card" data-qid="q_shaw">
-    <div class="question-header">
-      <span class="q-number">8</span>
-      <span class="q-text">George Bernard Shaw disse: "É um pecado ser pobre." Você concorda ou discorda? Por quê?</span>
-      <button class="hint-btn" onclick="toggleHint(this)" title="Ver dica">?</button>
-    </div>
-    <div class="hint-panel">
-      <strong>Como responder:</strong> Shaw quis provocar a reflexão de que aceitar a pobreza como destino inevitável é uma escolha inconsciente.
-    </div>
-    <div class="choice-row">
-      <label class="choice-label" onclick="selectChoice(this, 'q8')"><input type="radio" name="q8">Concordo</label>
-      <label class="choice-label" onclick="selectChoice(this, 'q8')"><input type="radio" name="q8">Discordo</label>
-      <label class="choice-label" onclick="selectChoice(this, 'q8')"><input type="radio" name="q8">Concordo parcialmente</label>
-    </div>
-    <div class="answer-area">
-      <textarea placeholder="Escreva sua reflexão aqui..." rows="3" oninput="updateChar(this);agendarSalvamento(this)"></textarea>
-    </div>
-    <div class="answer-footer">
-      <span class="char-count"></span>
-      <button class="save-btn" onclick="saveAnswer(this)"><span class="label">Salvar</span><span class="check">✓ Salvo</span></button>
+      <div class="money-field"><span>R$</span><input type="text" oninput="agendarSalvamento(this)"></div>
     </div>
   </div>
 
   <div class="question-card" data-qid="q_falta_dinheiro">
     <div class="question-header">
-      <span class="q-number">9</span>
-      <span class="q-text">A falta de dinheiro apresenta um problema em sua vida? Por quê?</span>
+      <span class="q-number">6</span>
+      <span class="q-text">O que a falta de dinheiro tem causado em sua vida durante todos esses anos?</span>
       <button class="hint-btn" onclick="toggleHint(this)" title="Ver dica">?</button>
     </div>
     <div class="hint-panel">
-      <strong>Como responder:</strong> Seja completamente honesto. Se a resposta for "Sim", descreva como esse problema se manifesta no dia a dia.
-    </div>
-    <div class="choice-row">
-      <label class="choice-label" onclick="selectChoice(this, 'q9')"><input type="radio" name="q9">Sim</label>
-      <label class="choice-label" onclick="selectChoice(this, 'q9')"><input type="radio" name="q9">Não</label>
+      <strong>Como responder:</strong> Seja completamente honesto. Descreva como a falta de dinheiro se manifesta no seu dia a dia.
     </div>
     <div class="answer-area">
-      <textarea placeholder="Por quê? Descreva com detalhes..." rows="3" oninput="updateChar(this);agendarSalvamento(this)"></textarea>
+      <textarea class="auto-grow" rows="1" oninput="updateChar(this);agendarSalvamento(this)"></textarea>
     </div>
     <div class="answer-footer">
       <span class="char-count"></span>
@@ -927,21 +1248,20 @@
     </div>
   </div>
 
-  <div class="question-card" data-qid="q_subconsciencia">
+  <div class="question-card dynamic-list" data-qid="q_subconsciencia">
     <div class="question-header">
-      <span class="q-number">✦</span>
-      <span class="q-text">Descreva os tipos de pensamentos e ideias com os quais você gostaria que sua mente subconsciente fosse condicionada.</span>
+      <span class="q-number">7</span>
+      <span class="q-text">Descreva os tipos de pensamentos sobre dinheiro com os quais você quer que sua mente seja condicionada.</span>
       <button class="hint-btn" onclick="toggleHint(this)" title="Ver dica">?</button>
     </div>
     <div class="hint-panel">
       <strong>Como responder:</strong> Escreva no presente, como se já fosse verdade. Ex: "Dinheiro vem para mim facilmente."
     </div>
-    <div class="answer-area">
-      <textarea placeholder="Escreva os pensamentos que deseja imprimir no seu subconsciente..." rows="5" oninput="updateChar(this);agendarSalvamento(this)"></textarea>
-    </div>
-    <div class="answer-footer">
-      <span class="char-count"></span>
-      <button class="save-btn" onclick="saveAnswer(this)"><span class="label">Salvar</span><span class="check">✓ Salvo</span></button>
+    <div class="list-fields">
+      <div class="list-field-row multi"><span class="list-num">1</span><textarea class="list-ta" rows="1" oninput="autoGrow(this);agendarSalvamento(this)"></textarea></div>
+      <div class="list-field-row multi"><span class="list-num">2</span><textarea class="list-ta" rows="1" oninput="autoGrow(this);agendarSalvamento(this)"></textarea></div>
+      <div class="list-field-row multi"><span class="list-num">3</span><textarea class="list-ta" rows="1" oninput="autoGrow(this);agendarSalvamento(this)"></textarea></div>
+      <button type="button" class="add-row-btn" onclick="addRow(this)">+ Adicionar</button>
     </div>
   </div>
 </div>
@@ -949,8 +1269,7 @@
 <!-- ══════════════════════════════════════════ -->
 <!-- QUANTO É SUFICIENTE? -->
 <!-- ══════════════════════════════════════════ -->
-<div class="section">
-  <p class="section-tag">Módulo 2B</p>
+<div class="section" id="suficiente">
   <h2 class="section-title">Quanto é Suficiente?</h2>
 
   <div class="quote-block">
@@ -961,13 +1280,13 @@
   <p class="section-text">Para ativar o conceito de prosperidade, você deve ser específico. O subconsciente não pensa — ele apenas aceita imagens e as move para a forma.</p>
 
   <div class="concept-box">
-    <h4>💰 As Duas Formas de Ganhar Dinheiro</h4>
+    <h4>As Duas Formas de Ganhar Dinheiro</h4>
     <p>1. <strong>Pessoas trabalhando</strong> — troca de tempo por dinheiro<br>2. <strong>Dinheiro trabalhando</strong> — investimentos, ativos, sistemas</p>
   </div>
 
   <div class="question-card" data-qid="q_suficiente">
     <div class="question-header">
-      <span class="q-number">✦</span>
+      <span class="q-number">1</span>
       <span class="q-text">Qual é o valor exato que você precisa para viver da forma que deseja?</span>
       <button class="hint-btn" onclick="toggleHint(this)" title="Ver dica">?</button>
     </div>
@@ -975,14 +1294,14 @@
       <strong>Como responder:</strong> Calcule quanto custaria sua vida ideal por mês. Multiplique por 12. Seja específico e corajoso.
     </div>
     <div class="answer-area">
-      <input type="text" placeholder="R$ _________ por ano / mês" oninput="agendarSalvamento(this)">
+      <div class="money-field"><span>R$</span><input type="text" oninput="agendarSalvamento(this)"></div>
     </div>
   </div>
 
   <div class="commitment-block" data-qid="q_planejador">
     <h4>Meu Compromisso Financeiro</h4>
     <p>Terei uma consulta com um planejador financeiro competente até:</p>
-    <input type="text" placeholder="Data: ___/___/______" oninput="agendarSalvamento(this)">
+    <input type="text" oninput="fitWidth(this);agendarSalvamento(this)">
   </div>
 </div>
 
@@ -990,7 +1309,6 @@
 <!-- O CRIADOR DE IMAGENS -->
 <!-- ══════════════════════════════════════════ -->
 <div class="section" id="imagem">
-  <p class="section-tag">Módulo 3</p>
   <h2 class="section-title">O Criador de Imagens</h2>
 
   <div class="quote-block">
@@ -1000,27 +1318,9 @@
 
   <p class="section-text">O conhecimento da criação de imagens elimina a competição da sua vida, movendo você do plano competitivo para o plano criativo.</p>
 
-  <div class="question-card" data-qid="q_ponto_imagem">
-    <div class="question-header">
-      <span class="q-number">✦</span>
-      <span class="q-text">Na sua opinião, qual é o ponto mais importante do capítulo "O Criador de Imagens"?</span>
-      <button class="hint-btn" onclick="toggleHint(this)" title="Ver dica">?</button>
-    </div>
-    <div class="hint-panel">
-      <strong>Como responder:</strong> Reflita sobre o que mais impactou sua forma de pensar neste capítulo.
-    </div>
-    <div class="answer-area">
-      <textarea placeholder="Escreva o ponto que mais te impactou e por quê..." rows="4" oninput="updateChar(this);agendarSalvamento(this)"></textarea>
-    </div>
-    <div class="answer-footer">
-      <span class="char-count"></span>
-      <button class="save-btn" onclick="saveAnswer(this)"><span class="label">Salvar</span><span class="check">✓ Salvo</span></button>
-    </div>
-  </div>
-
   <div class="question-card" data-qid="q_satisfacao">
     <div class="question-header">
-      <span class="q-number">✦</span>
+      <span class="q-number">1</span>
       <span class="q-text">Você está satisfeito com os resultados que experimenta na sua vida atualmente?</span>
       <button class="hint-btn" onclick="toggleHint(this)" title="Ver dica">?</button>
     </div>
@@ -1034,9 +1334,9 @@
     </div>
   </div>
 
-  <div class="question-card" data-qid="q_resultados_mudar">
+  <div class="question-card dynamic-list" data-qid="q_resultados_mudar">
     <div class="question-header">
-      <span class="q-number">✦</span>
+      <span class="q-number">2</span>
       <span class="q-text">Liste os resultados que você quer mudar na sua vida:</span>
       <button class="hint-btn" onclick="toggleHint(this)" title="Ver dica">?</button>
     </div>
@@ -1044,22 +1344,16 @@
       <strong>Como responder:</strong> Pense em todas as áreas: financeira, relacionamentos, saúde, carreira, liberdade. Seja específico.
     </div>
     <div class="list-fields">
-      <div class="list-field-row"><span class="list-num">1</span><input type="text" placeholder="Resultado que quero mudar..." oninput="agendarSalvamento(this)"></div>
-      <div class="list-field-row"><span class="list-num">2</span><input type="text" placeholder="Resultado que quero mudar..." oninput="agendarSalvamento(this)"></div>
-      <div class="list-field-row"><span class="list-num">3</span><input type="text" placeholder="Resultado que quero mudar..." oninput="agendarSalvamento(this)"></div>
-      <div class="list-field-row"><span class="list-num">4</span><input type="text" placeholder="Resultado que quero mudar..." oninput="agendarSalvamento(this)"></div>
-      <div class="list-field-row"><span class="list-num">5</span><input type="text" placeholder="Resultado que quero mudar..." oninput="agendarSalvamento(this)"></div>
-      <div class="list-field-row"><span class="list-num">6</span><input type="text" placeholder="Resultado que quero mudar..." oninput="agendarSalvamento(this)"></div>
-      <div class="list-field-row"><span class="list-num">7</span><input type="text" placeholder="Resultado que quero mudar..." oninput="agendarSalvamento(this)"></div>
-      <div class="list-field-row"><span class="list-num">8</span><input type="text" placeholder="Resultado que quero mudar..." oninput="agendarSalvamento(this)"></div>
-      <div class="list-field-row"><span class="list-num">9</span><input type="text" placeholder="Resultado que quero mudar..." oninput="agendarSalvamento(this)"></div>
-      <div class="list-field-row"><span class="list-num">10</span><input type="text" placeholder="Resultado que quero mudar..." oninput="agendarSalvamento(this)"></div>
+      <div class="list-field-row multi"><span class="list-num">1</span><textarea class="list-ta" rows="1" oninput="autoGrow(this);agendarSalvamento(this)"></textarea></div>
+      <div class="list-field-row multi"><span class="list-num">2</span><textarea class="list-ta" rows="1" oninput="autoGrow(this);agendarSalvamento(this)"></textarea></div>
+      <div class="list-field-row multi"><span class="list-num">3</span><textarea class="list-ta" rows="1" oninput="autoGrow(this);agendarSalvamento(this)"></textarea></div>
+      <button type="button" class="add-row-btn" onclick="addRow(this)">+ Adicionar</button>
     </div>
   </div>
 
   <div class="question-card" data-qid="q_descricao_futura">
     <div class="question-header">
-      <span class="q-number">✦</span>
+      <span class="q-number">3</span>
       <span class="q-text">Faça uma descrição escrita da pessoa que você está prestes a se tornar:</span>
       <button class="hint-btn" onclick="toggleHint(this)" title="Ver dica">?</button>
     </div>
@@ -1067,7 +1361,7 @@
       <strong>Como responder:</strong> Escreva no presente, como se já fosse verdade. "Eu sou uma pessoa que..." Seja corajoso e detalhado.
     </div>
     <div class="answer-area">
-      <textarea placeholder="Eu sou uma pessoa que... Descreva essa versão futura de você com riqueza de detalhes..." rows="8" oninput="updateChar(this);agendarSalvamento(this)"></textarea>
+      <textarea class="auto-grow" rows="1" oninput="updateChar(this);agendarSalvamento(this)"></textarea>
     </div>
     <div class="answer-footer">
       <span class="char-count"></span>
@@ -1080,91 +1374,47 @@
 <!-- ESPERE UMA ABUNDÂNCIA -->
 <!-- ══════════════════════════════════════════ -->
 <div class="section" id="abundancia">
-  <p class="section-tag">Módulo 4</p>
   <h2 class="section-title">Espere uma Abundância</h2>
 
   <p class="section-text">A mente é um poderoso ímã que <strong>atrai</strong> o que corresponde ao seu estado dominante. A <strong>EXPECTATIVA</strong> dita esse estado e governa o que é atraído para sua vida.</p>
 
   <div class="steps-box">
     <div class="step-item">
-      <span class="step-num">1</span>
+      <span class="step-num">✦</span>
       <span class="step-text">CONSTRUA A IMAGEM — Relaxe e se veja já em posse do bem que deseja</span>
     </div>
     <div class="step-item">
-      <span class="step-num">2</span>
+      <span class="step-num">✦</span>
       <span class="step-text">DEIXE IR E DEIXE DEUS — Entregue ao poder universal</span>
     </div>
     <div class="step-item">
-      <span class="step-num">3</span>
+      <span class="step-num">✦</span>
       <span class="step-text">ESPERE com todo o coração e alma que o Espírito o recompensará abertamente por sua fé</span>
-    </div>
-  </div>
-
-  <div class="question-card" data-qid="q_aumentar_renda">
-    <div class="question-header">
-      <span class="q-number">✦</span>
-      <span class="q-text">O que você está fazendo para aumentar sua renda?</span>
-      <button class="hint-btn" onclick="toggleHint(this)" title="Ver dica">?</button>
-    </div>
-    <div class="hint-panel">
-      <strong>Como responder:</strong> Liste ações concretas — não intenções.
-    </div>
-    <div class="answer-area">
-      <textarea placeholder="Liste as ações concretas que você já está tomando ou planeja tomar..." rows="4" oninput="updateChar(this);agendarSalvamento(this)"></textarea>
-    </div>
-    <div class="answer-footer">
-      <span class="char-count"></span>
-      <button class="save-btn" onclick="saveAnswer(this)"><span class="label">Salvar</span><span class="check">✓ Salvo</span></button>
-    </div>
-  </div>
-
-  <div class="question-card" data-qid="q_expectativa">
-    <div class="question-header">
-      <span class="q-number">✦</span>
-      <span class="q-text">Reconheça a diferença entre o que você DESEJA e o que você tem ESPERADO na vida. Descreva o que você realmente tem esperado até agora:</span>
-      <button class="hint-btn" onclick="toggleHint(this)" title="Ver dica">?</button>
-    </div>
-    <div class="hint-panel">
-      <strong>Como responder:</strong> Observe seus pensamentos automáticos sobre dinheiro, sucesso, relacionamentos. Esses são seus padrões de expectativa verdadeiros.
-    </div>
-    <div class="answer-area">
-      <textarea placeholder="O que eu verdadeiramente tenho esperado da minha vida é..." rows="6" oninput="updateChar(this);agendarSalvamento(this)"></textarea>
-    </div>
-    <div class="answer-footer">
-      <span class="char-count"></span>
-      <button class="save-btn" onclick="saveAnswer(this)"><span class="label">Salvar</span><span class="check">✓ Salvo</span></button>
     </div>
   </div>
 
   <div class="question-card" data-qid="q_objetivo">
     <div class="question-header">
-      <span class="q-number">✦</span>
-      <span class="q-text">Escreva seu objetivo com o máximo de detalhes possível — em suas próprias palavras:</span>
+      <span class="q-number">1</span>
+      <span class="q-text">Visualize os seus objetivos com o máximo de detalhes possíveis</span>
       <button class="hint-btn" onclick="toggleHint(this)" title="Ver dica">?</button>
     </div>
     <div class="hint-panel">
-      <strong>Como responder:</strong> Descreva seu objetivo no presente e com emoção, como se já fosse realidade.
-    </div>
-    <div class="answer-area">
-      <textarea placeholder="Meu objetivo é... (escreva como se já fosse verdade, com detalhes sensoriais e emocionais)" rows="7" oninput="updateChar(this);agendarSalvamento(this)"></textarea>
-    </div>
-    <div class="answer-footer">
-      <span class="char-count"></span>
-      <button class="save-btn" onclick="saveAnswer(this)"><span class="label">Salvar</span><span class="check">✓ Salvo</span></button>
+      <strong>Como fazer:</strong> Feche os olhos por 2 minutos e respire fundo. Imagine-se já tendo o que deseja, no presente e com emoção, como se já fosse realidade. Veja, ouça e sinta cada detalhe.
     </div>
   </div>
 
   <div class="question-card" data-qid="q_visualizacao">
     <div class="question-header">
-      <span class="q-number">✦</span>
-      <span class="q-text">Após relaxar e se visualizar em posse do bem que deseja, descreva a imagem que você construiu:</span>
+      <span class="q-number">2</span>
+      <span class="q-text">Agora escreva o que você visualizou com o máximo de detalhes que conseguir lembrar.</span>
       <button class="hint-btn" onclick="toggleHint(this)" title="Ver dica">?</button>
     </div>
     <div class="hint-panel">
-      <strong>Como responder:</strong> Feche os olhos por 2 minutos. Respire fundo. Imagine-se já tendo o que deseja. Depois escreva tudo.
+      <strong>Como responder:</strong> Logo depois de visualizar, escreva tudo o que você viu e sentiu, com todos os detalhes de que se lembrar.
     </div>
     <div class="answer-area">
-      <textarea placeholder="Na minha visualização, eu vejo... eu sinto... eu estou..." rows="6" oninput="updateChar(this);agendarSalvamento(this)"></textarea>
+      <textarea class="auto-grow" rows="1" oninput="updateChar(this);agendarSalvamento(this)"></textarea>
     </div>
     <div class="answer-footer">
       <span class="char-count"></span>
@@ -1177,7 +1427,6 @@
 <!-- LEI DA VIBRAÇÃO -->
 <!-- ══════════════════════════════════════════ -->
 <div class="section" id="vibracao">
-  <p class="section-tag">Módulo 5</p>
   <h2 class="section-title">A Lei da Vibração e Atração</h2>
 
   <p class="section-text">Tudo vibra, nada repousa. O pensamento é uma das formas mais elevadas de vibração. Você atrai para sua vida aquilo com o qual está em vibração harmoniosa.</p>
@@ -1198,7 +1447,7 @@
   </div>
 
   <div class="concept-box" style="margin-top:18px;">
-    <h4>🔑 A Lei da Transmutação Perpétua de Energia</h4>
+    <h4>A Lei da Transmutação Perpétua de Energia</h4>
     <p>Quando uma pessoa irradia uma vibração positiva, essa pessoa deve, pela Lei, RECEBER uma quantidade igual ao que irradiou. "Como plantares, assim colherás."</p>
   </div>
 </div>
@@ -1207,33 +1456,22 @@
 <!-- OS TOMADORES DE RISCO -->
 <!-- ══════════════════════════════════════════ -->
 <div class="section" id="risco">
-  <p class="section-tag">Módulo 6</p>
   <h2 class="section-title">Os Tomadores de Risco</h2>
 
-  <div class="quote-block">
-    <p>"A partir de hoje você é um tomador de risco dinâmico e vigoroso, cujos olhos estão sempre voltados para seus pontos fortes e ativos."</p>
-    <cite>— Bob Proctor</cite>
+  <div class="como-funciona">
+    <p class="cf-tag">Como funciona</p>
+    <p class="cf-intro">Cada objetivo é montado em três partes: <strong>o que você quer</strong>, <strong>por que quer</strong> e <strong>o que vai fazer</strong>. Quanto mais claro cada passo, mais rápido o objetivo deixa de ser sonho e vira <strong>plano</strong>.</p>
+    <div class="cf-step"><span class="cf-n">1</span><p><strong>Objetivo.</strong> Escreva o resultado que você quer alcançar, de forma específica e como se já fosse seu.</p></div>
+    <div class="cf-step"><span class="cf-n">2</span><p><strong>Por quê.</strong> O motivo é a sua força. Escreva o que você ganha e sente ao conquistar. É ele que sustenta você quando der vontade de desistir.</p></div>
+    <div class="cf-step"><span class="cf-n">3</span><p><strong>Ações.</strong> Liste os passos concretos que você vai dar, começando pelo que pode fazer ainda esta semana.</p></div>
+    <div class="cf-fim"><button type="button" class="add-meta-btn" onclick="addMeta()"><span class="plus">+</span>Adicionar objetivo</button></div>
   </div>
 
-  <div class="question-card" data-qid="q_sonho">
-    <div class="question-header">
-      <span class="q-number">✦</span>
-      <span class="q-text">Escreva seu sonho, seu objetivo principal:</span>
-      <button class="hint-btn" onclick="toggleHint(this)" title="Ver dica">?</button>
-    </div>
-    <div class="hint-panel">
-      <strong>Como responder:</strong> Escreva seu maior sonho sem censura. Ignore a voz que diz "isso é impossível".
-    </div>
-    <div class="answer-area">
-      <textarea placeholder="Meu grande sonho/objetivo é..." rows="4" oninput="updateChar(this);agendarSalvamento(this)"></textarea>
-    </div>
-    <div class="answer-footer">
-      <span class="char-count"></span>
-      <button class="save-btn" onclick="saveAnswer(this)"><span class="label">Salvar</span><span class="check">✓ Salvo</span></button>
-    </div>
+  <div id="metas" class="metas">
+    <div id="meta-lista"></div>
   </div>
 
-  <div class="question-card" data-qid="q_riscos">
+  <div class="question-card dynamic-list" data-qid="q_riscos">
     <div class="question-header">
       <span class="q-number">✦</span>
       <span class="q-text">Liste os riscos que você deve assumir para tornar seu sonho realidade:</span>
@@ -1243,62 +1481,10 @@
       <strong>Como responder:</strong> Liste as coisas específicas que você tem evitado: investir dinheiro, iniciar um negócio, mudar de carreira, aprender nova habilidade.
     </div>
     <div class="list-fields">
-      <div class="list-field-row"><span class="list-num">1</span><input type="text" placeholder="Risco necessário..." oninput="agendarSalvamento(this)"></div>
-      <div class="list-field-row"><span class="list-num">2</span><input type="text" placeholder="Risco necessário..." oninput="agendarSalvamento(this)"></div>
-      <div class="list-field-row"><span class="list-num">3</span><input type="text" placeholder="Risco necessário..." oninput="agendarSalvamento(this)"></div>
-      <div class="list-field-row"><span class="list-num">4</span><input type="text" placeholder="Risco necessário..." oninput="agendarSalvamento(this)"></div>
-      <div class="list-field-row"><span class="list-num">5</span><input type="text" placeholder="Risco necessário..." oninput="agendarSalvamento(this)"></div>
-      <div class="list-field-row"><span class="list-num">6</span><input type="text" placeholder="Risco necessário..." oninput="agendarSalvamento(this)"></div>
-      <div class="list-field-row"><span class="list-num">7</span><input type="text" placeholder="Risco necessário..." oninput="agendarSalvamento(this)"></div>
-    </div>
-  </div>
-
-  <div class="question-card" data-qid="q_movimentos">
-    <div class="question-header">
-      <span class="q-number">✦</span>
-      <span class="q-text">Liste os grandes movimentos que você se comprometeu a fazer e quando vai começar:</span>
-      <button class="hint-btn" onclick="toggleHint(this)" title="Ver dica">?</button>
-    </div>
-    <div class="hint-panel">
-      <strong>Como responder:</strong> Um objetivo sem data é apenas um desejo. Para cada ação, defina uma data de início concreta.
-    </div>
-    <div class="col-header"><span>Ação / Movimento</span><span>Data de Início</span></div>
-    <div class="two-col-fields">
-      <div class="two-col-row"><input type="text" placeholder="Ação 1..." oninput="agendarSalvamento(this)"><input type="text" placeholder="Data" oninput="agendarSalvamento(this)"></div>
-      <div class="two-col-row"><input type="text" placeholder="Ação 2..." oninput="agendarSalvamento(this)"><input type="text" placeholder="Data" oninput="agendarSalvamento(this)"></div>
-      <div class="two-col-row"><input type="text" placeholder="Ação 3..." oninput="agendarSalvamento(this)"><input type="text" placeholder="Data" oninput="agendarSalvamento(this)"></div>
-      <div class="two-col-row"><input type="text" placeholder="Ação 4..." oninput="agendarSalvamento(this)"><input type="text" placeholder="Data" oninput="agendarSalvamento(this)"></div>
-      <div class="two-col-row"><input type="text" placeholder="Ação 5..." oninput="agendarSalvamento(this)"><input type="text" placeholder="Data" oninput="agendarSalvamento(this)"></div>
-      <div class="two-col-row"><input type="text" placeholder="Ação 6..." oninput="agendarSalvamento(this)"><input type="text" placeholder="Data" oninput="agendarSalvamento(this)"></div>
-    </div>
-  </div>
-
-  <div class="question-card" data-qid="q_navalha">
-    <div class="question-header">
-      <span class="q-number">✦</span>
-      <span class="q-text">Liste 6 Ações da Navalha que você implementará imediatamente para fazer a diferença:</span>
-      <button class="hint-btn" onclick="toggleHint(this)" title="Ver dica">?</button>
-    </div>
-    <div class="hint-panel">
-      <strong>Como responder:</strong> "Ações da Navalha" são pequenas melhorias consistentes que, somadas, criam resultados extraordinários.
-    </div>
-    <div class="list-fields">
-      <div class="list-field-row"><span class="list-num">1</span><input type="text" placeholder="Ação pequena mas poderosa..." oninput="agendarSalvamento(this)"></div>
-      <div class="list-field-row"><span class="list-num">2</span><input type="text" placeholder="Ação pequena mas poderosa..." oninput="agendarSalvamento(this)"></div>
-      <div class="list-field-row"><span class="list-num">3</span><input type="text" placeholder="Ação pequena mas poderosa..." oninput="agendarSalvamento(this)"></div>
-      <div class="list-field-row"><span class="list-num">4</span><input type="text" placeholder="Ação pequena mas poderosa..." oninput="agendarSalvamento(this)"></div>
-      <div class="list-field-row"><span class="list-num">5</span><input type="text" placeholder="Ação pequena mas poderosa..." oninput="agendarSalvamento(this)"></div>
-      <div class="list-field-row"><span class="list-num">6</span><input type="text" placeholder="Ação pequena mas poderosa..." oninput="agendarSalvamento(this)"></div>
-    </div>
-  </div>
-
-  <div class="commitment-block" data-qid="q_compromisso_risco">
-    <h4>Meu Compromisso</h4>
-    <p>Comprometo-me a começar imediatamente a fazer as coisas que anteriormente evitava por medo:</p>
-    <textarea placeholder="Escreva seu compromisso aqui com convicção..." rows="5" oninput="agendarSalvamento(this)"></textarea>
-    <div class="sig-line">
-      <label>Assinatura:</label>
-      <input type="text" placeholder="Seu nome / assinatura" oninput="agendarSalvamento(this)">
+      <div class="list-field-row multi"><span class="list-num">1</span><textarea class="list-ta" rows="1" oninput="autoGrow(this);agendarSalvamento(this)"></textarea></div>
+      <div class="list-field-row multi"><span class="list-num">2</span><textarea class="list-ta" rows="1" oninput="autoGrow(this);agendarSalvamento(this)"></textarea></div>
+      <div class="list-field-row multi"><span class="list-num">3</span><textarea class="list-ta" rows="1" oninput="autoGrow(this);agendarSalvamento(this)"></textarea></div>
+      <button type="button" class="add-row-btn" onclick="addRow(this)">+ Adicionar</button>
     </div>
   </div>
 </div>
@@ -1307,7 +1493,6 @@
 <!-- LEI DO VÁCUO -->
 <!-- ══════════════════════════════════════════ -->
 <div class="section" id="vacuo">
-  <p class="section-tag">Módulo 7</p>
   <h2 class="section-title">A Lei do Vácuo da Prosperidade</h2>
 
   <div class="quote-block">
@@ -1315,123 +1500,38 @@
     <cite>— Bob Proctor</cite>
   </div>
 
-  <div class="concept-box">
-    <h4>🧹 Por Que Nos Agarramos ao Velho?</h4>
-    <p>A causa primária é a mesma para todos: <strong>falta de fé</strong> em nossa capacidade de obter novas ideias e novas coisas.</p>
+  <div class="como-funciona">
+    <p class="cf-tag">Como funciona</p>
+    <p class="cf-intro">Escolha uma <strong>área da sua vida</strong> e troque, nela, o que te limita pelo que te expande. Faça isso uma área de cada vez.</p>
+    <div class="cf-step"><span class="cf-n">1</span><p><strong>Área.</strong> Escreva o nome da área que você quer trabalhar, como financeira, familiar ou saúde.</p></div>
+    <div class="cf-step"><span class="cf-n">2</span><p><strong>Crenças limitantes.</strong> Liste o que você acredita hoje e que trava essa área. Identificar a crença é o primeiro passo para soltá-la.</p></div>
+    <div class="cf-step"><span class="cf-n">3</span><p><strong>Novas crenças.</strong> Para cada crença limitante, escreva a crença nova que vai ocupar o lugar dela.</p></div>
+    <div class="cf-fim"><button type="button" class="add-meta-btn" onclick="addArea()"><span class="plus">+</span>Adicionar área</button></div>
   </div>
 
-  <div class="question-card" data-qid="q_vacuo_areas">
-    <div class="question-header">
-      <span class="q-number">✦</span>
-      <span class="q-text">Liste as áreas da sua vida onde você criará um vácuo (liberar o velho para o novo entrar) e defina datas:</span>
-      <button class="hint-btn" onclick="toggleHint(this)" title="Ver dica">?</button>
-    </div>
-    <div class="hint-panel">
-      <strong>Como responder:</strong> Pense em áreas físicas (roupas que não usa, objetos acumulados) e mentais (crenças limitantes, ressentimentos, relacionamentos tóxicos).
-    </div>
-    <div class="col-header"><span>Área a Liberar</span><span>Data de Conclusão</span></div>
-    <div class="two-col-fields">
-      <div class="two-col-row"><input type="text" placeholder="Área física ou mental..." oninput="agendarSalvamento(this)"><input type="text" placeholder="Data" oninput="agendarSalvamento(this)"></div>
-      <div class="two-col-row"><input type="text" placeholder="Área física ou mental..." oninput="agendarSalvamento(this)"><input type="text" placeholder="Data" oninput="agendarSalvamento(this)"></div>
-      <div class="two-col-row"><input type="text" placeholder="Área física ou mental..." oninput="agendarSalvamento(this)"><input type="text" placeholder="Data" oninput="agendarSalvamento(this)"></div>
-      <div class="two-col-row"><input type="text" placeholder="Área física ou mental..." oninput="agendarSalvamento(this)"><input type="text" placeholder="Data" oninput="agendarSalvamento(this)"></div>
-      <div class="two-col-row"><input type="text" placeholder="Área física ou mental..." oninput="agendarSalvamento(this)"><input type="text" placeholder="Data" oninput="agendarSalvamento(this)"></div>
-      <div class="two-col-row"><input type="text" placeholder="Área física ou mental..." oninput="agendarSalvamento(this)"><input type="text" placeholder="Data" oninput="agendarSalvamento(this)"></div>
-      <div class="two-col-row"><input type="text" placeholder="Área física ou mental..." oninput="agendarSalvamento(this)"><input type="text" placeholder="Data" oninput="agendarSalvamento(this)"></div>
-      <div class="two-col-row"><input type="text" placeholder="Área física ou mental..." oninput="agendarSalvamento(this)"><input type="text" placeholder="Data" oninput="agendarSalvamento(this)"></div>
-    </div>
+  <div id="areas" class="metas">
+    <div id="area-lista"></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- CRIAÇÃO DE HÁBITOS -->
+<!-- ══════════════════════════════════════════ -->
+<div class="section" id="habitos">
+  <h2 class="section-title">Criação de Hábitos</h2>
+
+  <div class="como-funciona">
+    <p class="cf-tag">Como funciona</p>
+    <p class="cf-intro">Um hábito forte começa <strong>claro</strong>: o que você vai fazer, onde e a que horas. Depois, o que conta é a <strong>constância</strong>.</p>
+    <div class="cf-step"><span class="cf-n">1</span><p><strong>Hábito.</strong> Escreva uma ação pequena e específica, que você consiga repetir todos os dias.</p></div>
+    <div class="cf-step"><span class="cf-n">2</span><p><strong>Local e horário.</strong> Defina onde vai fazer e em qual intervalo de horas, por exemplo das 15:40 às 16:40.</p></div>
+    <div class="cf-step"><span class="cf-n">3</span><p><strong>Duração e check.</strong> Defina quantos minutos por dia. Toque em <strong>Iniciar hábito</strong> para cronometrar: ao terminar, o alarme toca. Com o app <strong>ntfy</strong>, o aviso chega no celular mesmo com a tela bloqueada. Depois, <strong>você</strong> marca se <strong>fez</strong> ou <strong>não fez</strong> o dia. Cada marca vira um número: verde se fez, vermelho se não fez.</p></div>
+    <div class="cf-step"><span class="cf-n">4</span><p><strong>Regra dos dois dias.</strong> Um dia sem cumprir não quebra nada. Marcar <strong>dois dias seguidos</strong> como não feitos reinicia a sequência.</p></div>
+    <div class="cf-fim"><button type="button" class="add-meta-btn" onclick="addHabito()"><span class="plus">+</span>Adicionar hábito</button></div>
   </div>
 
-  <div class="question-card" data-qid="q_crencas_limitantes">
-    <div class="question-header">
-      <span class="q-number">✦</span>
-      <span class="q-text">Faça uma lista de conceitos limitantes que você reconhece como obstruções para uma vida próspera:</span>
-      <button class="hint-btn" onclick="toggleHint(this)" title="Ver dica">?</button>
-    </div>
-    <div class="hint-panel">
-      <strong>Como responder:</strong> Ex: "Dinheiro é sujo", "Pessoas ricas são gananciosas", "Eu não mereço sucesso". Identificar a crença é o primeiro passo para dissolvê-la.
-    </div>
-    <div class="list-fields">
-      <div class="list-field-row"><span class="list-num">1</span><input type="text" placeholder="Crença limitante que vou liberar..." oninput="agendarSalvamento(this)"></div>
-      <div class="list-field-row"><span class="list-num">2</span><input type="text" placeholder="Crença limitante que vou liberar..." oninput="agendarSalvamento(this)"></div>
-      <div class="list-field-row"><span class="list-num">3</span><input type="text" placeholder="Crença limitante que vou liberar..." oninput="agendarSalvamento(this)"></div>
-      <div class="list-field-row"><span class="list-num">4</span><input type="text" placeholder="Crença limitante que vou liberar..." oninput="agendarSalvamento(this)"></div>
-      <div class="list-field-row"><span class="list-num">5</span><input type="text" placeholder="Crença limitante que vou liberar..." oninput="agendarSalvamento(this)"></div>
-      <div class="list-field-row"><span class="list-num">6</span><input type="text" placeholder="Crença limitante que vou liberar..." oninput="agendarSalvamento(this)"></div>
-    </div>
-  </div>
-
-  <div class="question-card" data-qid="q_novas_crencas">
-    <div class="question-header">
-      <span class="q-number">✦</span>
-      <span class="q-text">Liste os conceitos que você agora acredita serem verdadeiros (para substituir as crenças limitantes):</span>
-      <button class="hint-btn" onclick="toggleHint(this)" title="Ver dica">?</button>
-    </div>
-    <div class="hint-panel">
-      <strong>Como responder:</strong> Para cada crença limitante, escreva a crença expansiva que a substituirá.
-    </div>
-    <div class="list-fields">
-      <div class="list-field-row"><span class="list-num">1</span><input type="text" placeholder="Nova crença expansiva..." oninput="agendarSalvamento(this)"></div>
-      <div class="list-field-row"><span class="list-num">2</span><input type="text" placeholder="Nova crença expansiva..." oninput="agendarSalvamento(this)"></div>
-      <div class="list-field-row"><span class="list-num">3</span><input type="text" placeholder="Nova crença expansiva..." oninput="agendarSalvamento(this)"></div>
-      <div class="list-field-row"><span class="list-num">4</span><input type="text" placeholder="Nova crença expansiva..." oninput="agendarSalvamento(this)"></div>
-      <div class="list-field-row"><span class="list-num">5</span><input type="text" placeholder="Nova crença expansiva..." oninput="agendarSalvamento(this)"></div>
-      <div class="list-field-row"><span class="list-num">6</span><input type="text" placeholder="Nova crença expansiva..." oninput="agendarSalvamento(this)"></div>
-    </div>
-  </div>
-
-  <div class="question-card" data-qid="q_patti">
-    <div class="question-header">
-      <span class="q-number">✦</span>
-      <span class="q-text">Após ler a história de Patti's Cruise (pág. 181): Quais são os pontos importantes da história?</span>
-      <button class="hint-btn" onclick="toggleHint(this)" title="Ver dica">?</button>
-    </div>
-    <div class="hint-panel">
-      <strong>Como responder:</strong> A história ilustra como a fé e a expectativa atraem o bem desejado — mesmo antes de ver como vai acontecer.
-    </div>
-    <div class="answer-area">
-      <textarea placeholder="Os pontos importantes que identifiquei foram..." rows="4" oninput="updateChar(this);agendarSalvamento(this)"></textarea>
-    </div>
-    <div class="answer-footer">
-      <span class="char-count"></span>
-      <button class="save-btn" onclick="saveAnswer(this)"><span class="label">Salvar</span><span class="check">✓ Salvo</span></button>
-    </div>
-  </div>
-
-  <div class="question-card" data-qid="q_patti_aplicar">
-    <div class="question-header">
-      <span class="q-number">✦</span>
-      <span class="q-text">Como você pode aplicar esses pontos da história de Patti na sua própria vida?</span>
-      <button class="hint-btn" onclick="toggleHint(this)" title="Ver dica">?</button>
-    </div>
-    <div class="hint-panel">
-      <strong>Como responder:</strong> Pense em uma área específica da sua vida onde você pode aplicar imediatamente a lição.
-    </div>
-    <div class="answer-area">
-      <textarea placeholder="Na minha vida, vou aplicar isso da seguinte forma..." rows="5" oninput="updateChar(this);agendarSalvamento(this)"></textarea>
-    </div>
-    <div class="answer-footer">
-      <span class="char-count"></span>
-      <button class="save-btn" onclick="saveAnswer(this)"><span class="label">Salvar</span><span class="check">✓ Salvo</span></button>
-    </div>
-  </div>
-
-  <div class="question-card" data-qid="q_licao_vacuo">
-    <div class="question-header">
-      <span class="q-number">✦</span>
-      <span class="q-text">Qual é a lição que você aprendeu neste capítulo? Como vai aplicá-la para alcançar seu objetivo?</span>
-      <button class="hint-btn" onclick="toggleHint(this)" title="Ver dica">?</button>
-    </div>
-    <div class="hint-panel">
-      <strong>Como responder:</strong> Escreva a lição mais importante em suas próprias palavras. Depois descreva o primeiro passo concreto nas próximas 24 horas.
-    </div>
-    <div class="answer-area">
-      <textarea placeholder="A lição principal que aprendi foi... e vou aplicá-la..." rows="6" oninput="updateChar(this);agendarSalvamento(this)"></textarea>
-    </div>
-    <div class="answer-footer">
-      <span class="char-count"></span>
-      <button class="save-btn" onclick="saveAnswer(this)"><span class="label">Salvar</span><span class="check">✓ Salvo</span></button>
-    </div>
+  <div id="habitos-box" class="metas">
+    <div id="habito-lista"></div>
   </div>
 </div>
 
@@ -1439,38 +1539,9 @@
 <!-- AFIRMAÇÃO FINAL -->
 <!-- ══════════════════════════════════════════ -->
 <div class="section">
-  <p class="section-tag">Encerramento</p>
-  <h2 class="section-title">Afirmação de Liberação</h2>
-
-  <div class="concept-box">
-    <h4>🌟 Afirmação para Liberar Ressentimento e Culpa</h4>
-    <p style="font-family:'Cormorant Garamond',serif; font-style:italic; font-size:1rem; margin-bottom:12px; color:#f1f4f9; line-height:1.7;">
-      "Libero voluntariamente os pensamentos e as coisas que agitaram minha mente. Libero ____________ para seu maior bem, felicidade, saúde e riqueza — e a mim para o meu."
-    </p>
-    <p style="font-size:12px; color:#9aa6b8;">(Faça esta afirmação com emoção genuína.)</p>
-  </div>
-
-  <div class="question-card" data-qid="q_liberacao">
-    <div class="question-header">
-      <span class="q-number">✦</span>
-      <span class="q-text">Escreva o nome de quem você precisa liberar de ressentimentos, e o que você libera:</span>
-      <button class="hint-btn" onclick="toggleHint(this)" title="Ver dica">?</button>
-    </div>
-    <div class="hint-panel">
-      <strong>Como responder:</strong> O ressentimento é você bebendo veneno esperando que o outro sofra. Escreva os nomes e o que você libera — o ato de escrever tem poder de cura.
-    </div>
-    <div class="answer-area">
-      <textarea placeholder="Libero _________ para seu maior bem. Também libero _________ e _________ de minha mente..." rows="5" oninput="updateChar(this);agendarSalvamento(this)"></textarea>
-    </div>
-    <div class="answer-footer">
-      <span class="char-count"></span>
-      <button class="save-btn" onclick="saveAnswer(this)"><span class="label">Salvar</span><span class="check">✓ Salvo</span></button>
-    </div>
-  </div>
-
   <div style="text-align:center; padding: 36px 0 20px;">
     <div style="font-family:'Cormorant Garamond',serif; font-size:2.2rem; color:var(--gold-deep); margin-bottom:10px; font-weight:700; letter-spacing:2px;">I AM PROSPEROUS</div>
-    <div style="font-size:10px; letter-spacing:5px; text-transform:uppercase; color:var(--muted); font-family:'DM Sans',sans-serif;">I Was Born Rich</div>
+    <div style="font-size:9px; letter-spacing:5px; font-weight:600; text-transform:uppercase; color:var(--muted); font-family:'DM Sans',sans-serif;">I Was Born Rich</div>
   </div>
 </div>
 
@@ -1550,12 +1621,12 @@ function coletarDados() {
     var entradas = {};
 
     // textareas
-    card.querySelectorAll('textarea').forEach(function(el, i) {
+    card.querySelectorAll('textarea:not(.list-ta)').forEach(function(el, i) {
       entradas['textarea_' + i] = el.value;
     });
 
     // inputs text
-    card.querySelectorAll('input[type=text]').forEach(function(el, i) {
+    card.querySelectorAll('input[type=text], textarea.list-ta').forEach(function(el, i) {
       entradas['input_' + i] = el.value;
     });
 
@@ -1567,6 +1638,10 @@ function coletarDados() {
     dados[qid] = entradas;
   });
 
+  if (window.coletarMetas) dados['q_metas'] = { metas: JSON.stringify(window.coletarMetas()) };
+  if (window.coletarAreas) dados['q_areas'] = { areas: JSON.stringify(window.coletarAreas()) };
+  if (window.coletarHabitos) dados['q_habitos'] = { habitos: JSON.stringify(window.coletarHabitos()) };
+
   return dados;
 }
 
@@ -1574,21 +1649,45 @@ function coletarDados() {
 function preencherDados(dados) {
   if (!dados) return;
 
+  if (dados.q_habitos && dados.q_habitos.habitos && window.restoreHabitos) {
+    try { window.restoreHabitos(JSON.parse(dados.q_habitos.habitos)); } catch (_) {}
+  }
+
+  if (dados.q_areas && dados.q_areas.areas && window.restoreAreas) {
+    try { window.restoreAreas(JSON.parse(dados.q_areas.areas)); } catch (_) {}
+  }
+
+  if (dados.q_metas && dados.q_metas.metas && window.restoreMetas) {
+    try { window.restoreMetas(JSON.parse(dados.q_metas.metas)); } catch (_) {}
+  }
+
   document.querySelectorAll('[data-qid]').forEach(function(card) {
     var qid = card.dataset.qid;
     if (!dados[qid]) return;
     var entradas = dados[qid];
 
-    card.querySelectorAll('textarea').forEach(function(el, i) {
+    if (card.classList.contains('dynamic-list') && window.ensureRows) {
+      var maxI = 0;
+      Object.keys(entradas).forEach(function(k) {
+        var m = k.match(/^input_(\d+)$/);
+        if (m && entradas[k] && Number(m[1]) + 1 > maxI) maxI = Number(m[1]) + 1;
+      });
+      var linhas = card.querySelector('.two-col-row') ? Math.ceil(maxI / 2) : maxI;
+      window.ensureRows(card, Math.max(3, linhas));
+    }
+
+    card.querySelectorAll('textarea:not(.list-ta)').forEach(function(el, i) {
       if (entradas['textarea_' + i] !== undefined) {
         el.value = entradas['textarea_' + i];
         updateChar(el);
       }
     });
 
-    card.querySelectorAll('input[type=text]').forEach(function(el, i) {
+    card.querySelectorAll('input[type=text], textarea.list-ta').forEach(function(el, i) {
       if (entradas['input_' + i] !== undefined) {
         el.value = entradas['input_' + i];
+        if (el.tagName === 'TEXTAREA') updateChar(el);
+        else if (window.fitWidth && el.closest('.commitment-block')) window.fitWidth(el);
       }
     });
 
@@ -1615,7 +1714,7 @@ async function salvarNoFirebase() {
 
   if (window.syncShow) window.syncShow.syncing();
   try {
-    await setDoc(doc(db, 'born_rich', CADERNO_ID), payload, { merge: true });
+    await setDoc(doc(db, 'born_rich', CADERNO_ID), payload);
     respostasCache = dados;
     if (window.syncShow) window.syncShow.synced('Born Rich');
   } catch(e) {
@@ -1692,6 +1791,8 @@ window.addEventListener('online', function() {
 
 <!-- ─── Navegação: base history (impede fechar aba ao voltar) ────────────── -->
 <script>
+window.agendarSalvamento = window.agendarSalvamento || function(){};
+window.saveAnswer = window.saveAnswer || function(){};
   // PASSO 4 — base do histórico: nunca sai da página ao pressionar voltar
   history.replaceState({ _base: true }, '');
 
@@ -1707,6 +1808,633 @@ window.addEventListener('online', function() {
 
 <!-- ─── Funções UI (não-module) ──────────────────────────────────────────── -->
 <script>
+  var LINHAS = '.list-field-row, .two-col-row';
+  var CAIXA = '.list-fields, .two-col-fields';
+  var TA_HTML = '<textarea class="list-ta" rows="1" oninput="autoGrow(this);agendarSalvamento(this)"></textarea>';
+
+  function addRow(btn, semFoco) {
+    var box = btn.closest(CAIXA);
+    var row = document.createElement('div');
+    if (box.classList.contains('two-col-fields')) {
+      row.className = 'two-col-row';
+      row.innerHTML = TA_HTML + TA_HTML;
+    } else {
+      var n = box.querySelectorAll('.list-field-row').length + 1;
+      row.className = 'list-field-row multi';
+      row.innerHTML = '<span class="list-num">' + n + '</span>' + TA_HTML;
+    }
+    box.insertBefore(row, btn.parentNode === box ? btn : btn.parentNode);
+    if (!semFoco) row.querySelector('textarea').focus();
+  }
+
+  function ensureRows(card, n) {
+    var btn = card.querySelector('.add-row-btn');
+    if (!btn) return;
+    while (card.querySelectorAll(LINHAS).length < n) addRow(btn, true);
+  }
+
+  function delRow(row) {
+    var box = row.closest(CAIXA);
+    if (box.querySelectorAll(LINHAS).length <= 1) return;
+    var prev = row.previousElementSibling;
+    row.remove();
+    box.querySelectorAll('.list-num').forEach(function(n, i) { n.textContent = i + 1; });
+    var tas = prev ? prev.querySelectorAll('textarea') : [];
+    if (tas.length) {
+      var ta = tas[tas.length - 1];
+      ta.focus();
+      ta.setSelectionRange(ta.value.length, ta.value.length);
+    }
+    if (window.agendarSalvamento) window.agendarSalvamento(box);
+  }
+
+  // apagar (backspace) numa linha vazia remove a linha
+  var _ultimoDel = 0;
+  function apagarLinhaVazia(e) {
+    var ta = e.target;
+    if (!ta || !ta.classList || !ta.classList.contains('list-ta') || ta.value !== '') return false;
+    var row = ta.closest(LINHAS);
+    if (!row) return false;
+    var vazia = true;
+    row.querySelectorAll('textarea').forEach(function(t) { if (t.value !== '') vazia = false; });
+    if (!vazia) return false;
+    if (row.closest(CAIXA).querySelectorAll(LINHAS).length <= 1) return false;
+    if (Date.now() - _ultimoDel < 200) return true;
+    _ultimoDel = Date.now();
+    delRow(row);
+    return true;
+  }
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Backspace' && (apagarLinhaVazia(e) || apagarMetaVazia(e) || apagarAreaVazia(e) || apagarHabitoVazio(e))) e.preventDefault();
+  });
+  document.addEventListener('beforeinput', function(e) {
+    if (e.inputType === 'deleteContentBackward' && (apagarLinhaVazia(e) || apagarMetaVazia(e) || apagarAreaVazia(e) || apagarHabitoVazio(e))) e.preventDefault();
+  });
+
+  /* ── Objetivos: objetivo + por quê + ações ── */
+  function metaHTML(n) {
+    var linhas = '';
+    for (var i = 1; i <= 3; i++) {
+      linhas += '<div class="list-field-row multi"><span class="list-num">' + i + '</span>' + TA_HTML + '</div>';
+    }
+    var campo = function(rotulo, cls) {
+      return '<div class="meta-field"><label class="meta-label">' + rotulo + '</label>' +
+        '<textarea class="meta-ta ' + cls + '" rows="1" oninput="autoGrow(this);agendarSalvamento(this)"></textarea></div>';
+    };
+    return '<div class="meta-head"><span class="meta-badge">' + n + '</span></div>' +
+      campo('Objetivo', 'meta-obj') +
+      campo('Por quê', 'meta-why') +
+      '<div class="meta-field"><label class="meta-label">Ações</label><div class="list-fields">' + linhas +
+      '<button type="button" class="add-row-btn" onclick="addRow(this)">+ Adicionar</button></div></div>';
+  }
+
+  function addMeta(semFoco, apos) {
+    var lista = document.getElementById('meta-lista');
+    var n = lista.querySelectorAll('.meta-block').length + 1;
+    var b = document.createElement('div');
+    b.className = 'meta-block' + (n === 1 ? ' principal' : '');
+    b.innerHTML = metaHTML(n);
+    if (apos && apos.parentNode === lista) {
+      lista.insertBefore(b, apos.nextSibling);
+      renumerarMetas();
+      if (window.agendarSalvamento) window.agendarSalvamento(b);
+    } else {
+      lista.appendChild(b);
+    }
+    if (!semFoco) b.querySelector('.meta-obj').focus();
+    return b;
+  }
+
+  function renumerarMetas() {
+    document.querySelectorAll('#meta-lista .meta-block').forEach(function(b, i) {
+      b.querySelector('.meta-badge').textContent = i + 1;
+      b.classList.toggle('principal', i === 0);
+    });
+  }
+
+  function coletarMetas() {
+    var out = [];
+    document.querySelectorAll('#meta-lista .meta-block').forEach(function(b) {
+      var acoes = [];
+      b.querySelectorAll('.list-ta').forEach(function(t) { acoes.push(t.value); });
+      out.push({
+        obj: b.querySelector('.meta-obj').value,
+        porque: b.querySelector('.meta-why').value,
+        acoes: acoes
+      });
+    });
+    return out;
+  }
+
+  function restoreMetas(arr) {
+    if (!arr || !arr.length) return;
+    var lista = document.getElementById('meta-lista');
+    while (lista.querySelectorAll('.meta-block').length < arr.length) addMeta(true);
+    lista.querySelectorAll('.meta-block').forEach(function(b, i) {
+      var m = arr[i];
+      if (!m) return;
+      b.querySelector('.meta-obj').value = m.obj || '';
+      b.querySelector('.meta-why').value = m.porque || '';
+      var acoes = m.acoes || [];
+      ensureRows(b, Math.max(3, acoes.length));
+      b.querySelectorAll('.list-ta').forEach(function(t, k) { t.value = acoes[k] || ''; });
+      b.querySelectorAll('textarea').forEach(autoGrow);
+    });
+  }
+
+  // apagar numa caixa "Objetivo" vazia, com o bloco todo vazio, remove o bloco (menos o primeiro)
+  function apagarMetaVazia(e) {
+    var ta = e.target;
+    if (!ta || !ta.classList || !ta.classList.contains('meta-obj') || ta.value !== '') return false;
+    var lista = document.getElementById('meta-lista');
+    var b = ta.closest('.meta-block');
+    if (!b || b === lista.querySelector('.meta-block')) return false;
+    var vazio = true;
+    b.querySelectorAll('textarea').forEach(function(t) { if (t.value !== '') vazio = false; });
+    if (!vazio) return false;
+    if (Date.now() - _ultimoDel < 200) return true;
+    _ultimoDel = Date.now();
+    var prev = b.previousElementSibling;
+    b.remove();
+    renumerarMetas();
+    if (prev) {
+      var tas = prev.querySelectorAll('textarea');
+      var t = tas[tas.length - 1];
+      t.focus();
+      t.setSelectionRange(t.value.length, t.value.length);
+    }
+    if (window.agendarSalvamento) window.agendarSalvamento(lista);
+    return true;
+  }
+
+  addMeta(true);
+
+  /* ── Áreas da vida: área + crenças limitantes + novas crenças ── */
+  function areaHTML(n) {
+    var linhas = function() {
+      var r = '';
+      for (var i = 1; i <= 3; i++) r += '<div class="list-field-row multi"><span class="list-num">' + i + '</span>' + TA_HTML + '</div>';
+      return r;
+    };
+    var lista = function(rotulo) {
+      return '<div class="meta-field"><label class="meta-label">' + rotulo + '</label><div class="list-fields">' + linhas() +
+        '<button type="button" class="add-row-btn" onclick="addRow(this)">+ Adicionar</button></div></div>';
+    };
+    var ev = 'oninput="autoGrow(this);agendarSalvamento(this)"';
+    var real = '<textarea class="meta-ta area-nome" rows="1" ' + ev + '></textarea>';
+    var campo = real;
+    return '<div class="meta-head"><span class="meta-badge">' + n + '</span></div>' +
+      '<div class="meta-field"><label class="meta-label">Área</label>' + campo + '</div>' +
+      lista('Crenças limitantes') + lista('Novas crenças');
+  }
+
+  function addArea(semFoco) {
+    var lista = document.getElementById('area-lista');
+    var n = lista.querySelectorAll('.area-block').length + 1;
+    var b = document.createElement('div');
+    b.className = 'meta-block area-block';
+    b.innerHTML = areaHTML(n);
+    lista.appendChild(b);
+    if (!semFoco) b.querySelector('.area-nome').focus();
+    return b;
+  }
+
+  function renumerarAreas() {
+    document.querySelectorAll('#area-lista .area-block').forEach(function(b, i) {
+      b.querySelector('.meta-badge').textContent = i + 1;
+    });
+  }
+
+  function coletarAreas() {
+    var out = [];
+    document.querySelectorAll('#area-lista .area-block').forEach(function(b) {
+      var caixas = b.querySelectorAll('.list-fields');
+      var vals = function(c) { return Array.prototype.map.call(c.querySelectorAll('.list-ta'), function(t) { return t.value; }); };
+      out.push({ area: b.querySelector('.area-nome').value, limitantes: vals(caixas[0]), novas: vals(caixas[1]) });
+    });
+    return out;
+  }
+
+  function restoreAreas(arr) {
+    if (!arr || !arr.length) return;
+    var lista = document.getElementById('area-lista');
+    while (lista.querySelectorAll('.area-block').length < arr.length) addArea(true);
+    lista.querySelectorAll('.area-block').forEach(function(b, i) {
+      var m = arr[i];
+      if (!m) return;
+      b.querySelector('.area-nome').value = m.area || '';
+      var caixas = b.querySelectorAll('.list-fields');
+      [m.limitantes || [], m.novas || []].forEach(function(vals, k) {
+        var caixa = caixas[k];
+        var btn = caixa.querySelector('.add-row-btn');
+        while (caixa.querySelectorAll(LINHAS).length < Math.max(3, vals.length)) addRow(btn, true);
+        caixa.querySelectorAll('.list-ta').forEach(function(t, j) { t.value = vals[j] || ''; });
+      });
+      b.querySelectorAll('textarea').forEach(autoGrow);
+    });
+  }
+
+  // apagar numa caixa "Área" vazia, com o bloco todo vazio, remove o bloco (menos o primeiro)
+  function apagarAreaVazia(e) {
+    var ta = e.target;
+    if (!ta || !ta.classList || !ta.classList.contains('area-nome') || ta.value !== '') return false;
+    var lista = document.getElementById('area-lista');
+    var b = ta.closest('.area-block');
+    if (!b || b === lista.querySelector('.area-block')) return false;
+    var vazio = true;
+    b.querySelectorAll('textarea').forEach(function(t) { if (t.value !== '') vazio = false; });
+    if (!vazio) return false;
+    if (Date.now() - _ultimoDel < 200) return true;
+    _ultimoDel = Date.now();
+    var prev = b.previousElementSibling;
+    b.remove();
+    renumerarAreas();
+    if (prev) {
+      var tas = prev.querySelectorAll('textarea');
+      var t = tas[tas.length - 1];
+      t.focus();
+      t.setSelectionRange(t.value.length, t.value.length);
+    }
+    if (window.agendarSalvamento) window.agendarSalvamento(lista);
+    return true;
+  }
+
+  addArea(true);
+
+  /* ── Hábitos: hábito + local + horário + check diário ── */
+  function dFmt(d) { return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
+  function dNum(str) { var p = str.split('-'); return Math.round(Date.UTC(+p[0], +p[1] - 1, +p[2]) / 86400000); }
+
+  // Registro manual: cada dia é marcado por você como 'f' (fiz) ou 'n' (não fiz).
+  // Cada registro vira o próximo número: verde = fiz, vermelho = não fiz.
+  // Dois "não fiz" seguidos reiniciam a contagem.
+  function habStats(reg) {
+    var datas = Object.keys(reg).sort();
+    var total = datas.filter(function(d) { return reg[d] === 'f'; }).length;
+    var run = [];
+    datas.forEach(function(d) {
+      run.push(reg[d]);
+      if (run.length >= 2 && run[run.length - 1] === 'n' && run[run.length - 2] === 'n') run = [];
+    });
+    return { seq: run.length, total: total, perdeu: datas.length > 0 && run.length === 0, run: run };
+  }
+
+  function habitoHTML(n) {
+    var ev = 'oninput="autoGrow(this);agendarSalvamento(this)"';
+    var campo = function(rot, cls) {
+      return '<div class="meta-field"><label class="meta-label">' + rot + '</label><textarea class="meta-ta ' + cls + '" rows="1" ' + ev + '></textarea></div>';
+    };
+    return '<div class="meta-head"><span class="meta-badge">' + n + '</span>' +
+      '<button type="button" class="hab-info" onclick="toggleHabTrilha(this)">Dias seguidos</button></div>' +
+      campo('Hábito', 'hab-nome') + campo('Local', 'hab-local') +
+      '<div class="meta-field"><label class="meta-label">Horário</label><div class="hab-horario">' +
+        '<span>Das</span><input type="time" class="hab-time hab-de" oninput="agendarSalvamento(this)" onchange="agendarSalvamento(this)">' +
+        '<span>às</span><input type="time" class="hab-time hab-ate" oninput="agendarSalvamento(this)" onchange="agendarSalvamento(this)">' +
+      '</div></div>' +
+      '<div class="meta-field"><label class="meta-label">Duração</label><div class="hab-dur">' +
+        '<button type="button" class="hab-mm" onclick="ajustarDur(this, -1)" aria-label="Diminuir">−</button>' +
+        '<input type="number" class="hab-min" inputmode="numeric" min="1" max="600" value="2" oninput="atualizarDur(this.closest(\'.habito-block\'));agendarSalvamento(this)">' +
+        '<button type="button" class="hab-mm" onclick="ajustarDur(this, 1)" aria-label="Aumentar">+</button>' +
+        '<span>min por dia</span></div></div>' +
+      '<div class="hab-progresso">' +
+        '<div class="hab-stats"><div class="hab-stat"><b class="hab-seq">0</b><small>Sequência</small></div>' +
+        '<div class="hab-stat"><b class="hab-total">0</b><small>Total de vezes</small></div></div>' +
+        '<button type="button" class="hab-start" onclick="iniciarHabito(this.closest(\'.habito-block\'))">Iniciar hábito</button>' +
+        '<div class="hab-run" hidden><div class="hab-tempo">00:00</div><div class="hab-barra"><i></i></div>' +
+          '<p class="hab-ntfy" hidden></p>' +
+          '<p class="hab-vibaviso" hidden>O navegador bloqueou a vibração neste aparelho.</p>' +
+          '<button type="button" class="hab-cancel" onclick="pararHabito(this.closest(\'.habito-block\'))">Cancelar</button></div>' +
+        '<div class="hab-acoes">' +
+          '<button type="button" class="hab-fiz" onclick="marcarHabito(this.closest(\'.habito-block\'), \'f\')">Fiz</button>' +
+          '<button type="button" class="hab-nao" onclick="marcarHabito(this.closest(\'.habito-block\'), \'n\')">Não fiz</button></div>' +
+        '<p class="hab-aviso" hidden>Você marcou dois dias seguidos sem cumprir. A sequência recomeçou.</p>' +
+        '<div class="hab-trilha" hidden></div>' +
+      '</div>';
+  }
+
+  function durMin(b) {
+    var v = parseInt(b.querySelector('.hab-min').value, 10);
+    return (v >= 1 && v <= 600) ? v : 0;
+  }
+  function atualizarDur(b) {
+    b.querySelector('.hab-start').textContent = 'Iniciar hábito';
+  }
+  function ajustarDur(btn, dir) {
+    var b = btn.closest('.habito-block'), inp = b.querySelector('.hab-min');
+    var v = parseInt(inp.value, 10) || 2;
+    v = dir > 0 ? (v < 10 ? v + 1 : v + 5) : (v <= 10 ? v - 1 : v - 5);
+    inp.value = Math.min(600, Math.max(1, v));
+    atualizarDur(b);
+    if (window.agendarSalvamento) window.agendarSalvamento(b);
+  }
+
+  function diaAlvo() { return dFmt(new Date()); }
+
+  // botão discreto do topo: mostra/esconde os dias (que ficam no final do bloco)
+  function toggleHabTrilha(btn) {
+    var t = btn.closest('.habito-block').querySelector('.hab-trilha');
+    t.hidden = !t.hidden;
+    btn.classList.toggle('on', !t.hidden);
+  }
+
+  function renderHabito(b) {
+    var reg = b._reg || {};
+    var st = habStats(reg);
+    b.querySelector('.hab-seq').textContent = st.seq;
+    b.querySelector('.hab-total').textContent = st.total;
+    b.querySelector('.hab-aviso').hidden = !st.perdeu;
+    var alvo = reg[diaAlvo()];
+    b.querySelector('.hab-fiz').classList.toggle('on', alvo === 'f');
+    b.querySelector('.hab-nao').classList.toggle('on', alvo === 'n');
+    // trilha: 1, 2, 3... verde = fiz, vermelho = não fiz
+    var itens = st.run.map(function(x, i) {
+      var novo = b._pop && i === st.run.length - 1 ? ' novo' : '';
+      return '<i class="' + (x === 'f' ? 'feito' : 'falta') + novo + '">' + (i + 1) + '</i>';
+    });
+    itens.push('<i class="hoje">' + (st.run.length + 1) + '</i>');
+    b.querySelector('.hab-trilha').innerHTML = itens.slice(-35).join('');
+    b._pop = false;
+    atualizarDur(b);
+  }
+
+  // marca o dia escolhido (hoje ou ontem) como fiz/não fiz; tocar de novo desmarca
+  function marcarHabito(b, status) {
+    if (b._demo) { b._demo = false; b._reg = {}; }
+    b._reg = b._reg || {};
+    var dia = diaAlvo();
+    if (b._reg[dia] === status) delete b._reg[dia];
+    else { b._reg[dia] = status; if (status === 'f') b._pop = true; }
+    renderHabito(b);
+    if (window.agendarSalvamento) window.agendarSalvamento(b);
+  }
+
+  /* cronômetro do hábito + alarme ao concluir */
+  var _habTimer = null, _ac = null;
+  function habAudio() {
+    try {
+      var C = window.AudioContext || window.webkitAudioContext;
+      if (!C) return null;
+      _ac = _ac || new C();
+      if (_ac.state === 'suspended') _ac.resume();
+      return _ac;
+    } catch (e) { return null; }
+  }
+  // 3 toques seguidos; a vibração é disparada na mesma hora, no mesmo ritmo dos toques
+  var _oscs = [];
+  function limparAlarme() {
+    _oscs.forEach(function(o) { try { o.stop(); } catch (e) {} });
+    _oscs = [];
+  }
+  function tocarAlarme() {
+    limparAlarme();
+    var ac = habAudio();
+    if (ac) {
+      var t0 = ac.currentTime;
+      for (var i = 0; i < 3; i++) {
+        var o = ac.createOscillator(), g = ac.createGain(), t = t0 + i * 0.9;
+        o.type = 'sine';
+        o.frequency.value = 880;
+        g.gain.setValueAtTime(0, t);
+        g.gain.linearRampToValueAtTime(0.45, t + 0.04);
+        g.gain.exponentialRampToValueAtTime(0.001, t + 0.6);
+        o.connect(g); g.connect(ac.destination);
+        o.start(t); o.stop(t + 0.65);
+        _oscs.push(o);
+      }
+    }
+    var ok = vibrarAgora();
+    // com a tela apagada/página em segundo plano o navegador bloqueia a vibração:
+    // guarda para vibrar assim que você voltar para a tela
+    if (!ok && document.hidden) { _vibPend = true; return true; }
+    return ok;
+  }
+  var _vibPend = false;
+  function vibrarAgora() {
+    try { if (navigator.vibrate) return navigator.vibrate([600, 300, 600, 300, 600]); } catch (e) {}
+    return false;
+  }
+  document.addEventListener('visibilitychange', function() {
+    if (document.hidden || !_vibPend) return;
+    _vibPend = false;
+    var ok = vibrarAgora();
+    var av = document.querySelector('.hab-run.fim .hab-vibaviso');
+    if (av) av.hidden = ok !== false;
+  });
+  function pararAlarme() {
+    _vibPend = false;
+    limparAlarme();
+    try { if (navigator.vibrate) navigator.vibrate(0); } catch (e) {}
+  }
+  /* aviso no celular via app ntfy: a mensagem é agendada no servidor e toca mesmo com a tela bloqueada */
+  var NTFY_TOPIC = 'habitos_9sz8ivmowfkx20';
+  var _ntfyId = null, _ntfyOk = false;
+  function agendarNtfy(b, min) {
+    _ntfyOk = false;
+    var nome = (b.querySelector('.hab-nome').value || '').trim() || 'Seu hábito';
+    var av = b.querySelector('.hab-ntfy');
+    av.className = 'hab-ntfy';
+    av.hidden = false;
+    av.textContent = 'Agendando o aviso no celular...';
+    var url = 'https://ntfy.sh/' + NTFY_TOPIC + '?title=' + encodeURIComponent('Hábito concluído') + '&priority=5&delay=' + min + 'm';
+    var msg = nome + ': o tempo acabou. Volte ao caderno e marque Fiz ou Não fiz.';
+    try {
+      fetch(url, { method: 'POST', body: msg })
+        .then(function(r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+        .then(function(j) { _ntfyId = j && j.id; _ntfyOk = true; av.textContent = 'Aviso agendado no celular (ntfy).'; })
+        .catch(function() { av.classList.add('erro'); av.textContent = 'Não foi possível agendar o aviso no celular.'; });
+    } catch (e) {
+      av.classList.add('erro'); av.textContent = 'Não foi possível agendar o aviso no celular.';
+    }
+  }
+  function cancelarNtfy() {
+    if (!_ntfyId) return;
+    var id = _ntfyId;
+    _ntfyId = null;
+    _ntfyOk = false;
+    try { fetch('https://ntfy.sh/' + NTFY_TOPIC + '/' + id, { method: 'DELETE' }).catch(function() {}); } catch (e) {}
+  }
+
+  function liberarTimer() {
+    if (!_habTimer) return;
+    clearInterval(_habTimer.iv);
+    try { if (_habTimer.lock) _habTimer.lock.release(); } catch (e) {}
+    _habTimer = null;
+  }
+  function resetarTimerUI(b) {
+    b.querySelector('.hab-run').hidden = true;
+    b.querySelector('.hab-run').classList.remove('fim');
+    b.querySelector('.hab-ntfy').hidden = true;
+    b.querySelector('.hab-start').hidden = false;
+  }
+  function pararHabito(b) {
+    pararAlarme();
+    if (_habTimer) cancelarNtfy(); else _ntfyId = null; // só cancela se o tempo ainda não acabou
+    liberarTimer();
+    resetarTimerUI(b);
+  }
+  function fmtTempo(ms) {
+    var s = Math.max(0, Math.ceil(ms / 1000));
+    return String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0');
+  }
+  function iniciarHabito(b) {
+    var min = durMin(b);
+    if (!min) { b.querySelector('.hab-min').focus(); return; }
+    pararAlarme();
+    if (_habTimer) cancelarNtfy();
+    liberarTimer();
+    document.querySelectorAll('.habito-block').forEach(resetarTimerUI);
+    habAudio(); // destrava o som com o toque do usuário
+    var total = min * 60000, fim = Date.now() + total;
+    var run = b.querySelector('.hab-run'), tempo = run.querySelector('.hab-tempo'), barra = run.querySelector('.hab-barra i');
+    b.querySelector('.hab-start').hidden = true;
+    run.hidden = false;
+    run.querySelector('.hab-cancel').textContent = 'Cancelar';
+    run.querySelector('.hab-vibaviso').hidden = true;
+    tempo.textContent = fmtTempo(total);
+    barra.style.width = '0%';
+    var iv = setInterval(function() {
+      var resto = fim - Date.now();
+      if (resto > 0) {
+        tempo.textContent = fmtTempo(resto);
+        barra.style.width = (100 - resto / total * 100) + '%';
+        return;
+      }
+      liberarTimer();
+      tempo.textContent = 'Concluído';
+      barra.style.width = '100%';
+      run.classList.add('fim');
+      run.querySelector('.hab-cancel').textContent = 'Ok';
+      // com o aviso do ntfy agendado, quem toca é o app; o alarme da página fica só de reserva
+      if (!_ntfyOk) {
+        var vibrou = tocarAlarme();
+        var av = run.querySelector('.hab-vibaviso');
+        av.textContent = navigator.vibrate ? 'O navegador bloqueou a vibração neste aparelho.' : 'Este navegador não permite vibração.';
+        av.hidden = vibrou !== false;
+      }
+    }, 250);
+    _habTimer = { iv: iv, lock: null };
+    agendarNtfy(b, min);
+    try {
+      if (navigator.wakeLock) navigator.wakeLock.request('screen').then(function(l) {
+        if (_habTimer && _habTimer.iv === iv) _habTimer.lock = l; else l.release();
+      }).catch(function() {});
+    } catch (e) {}
+  }
+
+  function addHabito(semFoco) {
+    var lista = document.getElementById('habito-lista');
+    var n = lista.querySelectorAll('.habito-block').length + 1;
+    var b = document.createElement('div');
+    b.className = 'meta-block habito-block';
+    b.innerHTML = habitoHTML(n);
+    b._reg = {};
+    lista.appendChild(b);
+    renderHabito(b);
+    if (!semFoco) b.querySelector('.hab-nome').focus();
+    return b;
+  }
+
+  function renumerarHabitos() {
+    document.querySelectorAll('#habito-lista .habito-block').forEach(function(b, i) {
+      b.querySelector('.meta-badge').textContent = i + 1;
+    });
+  }
+
+  function coletarHabitos() {
+    var out = [];
+    document.querySelectorAll('#habito-lista .habito-block').forEach(function(b) {
+      out.push({
+        habito: b.querySelector('.hab-nome').value,
+        local: b.querySelector('.hab-local').value,
+        de: b.querySelector('.hab-de').value,
+        ate: b.querySelector('.hab-ate').value,
+        min: durMin(b) || 2,
+        reg: b._demo ? {} : Object.assign({}, b._reg || {})
+      });
+    });
+    return out;
+  }
+
+  function restoreHabitos(arr) {
+    if (!arr || !arr.length) return;
+    var lista = document.getElementById('habito-lista');
+    while (lista.querySelectorAll('.habito-block').length < arr.length) addHabito(true);
+    lista.querySelectorAll('.habito-block').forEach(function(b, i) {
+      var m = arr[i];
+      if (!m) return;
+      b.querySelector('.hab-nome').value = m.habito || '';
+      b.querySelector('.hab-local').value = m.local || '';
+      b.querySelector('.hab-de').value = m.de || '';
+      b.querySelector('.hab-ate').value = m.ate || '';
+      b.querySelector('.hab-min').value = m.min || 2;
+      b._demo = false;
+      var reg = {};
+      if (m.reg) { Object.keys(m.reg).forEach(function(k) { reg[k] = m.reg[k]; }); }
+      else (m.feitos || []).forEach(function(k) { reg[k] = 'f'; });
+      b._reg = reg;
+      b.querySelectorAll('textarea').forEach(autoGrow);
+      renderHabito(b);
+    });
+  }
+
+  // apagar numa caixa "Hábito" vazia, com o bloco todo vazio, remove o bloco (menos o primeiro)
+  function apagarHabitoVazio(e) {
+    var ta = e.target;
+    if (!ta || !ta.classList || !ta.classList.contains('hab-nome') || ta.value !== '') return false;
+    var lista = document.getElementById('habito-lista');
+    var b = ta.closest('.habito-block');
+    if (!b || b === lista.querySelector('.habito-block')) return false;
+    var vazio = !(b._reg && Object.keys(b._reg).length);
+    b.querySelectorAll('textarea, input').forEach(function(t) { if (t.value !== '') vazio = false; });
+    if (!vazio) return false;
+    if (Date.now() - _ultimoDel < 200) return true;
+    _ultimoDel = Date.now();
+    var prev = b.previousElementSibling;
+    b.remove();
+    renumerarHabitos();
+    if (prev) {
+      var t = prev.querySelector('.hab-local');
+      t.focus();
+      t.setSelectionRange(t.value.length, t.value.length);
+    }
+    if (window.agendarSalvamento) window.agendarSalvamento(lista);
+    return true;
+  }
+
+  var _h1 = addHabito(true);
+  /* DEMO TEMPORÁRIA (remover): 30 dias, 2 deles 'não fiz', não é salvo */
+  (function() {
+    _h1._demo = true;
+    _h1._reg = {};
+    for (var i = 29; i >= 0; i--) { var dd = new Date(); dd.setDate(dd.getDate() - i); _h1._reg[dFmt(dd)] = (i === 18 || i === 9) ? 'n' : 'f'; }
+    renderHabito(_h1);
+  })();
+  /* FIM DEMO */
+  document.addEventListener('visibilitychange', function() {
+    if (!document.hidden) document.querySelectorAll('#habito-lista .habito-block').forEach(renderHabito);
+  });
+
+  /* menu hambúrguer */
+  function fecharMenu() {
+    document.getElementById('menuPanel').hidden = true;
+    document.getElementById('menuOverlay').hidden = true;
+    document.getElementById('menuBtn').classList.remove('open');
+  }
+  function toggleMenu() {
+    var painel = document.getElementById('menuPanel');
+    if (painel.hidden) {
+      painel.hidden = false;
+      document.getElementById('menuOverlay').hidden = false;
+      document.getElementById('menuBtn').classList.add('open');
+    } else fecharMenu();
+  }
+  function irPara(id) {
+    fecharMenu();
+    var el = document.getElementById(id);
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+  document.addEventListener('keydown', function(e) { if (e.key === 'Escape') fecharMenu(); });
+
   function toggleHint(btn) {
     var card = btn.closest('.question-card');
     var panel = card.querySelector('.hint-panel');
@@ -1726,11 +2454,47 @@ window.addEventListener('online', function() {
   }
 
   function updateChar(el) {
+    if (el.classList.contains('auto-grow')) autoGrow(el);
     var card = el.closest('.question-card');
     if (!card) return;
     var counter = card.querySelector('.char-count');
     if (counter) counter.textContent = el.value.length + ' caracteres';
   }
+
+  // largura que acompanha o texto: vazio = largura total; texto curto = caixa pequena
+  var _cv = null;
+  function fitWidth(el) {
+    el.style.width = '';
+    var full = el.offsetWidth;
+    if (!full || !el.value) return;
+    var cs = getComputedStyle(el);
+    _cv = _cv || document.createElement('canvas').getContext('2d');
+    _cv.font = cs.fontStyle + ' ' + cs.fontWeight + ' ' + cs.fontSize + ' ' + cs.fontFamily;
+    var w = 0;
+    el.value.split('\n').forEach(function(l) { w = Math.max(w, _cv.measureText(l).width); });
+    var extra = parseFloat(cs.paddingLeft) + parseFloat(cs.paddingRight) + parseFloat(cs.borderLeftWidth) + parseFloat(cs.borderRightWidth);
+    var want = Math.max(72, Math.ceil(w + extra + 18));
+    if (want < full) el.style.width = want + 'px';
+  }
+
+  function autoGrow(el) {
+    if (el.matches && el.matches('textarea.auto-grow, textarea.meta-ta')) fitWidth(el);
+    el.style.height = 'auto';
+    var borda = el.offsetHeight - el.clientHeight;
+    el.style.height = (el.scrollHeight + borda) + 'px';
+  }
+
+  window.addEventListener('load', function() {
+    document.querySelectorAll('textarea.auto-grow, textarea.meta-ta, textarea.list-ta').forEach(autoGrow);
+    document.querySelectorAll('.commitment-block input[type=text]').forEach(fitWidth);
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(function() {
+      document.querySelectorAll('textarea.auto-grow, textarea.meta-ta').forEach(autoGrow);
+      document.querySelectorAll('.commitment-block input[type=text]').forEach(fitWidth);
+    });
+  });
+  window.addEventListener('resize', function() {
+    document.querySelectorAll('textarea.auto-grow, textarea.meta-ta, textarea.list-ta').forEach(autoGrow);
+  });
 </script>
 <!-- VOLTAR DESKTOP --><style>@media(max-width:768px){#__btn-voltar{display:none!important}}#__btn-voltar{position:fixed;bottom:22px;left:22px;z-index:99999;background:#0f1b2d;border:1px solid #2f4666;color:#d6dde8;text-decoration:none;padding:10px 18px;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;transition:all .2s;box-shadow:0 2px 12px rgba(0,0,0,.4)}#__btn-voltar:hover{background:#e0b54a;border-color:#e0b54a;color:#0f1b2d}</style><a id="__btn-voltar" href="OUTROS.html">← Outros</a><!-- FIM VOLTAR DESKTOP -->
 </body>
