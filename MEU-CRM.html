@@ -622,44 +622,73 @@
   .arquivo-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 4px; padding-bottom: 14px; border-bottom: 1px solid #eef1f5; }
   .arquivo-head .arquivo-nome { min-width: 0; flex: 1; overflow-wrap: anywhere; }
 
-  /* ═════════ NOVO CONTATO — janela solta, campos em pílula ═════════ */
-  #modal-novo { align-items: flex-end; }
-  #modal-novo .modal {
+  /* ═════════ JANELAS SOLTAS — campos em pílula (novo contato, reunião, proposta) ═════════ */
+  .sheet { align-items: flex-end; }
+  .sheet .modal {
     width: calc(100% - 24px); max-width: 480px; margin: 0 auto calc(12px + env(safe-area-inset-bottom, 0px));
     border-radius: 26px; padding: 12px 16px 16px; background: #fff;
     max-height: calc(100dvh - 24px - env(safe-area-inset-bottom, 0px)); box-shadow: 0 24px 60px -20px rgba(15,23,42,.35);
   }
-  #modal-novo .modal-handle { width: 40px; height: 4px; background: #d9dee6; border-radius: 999px; margin: 0 auto 18px; }
-  #modal-novo .campo { position: relative; margin-bottom: 12px; }
-  #modal-novo .campo-ic {
+  .sheet .modal-handle { width: 40px; height: 4px; background: #d9dee6; border-radius: 999px; margin: 0 auto 18px; }
+  .sheet .campo { position: relative; margin-bottom: 12px; }
+  .sheet .campo-ic {
     position: absolute; left: 0; top: 0; width: 50px; height: 52px; display: grid; place-items: center;
     color: #94a3b8; z-index: 1; -webkit-touch-callout: none; user-select: none; -webkit-user-select: none; touch-action: manipulation;
   }
-  #modal-novo .campo-ic .ic { width: 18px; height: 18px; vertical-align: 0; }
-  #modal-novo .form-input, #modal-novo .form-textarea {
+  .sheet .campo-ic .ic { width: 18px; height: 18px; vertical-align: 0; }
+  .sheet .form-input, .sheet .form-textarea {
     display: block; width: 100%; box-sizing: border-box; height: 52px; padding: 0 18px 0 48px; font-size: 16px; font-weight: 500;
     color: #0f172a; background: #fff; border: 1px solid #e5e7eb; border-radius: 999px; box-shadow: none; outline: none;
     -webkit-appearance: none; appearance: none; transition: border-color .15s;
   }
-  #modal-novo .form-textarea { height: auto; min-height: 112px; padding: 16px 18px 16px 48px; border-radius: 24px; resize: none; line-height: 1.45; }
-  #modal-novo .form-input:focus, #modal-novo .form-textarea:focus { border-color: #94a3b8; background: #fff; box-shadow: none; outline: none; }
-  #modal-novo .campo:focus-within .campo-ic { color: #475569; }
-  #modal-novo .modal-row { display: flex; gap: 10px; margin-top: 18px; }
-  #modal-novo .modal-row .form-group { flex: 1; margin: 0; }
-  #modal-novo .btn-full {
+  .sheet .form-textarea { height: auto; min-height: 112px; padding: 16px 18px 16px 48px; border-radius: 24px; resize: none; line-height: 1.45; }
+  .sheet .form-input:focus, .sheet .form-textarea:focus { border-color: #94a3b8; background: #fff; box-shadow: none; outline: none; }
+  .sheet .campo:focus-within .campo-ic { color: #475569; }
+  .sheet .modal-row { display: flex; gap: 10px; margin-top: 18px; }
+  .sheet .modal-row .form-group { flex: 1; margin: 0; }
+  .sheet .btn-full {
     height: 52px; padding: 0 16px; border-radius: 999px; font-size: 15px; font-weight: 600; white-space: nowrap;
     display: flex; align-items: center; justify-content: center;
   }
-  #modal-novo .btn-full.gray { background: #fff; color: #334155; border: 1px solid #e5e7eb; }
-  #modal-novo .btn-full.gray:active { background: #f3f5f8; }
-  #modal-novo .btn-full.blue { background: var(--brand); color: #fff; border: 0; }
-  #modal-novo .btn-full.blue:active { background: #047857; }
+  .sheet .btn-full.gray { background: #fff; color: #334155; border: 1px solid #e5e7eb; }
+  .sheet .btn-full.gray:active { background: #f3f5f8; }
+  .sheet .btn-full.blue { background: var(--brand); color: #fff; border: 0; }
+  .sheet .btn-full.blue:active { background: #047857; }
   .dica-balao {
     position: fixed; z-index: 700; transform: translate(-50%, -100%); background: #0f172a; color: #fff;
     font: 600 12px/1 'DM Sans', sans-serif; padding: 9px 13px; border-radius: 999px; white-space: nowrap;
     pointer-events: none; opacity: 0; transition: opacity .15s; max-width: calc(100vw - 24px);
   }
   .dica-balao.on { opacity: 1; }
+
+  .sheet .campo-row { display: flex; gap: 10px; margin-bottom: 12px; }
+  .sheet .campo-row .campo { flex: 1; min-width: 0; margin-bottom: 0; }
+  .sheet .form-input { position: relative; }
+  .sheet input[type="date"], .sheet input[type="time"] { text-align: left; min-width: 0; }
+  .sheet input[type="date"]::-webkit-calendar-picker-indicator, .sheet input[type="time"]::-webkit-calendar-picker-indicator {
+    position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
+  .sheet select.form-input {
+    padding-right: 42px; background-color: #fff;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='none'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2394a3b8' stroke-width='1.6' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 18px center; }
+  .sheet .campo-area .form-textarea.curta { min-height: 108px; }
+  .sheet .prompt-box { border: 1px solid #e5e7eb; border-radius: 20px; background: #fafbfc; padding: 14px 16px; font-size: 13px; line-height: 1.5; color: #334155; margin: 0 0 12px; max-height: 32vh; overflow: auto; }
+  .sheet .btn-copy { width: 100%; height: 52px; border-radius: 999px; background: #fff; color: #334155; border: 1px solid #e5e7eb; font-size: 15px; font-weight: 600;
+    display: flex; align-items: center; justify-content: center; gap: 8px; margin: 0 0 12px; }
+  .sheet .btn-copy:active { background: #f3f5f8; }
+  .sheet .btn-full.green { background: var(--brand); color: #fff; border: 0; }
+  .sheet .btn-full.green:active { background: #047857; }
+  .sheet .pilha { display: flex; flex-direction: column; gap: 10px; margin-top: 6px; }
+  .sheet .pilha .btn-full { width: 100%; }
+
+  /* menu da reunião */
+  .menu-opcoes.mo-clean { border: 1px solid #e6e9ef; border-radius: 22px; padding: 8px; width: min(264px, calc(100vw - 24px));
+    box-shadow: 0 1px 2px rgba(15,23,42,.04), 0 18px 40px -16px rgba(15,23,42,.22); }
+  .mo-clean .mo-item { min-height: 52px; padding: 6px 10px; border-radius: 999px; gap: 12px; }
+  .mo-clean .mo-item:active { background: #f3f5f8; }
+  .mo-clean .mo-ic { width: 38px; height: 38px; border-radius: 999px; background: #f1f4f8; color: #334155; }
+  .mo-clean .mo-ic.sim { background: #d1fae5; color: #047857; }
+  .mo-clean .mo-txt b { font-size: 15px; font-weight: 600; color: #0f172a; }
 </style>
 </head>
 <body>
@@ -700,6 +729,8 @@
 <symbol id="i-fast-forward" viewBox="0 0 24 24"><path d="M12 6a2 2 0 0 1 3.414-1.414l6 6a2 2 0 0 1 0 2.828l-6 6A2 2 0 0 1 12 18z" /> <path d="M2 6a2 2 0 0 1 3.414-1.414l6 6a2 2 0 0 1 0 2.828l-6 6A2 2 0 0 1 2 18z" /></symbol>
 <symbol id="i-ellipsis" viewBox="0 0 24 24"><circle cx="12" cy="12" r="1" /> <circle cx="19" cy="12" r="1" /> <circle cx="5" cy="12" r="1" /></symbol>
 <symbol id="i-copy" viewBox="0 0 24 24"><rect width="14" height="14" x="8" y="8" rx="2" ry="2" /> <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" /></symbol>
+<symbol id="i-dollar-sign" viewBox="0 0 24 24"><line x1="12" x2="12" y1="2" y2="22" /><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" /></symbol>
+<symbol id="i-percent" viewBox="0 0 24 24"><line x1="19" x2="5" y1="5" y2="19" /><circle cx="6.5" cy="6.5" r="2.5" /><circle cx="17.5" cy="17.5" r="2.5" /></symbol>
 </svg>
 
 <div class="overlay" id="overlay" onclick="closeSidebar()"></div>
@@ -790,7 +821,7 @@
 </main>
 
 <!-- MODAL NOVO CONTATO -->
-<div class="modal-backdrop" id="modal-novo">
+<div class="modal-backdrop sheet" id="modal-novo">
   <div class="modal">
     <div class="modal-handle"></div>
     <input type="hidden" id="edit-id">
@@ -832,10 +863,9 @@
         <span class="atendeu-btn-icon"><svg class="ic" aria-hidden="true"><use href="#i-file-text"/></svg></span> Gerar proposta
       </button>
       <button class="atendeu-btn" onclick="atendeuOpcao('excluir')">
-        <span class="atendeu-btn-icon"><svg class="ic" aria-hidden="true"><use href="#i-trash-2"/></svg></span> Excluir contato
-      </button>
+        <span class="atendeu-btn-icon"><svg class="ic" aria-hidden="true"><use href="#i-trash-2"/></svg></span> Excluído</button>
     </div>
-    <button class="btn-full gray" onclick="closeModal('modal-atendeu')">Cancelar</button>
+    <button class="btn-full gray" onclick="closeModal('modal-atendeu')">Cancela</button>
   </div>
 </div>
 
@@ -854,106 +884,61 @@
       </div>
     </div>
     <div class="modal-row">
-      <div class="form-group"><button class="btn-full gray" onclick="closeModal('modal-agendar')">Cancelar</button></div>
-      <div class="form-group"><button class="btn-full blue" onclick="confirmarAgenda()">Agendar</button></div>
+      <div class="form-group"><button class="btn-full gray" onclick="closeModal('modal-agendar')">Cancela</button></div>
+      <div class="form-group"><button class="btn-full blue" onclick="confirmarAgenda()">Agenda</button></div>
     </div>
   </div>
 </div>
 
 <!-- MODAL REUNIÃO -->
-<div class="modal-backdrop" id="modal-reuniao">
+<div class="modal-backdrop sheet" id="modal-reuniao">
   <div class="modal">
     <div class="modal-handle"></div>
+    <div class="campo-row">
+      <div class="campo" data-dica="Data (obrigatório)"><span class="campo-ic"><svg class="ic" aria-hidden="true"><use href="#i-calendar"/></svg></span><input class="form-input" id="re-data" type="date" aria-label="Data"></div>
+      <div class="campo" data-dica="Hora (obrigatório)"><span class="campo-ic"><svg class="ic" aria-hidden="true"><use href="#i-clock"/></svg></span><input class="form-input" id="re-hora" type="time" aria-label="Hora"></div>
+    </div>
+    <div class="campo" data-dica="Tipo da reunião"><span class="campo-ic"><svg class="ic" aria-hidden="true"><use href="#i-handshake"/></svg></span><select class="form-input" id="re-tipo" aria-label="Tipo"><option value="presencial">Presencial</option><option value="remota">Remota</option></select></div>
+    <div class="campo campo-area" data-dica="Mensagem 1 dia antes"><span class="campo-ic"><svg class="ic" aria-hidden="true"><use href="#i-message-circle"/></svg></span><textarea class="form-textarea curta" id="re-msg-dia-antes" aria-label="Mensagem 1 dia antes"></textarea></div>
+    <div class="campo campo-area" data-dica="Mensagem manhã do dia"><span class="campo-ic"><svg class="ic" aria-hidden="true"><use href="#i-sun"/></svg></span><textarea class="form-textarea curta" id="re-msg-manha" aria-label="Mensagem manhã do dia"></textarea></div>
+    <div class="campo campo-area" data-dica="Mensagem 1 hora antes"><span class="campo-ic"><svg class="ic" aria-hidden="true"><use href="#i-alarm-clock"/></svg></span><textarea class="form-textarea curta" id="re-msg-hora-antes" aria-label="Mensagem 1 hora antes"></textarea></div>
     <div class="modal-row">
-      <div class="form-group">
-        <label class="form-label">Data *</label>
-        <input class="form-input" id="re-data" type="date">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Hora *</label>
-        <input class="form-input" id="re-hora" type="time">
-      </div>
-    </div>
-    <div class="form-group">
-      <label class="form-label">Tipo *</label>
-      <select class="form-select" id="re-tipo">
-        <option value="presencial">Presencial</option>
-        <option value="remota">Remota (ligação/vídeo)</option>
-      </select>
-    </div>
-    <div class="form-group">
-      <label class="form-label"><svg class="ic" aria-hidden="true"><use href="#i-message-circle"/></svg> Mensagem — 1 dia antes</label>
-      <textarea class="form-textarea" id="re-msg-dia-antes" style="min-height:70px"></textarea>
-    </div>
-    <div class="form-group">
-      <label class="form-label"><svg class="ic" aria-hidden="true"><use href="#i-sun"/></svg> Mensagem — Manhã do dia</label>
-      <textarea class="form-textarea" id="re-msg-manha" style="min-height:70px"></textarea>
-    </div>
-    <div class="form-group">
-      <label class="form-label"><svg class="ic" aria-hidden="true"><use href="#i-alarm-clock"/></svg> Mensagem — 1 hora antes</label>
-      <textarea class="form-textarea" id="re-msg-hora-antes" style="min-height:70px"></textarea>
-    </div>
-    <div class="modal-row">
-      <div class="form-group"><button class="btn-full gray" onclick="closeModal('modal-reuniao')">Cancelar</button></div>
-      <div class="form-group"><button class="btn-full blue" onclick="confirmarReuniao()">Confirmar</button></div>
+      <div class="form-group"><button class="btn-full gray" onclick="closeModal('modal-reuniao')">Cancela</button></div>
+      <div class="form-group"><button class="btn-full blue" onclick="confirmarReuniao()">Confirma</button></div>
     </div>
   </div>
 </div>
 
 <!-- MODAL PROPOSTA -->
-<div class="modal-backdrop" id="modal-proposta">
+<div class="modal-backdrop sheet" id="modal-proposta">
   <div class="modal">
     <div class="modal-handle"></div>
     <div id="proposta-form-wrap">
-      <div class="form-group">
-        <label class="form-label">Serviço / Área *</label>
-        <input class="form-input" id="pr-servico" placeholder="Ex: Marketing Digital">
+      <div class="campo" data-dica="Serviço ou área (obrigatório)"><span class="campo-ic"><svg class="ic" aria-hidden="true"><use href="#i-briefcase"/></svg></span><input class="form-input" id="pr-servico" aria-label="Serviço ou área" autocomplete="off"></div>
+      <div class="campo campo-area" data-dica="O que será feito (obrigatório)"><span class="campo-ic"><svg class="ic" aria-hidden="true"><use href="#i-file-text"/></svg></span><textarea class="form-textarea" id="pr-descricao" aria-label="Descrição"></textarea></div>
+      <div class="campo-row">
+        <div class="campo" data-dica="Preço (obrigatório)"><span class="campo-ic"><svg class="ic" aria-hidden="true"><use href="#i-dollar-sign"/></svg></span><input class="form-input" id="pr-valor" type="text" inputmode="numeric" aria-label="Preço" autocomplete="off"></div>
+        <div class="campo" data-dica="Prazo em dias"><span class="campo-ic"><svg class="ic" aria-hidden="true"><use href="#i-clock"/></svg></span><input class="form-input" id="pr-prazo" type="text" inputmode="numeric" aria-label="Prazo" autocomplete="off"></div>
       </div>
-      <div class="form-group">
-        <label class="form-label">Descrição do que será feito *</label>
-        <textarea class="form-textarea" id="pr-descricao" placeholder="Ex: Gestão de redes sociais, criação de conteúdo..."></textarea>
+      <div class="campo-row">
+        <div class="campo" data-dica="Entrada"><span class="campo-ic"><svg class="ic" aria-hidden="true"><use href="#i-percent"/></svg></span><input class="form-input" id="pr-pagamento" type="text" inputmode="numeric" aria-label="Entrada" autocomplete="off"></div>
+        <div class="campo" data-dica="Validade em dias"><span class="campo-ic"><svg class="ic" aria-hidden="true"><use href="#i-calendar"/></svg></span><input class="form-input" id="pr-validade" type="text" inputmode="numeric" aria-label="Validade" autocomplete="off"></div>
       </div>
+      <div class="campo campo-area" data-dica="Observações extras"><span class="campo-ic"><svg class="ic" aria-hidden="true"><use href="#i-notebook-pen"/></svg></span><textarea class="form-textarea curta" id="pr-obs-extra" aria-label="Observações extras"></textarea></div>
       <div class="modal-row">
-        <div class="form-group">
-          <label class="form-label">Valor *</label>
-          <input class="form-input" type="text" inputmode="numeric" id="pr-valor" placeholder="500">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Prazo</label>
-          <input class="form-input" type="text" inputmode="numeric" id="pr-prazo" placeholder="30">
-        </div>
-      </div>
-      <div class="modal-row">
-        <div class="form-group">
-          <label class="form-label">Pagamento</label>
-          <input class="form-input" type="text" inputmode="numeric" id="pr-pagamento" placeholder="50">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Validade</label>
-          <input class="form-input" type="text" inputmode="numeric" id="pr-validade" placeholder="15">
-        </div>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Observações extras</label>
-        <textarea class="form-textarea" id="pr-obs-extra" placeholder="Qualquer detalhe adicional..."></textarea>
-      </div>
-      <div class="modal-row">
-        <div class="form-group"><button class="btn-full gray" onclick="closeModal('modal-proposta')">Cancelar</button></div>
-        <div class="form-group"><button class="btn-full blue" onclick="gerarPrompt()"><svg class="ic" aria-hidden="true"><use href="#i-clipboard-list"/></svg> Gerar Prompt</button></div>
+        <div class="form-group"><button class="btn-full gray" onclick="closeModal('modal-proposta')">Cancela</button></div>
+        <div class="form-group"><button class="btn-full blue" onclick="gerarPrompt()"><svg class="ic" aria-hidden="true"><use href="#i-clipboard-list"/></svg> Gera Prompt</button></div>
       </div>
     </div>
     <div id="proposta-prompt-wrap" style="display:none">
-      <p style="font-size:13px;color:var(--gray-500);margin-bottom:8px">Copie e cole no DeepSeek ou Gemini:</p>
       <div class="prompt-box" id="prompt-texto"></div>
-      <button class="btn-copy" onclick="copiarPrompt()"><svg class="ic" aria-hidden="true"><use href="#i-clipboard-list"/></svg> Copiar Prompt</button>
-      <div style="height:8px"></div>
-      <div style="font-size:13px;color:var(--gray-500);margin-bottom:6px">Cole o HTML gerado pela IA aqui:</div>
-      <textarea class="form-textarea" id="pr-html-gerado" placeholder="Cole aqui o HTML da proposta gerado pela IA..." style="min-height:80px"></textarea>
-      <button class="btn-full green" style="margin-top:8px" onclick="salvarHtmlProposta()"><svg class="ic" aria-hidden="true"><use href="#i-circle-check"/></svg> Proposta Pronta</button>
-      <div style="height:10px"></div>
-      <button class="btn-full green" onclick="marcarAtivoEFechar()"><svg class="ic" aria-hidden="true"><use href="#i-circle-check"/></svg> Proposta enviada — Mover para Ativos</button>
-      <div style="height:8px"></div>
-      <button class="btn-full gray" onclick="voltarFormProposta()">← Editar proposta</button>
+      <button class="btn-copy" onclick="copiarPrompt()"><svg class="ic" aria-hidden="true"><use href="#i-copy"/></svg> Copia Prompt</button>
+      <div class="campo campo-area" data-dica="HTML gerado pela IA"><span class="campo-ic"><svg class="ic" aria-hidden="true"><use href="#i-file-text"/></svg></span><textarea class="form-textarea curta" id="pr-html-gerado" aria-label="HTML gerado pela IA"></textarea></div>
+      <div class="pilha">
+        <button class="btn-full green" onclick="salvarHtmlProposta()"><svg class="ic" aria-hidden="true"><use href="#i-circle-check"/></svg> Proposta Pronta</button>
+        <button class="btn-full green" onclick="marcarAtivoEFechar()"><svg class="ic" aria-hidden="true"><use href="#i-send"/></svg> Enviada, vai para Ativos</button>
+        <button class="btn-full gray" onclick="voltarFormProposta()"><svg class="ic" aria-hidden="true"><use href="#i-pencil"/></svg> Edita</button>
+      </div>
     </div>
   </div>
 </div>
@@ -968,7 +953,7 @@
       <button class="concluir-btn pendente" onclick="concluirReuniao('pendente')"><svg class="ic" aria-hidden="true"><use href="#i-refresh-cw"/></svg> Pendente</button>
     </div>
     <div style="height:12px"></div>
-    <button class="btn-full gray" onclick="closeModal('modal-concluir')">Cancelar</button>
+    <button class="btn-full gray" onclick="closeModal('modal-concluir')">Cancela</button>
   </div>
 </div>
 
@@ -980,8 +965,8 @@
       <textarea class="form-textarea" id="obs-textarea" rows="1" placeholder="Digite a observação..." style="min-height:0;resize:none;overflow:hidden;max-height:45vh"></textarea>
     </div>
     <div class="modal-row">
-      <div class="form-group"><button class="btn-full gray" onclick="closeModal('modal-obs')">Cancelar</button></div>
-      <div class="form-group"><button class="btn-full blue" onclick="salvarObs()">Salvar</button></div>
+      <div class="form-group"><button class="btn-full gray" onclick="closeModal('modal-obs')">Cancela</button></div>
+      <div class="form-group"><button class="btn-full blue" onclick="salvarObs()">Salva</button></div>
     </div>
   </div>
 </div>
@@ -1014,7 +999,7 @@
     <button class="btn-full gray" style="padding:11px;font-size:13px;margin-bottom:10px" onclick="copiarHtmlProposta()"><svg class="ic" aria-hidden="true"><use href="#i-file-text"/></svg> Copiar HTML da Proposta</button>
     <a id="envio-wa-btn" target="_blank" class="btn-full green" style="padding:12px;font-size:14px;text-decoration:none;display:block;text-align:center;border-radius:8px;font-weight:700;font-family:'DM Sans',sans-serif"><svg class="ic" aria-hidden="true"><use href="#i-message-circle"/></svg> Abrir WhatsApp</a>
     <div style="height:10px"></div>
-    <button class="btn-full gray" onclick="closeModal('modal-envio-proposta')">Fechar</button>
+    <button class="btn-full gray" onclick="closeModal('modal-envio-proposta')">Fecha</button>
   </div>
 </div>
 
@@ -1037,8 +1022,8 @@
       </div>
     </div>
     <div class="modal-row">
-      <div class="form-group"><button class="btn-full gray" onclick="closeModal('modal-adiar')">Cancelar</button></div>
-      <div class="form-group"><button class="btn-full blue" onclick="confirmarAdiamento()">Confirmar</button></div>
+      <div class="form-group"><button class="btn-full gray" onclick="closeModal('modal-adiar')">Cancela</button></div>
+      <div class="form-group"><button class="btn-full blue" onclick="confirmarAdiamento()">Confirma</button></div>
     </div>
   </div>
 </div>
@@ -1046,11 +1031,11 @@
 <!-- MODAL CONFIRM -->
 <div class="modal-backdrop" id="modal-confirm" style="align-items:center">
   <div class="modal confirm-modal">
-    <div class="confirm-title" id="confirm-title">Confirmar</div>
+    <div class="confirm-title" id="confirm-title">Confirma</div>
     <div class="confirm-text" id="confirm-text">Tem certeza?</div>
     <div class="confirm-btns">
-      <button class="btn-full gray" style="padding:12px" onclick="closeModal('modal-confirm')">Cancelar</button>
-      <button class="btn-full red" id="confirm-ok" style="padding:12px">Confirmar</button>
+      <button class="btn-full gray" style="padding:12px" onclick="closeModal('modal-confirm')">Cancela</button>
+      <button class="btn-full red" id="confirm-ok" style="padding:12px">Confirma</button>
     </div>
   </div>
 </div>
@@ -1067,7 +1052,7 @@
         <span class="atendeu-btn-icon"><svg class="ic" aria-hidden="true"><use href="#i-circle-x"/></svg></span> Não atendeu
       </button>
     </div>
-    <button class="btn-full gray" onclick="closeModal('modal-liguei')">Cancelar</button>
+    <button class="btn-full gray" onclick="closeModal('modal-liguei')">Cancela</button>
   </div>
 </div>
 
@@ -1330,7 +1315,7 @@ function renderLixeiraCRM() {
       <div style="flex:1;min-width:0;">
         <div class="card-name" style="margin-bottom:0">${item.nome||item.titulo||'Item'}</div>
       </div>
-      <button onclick="restaurarItemCRM(${i})" style="background:var(--blue-light);color:var(--blue);border:1.5px solid var(--blue-mid);border-radius:8px;padding:6px 12px;font-size:12px;font-weight:600;cursor:pointer;">Restaurar</button>
+      <button onclick="restaurarItemCRM(${i})" style="background:var(--blue-light);color:var(--blue);border:1.5px solid var(--blue-mid);border-radius:8px;padding:6px 12px;font-size:12px;font-weight:600;cursor:pointer;">Restaura</button>
       <button onclick="excluirPermanenteCRM(${i})" style="background:none;border:none;color:var(--red);font-size:18px;cursor:pointer;"><svg class="ic" aria-hidden="true"><use href="#i-trash-2"/></svg></button>
     </div>
   `).join('');
@@ -1547,11 +1532,11 @@ window.toggleOpcoes = function(id, ev) {
     <div class="mo-item" onclick="fecharMenuOpcoes();openAtendeu('${c.id}')"><span class="mo-ic sim"><svg class="ic" aria-hidden="true"><use href="#i-circle-check"/></svg></span><span class="mo-txt"><b>${(c.tentativas || 0) < 3 ? 'Atendeu' : 'Mover contato'}</b></span></div>`);
 };
 
-function mostrarMenuOpcoes(btn, html) {
+function mostrarMenuOpcoes(btn, html, extra) {
   btn.classList.add('on');
   const menu = document.createElement('div');
   menu.id = 'menuOpcoes';
-  menu.className = 'menu-opcoes';
+  menu.className = 'menu-opcoes' + (extra ? ' ' + extra : '');
   menu.addEventListener('click', e => e.stopPropagation());
   menu.innerHTML = html;
   document.body.appendChild(menu);
@@ -1585,7 +1570,7 @@ window.toggleOpcoesAgenda = function(id, ev) {
     <div class="mo-item" data-d="${formatDate(ag.data)}" data-h="${escHtml(ag.hora)}" onclick="toggleHoraMenu(this)"><span class="mo-ic date"><svg class="ic" aria-hidden="true"><use href="#i-calendar"/></svg></span><span class="mo-txt"><b>${formatDate(ag.data)}</b></span></div>
     <div class="mo-item" onclick="fecharMenuOpcoes();editObs('agenda','${ag.id}')"><span class="mo-ic obs"><svg class="ic" aria-hidden="true"><use href="#i-notebook-pen"/></svg></span><span class="mo-txt"><b>Adicionado</b></span></div>
     <div class="mo-item" onclick="fecharMenuOpcoes();openLiguei('${ag.id}')"><span class="mo-ic sim"><svg class="ic" aria-hidden="true"><use href="#i-circle-check"/></svg></span><span class="mo-txt"><b>Liguei</b></span></div>
-    <div class="mo-item" onclick="fecharMenuOpcoes();excluirAgenda('${ag.id}')"><span class="mo-ic nao"><svg class="ic" aria-hidden="true"><use href="#i-trash-2"/></svg></span><span class="mo-txt"><b>Excluir</b></span></div>`);
+    <div class="mo-item" onclick="fecharMenuOpcoes();excluirAgenda('${ag.id}')"><span class="mo-ic nao"><svg class="ic" aria-hidden="true"><use href="#i-trash-2"/></svg></span><span class="mo-txt"><b>Excluído</b></span></div>`);
 };
 
 window.toggleOpcoesArquivo = function(id, ev) {
@@ -1614,7 +1599,7 @@ window.toggleOpcoesAtivo = function(id, ev) {
   mostrarMenuOpcoes(btn, `
     <div class="mo-item" onclick="fecharMenuOpcoes();editObs('ativos','${a.id}')"><span class="mo-ic obs"><svg class="ic" aria-hidden="true"><use href="#i-notebook-pen"/></svg></span><span class="mo-txt"><b>Observação</b></span></div>
     <div class="mo-item" onclick="fecharMenuOpcoes();openPropostaAtivo('${a.id}')"><span class="mo-ic prop"><svg class="ic" aria-hidden="true"><use href="#i-file-text"/></svg></span><span class="mo-txt"><b>Nova proposta</b></span></div>
-    <div class="mo-item" onclick="fecharMenuOpcoes();excluirAtivo('${a.id}')"><span class="mo-ic nao"><svg class="ic" aria-hidden="true"><use href="#i-trash-2"/></svg></span><span class="mo-txt"><b>Excluir</b></span></div>`);
+    <div class="mo-item" onclick="fecharMenuOpcoes();excluirAtivo('${a.id}')"><span class="mo-ic nao"><svg class="ic" aria-hidden="true"><use href="#i-trash-2"/></svg></span><span class="mo-txt"><b>Excluído</b></span></div>`);
 };
 
 window.toggleOpcoesCrono = function(id, tipo, ev) {
@@ -1644,10 +1629,10 @@ window.toggleOpcoesReuniao = function(id, ev) {
   mostrarMenuOpcoes(btn, `
     <div class="mo-item" data-d="${formatDate(r.data)}" data-h="${escHtml(r.hora)}" onclick="toggleHoraMenu(this)"><span class="mo-ic date"><svg class="ic" aria-hidden="true"><use href="#i-calendar"/></svg></span><span class="mo-txt"><b>${formatDate(r.data)}</b></span></div>
     <div class="mo-item" onclick="fecharMenuOpcoes();editObs('reunioes','${r.id}')"><span class="mo-ic obs"><svg class="ic" aria-hidden="true"><use href="#i-notebook-pen"/></svg></span><span class="mo-txt"><b>Adicionado</b></span></div>
-    <div class="mo-item" onclick="fecharMenuOpcoes();openPropostaReuniao('${r.id}')"><span class="mo-ic prop"><svg class="ic" aria-hidden="true"><use href="#i-file-text"/></svg></span><span class="mo-txt"><b>Criar Proposta</b></span></div>
-    ${r.propostaHtml ? `<div class="mo-item" onclick="fecharMenuOpcoes();abrirEnviarProposta('${r.id}')"><span class="mo-ic prop"><svg class="ic" aria-hidden="true"><use href="#i-send"/></svg></span><span class="mo-txt"><b>Enviar Proposta</b></span></div>` : ''}
-    <div class="mo-item" onclick="fecharMenuOpcoes();openConcluir('${r.id}')"><span class="mo-ic sim"><svg class="ic" aria-hidden="true"><use href="#i-circle-check"/></svg></span><span class="mo-txt"><b>Concluir Reunião</b></span></div>
-    <div class="mo-item"><span class="mo-ic date"><svg class="ic" aria-hidden="true"><use href="#${tipoIcon}"/></svg></span><span class="mo-txt"><b>${tipoTxt}</b></span></div>`);
+    <div class="mo-item" onclick="fecharMenuOpcoes();openPropostaReuniao('${r.id}')"><span class="mo-ic prop"><svg class="ic" aria-hidden="true"><use href="#i-file-text"/></svg></span><span class="mo-txt"><b>Proposta</b></span></div>
+    ${r.propostaHtml ? `<div class="mo-item" onclick="fecharMenuOpcoes();abrirEnviarProposta('${r.id}')"><span class="mo-ic prop"><svg class="ic" aria-hidden="true"><use href="#i-send"/></svg></span><span class="mo-txt"><b>Envia</b></span></div>` : ''}
+    <div class="mo-item" onclick="fecharMenuOpcoes();openConcluir('${r.id}')"><span class="mo-ic sim"><svg class="ic" aria-hidden="true"><use href="#i-circle-check"/></svg></span><span class="mo-txt"><b>Concluído</b></span></div>
+    <div class="mo-item"><span class="mo-ic date"><svg class="ic" aria-hidden="true"><use href="#${tipoIcon}"/></svg></span><span class="mo-txt"><b>${tipoTxt}</b></span></div>`, 'mo-clean');
 };
 document.addEventListener('click', e => { if (!e.target.closest('.toggle-opcoes')) fecharMenuOpcoes(); });
 window.addEventListener('scroll', fecharMenuOpcoes, true);
@@ -1778,8 +1763,8 @@ function renderArquivo() {
         <span class="icon-btn toggle-opcoes" onclick="toggleOpcoesArquivo('${a.id}', event)" aria-label="Opções"><svg class="ic" aria-hidden="true"><use href="#i-ellipsis"/></svg></span>
       </div>
       <div class="arquivo-btns">
-        <button class="btn-reativar" onclick="reativarContato('${a.id}')"><svg class="ic" aria-hidden="true"><use href="#i-refresh-cw"/></svg> Reativar</button>
-        <button class="btn-excluir" onclick="excluirArquivo('${a.id}')"><svg class="ic" aria-hidden="true"><use href="#i-trash-2"/></svg> Excluir</button>
+        <button class="btn-reativar" onclick="reativarContato('${a.id}')"><svg class="ic" aria-hidden="true"><use href="#i-refresh-cw"/></svg> Reativa</button>
+        <button class="btn-excluir" onclick="excluirArquivo('${a.id}')"><svg class="ic" aria-hidden="true"><use href="#i-trash-2"/></svg> Excluído</button>
       </div>
     </div>`;
   }).join('');
@@ -1835,7 +1820,7 @@ function renderCronograma() {
       ${alertaHtml}
       <div class="crono-btns-acao">
         <button class="btn-concluido" onclick="cronoConcluir('${item.id}','${item._tipo}')"><svg class="ic" aria-hidden="true"><use href="#i-check"/></svg> Concluído</button>
-        <button class="btn-adiado" onclick="cronoAdiar('${item.id}','${item._tipo}')"><svg class="ic" aria-hidden="true"><use href="#i-fast-forward"/></svg> Adiar</button>
+        <button class="btn-adiado" onclick="cronoAdiar('${item.id}','${item._tipo}')"><svg class="ic" aria-hidden="true"><use href="#i-fast-forward"/></svg> Adia</button>
       </div>
     </div>`;
   }).join('');
@@ -2536,20 +2521,25 @@ initListeners();
     balao.classList.add('on');
   }
   function esconder(){ clearTimeout(timer); balao.classList.remove('on'); }
-  var modal = document.getElementById('modal-novo');
-  if (!modal) return;
-  modal.querySelectorAll('.campo-ic').forEach(function(ic){
+  var modais = document.querySelectorAll('.sheet');
+  if (!modais.length) return;
+  document.querySelectorAll('.sheet .campo-ic').forEach(function(ic){
     var campo = ic.parentNode, longo = false;
     ic.addEventListener('touchstart', function(){ longo = false; timer = setTimeout(function(){ longo = true; mostrar(campo); }, 450); }, {passive:true});
     ic.addEventListener('touchend', function(){ clearTimeout(timer); setTimeout(esconder, 1200); }, {passive:true});
     ic.addEventListener('touchmove', esconder, {passive:true});
     ic.addEventListener('touchcancel', esconder, {passive:true});
-    ic.addEventListener('mousedown', function(){ timer = setTimeout(function(){ mostrar(campo); }, 450); });
+    ic.addEventListener('mousedown', function(){ timer = setTimeout(function(){ longo = true; mostrar(campo); }, 450); });
     ic.addEventListener('mouseup', function(){ clearTimeout(timer); setTimeout(esconder, 1200); });
-    ic.addEventListener('click', function(){ if (longo) { longo = false; return; } var f = campo.querySelector('input,textarea'); if (f) f.focus(); });
+    ic.addEventListener('click', function(){
+      if (longo) { longo = false; return; }
+      var f = campo.querySelector('input,textarea,select'); if (!f) return;
+      f.focus();
+      if (f.type === 'date' || f.type === 'time') { try { f.showPicker && f.showPicker(); } catch(e){} }
+    });
     ic.addEventListener('contextmenu', function(e){ e.preventDefault(); });
   });
-  modal.addEventListener('click', function(e){ if (e.target === modal) esconder(); });
+  modais.forEach(function(m){ m.addEventListener('click', function(e){ if (e.target === m) esconder(); }); });
 })();
 </script>
 </body>
