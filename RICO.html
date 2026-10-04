@@ -2,1072 +2,453 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0f1b2d">
 <title>Born Rich — Caderno de Atividades</title>
 <script src="https://arquivos98126066-sudo.github.io/SOFTWARE/sync-indicator.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@500;600;700;800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
-    /* ── Variáveis padrão do sistema ── */
-    --sys-bg: #07070f;
-    --sys-glass: rgba(255,255,255,0.05);
-    --sys-glass2: rgba(255,255,255,0.09);
-    --sys-border-r: rgba(255,255,255,0.08);
-    --sys-border2-r: rgba(255,255,255,0.15);
-    --sys-text-r: #f0f0fa;
-    --sys-muted: #6b6b88;
-    --sys-muted2: #9999bb;
-    --sys-accent: #7c6dfa;
-    --sys-accent2: #c96dfa;
-    --sys-green-r: #3ddc84;
-    --sys-red-r: #f87171;
-    /* ── Tema RICO (navy + dourado + creme) ── */
     --gold: #e0b54a;
     --gold-light: #f0d795;
     --gold-deep: #8a6212;
     --dark: #0f1b2d;
     --dark2: #16263d;
-    --dark3: #0b1524;
     --line-dark: #2f4666;
-    --cream: #fbf8f1;
-    --mid: #f1ece0;
-    --text: #1f2937;
-    --muted: #6b7280;
-    --border: rgba(15,27,45,0.14);
-    --accent: #0f1b2d;
+    --bg: #fbf8f1;
+    --tx: #0f1b2d;
+    --tx2: #6b7280;
+    --tx3: #9aa3b2;
+    --bd: #e8e3d6;
+    --bd-in: #e5e7eb;
+    --chip: #f1ece0;
+    --seg: #ece6d8;
+    --grad: linear-gradient(135deg, #8a6212, #c4952d 55%, #e0b54a);
+    --f-title: 'Barlow', 'DM Sans', system-ui, sans-serif;
+    --f-body: 'DM Sans', system-ui, sans-serif;
   }
 
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-  html { scroll-behavior: smooth; }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  [hidden] { display: none !important; }
+  html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; background: var(--bg); }
 
   body {
-    font-family: 'DM Sans', sans-serif;
-    background: var(--cream);
-    color: var(--text);
+    font-family: var(--f-body);
+    background: var(--bg);
+    color: var(--tx);
     font-size: 15px;
-    line-height: 1.75;
+    line-height: 1.7;
     -webkit-font-smoothing: antialiased;
     font-variant-numeric: lining-nums;
   }
+  button, input, textarea { font: inherit; color: inherit; }
+  button { background: none; border: none; cursor: pointer; touch-action: manipulation; }
+  :focus-visible { outline: 2px solid var(--gold-deep); outline-offset: 2px; }
 
-  /* ── COVER ── */
+  .ic { width: 20px; height: 20px; display: block; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+
+  /* ── Capa ── */
   .cover {
-    background: var(--dark);
-    color: #fff;
-    min-height: 100svh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    padding: 56px 28px;
-    position: relative;
-    overflow: hidden;
+    background: var(--dark); color: #fff; min-height: 100svh;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    text-align: center; padding: 56px 24px; position: relative; overflow: hidden;
   }
   .cover::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: radial-gradient(ellipse at 50% 30%, rgba(224,181,74,.10) 0%, transparent 65%);
-    pointer-events: none;
+    content: ''; position: absolute; inset: 0; pointer-events: none;
+    background: radial-gradient(ellipse at 50% 30%, rgba(224,181,74,.12) 0%, transparent 65%);
   }
-  .cover-ornament {
-    font-family: 'DM Sans', sans-serif;
-    font-size: 9px;
-    letter-spacing: 5px;
-    color: var(--gold);
-    text-transform: uppercase;
-    margin-bottom: 28px;
-    font-weight: 600;
-  }
+  .cover > * { position: relative; }
+  .cover-ornament { font-size: 13px; color: var(--gold); margin-bottom: 24px; font-weight: 600; letter-spacing: .02em; }
   .cover h1 {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: clamp(3.2rem, 14vw, 5.5rem);
-    font-weight: 700;
-    letter-spacing: 1px;
-    line-height: 1.05;
-    margin-bottom: 8px;
+    font-family: var(--f-title); font-size: clamp(3.2rem, 14vw, 5.5rem);
+    font-weight: 600; letter-spacing: -.01em; line-height: 1.02;
   }
   .cover h1 span { color: var(--gold); }
-  .cover-line {
-    width: 50px; height: 1px;
-    background: var(--gold);
-    margin: 28px auto;
-    opacity: .7;
-  }
-  .cover-sub {
-    font-family: 'Cormorant Garamond', serif;
-    font-style: italic;
-    font-size: 1.1rem;
-    color: var(--gold-light);
-    margin-bottom: 0;
-    font-weight: 400;
-  }
-  .cover-author {
-    font-size: 10px;
-    letter-spacing: 3px;
-    color: #9aa6b8;
-    text-transform: uppercase;
-    font-weight: 400;
-  }
-  .cover-scroll {
-    position: absolute;
-    bottom: 32px;
-    font-size: 10px;
-    letter-spacing: 4px;
-    color: #8a96a8;
-    text-transform: uppercase;
-    animation: bounce 2.2s ease-in-out infinite;
-  }
-  @keyframes bounce {
-    0%,100%{transform:translateY(0)} 50%{transform:translateY(7px)}
-  }
+  .cover-line { width: 44px; height: 1px; background: var(--gold); margin: 28px auto; opacity: .7; }
+  .cover-sub { font-size: 1rem; color: var(--gold-light); font-weight: 400; }
 
-  /* ── NAV ── */
-  .nav-bar {
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    background: var(--dark);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 13px 20px;
-    border-bottom: 1px solid var(--line-dark);
-  }
-  .nav-title {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 1.1rem;
-    font-weight: 700;
-    color: var(--gold);
-    letter-spacing: 2px;
-  }
-
-  /* ── SECTIONS ── */
+  /* ── Seções ── */
   .section {
-    padding: 52px 20px;
-    max-width: 680px;
-    margin: 0 auto;
+    padding: 44px max(20px, env(safe-area-inset-right)) 16px max(20px, env(safe-area-inset-left));
+    max-width: 680px; margin: 0 auto; scroll-margin-top: 0;
   }
-  .section + .section {
-    border-top: 1px solid var(--border);
-  }
-
-  .section-tag {
-    font-size: 9px;
-    letter-spacing: 5px;
-    text-transform: uppercase;
-    color: var(--gold-deep);
-    margin-bottom: 10px;
-    font-weight: 600;
-  }
+  .section + .section::before { content: ''; display: block; height: 1px; background: var(--bd); margin-bottom: 44px; }
   .section-title {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: clamp(1.7rem, 6vw, 2.3rem);
-    font-weight: 700;
-    color: var(--dark);
-    margin-bottom: 18px;
-    line-height: 1.15;
+    font-family: var(--f-title); font-size: clamp(1.7rem, 6vw, 2.2rem);
+    font-weight: 600; color: var(--tx); margin-bottom: 18px; line-height: 1.15; letter-spacing: -.01em;
   }
-  .section-text {
-    color: #3f4756;
-    margin-bottom: 16px;
-    font-size: 14px;
-    line-height: 1.75;
-  }
+  .section-text { color: #4b5563; margin-bottom: 16px; font-size: 15px; line-height: 1.7; }
+  .section-text strong { color: var(--tx); }
 
-  /* ── QUOTE ── */
-  .quote-block {
-    border-left: 3px solid var(--gold);
-    padding: 14px 20px;
-    margin: 24px 0;
-    background: var(--mid);
-    border-radius: 0 6px 6px 0;
+  /* ── Botões e chips ── */
+  .chip {
+    display: inline-flex; align-items: center; height: 28px; padding: 0 12px; border-radius: 999px;
+    background: var(--chip); color: #334155; font-weight: 700; font-size: 12.5px; white-space: nowrap;
   }
-  .quote-block p {
-    font-family: 'DM Sans', sans-serif;
-    font-style: normal;
-    font-size: 15px;
-    font-weight: 400;
-    color: #1f2937;
-    line-height: 1.7;
+  .btn-main {
+    display: inline-flex; align-items: center; justify-content: center; gap: 10px; height: 48px;
+    padding: 0 24px 0 18px; border-radius: 999px; background: var(--dark); color: #fff;
+    font-weight: 600; font-size: 15px; white-space: nowrap; transition: opacity .15s;
   }
-  .quote-block cite {
-    display: block;
-    font-size: 9px;
-    letter-spacing: 4px;
-    text-transform: uppercase;
-    color: var(--gold-deep);
-    margin-top: 12px;
-    font-style: normal;
-    font-family: 'DM Sans', sans-serif;
-    font-weight: 600;
-  }
+  .btn-main:active { opacity: .78; }
+  .btn-main .plus { display: flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 50%; background: var(--gold); color: var(--dark); }
+  .btn-main .plus .ic { width: 16px; height: 16px; stroke-width: 2; }
 
-  /* ── CONCEPT BOX ── */
-  .concept-box {
-    background: var(--dark);
-    color: #fff;
-    border-radius: 8px;
-    padding: 20px;
-    margin: 18px 0;
-  }
-  .concept-box h4 {
-    font-family: 'DM Sans', sans-serif;
-    font-size: 0.9rem;
-    color: var(--gold);
-    margin-bottom: 10px;
-    font-weight: 600;
-    letter-spacing: 0.3px;
-  }
-  .concept-box p { font-size: 13px; color: #d6dde8; line-height: 1.75; }
+  /* ── Citação ── */
+  .quote-block { background: #fff; border: 1px solid var(--bd); border-radius: 24px; padding: 20px; margin: 24px 0; }
+  .quote-block::before { content: ''; display: block; width: 28px; height: 3px; border-radius: 2px; background: var(--gold); margin-bottom: 14px; }
+  .quote-block p { font-size: 16px; line-height: 1.65; color: var(--tx); }
+  .quote-block cite { display: block; font-size: 13px; color: var(--tx2); margin-top: 12px; font-style: normal; font-weight: 600; }
 
-  /* ── QUESTION CARD ── */
-  .question-card {
-    background: #fff;
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    margin: 18px 0;
-    overflow: hidden;
-    box-shadow: 0 1px 6px rgba(15,27,45,.06);
-  }
-  .question-header {
-    display: flex;
-    align-items: flex-start;
-    gap: 12px;
-    padding: 16px 16px 14px;
-  }
+  /* ── Compromisso ── */
+  .commitment-block { background: var(--dark); border-radius: 24px; padding: 22px 16px 16px; margin: 20px 0; color: #fff; }
+  .commitment-block h4 { font-family: var(--f-title); color: var(--gold); font-size: 19px; font-weight: 600; margin-bottom: 8px; padding: 0 4px; }
+  .commitment-block p { font-size: 14.5px; color: #c9d2e0; line-height: 1.65; margin-bottom: 14px; padding: 0 4px; }
+
+  /* ── Conceito ── */
+  .concept-box { background: var(--dark); color: #fff; border-radius: 24px; padding: 20px; margin: 18px 0; }
+  .concept-box + .concept-box { margin-top: 12px; }
+  .concept-box h4 { font-family: var(--f-title); font-size: 18px; color: var(--gold); margin-bottom: 8px; font-weight: 600; }
+  .concept-box p { font-size: 14.5px; color: #d6dde8; line-height: 1.7; }
+  .concept-box strong { color: #fff; }
+
+  /* ── Pergunta ── */
+  .question-card { background: #fff; border: 1px solid var(--bd); border-radius: 24px; margin: 16px 0; overflow: hidden; }
+  .question-header { display: flex; align-items: flex-start; gap: 12px; padding: 18px 10px 14px 16px; }
   .q-number {
-    background: var(--gold);
-    color: var(--dark);
-    font-weight: 700;
-    font-size: 11px;
-    min-width: 28px;
-    height: 28px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    margin-top: 1px;
-    font-family: 'DM Sans', sans-serif;
+    background: var(--gold); color: var(--dark); font-family: var(--f-title); font-weight: 700; font-size: 15px;
+    width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
   }
-  .q-text {
-    font-size: 13.5px;
-    font-weight: 600;
-    color: var(--dark);
-    flex: 1;
-    line-height: 1.5;
-    font-family: 'DM Sans', sans-serif;
-  }
+  .q-number .ic { width: 16px; height: 16px; stroke-width: 1.8; }
+  .q-text { font-size: 15px; font-weight: 600; color: var(--tx); flex: 1; line-height: 1.45; padding-top: 3px; }
   .hint-btn {
-    background: none;
-    border: 1px solid var(--border);
-    border-radius: 50%;
-    width: 24px;
-    height: 24px;
-    font-size: 11px;
-    color: var(--muted);
-    cursor: pointer;
-    flex-shrink: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: border-color .2s, color .2s, background .2s;
-    margin-top: 2px;
-    font-family: 'DM Sans', sans-serif;
-    -webkit-tap-highlight-color: transparent;
+    width: 44px; height: 44px; margin: -7px 0 -7px 0; border-radius: 50%; flex-shrink: 0; color: var(--tx3);
+    display: flex; align-items: center; justify-content: center; transition: background .15s, color .15s;
   }
-  .hint-btn:active { border-color: #0f1b2d; color: #0f1b2d; background: #f1ece0; }
-  .hint-btn.active { background: #0f1b2d; color: #ffffff; border-color: #0f1b2d; }
-
+  .hint-btn:active, .hint-btn.active { background: var(--chip); color: var(--tx); }
   .hint-panel {
-    display: none;
-    padding: 12px 16px 14px 56px;
-    background: #f6f1e4;
-    border-top: 1px solid rgba(15,27,45,0.10);
-    font-size: 13px;
-    color: #374151;
-    line-height: 1.7;
+    display: none; margin: 0 14px 14px; padding: 14px 16px; background: var(--chip);
+    border-radius: 18px; font-size: 14px; color: #374151; line-height: 1.65;
   }
   .hint-panel.open { display: block; }
-  .hint-panel strong { color: var(--accent); }
 
-  /* choices */
-  .choice-row {
-    display: flex;
-    gap: 8px;
-    padding: 0 16px 14px 56px;
-    flex-wrap: wrap;
-  }
+  /* ── Escolhas ── */
+  .choice-row { display: flex; flex-direction: column; gap: 2px; margin: 0 14px 14px; padding: 4px; background: var(--seg); border-radius: 26px; }
   .choice-label {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    cursor: pointer;
-    font-size: 13px;
-    color: #374151;
-    padding: 6px 13px;
-    border: 1px solid var(--border);
-    border-radius: 20px;
-    transition: border-color .2s, background .2s;
-    user-select: none;
-    -webkit-tap-highlight-color: transparent;
-    font-family: 'DM Sans', sans-serif;
+    display: flex; align-items: center; justify-content: center; min-height: 44px; padding: 0 16px; border-radius: 999px;
+    cursor: pointer; font-size: 14.5px; font-weight: 600; color: #374151; text-align: center;
+    user-select: none; -webkit-user-select: none; transition: background .15s, color .15s;
   }
   .choice-label input { display: none; }
-  .choice-label.selected { background: #0f1b2d; color: #ffffff; border-color: #0f1b2d; font-weight: 600; }
+  .choice-label.selected { background: var(--dark); color: #fff; }
 
-  /* textarea / inputs */
-  .answer-area {
-    padding: 0 16px 16px 56px;
+  /* ── Campos (pílula) ── */
+  .answer-area { padding: 0 14px 14px; }
+  .fld {
+    display: flex; align-items: flex-start; gap: 12px; background: #fff; border: 1px solid var(--bd-in);
+    border-radius: 26px; padding: 0 20px 0 18px; cursor: text; transition: border-color .15s;
   }
-  .answer-area textarea,
-  .answer-area input[type=text] {
-    width: 100%;
-    border: 1px solid var(--border);
-    border-radius: 7px;
-    padding: 10px 12px;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 14px;
-    color: var(--text);
-    background: var(--cream);
-    resize: vertical;
-    min-height: 90px;
-    outline: none;
-    transition: border-color .2s;
-    -webkit-appearance: none;
-    appearance: none;
+  .fld > .ic { width: 18px; height: 18px; color: var(--tx3); margin-top: 16px; }
+  .fld:focus-within { border-color: #b9c0cc; }
+  .fld textarea, .fld input {
+    display: block; flex: 1 1 0; min-width: 0; width: 100%; background: transparent; border: none; outline: none;
+    font-size: 16px; line-height: 24px; padding: 13px 0; color: var(--tx); resize: none; overflow: hidden;
+    -webkit-appearance: none; appearance: none; user-select: text; -webkit-user-select: text;
   }
-  .answer-area input[type=text] { min-height: unset; height: 42px; resize: none; }
-  .answer-area textarea:focus,
-  .answer-area input[type=text]:focus { border-color: #0f1b2d; background: #fff; }
+  .fld input { height: 50px; }
+  .fld ::placeholder { color: var(--tx3); }
+  .fld.area { border-radius: 24px; }
+  .fld.area textarea { min-height: 24px; }
+  .fld.dark { background: var(--dark2); border-color: var(--line-dark); }
+  .fld.dark > .ic { color: #8a96a8; }
+  .fld.dark input { color: #f1f4f9; }
+  .fld.dark:focus-within { border-color: #5b7396; }
 
+  .meta-ta.area-nome { text-align: center; }
 
-  /* campo de valor centralizado: R$ + valor + texto fixo */
+  /* valor em reais: compacto e centralizado */
+  .answer-area:has(.money-field) { display: flex; justify-content: center; }
   .money-field {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: baseline;
-    justify-content: center;
-    column-gap: 10px;
-    row-gap: 2px;
-    margin-left: -40px;
-    padding: 14px 16px 12px;
-    border: 1px solid rgba(138,98,18,.35);
-    border-radius: 12px;
-    background: var(--cream);
-    text-align: center;
-    transition: border-color .2s, box-shadow .2s, background .2s;
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px; width: fit-content; max-width: 100%; min-width: 200px;
+    height: 60px; padding: 0 28px; background: linear-gradient(180deg, #fff, #f7f9fc); border: 1px solid var(--bd);
+    border-radius: 999px; box-shadow: 0 16px 34px -22px rgba(15,27,45,.35); transition: border-color .15s;
   }
-  .money-field:focus-within {
-    border-color: var(--gold-deep);
-    background: #fff;
-    box-shadow: 0 0 0 3px rgba(224,181,74,.25);
-  }
+  .money-field:focus-within { border-color: #c9b27a; }
   .money-field span {
-    font-family: 'DM Sans', sans-serif;
-    font-size: 1.25rem;
-    font-weight: 700;
-    color: var(--gold-deep);
-    line-height: 1.2;
+    font-family: var(--f-title); font-weight: 700; font-size: 16px; line-height: 1; position: relative; top: -5px;
+    background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; -webkit-text-fill-color: transparent;
   }
-  .money-field span.sfx {
-    flex-basis: 100%;
-    font-size: 1rem;
-    font-weight: 400;
-    font-style: italic;
-    color: var(--muted);
-    letter-spacing: .3px;
-  }
-  .answer-area .money-field input[type=text] {
-    flex: 0 1 190px;
-    width: auto;
-    min-width: 0;
-    height: auto;
-    min-height: 0;
-    padding: 2px 4px !important;
-    border: none !important;
-    border-bottom: 2px solid var(--gold) !important;
-    background: transparent !important;
-    border-radius: 0 !important;
-    text-align: center;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 1.25rem;
-    font-weight: 700;
-    color: var(--dark);
-    font-variant-numeric: lining-nums tabular-nums;
+  .money-field input:placeholder-shown { min-width: 3ch; }
+  .money-field input {
+    flex: 0 1 auto; field-sizing: content; width: auto; min-width: 0; max-width: 100%; height: 52px; border: none; outline: none; text-align: center;
+    font-family: var(--f-title); font-weight: 700; font-size: 30px; line-height: 1; padding: 0; border-radius: 0;
+    background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; -webkit-text-fill-color: transparent;
+    caret-color: var(--dark); font-variant-numeric: lining-nums tabular-nums; -webkit-appearance: none; appearance: none;
   }
 
-  /* caixa de texto que cresce conforme o conteúdo */
-  .answer-area textarea.auto-grow {
-    min-height: 48px;
-    padding: 12px;
-    line-height: 22px;
-    resize: none;
-    overflow: hidden;
-    display: block;
+  /* rodapé da resposta */
+  .answer-footer { display: flex; align-items: center; justify-content: flex-end; padding: 0 14px 14px; }
+  .save-btn {
+    margin-left: auto; display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 44px; padding: 0 24px;
+    background: var(--dark); color: #fff; border-radius: 999px; font-weight: 600; font-size: 14.5px; transition: background .2s, color .2s;
   }
+  .save-btn:active { opacity: .78; }
+  .save-btn .check { display: none; align-items: center; gap: 8px; }
+  .save-btn .check .ic { width: 16px; height: 16px; stroke-width: 2; }
+  .save-btn.saved .label { display: none; }
+  .save-btn.saved .check { display: inline-flex; }
+  .save-btn.saved { background: var(--gold); color: var(--dark); }
 
-  /* list fields */
-  .list-fields { padding: 0 16px 16px 56px; display: flex; flex-direction: column; gap: 8px; }
-  .list-field-row {
-    display: flex;
-    align-items: center;
-    gap: 10px;
+  /* ── Listas ── */
+  .list-fields { padding: 0 14px 14px; display: flex; flex-direction: column; gap: 8px; }
+  .list-field-row, .two-col-row {
+    display: flex; align-items: flex-start; gap: 10px; background: #fff; border: 1px solid var(--bd-in);
+    border-radius: 26px; padding: 0 20px 0 14px; transition: border-color .15s;
   }
-  .list-num {
-    font-size: 11px;
-    font-weight: 700;
-    color: var(--muted);
-    min-width: 18px;
-    text-align: right;
-    font-family: 'DM Sans', sans-serif;
+  .list-field-row:focus-within, .two-col-row:focus-within { border-color: #b9c0cc; }
+  .list-num { font-family: var(--f-title); font-weight: 600; font-size: 14px; color: var(--tx3); width: 20px; text-align: center; padding-top: 13px; line-height: 24px; flex-shrink: 0; }
+  .list-field-row textarea.list-ta, .two-col-row textarea.list-ta {
+    display: block; flex: 1 1 0; min-width: 0; width: 100%; border: none; outline: none; background: transparent;
+    font-size: 16px; line-height: 24px; padding: 13px 0; color: var(--tx); resize: none; overflow: hidden;
+    -webkit-appearance: none; appearance: none; border-radius: 0;
   }
-  .list-field-row input {
-    flex: 1;
-    border: none;
-    border-bottom: 1px solid var(--border);
-    padding: 7px 4px;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 13.5px;
-    background: transparent;
-    outline: none;
-    color: var(--text);
-    transition: border-color .2s;
-    -webkit-appearance: none;
-    border-radius: 0;
-  }
-  .list-field-row input:focus { border-bottom-color: #0f1b2d; }
-
-  /* botão para adicionar nova linha na lista */
+  .two-col-row { display: grid; grid-template-columns: 1fr 1fr; padding: 0 16px; gap: 10px; }
   .add-row-btn {
-    align-self: flex-start;
-    margin: 6px 0 0 28px;
-    padding: 8px 18px;
-    background: none;
-    border: 1px dashed var(--gold-deep);
-    border-radius: 20px;
-    color: var(--gold-deep);
-    font-family: 'DM Sans', sans-serif;
-    font-size: 12px;
-    font-weight: 600;
-    letter-spacing: 1px;
-    cursor: pointer;
-    transition: background .2s, color .2s;
-    -webkit-tap-highlight-color: transparent;
+    align-self: flex-start; display: inline-flex; align-items: center; gap: 6px; height: 38px; padding: 0 16px 0 12px;
+    background: #fff; border: 1px solid var(--bd-in); border-radius: 999px; color: var(--tx); font-weight: 600; font-size: 13.5px; transition: background .15s;
   }
-  .add-row-btn:active { background: var(--gold); color: var(--dark); border-color: var(--gold); }
+  .add-row-btn .ic { width: 14px; height: 14px; color: var(--gold-deep); stroke-width: 2; }
+  .add-row-btn:active { background: var(--chip); }
 
-  /* linha de lista que quebra para baixo quando o texto é grande */
-  .list-field-row.multi { align-items: flex-start; }
-  .list-field-row.multi .list-num { padding-top: 9px; }
-  .list-field-row textarea.list-ta,
-  .two-col-row textarea.list-ta {
-    flex: 1;
-    min-width: 0;
-    border: none;
-    border-bottom: 1px solid var(--border);
-    border-radius: 0;
-    padding: 8px 4px;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 13.5px;
-    line-height: 1.5;
-    background: transparent;
-    color: var(--text);
-    outline: none;
-    resize: none;
-    overflow: hidden;
-    display: block;
-    transition: border-color .2s;
-    -webkit-appearance: none;
-  }
-  .list-field-row textarea.list-ta:focus,
-  .two-col-row textarea.list-ta:focus { border-bottom-color: #0f1b2d; }
-  .two-col-fields .add-row-btn { margin-left: 0; }
-
-  /* objetivos: objetivo + por quê + ações */
+  /* ── Objetivos, áreas e hábitos ── */
   .metas { margin: 18px 0; }
-  .meta-block {
-    background: #fff;
-    border: 1px solid var(--border);
-    border-left: 4px solid var(--gold);
-    border-radius: 12px;
-    padding: 18px 16px 16px;
-    box-shadow: 0 1px 6px rgba(15,27,45,.06);
-  }
-  .meta-block + .meta-block { margin-top: 16px; }
-  .meta-block.principal {
-    background: var(--cream);
-    border-color: rgba(138,98,18,.35);
-    border-left-color: var(--gold-deep);
-    box-shadow: 0 2px 12px rgba(138,98,18,.12);
-  }
-  .meta-head { display: flex; align-items: center; margin-bottom: 12px; }
+  .meta-block { background: #fff; border: 1px solid var(--bd); border-radius: 24px; padding: 16px; }
+  .meta-block + .meta-block { margin-top: 14px; }
+  .meta-block.principal { background: linear-gradient(180deg, #fff, #f7f9fc); box-shadow: 0 18px 40px -24px rgba(15,27,45,.3); }
+  .meta-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; min-height: 30px; }
   .meta-badge {
-    background: var(--gold);
-    color: var(--dark);
-    font-weight: 700;
-    font-size: 12px;
-    min-width: 28px;
-    height: 28px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-family: 'DM Sans', sans-serif;
+    background: var(--gold); color: var(--dark); font-family: var(--f-title); font-weight: 700; font-size: 15px;
+    width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
   }
-  .meta-field + .meta-field { margin-top: 16px; }
-  .meta-label {
-    display: block;
-    font-size: 9px;
-    letter-spacing: 5px;
-    text-transform: uppercase;
-    font-weight: 600;
-    color: var(--gold-deep);
-    margin-bottom: 6px;
-    font-family: 'DM Sans', sans-serif;
-  }
-  .meta-ta {
-    display: block;
-    width: 100%;
-    min-height: 46px;
-    padding: 12px;
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    background: var(--cream);
-    font-family: 'DM Sans', sans-serif;
-    font-size: 14px;
-    line-height: 22px;
-    color: var(--text);
-    outline: none;
-    resize: none;
-    overflow: hidden;
-    -webkit-appearance: none;
-    transition: border-color .2s, background .2s;
-  }
-  .meta-block.principal .meta-ta { background: #fff; }
-  .meta-ta:focus { border-color: #0f1b2d; background: #fff; }
+  .meta-field + .meta-field { margin-top: 10px; }
+  .meta-field .chip { margin-bottom: 10px; }
   .meta-block .list-fields { padding: 0; }
-  .area-block .list-fields { gap: 4px; }
-  .area-block .list-num { min-width: 22px; text-align: left; }
-  .area-block .add-row-btn {
-    margin: 10px 0 0 0;
-    padding: 5px 14px;
-    font-size: 11px;
-    letter-spacing: .8px;
-  }
-  .area-block .meta-field + .meta-field {
-    margin-top: 26px;
-    padding-top: 22px;
-    border-top: 1px solid var(--border);
-  }
-  .area-block + .area-block { margin-top: 20px; }
+  .area-block .meta-field + .meta-field:has(.list-fields) { margin-top: 18px; }
+  .meta-field:has(.list-fields) { margin-top: 18px; }
+  .meta-head + .meta-field { margin-top: 0; }
 
   /* hábitos */
-  .habito-block + .habito-block { margin-top: 20px; }
-  .hab-horario { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-  .hab-horario span { font-size: 13px; color: var(--muted); font-family: 'DM Sans', sans-serif; }
-  .hab-time {
-    width: 132px; padding: 10px 10px; border: 1px solid var(--border); border-radius: 8px;
-    background: var(--cream); font-family: 'DM Sans', sans-serif; font-size: 15px; color: var(--text);
-    outline: none; -webkit-appearance: none; appearance: none; min-height: 44px;
-  }
-  .hab-time:focus { border-color: #0f1b2d; background: #fff; }
-  .hab-progresso { margin-top: 26px; padding-top: 22px; border-top: 1px solid var(--border); }
-  .hab-stats { display: flex; gap: 12px; margin-bottom: 14px; }
   .hab-info {
-    margin-left: auto; padding: 4px 11px; background: transparent; border: 1px solid rgba(138,98,18,.3);
-    border-radius: 999px; color: rgba(138,98,18,.75); font-family: 'DM Sans', sans-serif; font-size: 10px;
-    font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; cursor: pointer;
-    -webkit-tap-highlight-color: transparent;
+    min-height: 44px; margin: -7px -4px -7px 0; padding: 0 16px; border-radius: 999px; background: var(--chip); color: #334155;
+    font-weight: 700; font-size: 13px; transition: background .15s, color .15s;
   }
-  .hab-info.on { background: rgba(224,181,74,.18); color: var(--gold-deep); }
-  .hab-stat { flex: 1; text-align: center; background: var(--cream); border: 1px solid var(--border); border-radius: 10px; padding: 10px 6px; }
-  .hab-stat b { display: block; font-family: 'DM Sans', sans-serif; font-size: 24px; font-weight: 700; line-height: 1.2; color: var(--dark); font-variant-numeric: lining-nums tabular-nums; }
-  .hab-stat small { display: block; font-size: 9px; letter-spacing: 2px; text-transform: uppercase; font-weight: 700; color: var(--gold-deep); margin-top: 2px; font-family: 'DM Sans', sans-serif; }
-  .hab-acoes { display: flex; gap: 10px; margin-top: 16px; }
+  .hab-info.on { background: var(--dark); color: #fff; }
+  .hab-horario { display: flex; align-items: center; gap: 8px; }
+  .hab-horario > .ic { width: 18px; height: 18px; color: var(--tx3); margin: 0 2px 0 4px; }
+  .hab-horario > span { font-size: 14px; color: var(--tx2); }
+  .hab-horario .fld { flex: 1 1 0; min-width: 0; padding: 0 12px; }
+  .hab-time { min-height: 50px; font-variant-numeric: lining-nums tabular-nums; }
+  .hab-dur { display: flex; align-items: center; gap: 10px; }
+  .hab-dur > span { font-size: 14px; color: var(--tx2); }
+  .hab-mm {
+    width: 44px; height: 44px; border-radius: 50%; background: #fff; border: 1px solid var(--bd-in); color: var(--tx);
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .hab-mm .ic { width: 18px; height: 18px; stroke-width: 2; }
+  .hab-mm:active { background: var(--chip); }
+  .hab-min {
+    width: 76px; height: 50px; text-align: center; border: 1px solid var(--bd-in); border-radius: 999px; outline: none;
+    background: var(--grad); background-origin: border-box; -webkit-background-clip: text; background-clip: text; color: transparent; -webkit-text-fill-color: transparent;
+    font-family: var(--f-title); font-weight: 700; font-size: 24px; caret-color: var(--dark);
+    -moz-appearance: textfield; appearance: textfield; font-variant-numeric: lining-nums tabular-nums;
+  }
+  .hab-min::-webkit-outer-spin-button, .hab-min::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+  .hab-min:focus { border-color: #b9c0cc; }
+
+  .hab-progresso { margin-top: 20px; padding-top: 18px; border-top: 1px solid var(--bd); }
+  .hab-stats { display: flex; gap: 10px; margin-bottom: 14px; }
+  .hab-stat { flex: 1; text-align: center; background: #fff; border: 1px solid var(--bd); border-radius: 20px; padding: 12px 6px; }
+  .hab-stat b {
+    display: block; font-family: var(--f-title); font-size: 30px; font-weight: 700; line-height: 1.1;
+    background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; -webkit-text-fill-color: transparent;
+    font-variant-numeric: lining-nums tabular-nums;
+  }
+  .hab-stat small { display: block; font-size: 12.5px; font-weight: 500; color: var(--tx2); margin-top: 2px; }
+  .hab-start {
+    display: flex; align-items: center; justify-content: center; width: 100%; height: 52px; margin-bottom: 10px;
+    border-radius: 999px; background: var(--dark); color: #fff; font-weight: 600; font-size: 15px; transition: opacity .15s;
+  }
+  .hab-start:active { opacity: .78; }
+  .hab-run { margin-bottom: 10px; padding: 18px 16px 16px; border-radius: 24px; background: linear-gradient(180deg, #fff, #f7f9fc); border: 1px solid var(--bd); text-align: center; }
+  .hab-tempo {
+    font-family: var(--f-title); font-size: 46px; font-weight: 700; line-height: 1; letter-spacing: .02em;
+    background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; -webkit-text-fill-color: transparent;
+    font-variant-numeric: lining-nums tabular-nums;
+  }
+  .hab-run.fim .hab-tempo { font-size: 28px; }
+  .hab-barra { height: 6px; border-radius: 999px; background: var(--seg); margin: 16px 4px; overflow: hidden; }
+  .hab-barra i { display: block; height: 100%; width: 0; border-radius: 999px; background: var(--grad); }
+  .hab-ntfy, .hab-vibaviso { margin: 0 0 10px; font-size: 13px; color: var(--tx2); }
+  .hab-cancel {
+    height: 44px; padding: 0 26px; border-radius: 999px; background: #fff; border: 1px solid var(--bd-in);
+    color: var(--tx); font-weight: 600; font-size: 14.5px;
+  }
+  .hab-acoes { position: relative; display: flex; gap: 2px; padding: 4px; margin-top: 14px; background: var(--seg); border-radius: 999px; }
+  .hab-acoes::after { content: ''; position: absolute; left: 50%; top: 50%; width: 1px; height: 22px; margin: -11px 0 0 -.5px; background: rgba(15,27,45,.22); transition: opacity .15s; }
+  .hab-acoes:has(.on)::after { opacity: 0; }
   .hab-acoes button {
-    flex: 1; padding: 13px 10px; border-radius: 10px; background: #fff; font-family: 'DM Sans', sans-serif;
-    font-size: 13px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; cursor: pointer;
-    -webkit-tap-highlight-color: transparent; transition: background .15s, color .15s;
+    flex: 1; min-height: 44px; border-radius: 999px; font-size: 14.5px; font-weight: 600; color: #374151; transition: background .15s, color .15s;
   }
-  .hab-acoes button { border: 1.5px solid var(--gold-deep); color: var(--gold-deep); }
-  .hab-acoes button.on { background: rgba(224,181,74,.38) !important; border-color: var(--gold-deep); color: var(--dark); }
-  .hab-aviso { margin: 12px 0 0; font-size: 12.5px; line-height: 1.5; color: #8a3b12; }
-  .hab-trilha { display: grid; grid-template-columns: repeat(7, 1fr); gap: 12px 0; margin: 22px 0 0; }
-  .hab-trilha[hidden] { display: none; }
+  .hab-acoes button.on { background: var(--dark); color: #fff; }
+  .hab-aviso { margin: 12px 4px 0; font-size: 13.5px; line-height: 1.5; color: var(--tx2); }
+  .hab-trilha { display: grid; grid-template-columns: repeat(7, 1fr); gap: 12px 0; margin: 20px 0 0; }
   .hab-trilha i {
     display: flex; align-items: center; justify-content: center; width: 34px; height: 34px; margin: 0 auto;
-    border-radius: 50%; font-style: normal; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 700;
-    line-height: 1; color: #9aa6b8; background: transparent; border: 1px dashed #c5cdd9;
+    border-radius: 50%; font-style: normal; font-family: var(--f-title); font-size: 14px; font-weight: 700; line-height: 1;
+    color: #9aa6b8; background: transparent; border: 1px dashed #c5cdd9; font-variant-numeric: tabular-nums;
   }
   .hab-trilha i.feito { color: #7a5510; background: rgba(224,181,74,.28); border: 1px solid rgba(224,181,74,.65); }
   .hab-trilha i.falta { color: #3f4859; background: rgba(93,104,121,.2); border: 1px solid rgba(93,104,121,.45); }
   .hab-trilha i.novo { animation: habPop .45s ease; }
   @keyframes habPop { 0% { transform: scale(.4); } 60% { transform: scale(1.3); } 100% { transform: scale(1); } }
 
-  .hab-dur { display: flex; align-items: center; gap: 10px; }
-  .hab-mm {
-    width: 44px; height: 44px; border-radius: 50%; border: 1.5px solid var(--gold-deep); background: none;
-    color: var(--gold-deep); font-size: 22px; font-weight: 600; line-height: 1; cursor: pointer;
-    display: flex; align-items: center; justify-content: center; -webkit-tap-highlight-color: transparent;
-  }
-  .hab-mm:active { background: var(--gold); border-color: var(--gold); color: var(--dark); }
-  .hab-min {
-    width: 72px; height: 44px; text-align: center; border: 1px solid var(--border); border-radius: 8px;
-    background: var(--cream); font-family: 'DM Sans', sans-serif; font-size: 18px; font-weight: 700; color: var(--dark);
-    outline: none; -moz-appearance: textfield; appearance: textfield;
-  }
-  .hab-min::-webkit-outer-spin-button, .hab-min::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-  .hab-min:focus { border-color: #0f1b2d; background: #fff; }
-  .hab-dur span { font-size: 13px; color: var(--muted); font-family: 'DM Sans', sans-serif; }
-
-  .hab-start {
-    display: block; width: 100%; margin-bottom: 10px; padding: 13px 16px; border: 1.5px solid var(--gold-deep);
-    border-radius: 10px; background: rgba(224,181,74,.16); color: var(--gold-deep); font-family: 'DM Sans', sans-serif;
-    font-size: 13px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; cursor: pointer;
-    -webkit-tap-highlight-color: transparent;
-  }
-  .hab-start:active { background: var(--gold); border-color: var(--gold); color: var(--dark); }
-  .hab-run { margin-bottom: 10px; padding: 18px 16px 12px; border-radius: 12px; background: rgba(224,181,74,.16); border: 1px solid rgba(138,98,18,.28); text-align: center; }
-  .hab-run[hidden] { display: none; }
-  .hab-tempo { font-family: 'DM Sans', sans-serif; font-size: 40px; font-weight: 600; line-height: 1; letter-spacing: 2px; color: var(--dark); font-variant-numeric: lining-nums tabular-nums; }
-  .hab-barra { height: 4px; border-radius: 2px; background: rgba(138,98,18,.16); margin: 14px 0; overflow: hidden; }
-  .hab-barra i { display: block; height: 100%; width: 0; background: var(--gold-deep); }
-  .hab-ntfy { margin: 0 0 8px; font-size: 11.5px; color: var(--gold-deep); }
-  .hab-ntfy.erro { color: #8a3b12; }
-  .hab-vibaviso { margin: 0 0 8px; font-size: 11.5px; color: #8a3b12; }
-  .hab-cancel { border: none; background: none; color: var(--gold-deep); font-family: 'DM Sans', sans-serif; font-size: 12px; letter-spacing: 2px; text-transform: uppercase; font-weight: 700; padding: 6px 12px; cursor: pointer; }
-  .hab-run.fim .hab-tempo { font-size: 26px; }
-  .meta-ta.area-nome { text-align: center; margin-left: auto; margin-right: auto; }
-
-  .como-funciona {
-    background: #fff;
-    border: 1px solid rgba(138,98,18,.22);
-    border-radius: 14px;
-    padding: 22px 20px 20px;
-    margin: 0 0 22px;
-  }
-  .cf-tag {
-    font-family: 'DM Sans', sans-serif;
-    font-size: 9px;
-    font-weight: 600;
-    letter-spacing: 5px;
-    text-transform: uppercase;
-    color: var(--gold-deep);
-    margin: 0 0 14px;
-  }
-  .cf-intro {
-    font-size: 15px;
-    line-height: 1.65;
-    color: var(--text);
-    margin: 0 0 18px;
-  }
-  .cf-step {
-    display: flex;
-    gap: 14px;
-    align-items: flex-start;
-    padding: 14px 0;
-    border-top: 1px solid rgba(138,98,18,.16);
-  }
-  .cf-step p {
-    margin: 0;
-    font-size: 14.5px;
-    line-height: 1.6;
-    color: var(--text);
-  }
+  /* ── Como funciona ── */
+  .como-funciona { background: #fff; border: 1px solid var(--bd); border-radius: 24px; padding: 20px 18px 18px; margin: 0 0 20px; }
+  .cf-intro { font-size: 15px; line-height: 1.65; color: var(--tx); margin: 0 0 14px; }
+  .cf-step { display: flex; gap: 14px; align-items: flex-start; padding: 14px 0; border-top: 1px solid var(--bd); }
+  .cf-step p { margin: 0; font-size: 14.5px; line-height: 1.6; color: var(--tx); }
   .cf-n {
-    flex: 0 0 26px;
-    height: 26px;
-    border-radius: 50%;
-    background: var(--gold);
-    color: var(--dark);
-    font-size: 13px;
-    font-weight: 700;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-top: 1px;
+    flex: 0 0 28px; height: 28px; border-radius: 50%; background: var(--gold); color: var(--dark);
+    font-family: var(--f-title); font-size: 14px; font-weight: 700; display: flex; align-items: center; justify-content: center; margin-top: 1px;
   }
-  .cf-fim {
-    margin: 4px 0 0;
-    padding-top: 18px;
-    border-top: 1px solid rgba(138,98,18,.16);
-  }
+  .cf-fim { display: flex; justify-content: center; padding-top: 18px; border-top: 1px solid var(--bd); }
 
-  .add-meta-btn {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    width: fit-content;
-    margin: 0 auto;
-    padding: 8px 20px 8px 8px;
-    background: rgba(224,181,74,.18);
-    border: none;
-    border-radius: 999px;
-    color: var(--gold-deep);
-    font-family: 'DM Sans', sans-serif;
-    font-size: 12px;
-    font-weight: 700;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    box-shadow: none;
-    cursor: pointer;
-    -webkit-tap-highlight-color: transparent;
-    transition: background .15s;
-  }
-  .add-meta-btn .plus {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 28px;
-    height: 28px;
-    border-radius: 50%;
-    background: var(--gold);
-    color: var(--dark);
-    font-size: 18px;
-    font-weight: 700;
-    line-height: 1;
-  }
-  .add-meta-btn:active { background: rgba(224,181,74,.36); }
-
-  /* two-col table */
-  .two-col-fields { padding: 0 16px 16px 16px; display: flex; flex-direction: column; gap: 10px; }
-  .two-col-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-  .two-col-row input {
-    border: none;
-    border-bottom: 1px solid var(--border);
-    padding: 7px 4px;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 13px;
-    background: transparent;
-    outline: none;
-    color: var(--text);
-    -webkit-appearance: none;
-    border-radius: 0;
-    width: 100%;
-  }
-  .two-col-row input:focus { border-bottom-color: #0f1b2d; }
-  .col-header { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 0 16px 8px 16px; }
-  .col-header span { font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: #4b5563; font-weight: 700; font-family: 'DM Sans', sans-serif; }
-
-  /* save button */
-  .save-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 7px;
-    background: #0f1b2d;
-    color: #ffffff;
-    border: none;
-    border-radius: 6px;
-    padding: 9px 18px;
-    font-size: 11px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    font-family: 'DM Sans', sans-serif;
-    cursor: pointer;
-    transition: background .2s;
-    -webkit-tap-highlight-color: transparent;
-    font-weight: 500;
-  }
-  .save-btn:active { background: #1e3350; }
-  .save-btn .check { display: none; }
-  .save-btn.saved .label { display: none; }
-  .save-btn.saved .check { display: inline; }
-  .save-btn.saved { background: #1f6b3a; color: #e4f7ea; }
-
-  .answer-footer {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 16px 14px 56px;
-    flex-wrap: wrap;
-    gap: 8px;
-  }
-  .char-count { font-size: 11px; color: var(--muted); font-family: 'DM Sans', sans-serif; }
-
-  /* commitment block */
-  .commitment-block {
-    background: var(--dark);
-    border-radius: 12px;
-    padding: 24px 20px;
-    margin: 20px 0;
-    color: #fff;
-  }
-  .commitment-block h4 {
-    font-family: 'Cormorant Garamond', serif;
-    color: var(--gold);
-    margin-bottom: 14px;
-    font-size: 1.15rem;
-    font-weight: 700;
-  }
-  .commitment-block p {
-    font-size: 13px;
-    color: #c9d2e0;
-    margin-bottom: 14px;
-    line-height: 1.7;
-  }
-  .commitment-block textarea,
-  .commitment-block input[type=text] {
-    width: 100%;
-    background: var(--dark2);
-    border: 1px solid var(--line-dark);
-    border-radius: 7px;
-    padding: 12px;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 14px;
-    color: #f1f4f9;
-    outline: none;
-    transition: border-color .2s;
-    -webkit-appearance: none;
-  }
-  .commitment-block textarea { resize: vertical; min-height: 120px; }
-  .commitment-block input[type=text] { height: 44px; max-width: 100%; }
-  .commitment-block textarea:focus,
-  .commitment-block input[type=text]:focus { border-color: var(--gold); }
-
-  .commitment-block textarea.auto-grow {
-    min-height: 48px;
-    padding: 12px;
-    line-height: 22px;
-    resize: none;
-    overflow: hidden;
-    display: block;
-  }
-
-  .sig-line {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-top: 18px;
-    border-top: 1px solid var(--line-dark);
-    padding-top: 16px;
-  }
-  .sig-line label { font-size: 11px; color: #9aa6b8; letter-spacing: 1px; white-space: nowrap; font-family: 'DM Sans', sans-serif; }
-  .sig-line input {
-    flex: 1;
-    background: transparent;
-    border: none;
-    border-bottom: 1px solid #4a6082;
-    padding: 6px 4px;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 1rem;
-    color: #fff;
-    outline: none;
-    -webkit-appearance: none;
-    border-radius: 0;
-  }
-
-  /* steps */
+  /* ── Etapas ── */
   .steps-box { margin: 20px 0; display: flex; flex-direction: column; gap: 10px; }
-  .step-item {
-    display: flex;
-    gap: 14px;
-    align-items: flex-start;
-    background: #fff;
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 14px 16px;
-  }
+  .step-item { display: flex; gap: 14px; align-items: flex-start; background: #fff; border: 1px solid var(--bd); border-radius: 22px; padding: 14px 16px; }
   .step-num {
-    background: var(--gold);
-    color: var(--dark);
-    font-weight: 700;
-    font-size: 12px;
-    min-width: 28px;
-    height: 28px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    font-family: 'DM Sans', sans-serif;
+    background: var(--gold); color: var(--dark); font-family: var(--f-title); font-weight: 700; font-size: 15px;
+    width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
   }
-  .step-text { font-size: 13.5px; font-weight: 500; color: var(--dark); padding-top: 3px; font-family: 'DM Sans', sans-serif; }
+  .step-text { font-size: 15px; color: var(--tx); padding-top: 3px; line-height: 1.55; }
+  .step-text strong { font-weight: 700; }
 
-  /* diagram card */
-  .diagram-card {
-    background: var(--mid);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 24px 20px;
-    margin: 20px 0;
-    text-align: center;
-  }
-  .diagram-card h4 {
-    font-family: 'DM Sans', sans-serif;
-    font-size: 0.9rem;
-    margin-bottom: 18px;
-    color: var(--dark);
-    font-weight: 600;
-  }
+  /* ── Diagrama ── */
+  .diagram-card { background: #fff; border: 1px solid var(--bd); border-radius: 24px; padding: 24px 20px; margin: 20px 0; text-align: center; }
+  .diagram-card h4 { font-family: var(--f-title); font-size: 18px; margin-bottom: 18px; color: var(--tx); font-weight: 600; }
   .mind-model { display: flex; flex-direction: column; align-items: center; }
-  .mind-circle {
-    width: 160px;
-    border: 2px solid var(--dark);
-    border-radius: 80px;
-    overflow: hidden;
-  }
-  .mind-top, .mind-bottom {
-    padding: 10px;
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    font-family: 'DM Sans', sans-serif;
-  }
+  .mind-circle { width: 172px; border: 2px solid var(--dark); border-radius: 86px; overflow: hidden; }
+  .mind-top, .mind-bottom { padding: 12px 10px; font-size: 13px; font-weight: 700; }
   .mind-top { background: var(--gold); color: var(--dark); border-bottom: 2px solid var(--dark); }
-  .mind-bottom { background: #e6dcc3; color: #1f2937; }
+  .mind-bottom { background: var(--chip); color: var(--tx); }
   .mind-body-circle {
-    width: 68px;
-    height: 68px;
-    border: 2px solid var(--dark);
-    border-radius: 50%;
-    background: #fbf8f1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 9px;
-    font-weight: 700;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    color: #1f2937;
-    margin-top: 8px;
-    font-family: 'DM Sans', sans-serif;
+    width: 72px; height: 72px; border: 2px solid var(--dark); border-radius: 50%; background: #fff;
+    display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: var(--tx); margin-top: 8px;
   }
   .mind-connector { width: 2px; height: 14px; background: var(--dark); }
 
-  /* planes table */
-  .planes-table { width: 100%; border-collapse: collapse; margin: 16px 0; }
-  .planes-table td {
-    padding: 10px 14px;
-    border: 1px solid var(--border);
-    font-size: 13px;
-    font-family: 'DM Sans', sans-serif;
-  }
-  .planes-table td:first-child { font-weight: 600; background: var(--mid); width: 42%; }
-  .planes-table td:last-child { color: #3f4756; }
+  .planes-table { width: 100%; border-collapse: separate; border-spacing: 0; margin: 16px 0; background: #fff; border: 1px solid var(--bd); border-radius: 22px; overflow: hidden; }
+  .planes-table td { padding: 14px 18px; font-size: 14.5px; border-bottom: 1px solid var(--bd); }
+  .planes-table tr:last-child td { border-bottom: none; }
+  .planes-table td:first-child { font-family: var(--f-title); font-weight: 600; font-size: 16px; background: var(--chip); width: 42%; color: var(--tx); }
+  .planes-table td:last-child { color: #4b5563; }
 
-  /* cycle */
-  .cycle-block {
-    background: var(--dark);
-    border-radius: 10px;
-    padding: 20px;
-    margin: 20px 0;
-    color: #fff;
+  /* ── Ciclo ── */
+  .cycle-block { background: var(--dark); border-radius: 24px; padding: 20px; margin: 20px 0; color: #fff; }
+  .cycle-block h4 { color: var(--gold); font-family: var(--f-title); margin-bottom: 14px; font-size: 18px; font-weight: 600; }
+  .cycle-chain { position: relative; display: flex; flex-direction: column; align-items: stretch; padding-left: 28px; }
+  .cycle-chain::before {
+    content: ''; position: absolute; left: 0; top: 22px; bottom: 22px; width: 28px;
+    border: 2px solid rgba(224,181,74,.55); border-right: 0; border-radius: 20px 0 0 20px;
   }
-  .cycle-block h4 { color: var(--gold); font-family: 'Cormorant Garamond', serif; margin-bottom: 14px; font-size: 1.1rem; font-weight: 700; }
-  .cycle-chain {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    flex-wrap: wrap;
-    justify-content: center;
+  .cycle-chain::after {
+    content: ''; position: absolute; left: 19px; top: 16px; width: 0; height: 0;
+    border-left: 9px solid var(--gold); border-top: 6px solid transparent; border-bottom: 6px solid transparent;
   }
   .cycle-item {
-    background: var(--dark2);
-    border: 1px solid var(--line-dark);
-    border-radius: 20px;
-    padding: 6px 12px;
-    font-size: 11.5px;
-    letter-spacing: 0.5px;
-    color: #e6ebf3;
-    font-family: 'DM Sans', sans-serif;
+    display: flex; align-items: center; justify-content: center; min-height: 44px; padding: 0 16px; text-align: center;
+    background: var(--dark2); border: 1px solid var(--gold); border-radius: 999px; font-size: 14.5px; font-weight: 600; color: #fff;
   }
-  .cycle-arrow { color: var(--gold); font-size: 14px; }
+  .cycle-arrow { position: relative; display: flex; align-items: flex-end; justify-content: center; height: 26px; color: var(--gold); }
+  .cycle-arrow::before { content: ''; position: absolute; left: 50%; top: 0; bottom: 8px; width: 2px; margin-left: -1px; background: var(--gold); opacity: .7; }
+  .cycle-arrow .ic { width: 16px; height: 16px; transform: rotate(90deg); stroke-width: 2; }
 
-  /* sep */
-  .sep {
-    text-align: center;
-    color: var(--gold-deep);
-    font-size: 16px;
-    letter-spacing: 10px;
-    padding: 10px 0;
-    opacity: .6;
-  }
+  .final { text-align: center; padding: 36px 0 24px; font-family: var(--f-title); font-size: clamp(1.7rem, 8vw, 2.2rem); font-weight: 600; letter-spacing: .03em; color: var(--gold-deep); white-space: nowrap; }
 
-  /* footer */
-  footer {
-    background: var(--dark);
-    color: #9aa6b8;
-    text-align: center;
-    padding: 32px 20px;
-    font-size: 9px;
-    letter-spacing: 3px;
-    font-weight: 600;
-    text-transform: uppercase;
-    font-family: 'DM Sans', sans-serif;
-  }
-  footer span { color: var(--gold); }
+  footer { background: var(--dark); color: #9aa6b8; text-align: center; padding: 28px 20px calc(28px + env(safe-area-inset-bottom)); font-size: 13px; font-weight: 500; }
+  footer span { color: var(--gold); font-weight: 600; }
 
-  /* menu hambúrguer */
+  /* ── Menu ── */
   .menu-btn {
-    position: absolute; top: 14px; right: 14px; z-index: 99990; width: 42px; height: 42px; padding: 0;
-    border: none; border-radius: 12px; background: rgba(15,27,45,.88); cursor: pointer;
+    position: absolute; top: calc(14px + env(safe-area-inset-top)); right: 14px; z-index: 99990; width: 48px; height: 48px; padding: 0;
+    border-radius: 50%; background: rgba(15,27,45,.9); border: 1px solid var(--line-dark);
     display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
-    box-shadow: 0 2px 10px rgba(0,0,0,.25); -webkit-tap-highlight-color: transparent;
   }
   .menu-btn span { display: block; width: 18px; height: 2px; border-radius: 2px; background: var(--gold); transition: transform .2s, opacity .2s; }
   .menu-btn.open span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
   .menu-btn.open span:nth-child(2) { opacity: 0; }
   .menu-btn.open span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
-  .menu-overlay { position: fixed; inset: 0; z-index: 99980; background: transparent; }
-  .menu-overlay[hidden], .menu-panel[hidden] { display: none; }
+  .menu-overlay { position: fixed; inset: 0; z-index: 99980; background: rgba(15,27,45,.28); }
   .menu-panel {
-    position: absolute; top: 64px; right: 14px; z-index: 99985; width: min(290px, calc(100vw - 28px));
-    background: #fff; border: 1px solid rgba(138,98,18,.25);
-    border-radius: 14px; padding: 6px 0; box-shadow: 0 8px 28px rgba(15,27,45,.25);
+    position: absolute; top: calc(70px + env(safe-area-inset-top)); right: 12px; z-index: 99985; width: min(300px, calc(100vw - 24px));
+    background: #fff; border: 1px solid var(--bd); border-radius: 24px; padding: 6px 0; box-shadow: 0 24px 50px -20px rgba(15,27,45,.4);
   }
-  .menu-item {
-    display: block; width: 100%; text-align: left; padding: 11px 18px; border: none; background: none;
-    font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600; color: var(--dark); cursor: pointer;
-    -webkit-tap-highlight-color: transparent;
-  }
-  .menu-item small { display: block; margin-top: 2px; font-size: 9px; letter-spacing: 3px; text-transform: uppercase; font-weight: 600; color: var(--gold-deep); }
-  .menu-item:active { background: rgba(224,181,74,.18); }
-  .menu-item + .menu-item { border-top: 1px solid rgba(138,98,18,.1); }
-  .section, .cover { scroll-margin-top: 0; }
+  .menu-item { display: block; width: 100%; text-align: left; min-height: 48px; padding: 0 22px; font-size: 15px; font-weight: 600; color: var(--tx); }
+  .menu-item:active { background: var(--chip); }
+  .menu-item + .menu-item { border-top: 1px solid var(--bd); }
 
-  /* toast */
+  /* ── Aviso e balão ── */
   .toast {
-    position: fixed;
-    bottom: 24px;
-    left: 50%;
-    transform: translateX(-50%) translateY(70px);
-    background: #1f6b3a;
-    color: #e4f7ea;
-    padding: 10px 22px;
-    border-radius: 20px;
-    font-size: 11px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    transition: transform .3s ease;
-    pointer-events: none;
-    z-index: 999;
-    font-family: 'DM Sans', sans-serif;
-    white-space: nowrap;
+    position: fixed; top: calc(14px + env(safe-area-inset-top)); left: 50%; transform: translate(-50%, -16px); z-index: 999999;
+    height: 44px; padding: 0 22px; display: flex; align-items: center; background: var(--dark); color: #fff; border-radius: 999px;
+    font-weight: 600; font-size: 14px; white-space: nowrap; max-width: calc(100vw - 24px); overflow: hidden; text-overflow: ellipsis;
+    opacity: 0; pointer-events: none; transition: opacity .25s, transform .25s;
   }
-  .toast.show { transform: translateX(-50%) translateY(0); }
+  .toast.show { opacity: 1; transform: translate(-50%, 0); }
+  #tip {
+    position: fixed; z-index: 1000000; pointer-events: none; opacity: 0; transition: opacity .15s;
+    background: var(--dark); color: #fff; padding: 8px 14px; border-radius: 999px; font-weight: 600; font-size: 12.5px; white-space: nowrap;
+  }
+  #tip.show { opacity: 1; }
 
-  /* mobile */
-  @media (max-width: 480px) {
-    .section { padding: 40px 16px; }
-    .answer-area { padding: 0 14px 14px 14px; }
-    .answer-footer { padding: 0 14px 12px 14px; }
-    .list-fields { padding: 0 14px 14px 14px; }
-    .hint-panel { padding-left: 16px; }
-    .choice-row { padding-left: 16px; }
-    .question-header { padding: 14px 14px 12px; }
-    .money-field { margin-left: 0; }
+  /* ── Voltar (computador) ── */
+  #__btn-voltar {
+    position: fixed; bottom: 22px; left: 22px; z-index: 99999; display: flex; align-items: center; gap: 8px; height: 44px; padding: 0 20px 0 16px;
+    background: var(--dark); border: 1px solid var(--line-dark); color: #d6dde8; text-decoration: none; border-radius: 999px;
+    font-family: var(--f-body); font-size: 14px; font-weight: 600; transition: background .2s, color .2s;
   }
+  #__btn-voltar:hover { background: var(--gold); border-color: var(--gold); color: var(--dark); }
+  @media (max-width: 768px) { #__btn-voltar { display: none !important; } }
+
+  @media (max-width: 480px) { .section { padding-top: 40px; } }
+  @media (prefers-reduced-motion: reduce) { * { transition-duration: .01ms !important; animation-duration: .01ms !important; scroll-behavior: auto !important; } }
 </style>
 </head>
 <body>
-<button type="button" class="menu-btn" id="menuBtn" aria-label="Menu" onclick="toggleMenu()"><span></span><span></span><span></span></button>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <symbol id="i-arrow-left" viewBox="0 0 24 24"><path d="M19 12H5M11 6l-6 6 6 6"/></symbol>
+    <symbol id="i-chevron-right" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+    <symbol id="i-minus" viewBox="0 0 24 24"><path d="M5 12h14"/></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></symbol>
+    <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5.5"/><circle cx="12" cy="7.8" r="1" fill="currentColor" stroke="none"/></symbol>
+    <symbol id="i-flag" viewBox="0 0 24 24"><path d="M5 21V4M5 4h11l-2 4 2 4H5"/></symbol>
+    <symbol id="i-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1" fill="currentColor" stroke="none"/></symbol>
+    <symbol id="i-bulb" viewBox="0 0 24 24"><path d="M9.5 18h5M10.5 21h3M12 3a6 6 0 00-3.6 10.8c.6.5 1.1 1.2 1.1 2.2h5c0-1 .5-1.7 1.1-2.2A6 6 0 0012 3z"/></symbol>
+    <symbol id="i-layers" viewBox="0 0 24 24"><path d="M12 3l9 5-9 5-9-5 9-5zM3 13l9 5 9-5"/></symbol>
+    <symbol id="i-repeat" viewBox="0 0 24 24"><path d="M17 2l3 3-3 3M20 5H8a4 4 0 00-4 4v1M7 22l-3-3 3-3M4 19h12a4 4 0 004-4v-1"/></symbol>
+    <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 21s7-6.2 7-11.5A7 7 0 005 9.5C5 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+    <symbol id="i-calendar" viewBox="0 0 24 24"><path d="M5 6h14a1 1 0 011 1v12a1 1 0 01-1 1H5a1 1 0 01-1-1V7a1 1 0 011-1zM4 10h16M8 3v4M16 3v4"/></symbol>
+    <symbol id="i-text" viewBox="0 0 24 24"><path d="M5 7h14M5 12h14M5 17h9"/></symbol>
+  </defs>
+</svg>
+<div id="tip" aria-hidden="true"></div>
+<button type="button" class="menu-btn" id="menuBtn" aria-label="Menu" data-tip="Menu" onclick="toggleMenu()"><span></span><span></span><span></span></button>
 <div class="menu-overlay" id="menuOverlay" hidden onclick="fecharMenu()"></div>
 <nav class="menu-panel" id="menuPanel" hidden>
   <button type="button" class="menu-item" onclick="irPara('intro')">Introdução</button>
@@ -1094,7 +475,6 @@
 <!-- INTRODUÇÃO -->
 <!-- ══════════════════════════════════════════ -->
 <div class="section" id="intro">
-  <p class="section-tag">Introdução</p>
   <h2 class="section-title">O Ponto de Partida</h2>
 
   <div class="quote-block">
@@ -1141,12 +521,12 @@
     <p>A mente consciente é a parte do eu responsável pelos pensamentos, razão e decisões conscientes, pelas ideias, pelos pensamentos passados e futuros, e é a parte que tem o poder de mudar o que está no coração, para que assim mudemos os nossos resultados, pois eles dependem do que está dentro do coração.</p>
   </div>
 
-  <div class="concept-box" style="margin-top:10px; background:#16263d;">
+  <div class="concept-box">
     <h4>Coração — Centro de Controle</h4>
     <p>O coração é onde moram os nossos hábitos, crenças, valores, princípios, desejos bons e ruins, expectativa e condicionamento. Essa é a parte onde mora o nosso caráter, é responsável pelos resultados que temos em nossas vidas, sejam bons ou ruins, e ela também influencia o que pensamos em nossa mente consciente.</p>
   </div>
 
-  <div class="concept-box" style="margin-top:10px; background:#0b1524;">
+  <div class="concept-box">
     <h4>Corpo — O Instrumento da Mente</h4>
     <p>É a apresentação física de você. Pensamentos e imagens escolhidos conscientemente, impressos no coração, devem mover seu corpo para a ação. Ações determinam resultados.</p>
   </div>
@@ -1164,13 +544,13 @@
     <div class="question-header">
       <span class="q-number">1</span>
       <span class="q-text">Em sua posição atual, quanto dinheiro você ganha por mês?</span>
-      <button class="hint-btn" onclick="toggleHint(this)" title="Ver dica">?</button>
+      <button type="button" class="hint-btn" onclick="toggleHint(this)" aria-label="Dica" data-tip="Dica"><svg class="ic" aria-hidden="true"><use href="#i-info"/></svg></button>
     </div>
     <div class="hint-panel">
-      <strong>Como responder:</strong> Escreva um valor aproximado em reais (R$). Seja honesto — este é seu ponto de partida, não seu destino.
+      Escreva um valor aproximado em reais (R$). Seja honesto — este é seu ponto de partida, não seu destino.
     </div>
     <div class="answer-area">
-      <div class="money-field"><span>R$</span><input type="text" oninput="agendarSalvamento(this)"></div>
+      <div class="money-field"><span>R$</span><input type="text" inputmode="decimal" placeholder=" " aria-label="Valor" oninput="agendarSalvamento(this)"></div>
     </div>
   </div>
 
@@ -1178,13 +558,13 @@
     <div class="question-header">
       <span class="q-number">2</span>
       <span class="q-text">Quanto dinheiro você ganhou ao longo de toda a sua vida? (inclua heranças)</span>
-      <button class="hint-btn" onclick="toggleHint(this)" title="Ver dica">?</button>
+      <button type="button" class="hint-btn" onclick="toggleHint(this)" aria-label="Dica" data-tip="Dica"><svg class="ic" aria-hidden="true"><use href="#i-info"/></svg></button>
     </div>
     <div class="hint-panel">
-      <strong>Como responder:</strong> Faça um cálculo aproximado somando sua renda ao longo dos anos de trabalho. Não precisa ser exato — uma estimativa honesta já serve.
+      Faça um cálculo aproximado somando sua renda ao longo dos anos de trabalho. Não precisa ser exato — uma estimativa honesta já serve.
     </div>
     <div class="answer-area">
-      <div class="money-field"><span>R$</span><input type="text" oninput="agendarSalvamento(this)"></div>
+      <div class="money-field"><span>R$</span><input type="text" inputmode="decimal" placeholder=" " aria-label="Valor" oninput="agendarSalvamento(this)"></div>
     </div>
   </div>
 
@@ -1192,13 +572,13 @@
     <div class="question-header">
       <span class="q-number">3</span>
       <span class="q-text">Se você convertesse tudo o que possui em dinheiro e pagasse todas as dívidas, quanto sobraria?</span>
-      <button class="hint-btn" onclick="toggleHint(this)" title="Ver dica">?</button>
+      <button type="button" class="hint-btn" onclick="toggleHint(this)" aria-label="Dica" data-tip="Dica"><svg class="ic" aria-hidden="true"><use href="#i-info"/></svg></button>
     </div>
     <div class="hint-panel">
-      <strong>Como responder:</strong> Some o valor de seus bens e subtraia todas as dívidas. Este número revela seu patrimônio líquido real.
+      Some o valor de seus bens e subtraia todas as dívidas. Este número revela seu patrimônio líquido real.
     </div>
     <div class="answer-area">
-      <div class="money-field"><span>R$</span><input type="text" oninput="agendarSalvamento(this)"></div>
+      <div class="money-field"><span>R$</span><input type="text" inputmode="decimal" placeholder=" " aria-label="Valor" oninput="agendarSalvamento(this)"></div>
     </div>
   </div>
 
@@ -1206,13 +586,13 @@
     <div class="question-header">
       <span class="q-number">4</span>
       <span class="q-text">No seu melhor ano, quanto dinheiro você ganhou?</span>
-      <button class="hint-btn" onclick="toggleHint(this)" title="Ver dica">?</button>
+      <button type="button" class="hint-btn" onclick="toggleHint(this)" aria-label="Dica" data-tip="Dica"><svg class="ic" aria-hidden="true"><use href="#i-info"/></svg></button>
     </div>
     <div class="hint-panel">
-      <strong>Como responder:</strong> Lembre do seu ano de maior renda — pode incluir bônus, projetos extras, herança.
+      Lembre do seu ano de maior renda — pode incluir bônus, projetos extras, herança.
     </div>
     <div class="answer-area">
-      <div class="money-field"><span>R$</span><input type="text" oninput="agendarSalvamento(this)"></div>
+      <div class="money-field"><span>R$</span><input type="text" inputmode="decimal" placeholder=" " aria-label="Valor" oninput="agendarSalvamento(this)"></div>
     </div>
   </div>
 
@@ -1220,13 +600,13 @@
     <div class="question-header">
       <span class="q-number">5</span>
       <span class="q-text">Quanto você ganha atualmente por ano?</span>
-      <button class="hint-btn" onclick="toggleHint(this)" title="Ver dica">?</button>
+      <button type="button" class="hint-btn" onclick="toggleHint(this)" aria-label="Dica" data-tip="Dica"><svg class="ic" aria-hidden="true"><use href="#i-info"/></svg></button>
     </div>
     <div class="hint-panel">
-      <strong>Como responder:</strong> Escreva sua renda anual atual.
+      Escreva sua renda anual atual.
     </div>
     <div class="answer-area">
-      <div class="money-field"><span>R$</span><input type="text" oninput="agendarSalvamento(this)"></div>
+      <div class="money-field"><span>R$</span><input type="text" inputmode="decimal" placeholder=" " aria-label="Valor" oninput="agendarSalvamento(this)"></div>
     </div>
   </div>
 
@@ -1234,17 +614,16 @@
     <div class="question-header">
       <span class="q-number">6</span>
       <span class="q-text">O que a falta de dinheiro tem causado em sua vida durante todos esses anos?</span>
-      <button class="hint-btn" onclick="toggleHint(this)" title="Ver dica">?</button>
+      <button type="button" class="hint-btn" onclick="toggleHint(this)" aria-label="Dica" data-tip="Dica"><svg class="ic" aria-hidden="true"><use href="#i-info"/></svg></button>
     </div>
     <div class="hint-panel">
-      <strong>Como responder:</strong> Seja completamente honesto. Descreva como a falta de dinheiro se manifesta no seu dia a dia.
+      Seja completamente honesto. Descreva como a falta de dinheiro se manifesta no seu dia a dia.
     </div>
     <div class="answer-area">
-      <textarea class="auto-grow" rows="1" oninput="updateChar(this);agendarSalvamento(this)"></textarea>
+      <label class="fld area"><svg class="ic" aria-hidden="true"><use href="#i-text"/></svg><textarea class="auto-grow" rows="1" aria-label="Resposta" oninput="updateChar(this);agendarSalvamento(this)"></textarea></label>
     </div>
     <div class="answer-footer">
-      <span class="char-count"></span>
-      <button class="save-btn" onclick="saveAnswer(this)"><span class="label">Salvar</span><span class="check">✓ Salvo</span></button>
+      <button class="save-btn" onclick="saveAnswer(this)"><span class="label">Salva</span><span class="check"><svg class="ic" aria-hidden="true"><use href="#i-check"/></svg>Salvo</span></button>
     </div>
   </div>
 
@@ -1252,16 +631,16 @@
     <div class="question-header">
       <span class="q-number">7</span>
       <span class="q-text">Descreva os tipos de pensamentos sobre dinheiro com os quais você quer que sua mente seja condicionada.</span>
-      <button class="hint-btn" onclick="toggleHint(this)" title="Ver dica">?</button>
+      <button type="button" class="hint-btn" onclick="toggleHint(this)" aria-label="Dica" data-tip="Dica"><svg class="ic" aria-hidden="true"><use href="#i-info"/></svg></button>
     </div>
     <div class="hint-panel">
-      <strong>Como responder:</strong> Escreva no presente, como se já fosse verdade. Ex: "Dinheiro vem para mim facilmente."
+      Escreva no presente, como se já fosse verdade. Ex: "Dinheiro vem para mim facilmente."
     </div>
     <div class="list-fields">
       <div class="list-field-row multi"><span class="list-num">1</span><textarea class="list-ta" rows="1" oninput="autoGrow(this);agendarSalvamento(this)"></textarea></div>
       <div class="list-field-row multi"><span class="list-num">2</span><textarea class="list-ta" rows="1" oninput="autoGrow(this);agendarSalvamento(this)"></textarea></div>
       <div class="list-field-row multi"><span class="list-num">3</span><textarea class="list-ta" rows="1" oninput="autoGrow(this);agendarSalvamento(this)"></textarea></div>
-      <button type="button" class="add-row-btn" onclick="addRow(this)">+ Adicionar</button>
+      <button type="button" class="add-row-btn" onclick="addRow(this)"><svg class="ic" aria-hidden="true"><use href="#i-plus"/></svg>Adiciona</button>
     </div>
   </div>
 </div>
@@ -1279,29 +658,24 @@
 
   <p class="section-text">Para ativar o conceito de prosperidade, você deve ser específico. O subconsciente não pensa — ele apenas aceita imagens e as move para a forma.</p>
 
-  <div class="concept-box">
-    <h4>As Duas Formas de Ganhar Dinheiro</h4>
-    <p>1. <strong>Pessoas trabalhando</strong> — troca de tempo por dinheiro<br>2. <strong>Dinheiro trabalhando</strong> — investimentos, ativos, sistemas</p>
-  </div>
-
   <div class="question-card" data-qid="q_suficiente">
     <div class="question-header">
       <span class="q-number">1</span>
       <span class="q-text">Qual é o valor exato que você precisa para viver da forma que deseja?</span>
-      <button class="hint-btn" onclick="toggleHint(this)" title="Ver dica">?</button>
+      <button type="button" class="hint-btn" onclick="toggleHint(this)" aria-label="Dica" data-tip="Dica"><svg class="ic" aria-hidden="true"><use href="#i-info"/></svg></button>
     </div>
     <div class="hint-panel">
-      <strong>Como responder:</strong> Calcule quanto custaria sua vida ideal por mês. Multiplique por 12. Seja específico e corajoso.
+      Calcule quanto custaria sua vida ideal por mês. Multiplique por 12. Seja específico e corajoso.
     </div>
     <div class="answer-area">
-      <div class="money-field"><span>R$</span><input type="text" oninput="agendarSalvamento(this)"></div>
+      <div class="money-field"><span>R$</span><input type="text" inputmode="decimal" placeholder=" " aria-label="Valor" oninput="agendarSalvamento(this)"></div>
     </div>
   </div>
 
   <div class="commitment-block" data-qid="q_planejador">
     <h4>Meu Compromisso Financeiro</h4>
     <p>Terei uma consulta com um planejador financeiro competente até:</p>
-    <input type="text" oninput="fitWidth(this);agendarSalvamento(this)">
+    <label class="fld dark"><svg class="ic" aria-hidden="true"><use href="#i-calendar"/></svg><input type="text" aria-label="Data" oninput="fitWidth(this);agendarSalvamento(this)"></label>
   </div>
 </div>
 
@@ -1322,10 +696,10 @@
     <div class="question-header">
       <span class="q-number">1</span>
       <span class="q-text">Você está satisfeito com os resultados que experimenta na sua vida atualmente?</span>
-      <button class="hint-btn" onclick="toggleHint(this)" title="Ver dica">?</button>
+      <button type="button" class="hint-btn" onclick="toggleHint(this)" aria-label="Dica" data-tip="Dica"><svg class="ic" aria-hidden="true"><use href="#i-info"/></svg></button>
     </div>
     <div class="hint-panel">
-      <strong>Como responder:</strong> Os resultados de hoje são a manifestação física das imagens que seu subconsciente sustentou no passado.
+      Os resultados de hoje são a manifestação física das imagens que seu subconsciente sustentou no passado.
     </div>
     <div class="choice-row">
       <label class="choice-label" onclick="selectChoice(this, 'qimg2')"><input type="radio" name="qimg2">Sim, estou satisfeito</label>
@@ -1338,16 +712,16 @@
     <div class="question-header">
       <span class="q-number">2</span>
       <span class="q-text">Liste os resultados que você quer mudar na sua vida:</span>
-      <button class="hint-btn" onclick="toggleHint(this)" title="Ver dica">?</button>
+      <button type="button" class="hint-btn" onclick="toggleHint(this)" aria-label="Dica" data-tip="Dica"><svg class="ic" aria-hidden="true"><use href="#i-info"/></svg></button>
     </div>
     <div class="hint-panel">
-      <strong>Como responder:</strong> Pense em todas as áreas: financeira, relacionamentos, saúde, carreira, liberdade. Seja específico.
+      Pense em todas as áreas: financeira, relacionamentos, saúde, carreira, liberdade. Seja específico.
     </div>
     <div class="list-fields">
       <div class="list-field-row multi"><span class="list-num">1</span><textarea class="list-ta" rows="1" oninput="autoGrow(this);agendarSalvamento(this)"></textarea></div>
       <div class="list-field-row multi"><span class="list-num">2</span><textarea class="list-ta" rows="1" oninput="autoGrow(this);agendarSalvamento(this)"></textarea></div>
       <div class="list-field-row multi"><span class="list-num">3</span><textarea class="list-ta" rows="1" oninput="autoGrow(this);agendarSalvamento(this)"></textarea></div>
-      <button type="button" class="add-row-btn" onclick="addRow(this)">+ Adicionar</button>
+      <button type="button" class="add-row-btn" onclick="addRow(this)"><svg class="ic" aria-hidden="true"><use href="#i-plus"/></svg>Adiciona</button>
     </div>
   </div>
 
@@ -1355,17 +729,16 @@
     <div class="question-header">
       <span class="q-number">3</span>
       <span class="q-text">Faça uma descrição escrita da pessoa que você está prestes a se tornar:</span>
-      <button class="hint-btn" onclick="toggleHint(this)" title="Ver dica">?</button>
+      <button type="button" class="hint-btn" onclick="toggleHint(this)" aria-label="Dica" data-tip="Dica"><svg class="ic" aria-hidden="true"><use href="#i-info"/></svg></button>
     </div>
     <div class="hint-panel">
-      <strong>Como responder:</strong> Escreva no presente, como se já fosse verdade. "Eu sou uma pessoa que..." Seja corajoso e detalhado.
+      Escreva no presente, como se já fosse verdade. "Eu sou uma pessoa que..." Seja corajoso e detalhado.
     </div>
     <div class="answer-area">
-      <textarea class="auto-grow" rows="1" oninput="updateChar(this);agendarSalvamento(this)"></textarea>
+      <label class="fld area"><svg class="ic" aria-hidden="true"><use href="#i-text"/></svg><textarea class="auto-grow" rows="1" aria-label="Resposta" oninput="updateChar(this);agendarSalvamento(this)"></textarea></label>
     </div>
     <div class="answer-footer">
-      <span class="char-count"></span>
-      <button class="save-btn" onclick="saveAnswer(this)"><span class="label">Salvar</span><span class="check">✓ Salvo</span></button>
+      <button class="save-btn" onclick="saveAnswer(this)"><span class="label">Salva</span><span class="check"><svg class="ic" aria-hidden="true"><use href="#i-check"/></svg>Salvo</span></button>
     </div>
   </div>
 </div>
@@ -1380,16 +753,16 @@
 
   <div class="steps-box">
     <div class="step-item">
-      <span class="step-num">✦</span>
-      <span class="step-text">CONSTRUA A IMAGEM — Relaxe e se veja já em posse do bem que deseja</span>
+      <span class="step-num">1</span>
+      <span class="step-text"><strong>Construa a imagem</strong> — Relaxe e se veja já em posse do bem que deseja</span>
     </div>
     <div class="step-item">
-      <span class="step-num">✦</span>
-      <span class="step-text">DEIXE IR E DEIXE DEUS — Entregue ao poder universal</span>
+      <span class="step-num">2</span>
+      <span class="step-text"><strong>Deixe ir e deixe Deus</strong> — Entregue ao poder universal</span>
     </div>
     <div class="step-item">
-      <span class="step-num">✦</span>
-      <span class="step-text">ESPERE com todo o coração e alma que o Espírito o recompensará abertamente por sua fé</span>
+      <span class="step-num">3</span>
+      <span class="step-text"><strong>Espere</strong> com todo o coração e alma que o Espírito o recompensará abertamente por sua fé</span>
     </div>
   </div>
 
@@ -1397,10 +770,10 @@
     <div class="question-header">
       <span class="q-number">1</span>
       <span class="q-text">Visualize os seus objetivos com o máximo de detalhes possíveis</span>
-      <button class="hint-btn" onclick="toggleHint(this)" title="Ver dica">?</button>
+      <button type="button" class="hint-btn" onclick="toggleHint(this)" aria-label="Dica" data-tip="Dica"><svg class="ic" aria-hidden="true"><use href="#i-info"/></svg></button>
     </div>
     <div class="hint-panel">
-      <strong>Como fazer:</strong> Feche os olhos por 2 minutos e respire fundo. Imagine-se já tendo o que deseja, no presente e com emoção, como se já fosse realidade. Veja, ouça e sinta cada detalhe.
+      Feche os olhos por 2 minutos e respire fundo. Imagine-se já tendo o que deseja, no presente e com emoção, como se já fosse realidade. Veja, ouça e sinta cada detalhe.
     </div>
   </div>
 
@@ -1408,17 +781,16 @@
     <div class="question-header">
       <span class="q-number">2</span>
       <span class="q-text">Agora escreva o que você visualizou com o máximo de detalhes que conseguir lembrar.</span>
-      <button class="hint-btn" onclick="toggleHint(this)" title="Ver dica">?</button>
+      <button type="button" class="hint-btn" onclick="toggleHint(this)" aria-label="Dica" data-tip="Dica"><svg class="ic" aria-hidden="true"><use href="#i-info"/></svg></button>
     </div>
     <div class="hint-panel">
-      <strong>Como responder:</strong> Logo depois de visualizar, escreva tudo o que você viu e sentiu, com todos os detalhes de que se lembrar.
+      Logo depois de visualizar, escreva tudo o que você viu e sentiu, com todos os detalhes de que se lembrar.
     </div>
     <div class="answer-area">
-      <textarea class="auto-grow" rows="1" oninput="updateChar(this);agendarSalvamento(this)"></textarea>
+      <label class="fld area"><svg class="ic" aria-hidden="true"><use href="#i-text"/></svg><textarea class="auto-grow" rows="1" aria-label="Resposta" oninput="updateChar(this);agendarSalvamento(this)"></textarea></label>
     </div>
     <div class="answer-footer">
-      <span class="char-count"></span>
-      <button class="save-btn" onclick="saveAnswer(this)"><span class="label">Salvar</span><span class="check">✓ Salvo</span></button>
+      <button class="save-btn" onclick="saveAnswer(this)"><span class="label">Salva</span><span class="check"><svg class="ic" aria-hidden="true"><use href="#i-check"/></svg>Salvo</span></button>
     </div>
   </div>
 </div>
@@ -1435,18 +807,18 @@
     <h4>O Ciclo Vencedor</h4>
     <div class="cycle-chain">
       <span class="cycle-item">Pensamentos Prósperos</span>
-      <span class="cycle-arrow">→</span>
+      <span class="cycle-arrow"><svg class="ic" aria-hidden="true"><use href="#i-chevron-right"/></svg></span>
       <span class="cycle-item">Envolvimento Emocional</span>
-      <span class="cycle-arrow">→</span>
+      <span class="cycle-arrow"><svg class="ic" aria-hidden="true"><use href="#i-chevron-right"/></svg></span>
       <span class="cycle-item">Vibração Próspera</span>
-      <span class="cycle-arrow">→</span>
+      <span class="cycle-arrow"><svg class="ic" aria-hidden="true"><use href="#i-chevron-right"/></svg></span>
       <span class="cycle-item">Ações</span>
-      <span class="cycle-arrow">→</span>
+      <span class="cycle-arrow"><svg class="ic" aria-hidden="true"><use href="#i-chevron-right"/></svg></span>
       <span class="cycle-item">Novos Resultados</span>
     </div>
   </div>
 
-  <div class="concept-box" style="margin-top:18px;">
+  <div class="concept-box">
     <h4>A Lei da Transmutação Perpétua de Energia</h4>
     <p>Quando uma pessoa irradia uma vibração positiva, essa pessoa deve, pela Lei, RECEBER uma quantidade igual ao que irradiou. "Como plantares, assim colherás."</p>
   </div>
@@ -1459,12 +831,11 @@
   <h2 class="section-title">Os Tomadores de Risco</h2>
 
   <div class="como-funciona">
-    <p class="cf-tag">Como funciona</p>
     <p class="cf-intro">Cada objetivo é montado em três partes: <strong>o que você quer</strong>, <strong>por que quer</strong> e <strong>o que vai fazer</strong>. Quanto mais claro cada passo, mais rápido o objetivo deixa de ser sonho e vira <strong>plano</strong>.</p>
     <div class="cf-step"><span class="cf-n">1</span><p><strong>Objetivo.</strong> Escreva o resultado que você quer alcançar, de forma específica e como se já fosse seu.</p></div>
     <div class="cf-step"><span class="cf-n">2</span><p><strong>Por quê.</strong> O motivo é a sua força. Escreva o que você ganha e sente ao conquistar. É ele que sustenta você quando der vontade de desistir.</p></div>
     <div class="cf-step"><span class="cf-n">3</span><p><strong>Ações.</strong> Liste os passos concretos que você vai dar, começando pelo que pode fazer ainda esta semana.</p></div>
-    <div class="cf-fim"><button type="button" class="add-meta-btn" onclick="addMeta()"><span class="plus">+</span>Adicionar objetivo</button></div>
+    <div class="cf-fim"><button type="button" class="btn-main" onclick="addMeta()"><span class="plus"><svg class="ic" aria-hidden="true"><use href="#i-plus"/></svg></span>Novo objetivo</button></div>
   </div>
 
   <div id="metas" class="metas">
@@ -1473,18 +844,18 @@
 
   <div class="question-card dynamic-list" data-qid="q_riscos">
     <div class="question-header">
-      <span class="q-number">✦</span>
+      <span class="q-number"><svg class="ic" aria-hidden="true"><use href="#i-flag"/></svg></span>
       <span class="q-text">Liste os riscos que você deve assumir para tornar seu sonho realidade:</span>
-      <button class="hint-btn" onclick="toggleHint(this)" title="Ver dica">?</button>
+      <button type="button" class="hint-btn" onclick="toggleHint(this)" aria-label="Dica" data-tip="Dica"><svg class="ic" aria-hidden="true"><use href="#i-info"/></svg></button>
     </div>
     <div class="hint-panel">
-      <strong>Como responder:</strong> Liste as coisas específicas que você tem evitado: investir dinheiro, iniciar um negócio, mudar de carreira, aprender nova habilidade.
+      Liste as coisas específicas que você tem evitado: investir dinheiro, iniciar um negócio, mudar de carreira, aprender nova habilidade.
     </div>
     <div class="list-fields">
       <div class="list-field-row multi"><span class="list-num">1</span><textarea class="list-ta" rows="1" oninput="autoGrow(this);agendarSalvamento(this)"></textarea></div>
       <div class="list-field-row multi"><span class="list-num">2</span><textarea class="list-ta" rows="1" oninput="autoGrow(this);agendarSalvamento(this)"></textarea></div>
       <div class="list-field-row multi"><span class="list-num">3</span><textarea class="list-ta" rows="1" oninput="autoGrow(this);agendarSalvamento(this)"></textarea></div>
-      <button type="button" class="add-row-btn" onclick="addRow(this)">+ Adicionar</button>
+      <button type="button" class="add-row-btn" onclick="addRow(this)"><svg class="ic" aria-hidden="true"><use href="#i-plus"/></svg>Adiciona</button>
     </div>
   </div>
 </div>
@@ -1501,12 +872,11 @@
   </div>
 
   <div class="como-funciona">
-    <p class="cf-tag">Como funciona</p>
     <p class="cf-intro">Escolha uma <strong>área da sua vida</strong> e troque, nela, o que te limita pelo que te expande. Faça isso uma área de cada vez.</p>
     <div class="cf-step"><span class="cf-n">1</span><p><strong>Área.</strong> Escreva o nome da área que você quer trabalhar, como financeira, familiar ou saúde.</p></div>
     <div class="cf-step"><span class="cf-n">2</span><p><strong>Crenças limitantes.</strong> Liste o que você acredita hoje e que trava essa área. Identificar a crença é o primeiro passo para soltá-la.</p></div>
     <div class="cf-step"><span class="cf-n">3</span><p><strong>Novas crenças.</strong> Para cada crença limitante, escreva a crença nova que vai ocupar o lugar dela.</p></div>
-    <div class="cf-fim"><button type="button" class="add-meta-btn" onclick="addArea()"><span class="plus">+</span>Adicionar área</button></div>
+    <div class="cf-fim"><button type="button" class="btn-main" onclick="addArea()"><span class="plus"><svg class="ic" aria-hidden="true"><use href="#i-plus"/></svg></span>Nova área</button></div>
   </div>
 
   <div id="areas" class="metas">
@@ -1521,13 +891,12 @@
   <h2 class="section-title">Criação de Hábitos</h2>
 
   <div class="como-funciona">
-    <p class="cf-tag">Como funciona</p>
     <p class="cf-intro">Um hábito forte começa <strong>claro</strong>: o que você vai fazer, onde e a que horas. Depois, o que conta é a <strong>constância</strong>.</p>
     <div class="cf-step"><span class="cf-n">1</span><p><strong>Hábito.</strong> Escreva uma ação pequena e específica, que você consiga repetir todos os dias.</p></div>
     <div class="cf-step"><span class="cf-n">2</span><p><strong>Local e horário.</strong> Defina onde vai fazer e em qual intervalo de horas, por exemplo das 15:40 às 16:40.</p></div>
-    <div class="cf-step"><span class="cf-n">3</span><p><strong>Duração e check.</strong> Defina quantos minutos por dia. Toque em <strong>Iniciar hábito</strong> para cronometrar: ao terminar, o alarme toca. Com o app <strong>ntfy</strong>, o aviso chega no celular mesmo com a tela bloqueada. Depois, <strong>você</strong> marca se <strong>fez</strong> ou <strong>não fez</strong> o dia. Cada marca vira um número: verde se fez, vermelho se não fez.</p></div>
+    <div class="cf-step"><span class="cf-n">3</span><p><strong>Duração e check.</strong> Defina quantos minutos por dia. Toque em <strong>Inicia</strong> para cronometrar: ao terminar, o alarme toca. Com o app <strong>ntfy</strong>, o aviso chega no celular mesmo com a tela bloqueada. Depois, <strong>você</strong> marca se <strong>fez</strong> ou <strong>não fez</strong> o dia. Cada marca vira um número: dourado se fez, cinza se não fez.</p></div>
     <div class="cf-step"><span class="cf-n">4</span><p><strong>Regra dos dois dias.</strong> Um dia sem cumprir não quebra nada. Marcar <strong>dois dias seguidos</strong> como não feitos reinicia a sequência.</p></div>
-    <div class="cf-fim"><button type="button" class="add-meta-btn" onclick="addHabito()"><span class="plus">+</span>Adicionar hábito</button></div>
+    <div class="cf-fim"><button type="button" class="btn-main" onclick="addHabito()"><span class="plus"><svg class="ic" aria-hidden="true"><use href="#i-plus"/></svg></span>Novo hábito</button></div>
   </div>
 
   <div id="habitos-box" class="metas">
@@ -1539,20 +908,16 @@
 <!-- AFIRMAÇÃO FINAL -->
 <!-- ══════════════════════════════════════════ -->
 <div class="section">
-  <div style="text-align:center; padding: 36px 0 20px;">
-    <div style="font-family:'Cormorant Garamond',serif; font-size:2.2rem; color:var(--gold-deep); margin-bottom:10px; font-weight:700; letter-spacing:2px;">I AM PROSPEROUS</div>
-    <div style="font-size:9px; letter-spacing:5px; font-weight:600; text-transform:uppercase; color:var(--muted); font-family:'DM Sans',sans-serif;">I Was Born Rich</div>
-  </div>
+  <div class="final">I AM PROSPEROUS</div>
 </div>
 
 <!-- FOOTER -->
 <footer>
-  <span>Born Rich</span> — Proctor Gallagher Institute<br>
-  <span style="color:#7d8aa0; font-size:9px; letter-spacing:1px; margin-top:6px; display:block;">Material de estudo pessoal · Todas as respostas são suas</span>
+  <span>Born Rich</span> — Proctor Gallagher Institute
 </footer>
 
 <!-- TOAST -->
-<div class="toast" id="toast">✓ Resposta salva</div>
+<div class="toast" id="toast" role="status" aria-live="polite">Resposta salva</div>
 
 <!-- ══════════════════════════════════════════ -->
 <!-- FIREBASE + LÓGICA DE SALVAMENTO          -->
@@ -1604,9 +969,9 @@ var lixeiraRico = (function(){ try{return JSON.parse(localStorage.getItem('rico_
 // ─── Toast ───────────────────────────────────────────────────────────────────
 window.showToast = function(msg, cor) {
   var t = document.getElementById('toast');
-  t.textContent = msg || '✓ Resposta salva';
-  t.style.background = cor || '#1f6b3a';
-  t.style.color = cor ? '#fff' : '#e4f7ea';
+  t.textContent = msg || 'Resposta salva';
+  t.style.background = cor || '';
+  t.style.color = '';
   t.classList.add('show');
   setTimeout(function() { t.classList.remove('show'); }, 2200);
 };
@@ -1728,7 +1093,7 @@ window.agendarSalvamento = function(el) {
   clearTimeout(_saveTimer);
   _saveTimer = setTimeout(function() {
     salvarNoFirebase().then(function() {
-      showToast('✓ Salvo automaticamente');
+      showToast('Salvo automaticamente');
     });
   }, 1500);
 };
@@ -1737,7 +1102,7 @@ window.agendarSalvamento = function(el) {
 window.saveAnswer = function(btn) {
   btn.classList.add('saved');
   salvarNoFirebase().then(function() {
-    showToast('✓ Resposta salva');
+    showToast('Resposta salva');
     setTimeout(function() { btn.classList.remove('saved'); }, 3000);
   });
 };
@@ -1784,7 +1149,7 @@ carregarDados();
 window.addEventListener('online', function() {
   var dados = coletarDados();
   if (Object.keys(dados).length) {
-    salvarNoFirebase().then(function() { showToast('✓ Sincronizado com a nuvem'); });
+    salvarNoFirebase().then(function() { showToast('Sincronizado'); });
   }
 });
 </script>
@@ -1808,6 +1173,7 @@ window.saveAnswer = window.saveAnswer || function(){};
 
 <!-- ─── Funções UI (não-module) ──────────────────────────────────────────── -->
 <script>
+  function ic(n, c) { return '<svg class="ic' + (c ? ' ' + c : '') + '" aria-hidden="true"><use href="#i-' + n + '"/></svg>'; }
   var LINHAS = '.list-field-row, .two-col-row';
   var CAIXA = '.list-fields, .two-col-fields';
   var TA_HTML = '<textarea class="list-ta" rows="1" oninput="autoGrow(this);agendarSalvamento(this)"></textarea>';
@@ -1877,15 +1243,15 @@ window.saveAnswer = window.saveAnswer || function(){};
     for (var i = 1; i <= 3; i++) {
       linhas += '<div class="list-field-row multi"><span class="list-num">' + i + '</span>' + TA_HTML + '</div>';
     }
-    var campo = function(rotulo, cls) {
-      return '<div class="meta-field"><label class="meta-label">' + rotulo + '</label>' +
-        '<textarea class="meta-ta ' + cls + '" rows="1" oninput="autoGrow(this);agendarSalvamento(this)"></textarea></div>';
+    var campo = function(icone, rotulo, cls) {
+      return '<div class="meta-field"><label class="fld">' + ic(icone) +
+        '<textarea class="meta-ta ' + cls + '" rows="1" placeholder="' + rotulo + '" aria-label="' + rotulo + '" oninput="autoGrow(this);agendarSalvamento(this)"></textarea></label></div>';
     };
     return '<div class="meta-head"><span class="meta-badge">' + n + '</span></div>' +
-      campo('Objetivo', 'meta-obj') +
-      campo('Por quê', 'meta-why') +
-      '<div class="meta-field"><label class="meta-label">Ações</label><div class="list-fields">' + linhas +
-      '<button type="button" class="add-row-btn" onclick="addRow(this)">+ Adicionar</button></div></div>';
+      campo('target', 'Objetivo', 'meta-obj') +
+      campo('bulb', 'Por quê', 'meta-why') +
+      '<div class="meta-field"><span class="chip">Ações</span><div class="list-fields">' + linhas +
+      '<button type="button" class="add-row-btn" onclick="addRow(this)">' + ic('plus') + 'Adiciona</button></div></div>';
   }
 
   function addMeta(semFoco, apos) {
@@ -1977,14 +1343,13 @@ window.saveAnswer = window.saveAnswer || function(){};
       return r;
     };
     var lista = function(rotulo) {
-      return '<div class="meta-field"><label class="meta-label">' + rotulo + '</label><div class="list-fields">' + linhas() +
-        '<button type="button" class="add-row-btn" onclick="addRow(this)">+ Adicionar</button></div></div>';
+      return '<div class="meta-field"><span class="chip">' + rotulo + '</span><div class="list-fields">' + linhas() +
+        '<button type="button" class="add-row-btn" onclick="addRow(this)">' + ic('plus') + 'Adiciona</button></div></div>';
     };
     var ev = 'oninput="autoGrow(this);agendarSalvamento(this)"';
-    var real = '<textarea class="meta-ta area-nome" rows="1" ' + ev + '></textarea>';
-    var campo = real;
+    var campo = '<label class="fld">' + ic('layers') + '<textarea class="meta-ta area-nome" rows="1" placeholder="Área" aria-label="Área" ' + ev + '></textarea></label>';
     return '<div class="meta-head"><span class="meta-badge">' + n + '</span></div>' +
-      '<div class="meta-field"><label class="meta-label">Área</label>' + campo + '</div>' +
+      '<div class="meta-field">' + campo + '</div>' +
       lista('Crenças limitantes') + lista('Novas crenças');
   }
 
@@ -2081,32 +1446,33 @@ window.saveAnswer = window.saveAnswer || function(){};
 
   function habitoHTML(n) {
     var ev = 'oninput="autoGrow(this);agendarSalvamento(this)"';
-    var campo = function(rot, cls) {
-      return '<div class="meta-field"><label class="meta-label">' + rot + '</label><textarea class="meta-ta ' + cls + '" rows="1" ' + ev + '></textarea></div>';
+    var campo = function(icone, rot, cls) {
+      return '<div class="meta-field"><label class="fld">' + ic(icone) + '<textarea class="meta-ta ' + cls + '" rows="1" placeholder="' + rot + '" aria-label="' + rot + '" ' + ev + '></textarea></label></div>';
     };
     return '<div class="meta-head"><span class="meta-badge">' + n + '</span>' +
       '<button type="button" class="hab-info" onclick="toggleHabTrilha(this)">Dias seguidos</button></div>' +
-      campo('Hábito', 'hab-nome') + campo('Local', 'hab-local') +
-      '<div class="meta-field"><label class="meta-label">Horário</label><div class="hab-horario">' +
-        '<span>Das</span><input type="time" class="hab-time hab-de" oninput="agendarSalvamento(this)" onchange="agendarSalvamento(this)">' +
-        '<span>às</span><input type="time" class="hab-time hab-ate" oninput="agendarSalvamento(this)" onchange="agendarSalvamento(this)">' +
+      campo('repeat', 'Hábito', 'hab-nome') + campo('pin', 'Local', 'hab-local') +
+      '<div class="meta-field"><div class="hab-horario">' + ic('clock') +
+        '<label class="fld"><input type="time" class="hab-time hab-de" aria-label="Início" oninput="agendarSalvamento(this)" onchange="agendarSalvamento(this)"></label>' +
+        '<span>às</span>' +
+        '<label class="fld"><input type="time" class="hab-time hab-ate" aria-label="Fim" oninput="agendarSalvamento(this)" onchange="agendarSalvamento(this)"></label>' +
       '</div></div>' +
-      '<div class="meta-field"><label class="meta-label">Duração</label><div class="hab-dur">' +
-        '<button type="button" class="hab-mm" onclick="ajustarDur(this, -1)" aria-label="Diminuir">−</button>' +
-        '<input type="number" class="hab-min" inputmode="numeric" min="1" max="600" value="2" oninput="atualizarDur(this.closest(\'.habito-block\'));agendarSalvamento(this)">' +
-        '<button type="button" class="hab-mm" onclick="ajustarDur(this, 1)" aria-label="Aumentar">+</button>' +
-        '<span>min por dia</span></div></div>' +
+      '<div class="meta-field"><div class="hab-dur">' +
+        '<button type="button" class="hab-mm" onclick="ajustarDur(this, -1)" aria-label="Menos" data-tip="Menos">' + ic('minus') + '</button>' +
+        '<input type="number" class="hab-min" inputmode="numeric" min="1" max="600" value="2" aria-label="Minutos" oninput="atualizarDur(this.closest(\'.habito-block\'));agendarSalvamento(this)">' +
+        '<button type="button" class="hab-mm" onclick="ajustarDur(this, 1)" aria-label="Mais" data-tip="Mais">' + ic('plus') + '</button>' +
+        '</div></div>' +
       '<div class="hab-progresso">' +
         '<div class="hab-stats"><div class="hab-stat"><b class="hab-seq">0</b><small>Sequência</small></div>' +
         '<div class="hab-stat"><b class="hab-total">0</b><small>Total de vezes</small></div></div>' +
-        '<button type="button" class="hab-start" onclick="iniciarHabito(this.closest(\'.habito-block\'))">Iniciar hábito</button>' +
+        '<button type="button" class="hab-start" onclick="iniciarHabito(this.closest(\'.habito-block\'))">Inicia</button>' +
         '<div class="hab-run" hidden><div class="hab-tempo">00:00</div><div class="hab-barra"><i></i></div>' +
           '<p class="hab-ntfy" hidden></p>' +
           '<p class="hab-vibaviso" hidden>O navegador bloqueou a vibração neste aparelho.</p>' +
-          '<button type="button" class="hab-cancel" onclick="pararHabito(this.closest(\'.habito-block\'))">Cancelar</button></div>' +
+          '<button type="button" class="hab-cancel" onclick="pararHabito(this.closest(\'.habito-block\'))">Cancela</button></div>' +
         '<div class="hab-acoes">' +
           '<button type="button" class="hab-fiz" onclick="marcarHabito(this.closest(\'.habito-block\'), \'f\')">Fiz</button>' +
-          '<button type="button" class="hab-nao" onclick="marcarHabito(this.closest(\'.habito-block\'), \'n\')">Não fiz</button></div>' +
+          '<button type="button" class="hab-nao" aria-label="Não fiz" onclick="marcarHabito(this.closest(\'.habito-block\'), \'n\')">Não</button></div>' +
         '<p class="hab-aviso" hidden>Você marcou dois dias seguidos sem cumprir. A sequência recomeçou.</p>' +
         '<div class="hab-trilha" hidden></div>' +
       '</div>';
@@ -2117,7 +1483,7 @@ window.saveAnswer = window.saveAnswer || function(){};
     return (v >= 1 && v <= 600) ? v : 0;
   }
   function atualizarDur(b) {
-    b.querySelector('.hab-start').textContent = 'Iniciar hábito';
+    b.querySelector('.hab-start').textContent = 'Inicia';
   }
   function ajustarDur(btn, dir) {
     var b = btn.closest('.habito-block'), inp = b.querySelector('.hab-min');
@@ -2288,7 +1654,7 @@ window.saveAnswer = window.saveAnswer || function(){};
     var run = b.querySelector('.hab-run'), tempo = run.querySelector('.hab-tempo'), barra = run.querySelector('.hab-barra i');
     b.querySelector('.hab-start').hidden = true;
     run.hidden = false;
-    run.querySelector('.hab-cancel').textContent = 'Cancelar';
+    run.querySelector('.hab-cancel').textContent = 'Cancela';
     run.querySelector('.hab-vibaviso').hidden = true;
     tempo.textContent = fmtTempo(total);
     barra.style.width = '0%';
@@ -2441,7 +1807,7 @@ window.saveAnswer = window.saveAnswer || function(){};
     var isOpen = panel.classList.contains('open');
     panel.classList.toggle('open', !isOpen);
     btn.classList.toggle('active', !isOpen);
-    btn.textContent = isOpen ? '?' : '✕';
+    btn.innerHTML = isOpen ? ic('info') : ic('x');
   }
 
   function selectChoice(label, name) {
@@ -2478,7 +1844,6 @@ window.saveAnswer = window.saveAnswer || function(){};
   }
 
   function autoGrow(el) {
-    if (el.matches && el.matches('textarea.auto-grow, textarea.meta-ta')) fitWidth(el);
     el.style.height = 'auto';
     var borda = el.offsetHeight - el.clientHeight;
     el.style.height = (el.scrollHeight + borda) + 'px';
@@ -2495,7 +1860,44 @@ window.saveAnswer = window.saveAnswer || function(){};
   window.addEventListener('resize', function() {
     document.querySelectorAll('textarea.auto-grow, textarea.meta-ta, textarea.list-ta').forEach(autoGrow);
   });
+
+  /* balão de informação: aparece só ao segurar o elemento */
+  (function() {
+    var tip = document.getElementById('tip');
+    var timer = null, hideTimer = null, suppress = false;
+    function show(el) {
+      tip.textContent = el.getAttribute('data-tip');
+      tip.classList.add('show');
+      var r = el.getBoundingClientRect();
+      var w = tip.offsetWidth, h = tip.offsetHeight;
+      var x = Math.min(Math.max(12, r.left + r.width / 2 - w / 2), window.innerWidth - w - 12);
+      var y = r.top - h - 10;
+      if (y < 12) y = r.bottom + 10;
+      tip.style.left = x + 'px';
+      tip.style.top = y + 'px';
+      suppress = true;
+      clearTimeout(hideTimer);
+      hideTimer = setTimeout(hide, 1600);
+    }
+    function hide() { tip.classList.remove('show'); setTimeout(function() { suppress = false; }, 350); }
+    function start(e) {
+      var el = e.target.closest && e.target.closest('[data-tip]');
+      if (!el) return;
+      clearTimeout(timer);
+      timer = setTimeout(function() { show(el); }, 450);
+    }
+    function cancel() { clearTimeout(timer); }
+    document.addEventListener('touchstart', start, { passive: true });
+    document.addEventListener('touchmove', cancel, { passive: true });
+    document.addEventListener('touchend', cancel, { passive: true });
+    document.addEventListener('touchcancel', cancel, { passive: true });
+    document.addEventListener('mousedown', start);
+    document.addEventListener('mouseup', cancel);
+    document.addEventListener('click', function(e) {
+      if (suppress && e.target.closest && e.target.closest('[data-tip]')) { e.stopPropagation(); e.preventDefault(); suppress = false; }
+    }, true);
+  })();
 </script>
-<!-- VOLTAR DESKTOP --><style>@media(max-width:768px){#__btn-voltar{display:none!important}}#__btn-voltar{position:fixed;bottom:22px;left:22px;z-index:99999;background:#0f1b2d;border:1px solid #2f4666;color:#d6dde8;text-decoration:none;padding:10px 18px;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;transition:all .2s;box-shadow:0 2px 12px rgba(0,0,0,.4)}#__btn-voltar:hover{background:#e0b54a;border-color:#e0b54a;color:#0f1b2d}</style><a id="__btn-voltar" href="OUTROS.html">← Outros</a><!-- FIM VOLTAR DESKTOP -->
+<!-- VOLTAR DESKTOP --><a id="__btn-voltar" href="OUTROS.html"><svg class="ic" aria-hidden="true"><use href="#i-arrow-left"/></svg>Outros</a><!-- FIM VOLTAR DESKTOP -->
 </body>
 </html>
