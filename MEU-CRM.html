@@ -139,7 +139,7 @@
   .page.active { display: block; }
   @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
 
-  .page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; gap: 8px; }
+  .page-header { display: flex; align-items: center; justify-content: flex-end; margin-bottom: 16px; gap: 8px; }
   .page-title { font-family: 'Barlow', sans-serif; font-size: 20px; font-weight: 600; color: #111111; }
   .btn-primary {
     background: #111111; color: #ffffff; border: none;
@@ -441,8 +441,9 @@
 
   /* menu lateral */
   .sidebar { width: 290px; left: -300px; background: #fff; border-right: 1px solid var(--line); }
-  .sidebar-header { padding: 22px 18px 12px; border-bottom: 0; }
-  .sidebar-logo { display: flex; align-items: center; gap: 10px; font-family: 'Barlow', sans-serif; font-weight: 800; font-size: 20px; letter-spacing: .3px; }
+  .sidebar-header { padding: 34px 22px 22px; border-bottom: 0; }
+  .sidebar-logo { display: flex; align-items: center; gap: 14px; font-family: 'Barlow', sans-serif; font-weight: 500; font-size: 19px; letter-spacing: 2.5px; color: var(--ink); }
+  .sidebar-logo .app-mark.sm { width: 38px; height: 38px; border-radius: 12px; }
   .sidebar-nav { padding: 6px 12px; }
   .nav-item { border-radius: 14px; padding: 8px 10px; gap: 12px; font-size: 15px; font-weight: 500; color: #334155; margin-bottom: 3px; }
   .nav-item:hover { background: #f6f8fa; color: var(--ink); }
@@ -584,10 +585,42 @@
   .agenda-name { margin-top: 0; }
   .ativo-nome, .arquivo-nome { font-size: 18px; line-height: 1.25; margin-bottom: 8px; }
   .ativo-servico, .arquivo-info { margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid #eef1f5; }
-  .crono-nome { font-size: 17px; line-height: 1.25; margin: 16px 0 14px; }
+  .crono-nome { font-size: 17px; line-height: 1.25; margin: 14px 0 18px; }
   .contact-btns { margin-bottom: 14px; }
   .tentativas-wrap { margin-bottom: 14px; }
   .card-obs { margin-top: 16px; padding-top: 14px; }
+
+  /* menu flutuante de opções do contato */
+  .toggle-opcoes.on { background: #d1fae5 !important; color: #047857; }
+  .menu-opcoes { position: fixed; z-index: 300; width: min(300px, calc(100vw - 24px)); background: #fff; border-radius: 18px; padding: 8px;
+                 border: 1px solid #e8ecf1; box-shadow: 0 18px 40px -12px rgba(15,23,42,.28), 0 4px 10px rgba(15,23,42,.08);
+                 animation: menuIn .14s ease; transform-origin: top right; }
+  @keyframes menuIn { from { opacity: 0; transform: scale(.96) translateY(-4px); } to { opacity: 1; transform: none; } }
+  .mo-item { display: flex; align-items: center; gap: 12px; padding: 11px 12px; border-radius: 12px; text-decoration: none; color: #111827; cursor: pointer; }
+  .mo-item:active { background: #f1f5f9; }
+  .mo-item + .mo-item { margin-top: 2px; }
+  .mo-ic { width: 38px; height: 38px; border-radius: 12px; display: grid; place-items: center; flex: none; }
+  .mo-ic .ic { width: 19px; height: 19px; vertical-align: 0; }
+  .mo-ic.phone { background: #f1f5f9; color: #334155; }
+  .mo-ic.wa { background: #dcfce7; color: #15803d; }
+  .mo-ic.ind { background: #eff6ff; color: #1d4ed8; }
+  .mo-ic.obs { background: #ecfdf5; color: #047857; }
+  .mo-sep { height: 1px; background: #eef1f5; margin: 6px 8px; }
+  .mo-ic.nao { background: #fee2e2; color: #b91c1c; }
+  .mo-ic.sim { background: #d1fae5; color: #047857; }
+  .mo-txt { display: flex; flex-direction: column; min-width: 0; gap: 1px; }
+  .mo-txt b { font-size: 14.5px; font-weight: 600; font-family: 'DM Sans', sans-serif; }
+  .mo-txt small { font-size: 12.5px; color: #64748b; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+  .mo-txt small.has { color: #475569; }
+  #obs-textarea[readonly] { background: #f8fafc; box-shadow: none !important; border-color: #e5e9f0 !important; caret-color: transparent; cursor: pointer; }
+  .reuniao-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .reuniao-top-dir { display: flex; align-items: center; gap: 6px; flex: none; }
+  .mo-ic.date { background: #f1f5f9; color: #334155; }
+  .mo-ic.prop { background: #eff6ff; color: #1d4ed8; }
+  .agenda-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 14px; padding-bottom: 14px; border-bottom: 1px solid #eef1f5; }
+  .agenda-head .agenda-name { margin: 0; padding: 0; border: 0; min-width: 0; flex: 1; overflow-wrap: anywhere; }
+  .arquivo-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 4px; padding-bottom: 14px; border-bottom: 1px solid #eef1f5; }
+  .arquivo-head .arquivo-nome { min-width: 0; flex: 1; overflow-wrap: anywhere; }
 </style>
 </head>
 <body>
@@ -626,6 +659,7 @@
 <symbol id="i-plus" viewBox="0 0 24 24"><path d="M5 12h14" /> <path d="M12 5v14" /></symbol>
 <symbol id="i-alarm-clock" viewBox="0 0 24 24"><circle cx="12" cy="13" r="8" /> <path d="M12 9v4l2 2" /> <path d="M5 3 2 6" /> <path d="m22 6-3-3" /> <path d="M6.38 18.7 4 21" /> <path d="M17.64 18.67 20 21" /></symbol>
 <symbol id="i-fast-forward" viewBox="0 0 24 24"><path d="M12 6a2 2 0 0 1 3.414-1.414l6 6a2 2 0 0 1 0 2.828l-6 6A2 2 0 0 1 12 18z" /> <path d="M2 6a2 2 0 0 1 3.414-1.414l6 6a2 2 0 0 1 0 2.828l-6 6A2 2 0 0 1 2 18z" /></symbol>
+<symbol id="i-ellipsis" viewBox="0 0 24 24"><circle cx="12" cy="12" r="1" /> <circle cx="19" cy="12" r="1" /> <circle cx="5" cy="12" r="1" /></symbol>
 <symbol id="i-copy" viewBox="0 0 24 24"><rect width="14" height="14" x="8" y="8" rx="2" ry="2" /> <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" /></symbol>
 </svg>
 
@@ -637,7 +671,6 @@
       <svg class="ic" aria-hidden="true"><use href="#i-menu"/></svg>
     </button>
     <span class="app-mark"><svg class="ic" aria-hidden="true"><use href="#i-users"/></svg></span>
-    <span class="topbar-title">MEU CRM</span>
   </div>
   <div class="sync-badge">
     <div class="sync-dot"></div>
@@ -679,7 +712,6 @@
 <main class="main">
   <div class="page active" id="page-contatos">
     <div class="page-header">
-      <span class="page-title">Contatos</span>
       <button class="btn-primary" onclick="openModalNovoContato()">＋ Novo</button>
     </div>
     <div class="search-wrap">
@@ -690,37 +722,22 @@
   </div>
 
   <div class="page" id="page-agenda">
-    <div class="page-header">
-      <span class="page-title">Agenda</span>
-    </div>
     <div id="lista-agenda"></div>
   </div>
 
   <div class="page" id="page-reunioes">
-    <div class="page-header">
-      <span class="page-title">Reuniões</span>
-    </div>
     <div id="lista-reunioes"></div>
   </div>
 
   <div class="page" id="page-ativos">
-    <div class="page-header">
-      <span class="page-title">Clientes Ativos</span>
-    </div>
     <div id="lista-ativos"></div>
   </div>
 
   <div class="page" id="page-arquivo">
-    <div class="page-header">
-      <span class="page-title">Arquivo</span>
-    </div>
     <div id="lista-arquivo"></div>
   </div>
 
   <div class="page" id="page-cronograma">
-    <div class="page-header">
-      <span class="page-title">Cronograma</span>
-    </div>
     <div style="display:flex;gap:8px;margin-bottom:16px">
       <button class="crono-tab active" id="tab-hoje" onclick="setCronoTab('hoje')">Hoje</button>
       <button class="crono-tab" id="tab-amanha" onclick="setCronoTab('amanha')">Amanhã</button>
@@ -729,10 +746,6 @@
     <div id="lista-cronograma"></div>
   </div>
   <div class="page" id="page-lixeira">
-    <div class="page-header">
-      <span class="page-title"><svg class="ic" aria-hidden="true"><use href="#i-trash-2"/></svg> Lixeira</span>
-    </div>
-    <p style="font-size:12px;color:var(--gray-400);margin-bottom:16px;">Itens excluídos. Restaure ou apague permanentemente.</p>
     <div id="lixeira-crm-lista"></div>
   </div>
 </main>
@@ -741,7 +754,6 @@
 <div class="modal-backdrop" id="modal-novo">
   <div class="modal">
     <div class="modal-handle"></div>
-    <div class="modal-title" id="modal-novo-title">Novo Contato</div>
     <input type="hidden" id="edit-id">
     <div class="form-group">
       <label class="form-label">Nome / Empresa</label>
@@ -770,7 +782,6 @@
 <div class="modal-backdrop" id="modal-atendeu">
   <div class="modal">
     <div class="modal-handle"></div>
-    <div class="modal-title" id="atendeu-title">Atendeu!</div>
     <div class="atendeu-options">
       <button class="atendeu-btn" onclick="atendeuOpcao('agenda')">
         <span class="atendeu-btn-icon"><svg class="ic" aria-hidden="true"><use href="#i-calendar"/></svg></span> Religar depois
@@ -793,7 +804,6 @@
 <div class="modal-backdrop" id="modal-agendar">
   <div class="modal">
     <div class="modal-handle"></div>
-    <div class="modal-title">Agendar Retorno</div>
     <div class="modal-row">
       <div class="form-group">
         <label class="form-label">Data *</label>
@@ -815,7 +825,6 @@
 <div class="modal-backdrop" id="modal-reuniao">
   <div class="modal">
     <div class="modal-handle"></div>
-    <div class="modal-title">Marcar Reunião</div>
     <div class="modal-row">
       <div class="form-group">
         <label class="form-label">Data *</label>
@@ -856,7 +865,6 @@
 <div class="modal-backdrop" id="modal-proposta">
   <div class="modal">
     <div class="modal-handle"></div>
-    <div class="modal-title" id="proposta-title">Gerar Proposta</div>
     <div id="proposta-form-wrap">
       <div class="form-group">
         <label class="form-label">Serviço / Área *</label>
@@ -915,8 +923,6 @@
 <div class="modal-backdrop" id="modal-concluir">
   <div class="modal">
     <div class="modal-handle"></div>
-    <div class="modal-title" id="concluir-title">Resultado da Reunião</div>
-    <p style="font-size:14px;color:var(--gray-500);margin-bottom:16px">Como foi a reunião?</p>
     <div class="concluir-options">
       <button class="concluir-btn fechou" onclick="concluirReuniao('fechou')"><svg class="ic" aria-hidden="true"><use href="#i-circle-check"/></svg> Fechou negócio</button>
       <button class="concluir-btn nao-fechou" onclick="concluirReuniao('nao-fechou')"><svg class="ic" aria-hidden="true"><use href="#i-circle-x"/></svg> Não fechou</button>
@@ -931,9 +937,8 @@
 <div class="modal-backdrop" id="modal-obs">
   <div class="modal">
     <div class="modal-handle"></div>
-    <div class="modal-title">Editar Observação</div>
     <div class="form-group">
-      <textarea class="form-textarea" id="obs-textarea" placeholder="Digite a observação..." style="min-height:120px"></textarea>
+      <textarea class="form-textarea" id="obs-textarea" rows="1" placeholder="Digite a observação..." style="min-height:0;resize:none;overflow:hidden;max-height:45vh"></textarea>
     </div>
     <div class="modal-row">
       <div class="form-group"><button class="btn-full gray" onclick="closeModal('modal-obs')">Cancelar</button></div>
@@ -958,7 +963,6 @@
 <div class="modal-backdrop" id="modal-envio-proposta">
   <div class="modal">
     <div class="modal-handle"></div>
-    <div class="modal-title"><svg class="ic" aria-hidden="true"><use href="#i-send"/></svg> Enviar Proposta</div>
     <p style="font-size:13px;color:var(--gray-500);margin-bottom:12px">Para: <strong id="envio-nome"></strong></p>
     <div class="form-group">
       <label class="form-label"><svg class="ic" aria-hidden="true"><use href="#i-mail"/></svg> Texto da mensagem</label>
@@ -979,7 +983,6 @@
 <div class="modal-backdrop" id="modal-adiar">
   <div class="modal">
     <div class="modal-handle"></div>
-    <div class="modal-title">Adiar Compromisso</div>
     <div class="form-group">
       <label class="form-label">Observação (opcional)</label>
       <textarea class="form-textarea" id="adiar-obs" placeholder="Ex: Cliente pediu para remarcar..." style="min-height:70px"></textarea>
@@ -1017,7 +1020,6 @@
 <div class="modal-backdrop" id="modal-liguei">
   <div class="modal">
     <div class="modal-handle"></div>
-    <div class="modal-title" id="liguei-title">Resultado da ligação</div>
     <div class="atendeu-options">
       <button class="atendeu-btn" onclick="ligueiResultado('atendeu')">
         <span class="atendeu-btn-icon"><svg class="ic" aria-hidden="true"><use href="#i-circle-check"/></svg></span> Atendeu
@@ -1281,14 +1283,13 @@ function renderLixeiraCRM() {
   const el = document.getElementById('lixeira-crm-lista');
   if (!el) return;
   if (!lixeiraCRM.length) {
-    el.innerHTML = '<p style="font-size:13px;color:var(--gray-400);padding:16px 0;">Lixeira vazia.</p>';
+    el.innerHTML = '';
     return;
   }
   el.innerHTML = lixeiraCRM.map((item, i) => `
     <div class="card" style="display:flex;align-items:center;gap:12px;">
       <div style="flex:1;min-width:0;">
-        <div class="card-name">${item.nome||item.titulo||'Item'}</div>
-        <div style="font-size:11px;color:var(--gray-400);">${item._col||''} · ${item._lixeira_data||''}</div>
+        <div class="card-name" style="margin-bottom:0">${item.nome||item.titulo||'Item'}</div>
       </div>
       <button onclick="restaurarItemCRM(${i})" style="background:var(--blue-light);color:var(--blue);border:1.5px solid var(--blue-mid);border-radius:8px;padding:6px 12px;font-size:12px;font-weight:600;cursor:pointer;">Restaurar</button>
       <button onclick="excluirPermanenteCRM(${i})" style="background:none;border:none;color:var(--red);font-size:18px;cursor:pointer;"><svg class="ic" aria-hidden="true"><use href="#i-trash-2"/></svg></button>
@@ -1407,7 +1408,7 @@ function fmtPhone(n) { const d = n.replace(/\D/g,''); return '0' + d; }
 function fmtWA(n) { const d = n.replace(/\D/g,''); return 'https://wa.me/55' + d; }
 function fmtTel(n) { const d = n.replace(/\D/g,''); return 'tel:0' + d; }
 function contactBtns(numero) {
-  return `<a href="${fmtTel(numero)}" class="contact-btn phone"><svg class="ic" aria-hidden="true"><use href="#i-phone"/></svg> ${fmtPhone(numero)}</a>
+  return `<a href="${fmtTel(numero)}" class="contact-btn phone"><svg class="ic" aria-hidden="true"><use href="#i-phone"/></svg> Ligando</a>
     <a href="${fmtWA(numero)}" target="_blank" class="contact-btn whatsapp"><svg class="ic" aria-hidden="true"><use href="#i-message-circle"/></svg> WhatsApp</a>`;
 }
 
@@ -1477,12 +1478,141 @@ function renderContatos() {
     c.nome.toLowerCase().includes(q) || c.numero.includes(q)
   );
   if (!items.length) {
-    lista.innerHTML = `<div class="empty-state"><div class="empty-icon"><svg class="ic" aria-hidden="true"><use href="#i-clipboard-list"/></svg></div><div class="empty-text">Nenhum contato ainda</div><div class="empty-sub">Toque em "+ Novo" para adicionar</div></div>`;
+    lista.innerHTML = `<div class="empty-state"><div class="empty-icon"><svg class="ic" aria-hidden="true"><use href="#i-clipboard-list"/></svg></div><div class="empty-text">Nenhum contato ainda</div></div>`;
     return;
   }
   lista.innerHTML = items.map(c => cardContato(c)).join('');
 }
 window.renderContatos = renderContatos;
+
+function fecharMenuOpcoes() {
+  document.getElementById('menuOpcoes')?.remove();
+  document.querySelectorAll('.toggle-opcoes.on').forEach(b => b.classList.remove('on'));
+}
+window.fecharMenuOpcoes = fecharMenuOpcoes;
+
+window.toggleOpcoes = function(id, ev) {
+  if (ev) ev.stopPropagation();
+  const btn = document.querySelector('#card-' + id + ' .toggle-opcoes');
+  const jaAberto = btn && btn.classList.contains('on');
+  fecharMenuOpcoes();
+  if (jaAberto || !btn) return;
+  const c = state.contatos.find(x => x.id === id);
+  if (!c) return;
+  mostrarMenuOpcoes(btn, `
+    <a class="mo-item" href="${fmtTel(c.numero)}"><span class="mo-ic phone"><svg class="ic" aria-hidden="true"><use href="#i-phone"/></svg></span><span class="mo-txt"><b>Ligando</b></span></a>
+    <a class="mo-item" href="${fmtWA(c.numero)}" target="_blank"><span class="mo-ic wa"><svg class="ic" aria-hidden="true"><use href="#i-message-circle"/></svg></span><span class="mo-txt"><b>WhatsApp</b></span></a>
+    ${c.indicado ? `<div class="mo-item"><span class="mo-ic ind"><svg class="ic" aria-hidden="true"><use href="#i-user"/></svg></span><span class="mo-txt"><b>${escHtml(c.indicado)}</b></span></div>` : ''}
+    <div class="mo-item" onclick="fecharMenuOpcoes();editObs('contatos','${c.id}')"><span class="mo-ic obs"><svg class="ic" aria-hidden="true"><use href="#i-notebook-pen"/></svg></span><span class="mo-txt"><b>Adicionado</b></span></div>
+    ${(c.tentativas || 0) < 3 ? `<div class="mo-item" onclick="fecharMenuOpcoes();naoAtendeu('${c.id}')"><span class="mo-ic nao"><svg class="ic" aria-hidden="true"><use href="#i-circle-x"/></svg></span><span class="mo-txt"><b>Atendido</b></span></div>` : ''}
+    <div class="mo-item" onclick="fecharMenuOpcoes();openAtendeu('${c.id}')"><span class="mo-ic sim"><svg class="ic" aria-hidden="true"><use href="#i-circle-check"/></svg></span><span class="mo-txt"><b>${(c.tentativas || 0) < 3 ? 'Atendeu' : 'Mover contato'}</b></span></div>`);
+};
+
+function mostrarMenuOpcoes(btn, html) {
+  btn.classList.add('on');
+  const menu = document.createElement('div');
+  menu.id = 'menuOpcoes';
+  menu.className = 'menu-opcoes';
+  menu.addEventListener('click', e => e.stopPropagation());
+  menu.innerHTML = html;
+  document.body.appendChild(menu);
+  const r = btn.getBoundingClientRect();
+  const w = menu.offsetWidth, h = menu.offsetHeight;
+  let left = Math.min(Math.max(12, r.right - w), window.innerWidth - w - 12);
+  let top = r.bottom + 8;
+  if (top + h > window.innerHeight - 12) top = Math.max(12, r.top - h - 8);
+  menu.style.left = left + 'px';
+  menu.style.top = top + 'px';
+}
+
+window.toggleHoraMenu = function(el) {
+  const prox = el.nextElementSibling;
+  if (prox && prox.classList.contains('mo-hora')) { prox.remove(); return; }
+  const linha = document.createElement('div');
+  linha.className = 'mo-item mo-hora';
+  linha.innerHTML = '<span class="mo-ic date"><svg class="ic" aria-hidden="true"><use href="#i-alarm-clock"/></svg></span><span class="mo-txt"><b>Horario ' + el.dataset.h + '</b></span>';
+  el.after(linha);
+};
+
+window.toggleOpcoesAgenda = function(id, ev) {
+  if (ev) ev.stopPropagation();
+  const btn = document.querySelector('#acard-' + id + ' .toggle-opcoes');
+  const jaAberto = btn && btn.classList.contains('on');
+  fecharMenuOpcoes();
+  if (jaAberto || !btn) return;
+  const ag = state.agenda.find(x => x.id === id);
+  if (!ag) return;
+  mostrarMenuOpcoes(btn, `
+    <div class="mo-item" data-d="${formatDate(ag.data)}" data-h="${escHtml(ag.hora)}" onclick="toggleHoraMenu(this)"><span class="mo-ic date"><svg class="ic" aria-hidden="true"><use href="#i-calendar"/></svg></span><span class="mo-txt"><b>${formatDate(ag.data)}</b></span></div>
+    <div class="mo-item" onclick="fecharMenuOpcoes();editObs('agenda','${ag.id}')"><span class="mo-ic obs"><svg class="ic" aria-hidden="true"><use href="#i-notebook-pen"/></svg></span><span class="mo-txt"><b>Adicionado</b></span></div>
+    <div class="mo-item" onclick="fecharMenuOpcoes();openLiguei('${ag.id}')"><span class="mo-ic sim"><svg class="ic" aria-hidden="true"><use href="#i-circle-check"/></svg></span><span class="mo-txt"><b>Liguei</b></span></div>
+    <div class="mo-item" onclick="fecharMenuOpcoes();excluirAgenda('${ag.id}')"><span class="mo-ic nao"><svg class="ic" aria-hidden="true"><use href="#i-trash-2"/></svg></span><span class="mo-txt"><b>Excluir</b></span></div>`);
+};
+
+window.toggleOpcoesArquivo = function(id, ev) {
+  if (ev) ev.stopPropagation();
+  const btn = document.querySelector('#vcard-' + id + ' .toggle-opcoes');
+  const jaAberto = btn && btn.classList.contains('on');
+  fecharMenuOpcoes();
+  if (jaAberto || !btn) return;
+  const a = state.arquivo.find(x => x.id === id);
+  if (!a) return;
+  mostrarMenuOpcoes(btn, `
+    <a class="mo-item" href="${fmtTel(a.numero)}"><span class="mo-ic phone"><svg class="ic" aria-hidden="true"><use href="#i-phone"/></svg></span><span class="mo-txt"><b>Ligando</b></span></a>
+    <a class="mo-item" href="${fmtWA(a.numero)}" target="_blank"><span class="mo-ic wa"><svg class="ic" aria-hidden="true"><use href="#i-message-circle"/></svg></span><span class="mo-txt"><b>WhatsApp</b></span></a>
+    <div class="mo-item"><span class="mo-ic nao"><svg class="ic" aria-hidden="true"><use href="#i-circle-x"/></svg></span><span class="mo-txt"><b>Tentativas</b></span></div>
+    ${a.obs ? `<div class="mo-item" onclick="fecharMenuOpcoes();editObs('arquivo','${a.id}')"><span class="mo-ic obs"><svg class="ic" aria-hidden="true"><use href="#i-notebook-pen"/></svg></span><span class="mo-txt"><b>Adicionado</b></span></div>` : ''}`);
+};
+
+window.toggleOpcoesAtivo = function(id, ev) {
+  if (ev) ev.stopPropagation();
+  const btn = document.querySelector('#atcard-' + id + ' .toggle-opcoes');
+  const jaAberto = btn && btn.classList.contains('on');
+  fecharMenuOpcoes();
+  if (jaAberto || !btn) return;
+  const a = state.ativos.find(x => x.id === id);
+  if (!a) return;
+  mostrarMenuOpcoes(btn, `
+    <div class="mo-item" onclick="fecharMenuOpcoes();editObs('ativos','${a.id}')"><span class="mo-ic obs"><svg class="ic" aria-hidden="true"><use href="#i-notebook-pen"/></svg></span><span class="mo-txt"><b>Observação</b></span></div>
+    <div class="mo-item" onclick="fecharMenuOpcoes();openPropostaAtivo('${a.id}')"><span class="mo-ic prop"><svg class="ic" aria-hidden="true"><use href="#i-file-text"/></svg></span><span class="mo-txt"><b>Nova proposta</b></span></div>
+    <div class="mo-item" onclick="fecharMenuOpcoes();excluirAtivo('${a.id}')"><span class="mo-ic nao"><svg class="ic" aria-hidden="true"><use href="#i-trash-2"/></svg></span><span class="mo-txt"><b>Excluir</b></span></div>`);
+};
+
+window.toggleOpcoesCrono = function(id, tipo, ev) {
+  if (ev) ev.stopPropagation();
+  const btn = document.querySelector('#ccard-' + tipo + '-' + id + ' .toggle-opcoes');
+  const jaAberto = btn && btn.classList.contains('on');
+  fecharMenuOpcoes();
+  if (jaAberto || !btn) return;
+  const item = (tipo === 'reuniao' ? state.reunioes : state.agenda).find(x => x.id === id);
+  if (!item) return;
+  mostrarMenuOpcoes(btn, `
+    <a class="mo-item" href="${fmtTel(item.numero)}"><span class="mo-ic phone"><svg class="ic" aria-hidden="true"><use href="#i-phone"/></svg></span><span class="mo-txt"><b>Ligando</b></span></a>
+    <a class="mo-item" href="${fmtWA(item.numero)}" target="_blank"><span class="mo-ic wa"><svg class="ic" aria-hidden="true"><use href="#i-message-circle"/></svg></span><span class="mo-txt"><b>WhatsApp</b></span></a>
+    <div class="mo-item" data-d="${formatDate(item.data)}" data-h="${escHtml(item.hora)}" onclick="toggleHoraMenu(this)"><span class="mo-ic date"><svg class="ic" aria-hidden="true"><use href="#i-calendar"/></svg></span><span class="mo-txt"><b>${formatDate(item.data)}</b></span></div>`);
+};
+
+window.toggleOpcoesReuniao = function(id, ev) {
+  if (ev) ev.stopPropagation();
+  const btn = document.querySelector('#rcard-' + id + ' .toggle-opcoes');
+  const jaAberto = btn && btn.classList.contains('on');
+  fecharMenuOpcoes();
+  if (jaAberto || !btn) return;
+  const r = state.reunioes.find(x => x.id === id);
+  if (!r) return;
+  const tipoIcon = r.tipo === 'presencial' ? 'i-map-pin' : 'i-smartphone';
+  const tipoTxt = r.tipo === 'presencial' ? 'Presencial' : 'Remota';
+  mostrarMenuOpcoes(btn, `
+    <div class="mo-item" data-d="${formatDate(r.data)}" data-h="${escHtml(r.hora)}" onclick="toggleHoraMenu(this)"><span class="mo-ic date"><svg class="ic" aria-hidden="true"><use href="#i-calendar"/></svg></span><span class="mo-txt"><b>${formatDate(r.data)}</b></span></div>
+    <div class="mo-item" onclick="fecharMenuOpcoes();editObs('reunioes','${r.id}')"><span class="mo-ic obs"><svg class="ic" aria-hidden="true"><use href="#i-notebook-pen"/></svg></span><span class="mo-txt"><b>Adicionado</b></span></div>
+    <div class="mo-item" onclick="fecharMenuOpcoes();openPropostaReuniao('${r.id}')"><span class="mo-ic prop"><svg class="ic" aria-hidden="true"><use href="#i-file-text"/></svg></span><span class="mo-txt"><b>Criar Proposta</b></span></div>
+    ${r.propostaHtml ? `<div class="mo-item" onclick="fecharMenuOpcoes();abrirEnviarProposta('${r.id}')"><span class="mo-ic prop"><svg class="ic" aria-hidden="true"><use href="#i-send"/></svg></span><span class="mo-txt"><b>Enviar Proposta</b></span></div>` : ''}
+    <div class="mo-item" onclick="fecharMenuOpcoes();openConcluir('${r.id}')"><span class="mo-ic sim"><svg class="ic" aria-hidden="true"><use href="#i-circle-check"/></svg></span><span class="mo-txt"><b>Concluir Reunião</b></span></div>
+    <div class="mo-item"><span class="mo-ic date"><svg class="ic" aria-hidden="true"><use href="#${tipoIcon}"/></svg></span><span class="mo-txt"><b>${tipoTxt}</b></span></div>`);
+};
+document.addEventListener('click', e => { if (!e.target.closest('.toggle-opcoes')) fecharMenuOpcoes(); });
+window.addEventListener('scroll', fecharMenuOpcoes, true);
+window.addEventListener('resize', fecharMenuOpcoes);
 
 function cardContato(c) {
   const t = c.tentativas || 0;
@@ -1502,22 +1632,17 @@ function cardContato(c) {
           <div class="card-name">${escHtml(c.nome)}</div>
         </div>
         <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">
-          <span class="icon-btn" onclick="editarContato('${c.id}')"><svg class="ic" aria-hidden="true"><use href="#i-pencil"/></svg></span>
-          ${indicadoHtml}
+          <div style="display:flex;gap:8px">
+            <span class="icon-btn toggle-opcoes" onclick="toggleOpcoes('${c.id}', event)" aria-label="Opções"><svg class="ic" aria-hidden="true"><use href="#i-ellipsis"/></svg></span>
+            <span class="icon-btn" onclick="editarContato('${c.id}')"><svg class="ic" aria-hidden="true"><use href="#i-pencil"/></svg></span>
+          </div>
         </div>
       </div>
-      <div class="contact-btns">${contactBtns(c.numero)}</div>
       <div class="tentativas-wrap">
         <span class="tentativa-label">Tentativas:</span>
         <div class="dots">${dots}</div>
         <span style="font-size:12px;color:var(--gray-400)">${t}/3</span>
       </div>
-      ${t < 3 ? `
-      <div class="action-btns">
-        <button class="btn-nao" onclick="naoAtendeu('${c.id}')">Não Atendeu</button>
-        <button class="btn-atendeu" onclick="openAtendeu('${c.id}')">Atendeu</button>
-      </div>` : `<div style="text-align:center;font-size:13px;color:var(--red);font-weight:600;padding:6px 0">3 tentativas atingidas — <span style="color:#111;cursor:pointer;text-decoration:underline" onclick="openAtendeu('${c.id}')">Mover contato</span></div>`}
-      ${obsHtml}
     </div>`;
 }
 
@@ -1527,7 +1652,7 @@ function cardContato(c) {
 function renderAgenda() {
   const lista = document.getElementById('lista-agenda');
   if (!state.agenda.length) {
-    lista.innerHTML = `<div class="empty-state"><div class="empty-icon"><svg class="ic" aria-hidden="true"><use href="#i-calendar"/></svg></div><div class="empty-text">Nenhum agendamento</div><div class="empty-sub">Agende retornos após um atendimento</div></div>`;
+    lista.innerHTML = `<div class="empty-state"><div class="empty-icon"><svg class="ic" aria-hidden="true"><use href="#i-calendar"/></svg></div><div class="empty-text">Nenhum agendamento</div></div>`;
     return;
   }
   const sorted = [...state.agenda].sort((a,b) => (a.data+a.hora).localeCompare(b.data+b.hora));
@@ -1539,20 +1664,13 @@ function renderAgenda() {
     let sec = ag.data === hoje ? '<svg class="ic" aria-hidden="true"><use href="#i-calendar"/></svg> Hoje' : ag.data === amanha ? '<svg class="ic" aria-hidden="true"><use href="#i-calendar"/></svg> Amanhã' : `<svg class="ic" aria-hidden="true"><use href="#i-calendar"/></svg> ${formatDate(ag.data)}`;
     if (sec !== lastSec) { html += `<div class="agenda-section-title">${sec}</div>`; lastSec = sec; }
     const isAgora = ag.data === hoje;
-    const obsHtml = ag.obs ? `<div class="card-obs"><span><svg class="ic" aria-hidden="true"><use href="#i-notebook-pen"/></svg></span> ${escHtml(ag.obs)}</div>` : '';
     html += `
-      <div class="agenda-card ${isAgora ? 'alerta-agora' : ''}">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
-          <div class="agenda-time" style="font-size:13px;font-weight:600;color:var(--gray-500)"><svg class="ic" aria-hidden="true"><use href="#i-calendar"/></svg> ${formatDate(ag.data)}</div>
-          <span style="font-size:13px;font-weight:600;color:var(--gray-500)"><svg class="ic" aria-hidden="true"><use href="#i-alarm-clock"/></svg> ${ag.hora}</span>
+      <div class="agenda-card ${isAgora ? 'alerta-agora' : ''}" id="acard-${ag.id}">
+        <div class="agenda-head">
+          <div class="agenda-name">${escHtml(ag.nome)}</div>
+          <span class="icon-btn toggle-opcoes" onclick="toggleOpcoesAgenda('${ag.id}', event)" aria-label="Opções"><svg class="ic" aria-hidden="true"><use href="#i-ellipsis"/></svg></span>
         </div>
-        <div class="agenda-name">${escHtml(ag.nome)}</div>
         <div class="contact-btns">${contactBtns(ag.numero)}</div>
-        ${obsHtml}
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px">
-          <button class="btn-liguei" style="margin-top:0" onclick="openLiguei('${ag.id}')"><svg class="ic" aria-hidden="true"><use href="#i-circle-check"/></svg> Liguei</button>
-          <button onclick="excluirAgenda('${ag.id}')" style="border:none;background:none;font-size:20px;cursor:pointer;color:var(--gray-300)"><svg class="ic" aria-hidden="true"><use href="#i-trash-2"/></svg></button>
-        </div>
       </div>`;
   });
   lista.innerHTML = html;
@@ -1564,28 +1682,18 @@ function renderAgenda() {
 function renderReunioes() {
   const lista = document.getElementById('lista-reunioes');
   if (!state.reunioes.length) {
-    lista.innerHTML = `<div class="empty-state"><div class="empty-icon"><svg class="ic" aria-hidden="true"><use href="#i-handshake"/></svg></div><div class="empty-text">Nenhuma reunião</div><div class="empty-sub">Reuniões marcadas aparecem aqui</div></div>`;
+    lista.innerHTML = `<div class="empty-state"><div class="empty-icon"><svg class="ic" aria-hidden="true"><use href="#i-handshake"/></svg></div><div class="empty-text">Nenhuma reunião</div></div>`;
     return;
   }
   const sorted = [...state.reunioes].sort((a,b) => (a.data+a.hora).localeCompare(b.data+b.hora));
   lista.innerHTML = sorted.map(r => {
-    const obsHtml = r.obs
-      ? `<div class="card-obs"><span><svg class="ic" aria-hidden="true"><use href="#i-notebook-pen"/></svg></span> ${escHtml(r.obs)} <span class="obs-edit-btn" onclick="editObs('reunioes','${r.id}')"><svg class="ic" aria-hidden="true"><use href="#i-pencil"/></svg></span></div>`
-      : `<div class="card-obs" style="color:var(--blue);cursor:pointer" onclick="editObs('reunioes','${r.id}')"><svg class="ic" aria-hidden="true"><use href="#i-notebook-pen"/></svg> Adicionar observação...</div>`;
     return `
-    <div class="reuniao-card">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
-        <div class="reuniao-tipo ${r.tipo}" style="margin-bottom:0">${r.tipo === 'presencial' ? '<svg class="ic" aria-hidden="true"><use href="#i-map-pin"/></svg> Presencial' : '<svg class="ic" aria-hidden="true"><use href="#i-smartphone"/></svg> Remota'}</div>
-        <div class="reuniao-data" style="font-size:12px"><svg class="ic" aria-hidden="true"><use href="#i-calendar"/></svg> ${formatDate(r.data)} às ${r.hora}</div>
+    <div class="reuniao-card" id="rcard-${r.id}">
+      <div class="arquivo-head" style="margin-bottom:14px">
+        <div class="reuniao-nome" style="margin:0;padding:0;border:0;min-width:0;flex:1;overflow-wrap:anywhere">${escHtml(r.nome)}</div>
+        <span class="icon-btn toggle-opcoes" onclick="toggleOpcoesReuniao('${r.id}', event)" aria-label="Opções"><svg class="ic" aria-hidden="true"><use href="#i-ellipsis"/></svg></span>
       </div>
-      <div class="reuniao-nome">${escHtml(r.nome)}</div>
       <div class="contact-btns">${contactBtns(r.numero)}</div>
-      ${obsHtml}
-      <div class="reuniao-acoes">
-        <button class="btn-concluir" onclick="openPropostaReuniao('${r.id}')">Criar Proposta</button>
-        ${r.propostaHtml ? `<button class="btn-concluir" style="background:var(--blue-light);color:var(--blue)" onclick="abrirEnviarProposta('${r.id}')">Enviar Proposta</button>` : ''}
-        <button class="btn-concluir" onclick="openConcluir('${r.id}')" style="background:var(--green-light);color:var(--green)">Concluir Reunião</button>
-      </div>
     </div>`;
   }).join('');
 }
@@ -1596,25 +1704,20 @@ function renderReunioes() {
 function renderAtivos() {
   const lista = document.getElementById('lista-ativos');
   if (!state.ativos.length) {
-    lista.innerHTML = `<div class="empty-state"><div class="empty-icon"><svg class="ic" aria-hidden="true"><use href="#i-star"/></svg></div><div class="empty-text">Nenhum cliente ativo</div><div class="empty-sub">Clientes com proposta aceita aparecem aqui</div></div>`;
+    lista.innerHTML = `<div class="empty-state"><div class="empty-icon"><svg class="ic" aria-hidden="true"><use href="#i-star"/></svg></div><div class="empty-text">Nenhum cliente ativo</div></div>`;
     return;
   }
   lista.innerHTML = state.ativos.map(a => {
-    const obsHtml = a.obs
-      ? `<div class="card-obs"><span><svg class="ic" aria-hidden="true"><use href="#i-notebook-pen"/></svg></span> ${escHtml(a.obs)} <span class="obs-edit-btn" onclick="editObs('ativos','${a.id}')"><svg class="ic" aria-hidden="true"><use href="#i-pencil"/></svg></span></div>`
-      : `<div class="card-obs" style="color:var(--blue);cursor:pointer" onclick="editObs('ativos','${a.id}')"><svg class="ic" aria-hidden="true"><use href="#i-notebook-pen"/></svg> Adicionar observação...</div>`;
     return `
-    <div class="ativo-card">
-      <div style="display:flex;justify-content:space-between">
-        <div>
-          <div class="ativo-nome"><svg class="ic" aria-hidden="true"><use href="#i-star"/></svg> ${escHtml(a.nome)}</div>
-          <div class="ativo-servico">${a.servico ? '<svg class="ic" aria-hidden="true"><use href="#i-briefcase"/></svg> ' + escHtml(a.servico) : ''}</div>
+    <div class="ativo-card" id="atcard-${a.id}">
+      <div class="arquivo-head" style="margin-bottom:14px">
+        <div style="min-width:0;flex:1">
+          <div class="ativo-nome" style="max-width:none;margin-bottom:0;overflow-wrap:anywhere">${escHtml(a.nome)}</div>
+          ${a.servico ? `<div style="font-size:12.5px;color:#64748b;margin-top:6px"><svg class="ic" aria-hidden="true"><use href="#i-briefcase"/></svg> ${escHtml(a.servico)}</div>` : ''}
         </div>
-        <button onclick="excluirAtivo('${a.id}')" style="border:none;background:none;font-size:18px;cursor:pointer;color:var(--gray-400)"><svg class="ic" aria-hidden="true"><use href="#i-trash-2"/></svg></button>
+        <span class="icon-btn toggle-opcoes" onclick="toggleOpcoesAtivo('${a.id}', event)" aria-label="Opções"><svg class="ic" aria-hidden="true"><use href="#i-ellipsis"/></svg></span>
       </div>
-      <div class="contact-btns">${contactBtns(a.numero)}</div>
-      ${obsHtml}
-      <button class="btn-proposta" onclick="openPropostaAtivo('${a.id}')"><svg class="ic" aria-hidden="true"><use href="#i-file-text"/></svg> Nova proposta</button>
+      <div class="contact-btns" style="margin-bottom:0">${contactBtns(a.numero)}</div>
     </div>`;
   }).join('');
 }
@@ -1625,17 +1728,16 @@ function renderAtivos() {
 function renderArquivo() {
   const lista = document.getElementById('lista-arquivo');
   if (!state.arquivo.length) {
-    lista.innerHTML = `<div class="empty-state"><div class="empty-icon"><svg class="ic" aria-hidden="true"><use href="#i-archive"/></svg></div><div class="empty-text">Arquivo vazio</div><div class="empty-sub">Contatos com 3 tentativas sem retorno aparecem aqui</div></div>`;
+    lista.innerHTML = `<div class="empty-state"><div class="empty-icon"><svg class="ic" aria-hidden="true"><use href="#i-archive"/></svg></div><div class="empty-text">Arquivo vazio</div></div>`;
     return;
   }
   lista.innerHTML = state.arquivo.map(a => {
-    const obsHtml = a.obs ? `<div class="card-obs"><span><svg class="ic" aria-hidden="true"><use href="#i-notebook-pen"/></svg></span> ${escHtml(a.obs)}</div>` : '';
     return `
-    <div class="arquivo-card">
-      <div class="arquivo-nome"><svg class="ic" aria-hidden="true"><use href="#i-archive"/></svg> ${escHtml(a.nome)}</div>
-      <div class="arquivo-info"><svg class="ic" aria-hidden="true"><use href="#i-circle-x"/></svg> 3 tentativas sem retorno</div>
-      <div class="contact-btns">${contactBtns(a.numero)}</div>
-      ${obsHtml}
+    <div class="arquivo-card" id="vcard-${a.id}">
+      <div class="arquivo-head">
+        <div class="arquivo-nome" style="margin-bottom:0">${escHtml(a.nome)}</div>
+        <span class="icon-btn toggle-opcoes" onclick="toggleOpcoesArquivo('${a.id}', event)" aria-label="Opções"><svg class="ic" aria-hidden="true"><use href="#i-ellipsis"/></svg></span>
+      </div>
       <div class="arquivo-btns">
         <button class="btn-reativar" onclick="reativarContato('${a.id}')"><svg class="ic" aria-hidden="true"><use href="#i-refresh-cw"/></svg> Reativar</button>
         <button class="btn-excluir" onclick="excluirArquivo('${a.id}')"><svg class="ic" aria-hidden="true"><use href="#i-trash-2"/></svg> Excluir</button>
@@ -1665,7 +1767,7 @@ function renderCronograma() {
   }).sort((a,b) => (a.data+a.hora).localeCompare(b.data+b.hora));
 
   if (!todos.length) {
-    lista.innerHTML = `<div class="empty-state"><div class="empty-icon"><svg class="ic" aria-hidden="true"><use href="#i-clock"/></svg></div><div class="empty-text">Nenhum compromisso</div><div class="empty-sub">Nada agendado para este período</div></div>`;
+    lista.innerHTML = `<div class="empty-state"><div class="empty-icon"><svg class="ic" aria-hidden="true"><use href="#i-clock"/></svg></div><div class="empty-text">Nenhum compromisso</div></div>`;
     return;
   }
 
@@ -1683,19 +1785,14 @@ function renderCronograma() {
     }
     const tipoLabel = item._tipo === 'reuniao' ? 'Reunião' : 'Ligação';
     return `
-    <div class="crono-item ${item._tipo}">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
-        <div style="display:flex;align-items:center;gap:14px">
-          <span class="crono-hora"><svg class="ic" aria-hidden="true"><use href="#i-alarm-clock"/></svg> ${item.hora}</span>
-          <span class="crono-tipo-tag ${item._tipo}">${tipoLabel}</span>
+    <div class="crono-item ${item._tipo}" id="ccard-${item._tipo}-${item.id}">
+      <div class="reuniao-top">
+        <span class="crono-tipo-tag ${item._tipo}" style="margin-bottom:0">${tipoLabel}</span>
+        <div class="reuniao-top-dir">
+          <span class="icon-btn toggle-opcoes" onclick="toggleOpcoesCrono('${item.id}','${item._tipo}', event)" aria-label="Opções"><svg class="ic" aria-hidden="true"><use href="#i-ellipsis"/></svg></span>
         </div>
-        <span class="crono-data-tag"><svg class="ic" aria-hidden="true"><use href="#i-calendar"/></svg> ${formatDate(item.data)}</span>
       </div>
       <div class="crono-nome">${escHtml(item.nome)}</div>
-      <div class="crono-btns-contato">
-        <a href="${fmtTel(item.numero)}" class="contact-btn phone"><svg class="ic" aria-hidden="true"><use href="#i-phone"/></svg> Ligar</a>
-        <a href="${fmtWA(item.numero)}" target="_blank" class="contact-btn whatsapp"><svg class="ic" aria-hidden="true"><use href="#i-message-circle"/></svg> WhatsApp</a>
-      </div>
       ${alertaHtml}
       <div class="crono-btns-acao">
         <button class="btn-concluido" onclick="cronoConcluir('${item.id}','${item._tipo}')"><svg class="ic" aria-hidden="true"><use href="#i-check"/></svg> Concluído</button>
@@ -1789,7 +1886,6 @@ window.mascararTelefone = function(input) {
 };
 
 window.openModalNovoContato = function() {
-  document.getElementById('modal-novo-title').textContent = 'Novo Contato';
   document.getElementById('edit-id').value = '';
   ['inp-nome','inp-numero','inp-indicado','inp-obs'].forEach(id => document.getElementById(id).value = '');
   window.openModal('modal-novo');
@@ -1799,7 +1895,6 @@ window.openModalNovoContato = function() {
 window.editarContato = function(id) {
   const c = state.contatos.find(x => x.id === id);
   if (!c) return;
-  document.getElementById('modal-novo-title').textContent = 'Editar Contato';
   document.getElementById('edit-id').value = id;
   document.getElementById('inp-nome').value = c.nome;
   // Aplica máscara ao número existente ao editar
@@ -1859,7 +1954,6 @@ window.openAtendeu = function(id) {
   selectedContatoId = id;
   const c = state.contatos.find(x => x.id === id);
   if (!c) { toast('Contato não encontrado'); return; }
-  document.getElementById('atendeu-title').textContent = `${c.nome} atendeu!`;
   // Garante que qualquer modal anterior foi fechado antes de abrir
   document.querySelectorAll('.modal-backdrop.active').forEach(m => m.classList.remove('active'));
   setTimeout(function() { window.openModal('modal-atendeu'); }, 50);
@@ -1974,7 +2068,6 @@ window.openPropostaReuniao = function(id) {
   selectedReuniaoId = id;
   const r = state.reunioes.find(x => x.id === id);
   if (!r) return;
-  document.getElementById('proposta-title').textContent = `Proposta — ${r.nome}`;
   const _pp = JSON.parse(localStorage.getItem('meucrmPropostaPadrao') || '{}');
   ['pr-servico','pr-descricao','pr-valor','pr-prazo','pr-pagamento','pr-validade','pr-obs-extra'].forEach(fid => {
     document.getElementById(fid).value = _pp[fid] || '';
@@ -2024,7 +2117,6 @@ window.copiarHtmlProposta = function() {
 function openModalProposta() {
   const c = state.contatos.find(x => x.id === selectedContatoId);
   if (!c) return;
-  document.getElementById('proposta-title').textContent = `Proposta — ${c.nome}`;
   const _pp = JSON.parse(localStorage.getItem('meucrmPropostaPadrao') || '{}');
   ['pr-servico','pr-descricao','pr-valor','pr-prazo','pr-pagamento','pr-validade','pr-obs-extra'].forEach(fid => {
     document.getElementById(fid).value = _pp[fid] || '';
@@ -2040,7 +2132,6 @@ window.openPropostaAtivo = function(id) {
   const a = state.ativos.find(x => x.id === id);
   if (!a) return;
   selectedContatoId = '__ativo__' + id;
-  document.getElementById('proposta-title').textContent = `Nova Proposta — ${a.nome}`;
   ['pr-servico','pr-descricao','pr-valor','pr-prazo','pr-pagamento','pr-validade','pr-obs-extra'].forEach(fid => document.getElementById(fid).value = '');
   document.getElementById('proposta-form-wrap').style.display = '';
   document.getElementById('proposta-prompt-wrap').style.display = 'none';
@@ -2164,7 +2255,6 @@ window.openLiguei = function(agId) {
   selectedAgendaId = agId;
   const ag = state.agenda.find(x => x.id === agId);
   if (!ag) return;
-  document.getElementById('liguei-title').textContent = `Ligação para ${ag.nome}`;
   window.openModal('modal-liguei');
 }
 
@@ -2194,7 +2284,6 @@ window.openConcluir = function(id) {
   selectedReuniaoId = id;
   const r = state.reunioes.find(x => x.id === id);
   if (!r) return;
-  document.getElementById('concluir-title').textContent = `Reunião — ${r.nome}`;
   window.openModal('modal-concluir');
 }
 
@@ -2258,10 +2347,40 @@ window.editObs = function(tipo, id) {
   let obs = '';
   const item = state[tipo]?.find(x => x.id === id);
   if (item) obs = item.obs || '';
-  document.getElementById('obs-textarea').value = obs;
+  const ta = document.getElementById('obs-textarea');
+  ta.value = obs;
+  ta.readOnly = !!obs;   // com texto: abre em modo leitura; toque para editar
   window.openModal('modal-obs');
-  setTimeout(() => document.getElementById('obs-textarea').focus(), 400);
+  autoGrowObs();
+  setTimeout(autoGrowObs, 60);
+  if (!obs) setTimeout(() => ta.focus(), 400);
 }
+function autoGrowObs() {
+  const ta = document.getElementById('obs-textarea');
+  const cs = getComputedStyle(ta);
+  const ctx = (autoGrowObs._c ||= document.createElement('canvas').getContext('2d'));
+  ctx.font = cs.fontStyle + ' ' + cs.fontWeight + ' ' + cs.fontSize + ' ' + cs.fontFamily;
+  const texto = ta.value || ta.placeholder || '';
+  const maxLinha = Math.max(...texto.split('\n').map(l => ctx.measureText(l || ' ').width));
+  const extra = parseFloat(cs.paddingLeft) + parseFloat(cs.paddingRight) + parseFloat(cs.borderLeftWidth) + parseFloat(cs.borderRightWidth);
+  const disponivel = ta.parentElement.clientWidth;
+  const largura = Math.min(Math.ceil(maxLinha + extra + 6), disponivel);
+  ta.style.display = 'block';
+  ta.style.width = largura + 'px';
+  ta.style.maxWidth = '100%';
+  ta.style.height = 'auto';
+  ta.style.height = ta.scrollHeight + 2 + 'px';
+  ta.style.overflowY = ta.scrollHeight > ta.clientHeight + 2 ? 'auto' : 'hidden';
+}
+document.getElementById('obs-textarea').addEventListener('input', autoGrowObs);
+document.getElementById('obs-textarea').addEventListener('click', function() {
+  if (this.readOnly) {
+    this.readOnly = false;
+    this.focus();
+    const n = this.value.length;
+    try { this.setSelectionRange(n, n); } catch(e) {}
+  }
+});
 
 window.salvarObs = async function() {
   if (!selectedObsTarget) return;
