@@ -3,12 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta name="theme-color" content="#2563eb">
+<meta name="theme-color" content="#ffffff">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="MEU CRM">
 <title>MEU CRM</title>
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Sora:wght@400;500;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@600;700;800&family=DM+Sans:wght@400;500;600;700&family=Outfit:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://arquivos98126066-sudo.github.io/SOFTWARE/sync-indicator.js"></script>
 <style>
   :root {
@@ -54,7 +54,7 @@
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 
   body {
-    font-family: 'Inter', sans-serif;
+    font-family: 'DM Sans', sans-serif;
     background: #f9fafb;
     color: #111111;
     min-height: 100dvh;
@@ -81,7 +81,7 @@
     display: block; width: 22px; height: 2px; background: var(--gray-700);
     border-radius: 2px; transition: all 0.3s ease;
   }
-  .topbar-title { font-family: 'Sora', sans-serif; font-weight: 600; font-size: 17px; color: #111111; letter-spacing: -0.3px; }
+  .topbar-title { font-family: 'Barlow', sans-serif; font-weight: 600; font-size: 17px; color: #111111; letter-spacing: -0.3px; }
   .sync-badge {
     display: flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 500;
     color: var(--gray-400); padding: 4px 8px; border-radius: 20px; background: var(--gray-100);
@@ -107,7 +107,7 @@
     border-bottom: 1px solid rgba(0,0,0,0.08);
     background: #ffffff;
   }
-  .sidebar-logo { font-family: 'Sora', sans-serif; font-weight: 600; font-size: 17px; color: #111111; }
+  .sidebar-logo { font-family: 'Barlow', sans-serif; font-weight: 600; font-size: 17px; color: #111111; }
   .sidebar-sub { font-size: 12px; color: #9ca3af; margin-top: 2px; }
   .sidebar-nav { padding: 12px 0; flex: 1; }
   .nav-item {
@@ -140,12 +140,12 @@
   @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
 
   .page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; gap: 8px; }
-  .page-title { font-family: 'Sora', sans-serif; font-size: 20px; font-weight: 600; color: #111111; }
+  .page-title { font-family: 'Barlow', sans-serif; font-size: 20px; font-weight: 600; color: #111111; }
   .btn-primary {
     background: #111111; color: #ffffff; border: none;
     padding: 7px 13px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 500;
     cursor: pointer; display: flex; align-items: center; gap: 5px; transition: all 0.2s;
-    font-family: 'Inter', sans-serif; line-height: 1;
+    font-family: 'DM Sans', sans-serif; line-height: 1;
   }
   .btn-primary:active { transform: scale(0.97); background: #333333; }
 
@@ -153,7 +153,7 @@
   .search-input {
     width: 100%; padding: 11px 16px 11px 40px; border: 1.5px solid var(--gray-200);
     border-radius: var(--radius-sm); font-size: 14px; background: var(--white);
-    outline: none; transition: border 0.2s; font-family: 'Inter', sans-serif;
+    outline: none; transition: border 0.2s; font-family: 'DM Sans', sans-serif;
   }
   .search-input:focus { border-color: #111111; }
   .search-icon { position: absolute; left: 13px; top: 50%; transform: translateY(-50%); font-size: 16px; color: var(--gray-400); }
@@ -170,7 +170,7 @@
   .card.red { border-left-color: var(--red); }
 
   .card-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 10px; }
-  .card-name { font-family: 'Sora', sans-serif; font-weight: 600; font-size: 15px; color: var(--gray-900); margin-bottom: 10px; }
+  .card-name { font-family: 'Barlow', sans-serif; font-weight: 600; font-size: 15px; color: var(--gray-900); margin-bottom: 10px; }
   .card-num { font-size: 12px; color: var(--gray-500); margin-top: 1px; }
   .card-order { font-size: 12px; color: var(--gray-400); font-weight: 600; }
 
@@ -198,7 +198,7 @@
   .btn-nao, .btn-atendeu {
     flex: 1; padding: 9px; border-radius: var(--radius-sm); border: none;
     font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s;
-    font-family: 'Inter', sans-serif;
+    font-family: 'DM Sans', sans-serif;
   }
   .btn-nao { background: var(--red-light); color: var(--red); }
   .btn-atendeu { background: var(--green-light); color: var(--green); }
@@ -209,7 +209,7 @@
     border-radius: var(--radius-sm); border: 1.5px solid var(--gray-200);
     background: var(--gray-100); color: var(--gray-700);
     font-size: 13px; font-weight: 600; cursor: pointer;
-    font-family: 'Inter', sans-serif; transition: all 0.2s;
+    font-family: 'DM Sans', sans-serif; transition: all 0.2s;
     display: flex; align-items: center; justify-content: center; gap: 6px;
   }
   .btn-mover-contato:active { transform: scale(0.97); background: var(--gray-200); }
@@ -223,12 +223,12 @@
 
   .agenda-section-title { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--gray-400); margin: 16px 0 8px; }
   .agenda-card { background: var(--white); border-radius: var(--radius); padding: 18px 16px; box-shadow: var(--shadow); margin-bottom: 14px; }
-  .agenda-time { font-family: 'Sora', sans-serif; font-size: 18px; font-weight: 700; color: #111111; }
+  .agenda-time { font-family: 'Barlow', sans-serif; font-size: 18px; font-weight: 700; color: #111111; }
   .agenda-name { font-size: 16px; font-weight: 700; color: var(--gray-900); margin: 14px 0 14px; padding-bottom: 12px; border-bottom: 1px solid var(--gray-100); }
   .btn-liguei {
     background: #f5f5f5; color: #111111; border: none;
     padding: 8px 16px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 600;
-    cursor: pointer; font-family: 'Inter', sans-serif; transition: all 0.2s; margin-top: 8px;
+    cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.2s; margin-top: 8px;
   }
   .btn-liguei:active { transform: scale(0.97); }
 
@@ -245,7 +245,7 @@
   .btn-concluir {
     background: var(--green-light); color: var(--green); border: none;
     padding: 10px 16px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 600;
-    cursor: pointer; font-family: 'Inter', sans-serif; transition: all 0.2s; margin-top: 6px;
+    cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.2s; margin-top: 6px;
   }
   .btn-concluir:active { transform: scale(0.97); }
 
@@ -255,7 +255,7 @@
   .btn-proposta {
     background: #f5f5f5; color: #111111; border: none;
     padding: 8px 14px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 600;
-    cursor: pointer; font-family: 'Inter', sans-serif; transition: all 0.2s;
+    cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.2s;
   }
   .btn-proposta:active { transform: scale(0.97); }
 
@@ -263,8 +263,8 @@
   .arquivo-nome { font-size: 16px; font-weight: 700; color: var(--gray-900); margin-bottom: 6px; }
   .arquivo-info { font-size: 12px; color: var(--red); font-weight: 500; margin-bottom: 14px; padding-bottom: 12px; border-bottom: 1px solid var(--gray-100); }
   .arquivo-btns { display: flex; gap: 8px; margin-top: 10px; }
-  .btn-reativar { background: #f5f5f5; color: #111111; border: none; padding: 8px 14px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 600; cursor: pointer; font-family: 'Inter', sans-serif; transition: all 0.2s; }
-  .btn-excluir { background: var(--red-light); color: var(--red); border: none; padding: 8px 14px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 600; cursor: pointer; font-family: 'Inter', sans-serif; transition: all 0.2s; }
+  .btn-reativar { background: #f5f5f5; color: #111111; border: none; padding: 8px 14px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.2s; }
+  .btn-excluir { background: var(--red-light); color: var(--red); border: none; padding: 8px 14px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.2s; }
   .btn-reativar:active, .btn-excluir:active { transform: scale(0.97); }
 
   .empty-state { text-align: center; padding: 60px 20px; color: var(--gray-400); }
@@ -284,14 +284,14 @@
   }
   .modal-backdrop.active .modal { transform: translateY(0); }
   .modal-handle { width: 40px; height: 4px; background: var(--gray-200); border-radius: 2px; margin: 0 auto 20px; }
-  .modal-title { font-family: 'Sora', sans-serif; font-size: 18px; font-weight: 600; color: #111111; margin-bottom: 20px; }
+  .modal-title { font-family: 'Barlow', sans-serif; font-size: 18px; font-weight: 600; color: #111111; margin-bottom: 20px; }
 
   .form-group { margin-bottom: 16px; }
   .form-label { display: block; font-size: 13px; font-weight: 600; color: var(--gray-600); margin-bottom: 6px; }
   .form-input, .form-textarea, .form-select {
     width: 100%; padding: 12px 14px; border: 1.5px solid var(--gray-200);
     border-radius: var(--radius-sm); font-size: 15px; background: var(--white);
-    outline: none; transition: border 0.2s; font-family: 'Inter', sans-serif; color: var(--gray-900);
+    outline: none; transition: border 0.2s; font-family: 'DM Sans', sans-serif; color: var(--gray-900);
   }
   .form-input:focus, .form-textarea:focus, .form-select:focus { border-color: #111111; }
   .form-textarea { min-height: 80px; resize: vertical; }
@@ -302,7 +302,7 @@
 
   .btn-full {
     width: 100%; padding: 14px; border-radius: var(--radius-sm); border: none;
-    font-size: 15px; font-weight: 700; cursor: pointer; font-family: 'Inter', sans-serif; transition: all 0.2s;
+    font-size: 15px; font-weight: 700; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.2s;
   }
   .btn-full.blue { background: #111111; color: #ffffff; }
   .btn-full.blue:active { background: #333333; }
@@ -315,7 +315,7 @@
     display: flex; align-items: center; gap: 13px; padding: 15px 16px;
     border-radius: var(--radius-sm); border: 1.5px solid var(--gray-200);
     background: var(--white); cursor: pointer; font-size: 15px; font-weight: 500;
-    color: var(--gray-700); transition: all 0.2s; font-family: 'Inter', sans-serif; text-align: left;
+    color: var(--gray-700); transition: all 0.2s; font-family: 'DM Sans', sans-serif; text-align: left;
   }
   .atendeu-btn:hover { border-color: #111111; background: #f5f5f5; color: #111111; }
   .atendeu-btn:active { transform: scale(0.98); }
@@ -330,7 +330,7 @@
   .btn-copy {
     width: 100%; padding: 12px; border-radius: var(--radius-sm); border: 1.5px solid rgba(0,0,0,0.15);
     font-size: 14px; font-weight: 600; cursor: pointer; background: #ffffff;
-    color: #111111; font-family: 'Inter', sans-serif; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 6px;
+    color: #111111; font-family: 'DM Sans', sans-serif; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 6px;
   }
   .btn-copy:active { background: #f5f5f5; }
 
@@ -338,14 +338,14 @@
   .concluir-btn {
     flex: 1; min-width: 100px; padding: 12px 8px; border-radius: var(--radius-sm); border: 1.5px solid var(--gray-200);
     background: var(--white); cursor: pointer; font-size: 13px; font-weight: 600;
-    color: var(--gray-700); transition: all 0.2s; font-family: 'Inter', sans-serif; text-align: center;
+    color: var(--gray-700); transition: all 0.2s; font-family: 'DM Sans', sans-serif; text-align: center;
   }
   .concluir-btn.fechou { border-color: var(--green); color: var(--green); background: var(--green-light); }
   .concluir-btn.nao-fechou { border-color: var(--red); color: var(--red); background: var(--red-light); }
   .concluir-btn.pendente { border-color: var(--gray-300); color: var(--gray-700); background: var(--gray-100); }
   .concluir-btn:active { transform: scale(0.97); }
 
-  .crono-tab { flex:1; padding:9px 8px; border-radius:var(--radius-sm); border:1.5px solid var(--gray-200); background:var(--white); font-size:13px; font-weight:600; color:var(--gray-500); cursor:pointer; font-family:'Inter',sans-serif; transition:all 0.2s; }
+  .crono-tab { flex:1; padding:9px 8px; border-radius:var(--radius-sm); border:1.5px solid var(--gray-200); background:var(--white); font-size:13px; font-weight:600; color:var(--gray-500); cursor:pointer; font-family:'DM Sans',sans-serif; transition:all 0.2s; }
   .crono-tab.active { background:#111111; color:#ffffff; border-color:#111111; }
   .crono-item {
     background: var(--white); border-radius: var(--radius); padding: 14px 16px;
@@ -354,7 +354,7 @@
   }
   .crono-item.reuniao { border-left-color: var(--green); }
   .crono-item.agenda { border-left-color: #111111; }
-  .crono-hora { font-family: 'Sora', sans-serif; font-size: 14px; font-weight: 700; color: var(--gray-500); }
+  .crono-hora { font-family: 'Barlow', sans-serif; font-size: 14px; font-weight: 700; color: var(--gray-500); }
   .crono-data-tag { font-size: 12px; color: var(--gray-400); margin-left: 6px; }
   .crono-tipo-tag {
     display: inline-block; font-size: 10px; font-weight: 700; text-transform: uppercase;
@@ -362,20 +362,20 @@
   }
   .crono-tipo-tag.reuniao { background: var(--green-light); color: var(--green); }
   .crono-tipo-tag.agenda { background: #f5f5f5; color: #374151; }
-  .crono-nome { font-family: 'Sora', sans-serif; font-size: 15px; font-weight: 700; color: var(--gray-900); margin: 12px 0 10px; }
+  .crono-nome { font-family: 'Barlow', sans-serif; font-size: 15px; font-weight: 700; color: var(--gray-900); margin: 12px 0 10px; }
   .crono-btns-contato { display: flex; gap: 8px; margin-bottom: 10px; }
   .crono-btns-acao { display: flex; gap: 8px; margin-top: 8px; }
   .btn-concluido {
     flex: 1; padding: 8px; border-radius: var(--radius-sm); border: none;
     background: var(--green-light); color: var(--green);
     font-size: 13px; font-weight: 600; cursor: pointer;
-    font-family: 'Inter', sans-serif; transition: all 0.2s;
+    font-family: 'DM Sans', sans-serif; transition: all 0.2s;
   }
   .btn-adiado {
     flex: 1; padding: 8px; border-radius: var(--radius-sm); border: none;
     background: #f5f5f5; color: #111111;
     font-size: 13px; font-weight: 600; cursor: pointer;
-    font-family: 'Inter', sans-serif; transition: all 0.2s;
+    font-family: 'DM Sans', sans-serif; transition: all 0.2s;
   }
   .btn-concluido:active, .btn-adiado:active { transform: scale(0.97); }
   .crono-alerta {
@@ -393,7 +393,7 @@
   .toast.show { transform: translateX(-50%) translateY(0); }
 
   .confirm-modal { max-width: 340px; margin: auto; border-radius: 20px; padding: 24px 20px; }
-  .confirm-title { font-family: 'Sora', sans-serif; font-size: 17px; font-weight: 700; margin-bottom: 8px; }
+  .confirm-title { font-family: 'Barlow', sans-serif; font-size: 17px; font-weight: 700; margin-bottom: 8px; }
   .confirm-text { font-size: 14px; color: var(--gray-500); margin-bottom: 20px; }
   .confirm-btns { display: flex; gap: 10px; }
 
@@ -413,17 +413,230 @@
     .modal { max-width: 480px; margin: 0 auto; border-radius: 24px; margin-bottom: 20px; }
     .modal-backdrop { align-items: center; }
   }
+
+  /* ═════════ TEMA NOVO — mesmo visual do painel: ícones SVG, cartões, chips e botões ═════════ */
+  :root {
+    --brand: #059669; --brand2: #10b981; --ink: #0f172a; --page: #f3f5f8; --line: #e6e9ef;
+    --r: 18px; --r12: 12px;
+    --sombra: 0 1px 2px rgba(15,23,42,.04), 0 10px 26px -14px rgba(15,23,42,.20);
+  }
+  body { background: var(--page); color: var(--ink); font-family: 'DM Sans', sans-serif; -webkit-font-smoothing: antialiased; }
+  .ic { display: inline-block; width: 1.15em; height: 1.15em; flex: none; fill: none; stroke: currentColor;
+        stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; vertical-align: -.2em; }
+
+  /* topo */
+  .topbar { height: 64px; background: rgba(255,255,255,.94); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--line); box-shadow: none; }
+  .main { padding-top: 64px; }
+  .topbar-left { gap: 10px; }
+  .hamburger { width: 42px; height: 42px; border-radius: 12px; color: var(--ink); display: grid; place-items: center; }
+  .hamburger:active { background: #eef1f5; }
+  .hamburger .ic { width: 23px; height: 23px; }
+  .app-mark { width: 34px; height: 34px; border-radius: 11px; display: grid; place-items: center; color: #fff;
+              background: linear-gradient(145deg, #34d399, #047857);
+              box-shadow: 0 6px 14px -6px rgba(4,120,87,.65), inset 0 1px 0 rgba(255,255,255,.35); }
+  .app-mark .ic { width: 19px; height: 19px; }
+  .app-mark.sm { width: 32px; height: 32px; border-radius: 10px; }
+  .topbar-title { font-family: 'Barlow', sans-serif; font-weight: 800; font-size: 19px; letter-spacing: .3px; color: var(--ink); }
+
+  /* menu lateral */
+  .sidebar { width: 290px; left: -300px; background: #fff; border-right: 1px solid var(--line); }
+  .sidebar-header { padding: 22px 18px 12px; border-bottom: 0; }
+  .sidebar-logo { display: flex; align-items: center; gap: 10px; font-family: 'Barlow', sans-serif; font-weight: 800; font-size: 20px; letter-spacing: .3px; }
+  .sidebar-nav { padding: 6px 12px; }
+  .nav-item { border-radius: 14px; padding: 8px 10px; gap: 12px; font-size: 15px; font-weight: 500; color: #334155; margin-bottom: 3px; }
+  .nav-item:hover { background: #f6f8fa; color: var(--ink); }
+  .nav-item.active { background: #ecfdf5; color: #065f46; font-weight: 700; }
+  .nav-item.active::before { display: none; }
+  .nav-icon { width: 34px; height: 34px; border-radius: 11px; display: grid; place-items: center; color: #fff; font-size: 0;
+              box-shadow: inset 0 1px 0 rgba(255,255,255,.35); }
+  .nav-icon .ic { width: 18px; height: 18px; }
+  .nav-item[data-page=contatos] .nav-icon { background: linear-gradient(145deg,#34d399,#047857); }
+  .nav-item[data-page=agenda] .nav-icon { background: linear-gradient(145deg,#60a5fa,#1d4ed8); }
+  .nav-item[data-page=reunioes] .nav-icon { background: linear-gradient(145deg,#a78bfa,#6d28d9); }
+  .nav-item[data-page=ativos] .nav-icon { background: linear-gradient(145deg,#fcd34d,#b45309); }
+  .nav-item[data-page=arquivo] .nav-icon { background: linear-gradient(145deg,#94a3b8,#334155); }
+  .nav-item[data-page=cronograma] .nav-icon { background: linear-gradient(145deg,#fb7185,#be123c); }
+  .nav-item[data-page=lixeira] .nav-icon { background: linear-gradient(145deg,#cbd5e1,#64748b); }
+  .nav-badge, .nav-badge.yellow, .nav-badge.green { background: #eef1f5; color: #475569; border-radius: 999px; font-weight: 700; }
+  .nav-item.active .nav-badge { background: #d1fae5; color: #047857; }
+
+  /* títulos e busca */
+  .page { padding: 18px 14px; }
+  .page-header { margin-bottom: 16px; }
+  .page-title { font-family: 'Barlow', sans-serif; font-size: 30px; font-weight: 800; letter-spacing: -.5px; color: var(--ink); display: flex; align-items: center; gap: 8px; }
+  .btn-primary { background: var(--ink); color: #fff; padding: 11px 17px; border-radius: 999px; font-size: 14px; font-weight: 700; gap: 6px;
+                 box-shadow: 0 10px 18px -10px rgba(15,23,42,.7); }
+  .btn-primary .ic { width: 16px; height: 16px; }
+  .search-input { padding: 14px 16px 14px 46px; border: 1px solid var(--line); border-radius: 14px; font-size: 15px; box-shadow: var(--sombra); }
+  .search-input:focus { border-color: var(--brand2); box-shadow: 0 0 0 3px rgba(16,185,129,.16); }
+  .search-icon { left: 16px; color: #94a3b8; display: flex; }
+  .search-icon .ic { width: 19px; height: 19px; }
+
+  /* cartões */
+  .card, .agenda-card, .reuniao-card, .ativo-card, .arquivo-card, .crono-item {
+    background: #fff; border: 1px solid var(--line); border-left: 1px solid var(--line); border-radius: var(--r);
+    box-shadow: var(--sombra); position: relative; overflow: hidden; padding: 18px 16px 16px 20px; margin-bottom: 14px; }
+  .card.blue, .card.yellow, .card.green, .card.red { border-left-color: var(--line); }
+  .card::before, .ativo-card::before, .arquivo-card::before, .crono-item::before {
+    content: ''; position: absolute; left: 0; top: 16px; bottom: 16px; width: 4px; border-radius: 0 4px 4px 0; background: #cbd5e1; }
+  .card.yellow::before { background: #f59e0b; }
+  .card.red::before, .arquivo-card::before { background: #ef4444; }
+  .card.green::before, .ativo-card::before, .crono-item.reuniao::before { background: #10b981; }
+  .crono-item.agenda::before { background: #64748b; }
+  .card-name { font-family: 'Barlow', sans-serif; font-size: 21px; font-weight: 700; letter-spacing: -.3px; color: var(--ink); margin-bottom: 12px; }
+  .agenda-name, .reuniao-nome, .ativo-nome, .arquivo-nome { font-family: 'Barlow', sans-serif; font-size: 20px; font-weight: 700; letter-spacing: -.2px; }
+  .status-tag { display: inline-flex; align-items: center; gap: 6px; font-size: 10.5px; font-weight: 700; letter-spacing: .9px; padding: 4px 10px; border-radius: 999px; margin-bottom: 10px; }
+  .status-tag::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+  .status-tag.novo { background: #eef2f6; color: #475569; }
+  .status-tag.tentando { background: #fef3c7; color: #b45309; }
+  .status-tag.atendeu { background: #d1fae5; color: #047857; }
+  .status-tag.sem-retorno { background: #fee2e2; color: #b91c1c; }
+
+  /* botões redondos (editar, excluir) */
+  .icon-btn, button[onclick^="excluirAgenda"], button[onclick^="excluirAtivo"], button[onclick^="excluirPermanenteCRM"] {
+    width: 36px; height: 36px; border-radius: 50% !important; display: grid !important; place-items: center; cursor: pointer;
+    background: #f1f4f8 !important; color: #64748b !important; border: 0 !important; font-size: 16px !important; }
+  .icon-btn:active { background: #e5e9f0 !important; }
+  button[onclick^="excluirAgenda"] .ic, button[onclick^="excluirAtivo"] .ic, button[onclick^="excluirPermanenteCRM"] .ic, .icon-btn .ic { width: 18px; height: 18px; vertical-align: 0; }
+
+  /* telefone e WhatsApp */
+  .contact-btns { gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
+  .contact-btn { padding: 10px 14px; border-radius: var(--r12); font-size: 14px; font-weight: 600; gap: 8px; font-family: 'DM Sans', sans-serif; }
+  .contact-btn.phone { background: #fff; color: var(--ink); border: 1px solid var(--line); box-shadow: 0 1px 2px rgba(15,23,42,.05); }
+  .contact-btn.whatsapp { background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
+
+  /* tentativas e ações */
+  .tentativa-label { font-size: 12.5px; color: #64748b; }
+  .dot { width: 11px; height: 11px; border: 0; background: #dfe5ec; }
+  .dot.filled { background: #f59e0b; }
+  .dot.filled-red { background: #ef4444; }
+  .btn-nao, .btn-atendeu { padding: 12px 10px; border-radius: var(--r12); font-size: 14px; font-weight: 700;
+                           display: flex; align-items: center; justify-content: center; gap: 7px; }
+  .btn-nao { background: #fff; color: #dc2626; border: 1px solid #fecaca; }
+  .btn-atendeu { background: linear-gradient(145deg, #10b981, #047857); color: #fff; box-shadow: 0 10px 18px -10px rgba(4,120,87,.75); }
+
+  /* observação */
+  .card-obs { margin-top: 14px; padding-top: 12px; border-top: 1px solid #eef1f5; font-size: 12.5px; color: #64748b;
+              display: flex; gap: 7px; align-items: flex-start; flex-wrap: nowrap; line-height: 1.5; }
+  .card-obs > span:first-child { color: #94a3b8; display: inline-flex; font-weight: 400; }
+  .card-obs[style*="color:var(--blue)"] { color: var(--brand) !important; font-weight: 600; }
+  .obs-edit-btn { display: inline-flex; flex: none; color: #94a3b8; text-decoration: none; margin-left: auto; padding-left: 6px; cursor: pointer; }
+  .card-indicado { display: flex; align-items: center; gap: 5px; justify-content: flex-end; font-size: 11.5px; color: #94a3b8; }
+
+  /* botões dos outros cartões */
+  .btn-liguei, .btn-concluir, .btn-proposta, .btn-reativar, .btn-excluir, .btn-concluido, .btn-adiado, .btn-mover-contato {
+    display: inline-flex; align-items: center; justify-content: center; gap: 7px; border-radius: var(--r12); padding: 10px 14px; font-weight: 700; font-size: 13.5px; }
+  .btn-liguei, .btn-concluir, .btn-concluido { background: #d1fae5; color: #047857; }
+  .btn-proposta, .btn-reativar, .btn-adiado, .btn-mover-contato { background: #eef2f6; color: #334155; border: 0; }
+  .btn-excluir { background: #fee2e2; color: #b91c1c; }
+  .reuniao-tipo { gap: 6px; padding: 5px 12px; background: #eef2f6 !important; color: #334155 !important; }
+  .agenda-section-title { display: flex; align-items: center; gap: 7px; font-size: 12px; letter-spacing: .8px; color: #64748b; margin: 18px 2px 10px; }
+  .agenda-time { font-family: 'Barlow', sans-serif; }
+  .crono-hora { font-family: 'Barlow', sans-serif; display: inline-flex; align-items: center; gap: 6px; color: #475569; }
+  .crono-data-tag { display: inline-flex; align-items: center; gap: 5px; }
+  .crono-alerta { display: flex; align-items: center; gap: 7px; border-radius: var(--r12); }
+  .crono-tab { border-radius: 999px; }
+
+  /* estados vazios */
+  .empty-state { padding: 56px 20px; }
+  .empty-icon { width: 68px; height: 68px; border-radius: 22px; margin: 0 auto 14px; display: grid; place-items: center; font-size: 0;
+                background: linear-gradient(145deg, #eef2f6, #e1e7ee); color: #64748b; }
+  .empty-icon .ic { width: 30px; height: 30px; vertical-align: 0; }
+  .empty-text { color: #334155; font-weight: 600; }
+
+  /* janelas (modais) */
+  .modal { border-radius: 26px 26px 0 0; padding: 22px 18px 30px; }
+  .modal-handle { width: 42px; background: #d9dee6; }
+  .modal-title { font-family: 'Barlow', sans-serif; font-weight: 800; font-size: 23px; letter-spacing: -.3px; display: flex; align-items: center; gap: 8px; }
+  .form-label { display: flex; align-items: center; gap: 6px; font-size: 13px; color: #475569; }
+  .form-input, .form-textarea, .form-select { border: 1px solid var(--line); border-radius: var(--r12); background: #fafbfc; }
+  .form-input:focus, .form-textarea:focus, .form-select:focus { border-color: var(--brand2); background: #fff; box-shadow: 0 0 0 3px rgba(16,185,129,.16); }
+  .btn-full { border-radius: 14px; padding: 15px; display: flex; align-items: center; justify-content: center; gap: 8px; }
+  .btn-full.blue { background: var(--ink); }
+  .btn-full.green { background: linear-gradient(145deg, #10b981, #047857); }
+  .btn-full.gray { background: #eef1f5; color: #334155; }
+  .atendeu-btn { border-radius: 14px; border: 1px solid var(--line); padding: 13px 14px; gap: 14px; box-shadow: var(--sombra); }
+  .atendeu-btn:hover { border-color: var(--brand2); background: #f0fdf9; color: #065f46; }
+  .atendeu-btn-icon { width: 38px; height: 38px; border-radius: 12px; display: grid; place-items: center; background: #eef2f6; color: #334155; font-size: 0; }
+  .atendeu-btn-icon .ic { width: 20px; height: 20px; vertical-align: 0; }
+  .concluir-btn { border-radius: 14px; display: flex; align-items: center; justify-content: center; gap: 6px; }
+  .btn-copy { border-radius: 14px; gap: 8px; }
+  .confirm-title { display: flex; align-items: center; gap: 8px; font-family: 'Barlow', sans-serif; font-weight: 800; }
+  .toast { background: var(--ink); border-radius: 999px; }
+
+  .ativo-nome { max-width: calc(100% - 50px); }
+
+  /* Não Atendeu / Atendeu: menores, só texto */
+  .action-btns { gap: 8px; }
+  .btn-nao, .btn-atendeu { flex: 0 0 auto; min-width: 108px; padding: 8px 16px; font-size: 13px; border-radius: 10px; gap: 0; }
+  .btn-atendeu { box-shadow: 0 6px 12px -8px rgba(4,120,87,.8); }
+
+  /* Reuniões: botões compactos, sem ícone, todos na mesma linha */
+  .reuniao-acoes { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 16px; }
+  .btn-concluir { flex: 0 0 auto; min-width: 108px; padding: 8px 16px; font-size: 13px; border-radius: 10px; margin-top: 0; gap: 0; }
+
+  /* Títulos menores e mais espaço em volta: ritmo de 16 px entre as partes de cada cartão */
+  .card-name { font-size: 18px; letter-spacing: -.2px; line-height: 1.25; margin-bottom: 16px; }
+  .status-tag { margin-bottom: 14px; }
+  .reuniao-card > div:first-child, .agenda-card > div:first-child { margin-bottom: 14px !important; }
+  .reuniao-nome, .agenda-name { font-size: 18px; line-height: 1.25; margin: 0 0 16px; padding-bottom: 16px; border-bottom: 1px solid #eef1f5; }
+  .agenda-name { margin-top: 0; }
+  .ativo-nome, .arquivo-nome { font-size: 18px; line-height: 1.25; margin-bottom: 8px; }
+  .ativo-servico, .arquivo-info { margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid #eef1f5; }
+  .crono-nome { font-size: 17px; line-height: 1.25; margin: 16px 0 14px; }
+  .contact-btns { margin-bottom: 14px; }
+  .tentativas-wrap { margin-bottom: 14px; }
+  .card-obs { margin-top: 16px; padding-top: 14px; }
 </style>
 </head>
 <body>
+<!-- Ícones: Lucide (https://lucide.dev), licença ISC -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+<symbol id="i-phone" viewBox="0 0 24 24"><path d="M13.832 16.568a1 1 0 0 0 1.213-.303l.355-.465A2 2 0 0 1 17 15h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2A18 18 0 0 1 2 4a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v3a2 2 0 0 1-.8 1.6l-.468.351a1 1 0 0 0-.292 1.233 14 14 0 0 0 6.392 6.384" /></symbol>
+<symbol id="i-message-circle" viewBox="0 0 24 24"><path d="M2.992 16.342a2 2 0 0 1 .094 1.167l-1.065 3.29a1 1 0 0 0 1.236 1.168l3.413-.998a2 2 0 0 1 1.099.092 10 10 0 1 0-4.777-4.719" /></symbol>
+<symbol id="i-pencil" viewBox="0 0 24 24"><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z" /> <path d="m15 5 4 4" /></symbol>
+<symbol id="i-search" viewBox="0 0 24 24"><path d="m21 21-4.34-4.34" /> <circle cx="11" cy="11" r="8" /></symbol>
+<symbol id="i-clipboard-list" viewBox="0 0 24 24"><rect width="8" height="4" x="8" y="2" rx="1" ry="1" /> <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" /> <path d="M12 11h4" /> <path d="M12 16h4" /> <path d="M8 11h.01" /> <path d="M8 16h.01" /></symbol>
+<symbol id="i-calendar" viewBox="0 0 24 24"><path d="M8 2v3" /> <path d="M16 2v3" /> <rect x="3" y="3" width="18" height="18" rx="2" /> <path d="M3 9h18" /></symbol>
+<symbol id="i-handshake" viewBox="0 0 24 24"><path d="m11 17 2 2a1 1 0 1 0 3-3" /> <path d="m14 14 2.5 2.5a1 1 0 1 0 3-3l-3.88-3.88a3 3 0 0 0-4.24 0l-.88.88a1 1 0 1 1-3-3l2.81-2.81a5.79 5.79 0 0 1 7.06-.87l.47.28a2 2 0 0 0 1.42.25L21 4" /> <path d="m21 3 1 11h-2" /> <path d="M3 3 2 14l6.5 6.5a1 1 0 1 0 3-3" /> <path d="M3 4h8" /></symbol>
+<symbol id="i-star" viewBox="0 0 24 24"><path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z" /></symbol>
+<symbol id="i-archive" viewBox="0 0 24 24"><rect width="20" height="5" x="2" y="3" rx="1" /> <path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8" /> <path d="M10 12h4" /></symbol>
+<symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" /> <path d="M12 6v6l4 2" /></symbol>
+<symbol id="i-trash-2" viewBox="0 0 24 24"><path d="M10 11v6" /> <path d="M14 11v6" /> <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" /> <path d="M3 6h18" /> <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" /></symbol>
+<symbol id="i-file-text" viewBox="0 0 24 24"><path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z" /> <path d="M14 2v5a1 1 0 0 0 1 1h5" /> <path d="M10 9H8" /> <path d="M16 13H8" /> <path d="M16 17H8" /></symbol>
+<symbol id="i-notebook-pen" viewBox="0 0 24 24"><path d="M13.4 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7.4" /> <path d="M2 6h4" /> <path d="M2 10h4" /> <path d="M2 14h4" /> <path d="M2 18h4" /> <path d="M21.378 5.626a1 1 0 1 0-3.004-3.004l-5.01 5.012a2 2 0 0 0-.506.854l-.837 2.87a.5.5 0 0 0 .62.62l2.87-.837a2 2 0 0 0 .854-.506z" /></symbol>
+<symbol id="i-user" viewBox="0 0 24 24"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" /> <circle cx="12" cy="7" r="4" /></symbol>
+<symbol id="i-users" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /> <path d="M16 3.128a4 4 0 0 1 0 7.744" /> <path d="M22 21v-2a4 4 0 0 0-3-3.87" /> <circle cx="9" cy="7" r="4" /></symbol>
+<symbol id="i-briefcase" viewBox="0 0 24 24"><path d="M16 20V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" /> <rect width="20" height="14" x="2" y="6" rx="2" /></symbol>
+<symbol id="i-circle-check" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" /> <path d="m16 9-5.5 5.5L8 12" /></symbol>
+<symbol id="i-circle-x" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" /> <path d="m15 9-6 6" /> <path d="m9 9 6 6" /></symbol>
+<symbol id="i-refresh-cw" viewBox="0 0 24 24"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" /> <path d="M21 3v5h-5" /> <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16" /> <path d="M8 16H3v5" /></symbol>
+<symbol id="i-save" viewBox="0 0 24 24"><path d="M15.2 3a2 2 0 0 1 1.4.6l3.8 3.8a2 2 0 0 1 .6 1.4V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z" /> <path d="M17 21v-7a1 1 0 0 0-1-1H8a1 1 0 0 0-1 1v7" /> <path d="M7 3v4a1 1 0 0 0 1 1h7" /></symbol>
+<symbol id="i-send" viewBox="0 0 24 24"><path d="M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z" /> <path d="m21.854 2.147-10.94 10.939" /></symbol>
+<symbol id="i-mail" viewBox="0 0 24 24"><path d="m22 7-8.991 5.727a2 2 0 0 1-2.009 0L2 7" /> <rect x="2" y="4" width="20" height="16" rx="2" /></symbol>
+<symbol id="i-map-pin" viewBox="0 0 24 24"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0" /> <circle cx="12" cy="10" r="3" /></symbol>
+<symbol id="i-smartphone" viewBox="0 0 24 24"><rect width="14" height="20" x="5" y="2" rx="2" ry="2" /> <path d="M12 18h.01" /></symbol>
+<symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4" /> <path d="M12 2v2" /> <path d="M12 20v2" /> <path d="m4.93 4.93 1.41 1.41" /> <path d="m17.66 17.66 1.41 1.41" /> <path d="M2 12h2" /> <path d="M20 12h2" /> <path d="m6.34 17.66-1.41 1.41" /> <path d="m19.07 4.93-1.41 1.41" /></symbol>
+<symbol id="i-triangle-alert" viewBox="0 0 24 24"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3" /> <path d="M12 9v4" /> <path d="M12 17h.01" /></symbol>
+<symbol id="i-ban" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" /> <path d="M4.929 4.929 19.07 19.071" /></symbol>
+<symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5" /></symbol>
+<symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18" /> <path d="m6 6 12 12" /></symbol>
+<symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 5h16" /> <path d="M4 12h16" /> <path d="M4 19h16" /></symbol>
+<symbol id="i-plus" viewBox="0 0 24 24"><path d="M5 12h14" /> <path d="M12 5v14" /></symbol>
+<symbol id="i-alarm-clock" viewBox="0 0 24 24"><circle cx="12" cy="13" r="8" /> <path d="M12 9v4l2 2" /> <path d="M5 3 2 6" /> <path d="m22 6-3-3" /> <path d="M6.38 18.7 4 21" /> <path d="M17.64 18.67 20 21" /></symbol>
+<symbol id="i-fast-forward" viewBox="0 0 24 24"><path d="M12 6a2 2 0 0 1 3.414-1.414l6 6a2 2 0 0 1 0 2.828l-6 6A2 2 0 0 1 12 18z" /> <path d="M2 6a2 2 0 0 1 3.414-1.414l6 6a2 2 0 0 1 0 2.828l-6 6A2 2 0 0 1 2 18z" /></symbol>
+<symbol id="i-copy" viewBox="0 0 24 24"><rect width="14" height="14" x="8" y="8" rx="2" ry="2" /> <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" /></symbol>
+</svg>
 
 <div class="overlay" id="overlay" onclick="closeSidebar()"></div>
 
 <div class="topbar">
   <div class="topbar-left">
     <button class="hamburger" onclick="toggleSidebar()" aria-label="Menu">
-      <span></span><span></span><span></span>
+      <svg class="ic" aria-hidden="true"><use href="#i-menu"/></svg>
     </button>
+    <span class="app-mark"><svg class="ic" aria-hidden="true"><use href="#i-users"/></svg></span>
     <span class="topbar-title">MEU CRM</span>
   </div>
   <div class="sync-badge">
@@ -434,30 +647,30 @@
 
 <div class="sidebar" id="sidebar">
   <div class="sidebar-header">
-    <div class="sidebar-logo">MEU CRM</div>
+    <div class="sidebar-logo"><span class="app-mark sm"><svg class="ic" aria-hidden="true"><use href="#i-users"/></svg></span>MEU CRM</div>
   </div>
   <nav class="sidebar-nav">
     <div class="nav-item active" data-page="contatos" onclick="navigate('contatos')">
-      <span class="nav-icon">📋</span> Contatos <span class="nav-badge" id="badge-contatos">0</span>
+      <span class="nav-icon"><svg class="ic" aria-hidden="true"><use href="#i-clipboard-list"/></svg></span> Contatos <span class="nav-badge" id="badge-contatos">0</span>
     </div>
     <div class="nav-item" data-page="agenda" onclick="navigate('agenda')">
-      <span class="nav-icon">🗓️</span> Agenda <span class="nav-badge yellow" id="badge-agenda" style="display:none">0</span>
+      <span class="nav-icon"><svg class="ic" aria-hidden="true"><use href="#i-calendar"/></svg></span> Agenda <span class="nav-badge yellow" id="badge-agenda" style="display:none">0</span>
     </div>
     <div class="nav-item" data-page="reunioes" onclick="navigate('reunioes')">
-      <span class="nav-icon">🤝</span> Reuniões <span class="nav-badge" id="badge-reunioes" style="display:none">0</span>
+      <span class="nav-icon"><svg class="ic" aria-hidden="true"><use href="#i-handshake"/></svg></span> Reuniões <span class="nav-badge" id="badge-reunioes" style="display:none">0</span>
     </div>
     <div class="nav-item" data-page="ativos" onclick="navigate('ativos')">
-      <span class="nav-icon">⭐</span> Ativos <span class="nav-badge green" id="badge-ativos" style="display:none">0</span>
+      <span class="nav-icon"><svg class="ic" aria-hidden="true"><use href="#i-star"/></svg></span> Ativos <span class="nav-badge green" id="badge-ativos" style="display:none">0</span>
     </div>
     <div class="nav-item" data-page="arquivo" onclick="navigate('arquivo')">
-      <span class="nav-icon">📁</span> Arquivo <span class="nav-badge" id="badge-arquivo" style="display:none">0</span>
+      <span class="nav-icon"><svg class="ic" aria-hidden="true"><use href="#i-archive"/></svg></span> Arquivo <span class="nav-badge" id="badge-arquivo" style="display:none">0</span>
     </div>
     <div class="nav-item" data-page="cronograma" onclick="navigate('cronograma')">
-      <span class="nav-icon">🕐</span> Cronograma
+      <span class="nav-icon"><svg class="ic" aria-hidden="true"><use href="#i-clock"/></svg></span> Cronograma
       <span class="nav-badge" id="badge-cronograma" style="display:none">0</span>
     </div>
     <div class="nav-item" data-page="lixeira" onclick="navigate('lixeira');renderLixeiraCRM()">
-      <span class="nav-icon">🗑️</span> Lixeira
+      <span class="nav-icon"><svg class="ic" aria-hidden="true"><use href="#i-trash-2"/></svg></span> Lixeira
     </div>
   </nav>
   <div class="sidebar-footer">v2.0 · Firebase Firestore</div>
@@ -470,7 +683,7 @@
       <button class="btn-primary" onclick="openModalNovoContato()">＋ Novo</button>
     </div>
     <div class="search-wrap">
-      <span class="search-icon">🔍</span>
+      <span class="search-icon"><svg class="ic" aria-hidden="true"><use href="#i-search"/></svg></span>
       <input class="search-input" id="searchContatos" placeholder="Buscar contato..." oninput="renderContatos()">
     </div>
     <div id="lista-contatos"></div>
@@ -517,7 +730,7 @@
   </div>
   <div class="page" id="page-lixeira">
     <div class="page-header">
-      <span class="page-title">🗑️ Lixeira</span>
+      <span class="page-title"><svg class="ic" aria-hidden="true"><use href="#i-trash-2"/></svg> Lixeira</span>
     </div>
     <p style="font-size:12px;color:var(--gray-400);margin-bottom:16px;">Itens excluídos. Restaure ou apague permanentemente.</p>
     <div id="lixeira-crm-lista"></div>
@@ -557,19 +770,19 @@
 <div class="modal-backdrop" id="modal-atendeu">
   <div class="modal">
     <div class="modal-handle"></div>
-    <div class="modal-title" id="atendeu-title">Atendeu! 🎉</div>
+    <div class="modal-title" id="atendeu-title">Atendeu!</div>
     <div class="atendeu-options">
       <button class="atendeu-btn" onclick="atendeuOpcao('agenda')">
-        <span class="atendeu-btn-icon">🗓️</span> Religar depois
+        <span class="atendeu-btn-icon"><svg class="ic" aria-hidden="true"><use href="#i-calendar"/></svg></span> Religar depois
       </button>
       <button class="atendeu-btn" onclick="atendeuOpcao('reuniao')">
-        <span class="atendeu-btn-icon">🤝</span> Marcar reunião
+        <span class="atendeu-btn-icon"><svg class="ic" aria-hidden="true"><use href="#i-handshake"/></svg></span> Marcar reunião
       </button>
       <button class="atendeu-btn" onclick="atendeuOpcao('proposta')">
-        <span class="atendeu-btn-icon">📄</span> Gerar proposta
+        <span class="atendeu-btn-icon"><svg class="ic" aria-hidden="true"><use href="#i-file-text"/></svg></span> Gerar proposta
       </button>
       <button class="atendeu-btn" onclick="atendeuOpcao('excluir')">
-        <span class="atendeu-btn-icon">🗑️</span> Excluir contato
+        <span class="atendeu-btn-icon"><svg class="ic" aria-hidden="true"><use href="#i-trash-2"/></svg></span> Excluir contato
       </button>
     </div>
     <button class="btn-full gray" onclick="closeModal('modal-atendeu')">Cancelar</button>
@@ -616,20 +829,20 @@
     <div class="form-group">
       <label class="form-label">Tipo *</label>
       <select class="form-select" id="re-tipo">
-        <option value="presencial">📍 Presencial</option>
-        <option value="remota">📱 Remota (ligação/vídeo)</option>
+        <option value="presencial">Presencial</option>
+        <option value="remota">Remota (ligação/vídeo)</option>
       </select>
     </div>
     <div class="form-group">
-      <label class="form-label">💬 Mensagem — 1 dia antes</label>
+      <label class="form-label"><svg class="ic" aria-hidden="true"><use href="#i-message-circle"/></svg> Mensagem — 1 dia antes</label>
       <textarea class="form-textarea" id="re-msg-dia-antes" style="min-height:70px"></textarea>
     </div>
     <div class="form-group">
-      <label class="form-label">☀️ Mensagem — Manhã do dia</label>
+      <label class="form-label"><svg class="ic" aria-hidden="true"><use href="#i-sun"/></svg> Mensagem — Manhã do dia</label>
       <textarea class="form-textarea" id="re-msg-manha" style="min-height:70px"></textarea>
     </div>
     <div class="form-group">
-      <label class="form-label">⏰ Mensagem — 1 hora antes</label>
+      <label class="form-label"><svg class="ic" aria-hidden="true"><use href="#i-alarm-clock"/></svg> Mensagem — 1 hora antes</label>
       <textarea class="form-textarea" id="re-msg-hora-antes" style="min-height:70px"></textarea>
     </div>
     <div class="modal-row">
@@ -679,19 +892,19 @@
       </div>
       <div class="modal-row">
         <div class="form-group"><button class="btn-full gray" onclick="closeModal('modal-proposta')">Cancelar</button></div>
-        <div class="form-group"><button class="btn-full blue" onclick="gerarPrompt()">📋 Gerar Prompt</button></div>
+        <div class="form-group"><button class="btn-full blue" onclick="gerarPrompt()"><svg class="ic" aria-hidden="true"><use href="#i-clipboard-list"/></svg> Gerar Prompt</button></div>
       </div>
     </div>
     <div id="proposta-prompt-wrap" style="display:none">
       <p style="font-size:13px;color:var(--gray-500);margin-bottom:8px">Copie e cole no DeepSeek ou Gemini:</p>
       <div class="prompt-box" id="prompt-texto"></div>
-      <button class="btn-copy" onclick="copiarPrompt()">📋 Copiar Prompt</button>
+      <button class="btn-copy" onclick="copiarPrompt()"><svg class="ic" aria-hidden="true"><use href="#i-clipboard-list"/></svg> Copiar Prompt</button>
       <div style="height:8px"></div>
       <div style="font-size:13px;color:var(--gray-500);margin-bottom:6px">Cole o HTML gerado pela IA aqui:</div>
       <textarea class="form-textarea" id="pr-html-gerado" placeholder="Cole aqui o HTML da proposta gerado pela IA..." style="min-height:80px"></textarea>
-      <button class="btn-full green" style="margin-top:8px" onclick="salvarHtmlProposta()">✅ Proposta Pronta</button>
+      <button class="btn-full green" style="margin-top:8px" onclick="salvarHtmlProposta()"><svg class="ic" aria-hidden="true"><use href="#i-circle-check"/></svg> Proposta Pronta</button>
       <div style="height:10px"></div>
-      <button class="btn-full green" onclick="marcarAtivoEFechar()">✅ Proposta enviada — Mover para Ativos</button>
+      <button class="btn-full green" onclick="marcarAtivoEFechar()"><svg class="ic" aria-hidden="true"><use href="#i-circle-check"/></svg> Proposta enviada — Mover para Ativos</button>
       <div style="height:8px"></div>
       <button class="btn-full gray" onclick="voltarFormProposta()">← Editar proposta</button>
     </div>
@@ -705,9 +918,9 @@
     <div class="modal-title" id="concluir-title">Resultado da Reunião</div>
     <p style="font-size:14px;color:var(--gray-500);margin-bottom:16px">Como foi a reunião?</p>
     <div class="concluir-options">
-      <button class="concluir-btn fechou" onclick="concluirReuniao('fechou')">✅ Fechou negócio</button>
-      <button class="concluir-btn nao-fechou" onclick="concluirReuniao('nao-fechou')">❌ Não fechou</button>
-      <button class="concluir-btn pendente" onclick="concluirReuniao('pendente')">🔄 Pendente</button>
+      <button class="concluir-btn fechou" onclick="concluirReuniao('fechou')"><svg class="ic" aria-hidden="true"><use href="#i-circle-check"/></svg> Fechou negócio</button>
+      <button class="concluir-btn nao-fechou" onclick="concluirReuniao('nao-fechou')"><svg class="ic" aria-hidden="true"><use href="#i-circle-x"/></svg> Não fechou</button>
+      <button class="concluir-btn pendente" onclick="concluirReuniao('pendente')"><svg class="ic" aria-hidden="true"><use href="#i-refresh-cw"/></svg> Pendente</button>
     </div>
     <div style="height:12px"></div>
     <button class="btn-full gray" onclick="closeModal('modal-concluir')">Cancelar</button>
@@ -732,11 +945,11 @@
 <!-- MODAL PROPOSTA PADRÃO -->
 <div class="modal-backdrop" id="modal-proposta-padrao" style="align-items:center">
   <div class="modal confirm-modal">
-    <div class="confirm-title">💾 Salvar como padrão?</div>
+    <div class="confirm-title"><svg class="ic" aria-hidden="true"><use href="#i-save"/></svg> Salvar como padrão?</div>
     <div class="confirm-text">Deseja usar esses dados como modelo para todas as futuras propostas?</div>
     <div class="confirm-btns" style="flex-direction:column;gap:10px">
-      <button class="btn-full blue" style="padding:12px" onclick="aplicarProposta(true)">✅ Salvar como padrão</button>
-      <button class="btn-full gray" style="padding:12px" onclick="aplicarProposta(false)">👤 Só este cliente</button>
+      <button class="btn-full blue" style="padding:12px" onclick="aplicarProposta(true)"><svg class="ic" aria-hidden="true"><use href="#i-circle-check"/></svg> Salvar como padrão</button>
+      <button class="btn-full gray" style="padding:12px" onclick="aplicarProposta(false)"><svg class="ic" aria-hidden="true"><use href="#i-user"/></svg> Só este cliente</button>
     </div>
   </div>
 </div>
@@ -745,18 +958,18 @@
 <div class="modal-backdrop" id="modal-envio-proposta">
   <div class="modal">
     <div class="modal-handle"></div>
-    <div class="modal-title">📤 Enviar Proposta</div>
+    <div class="modal-title"><svg class="ic" aria-hidden="true"><use href="#i-send"/></svg> Enviar Proposta</div>
     <p style="font-size:13px;color:var(--gray-500);margin-bottom:12px">Para: <strong id="envio-nome"></strong></p>
     <div class="form-group">
-      <label class="form-label">✉️ Texto da mensagem</label>
+      <label class="form-label"><svg class="ic" aria-hidden="true"><use href="#i-mail"/></svg> Texto da mensagem</label>
       <textarea class="form-textarea" id="envio-texto" style="min-height:90px"></textarea>
     </div>
     <div style="display:flex;gap:8px;margin-bottom:10px">
-      <button class="btn-full blue" style="padding:11px;font-size:13px" onclick="aplicarTextoEnvio(false)">📋 Copiar Texto</button>
-      <button class="btn-full gray" style="padding:11px;font-size:13px" onclick="aplicarTextoEnvio(true)">💾 Salvar como padrão</button>
+      <button class="btn-full blue" style="padding:11px;font-size:13px" onclick="aplicarTextoEnvio(false)"><svg class="ic" aria-hidden="true"><use href="#i-clipboard-list"/></svg> Copiar Texto</button>
+      <button class="btn-full gray" style="padding:11px;font-size:13px" onclick="aplicarTextoEnvio(true)"><svg class="ic" aria-hidden="true"><use href="#i-save"/></svg> Salvar como padrão</button>
     </div>
-    <button class="btn-full gray" style="padding:11px;font-size:13px;margin-bottom:10px" onclick="copiarHtmlProposta()">📄 Copiar HTML da Proposta</button>
-    <a id="envio-wa-btn" target="_blank" class="btn-full green" style="padding:12px;font-size:14px;text-decoration:none;display:block;text-align:center;border-radius:8px;font-weight:700;font-family:Inter,sans-serif">💬 Abrir WhatsApp</a>
+    <button class="btn-full gray" style="padding:11px;font-size:13px;margin-bottom:10px" onclick="copiarHtmlProposta()"><svg class="ic" aria-hidden="true"><use href="#i-file-text"/></svg> Copiar HTML da Proposta</button>
+    <a id="envio-wa-btn" target="_blank" class="btn-full green" style="padding:12px;font-size:14px;text-decoration:none;display:block;text-align:center;border-radius:8px;font-weight:700;font-family:'DM Sans',sans-serif"><svg class="ic" aria-hidden="true"><use href="#i-message-circle"/></svg> Abrir WhatsApp</a>
     <div style="height:10px"></div>
     <button class="btn-full gray" onclick="closeModal('modal-envio-proposta')">Fechar</button>
   </div>
@@ -807,10 +1020,10 @@
     <div class="modal-title" id="liguei-title">Resultado da ligação</div>
     <div class="atendeu-options">
       <button class="atendeu-btn" onclick="ligueiResultado('atendeu')">
-        <span class="atendeu-btn-icon">✅</span> Atendeu
+        <span class="atendeu-btn-icon"><svg class="ic" aria-hidden="true"><use href="#i-circle-check"/></svg></span> Atendeu
       </button>
       <button class="atendeu-btn" onclick="ligueiResultado('nao-atendeu')">
-        <span class="atendeu-btn-icon">❌</span> Não atendeu
+        <span class="atendeu-btn-icon"><svg class="ic" aria-hidden="true"><use href="#i-circle-x"/></svg></span> Não atendeu
       </button>
     </div>
     <button class="btn-full gray" onclick="closeModal('modal-liguei')">Cancelar</button>
@@ -1078,10 +1291,11 @@ function renderLixeiraCRM() {
         <div style="font-size:11px;color:var(--gray-400);">${item._col||''} · ${item._lixeira_data||''}</div>
       </div>
       <button onclick="restaurarItemCRM(${i})" style="background:var(--blue-light);color:var(--blue);border:1.5px solid var(--blue-mid);border-radius:8px;padding:6px 12px;font-size:12px;font-weight:600;cursor:pointer;">Restaurar</button>
-      <button onclick="excluirPermanenteCRM(${i})" style="background:none;border:none;color:var(--red);font-size:18px;cursor:pointer;">🗑️</button>
+      <button onclick="excluirPermanenteCRM(${i})" style="background:none;border:none;color:var(--red);font-size:18px;cursor:pointer;"><svg class="ic" aria-hidden="true"><use href="#i-trash-2"/></svg></button>
     </div>
   `).join('');
 }
+window.renderLixeiraCRM = renderLixeiraCRM;
 
 function showToastCRM(msg) {
   let t = document.getElementById('crm-toast');
@@ -1193,8 +1407,8 @@ function fmtPhone(n) { const d = n.replace(/\D/g,''); return '0' + d; }
 function fmtWA(n) { const d = n.replace(/\D/g,''); return 'https://wa.me/55' + d; }
 function fmtTel(n) { const d = n.replace(/\D/g,''); return 'tel:0' + d; }
 function contactBtns(numero) {
-  return `<a href="${fmtTel(numero)}" class="contact-btn phone">📞 ${fmtPhone(numero)}</a>
-    <a href="${fmtWA(numero)}" target="_blank" class="contact-btn whatsapp">💬 WhatsApp</a>`;
+  return `<a href="${fmtTel(numero)}" class="contact-btn phone"><svg class="ic" aria-hidden="true"><use href="#i-phone"/></svg> ${fmtPhone(numero)}</a>
+    <a href="${fmtWA(numero)}" target="_blank" class="contact-btn whatsapp"><svg class="ic" aria-hidden="true"><use href="#i-message-circle"/></svg> WhatsApp</a>`;
 }
 
 // ══════════════════════════════════════════════
@@ -1263,19 +1477,20 @@ function renderContatos() {
     c.nome.toLowerCase().includes(q) || c.numero.includes(q)
   );
   if (!items.length) {
-    lista.innerHTML = `<div class="empty-state"><div class="empty-icon">📋</div><div class="empty-text">Nenhum contato ainda</div><div class="empty-sub">Toque em "+ Novo" para adicionar</div></div>`;
+    lista.innerHTML = `<div class="empty-state"><div class="empty-icon"><svg class="ic" aria-hidden="true"><use href="#i-clipboard-list"/></svg></div><div class="empty-text">Nenhum contato ainda</div><div class="empty-sub">Toque em "+ Novo" para adicionar</div></div>`;
     return;
   }
   lista.innerHTML = items.map(c => cardContato(c)).join('');
 }
+window.renderContatos = renderContatos;
 
 function cardContato(c) {
   const t = c.tentativas || 0;
   const dots = [0,1,2].map(n => `<div class="dot ${n < t ? (t >= 3 ? 'filled-red' : 'filled') : ''}"></div>`).join('');
   const obsHtml = c.obs
-    ? `<div class="card-obs"><span>📝</span> ${escHtml(c.obs)} <span class="obs-edit-btn" onclick="editObs('contatos','${c.id}')">✏️</span></div>`
-    : `<div class="card-obs" style="color:var(--blue);cursor:pointer" onclick="editObs('contatos','${c.id}')">📝 Adicionar observação...</div>`;
-  const indicadoHtml = c.indicado ? `<div class="card-indicado">👤 Indicado por: ${escHtml(c.indicado)}</div>` : '';
+    ? `<div class="card-obs"><span><svg class="ic" aria-hidden="true"><use href="#i-notebook-pen"/></svg></span> ${escHtml(c.obs)} <span class="obs-edit-btn" onclick="editObs('contatos','${c.id}')"><svg class="ic" aria-hidden="true"><use href="#i-pencil"/></svg></span></div>`
+    : `<div class="card-obs" style="color:var(--blue);cursor:pointer" onclick="editObs('contatos','${c.id}')"><svg class="ic" aria-hidden="true"><use href="#i-notebook-pen"/></svg> Adicionar observação...</div>`;
+  const indicadoHtml = c.indicado ? `<div class="card-indicado"><svg class="ic" aria-hidden="true"><use href="#i-user"/></svg> Indicado por: ${escHtml(c.indicado)}</div>` : '';
   const statusLabel = t === 0 ? 'NOVO' : t < 3 ? 'TENTANDO' : 'SEM RETORNO';
   const statusCls = t === 0 ? 'novo' : t < 3 ? 'tentando' : 'sem-retorno';
   const cardCls = t === 0 ? 'blue' : t < 3 ? 'yellow' : 'red';
@@ -1287,7 +1502,7 @@ function cardContato(c) {
           <div class="card-name">${escHtml(c.nome)}</div>
         </div>
         <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">
-          <span style="font-size:18px;cursor:pointer" onclick="editarContato('${c.id}')">✏️</span>
+          <span class="icon-btn" onclick="editarContato('${c.id}')"><svg class="ic" aria-hidden="true"><use href="#i-pencil"/></svg></span>
           ${indicadoHtml}
         </div>
       </div>
@@ -1299,8 +1514,8 @@ function cardContato(c) {
       </div>
       ${t < 3 ? `
       <div class="action-btns">
-        <button class="btn-nao" onclick="naoAtendeu('${c.id}')">✕ Não Atendeu</button>
-        <button class="btn-atendeu" onclick="openAtendeu('${c.id}')">✓ Atendeu</button>
+        <button class="btn-nao" onclick="naoAtendeu('${c.id}')">Não Atendeu</button>
+        <button class="btn-atendeu" onclick="openAtendeu('${c.id}')">Atendeu</button>
       </div>` : `<div style="text-align:center;font-size:13px;color:var(--red);font-weight:600;padding:6px 0">3 tentativas atingidas — <span style="color:#111;cursor:pointer;text-decoration:underline" onclick="openAtendeu('${c.id}')">Mover contato</span></div>`}
       ${obsHtml}
     </div>`;
@@ -1312,7 +1527,7 @@ function cardContato(c) {
 function renderAgenda() {
   const lista = document.getElementById('lista-agenda');
   if (!state.agenda.length) {
-    lista.innerHTML = `<div class="empty-state"><div class="empty-icon">🗓️</div><div class="empty-text">Nenhum agendamento</div><div class="empty-sub">Agende retornos após um atendimento</div></div>`;
+    lista.innerHTML = `<div class="empty-state"><div class="empty-icon"><svg class="ic" aria-hidden="true"><use href="#i-calendar"/></svg></div><div class="empty-text">Nenhum agendamento</div><div class="empty-sub">Agende retornos após um atendimento</div></div>`;
     return;
   }
   const sorted = [...state.agenda].sort((a,b) => (a.data+a.hora).localeCompare(b.data+b.hora));
@@ -1321,22 +1536,22 @@ function renderAgenda() {
   let lastSec = null;
   sorted.forEach(ag => {
     const amanha = new Date(Date.now()+86400000).toISOString().slice(0,10);
-    let sec = ag.data === hoje ? '📅 Hoje' : ag.data === amanha ? '📅 Amanhã' : `📅 ${formatDate(ag.data)}`;
+    let sec = ag.data === hoje ? '<svg class="ic" aria-hidden="true"><use href="#i-calendar"/></svg> Hoje' : ag.data === amanha ? '<svg class="ic" aria-hidden="true"><use href="#i-calendar"/></svg> Amanhã' : `<svg class="ic" aria-hidden="true"><use href="#i-calendar"/></svg> ${formatDate(ag.data)}`;
     if (sec !== lastSec) { html += `<div class="agenda-section-title">${sec}</div>`; lastSec = sec; }
     const isAgora = ag.data === hoje;
-    const obsHtml = ag.obs ? `<div class="card-obs"><span>📝</span> ${escHtml(ag.obs)}</div>` : '';
+    const obsHtml = ag.obs ? `<div class="card-obs"><span><svg class="ic" aria-hidden="true"><use href="#i-notebook-pen"/></svg></span> ${escHtml(ag.obs)}</div>` : '';
     html += `
       <div class="agenda-card ${isAgora ? 'alerta-agora' : ''}">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
-          <div class="agenda-time" style="font-size:13px;font-weight:600;color:var(--gray-500)">📅 ${formatDate(ag.data)}</div>
-          <span style="font-size:13px;font-weight:600;color:var(--gray-500)">⏰ ${ag.hora}</span>
+          <div class="agenda-time" style="font-size:13px;font-weight:600;color:var(--gray-500)"><svg class="ic" aria-hidden="true"><use href="#i-calendar"/></svg> ${formatDate(ag.data)}</div>
+          <span style="font-size:13px;font-weight:600;color:var(--gray-500)"><svg class="ic" aria-hidden="true"><use href="#i-alarm-clock"/></svg> ${ag.hora}</span>
         </div>
         <div class="agenda-name">${escHtml(ag.nome)}</div>
         <div class="contact-btns">${contactBtns(ag.numero)}</div>
         ${obsHtml}
         <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px">
-          <button class="btn-liguei" style="margin-top:0" onclick="openLiguei('${ag.id}')">✅ Liguei</button>
-          <button onclick="excluirAgenda('${ag.id}')" style="border:none;background:none;font-size:20px;cursor:pointer;color:var(--gray-300)">🗑️</button>
+          <button class="btn-liguei" style="margin-top:0" onclick="openLiguei('${ag.id}')"><svg class="ic" aria-hidden="true"><use href="#i-circle-check"/></svg> Liguei</button>
+          <button onclick="excluirAgenda('${ag.id}')" style="border:none;background:none;font-size:20px;cursor:pointer;color:var(--gray-300)"><svg class="ic" aria-hidden="true"><use href="#i-trash-2"/></svg></button>
         </div>
       </div>`;
   });
@@ -1349,28 +1564,28 @@ function renderAgenda() {
 function renderReunioes() {
   const lista = document.getElementById('lista-reunioes');
   if (!state.reunioes.length) {
-    lista.innerHTML = `<div class="empty-state"><div class="empty-icon">🤝</div><div class="empty-text">Nenhuma reunião</div><div class="empty-sub">Reuniões marcadas aparecem aqui</div></div>`;
+    lista.innerHTML = `<div class="empty-state"><div class="empty-icon"><svg class="ic" aria-hidden="true"><use href="#i-handshake"/></svg></div><div class="empty-text">Nenhuma reunião</div><div class="empty-sub">Reuniões marcadas aparecem aqui</div></div>`;
     return;
   }
   const sorted = [...state.reunioes].sort((a,b) => (a.data+a.hora).localeCompare(b.data+b.hora));
   lista.innerHTML = sorted.map(r => {
     const obsHtml = r.obs
-      ? `<div class="card-obs"><span>📝</span> ${escHtml(r.obs)} <span class="obs-edit-btn" onclick="editObs('reunioes','${r.id}')">✏️</span></div>`
-      : `<div class="card-obs" style="color:var(--blue);cursor:pointer" onclick="editObs('reunioes','${r.id}')">📝 Adicionar observação...</div>`;
+      ? `<div class="card-obs"><span><svg class="ic" aria-hidden="true"><use href="#i-notebook-pen"/></svg></span> ${escHtml(r.obs)} <span class="obs-edit-btn" onclick="editObs('reunioes','${r.id}')"><svg class="ic" aria-hidden="true"><use href="#i-pencil"/></svg></span></div>`
+      : `<div class="card-obs" style="color:var(--blue);cursor:pointer" onclick="editObs('reunioes','${r.id}')"><svg class="ic" aria-hidden="true"><use href="#i-notebook-pen"/></svg> Adicionar observação...</div>`;
     return `
     <div class="reuniao-card">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
-        <div class="reuniao-tipo ${r.tipo}" style="margin-bottom:0">${r.tipo === 'presencial' ? '📍 Presencial' : '📱 Remota'}</div>
-        <div class="reuniao-data" style="font-size:12px">📅 ${formatDate(r.data)} às ${r.hora}</div>
+        <div class="reuniao-tipo ${r.tipo}" style="margin-bottom:0">${r.tipo === 'presencial' ? '<svg class="ic" aria-hidden="true"><use href="#i-map-pin"/></svg> Presencial' : '<svg class="ic" aria-hidden="true"><use href="#i-smartphone"/></svg> Remota'}</div>
+        <div class="reuniao-data" style="font-size:12px"><svg class="ic" aria-hidden="true"><use href="#i-calendar"/></svg> ${formatDate(r.data)} às ${r.hora}</div>
       </div>
       <div class="reuniao-nome">${escHtml(r.nome)}</div>
       <div class="contact-btns">${contactBtns(r.numero)}</div>
       ${obsHtml}
-      <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
-        <button class="btn-concluir" style="flex:1;margin-top:0" onclick="openPropostaReuniao('${r.id}')">📝 Criar Proposta</button>
-        ${r.propostaHtml ? `<button class="btn-concluir" style="flex:1;margin-top:0;background:var(--blue-light);color:var(--blue)" onclick="abrirEnviarProposta('${r.id}')">📤 Enviar Proposta</button>` : ''}
+      <div class="reuniao-acoes">
+        <button class="btn-concluir" onclick="openPropostaReuniao('${r.id}')">Criar Proposta</button>
+        ${r.propostaHtml ? `<button class="btn-concluir" style="background:var(--blue-light);color:var(--blue)" onclick="abrirEnviarProposta('${r.id}')">Enviar Proposta</button>` : ''}
+        <button class="btn-concluir" onclick="openConcluir('${r.id}')" style="background:var(--green-light);color:var(--green)">Concluir Reunião</button>
       </div>
-      <button class="btn-concluir" onclick="openConcluir('${r.id}')" style="width:100%;margin-top:8px;background:var(--green-light);color:var(--green)">✔️ Concluir Reunião</button>
     </div>`;
   }).join('');
 }
@@ -1381,25 +1596,25 @@ function renderReunioes() {
 function renderAtivos() {
   const lista = document.getElementById('lista-ativos');
   if (!state.ativos.length) {
-    lista.innerHTML = `<div class="empty-state"><div class="empty-icon">⭐</div><div class="empty-text">Nenhum cliente ativo</div><div class="empty-sub">Clientes com proposta aceita aparecem aqui</div></div>`;
+    lista.innerHTML = `<div class="empty-state"><div class="empty-icon"><svg class="ic" aria-hidden="true"><use href="#i-star"/></svg></div><div class="empty-text">Nenhum cliente ativo</div><div class="empty-sub">Clientes com proposta aceita aparecem aqui</div></div>`;
     return;
   }
   lista.innerHTML = state.ativos.map(a => {
     const obsHtml = a.obs
-      ? `<div class="card-obs"><span>📝</span> ${escHtml(a.obs)} <span class="obs-edit-btn" onclick="editObs('ativos','${a.id}')">✏️</span></div>`
-      : `<div class="card-obs" style="color:var(--blue);cursor:pointer" onclick="editObs('ativos','${a.id}')">📝 Adicionar observação...</div>`;
+      ? `<div class="card-obs"><span><svg class="ic" aria-hidden="true"><use href="#i-notebook-pen"/></svg></span> ${escHtml(a.obs)} <span class="obs-edit-btn" onclick="editObs('ativos','${a.id}')"><svg class="ic" aria-hidden="true"><use href="#i-pencil"/></svg></span></div>`
+      : `<div class="card-obs" style="color:var(--blue);cursor:pointer" onclick="editObs('ativos','${a.id}')"><svg class="ic" aria-hidden="true"><use href="#i-notebook-pen"/></svg> Adicionar observação...</div>`;
     return `
     <div class="ativo-card">
       <div style="display:flex;justify-content:space-between">
         <div>
-          <div class="ativo-nome">⭐ ${escHtml(a.nome)}</div>
-          <div class="ativo-servico">${a.servico ? '💼 ' + escHtml(a.servico) : ''}</div>
+          <div class="ativo-nome"><svg class="ic" aria-hidden="true"><use href="#i-star"/></svg> ${escHtml(a.nome)}</div>
+          <div class="ativo-servico">${a.servico ? '<svg class="ic" aria-hidden="true"><use href="#i-briefcase"/></svg> ' + escHtml(a.servico) : ''}</div>
         </div>
-        <button onclick="excluirAtivo('${a.id}')" style="border:none;background:none;font-size:18px;cursor:pointer;color:var(--gray-400)">🗑️</button>
+        <button onclick="excluirAtivo('${a.id}')" style="border:none;background:none;font-size:18px;cursor:pointer;color:var(--gray-400)"><svg class="ic" aria-hidden="true"><use href="#i-trash-2"/></svg></button>
       </div>
       <div class="contact-btns">${contactBtns(a.numero)}</div>
       ${obsHtml}
-      <button class="btn-proposta" onclick="openPropostaAtivo('${a.id}')">📄 Nova proposta</button>
+      <button class="btn-proposta" onclick="openPropostaAtivo('${a.id}')"><svg class="ic" aria-hidden="true"><use href="#i-file-text"/></svg> Nova proposta</button>
     </div>`;
   }).join('');
 }
@@ -1410,20 +1625,20 @@ function renderAtivos() {
 function renderArquivo() {
   const lista = document.getElementById('lista-arquivo');
   if (!state.arquivo.length) {
-    lista.innerHTML = `<div class="empty-state"><div class="empty-icon">📁</div><div class="empty-text">Arquivo vazio</div><div class="empty-sub">Contatos com 3 tentativas sem retorno aparecem aqui</div></div>`;
+    lista.innerHTML = `<div class="empty-state"><div class="empty-icon"><svg class="ic" aria-hidden="true"><use href="#i-archive"/></svg></div><div class="empty-text">Arquivo vazio</div><div class="empty-sub">Contatos com 3 tentativas sem retorno aparecem aqui</div></div>`;
     return;
   }
   lista.innerHTML = state.arquivo.map(a => {
-    const obsHtml = a.obs ? `<div class="card-obs"><span>📝</span> ${escHtml(a.obs)}</div>` : '';
+    const obsHtml = a.obs ? `<div class="card-obs"><span><svg class="ic" aria-hidden="true"><use href="#i-notebook-pen"/></svg></span> ${escHtml(a.obs)}</div>` : '';
     return `
     <div class="arquivo-card">
-      <div class="arquivo-nome">📁 ${escHtml(a.nome)}</div>
-      <div class="arquivo-info">❌ 3 tentativas sem retorno</div>
+      <div class="arquivo-nome"><svg class="ic" aria-hidden="true"><use href="#i-archive"/></svg> ${escHtml(a.nome)}</div>
+      <div class="arquivo-info"><svg class="ic" aria-hidden="true"><use href="#i-circle-x"/></svg> 3 tentativas sem retorno</div>
       <div class="contact-btns">${contactBtns(a.numero)}</div>
       ${obsHtml}
       <div class="arquivo-btns">
-        <button class="btn-reativar" onclick="reativarContato('${a.id}')">🔄 Reativar</button>
-        <button class="btn-excluir" onclick="excluirArquivo('${a.id}')">🗑️ Excluir</button>
+        <button class="btn-reativar" onclick="reativarContato('${a.id}')"><svg class="ic" aria-hidden="true"><use href="#i-refresh-cw"/></svg> Reativar</button>
+        <button class="btn-excluir" onclick="excluirArquivo('${a.id}')"><svg class="ic" aria-hidden="true"><use href="#i-trash-2"/></svg> Excluir</button>
       </div>
     </div>`;
   }).join('');
@@ -1450,7 +1665,7 @@ function renderCronograma() {
   }).sort((a,b) => (a.data+a.hora).localeCompare(b.data+b.hora));
 
   if (!todos.length) {
-    lista.innerHTML = `<div class="empty-state"><div class="empty-icon">🕐</div><div class="empty-text">Nenhum compromisso</div><div class="empty-sub">Nada agendado para este período</div></div>`;
+    lista.innerHTML = `<div class="empty-state"><div class="empty-icon"><svg class="ic" aria-hidden="true"><use href="#i-clock"/></svg></div><div class="empty-text">Nenhum compromisso</div><div class="empty-sub">Nada agendado para este período</div></div>`;
     return;
   }
 
@@ -1463,7 +1678,7 @@ function renderCronograma() {
       const diffMin = (h2*60+m2) - (h1*60+m1);
       if (diffMin > 0 && diffMin <= 30) {
         const tipoProx = proximo._tipo === 'reuniao' ? 'Reunião' : 'Ligação';
-        alertaHtml = `<div class="crono-alerta">⚠️ Em ${diffMin} min: ${tipoProx} com ${escHtml(proximo.nome)}</div>`;
+        alertaHtml = `<div class="crono-alerta"><svg class="ic" aria-hidden="true"><use href="#i-triangle-alert"/></svg> Em ${diffMin} min: ${tipoProx} com ${escHtml(proximo.nome)}</div>`;
       }
     }
     const tipoLabel = item._tipo === 'reuniao' ? 'Reunião' : 'Ligação';
@@ -1471,20 +1686,20 @@ function renderCronograma() {
     <div class="crono-item ${item._tipo}">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
         <div style="display:flex;align-items:center;gap:14px">
-          <span class="crono-hora">⏰ ${item.hora}</span>
+          <span class="crono-hora"><svg class="ic" aria-hidden="true"><use href="#i-alarm-clock"/></svg> ${item.hora}</span>
           <span class="crono-tipo-tag ${item._tipo}">${tipoLabel}</span>
         </div>
-        <span class="crono-data-tag">📅 ${formatDate(item.data)}</span>
+        <span class="crono-data-tag"><svg class="ic" aria-hidden="true"><use href="#i-calendar"/></svg> ${formatDate(item.data)}</span>
       </div>
       <div class="crono-nome">${escHtml(item.nome)}</div>
       <div class="crono-btns-contato">
-        <a href="${fmtTel(item.numero)}" class="contact-btn phone">📞 Ligar</a>
-        <a href="${fmtWA(item.numero)}" target="_blank" class="contact-btn whatsapp">💬 WhatsApp</a>
+        <a href="${fmtTel(item.numero)}" class="contact-btn phone"><svg class="ic" aria-hidden="true"><use href="#i-phone"/></svg> Ligar</a>
+        <a href="${fmtWA(item.numero)}" target="_blank" class="contact-btn whatsapp"><svg class="ic" aria-hidden="true"><use href="#i-message-circle"/></svg> WhatsApp</a>
       </div>
       ${alertaHtml}
       <div class="crono-btns-acao">
-        <button class="btn-concluido" onclick="cronoConcluir('${item.id}','${item._tipo}')">✔ Concluído</button>
-        <button class="btn-adiado" onclick="cronoAdiar('${item.id}','${item._tipo}')">⏩ Adiar</button>
+        <button class="btn-concluido" onclick="cronoConcluir('${item.id}','${item._tipo}')"><svg class="ic" aria-hidden="true"><use href="#i-check"/></svg> Concluído</button>
+        <button class="btn-adiado" onclick="cronoAdiar('${item.id}','${item._tipo}')"><svg class="ic" aria-hidden="true"><use href="#i-fast-forward"/></svg> Adiar</button>
       </div>
     </div>`;
   }).join('');
@@ -1497,7 +1712,7 @@ window.cronoConcluir = function(id, tipo) {
   confirm2('Concluir compromisso?', 'O item será removido do cronograma.', async () => {
     const colKey = tipo === 'reuniao' ? 'reunioes' : 'agenda';
     await fsDelete(colKey, id);
-    toast('Compromisso concluído ✅');
+    toast('Compromisso concluído');
   });
 }
 
@@ -1526,7 +1741,7 @@ window.confirmarAdiamento = async function() {
 
   await fsUpdate(colKey, id, updates);
   window.closeModal('modal-adiar');
-  toast('Compromisso adiado ⏩');
+  toast('Compromisso adiado');
 }
 
 function verificarConflitoHorario(data, hora) {
@@ -1539,8 +1754,8 @@ function verificarConflitoHorario(data, hora) {
   for (const item of todos) {
     const [h,m] = item.hora.split(':').map(Number);
     const diff = Math.abs(minNovo - (h*60+m));
-    if (diff === 0) { toast('⛔ Já existe ' + (item._tipo==='reuniao'?'Reunião':'Ligação') + ' com ' + item.nome + ' às ' + item.hora + '!'); return 'bloqueado'; }
-    if (diff < 30) { toast('⚠️ Atenção: em ' + diff + ' min você tem ' + (item._tipo==='reuniao'?'Reunião':'Ligação') + ' com ' + item.nome); return 'alerta'; }
+    if (diff === 0) { toast('Já existe ' + (item._tipo==='reuniao'?'Reunião':'Ligação') + ' com ' + item.nome + ' às ' + item.hora + '!'); return 'bloqueado'; }
+    if (diff < 30) { toast('Atenção: em ' + diff + ' min você tem ' + (item._tipo==='reuniao'?'Reunião':'Ligação') + ' com ' + item.nome); return 'alerta'; }
   }
   return 'livre';
 }
@@ -1644,7 +1859,7 @@ window.openAtendeu = function(id) {
   selectedContatoId = id;
   const c = state.contatos.find(x => x.id === id);
   if (!c) { toast('Contato não encontrado'); return; }
-  document.getElementById('atendeu-title').textContent = `${c.nome} atendeu! 🎉`;
+  document.getElementById('atendeu-title').textContent = `${c.nome} atendeu!`;
   // Garante que qualquer modal anterior foi fechado antes de abrir
   document.querySelectorAll('.modal-backdrop.active').forEach(m => m.classList.remove('active'));
   setTimeout(function() { window.openModal('modal-atendeu'); }, 50);
@@ -1695,7 +1910,7 @@ window.confirmarAgenda = async function() {
   window.closeModal('modal-agendar');
   await fsAdd('agenda', { contatoId: c.id, nome: c.nome, numero: c.numero, data, hora, obs: c.obs || '' });
   await fsDelete('contatos', selectedContatoId);
-  toast('Agendado! ✅');
+  toast('Agendado!');
   scheduleNotification(c.nome, data, hora);
 }
 
@@ -1743,12 +1958,12 @@ window.confirmarReuniao = async function() {
   setTimeout(() => {
     const t = document.createElement('div');
     t.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#111;color:#fff;padding:12px 20px;border-radius:12px;font-size:13px;font-weight:600;z-index:9999;display:flex;gap:10px;align-items:center;box-shadow:0 4px 20px rgba(0,0,0,0.3);white-space:nowrap;';
-    t.innerHTML = `<span>📅</span><a href="${gcalUrl}" target="_blank" style="color:#fff;text-decoration:none;">Salvar no Google Agenda</a>`;
+    t.innerHTML = `<span><svg class="ic" aria-hidden="true"><use href="#i-calendar"/></svg></span><a href="${gcalUrl}" target="_blank" style="color:#fff;text-decoration:none;">Salvar no Google Agenda</a>`;
     document.body.appendChild(t);
     setTimeout(() => t.remove(), 8000);
   }, 600);
 
-  toast('Reunião marcada! 🤝');
+  toast('Reunião marcada!');
   scheduleReuniaoNotifications(c.nome, c.numero, data, hora, msgDiaAntes, msgManha, msgHoraAntes);
 }
 
@@ -1787,22 +2002,22 @@ window.aplicarTextoEnvio = function(salvarPadrao) {
   const texto = document.getElementById('envio-texto').value.trim();
   if (salvarPadrao) {
     localStorage.setItem('meucrmTextoEnvioProposta', JSON.stringify({ texto }));
-    toast('Texto padrão salvo! ✅');
+    toast('Texto padrão salvo!');
   }
-  navigator.clipboard.writeText(texto).then(() => toast('Texto copiado! ✅')).catch(() => {
+  navigator.clipboard.writeText(texto).then(() => toast('Texto copiado!')).catch(() => {
     const ta = document.createElement('textarea'); ta.value = texto;
     document.body.appendChild(ta); ta.select(); document.execCommand('copy');
-    document.body.removeChild(ta); toast('Texto copiado! ✅');
+    document.body.removeChild(ta); toast('Texto copiado!');
   });
 }
 
 window.copiarHtmlProposta = function() {
   const r = state.reunioes.find(x => x.id === window._envioReuniaoId);
   if (!r || !r.propostaHtml) { toast('Nenhuma proposta encontrada!'); return; }
-  navigator.clipboard.writeText(r.propostaHtml).then(() => toast('HTML da proposta copiado! ✅')).catch(() => {
+  navigator.clipboard.writeText(r.propostaHtml).then(() => toast('HTML da proposta copiado!')).catch(() => {
     const ta = document.createElement('textarea'); ta.value = r.propostaHtml;
     document.body.appendChild(ta); ta.select(); document.execCommand('copy');
-    document.body.removeChild(ta); toast('HTML copiado! ✅');
+    document.body.removeChild(ta); toast('HTML copiado!');
   });
 }
 
@@ -1893,7 +2108,7 @@ window.aplicarProposta = async function(salvarPadrao) {
   window.closeModal('modal-proposta-padrao');
   if (salvarPadrao) {
     localStorage.setItem('meucrmPropostaPadrao', JSON.stringify(window._propostaDadosTemp));
-    toast('Padrão salvo! ✅');
+    toast('Padrão salvo!');
   }
   if (window._propostaContexto === 'reuniao' && selectedReuniaoId) {
     await fsUpdate('reunioes', selectedReuniaoId, { propostaPrompt: window._propostaPromptTemp });
@@ -1911,15 +2126,15 @@ window.salvarHtmlProposta = async function() {
     await fsUpdate('reunioes', selectedReuniaoId, { propostaHtml: html, propostaPronta: true });
   }
   window.closeModal('modal-proposta');
-  toast('Proposta salva! Agora você pode enviá-la. 📤');
+  toast('Proposta salva! Agora você pode enviá-la.');
 }
 
 window.copiarPrompt = function() {
   const txt = document.getElementById('prompt-texto').textContent;
-  navigator.clipboard.writeText(txt).then(() => toast('Prompt copiado! ✅')).catch(() => {
+  navigator.clipboard.writeText(txt).then(() => toast('Prompt copiado!')).catch(() => {
     const ta = document.createElement('textarea');
     ta.value = txt; document.body.appendChild(ta); ta.select(); document.execCommand('copy');
-    document.body.removeChild(ta); toast('Prompt copiado! ✅');
+    document.body.removeChild(ta); toast('Prompt copiado!');
   });
 }
 
@@ -1934,7 +2149,7 @@ window.marcarAtivoEFechar = async function() {
   await fsDelete('contatos', selectedContatoId);
   window.closeModal('modal-proposta');
   window.navigate('ativos');
-  toast('Cliente movido para Ativos! ⭐');
+  toast('Cliente movido para Ativos!');
 }
 
 window.voltarFormProposta = function() {
@@ -1990,11 +2205,11 @@ window.concluirReuniao = async function(resultado) {
   await fsDelete('reunioes', selectedReuniaoId);
   if (resultado === 'fechou') {
     await fsAdd('ativos', { contatoId: r.contatoId || '', nome: r.nome, numero: r.numero, servico: '', obs: r.obs || '' });
-    toast('Fechou negócio! Movido para Ativos ⭐');
+    toast('Fechou negócio! Movido para Ativos');
     window.navigate('ativos');
   } else if (resultado === 'nao-fechou') {
     await fsAdd('arquivo', { contatoId: r.contatoId || '', nome: r.nome, numero: r.numero, obs: r.obs || '', motivo: 'nao-fechou' });
-    toast('Não fechou. Movido para Arquivo 📁');
+    toast('Não fechou. Movido para Arquivo');
     window.navigate('arquivo');
   } else {
     await fsAdd('contatos', { nome: r.nome, numero: r.numero, indicado: '', obs: r.obs || '', tentativas: 0, status: 'ativo' });
@@ -2025,7 +2240,7 @@ window.reativarContato = async function(id) {
   if (!a) return;
   await fsAdd('contatos', { nome: a.nome, numero: a.numero, indicado: '', obs: a.obs || '', tentativas: 0, status: 'ativo' });
   await fsDelete('arquivo', id);
-  toast('Reativado! Voltou para o fim da fila ✅');
+  toast('Reativado! Voltou para o fim da fila');
 }
 
 window.excluirArquivo = function(id) {
@@ -2086,7 +2301,7 @@ function scheduleNotification(nome, data, hora) {
   if (diff <= 0) return;
   setTimeout(() => {
     if (Notification.permission === 'granted') {
-      new Notification('MEU CRM 🔔', { body: `Hora de ligar para ${nome}!`, icon: '' });
+      new Notification('MEU CRM', { body: `Hora de ligar para ${nome}!`, icon: '' });
     }
   }, diff);
 }
@@ -2098,19 +2313,19 @@ function scheduleReuniaoNotifications(nome, numero, data, hora, msgDiaAntes, msg
   const umDiaAntes = new Date(reuniaoTime.getTime() - 24*60*60*1000);
   if (umDiaAntes.getTime() > now) {
     setTimeout(() => {
-      new Notification('MEU CRM — Reunião Amanhã 📅', { body: msgDiaAntes || `Amanhã você tem reunião com ${nome} às ${hora}.`, icon: '' });
+      new Notification('MEU CRM — Reunião Amanhã', { body: msgDiaAntes || `Amanhã você tem reunião com ${nome} às ${hora}.`, icon: '' });
     }, umDiaAntes.getTime() - now);
   }
   const manha = new Date(`${data}T08:00`);
   if (manha.getTime() > now && manha < reuniaoTime) {
     setTimeout(() => {
-      new Notification('MEU CRM — Bom dia! ☀️', { body: msgManha || `Hoje você tem reunião com ${nome} às ${hora}.`, icon: '' });
+      new Notification('MEU CRM — Bom dia!', { body: msgManha || `Hoje você tem reunião com ${nome} às ${hora}.`, icon: '' });
     }, manha.getTime() - now);
   }
   const umaHoraAntes = new Date(reuniaoTime.getTime() - 60*60*1000);
   if (umaHoraAntes.getTime() > now) {
     setTimeout(() => {
-      new Notification('MEU CRM — Falta 1 hora! ⏰', { body: msgHoraAntes || `Em 1 hora você tem reunião com ${nome} às ${hora}.`, icon: '' });
+      new Notification('MEU CRM — Falta 1 hora!', { body: msgHoraAntes || `Em 1 hora você tem reunião com ${nome} às ${hora}.`, icon: '' });
     }, umaHoraAntes.getTime() - now);
   }
 }
