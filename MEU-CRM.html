@@ -621,6 +621,45 @@
   .agenda-head .agenda-name { margin: 0; padding: 0; border: 0; min-width: 0; flex: 1; overflow-wrap: anywhere; }
   .arquivo-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 4px; padding-bottom: 14px; border-bottom: 1px solid #eef1f5; }
   .arquivo-head .arquivo-nome { min-width: 0; flex: 1; overflow-wrap: anywhere; }
+
+  /* ═════════ NOVO CONTATO — janela solta, campos em pílula ═════════ */
+  #modal-novo { align-items: flex-end; }
+  #modal-novo .modal {
+    width: calc(100% - 24px); max-width: 480px; margin: 0 auto calc(12px + env(safe-area-inset-bottom, 0px));
+    border-radius: 26px; padding: 12px 16px 16px; background: #fff;
+    max-height: calc(100dvh - 24px - env(safe-area-inset-bottom, 0px)); box-shadow: 0 24px 60px -20px rgba(15,23,42,.35);
+  }
+  #modal-novo .modal-handle { width: 40px; height: 4px; background: #d9dee6; border-radius: 999px; margin: 0 auto 18px; }
+  #modal-novo .campo { position: relative; margin-bottom: 12px; }
+  #modal-novo .campo-ic {
+    position: absolute; left: 0; top: 0; width: 50px; height: 52px; display: grid; place-items: center;
+    color: #94a3b8; z-index: 1; -webkit-touch-callout: none; user-select: none; -webkit-user-select: none; touch-action: manipulation;
+  }
+  #modal-novo .campo-ic .ic { width: 18px; height: 18px; vertical-align: 0; }
+  #modal-novo .form-input, #modal-novo .form-textarea {
+    display: block; width: 100%; box-sizing: border-box; height: 52px; padding: 0 18px 0 48px; font-size: 16px; font-weight: 500;
+    color: #0f172a; background: #fff; border: 1px solid #e5e7eb; border-radius: 999px; box-shadow: none; outline: none;
+    -webkit-appearance: none; appearance: none; transition: border-color .15s;
+  }
+  #modal-novo .form-textarea { height: auto; min-height: 112px; padding: 16px 18px 16px 48px; border-radius: 24px; resize: none; line-height: 1.45; }
+  #modal-novo .form-input:focus, #modal-novo .form-textarea:focus { border-color: #94a3b8; background: #fff; box-shadow: none; outline: none; }
+  #modal-novo .campo:focus-within .campo-ic { color: #475569; }
+  #modal-novo .modal-row { display: flex; gap: 10px; margin-top: 18px; }
+  #modal-novo .modal-row .form-group { flex: 1; margin: 0; }
+  #modal-novo .btn-full {
+    height: 52px; padding: 0 16px; border-radius: 999px; font-size: 15px; font-weight: 600; white-space: nowrap;
+    display: flex; align-items: center; justify-content: center;
+  }
+  #modal-novo .btn-full.gray { background: #fff; color: #334155; border: 1px solid #e5e7eb; }
+  #modal-novo .btn-full.gray:active { background: #f3f5f8; }
+  #modal-novo .btn-full.blue { background: var(--brand); color: #fff; border: 0; }
+  #modal-novo .btn-full.blue:active { background: #047857; }
+  .dica-balao {
+    position: fixed; z-index: 700; transform: translate(-50%, -100%); background: #0f172a; color: #fff;
+    font: 600 12px/1 'DM Sans', sans-serif; padding: 9px 13px; border-radius: 999px; white-space: nowrap;
+    pointer-events: none; opacity: 0; transition: opacity .15s; max-width: calc(100vw - 24px);
+  }
+  .dica-balao.on { opacity: 1; }
 </style>
 </head>
 <body>
@@ -755,25 +794,25 @@
   <div class="modal">
     <div class="modal-handle"></div>
     <input type="hidden" id="edit-id">
-    <div class="form-group">
-      <label class="form-label">Nome / Empresa</label>
-      <input class="form-input" id="inp-nome" placeholder="Ex: João Silva" maxlength="80">
+    <div class="campo" data-dica="Nome ou empresa">
+      <span class="campo-ic"><svg class="ic" aria-hidden="true"><use href="#i-user"/></svg></span>
+      <input class="form-input" id="inp-nome" aria-label="Nome ou empresa" maxlength="80" autocomplete="off">
     </div>
-    <div class="form-group">
-      <label class="form-label">Número (DDD + número) *</label>
-      <input class="form-input" id="inp-numero" placeholder="(48) 98120-0000" type="tel" inputmode="numeric" maxlength="16" oninput="mascararTelefone(this)">
+    <div class="campo" data-dica="Número com DDD (obrigatório)">
+      <span class="campo-ic"><svg class="ic" aria-hidden="true"><use href="#i-phone"/></svg></span>
+      <input class="form-input" id="inp-numero" aria-label="Número com DDD" type="tel" inputmode="numeric" maxlength="16" autocomplete="off" oninput="mascararTelefone(this)">
     </div>
-    <div class="form-group">
-      <label class="form-label">Indicado por (opcional)</label>
-      <input class="form-input" id="inp-indicado" placeholder="Ex: Carlos">
+    <div class="campo" data-dica="Indicado por">
+      <span class="campo-ic"><svg class="ic" aria-hidden="true"><use href="#i-users"/></svg></span>
+      <input class="form-input" id="inp-indicado" aria-label="Indicado por" autocomplete="off">
     </div>
-    <div class="form-group">
-      <label class="form-label">Observação inicial (opcional)</label>
-      <textarea class="form-textarea" id="inp-obs" placeholder="Anote algo sobre este contato..."></textarea>
+    <div class="campo campo-area" data-dica="Observação">
+      <span class="campo-ic"><svg class="ic" aria-hidden="true"><use href="#i-notebook-pen"/></svg></span>
+      <textarea class="form-textarea" id="inp-obs" aria-label="Observação"></textarea>
     </div>
     <div class="modal-row">
-      <div class="form-group"><button class="btn-full gray" onclick="closeModal('modal-novo')">Cancelar</button></div>
-      <div class="form-group"><button class="btn-full blue" onclick="salvarContato()">Salvar</button></div>
+      <div class="form-group"><button class="btn-full gray" onclick="closeModal('modal-novo')">Cancela</button></div>
+      <div class="form-group"><button class="btn-full blue" onclick="salvarContato()">Salva</button></div>
     </div>
   </div>
 </div>
@@ -2483,6 +2522,34 @@ initListeners();
       history.replaceState({ _eco: true, dest: "index.html" }, "");
     }
   });
+})();
+</script>
+<script>
+(function(){
+  var balao = document.createElement('div'); balao.className = 'dica-balao'; document.body.appendChild(balao);
+  var timer = null;
+  function mostrar(campo){
+    var r = campo.getBoundingClientRect();
+    balao.textContent = campo.getAttribute('data-dica') || '';
+    var x = Math.min(Math.max(r.left + 90, 12 + balao.offsetWidth / 2), window.innerWidth - 12 - balao.offsetWidth / 2);
+    balao.style.left = x + 'px'; balao.style.top = Math.max(r.top - 6, 40) + 'px';
+    balao.classList.add('on');
+  }
+  function esconder(){ clearTimeout(timer); balao.classList.remove('on'); }
+  var modal = document.getElementById('modal-novo');
+  if (!modal) return;
+  modal.querySelectorAll('.campo-ic').forEach(function(ic){
+    var campo = ic.parentNode, longo = false;
+    ic.addEventListener('touchstart', function(){ longo = false; timer = setTimeout(function(){ longo = true; mostrar(campo); }, 450); }, {passive:true});
+    ic.addEventListener('touchend', function(){ clearTimeout(timer); setTimeout(esconder, 1200); }, {passive:true});
+    ic.addEventListener('touchmove', esconder, {passive:true});
+    ic.addEventListener('touchcancel', esconder, {passive:true});
+    ic.addEventListener('mousedown', function(){ timer = setTimeout(function(){ mostrar(campo); }, 450); });
+    ic.addEventListener('mouseup', function(){ clearTimeout(timer); setTimeout(esconder, 1200); });
+    ic.addEventListener('click', function(){ if (longo) { longo = false; return; } var f = campo.querySelector('input,textarea'); if (f) f.focus(); });
+    ic.addEventListener('contextmenu', function(e){ e.preventDefault(); });
+  });
+  modal.addEventListener('click', function(e){ if (e.target === modal) esconder(); });
 })();
 </script>
 </body>
