@@ -424,6 +424,63 @@
 
   @media (max-width: 480px) { .section { padding-top: 40px; } }
   @media (prefers-reduced-motion: reduce) { * { transition-duration: .01ms !important; animation-duration: .01ms !important; scroll-behavior: auto !important; } }
+
+  /* ── Hábitos: bloco um pouco menor (só tamanhos) ── */
+  .meta-block { padding: 12px; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+  .meta-block .meta-head { margin-bottom: 8px; min-height: 24px; }
+  .meta-block .meta-badge { width: 24px; height: 24px; font-size: 12px; }
+  .meta-block .meta-field + .meta-field { margin-top: 6px; }
+  .meta-block .fld { padding: 0 14px 0 12px; gap: 8px; }
+  .meta-block .fld > .ic { width: 15px; height: 15px; margin-top: 12px; }
+  .meta-block .fld textarea, .meta-block .fld input { font-size: 13.5px; line-height: 20px; padding: 10px 0; }
+  .meta-block .fld input { height: 40px; }
+  .habito-block .hab-time { min-height: 40px; }
+  .habito-block .hab-horario > .ic { width: 16px; height: 16px; }
+  .habito-block .hab-horario > span, .habito-block .hab-dur > span { font-size: 12px; }
+  .habito-block .hab-mm { width: 40px; height: 40px; }
+  .habito-block .hab-min { width: 58px; height: 40px; font-size: 19px; }
+  .habito-block .hab-mm .ic { width: 15px; height: 15px; }
+  .habito-block .hab-dur { gap: 8px; }
+  .habito-block .hab-horario { gap: 6px; }
+  .habito-block .hab-progresso { margin-top: 12px; padding-top: 12px; }
+  .habito-block .hab-stats { gap: 8px; margin-bottom: 10px; }
+  .habito-block .hab-stat { padding: 7px 6px; border-radius: 16px; }
+  .habito-block .hab-stat b { font-size: 22px; }
+  .habito-block .hab-stat small { font-size: 10.5px; margin-top: 0; }
+  .habito-block .hab-start { height: 44px; font-size: 13.5px; margin-bottom: 8px; }
+  .habito-block .hab-tempo { font-size: 34px; }
+  .habito-block .hab-acoes { margin-top: 8px; padding: 3px; }
+  .habito-block .hab-acoes button { font-size: 12.5px; min-height: 40px; }
+  .habito-block .hab-aviso { font-size: 11.5px; }
+  .habito-block .hab-trilha { gap: 8px 0; margin-top: 12px; }
+  .habito-block .hab-trilha i { width: 27px; height: 27px; font-size: 11.5px; }
+  .habito-block .hab-info {
+    position: relative; isolation: isolate; background: transparent; min-height: 44px; padding: 0 12px; font-size: 11px;
+  }
+  .habito-block .hab-info::before {
+    content: ''; position: absolute; left: 0; right: 0; top: 50%; height: 26px; margin-top: -13px; border-radius: 999px;
+    background: var(--chip); z-index: -1; transition: background .15s;
+  }
+  .habito-block .hab-info.on { background: transparent; color: #fff; }
+  .habito-block .hab-info.on::before { background: var(--dark); }
+
+  .meta-block textarea, .meta-block input { -webkit-user-select: text; user-select: text; }
+  .meta-block .chip { height: 24px; padding: 0 10px; font-size: 11px; }
+  .meta-block .meta-field .chip { margin-bottom: 8px; }
+  .meta-block .meta-field:has(.list-fields), .meta-block.area-block .meta-field + .meta-field:has(.list-fields) { margin-top: 14px; }
+  .meta-block .list-fields { gap: 6px; }
+  .meta-block .list-field-row { gap: 8px; padding: 0 14px 0 10px; }
+  .meta-block .list-num { font-size: 13px; width: 18px; padding-top: 10px; line-height: 20px; }
+  .meta-block .list-field-row textarea.list-ta { font-size: 13.5px; line-height: 20px; padding: 10px 0; }
+  .meta-block .add-row-btn { height: 34px; font-size: 12.5px; padding: 0 14px 0 10px; }
+  .meta-block .add-row-btn .ic { width: 13px; height: 13px; }
+
+  /* mover bloco: segurar e arrastar */
+  .meta-block { transition: box-shadow .15s; }
+  .meta-block.arrastando {
+    position: relative; z-index: 20; touch-action: none; transition: none;
+    box-shadow: 0 22px 44px -18px rgba(15,27,45,.38); will-change: transform;
+  }
 </style>
 </head>
 <body>
@@ -1579,6 +1636,83 @@ window.saveAnswer = window.saveAnswer || function(){};
     try { if (navigator.vibrate) return navigator.vibrate([600, 300, 600, 300, 600]); } catch (e) {}
     return false;
   }
+  /* mover bloco (hábito, objetivo, área): segurar e arrastar para cima ou para baixo */
+  function arrastavel(listaId, seletor, aoSoltar) {
+    var lista = document.getElementById(listaId);
+    if (!lista) return;
+    var seg = null, arr = null, timer = null, x0 = 0, y0 = 0, lastY = 0, offY = 0, raf = null, solto = 0;
+    function alvo(e) {
+      var t = e.target;
+      if (!t || !t.closest || t.closest('input, textarea, button, select, label, a')) return null;
+      var b = t.closest(seletor);
+      return b && b.parentNode === lista ? b : null;
+    }
+    function cancelar() { clearTimeout(timer); timer = null; seg = null; }
+    function meio(el) { var r = el.getBoundingClientRect(); return r.top + r.height / 2; }
+    function irmao(el, dir) {
+      var x = dir < 0 ? el.previousElementSibling : el.nextElementSibling;
+      return x && x.matches(seletor) ? x : null;
+    }
+    function mover() {
+      var b = arr; if (!b) return;
+      b.style.transform = 'none';
+      var cy = lastY - offY + b.offsetHeight / 2;
+      var prev = irmao(b, -1), next = irmao(b, 1);
+      while (prev && cy < meio(prev)) { lista.insertBefore(b, prev); prev = irmao(b, -1); }
+      while (next && cy > meio(next)) { lista.insertBefore(b, next.nextSibling); next = irmao(b, 1); }
+      var topo = b.getBoundingClientRect().top;
+      b.style.transform = 'translateY(' + (lastY - offY - topo) + 'px) scale(1.015)';
+    }
+    function quadro() {
+      if (!arr) return;
+      var h = window.innerHeight;
+      if (lastY < 90) window.scrollBy(0, -10); else if (lastY > h - 90) window.scrollBy(0, 10);
+      mover();
+      raf = requestAnimationFrame(quadro);
+    }
+    function iniciar(b) {
+      timer = null; arr = b;
+      if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
+      if (navigator.vibrate) { try { navigator.vibrate(15); } catch (_) {} }
+      offY = lastY - b.getBoundingClientRect().top;
+      b.classList.add('arrastando');
+      quadro();
+    }
+    function fim() {
+      if (!arr) { cancelar(); return; }
+      cancelAnimationFrame(raf);
+      var b = arr; arr = null; seg = null;
+      b.style.transform = '';
+      b.classList.remove('arrastando');
+      solto = Date.now();
+      aoSoltar();
+      if (window.agendarSalvamento) window.agendarSalvamento(lista);
+    }
+    lista.addEventListener('touchstart', function(e) {
+      if (arr || e.touches.length !== 1) return;
+      var b = alvo(e); if (!b) return;
+      var t = e.touches[0];
+      x0 = t.clientX; y0 = t.clientY; lastY = y0; seg = b;
+      clearTimeout(timer);
+      timer = setTimeout(function() { if (seg) iniciar(seg); }, 450);
+    }, { passive: true });
+    lista.addEventListener('touchmove', function(e) {
+      var t = e.touches[0];
+      if (!arr) { if (timer && (Math.abs(t.clientX - x0) > 8 || Math.abs(t.clientY - y0) > 8)) cancelar(); return; }
+      e.preventDefault();
+      lastY = t.clientY;
+    }, { passive: false });
+    lista.addEventListener('touchend', fim);
+    lista.addEventListener('touchcancel', fim);
+    lista.addEventListener('contextmenu', function(e) { if (arr || timer) e.preventDefault(); });
+    document.addEventListener('click', function(e) {
+      if (Date.now() - solto < 400 && lista.contains(e.target)) { e.preventDefault(); e.stopPropagation(); }
+    }, true);
+  }
+  arrastavel('habito-lista', '.habito-block', renumerarHabitos);
+  arrastavel('meta-lista', '.meta-block', renumerarMetas);
+  arrastavel('area-lista', '.area-block', renumerarAreas);
+
   document.addEventListener('visibilitychange', function() {
     if (document.hidden || !_vibPend) return;
     _vibPend = false;
