@@ -116,7 +116,7 @@
 
   /* ── Pergunta ── */
   .question-card { background: #fff; border: 1px solid var(--bd); border-radius: 24px; margin: 16px 0; overflow: hidden; }
-  .question-header { display: flex; align-items: flex-start; gap: 12px; padding: 18px 10px 14px 16px; }
+  .question-header { display: flex; align-items: flex-start; gap: 12px; padding: 18px 22px 14px 18px; }
   .q-number {
     background: var(--gold); color: var(--dark); font-family: var(--f-title); font-weight: 700; font-size: 15px;
     width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
@@ -154,7 +154,7 @@
   .fld:focus-within { border-color: #b9c0cc; }
   .fld textarea, .fld input {
     display: block; flex: 1 1 0; min-width: 0; width: 100%; background: transparent; border: none; outline: none;
-    font-size: 16px; line-height: 24px; padding: 13px 0; color: var(--tx); resize: none; overflow: hidden;
+    font-size: 15px; line-height: 22px; padding: 13px 0; color: var(--tx); resize: none; overflow: hidden;
     -webkit-appearance: none; appearance: none; user-select: text; -webkit-user-select: text;
   }
   .fld input { height: 50px; }
@@ -181,10 +181,11 @@
     background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; -webkit-text-fill-color: transparent;
   }
   .money-field input:placeholder-shown { min-width: 3ch; }
+  /* o número digitado fica em cor sólida: texto com degradê dentro de input some ao digitar em alguns navegadores móveis */
   .money-field input {
     flex: 0 1 auto; field-sizing: content; width: auto; min-width: 0; max-width: 100%; height: 52px; border: none; outline: none; text-align: center;
     font-family: var(--f-title); font-weight: 700; font-size: 30px; line-height: 1; padding: 0; border-radius: 0;
-    background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; -webkit-text-fill-color: transparent;
+    background: none; color: var(--dark); -webkit-text-fill-color: var(--dark);
     caret-color: var(--dark); font-variant-numeric: lining-nums tabular-nums; -webkit-appearance: none; appearance: none;
   }
 
@@ -205,13 +206,13 @@
   .list-fields { padding: 0 14px 14px; display: flex; flex-direction: column; gap: 8px; }
   .list-field-row, .two-col-row {
     display: flex; align-items: flex-start; gap: 10px; background: #fff; border: 1px solid var(--bd-in);
-    border-radius: 26px; padding: 0 20px 0 14px; transition: border-color .15s;
+    border-radius: 24px; padding: 0 20px 0 14px; transition: border-color .15s;
   }
   .list-field-row:focus-within, .two-col-row:focus-within { border-color: #b9c0cc; }
   .list-num { font-family: var(--f-title); font-weight: 600; font-size: 14px; color: var(--tx3); width: 20px; text-align: center; padding-top: 13px; line-height: 24px; flex-shrink: 0; }
   .list-field-row textarea.list-ta, .two-col-row textarea.list-ta {
     display: block; flex: 1 1 0; min-width: 0; width: 100%; border: none; outline: none; background: transparent;
-    font-size: 16px; line-height: 24px; padding: 13px 0; color: var(--tx); resize: none; overflow: hidden;
+    font-size: 15px; line-height: 22px; padding: 13px 0; color: var(--tx); resize: none; overflow: hidden;
     -webkit-appearance: none; appearance: none; border-radius: 0;
   }
   .two-col-row { display: grid; grid-template-columns: 1fr 1fr; padding: 0 16px; gap: 10px; }
@@ -246,10 +247,11 @@
   }
   .hab-info.on { background: var(--dark); color: #fff; }
   .hab-horario { display: flex; align-items: center; gap: 8px; }
-  .hab-horario > .ic { width: 18px; height: 18px; color: var(--tx3); margin: 0 2px 0 4px; }
+  .hab-horario > .ic { width: 13px; height: 13px; color: var(--tx3); margin: 0 2px 0 4px; }
   .hab-horario > span { font-size: 14px; color: var(--tx2); }
   .hab-horario .fld { flex: 1 1 0; min-width: 0; padding: 0 12px; }
   .hab-time { min-height: 50px; font-variant-numeric: lining-nums tabular-nums; }
+  .hab-time::-webkit-calendar-picker-indicator { width: 13px; height: 13px; padding: 0; margin: 0; background-size: 13px 13px; opacity: .8; }
   .hab-dur { display: flex; align-items: center; gap: 10px; }
   .hab-dur > span { font-size: 14px; color: var(--tx2); }
   .hab-mm {
@@ -260,7 +262,7 @@
   .hab-mm:active { background: var(--chip); }
   .hab-min {
     width: 76px; height: 50px; text-align: center; border: 1px solid var(--bd-in); border-radius: 999px; outline: none;
-    background: var(--grad); background-origin: border-box; -webkit-background-clip: text; background-clip: text; color: transparent; -webkit-text-fill-color: transparent;
+    background: #fff; color: var(--dark); -webkit-text-fill-color: var(--dark);
     font-family: var(--f-title); font-weight: 700; font-size: 24px; caret-color: var(--dark);
     -moz-appearance: textfield; appearance: textfield; font-variant-numeric: lining-nums tabular-nums;
   }
@@ -427,42 +429,13 @@
 
   /* ── Hábitos: bloco um pouco menor (só tamanhos) ── */
   .meta-block { padding: 12px; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
-  .meta-block .meta-head { margin-bottom: 8px; min-height: 24px; }
-  .meta-block .meta-badge { width: 24px; height: 24px; font-size: 12px; }
+  .meta-block .meta-head { margin-bottom: 12px; min-height: 30px; }
+  .meta-block .meta-badge { width: 30px; height: 30px; font-size: 15px; }
   .meta-block .meta-field + .meta-field { margin-top: 6px; }
-  .meta-block .fld { padding: 0 14px 0 12px; gap: 8px; }
-  .meta-block .fld > .ic { width: 15px; height: 15px; margin-top: 12px; }
-  .meta-block .fld textarea, .meta-block .fld input { font-size: 13.5px; line-height: 20px; padding: 10px 0; }
-  .meta-block .fld input { height: 40px; }
-  .habito-block .hab-time { min-height: 40px; }
-  .habito-block .hab-horario > .ic { width: 16px; height: 16px; }
-  .habito-block .hab-horario > span, .habito-block .hab-dur > span { font-size: 12px; }
-  .habito-block .hab-mm { width: 40px; height: 40px; }
-  .habito-block .hab-min { width: 58px; height: 40px; font-size: 19px; }
-  .habito-block .hab-mm .ic { width: 15px; height: 15px; }
-  .habito-block .hab-dur { gap: 8px; }
-  .habito-block .hab-horario { gap: 6px; }
-  .habito-block .hab-progresso { margin-top: 12px; padding-top: 12px; }
-  .habito-block .hab-stats { gap: 8px; margin-bottom: 10px; }
-  .habito-block .hab-stat { padding: 7px 6px; border-radius: 16px; }
-  .habito-block .hab-stat b { font-size: 22px; }
-  .habito-block .hab-stat small { font-size: 10.5px; margin-top: 0; }
-  .habito-block .hab-start { height: 44px; font-size: 13.5px; margin-bottom: 8px; }
-  .habito-block .hab-tempo { font-size: 34px; }
-  .habito-block .hab-acoes { margin-top: 8px; padding: 3px; }
-  .habito-block .hab-acoes button { font-size: 12.5px; min-height: 40px; }
-  .habito-block .hab-aviso { font-size: 11.5px; }
-  .habito-block .hab-trilha { gap: 8px 0; margin-top: 12px; }
-  .habito-block .hab-trilha i { width: 27px; height: 27px; font-size: 11.5px; }
-  .habito-block .hab-info {
-    position: relative; isolation: isolate; background: transparent; min-height: 44px; padding: 0 12px; font-size: 11px;
-  }
-  .habito-block .hab-info::before {
-    content: ''; position: absolute; left: 0; right: 0; top: 50%; height: 26px; margin-top: -13px; border-radius: 999px;
-    background: var(--chip); z-index: -1; transition: background .15s;
-  }
-  .habito-block .hab-info.on { background: transparent; color: #fff; }
-  .habito-block .hab-info.on::before { background: var(--dark); }
+  .meta-block .fld { padding: 0 20px 0 18px; gap: 12px; }
+  .meta-block .fld > .ic { width: 18px; height: 18px; margin-top: 16px; }
+  .meta-block .fld textarea, .meta-block .fld input { font-size: 14px; line-height: 24px; padding: 13px 0; }
+  .meta-block .fld input { height: 50px; }
 
   .meta-block textarea, .meta-block input { -webkit-user-select: text; user-select: text; }
   .meta-block .chip { height: 24px; padding: 0 10px; font-size: 11px; }
@@ -471,9 +444,86 @@
   .meta-block .list-fields { gap: 6px; }
   .meta-block .list-field-row { gap: 8px; padding: 0 14px 0 10px; }
   .meta-block .list-num { font-size: 13px; width: 18px; padding-top: 10px; line-height: 20px; }
-  .meta-block .list-field-row textarea.list-ta { font-size: 13.5px; line-height: 20px; padding: 10px 0; }
+  .meta-block .list-field-row textarea.list-ta { font-size: 15px; line-height: 22px; padding: 13px 0; }
   .meta-block .add-row-btn { height: 34px; font-size: 12.5px; padding: 0 14px 0 10px; }
   .meta-block .add-row-btn .ic { width: 13px; height: 13px; }
+
+  /* ── Janela de etapa do Ciclo (sobe de baixo) ── */
+  .sheet-ov { position: fixed; inset: 0; z-index: 99970; background: var(--grad); }
+  .sheet {
+    position: fixed; left: 12px; right: 12px; bottom: calc(12px + env(safe-area-inset-bottom)); z-index: 99971;
+    max-height: calc(100svh - 48px); overflow-y: auto; background: #fff; border: 1px solid var(--bd);
+    border-radius: 26px; padding: 10px 14px 14px; box-shadow: 0 24px 50px -20px rgba(15,27,45,.45);
+  }
+  .sheet-handle { width: 40px; height: 4px; border-radius: 2px; background: #d5dae3; margin: 0 auto 14px; }
+  .sheet .fld { margin-bottom: 0; }
+  .sheet .list-fields { padding: 0; margin-top: 12px; }
+  .sheet .list-field-row { border-radius: 24px; }
+  .sheet-foot { display: flex; gap: 10px; margin-top: 14px; }
+  .sheet-foot button { flex: 1; height: 48px; border-radius: 999px; font-weight: 600; font-size: 14.5px; white-space: nowrap; }
+  .sheet-ok { background: var(--dark); color: #fff; }
+  .sheet-del { background: #fff; color: #dc2626; border: 1px solid #fbd0d0; }
+
+  /* ── Ciclo Vencedor: etapas ── */
+  .cycle-item { user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; cursor: pointer; }
+  .ciclo-add {
+    display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; height: 44px; margin-top: 14px;
+    border-radius: 999px; background: var(--dark2); border: 1px solid var(--gold); color: #fff; font-weight: 600; font-size: 14.5px;
+  }
+  .ciclo-add:active { opacity: .78; }
+  .ciclo-add .ic { width: 16px; height: 16px; color: var(--gold); stroke-width: 2; }
+
+  /* ── Janela de ações (Editar, Mover, Excluir) ── */
+  .act-list { display: flex; flex-direction: column; gap: 10px; }
+  .act-btn {
+    display: flex; align-items: center; justify-content: center; width: 100%; height: 50px; border-radius: 999px;
+    background: #fff; border: 1px solid var(--bd-in); color: var(--tx); font-weight: 600; font-size: 15px; white-space: nowrap;
+  }
+  .act-btn:active { background: var(--chip); }
+  .act-btn.pri { background: var(--dark); border-color: var(--dark); color: #fff; }
+  .act-btn.del { color: #dc2626; border-color: #fbd0d0; }
+
+  /* bloco recolhido: mostra só o nome; o botão estende o resto */
+  .meta-toggle {
+    margin-left: auto; width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0;
+    background: #fff; border: 1px solid var(--bd-in); color: var(--tx); display: flex; align-items: center; justify-content: center;
+  }
+  .meta-toggle .ic { width: 16px; height: 16px; transition: transform .2s; }
+  .meta-block.aberto .meta-toggle .ic { transform: rotate(90deg); }
+  .meta-block:not(.aberto) .meta-extra { display: none; }
+  .meta-head .hab-info { margin: 0 8px 0 auto; height: 28px; min-height: 28px; padding: 0 12px; font-size: 12.5px; }
+  .hab-info + .meta-toggle { margin-left: 0; }
+  .list-field-row { align-items: flex-start; }
+  .list-field-row .list-num { padding-top: 13px; line-height: 22px; align-self: flex-start; }
+
+  /* número na caixa de resposta, igual ao das linhas */
+  .fld-num {
+    flex: 0 0 auto; width: 20px; text-align: center; padding-top: 13px; line-height: 22px;
+    font-family: var(--f-title); font-weight: 600; font-size: 14px; color: var(--tx3);
+  }
+
+  /* botão de mais que aparece ao segurar uma caixa de resposta */
+  .caixa-mais {
+    display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; margin: 10px auto 0;
+    border-radius: 50%; background: var(--dark); color: #fff;
+  }
+  .caixa-mais .ic { width: 18px; height: 18px; stroke-width: 2; }
+
+  /* botões "Adiciona" saem da tela: adicionar agora fica no botão que aparece ao segurar */
+  .add-row-btn { display: none !important; }
+
+  /* botões de novo bloco saem da tela: adicionar agora fica no número, ao segurar */
+  .cf-fim, .ciclo-add { display: none !important; }
+
+  /* segurar o número não pode disparar seleção de texto do celular (que cancela o toque longo) */
+  .list-num, .meta-badge, .cycle-item, .q-number { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+
+  /* botões de informação saem de todas as perguntas */
+  .hint-btn { display: none !important; }
+
+  /* linha selecionada (toque no número) */
+  .list-field-row.sel { border-color: var(--gold); box-shadow: inset 0 0 0 1px var(--gold); }
+  .list-field-row.sel .list-num { color: var(--gold-deep); }
 
   /* mover bloco: segurar e arrastar */
   .meta-block { transition: box-shadow .15s; }
@@ -566,7 +616,7 @@
     <div class="mind-model">
       <div class="mind-circle">
         <div class="mind-top">Mente Consciente</div>
-        <div class="mind-bottom">Coração</div>
+        <div class="mind-bottom">Subconsciente</div>
       </div>
       <div class="mind-connector"></div>
       <div class="mind-body-circle">Corpo</div>
@@ -574,18 +624,18 @@
   </div>
 
   <div class="concept-box">
-    <h4>Mente Consciente — A Mente Pensante</h4>
-    <p>A mente consciente é a parte do eu responsável pelos pensamentos, razão e decisões conscientes, pelas ideias, pelos pensamentos passados e futuros, e é a parte que tem o poder de mudar o que está no coração, para que assim mudemos os nossos resultados, pois eles dependem do que está dentro do coração.</p>
+    <h4>Mente Consciente — Pensante</h4>
+    <p>A mente consciente é a parte do eu responsável pelos pensamentos, razão e decisões conscientes, pelas ideias, pelos pensamentos passados e futuros, e é a parte que tem o poder de mudar o que está no subconsciente, para que assim mudemos os nossos resultados, pois eles dependem do que está dentro do subconsciente.</p>
   </div>
 
   <div class="concept-box">
-    <h4>Coração — Centro de Controle</h4>
-    <p>O coração é onde moram os nossos hábitos, crenças, valores, princípios, desejos bons e ruins, expectativa e condicionamento. Essa é a parte onde mora o nosso caráter, é responsável pelos resultados que temos em nossas vidas, sejam bons ou ruins, e ela também influencia o que pensamos em nossa mente consciente.</p>
+    <h4>Subconsciente — Controle</h4>
+    <p>O subconsciente é onde moram os nossos hábitos, crenças, valores, princípios, desejos bons e ruins, expectativa e condicionamento. É lá que ficam os hábitos, os desejos e os valores que movem suas ações todos os dias. Essa é a parte onde mora o nosso caráter, é responsável pelos resultados que temos em nossas vidas, sejam bons ou ruins, e ela também influencia o que pensamos em nossa mente consciente.</p>
   </div>
 
   <div class="concept-box">
     <h4>Corpo — O Instrumento da Mente</h4>
-    <p>É a apresentação física de você. Pensamentos e imagens escolhidos conscientemente, impressos no coração, devem mover seu corpo para a ação. Ações determinam resultados.</p>
+    <p>É a apresentação física de você. Pensamentos e imagens escolhidos conscientemente, impressos no subconsciente, devem mover seu corpo para a ação. Ações determinam resultados.</p>
   </div>
 </div>
 
@@ -677,10 +727,7 @@
       Seja completamente honesto. Descreva como a falta de dinheiro se manifesta no seu dia a dia.
     </div>
     <div class="answer-area">
-      <label class="fld area"><svg class="ic" aria-hidden="true"><use href="#i-text"/></svg><textarea class="auto-grow" rows="1" aria-label="Resposta" oninput="updateChar(this);agendarSalvamento(this)"></textarea></label>
-    </div>
-    <div class="answer-footer">
-      <button class="save-btn" onclick="saveAnswer(this)"><span class="label">Salva</span><span class="check"><svg class="ic" aria-hidden="true"><use href="#i-check"/></svg>Salvo</span></button>
+      <label class="fld area"><textarea class="auto-grow" rows="1" aria-label="Resposta" oninput="updateChar(this);agendarSalvamento(this)"></textarea></label>
     </div>
   </div>
 
@@ -792,10 +839,7 @@
       Escreva no presente, como se já fosse verdade. "Eu sou uma pessoa que..." Seja corajoso e detalhado.
     </div>
     <div class="answer-area">
-      <label class="fld area"><svg class="ic" aria-hidden="true"><use href="#i-text"/></svg><textarea class="auto-grow" rows="1" aria-label="Resposta" oninput="updateChar(this);agendarSalvamento(this)"></textarea></label>
-    </div>
-    <div class="answer-footer">
-      <button class="save-btn" onclick="saveAnswer(this)"><span class="label">Salva</span><span class="check"><svg class="ic" aria-hidden="true"><use href="#i-check"/></svg>Salvo</span></button>
+      <label class="fld area"><textarea class="auto-grow" rows="1" aria-label="Resposta" oninput="updateChar(this);agendarSalvamento(this)"></textarea></label>
     </div>
   </div>
 </div>
@@ -844,10 +888,7 @@
       Logo depois de visualizar, escreva tudo o que você viu e sentiu, com todos os detalhes de que se lembrar.
     </div>
     <div class="answer-area">
-      <label class="fld area"><svg class="ic" aria-hidden="true"><use href="#i-text"/></svg><textarea class="auto-grow" rows="1" aria-label="Resposta" oninput="updateChar(this);agendarSalvamento(this)"></textarea></label>
-    </div>
-    <div class="answer-footer">
-      <button class="save-btn" onclick="saveAnswer(this)"><span class="label">Salva</span><span class="check"><svg class="ic" aria-hidden="true"><use href="#i-check"/></svg>Salvo</span></button>
+      <label class="fld area"><textarea class="auto-grow" rows="1" aria-label="Resposta" oninput="updateChar(this);agendarSalvamento(this)"></textarea></label>
     </div>
   </div>
 </div>
@@ -862,22 +903,13 @@
 
   <div class="cycle-block">
     <h4>O Ciclo Vencedor</h4>
-    <div class="cycle-chain">
-      <span class="cycle-item">Pensamentos Prósperos</span>
-      <span class="cycle-arrow"><svg class="ic" aria-hidden="true"><use href="#i-chevron-right"/></svg></span>
-      <span class="cycle-item">Envolvimento Emocional</span>
-      <span class="cycle-arrow"><svg class="ic" aria-hidden="true"><use href="#i-chevron-right"/></svg></span>
-      <span class="cycle-item">Vibração Próspera</span>
-      <span class="cycle-arrow"><svg class="ic" aria-hidden="true"><use href="#i-chevron-right"/></svg></span>
-      <span class="cycle-item">Ações</span>
-      <span class="cycle-arrow"><svg class="ic" aria-hidden="true"><use href="#i-chevron-right"/></svg></span>
-      <span class="cycle-item">Novos Resultados</span>
-    </div>
+    <div class="cycle-chain" id="ciclo-lista"></div>
+    <button type="button" class="ciclo-add" onclick="addEtapa()"><svg class="ic" aria-hidden="true"><use href="#i-plus"/></svg>Nova etapa</button>
   </div>
 
   <div class="concept-box">
-    <h4>A Lei da Transmutação Perpétua de Energia</h4>
-    <p>Quando uma pessoa irradia uma vibração positiva, essa pessoa deve, pela Lei, RECEBER uma quantidade igual ao que irradiou. "Como plantares, assim colherás."</p>
+    <h4>Colheita Proporcional</h4>
+    <p>Cada atitude que você repete no dia a dia cria um caminho. Com o tempo, o que você semeia volta para você em forma de resultado, na mesma medida em que foi plantado.</p>
   </div>
 </div>
 
@@ -921,7 +953,7 @@
 <!-- LEI DO VÁCUO -->
 <!-- ══════════════════════════════════════════ -->
 <div class="section" id="vacuo">
-  <h2 class="section-title">A Lei do Vácuo da Prosperidade</h2>
+  <h2 class="section-title">A Lei do Vácuo</h2>
 
   <div class="quote-block">
     <p>"O elemento crucial desta lei do vácuo da prosperidade é que você deve soltar o velho antes de criar espaço para o novo."</p>
@@ -973,6 +1005,25 @@
   <span>Born Rich</span> — Proctor Gallagher Institute
 </footer>
 
+<!-- JANELA DA ETAPA DO CICLO -->
+<div class="sheet-ov" id="sheetOv" hidden onclick="fecharSheet()"></div>
+<div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-label="Etapa" hidden>
+  <div class="sheet-handle"></div>
+  <label class="fld" hidden><textarea id="sheetTitulo" class="meta-ta" rows="1" placeholder="Nome da etapa" aria-label="Nome da etapa" oninput="autoGrow(this)"></textarea></label>
+  <div class="list-fields" id="sheetLista"></div>
+  <div class="sheet-foot">
+    <button type="button" class="sheet-del" onclick="excluirEtapa()">Excluído</button>
+    <button type="button" class="sheet-ok" onclick="fecharSheet()">Pronto</button>
+  </div>
+</div>
+
+<!-- JANELA DE AÇÕES (segurar uma etapa ou um número) -->
+<div class="sheet-ov" id="actOv" hidden onclick="fecharAcoes()"></div>
+<div class="sheet" id="actSheet" role="dialog" aria-modal="true" aria-label="Ações" hidden>
+  <div class="sheet-handle"></div>
+  <div class="act-list" id="actList"></div>
+</div>
+
 <!-- TOAST -->
 <div class="toast" id="toast" role="status" aria-live="polite">Resposta salva</div>
 
@@ -990,6 +1041,8 @@ import {
 var CADERNO_ID = 'born_rich_caderno_principal';
 var respostasCache = {};
 var _saveTimer = null;
+// true assim que o usuário digita algo: a carga da nuvem não pode apagar o que ele já escreveu
+var _editou = false;
 
 // ─── Camada 1: IndexedDB com fallback localStorage ────────────────────────────
 function saveLocal(key, data) {
@@ -1063,25 +1116,35 @@ function coletarDados() {
   if (window.coletarMetas) dados['q_metas'] = { metas: JSON.stringify(window.coletarMetas()) };
   if (window.coletarAreas) dados['q_areas'] = { areas: JSON.stringify(window.coletarAreas()) };
   if (window.coletarHabitos) dados['q_habitos'] = { habitos: JSON.stringify(window.coletarHabitos()) };
+  if (window.coletarCiclo) dados['q_ciclo'] = { ciclo: JSON.stringify(window.coletarCiclo()) };
 
   return dados;
 }
 
 // ─── Preencher formulário a partir dos dados do Firebase ─────────────────────
+// Só preenche o que está vazio e fora de foco: nunca apaga o que a pessoa já digitou
 function preencherDados(dados) {
   if (!dados) return;
 
-  if (dados.q_habitos && dados.q_habitos.habitos && window.restoreHabitos) {
-    try { window.restoreHabitos(JSON.parse(dados.q_habitos.habitos)); } catch (_) {}
+  if (!_editou) {
+    if (dados.q_habitos && dados.q_habitos.habitos && window.restoreHabitos) {
+      try { window.restoreHabitos(JSON.parse(dados.q_habitos.habitos)); } catch (_) {}
+    }
+
+    if (dados.q_areas && dados.q_areas.areas && window.restoreAreas) {
+      try { window.restoreAreas(JSON.parse(dados.q_areas.areas)); } catch (_) {}
+    }
+
+    if (dados.q_metas && dados.q_metas.metas && window.restoreMetas) {
+      try { window.restoreMetas(JSON.parse(dados.q_metas.metas)); } catch (_) {}
+    }
   }
 
-  if (dados.q_areas && dados.q_areas.areas && window.restoreAreas) {
-    try { window.restoreAreas(JSON.parse(dados.q_areas.areas)); } catch (_) {}
+  if (!_editou && dados.q_ciclo && dados.q_ciclo.ciclo && window.restoreCiclo) {
+    try { window.restoreCiclo(JSON.parse(dados.q_ciclo.ciclo)); } catch (_) {}
   }
 
-  if (dados.q_metas && dados.q_metas.metas && window.restoreMetas) {
-    try { window.restoreMetas(JSON.parse(dados.q_metas.metas)); } catch (_) {}
-  }
+  var livre = function(el) { return el.value === '' && el !== document.activeElement; };
 
   document.querySelectorAll('[data-qid]').forEach(function(card) {
     var qid = card.dataset.qid;
@@ -1099,21 +1162,21 @@ function preencherDados(dados) {
     }
 
     card.querySelectorAll('textarea:not(.list-ta)').forEach(function(el, i) {
-      if (entradas['textarea_' + i] !== undefined) {
+      if (entradas['textarea_' + i] !== undefined && livre(el)) {
         el.value = entradas['textarea_' + i];
         updateChar(el);
       }
     });
 
     card.querySelectorAll('input[type=text], textarea.list-ta').forEach(function(el, i) {
-      if (entradas['input_' + i] !== undefined) {
+      if (entradas['input_' + i] !== undefined && livre(el)) {
         el.value = entradas['input_' + i];
-        if (el.tagName === 'TEXTAREA') updateChar(el);
+        if (el.tagName === 'TEXTAREA') { updateChar(el); autoGrow(el); }
         else if (window.fitWidth && el.closest('.commitment-block')) window.fitWidth(el);
       }
     });
 
-    if (entradas['choice']) {
+    if (entradas['choice'] && !card.querySelector('.choice-label.selected')) {
       card.querySelectorAll('.choice-label').forEach(function(lbl) {
         if (lbl.textContent.trim() === entradas['choice']) {
           lbl.classList.add('selected');
@@ -1147,6 +1210,7 @@ async function salvarNoFirebase() {
 
 // ─── Agendador de salvamento (debounce — salva 1.5s após parar de digitar) ───
 window.agendarSalvamento = function(el) {
+  _editou = true;
   clearTimeout(_saveTimer);
   _saveTimer = setTimeout(function() {
     salvarNoFirebase().then(function() {
@@ -1288,11 +1352,36 @@ window.saveAnswer = window.saveAnswer || function(){};
     return true;
   }
   document.addEventListener('keydown', function(e) {
+    // campos de uma linha só (nomes, objetivos, áreas, hábitos): Enter não pula linha
+    if (e.key === 'Enter' && !e.shiftKey && e.target && e.target.classList && e.target.classList.contains('meta-ta')) {
+      e.preventDefault();
+      e.target.blur();
+      return;
+    }
     if (e.key === 'Backspace' && (apagarLinhaVazia(e) || apagarMetaVazia(e) || apagarAreaVazia(e) || apagarHabitoVazio(e))) e.preventDefault();
   });
   document.addEventListener('beforeinput', function(e) {
     if (e.inputType === 'deleteContentBackward' && (apagarLinhaVazia(e) || apagarMetaVazia(e) || apagarAreaVazia(e) || apagarHabitoVazio(e))) e.preventDefault();
   });
+
+  /* recolher: os campos após os primeiros ficam escondidos até estender; o cronômetro segue rodando */
+  function prepararRecolher(b, visiveis) {
+    Array.prototype.slice.call(b.querySelectorAll('.meta-field')).slice(visiveis).forEach(function(x) { x.classList.add('meta-extra'); });
+    var pr = b.querySelector('.hab-progresso');
+    if (pr) pr.classList.add('meta-extra');
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'meta-toggle';
+    btn.setAttribute('aria-label', 'Expandir');
+    btn.innerHTML = ic('chevron-right');
+    btn.onclick = function() {
+      b.classList.toggle('aberto');
+      // campos que estavam escondidos só ganham altura quando aparecem
+      if (b.classList.contains('aberto')) b.querySelectorAll('textarea').forEach(autoGrow);
+      btn.setAttribute('aria-label', b.classList.contains('aberto') ? 'Recolher' : 'Expandir');
+    };
+    b.querySelector('.meta-head').appendChild(btn);
+  }
 
   /* ── Objetivos: objetivo + por quê + ações ── */
   function metaHTML(n) {
@@ -1317,6 +1406,7 @@ window.saveAnswer = window.saveAnswer || function(){};
     var b = document.createElement('div');
     b.className = 'meta-block' + (n === 1 ? ' principal' : '');
     b.innerHTML = metaHTML(n);
+    prepararRecolher(b, 2);
     if (apos && apos.parentNode === lista) {
       lista.insertBefore(b, apos.nextSibling);
       renumerarMetas();
@@ -1416,6 +1506,7 @@ window.saveAnswer = window.saveAnswer || function(){};
     var b = document.createElement('div');
     b.className = 'meta-block area-block';
     b.innerHTML = areaHTML(n);
+    prepararRecolher(b, 1);
     lista.appendChild(b);
     if (!semFoco) b.querySelector('.area-nome').focus();
     return b;
@@ -1827,6 +1918,7 @@ window.saveAnswer = window.saveAnswer || function(){};
     var b = document.createElement('div');
     b.className = 'meta-block habito-block';
     b.innerHTML = habitoHTML(n);
+    prepararRecolher(b, 1);
     b._reg = {};
     lista.appendChild(b);
     renderHabito(b);
@@ -1913,6 +2005,350 @@ window.saveAnswer = window.saveAnswer || function(){};
   document.addEventListener('visibilitychange', function() {
     if (!document.hidden) document.querySelectorAll('#habito-lista .habito-block').forEach(renderHabito);
   });
+
+  /* ── Ciclo Vencedor: etapas em sequência; segurar uma etapa abre para editar ── */
+  var CICLO_PADRAO = [
+    { t: 'Objetivo', i: ['Quem não tem metas está condenado a trabalhar para quem têm. Poucos tem metas claras escrita, definir metas e planejar é a habilidade mestra do sucesso', 'A razão (o porque) é mais importante que a meta, elas podem mudar o porquê fica, quando mais razões você listar mais forte o desejo', 'Cada minuto gasto em planejar pouca de cinco a quinze minutos na execução, agir sem planejar é a causa de quase todo os fracassos'] },
+    { t: 'Expectativa', i: ['Você não recebe oque quer, você recebe oque espera, as expectativas sobre como as coisas vão acabar viram profecia que se cumprem'] },
+    { t: 'Riscos', i: ['O medo e o descoforto vai sumir com a repetição focada'] },
+    { t: 'Ação', i: ['Ler e memoriza não vai fazer você uma pessoa bem sucedido o que conta e entender a ideia e aplicar ela massivamente e consistentemente.', 'Faça a coisa e você tera energia para fazer a coisa, comece esteja pronto ou não assim faz os grandes.'] },
+    { t: 'Ajustes', i: ['Há sempre um caminho'] },
+    { t: 'Perseverança', i: ['As coisas que Napoleon hill encontro em Edison e Ford foi a grande perseverança pois quando tinha uma ideia eles so paravam quando concretiza suas ideia', 'Excelência é simplesmente o compromisso firme com a conclusão', 'Dizem que tenta é fracasar com honra, eu não tentei. Eu me comprometir a fazer até funcionar'] },
+    { t: 'Passado', i: ['Seu passado nao define seu futuro', 'Neste momento você tem uma pagina branco escreva com mais sabedoria'] },
+    { t: 'Subconsciente', i: ['Nenhuma pessoa o circunstância pode fazer você pensar ou sentir oque você não quer, o controle do que você pensa e senti está em sua mão', 'Quando vier aquela lembrança dizendo o porque você não consegui, ela não reflete o seu potencial, reflete o seu condicionamento passado', 'Não podemos superar as nossas crenças, elas define o nosso desempenho e o limite em todas areas da vida', 'Os seus resultados externos e resultado do que esta dentro de você, para você mudar o que está fora você precisar mudar o quê a dentro (valos, crenças, habitos, emoções e desejos)', 'Toda decisão é emocional, e a emoção mais forte domina a mais fraca'] },
+    { t: 'Doação', i: ['Buscai juntar tesouro no céu'] },
+    { t: 'Dinheiro', i: [] },
+    { t: 'Sociabilidade', i: [] }
+  ];
+  var CICLO = JSON.parse(JSON.stringify(CICLO_PADRAO));
+  var _etapa = -1;
+
+  function renderCiclo() {
+    var box = document.getElementById('ciclo-lista');
+    if (!box) return;
+    box.innerHTML = '';
+    CICLO.forEach(function(e, k) {
+      if (k > 0) {
+        var a = document.createElement('span');
+        a.className = 'cycle-arrow';
+        a.innerHTML = ic('chevron-right');
+        box.appendChild(a);
+      }
+      var s = document.createElement('span');
+      s.className = 'cycle-item';
+      s.dataset.idx = k;
+      s.textContent = e.t || 'Nova etapa';
+      box.appendChild(s);
+    });
+  }
+
+  function abrirEtapa(k, editavel) {
+    var e = CICLO[k];
+    if (!e) return;
+    _etapa = k;
+    document.getElementById('sheet').hidden = false;
+    document.getElementById('sheetOv').hidden = false;
+    var titulo = document.getElementById('sheetTitulo');
+    titulo.value = e.t || '';
+    autoGrow(titulo);
+    var lista = document.getElementById('sheetLista');
+    lista.innerHTML = '<button type="button" class="add-row-btn" onclick="addRow(this)">' + ic('plus') + 'Adiciona</button>';
+    var btn = lista.querySelector('.add-row-btn');
+    (e.i && e.i.length ? e.i : ['']).forEach(function(v) {
+      addRow(btn, true);
+      var ta = btn.previousElementSibling.querySelector('textarea');
+      ta.value = v;
+      autoGrow(ta);
+    });
+    // só edita depois de segurar e escolher Editar (toque normal apenas mostra o texto)
+    titulo.readOnly = !editavel;
+    lista.querySelectorAll('textarea').forEach(function(t) { t.readOnly = !editavel; });
+  }
+
+  function sincronizarEtapa() {
+    var e = CICLO[_etapa];
+    if (!e) return;
+    e.t = document.getElementById('sheetTitulo').value;
+    e.i = Array.prototype.map.call(document.querySelectorAll('#sheetLista .list-ta'), function(t) { return t.value; });
+    var n = document.querySelector('#ciclo-lista .cycle-item[data-idx="' + _etapa + '"]');
+    if (n) n.textContent = e.t || 'Nova etapa';
+    if (window.agendarSalvamento) window.agendarSalvamento(n || document.body);
+  }
+
+  function fecharSheet() {
+    _etapa = -1;
+    document.querySelectorAll('.list-field-row.sel').forEach(function(r) { r.classList.remove('sel'); });
+    document.getElementById('sheet').hidden = true;
+    document.getElementById('sheetOv').hidden = true;
+  }
+
+  function addEtapa() {
+    CICLO.push({ t: '', i: [] });
+    renderCiclo();
+    if (window.agendarSalvamento) window.agendarSalvamento(document.body);
+    abrirEtapa(CICLO.length - 1, true);
+  }
+
+  function excluirEtapa() {
+    if (_etapa < 0 || CICLO.length <= 1) return;
+    if (!confirm('Excluir esta etapa?')) return;
+    CICLO.splice(_etapa, 1);
+    fecharSheet();
+    renderCiclo();
+    if (window.agendarSalvamento) window.agendarSalvamento(document.body);
+  }
+
+  window.coletarCiclo = function() { return JSON.parse(JSON.stringify(CICLO)); };
+  window.restoreCiclo = function(arr) {
+    if (!arr || !arr.length) return;
+    CICLO = arr.map(function(e) { return { t: e.t || '', i: e.i || [] }; });
+    renderCiclo();
+  };
+
+  // um toque simples em uma etapa abre a janela com os textos
+  document.getElementById('ciclo-lista').addEventListener('click', function(e) {
+    var el = e.target && e.target.closest ? e.target.closest('.cycle-item') : null;
+    if (el) abrirEtapa(+el.dataset.idx);
+  });
+
+  document.getElementById('sheet').addEventListener('input', sincronizarEtapa);
+  document.addEventListener('keydown', function(e) { if (e.key === 'Escape' && _etapa >= 0) fecharSheet(); });
+  renderCiclo();
+
+  // segurar uma caixa de resposta mostra o botão de mais; ele adiciona outra caixa logo abaixo
+  function limparMais() {
+    document.querySelectorAll('.caixa-mais').forEach(function(b) { b.remove(); });
+  }
+  function fecharMaisFora(e) {
+    if (e.target && e.target.closest && e.target.closest('.caixa-mais')) return;
+    limparMais();
+    document.removeEventListener('pointerdown', fecharMaisFora, true);
+  }
+  function mostrarMais(label) {
+    limparMais();
+    var area = label.parentNode;
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'caixa-mais';
+    b.setAttribute('aria-label', 'Adicionar caixa abaixo');
+    b.innerHTML = ic('plus');
+    b.onclick = function(e) { e.stopPropagation(); adicionarCaixaAbaixo(area); };
+    area.appendChild(b);
+    setTimeout(function() { document.addEventListener('pointerdown', fecharMaisFora, true); }, 0);
+  }
+  function adicionarCaixaAbaixo(area) {
+    limparMais();
+    var nova = document.createElement('div');
+    nova.className = 'answer-area';
+    nova.innerHTML = '<label class="fld area"><textarea class="auto-grow" rows="1" aria-label="Resposta" oninput="updateChar(this);agendarSalvamento(this)"></textarea></label>';
+    area.parentNode.insertBefore(nova, area.nextSibling);
+    var ta = nova.querySelector('textarea');
+    autoGrow(ta);
+    ta.focus();
+    agendarSalvamento(nova);
+  }
+
+  /* ── Segurar uma etapa do ciclo ou um número de bloco: Editar, Mover, Excluir ── */
+  var _acao = null;
+  var _pressTimer = null, _pressX = 0, _pressY = 0, _pressFired = false;
+  function alvoSegurar(t) {
+    return t && t.closest ? (t.closest('.cycle-item') || t.closest('.meta-badge') || t.closest('.q-number') || t.closest('.list-field-row > .list-num') || t.closest('.list-field-row') || t.closest('label.fld.area')) : null;
+  }
+  function salvarAlt() { if (window.agendarSalvamento) window.agendarSalvamento(document.body); }
+  function renumerarPai(pai) {
+    if (pai.id === 'meta-lista') renumerarMetas();
+    else if (pai.id === 'area-lista') renumerarAreas();
+    else if (pai.id === 'habito-lista') renumerarHabitos();
+  }
+
+  function abrirMenuItem(el) {
+    // segurar em qualquer parte da linha abre as ações da linha
+    if (el.classList.contains('list-field-row')) el = el.querySelector('.list-num');
+    if (el.classList.contains('q-number')) {
+      // número de uma pergunta: Editar, Mover e Excluir a pergunta inteira
+      var cartao = el.closest('.question-card');
+      if (!cartao) return;
+      var paiCartao = cartao.parentNode;
+      _acao = {
+        editar: function() {
+          fecharAcoes();
+          cartao.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          var ta = cartao.querySelector('textarea');
+          if (ta) setTimeout(function() { ta.focus(); }, 300);
+        },
+        excluir: function() { cartao.remove(); salvarAlt(); },
+        mover: function(dir) {
+          var sib = dir < 0 ? cartao.previousElementSibling : cartao.nextElementSibling;
+          if (!sib || !sib.classList.contains('question-card')) return;
+          if (dir < 0) paiCartao.insertBefore(cartao, sib); else paiCartao.insertBefore(sib, cartao);
+          salvarAlt();
+        }
+      };
+      renderAcoes(false);
+      document.getElementById('actOv').hidden = false;
+      document.getElementById('actSheet').hidden = false;
+      return;
+    }
+    if (el.classList.contains('fld') && el.classList.contains('area')) {
+      mostrarMais(el);
+      return;
+    }
+    if (el.classList.contains('list-num')) {
+      // número de uma linha (inclusive dentro da janela da etapa)
+      var linha = el.closest('.list-field-row');
+      var caixa = linha.parentNode;
+      selecionarLinha(linha);
+      var reNum = function() {
+        caixa.querySelectorAll('.list-field-row').forEach(function(r, i) { r.querySelector('.list-num').textContent = i + 1; });
+      };
+      var sync = function() { if (_etapa >= 0) sincronizarEtapa(); salvarAlt(); };
+      _acao = {
+        editar: function() {
+          fecharAcoes();
+          linha.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          var ta = linha.querySelector('textarea');
+          if (ta) { ta.readOnly = false; setTimeout(function() { ta.focus(); }, 300); }
+        },
+        excluir: function() {
+          if (caixa.querySelectorAll('.list-field-row').length <= 1) return;
+          linha.remove(); reNum(); sync();
+        },
+        mover: function(dir) {
+          var sib = dir < 0 ? linha.previousElementSibling : linha.nextElementSibling;
+          if (!sib || !sib.classList.contains('list-field-row')) return;
+          if (dir < 0) caixa.insertBefore(linha, sib); else caixa.insertBefore(sib, linha);
+          reNum(); sync();
+        }
+      };
+      _acao.adicionar = function() {
+        var nova = document.createElement('div');
+        nova.className = 'list-field-row multi';
+        nova.innerHTML = '<span class="list-num">0</span>' + TA_HTML;
+        caixa.insertBefore(nova, linha.nextSibling);
+        reNum(); sync();
+        nova.querySelector('textarea').focus();
+      };
+      renderAcoes(false);
+      document.getElementById('actOv').hidden = false;
+      document.getElementById('actSheet').hidden = false;
+      return;
+    }
+    if (el.classList.contains('cycle-item')) {
+      _acao = {
+        idx: +el.dataset.idx,
+        adicionar: function() { CICLO.splice(_acao.idx + 1, 0, { t: '', i: [] }); renderCiclo(); salvarAlt(); },
+        editar: function() { var k = _acao.idx; fecharAcoes(); abrirEtapa(k, true); },
+        excluir: function() {
+          if (CICLO.length <= 1) return;
+          CICLO.splice(_acao.idx, 1);
+          renderCiclo(); salvarAlt();
+        },
+        mover: function(dir) {
+          var n = _acao.idx + dir;
+          if (n < 0 || n >= CICLO.length) return;
+          var tmp = CICLO[_acao.idx]; CICLO[_acao.idx] = CICLO[n]; CICLO[n] = tmp;
+          _acao.idx = n;
+          renderCiclo(); salvarAlt();
+        }
+      };
+    } else {
+      var bloco = el.closest('.meta-block');
+      if (!bloco) return;
+      var pai = bloco.parentNode;
+      _acao = {
+        editar: function() {
+          var f = bloco.querySelector('.meta-obj, .area-nome, .hab-nome');
+          fecharAcoes();
+          bloco.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          if (f) setTimeout(function() { f.focus(); }, 300);
+        },
+        excluir: function() {
+          bloco.remove(); renumerarPai(pai); salvarAlt();
+        },
+        adicionar: function() {
+          var f = pai.id === 'meta-lista' ? addMeta : (pai.id === 'area-lista' ? addArea : addHabito);
+          var nb = f(true);
+          pai.insertBefore(nb, bloco.nextSibling);
+          renumerarPai(pai); salvarAlt();
+        },
+        mover: function(dir) {
+          var sib = dir < 0 ? bloco.previousElementSibling : bloco.nextElementSibling;
+          if (!sib || !sib.classList.contains('meta-block')) return;
+          if (dir < 0) pai.insertBefore(bloco, sib); else pai.insertBefore(sib, bloco);
+          renumerarPai(pai); salvarAlt();
+        }
+      };
+    }
+    renderAcoes(false);
+    document.getElementById('actOv').hidden = false;
+    document.getElementById('actSheet').hidden = false;
+  }
+
+  function btnAcao(texto, cls, fn) {
+    var b = document.createElement('button');
+    b.type = 'button'; b.className = cls; b.textContent = texto;
+    b.onclick = fn;
+    return b;
+  }
+
+  function renderAcoes(movendo) {
+    var box = document.getElementById('actList');
+    box.innerHTML = '';
+    if (!movendo) {
+      box.appendChild(btnAcao('Editado', 'act-btn', function() { if (_acao) _acao.editar(); }));
+      box.appendChild(btnAcao('Movido', 'act-btn', function() { renderAcoes(true); }));
+      if (_acao && _acao.adicionar) box.appendChild(btnAcao('Adicionado', 'act-btn', function() { if (_acao) { _acao.adicionar(); fecharAcoes(); } }));
+      box.appendChild(btnAcao('Excluído', 'act-btn del', function() {
+        if (!_acao || !confirm('Excluir este item?')) return;
+        var f = _acao.excluir;
+        f();
+        fecharAcoes();
+      }));
+    } else {
+      box.appendChild(btnAcao('Subido', 'act-btn', function() { if (_acao) _acao.mover(-1); }));
+      box.appendChild(btnAcao('Descido', 'act-btn', function() { if (_acao) _acao.mover(1); }));
+      box.appendChild(btnAcao('Pronto', 'act-btn pri', fecharAcoes));
+    }
+  }
+
+  function fecharAcoes() {
+    _acao = null;
+    document.getElementById('actSheet').hidden = true;
+    document.getElementById('actOv').hidden = true;
+  }
+
+  // segurar (450 ms) abre as ações; toque rápido segue normal
+  document.addEventListener('pointerdown', function(e) {
+    var el = alvoSegurar(e.target);
+    if (!el || (e.pointerType === 'mouse' && e.button !== 0)) return;
+    clearTimeout(_pressTimer);
+    _pressX = e.clientX; _pressY = e.clientY; _pressFired = false;
+    _pressTimer = setTimeout(function() {
+      _pressTimer = null; _pressFired = true;
+      if (navigator.vibrate) { try { navigator.vibrate(15); } catch (_) {} }
+      abrirMenuItem(el);
+    }, 450);
+  }, true);
+  document.addEventListener('pointermove', function(e) {
+    if (_pressTimer && (Math.abs(e.clientX - _pressX) > 8 || Math.abs(e.clientY - _pressY) > 8)) {
+      clearTimeout(_pressTimer); _pressTimer = null;
+    }
+  }, true);
+  ['pointerup', 'pointercancel'].forEach(function(ev) {
+    document.addEventListener(ev, function() { clearTimeout(_pressTimer); _pressTimer = null; }, true);
+  });
+  document.addEventListener('contextmenu', function(e) { if (alvoSegurar(e.target)) e.preventDefault(); });
+  document.addEventListener('click', function(e) {
+    if (_pressFired && alvoSegurar(e.target)) { e.preventDefault(); e.stopPropagation(); _pressFired = false; return; }
+    // toque simples no número seleciona a linha (destaque); segurar abre as ações
+    var num = e.target && e.target.closest ? e.target.closest('.list-field-row > .list-num') : null;
+    if (num) selecionarLinha(num.closest('.list-field-row'));
+  }, true);
+  function selecionarLinha(linha) {
+    document.querySelectorAll('.list-field-row.sel').forEach(function(r) { r.classList.remove('sel'); });
+    if (linha) linha.classList.add('sel');
+  }
+  document.addEventListener('keydown', function(e) { if (e.key === 'Escape') fecharAcoes(); });
 
   /* menu hambúrguer */
   function fecharMenu() {
