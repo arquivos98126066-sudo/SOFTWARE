@@ -668,12 +668,12 @@
   .ed-view strong { font-weight: 700; }
   .ed-view em { font-style: italic; }
   .ed-view.pen { touch-action: none; -webkit-user-select: none; user-select: none; cursor: pointer; }
-  .ed-tools { position: absolute; right: 24px; bottom: calc(16px + 56px + 14px + env(safe-area-inset-bottom)); display: flex; flex-direction: column; gap: 10px; }
+  .ed-tools { position: absolute; right: 82px; bottom: calc(20px + env(safe-area-inset-bottom)); max-width: calc(100% - 82px - 16px); display: flex; flex-direction: row; flex-wrap: nowrap; justify-content: flex-end; gap: 8px; }
   .ed-tool {
-    width: 40px; height: 40px; border-radius: 50%; background: #fff; border: 1px solid var(--bd-in); color: var(--dark);
+    flex: none; width: min(44px, calc((100vw - 138px) / 6)); height: min(44px, calc((100vw - 138px) / 6)); border-radius: 50%; background: #fff; border: 1px solid var(--bd-in); color: var(--dark);
     display: flex; align-items: center; justify-content: center; box-shadow: 0 12px 24px -14px rgba(15,27,45,.5);
   }
-  .ed-tool .ic { width: 18px; height: 18px; stroke-width: 2; }
+  .ed-tool .ic { width: 22px; height: 22px; stroke-width: 2; }
   .ed-tool.on { background: var(--gold); border-color: var(--gold); }
   .ed-ok {
     position: absolute; right: 16px; bottom: calc(16px + env(safe-area-inset-bottom)); width: 56px; height: 56px; border-radius: 50%;
@@ -687,10 +687,13 @@
   .ln.gap { height: var(--gap, 12px); line-height: var(--gap, 12px); }
   .ln.done { text-decoration: line-through; color: var(--tx2); }
   .ln:has(> .ck, > .nm, > .bl) { padding-left: 32px; text-indent: -32px; }
-  .ln > .ck, .ln > .nm, .ln > .bl { text-indent: 0; }
+  .ln > .ck, .ln > .nm, .ln > .bl, .ln > .ds { text-indent: 0; }
   .nm { display: inline-block; min-width: 22px; height: 22px; padding: 0 5px; margin-right: 10px; box-sizing: border-box; border-radius: 999px; background: var(--chip); color: #334155; font-family: var(--f-title); font-weight: 700; font-size: 12.5px; line-height: 22px; font-style: normal; text-align: center; vertical-align: 1px; font-variant-numeric: lining-nums tabular-nums; -webkit-user-select: none; user-select: none; }
   .bl { position: relative; display: inline-block; width: 14px; height: 22px; margin-right: 8px; vertical-align: -5px; }
   .ln:has(> .bl) { padding-left: 22px; text-indent: -22px; }
+  .ds { position: relative; display: inline-block; width: 14px; height: 22px; margin-right: 8px; vertical-align: -5px; }
+  .ds::after { content: ''; position: absolute; left: 2px; top: 10px; width: 10px; height: 2px; border-radius: 1px; background: var(--dark); }
+  .ln:has(> .ds) { padding-left: 22px; text-indent: -22px; }
   .bl::after { content: ''; position: absolute; left: 3.5px; top: 7.5px; width: 7px; height: 7px; border-radius: 50%; background: var(--dark); }
   .ck { position: relative; display: inline-block; width: 20px; height: 20px; margin-right: 12px; vertical-align: -4px; box-sizing: border-box; border-radius: 50%; border: 1.6px solid #b9c0cc; background: #fff; cursor: pointer; }
   .ck::before { content: ''; position: absolute; inset: -12px; }
@@ -809,6 +812,7 @@
     <h4>O Ciclo Vencedor</h4>
     <div class="cycle-chain" id="ciclo-lista"></div>
   </div>
+
 </div>
 
 <!-- ══════════════════════════════════════════ -->
@@ -1184,6 +1188,7 @@
     <button type="button" class="ed-tool" data-t="c" aria-label="Check"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M8.2 12.4l2.6 2.6 5-5.2"/></svg></button>
     <button type="button" class="ed-tool" data-t="n" aria-label="Numeração"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M11 6h9M11 12h9M11 18h9M4.5 5.5l1.5-1v5M4 14.2c.6-1 2.3-.8 2.1.4-.3 1-1.6 1.5-2.1 2.4h2.4"/></svg></button>
     <button type="button" class="ed-tool" data-t="p" aria-label="Marcadores"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M11 6h9M11 12h9M11 18h9"/><circle cx="5.5" cy="6" r=".9" fill="currentColor"/><circle cx="5.5" cy="12" r=".9" fill="currentColor"/><circle cx="5.5" cy="18" r=".9" fill="currentColor"/></svg></button>
+    <button type="button" class="ed-tool" data-t="d" aria-label="Traço"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h3M11 6h9M4 12h3M11 12h9M4 18h3M11 18h9"/></svg></button>
   </div>
   <button type="button" class="ed-ok" id="edOk" aria-label="Sair"><svg class="ic" aria-hidden="true"><use href="#i-plus"/></svg></button>
 </div>
@@ -2688,6 +2693,7 @@ window.saveAnswer = window.saveAnswer || function(){};
     titulo.parentNode.hidden = !editavel;
     if (editavel) { autoGrow(titulo); setTimeout(function() { try { titulo.focus(); } catch (_) {} }, 120); }
     lista.querySelectorAll('textarea').forEach(function(t) { t.readOnly = !editavel; });
+    if (!editavel && window.negritoTodos) { window.negritoTodos(); setTimeout(window.negritoTodos, 50); }
   }
 
   function sincronizarEtapa() {
@@ -3236,8 +3242,12 @@ window.saveAnswer = window.saveAnswer || function(){};
   function rtParse(t) {
     var lines = [], W = [];
     String(t).split('\n').forEach(function(raw, li) {
-      var c = null, mk = null, m = /^\[( |x|#|-)\] ?/.exec(raw);
-      if (m) { mk = m[1] === '#' ? 'n' : (m[1] === '-' ? 'p' : 'c'); c = m[1] === 'x' ? 1 : 0; raw = raw.slice(m[0].length); }
+      var c = null, mk = null, rs = 0, m = /^\[( |x|#|-|=|!)\] ?/.exec(raw);
+      if (!m) {
+        var am = /^-\s+/.test(raw) ? '[=] ' : (/^[*•]\s+/.test(raw) ? '[-] ' : (/^\d{1,3}[.)]\s+/.test(raw) ? '[#] ' : ''));
+        if (am) { raw = am + raw.replace(/^([-*•]|\d{1,3}[.)])\s+/, ''); m = /^\[( |x|#|-|=|!)\] ?/.exec(raw); }
+      }
+      if (m) { mk = (m[1] === '#' || m[1] === '!') ? 'n' : (m[1] === '-' ? 'p' : (m[1] === '=' ? 'd' : 'c')); rs = m[1] === '!' ? 1 : 0; c = m[1] === 'x' ? 1 : 0; raw = raw.slice(m[0].length); }
       var P = '', B = [], I = [], b = false, it = false;
       for (var i = 0; i < raw.length; i++) {
         var ch = raw.charAt(i), nx = raw.charAt(i + 1);
@@ -3247,7 +3257,7 @@ window.saveAnswer = window.saveAnswer || function(){};
       }
       var re = /\S+/g, mm;
       while ((mm = re.exec(P))) W.push({ l: li, s: mm.index, e: mm.index + mm[0].length });
-      lines.push({ c: c, m: mk, P: P, B: B, I: I });
+      lines.push({ c: c, m: mk, r: rs, P: P, B: B, I: I });
     });
     return { lines: lines, W: W };
   }
@@ -3265,7 +3275,8 @@ window.saveAnswer = window.saveAnswer || function(){};
   }
   function rtMk(ln, li, n) {
     if (ln.m === 'c') return '<span class="ck" contenteditable="false" data-l="' + li + '" data-s="' + ln.c + '"></span>';
-    if (ln.m === 'n') return '<span class="nm" contenteditable="false">' + n + '</span>';
+    if (ln.m === 'n') return '<span class="nm" contenteditable="false"' + (ln.r ? ' data-r="1"' : '') + '>' + n + '</span>';
+    if (ln.m === 'd') return '<span class="ds" contenteditable="false"></span>';
     if (ln.m === 'p') return '<span class="bl" contenteditable="false"></span>';
     return '';
   }
@@ -3274,7 +3285,7 @@ window.saveAnswer = window.saveAnswer || function(){};
     var k = 0, num = 0;
     return pm.lines.map(function(ln, li) {
       var vazia = ln.P.trim() === '' && ln.m === null;
-      if (ln.m === 'n') num++; else if (!vazia) num = 0;
+      if (ln.m === 'n') { if (ln.r) num = 1; else num++; }
       if (vazia) return '<div class="ln gap" data-l="' + li + '"><br></div>';
       var h = rtMk(ln, li, num), p = 0;
       ln.P.split(/(\s+)/).forEach(function(tk) {
@@ -3311,7 +3322,7 @@ window.saveAnswer = window.saveAnswer || function(){};
       }
       if (ab) out += '**';
       if (ai) out += '__';
-      return (ln.m === null ? '' : (ln.m === 'n' ? '[#] ' : (ln.m === 'p' ? '[-] ' : (ln.c ? '[x] ' : '[ ] ')))) + out;
+      return (ln.m === null ? '' : (ln.m === 'n' ? (ln.r ? '[!] ' : '[#] ') : (ln.m === 'p' ? '[-] ' : (ln.m === 'd' ? '[=] ' : (ln.c ? '[x] ' : '[ ] '))))) + out;
     }).join('\n');
   }
   /* o que está na tela (ou foi colado de fora) vira texto com os marcadores */
@@ -3353,7 +3364,8 @@ window.saveAnswer = window.saveAnswer || function(){};
       if (tag === 'BR') { if (!L) nova(); fim(); return; }
       if (tag === 'HR') { fim(); out.push(''); return; }
       if (n.classList && n.classList.contains('ck')) { if (!L) nova(); L.pre = n.getAttribute('data-s') === '1' ? '[x] ' : '[ ] '; return; }
-      if (n.classList && n.classList.contains('nm')) { if (!L) nova(); L.pre = '[#] '; return; }
+      if (n.classList && n.classList.contains('nm')) { if (!L) nova(); L.pre = n.getAttribute('data-r') === '1' ? '[!] ' : '[#] '; return; }
+      if (n.classList && n.classList.contains('ds')) { if (!L) nova(); L.pre = '[=] '; return; }
       if (n.classList && n.classList.contains('bl')) { if (!L) nova(); L.pre = '[-] '; return; }
       var st = estilo(n, b, i);
       if (/^(DIV|P|LI|H[1-6]|UL|OL|BLOCKQUOTE|TR|TABLE|SECTION|ARTICLE)$/.test(tag)) {
@@ -3387,9 +3399,9 @@ window.saveAnswer = window.saveAnswer || function(){};
       l = l.replace(/\[([^\]\n]+)\]\([^)\n]*\)/g, '$1').replace(/`([^`\n]+)`/g, '$1');
       var h = /^#{1,6}\s+(.*)$/.exec(l);
       if (h) l = '**' + h[1].replace(/\*\*/g, '').replace(/^\*|\*$/g, '') + '**';
-      else if (!/^\[( |x|#|-)\] /.test(l)) {
-        var b = /^[-*•]\s+(.*)$/.exec(l), n = /^\d{1,3}[.)]\s+(.*)$/.exec(l);
-        if (b) l = '[-] ' + b[1]; else if (n) l = '[#] ' + n[1];
+      else if (!/^\[( |x|#|-|=|!)\] /.test(l)) {
+        var d = /^-\s+(.*)$/.exec(l), b = /^[*•]\s+(.*)$/.exec(l), n = /^\d{1,3}[.)]\s+(.*)$/.exec(l);
+        if (d) l = '[=] ' + d[1]; else if (b) l = '[-] ' + b[1]; else if (n) l = '[#] ' + n[1];
       }
       l = l.replace(/\*\*\*([^*\n]+?)\*\*\*/g, '**__$1__**');
       l = l.replace(/\*\*([^*\n]+?)\*\*/g, '\u0001$1\u0002');
@@ -3433,7 +3445,7 @@ window.saveAnswer = window.saveAnswer || function(){};
     var v = document.getElementById('edView');
     Array.prototype.forEach.call(v.children, function(n) {
       if (n.tagName !== 'DIV') return;
-      var ck = n.querySelector('.ck'), mk = n.querySelector('.ck, .nm, .bl');
+      var ck = n.querySelector('.ck'), mk = n.querySelector('.ck, .nm, .bl, .ds');
       var vazio = !mk && !n.textContent.replace(/[​]/g, '').trim();
       n.className = 'ln' + (vazio ? ' gap' : '') + (mk ? ' li' : '') + (ck && ck.getAttribute('data-s') === '1' ? ' done' : '');
     });
@@ -3528,7 +3540,7 @@ window.saveAnswer = window.saveAnswer || function(){};
       while (n && n.parentNode !== v) n = n.parentNode;
       if (!n || n.nodeType !== 1) return;
       var mk = null;
-      for (var c = n.firstChild; c; c = c.nextSibling) { if (c.nodeType === 1 && c.classList && (c.classList.contains('ck') || c.classList.contains('nm') || c.classList.contains('bl'))) { mk = c; break; } }
+      for (var c = n.firstChild; c; c = c.nextSibling) { if (c.nodeType === 1 && c.classList && (c.classList.contains('ck') || c.classList.contains('nm') || c.classList.contains('bl') || c.classList.contains('ds'))) { mk = c; break; } }
       if (!mk) return;
       var pre = document.createRange();
       pre.setStartAfter(mk); pre.setEnd(r.startContainer, r.startOffset);
@@ -3574,6 +3586,7 @@ window.saveAnswer = window.saveAnswer || function(){};
   })();
 
   /* botão de mais: toque sai; segurar mostra as ferramentas (negrito, itálico, check) */
+  var _nIniciou = false;
   function ferramentaEscolher(t, quieto) {
     _tool = t;
     document.getElementById('edView').classList.toggle('pen', !!t);
@@ -3584,6 +3597,7 @@ window.saveAnswer = window.saveAnswer || function(){};
   }
   function ferramentasMostrar(sim, quieto) {
     document.getElementById('edTools').hidden = !sim;
+    _nIniciou = false;
     if (!sim) ferramentaEscolher(null, true);
     if (!quieto) edLer();
   }
@@ -3630,10 +3644,13 @@ window.saveAnswer = window.saveAnswer || function(){};
       mudou = true;
     }
     function linha(l) {
-      var ln = _pm.lines[l], tipo = _tool === 'c' ? 'c' : (_tool === 'n' ? 'n' : 'p'), tem = ln.m === tipo;
+      var ln = _pm.lines[l], tipo = _tool === 'c' ? 'c' : (_tool === 'n' ? 'n' : (_tool === 'd' ? 'd' : 'p')), tem = ln.m === tipo;
       if (alvo === null) alvo = !tem;
       if (tem === alvo) return;
       ln.m = alvo ? tipo : null; ln.c = 0;
+      // cada vez que a numeração é ligada, a primeira linha recomeça em 1 e as seguintes continuam
+      ln.r = (alvo && tipo === 'n' && !_nIniciou) ? 1 : 0;
+      if (alvo && tipo === 'n') _nIniciou = true;
       v.innerHTML = rtHtml(_pm, _tool);
       mudou = true;
     }
@@ -3646,16 +3663,40 @@ window.saveAnswer = window.saveAnswer || function(){};
       arrasta = false; alvo = null;
       if (mudou) { document.getElementById('edTa').value = rtSer(_pm); mudou = false; }
     }
+    var x0 = 0, y0 = 0, toque = false, pronto = false, rola = false, ev0 = null, ly = 0, lt = 0, vel = 0, raf = 0;
+    function inercia() {
+      if (Math.abs(vel) < 0.05) return;
+      v.scrollTop += vel * 16; vel *= 0.95;
+      raf = requestAnimationFrame(inercia);
+    }
     v.addEventListener('pointerdown', function(e) {
       if (!_tool) return;
-      e.preventDefault();
-      arrasta = true; alvo = null; mudou = false;
-      try { v.setPointerCapture(e.pointerId); } catch (_) {}
-      toca(e);
+      cancelAnimationFrame(raf);
+      toque = true; pronto = false; rola = false; vel = 0; ev0 = { clientX: e.clientX, clientY: e.clientY, pointerId: e.pointerId };
+      x0 = e.clientX; y0 = e.clientY; ly = e.clientY; lt = e.timeStamp;
     });
-    v.addEventListener('pointermove', function(e) { if (_tool && arrasta) toca(e); });
-    v.addEventListener('pointerup', fim);
-    v.addEventListener('pointercancel', fim);
+    v.addEventListener('pointermove', function(e) {
+      if (!_tool || !toque) return;
+      var dx = Math.abs(e.clientX - x0), dy = Math.abs(e.clientY - y0);
+      if (!pronto && !rola && (dx > 8 || dy > 8)) {
+        if (dx > dy) { pronto = true; arrasta = true; alvo = null; mudou = false; toca(ev0); }
+        else rola = true;
+      }
+      if (rola) {
+        var d = e.clientY - ly, dt = Math.max(1, e.timeStamp - lt);
+        v.scrollTop -= d; vel = -d / dt; ly = e.clientY; lt = e.timeStamp;
+        return;
+      }
+      if (pronto && arrasta) toca(e);
+    });
+    v.addEventListener('pointerup', function(e) {
+      if (!_tool || !toque) { fim(); return; }
+      toque = false;
+      if (rola) { rola = false; inercia(); return; }
+      if (!pronto) { arrasta = true; alvo = null; mudou = false; toca(e); }
+      fim();
+    });
+    v.addEventListener('pointercancel', function() { toque = false; pronto = false; rola = false; fim(); });
   })();
   document.getElementById('edTit').addEventListener('keydown', function(e) {
     if (e.key === 'Enter') { e.preventDefault(); edEditar(); }
@@ -3771,6 +3812,16 @@ window.saveAnswer = window.saveAnswer || function(){};
     document.getElementById('actOv').hidden = true;
   }
 
+  // depois de segurar, o navegador pode tentar selecionar a palavra: desfaz na hora
+  var _supSel = 0;
+  function limpaSelecao() {
+    try { window.getSelection().removeAllRanges(); } catch (_) {}
+    var a = document.activeElement;
+    if (a && (a.tagName === 'TEXTAREA' || a.tagName === 'INPUT')) {
+      try { var f = a.selectionEnd; a.setSelectionRange(f, f); a.blur(); } catch (_) {}
+    }
+  }
+  document.addEventListener('selectionchange', function() { if (Date.now() < _supSel) limpaSelecao(); });
   // segurar (450 ms) abre as ações; toque rápido segue normal
   document.addEventListener('pointerdown', function(e) {
     var el = alvoSegurar(e.target);
@@ -3784,6 +3835,12 @@ window.saveAnswer = window.saveAnswer || function(){};
       if (ed && !ed.readOnly && document.activeElement === ed) return;
       _pressFired = true;
       try { window.getSelection().removeAllRanges(); } catch (_) {}
+      _supSel = Date.now() + 1500;
+      limpaSelecao();
+      if (ed) {
+        ed.style.pointerEvents = 'none';
+        setTimeout(function() { ed.style.pointerEvents = ''; }, 1500);
+      }
       if (navigator.vibrate) { try { navigator.vibrate(15); } catch (_) {} }
       abrirMenuItem(el);
     }, 450);
@@ -3792,14 +3849,14 @@ window.saveAnswer = window.saveAnswer || function(){};
     var t = e.target;
     if (!t || !t.closest) return;
     var ed = t.closest('textarea,input');
-    if (ed && !ed.readOnly) return;
+    if (ed && !ed.readOnly && document.activeElement === ed) return;
     if (t.closest('.question-card, .meta-block, .cycle-block, #sheet, #actSheet')) e.preventDefault();
   });
   document.addEventListener('selectstart', function(e) {
     var t = e.target && (e.target.nodeType === 1 ? e.target : e.target.parentElement);
     if (!t || !t.closest) return;
     var ed = t.closest('textarea,input');
-    if (ed && !ed.readOnly) return;
+    if (ed && !ed.readOnly && document.activeElement === ed) return;
     if (t.closest('.question-card, .meta-block, .cycle-block, #sheet, #actSheet')) e.preventDefault();
   });
   document.addEventListener('pointermove', function(e) {
@@ -3987,7 +4044,7 @@ window.saveAnswer = window.saveAnswer || function(){};
 <script>
 /* negrito automático: **texto** vira negrito quando a caixa não está sendo editada */
 (function() {
-  var TEM = /\*\*[^*\n][^*]*?\*\*|__[^_\n][^_]*?__|^\[(?: |x|#|-)\]/m;
+  var TEM = /\*\*[^*\n][^*]*?\*\*|__[^_\n][^_]*?__|^\[(?: |x|#|-|=|!)\]/m;
   var VAZIA = /\n[ \t]*\n/;
   function esc(t) { return String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
   function html(t) { return rtHtml(rtParse(t), null); }
@@ -3998,7 +4055,7 @@ window.saveAnswer = window.saveAnswer || function(){};
   }
   function por(ta) {
     var v = ta._negV;
-    if (document.activeElement === ta || !(TEM.test(ta.value) || VAZIA.test(ta.value)) || ta.id === 'sheetTitulo' || ta.id === 'edTa') { tirar(ta); return; }
+    if ((document.activeElement === ta && !ta.readOnly) || !(TEM.test(ta.value) || VAZIA.test(ta.value)) || ta.id === 'sheetTitulo' || ta.id === 'edTa') { tirar(ta); return; }
     if (v && ta._negVal === ta.value && ta.classList.contains('neg-oculto')) return;
     if (!v) {
       v = document.createElement('div');
@@ -4033,7 +4090,12 @@ window.saveAnswer = window.saveAnswer || function(){};
     ta.classList.add('neg-oculto');
   }
   var foco0 = HTMLTextAreaElement.prototype.focus;
-  HTMLTextAreaElement.prototype.focus = function(o) { if (this._negV) tirar(this); return foco0.call(this, o); };
+  HTMLTextAreaElement.prototype.focus = function(o) { if (this._negV && !this.readOnly) tirar(this); return foco0.call(this, o); };
+  // caixa só de leitura nunca vira texto cru: não fica com foco e volta para a versão formatada
+  document.addEventListener('focusin', function(e) {
+    var t = e.target;
+    if (t && t.tagName === 'TEXTAREA' && t.readOnly && t.id !== 'edTa') { try { t.blur(); } catch (_) {} por(t); }
+  }, true);
   document.addEventListener('focusout', function(e) {
     var t = e.target;
     if (t && t.tagName === 'TEXTAREA') setTimeout(function() { por(t); }, 0);
