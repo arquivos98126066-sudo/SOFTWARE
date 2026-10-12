@@ -1487,7 +1487,12 @@ window.saveAnswer = window.saveAnswer || function(){};
       row.innerHTML = '<span class="list-num">' + n + '</span>' + TA_HTML;
     }
     box.insertBefore(row, btn.parentNode === box ? btn : btn.parentNode);
-    if (box.id === 'sheetLista' && !window._sheetEdit) row.querySelectorAll('textarea').forEach(function(t) { t.readOnly = true; });
+    if (box.id === 'sheetLista') {
+      // dentro da janela da etapa só o nome edita direto; o texto abre no editor
+      row.querySelectorAll('textarea').forEach(function(t) { t.readOnly = true; });
+      if (!semFoco && window.abrirEditor) { window.abrirEditor(row.querySelector('textarea'), '', row); }
+      return;
+    }
     if (!semFoco) row.querySelector('textarea').focus();
   }
 
@@ -2703,8 +2708,8 @@ window.saveAnswer = window.saveAnswer || function(){};
         if (document.activeElement !== titulo) { try { titulo.focus(); } catch (_) {} }
       }, ms); });
     }
-    lista.querySelectorAll('textarea').forEach(function(t) { t.readOnly = !editavel; });
-    if (!editavel && window.negritoTodos) { window.negritoTodos(); setTimeout(window.negritoTodos, 50); }
+    lista.querySelectorAll('textarea').forEach(function(t) { t.readOnly = true; });
+    if (window.negritoTodos) { window.negritoTodos(); setTimeout(window.negritoTodos, 50); }
   }
 
   function sincronizarEtapa() {
@@ -3468,6 +3473,7 @@ window.saveAnswer = window.saveAnswer || function(){};
     ta.dispatchEvent(new Event('input', { bubbles: true }));
   }
   window.edSalvaJa = edSalvaJa;
+  window.abrirEditor = function(ta, t, d) { abrirEditor(ta, t, d); };
   function edClasses() {
     var v = document.getElementById('edView');
     Array.prototype.forEach.call(v.children, function(n) {
