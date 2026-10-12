@@ -1378,7 +1378,6 @@ async function salvarNoFirebase() {
     if (window.syncShow) window.syncShow.synced('Born Rich');
   } catch(e) {
     if (window.syncShow) window.syncShow.local();
-    showToast('Salvo localmente (offline)', '#b45309');
   }
 }
 
@@ -1386,12 +1385,15 @@ async function salvarNoFirebase() {
 window.agendarSalvamento = function(el) {
   _editou = true;
   clearTimeout(_saveTimer);
-  _saveTimer = setTimeout(function() {
-    salvarNoFirebase().then(function() {
-      showToast('Salvo automaticamente');
-    });
-  }, 1500);
+  _saveTimer = setTimeout(function() { salvarNoFirebase(); }, 400);
 };
+window.salvarAgora = function() {
+  if (!_editou) return;
+  clearTimeout(_saveTimer);
+  try { return salvarNoFirebase(); } catch (_) {}
+};
+document.addEventListener('visibilitychange', function() { if (document.visibilityState === 'hidden') { if (window.edSalvaJa) window.edSalvaJa(); window.salvarAgora(); } });
+window.addEventListener('pagehide', function() { if (window.edSalvaJa) window.edSalvaJa(); window.salvarAgora(); });
 
 // ─── Botão Salvar manual ─────────────────────────────────────────────────────
 window.saveAnswer = function(btn) {
@@ -2691,7 +2693,16 @@ window.saveAnswer = window.saveAnswer || function(){};
     window._sheetEdit = !!editavel;
     titulo.readOnly = !editavel;
     titulo.parentNode.hidden = !editavel;
-    if (editavel) { autoGrow(titulo); setTimeout(function() { try { titulo.focus(); } catch (_) {} }, 120); }
+    if (editavel) {
+      autoGrow(titulo);
+      var _fe = _etapa;
+      [160].forEach(function(ms) { setTimeout(function() {
+        var sh = document.getElementById('sheet');
+        if (_etapa !== _fe || sh.hidden || !window._sheetEdit) return;
+        titulo.readOnly = false; titulo.parentNode.hidden = false;
+        if (document.activeElement !== titulo) { try { titulo.focus(); } catch (_) {} }
+      }, ms); });
+    }
     lista.querySelectorAll('textarea').forEach(function(t) { t.readOnly = !editavel; });
     if (!editavel && window.negritoTodos) { window.negritoTodos(); setTimeout(window.negritoTodos, 50); }
   }
@@ -2715,6 +2726,12 @@ window.saveAnswer = window.saveAnswer || function(){};
 
   var _scrollSheet = 0, _fechouEm = 0;
   function fecharSheet() {
+    var _ve = CICLO[_etapa];
+    if (_ve && !_ve.h && !String(_ve.t || '').trim() && !(_ve.i || []).some(function(v) { return String(v || '').trim(); }) && !cicloFilhos(_etapa).length) {
+      CICLO.splice(_etapa, 1);
+      setTimeout(function() { renderCiclo(); if (window.agendarSalvamento) window.agendarSalvamento(document.body); }, 0);
+    }
+    window._sheetEdit = false;
     _etapa = -1;
     document.querySelectorAll('.list-field-row.sel').forEach(function(r) { r.classList.remove('sel'); });
     var sh = document.getElementById('sheet');
@@ -2876,17 +2893,16 @@ window.saveAnswer = window.saveAnswer || function(){};
   document.getElementById('sheet').addEventListener('focusout', function(e) {
     var t = e.target;
     if (t && t._tempEdit) { t._tempEdit = false; t.readOnly = true; }
-    // clicou fora: sai da edição, tudo na janela volta a ser só leitura
-    setTimeout(function() {
-      var sh = document.getElementById('sheet');
-      if (!window._sheetEdit || sh.hidden) return;
-      var ae = document.activeElement;
-      if (ae && sh.contains(ae) && ae.closest && ae.closest('textarea, input, button, [contenteditable="true"]')) return;
-      window._sheetEdit = false;
-      sh.querySelectorAll('textarea').forEach(function(x) { x.readOnly = true; });
-      var tt = document.getElementById('sheetTitulo');
-      tt.readOnly = true; tt.parentNode.hidden = true;
-    }, 60);
+  });
+  // toque fora dos campos (e fora dos botões) sai da edição; sair do foco sozinho nunca esconde o nome
+  document.getElementById('sheet').addEventListener('pointerdown', function(e) {
+    if (!window._sheetEdit) return;
+    var a = e.target;
+    if (a && a.closest && a.closest('textarea, input, button, .fld, .list-field-row, [contenteditable="true"]')) return;
+    window._sheetEdit = false;
+    document.getElementById('sheet').querySelectorAll('textarea').forEach(function(x) { x.readOnly = true; });
+    var tt = document.getElementById('sheetTitulo');
+    tt.readOnly = true; tt.parentNode.hidden = true;
   });
   document.addEventListener('keydown', function(e) { if (e.key === 'Escape' && _etapa >= 0) fecharSheet(); });
   renderCiclo();
@@ -3441,6 +3457,17 @@ window.saveAnswer = window.saveAnswer || function(){};
     ferramentasMostrar(false, true);
     edLer();
   }
+  // salva a cada letra, sem aviso: o texto vai direto para a caixa de origem
+  function edSalvaJa() {
+    var ta = _edAlvo; if (!ta) return;
+    var ed = document.getElementById('edTa'), v = document.getElementById('edView');
+    try { if (_edModo === 'editar') ed.value = rtDeDom(v, false); } catch (_) {}
+    if (ta.value === ed.value) return;
+    ta.value = ed.value;
+    try { autoGrow(ta); } catch (_) {}
+    ta.dispatchEvent(new Event('input', { bubbles: true }));
+  }
+  window.edSalvaJa = edSalvaJa;
   function edClasses() {
     var v = document.getElementById('edView');
     Array.prototype.forEach.call(v.children, function(n) {
@@ -3477,6 +3504,7 @@ window.saveAnswer = window.saveAnswer || function(){};
     if (_edModo === 'ler' && _pm && _pm.lines[li]) {
       _pm.lines[li].c = feito ? 1 : 0;
       document.getElementById('edTa').value = rtSer(_pm);
+      edSalvaJa();
     }
   }
   // leitura: um toque entra em edição. edição: dois toques seguidos voltam para a leitura
@@ -3530,6 +3558,7 @@ window.saveAnswer = window.saveAnswer || function(){};
       }
       edClasses();
       try { _snap = rtDeDom(v, false); } catch (_) {}
+      edSalvaJa();
     });
     // Enter no começo de uma linha com marcador: empurra a linha para baixo sem tirar o marcador dela
     v.addEventListener('beforeinput', function(e) {
@@ -3582,6 +3611,7 @@ window.saveAnswer = window.saveAnswer || function(){};
       }
       edClasses();
       try { _snap = rtDeDom(v, false); } catch (_) {}
+      edSalvaJa();
     });
   })();
 
@@ -3661,7 +3691,7 @@ window.saveAnswer = window.saveAnswer || function(){};
     function fim() {
       if (!arrasta) return;
       arrasta = false; alvo = null;
-      if (mudou) { document.getElementById('edTa').value = rtSer(_pm); mudou = false; }
+      if (mudou) { document.getElementById('edTa').value = rtSer(_pm); mudou = false; edSalvaJa(); }
     }
     var x0 = 0, y0 = 0, toque = false, pronto = false, rola = false, ev0 = null, ly = 0, lt = 0, vel = 0, raf = 0;
     function inercia() {
@@ -3817,11 +3847,15 @@ window.saveAnswer = window.saveAnswer || function(){};
   function limpaSelecao() {
     try { window.getSelection().removeAllRanges(); } catch (_) {}
     var a = document.activeElement;
-    if (a && (a.tagName === 'TEXTAREA' || a.tagName === 'INPUT')) {
+    if (a && (a.tagName === 'TEXTAREA' || a.tagName === 'INPUT') && a.readOnly) {
       try { var f = a.selectionEnd; a.setSelectionRange(f, f); a.blur(); } catch (_) {}
     }
   }
-  document.addEventListener('selectionchange', function() { if (Date.now() < _supSel) limpaSelecao(); });
+  document.addEventListener('selectionchange', function() {
+    var a = document.activeElement;
+    if (a && (a.tagName === 'TEXTAREA' || a.tagName === 'INPUT') && !a.readOnly) return;
+    if (Date.now() < _supSel) limpaSelecao();
+  });
   // segurar (450 ms) abre as ações; toque rápido segue normal
   document.addEventListener('pointerdown', function(e) {
     var el = alvoSegurar(e.target);
@@ -4104,6 +4138,25 @@ window.saveAnswer = window.saveAnswer || function(){};
   window.negritoTodos = todos;
   setInterval(todos, 600);
   setTimeout(todos, 300);
+})();
+</script>
+<script>
+(function() {
+  function fix(el) {
+    if (el.__ac) return; el.__ac = 1;
+    el.setAttribute('autocomplete', 'off'); el.setAttribute('autocorrect', 'off');
+    el.setAttribute('autocapitalize', 'off'); el.setAttribute('spellcheck', 'false');
+    el.setAttribute('data-lpignore', 'true'); el.setAttribute('data-form-type', 'other');
+  }
+  function todos() { document.querySelectorAll('textarea, input').forEach(fix); }
+  todos();
+  new MutationObserver(todos).observe(document.body, { childList: true, subtree: true });
+  // duplo toque fora de campos editáveis não seleciona texto nem chama a busca do sistema
+  document.addEventListener('dblclick', function(e) {
+    if (e.target && e.target.closest && e.target.closest('textarea:not([readonly]), input, [contenteditable="true"]')) return;
+    e.preventDefault();
+    try { window.getSelection().removeAllRanges(); } catch (_) {}
+  }, true);
 })();
 </script>
 </body>
