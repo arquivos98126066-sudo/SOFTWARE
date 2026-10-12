@@ -3473,7 +3473,6 @@ window.saveAnswer = window.saveAnswer || function(){};
     ta.dispatchEvent(new Event('input', { bubbles: true }));
   }
   window.edSalvaJa = edSalvaJa;
-  window.abrirEditor = function(ta, t, d) { abrirEditor(ta, t, d); };
   function edClasses() {
     var v = document.getElementById('edView');
     Array.prototype.forEach.call(v.children, function(n) {
