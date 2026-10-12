@@ -689,6 +689,74 @@
   .mo-clean .mo-ic { width: 38px; height: 38px; border-radius: 999px; background: #f1f4f8; color: #334155; }
   .mo-clean .mo-ic.sim { background: #d1fae5; color: #047857; }
   .mo-clean .mo-txt b { font-size: 15px; font-weight: 600; color: #0f172a; }
+  /* cartão do contato compacto (mesmo ritmo do Leads) */
+  .card.ct { border-radius: 24px; padding: 0; margin-bottom: 12px; }
+  .card.ct::before { display: none; }
+  .ct-row { display: flex; align-items: center; gap: 8px; min-height: 76px; padding: 14px 12px 14px 18px; }
+  .ct-tx { flex: 1; min-width: 0; }
+  .card.ct .card-name { margin: 0; font-size: 17px; font-weight: 600; line-height: 1.25; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .ct-meta { display: flex; align-items: center; gap: 8px; margin-top: 6px; }
+  .card.ct .status-tag { margin: 0; padding: 0 10px; height: 24px; font-size: 11px; letter-spacing: .04em; }
+  .card.ct .dots { gap: 5px; }
+  .card.ct .dot { width: 9px; height: 9px; }
+  .ct-n { font-size: 12.5px; color: #6b7280; }
+  .card.ct .icon-btn { flex: none; width: 44px; height: 44px; }
+  .card.ct .status-tag::before { display: none; }
+  .ct-row { padding: 18px 12px 18px 18px; }
+  .ct-meta { margin-top: 8px; }
+
+  /* demais cartões: mesmo ritmo compacto e folgado embaixo */
+  .agenda-card, .reuniao-card, .ativo-card, .arquivo-card, .crono-item { border-radius: 24px; padding: 16px 14px 18px 18px; margin-bottom: 12px; }
+  .agenda-head { margin-bottom: 12px; padding-bottom: 12px; }
+  .agenda-card .contact-btns { margin-bottom: 0; }
+  .agenda-card > div:first-child, .reuniao-card > div:first-child { margin-bottom: 12px !important; }
+  .reuniao-nome, .agenda-name { margin-bottom: 12px; padding-bottom: 12px; }
+  .agenda-head .agenda-name { margin-bottom: 0; padding-bottom: 0; }
+  .ativo-servico, .arquivo-info { margin-bottom: 12px; padding-bottom: 12px; }
+  .reuniao-acoes { margin-top: 12px; }
+  .status-tag::before { display: none; }
+  .card-name, .agenda-name, .reuniao-nome, .ativo-nome, .arquivo-nome, .crono-nome { text-transform: uppercase; }
+  .card.ct .card-name { font-size: 15px; letter-spacing: .02em; }
+
+  /* uniformidade final: mesmo nome, mesma folga em todos os cartões */
+  .card-name, .agenda-name, .reuniao-nome, .ativo-nome, .arquivo-nome, .crono-nome { font-size: 15px !important; font-weight: 600; letter-spacing: .02em; line-height: 1.25; }
+  .agenda-card, .reuniao-card, .ativo-card, .arquivo-card, .crono-item { padding: 14px 12px 14px 18px !important; margin-bottom: 12px; }
+  .agenda-head { gap: 8px; margin-bottom: 10px !important; padding-bottom: 10px !important; }
+  .agenda-head .icon-btn { width: 40px; height: 40px; }
+  .agenda-card .contact-btns, .reuniao-card .contact-btns, .ativo-card .contact-btns, .arquivo-card .contact-btns { margin: 0 !important; }
+  .contact-btn { padding: 8px 14px; min-height: 40px; }
+  .ativo-nome, .arquivo-nome { margin-bottom: 6px; }
+  .ativo-servico, .arquivo-info { margin-bottom: 10px; padding-bottom: 10px; }
+  .reuniao-card > div:first-child { margin-bottom: 10px !important; }
+  .reuniao-nome { margin-bottom: 10px; padding-bottom: 10px; }
+  .reuniao-acoes { margin-top: 10px; }
+
+  /* compacto de verdade: sem linha divisória, botões baixos, nomes menores */
+  .card-name, .agenda-name, .reuniao-nome, .ativo-nome, .arquivo-nome, .crono-nome { font-size: 14px !important; }
+  .agenda-card, .reuniao-card, .ativo-card, .arquivo-card, .crono-item { padding: 12px 12px 12px 18px !important; margin-bottom: 10px; border-radius: 22px; }
+  .agenda-head, .reuniao-nome, .agenda-name, .ativo-servico, .arquivo-info { border-bottom: 0 !important; }
+  .agenda-head { margin-bottom: 8px !important; padding-bottom: 0 !important; }
+  .agenda-head .icon-btn, .icon-btn { width: 36px; height: 36px; }
+  .reuniao-nome { margin-bottom: 8px; padding-bottom: 0; }
+  .reuniao-card > div:first-child { margin-bottom: 8px !important; }
+  .ativo-servico, .arquivo-info { margin-bottom: 8px; padding-bottom: 0; }
+  .ativo-nome, .arquivo-nome { margin-bottom: 4px; }
+  .contact-btn, .btn-reativar, .btn-excluir, .btn-proposta, .btn-liguei, .btn-concluir, .btn-concluido, .btn-adiado, .btn-mover-contato { min-height: 36px; padding: 6px 14px; font-size: 13px; }
+  .contact-btns, .reuniao-acoes, .arquivo-acoes, .ativo-acoes { gap: 8px; }
+  .card.ct .dots { gap: 6px; }
+  .card.ct .dot { width: 11px; height: 11px; }
+  .card.ct .ct-n { font: 600 13.5px 'Barlow', sans-serif; color: #64748b; letter-spacing: .02em; margin-left: 2px; }
+  .card.ct .ct-meta { gap: 10px; }
+
+  /* sem linha e sem vão entre o nome e os botões, em todos os cartões */
+  .arquivo-head, .ativo-head, .reuniao-head { border-bottom: 0 !important; padding-bottom: 0 !important; margin-bottom: 8px !important; gap: 8px; }
+  .arquivo-btns { margin-top: 0 !important; }
+  .agenda-head, .arquivo-head, .ativo-head, .reuniao-head { min-height: 36px; }
+  .arquivo-card, .ativo-card, .reuniao-card, .agenda-card, .crono-item { padding: 10px 12px 12px 18px !important; margin-bottom: 8px !important; }
+  .arquivo-nome, .ativo-nome, .reuniao-nome, .agenda-name { margin: 0 !important; padding: 0 !important; }
+  .crono-nome { margin: 8px 0 8px !important; }
+  .crono-btns-contato { margin-bottom: 8px; }
+  .crono-btns-acao { margin-top: 6px; }
 </style>
 </head>
 <body>
@@ -827,7 +895,7 @@
     <input type="hidden" id="edit-id">
     <div class="campo" data-dica="Nome ou empresa">
       <span class="campo-ic"><svg class="ic" aria-hidden="true"><use href="#i-user"/></svg></span>
-      <input class="form-input" id="inp-nome" aria-label="Nome ou empresa" maxlength="80" autocomplete="off">
+      <input class="form-input" id="inp-nome" aria-label="Nome ou empresa" maxlength="80" autocomplete="off" autocapitalize="characters" style="text-transform:uppercase" oninput="var p=this.selectionStart;this.value=this.value.toUpperCase();try{this.setSelectionRange(p,p)}catch(e){}">
     </div>
     <div class="campo" data-dica="Número com DDD (obrigatório)">
       <span class="campo-ic"><svg class="ic" aria-hidden="true"><use href="#i-phone"/></svg></span>
@@ -1649,23 +1717,14 @@ function cardContato(c) {
   const statusCls = t === 0 ? 'novo' : t < 3 ? 'tentando' : 'sem-retorno';
   const cardCls = t === 0 ? 'blue' : t < 3 ? 'yellow' : 'red';
   return `
-    <div class="card ${cardCls}" id="card-${c.id}">
-      <div class="card-header">
-        <div>
-          <div class="status-tag ${statusCls}">${statusLabel}</div>
+    <div class="card ct ${cardCls}" id="card-${c.id}">
+      <div class="ct-row">
+        <div class="ct-tx">
           <div class="card-name">${escHtml(c.nome)}</div>
+          <div class="ct-meta"><div class="dots">${dots}</div><span class="ct-n">${t}/3</span></div>
         </div>
-        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">
-          <div style="display:flex;gap:8px">
-            <span class="icon-btn toggle-opcoes" onclick="toggleOpcoes('${c.id}', event)" aria-label="Opções"><svg class="ic" aria-hidden="true"><use href="#i-ellipsis"/></svg></span>
-            <span class="icon-btn" onclick="editarContato('${c.id}')"><svg class="ic" aria-hidden="true"><use href="#i-pencil"/></svg></span>
-          </div>
-        </div>
-      </div>
-      <div class="tentativas-wrap">
-        <span class="tentativa-label">Tentativas:</span>
-        <div class="dots">${dots}</div>
-        <span style="font-size:12px;color:var(--gray-400)">${t}/3</span>
+        <span class="icon-btn toggle-opcoes" onclick="toggleOpcoes('${c.id}', event)" aria-label="Opções"><svg class="ic" aria-hidden="true"><use href="#i-ellipsis"/></svg></span>
+        <span class="icon-btn" onclick="editarContato('${c.id}')" aria-label="Edita"><svg class="ic" aria-hidden="true"><use href="#i-pencil"/></svg></span>
       </div>
     </div>`;
 }
@@ -2543,4 +2602,4 @@ initListeners();
 })();
 </script>
 </body>
-</html>
+  </html>
