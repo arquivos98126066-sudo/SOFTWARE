@@ -6,7 +6,7 @@
 <meta name="robots" content="noindex, nofollow">
 <meta name="theme-color" content="#ffffff">
 <title>Estudos</title>
-<link rel="manifest" href="manifest.json">
+<link rel="manifest" href="manifest-estudos.json">
 <link rel="apple-touch-icon" href="icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -33,7 +33,7 @@ header{position:sticky;top:0;z-index:5;background:rgba(255,255,255,.97);backdrop
 header h2{flex:1;font-size:19px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .ico{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;background:var(--surface)}
 .ico svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-#sair{font-size:13px;color:var(--muted);padding:8px}
+#app.raiz #busca{margin-top:calc(env(safe-area-inset-top) + 16px)}
 #busca{display:block;width:calc(100% - 32px);margin:14px 16px 4px;height:46px;border-radius:12px;border:1px solid var(--line);background:var(--surface);padding:0 14px;font:inherit;font-size:16px;outline:none}
 #lista{padding:8px 16px 40px;display:flex;flex-direction:column;gap:8px}
 .it{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:14px;border-radius:14px;border:1px solid var(--line);background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.04)}
@@ -46,8 +46,6 @@ header h2{flex:1;font-size:19px;font-weight:600;white-space:nowrap;overflow:hidd
 .vazio{color:var(--muted);text-align:center;padding:40px 0;font-size:15px}
 
 #leitor{position:fixed;inset:0;background:#fff;display:flex;flex-direction:column;z-index:20}
-#leitor .bar{padding:calc(env(safe-area-inset-top) + 8px) 12px 8px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--line)}
-#leitor .bar b{flex:1;font-size:15px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #leitor iframe{flex:1;width:100%;border:0}
 </style>
 </head>
@@ -55,27 +53,22 @@ header h2{flex:1;font-size:19px;font-weight:600;white-space:nowrap;overflow:hidd
 
 <div id="lock" hidden>
   <h1>Estudos</h1>
-  <p>Digite a senha que você recebeu.</p>
+  <p>Abra pelo link que você recebeu, ou digite a senha.</p>
   <input id="senha" type="password" placeholder="Senha" autocomplete="current-password" autocapitalize="off" autocorrect="off" spellcheck="false">
   <div id="erro"></div>
   <button class="ok" id="entrar">Entrar</button>
 </div>
 
-<div id="app" hidden>
-  <header>
-    <button class="ico" id="voltar" hidden aria-label="Voltar"><svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg></button>
-    <h2 id="titulo">Estudos</h2>
-    <button id="sair">Sair</button>
+<div id="app" class="raiz" hidden>
+  <header id="topo" hidden>
+    <button class="ico" id="voltar" aria-label="Voltar"><svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg></button>
+    <h2 id="titulo"></h2>
   </header>
   <input id="busca" type="search" placeholder="Buscar estudo" autocomplete="off">
   <div id="lista"></div>
 </div>
 
 <div id="leitor" hidden>
-  <div class="bar">
-    <button class="ico" id="fechar" aria-label="Voltar"><svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg></button>
-    <b id="ltitulo"></b>
-  </div>
   <iframe id="quadro" sandbox="allow-scripts allow-popups allow-popups-to-escape-sandbox"></iframe>
 </div>
 
@@ -190,8 +183,9 @@ header h2{flex:1;font-size:19px;font-weight:600;white-space:nowrap;overflow:hidd
   function desenhar(){
     var box = $('lista'), cam = estado.cam, termo = sem($('busca').value.trim());
     box.innerHTML = '';
-    $('titulo').textContent = cam.length ? cam[cam.length - 1] : 'Estudos';
-    $('voltar').hidden = !cam.length;
+    $('titulo').textContent = cam.length ? cam[cam.length - 1] : '';
+    $('topo').hidden = !cam.length;
+    $('app').classList.toggle('raiz', !cam.length);
     if (termo){
       var ach = docs.filter(function(d){ return sem(d.pastas.join(' ') + ' ' + d.nome).indexOf(termo) >= 0; });
       ach.sort(function(a, b){ return cmp(a.pastas.join('/') + a.nome, b.pastas.join('/') + b.nome); });
@@ -214,13 +208,12 @@ header h2{flex:1;font-size:19px;font-weight:600;white-space:nowrap;overflow:hidd
   function abrir(d, empurrar){
     estado = {cam: estado.cam, doc: docs.indexOf(d)};
     if (empurrar) history.pushState(estado, '');
-    $('ltitulo').textContent = d.nome;
     $('quadro').srcdoc = d.h;
     $('leitor').hidden = false;
   }
   function mostrar(){
     var d = estado.doc !== null && docs[estado.doc];
-    if (d){ $('ltitulo').textContent = d.nome; $('quadro').srcdoc = d.h; $('leitor').hidden = false; }
+    if (d){ $('quadro').srcdoc = d.h; $('leitor').hidden = false; }
     else { $('leitor').hidden = true; $('quadro').srcdoc = ''; desenhar(); }
   }
   window.addEventListener('popstate', function(e){
@@ -228,7 +221,6 @@ header h2{flex:1;font-size:19px;font-weight:600;white-space:nowrap;overflow:hidd
     mostrar();
   });
   $('voltar').onclick = function(){ history.back(); };
-  $('fechar').onclick = function(){ history.back(); };
   $('busca').oninput = desenhar;
 
   function entrar(lista){
@@ -254,11 +246,21 @@ header h2{flex:1;font-size:19px;font-weight:600;white-space:nowrap;overflow:hidd
     }).catch(function(){ trancar('Senha incorreta.'); });
   };
   $('senha').addEventListener('keydown', function(e){ if (e.key === 'Enter') $('entrar').click(); });
-  $('sair').onclick = function(){ guardar('chave', null).catch(function(){}).then(function(){ trancar(''); }); };
 
-  /* abertura: se o aparelho já tem a chave, entra direto */
-  ler('chave').catch(function(){ return null; }).then(function(priv){
-    if (!priv) return trancar('');
+  /* abertura pelo link: o segredo vem depois do # (nunca vai ao servidor nem fica no repositório) */
+  var m = /^#k=(.+)$/.exec(location.hash);
+  var doLink = null;
+  if (m){
+    try { doLink = decodeURIComponent(m[1]); } catch (e) { doLink = m[1]; }
+    history.replaceState(null, '', location.pathname + location.search);
+  }
+
+  /* abertura: link com chave, ou chave já guardada no aparelho; senão pede a senha */
+  (doLink ? abrirChave(doLink).then(function(priv){
+    guardar('chave', priv).catch(function(){});
+    return priv;
+  }).catch(function(){ return null; }) : ler('chave').catch(function(){ return null; })).then(function(priv){
+    if (!priv) return trancar(doLink ? 'Link incorreto. Peça o link de novo.' : '');
     return carregar(priv).then(entrar).catch(function(e){
       if (e && e.name === 'OperationError'){ guardar('chave', null).catch(function(){}); trancar(''); }
       else trancar('Sem conexão. Abra de novo quando estiver online.');
