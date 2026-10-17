@@ -1,4 +1,4 @@
-const CACHE_NAME = 'meus-apps-v20';
+const CACHE_NAME = 'meus-apps-v21';
 
 const URLS_TO_CACHE = [
   './',
@@ -63,9 +63,9 @@ self.addEventListener('fetch', event => {
 
   const isLocal = url.hostname === self.location.hostname;
 
-  if (url.pathname.endsWith('/lib/lista.json') || url.pathname.endsWith('/lib/chave.json')) {
+  if (url.pathname.endsWith('/LER.html') || url.pathname.endsWith('/manifest-estudos.json') || url.pathname.endsWith('/lib/lista.json') || url.pathname.endsWith('/lib/chave.json')) {
     event.respondWith(
-      fetch(event.request).then(response => {
+      fetch(event.request.url, {cache: 'no-store'}).then(response => {
         if (response && response.status === 200) {
           const clone = response.clone();
           caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
