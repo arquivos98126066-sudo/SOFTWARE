@@ -1,4 +1,4 @@
-const CACHE_NAME = 'meus-apps-v21';
+const CACHE_NAME = 'meus-apps-v22';
 
 const URLS_TO_CACHE = [
   './',
@@ -63,30 +63,23 @@ self.addEventListener('fetch', event => {
 
   const isLocal = url.hostname === self.location.hostname;
 
-  if (url.pathname.endsWith('/LER.html') || url.pathname.endsWith('/manifest-estudos.json') || url.pathname.endsWith('/lib/lista.json') || url.pathname.endsWith('/lib/chave.json')) {
-    event.respondWith(
-      fetch(event.request.url, {cache: 'no-store'}).then(response => {
-        if (response && response.status === 200) {
-          const clone = response.clone();
-          caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
-        }
-        return response;
-      }).catch(() => caches.match(event.request))
-    );
-    return;
-  }
-
   if (isLocal) {
+    const req = event.request;
+    const rede = fetch(req.url, {cache: 'no-store'}).then(response => {
+      if (response && response.status === 200) {
+        const clone = response.clone();
+        caches.open(CACHE_NAME).then(cache => cache.put(req, clone));
+      }
+      return response;
+    });
+    event.waitUntil(rede.catch(() => {}));
     event.respondWith(
-      caches.match(event.request).then(cached => {
-        const networkFetch = fetch(event.request).then(response => {
-          if (response && response.status === 200) {
-            const clone = response.clone();
-            caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
-          }
-          return response;
-        }).catch(() => cached);
-        return cached || networkFetch;
+      caches.match(req).then(cached => {
+        if (!cached) return rede;
+        return Promise.race([
+          rede.catch(() => cached),
+          new Promise(resolve => setTimeout(() => resolve(cached), 2000))
+        ]);
       })
     );
   } else {
