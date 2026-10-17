@@ -30,16 +30,14 @@ button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
 
 #app{max-width:640px;margin:0 auto;min-height:100vh}
 header{position:sticky;top:0;z-index:5;background:rgba(255,255,255,.97);backdrop-filter:blur(16px);border-bottom:1px solid var(--line);padding:calc(env(safe-area-inset-top) + 12px) 16px 12px;display:flex;align-items:center;gap:8px}
-header h2{flex:1;font-size:19px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+header h2{flex:1;font-size:19px;font-weight:600;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .ico{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;background:var(--surface)}
 .ico svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-#app.raiz #busca{margin-top:calc(env(safe-area-inset-top) + 16px)}
-#busca{display:block;width:calc(100% - 32px);margin:14px 16px 4px;height:46px;border-radius:12px;border:1px solid var(--line);background:var(--surface);padding:0 14px;font:inherit;font-size:16px;outline:none}
-#lista{padding:8px 16px 40px;display:flex;flex-direction:column;gap:8px}
+#lista{padding:14px 16px 40px;display:flex;flex-direction:column;gap:8px}
 .it{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:14px;border-radius:14px;border:1px solid var(--line);background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.04)}
 .it:active{background:var(--surface)}
 .it .t{flex:1;min-width:0}
-.it .n{font-size:16px;font-weight:500;line-height:1.3}
+.it .n{font-size:16px;font-weight:500;line-height:1.3;text-transform:uppercase}
 .it .s{font-size:13px;color:var(--muted);margin-top:2px}
 .it svg{width:22px;height:22px;flex:none;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;color:var(--muted)}
 .it.pasta svg.p{color:var(--accent)}
@@ -60,11 +58,10 @@ header h2{flex:1;font-size:19px;font-weight:600;white-space:nowrap;overflow:hidd
 </div>
 
 <div id="app" class="raiz" hidden>
-  <header id="topo" hidden>
+  <header id="topo">
     <button class="ico" id="voltar" aria-label="Voltar"><svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg></button>
     <h2 id="titulo"></h2>
   </header>
-  <input id="busca" type="search" placeholder="Buscar estudo" autocomplete="off">
   <div id="lista"></div>
 </div>
 
@@ -181,22 +178,13 @@ header h2{flex:1;font-size:19px;font-weight:600;white-space:nowrap;overflow:hidd
     return b;
   }
   function desenhar(){
-    var box = $('lista'), cam = estado.cam, termo = sem($('busca').value.trim());
+    var box = $('lista'), cam = estado.cam;
     box.innerHTML = '';
-    $('titulo').textContent = cam.length ? cam[cam.length - 1] : '';
-    $('topo').hidden = !cam.length;
-    $('app').classList.toggle('raiz', !cam.length);
-    if (termo){
-      var ach = docs.filter(function(d){ return sem(d.pastas.join(' ') + ' ' + d.nome).indexOf(termo) >= 0; });
-      ach.sort(function(a, b){ return cmp(a.pastas.join('/') + a.nome, b.pastas.join('/') + b.nome); });
-      ach.forEach(function(d){ box.appendChild(item({i: IC_DOC, n: d.nome, s: d.pastas.join(' › ')}, function(){ abrir(d, true); })); });
-      if (!ach.length) box.innerHTML = '<div class="vazio">Nada encontrado.</div>';
-      return;
-    }
+    $('titulo').textContent = cam.length ? cam[cam.length - 1] : 'Estudos';
+    $('voltar').hidden = !cam.length;
     var no = no_de(cam);
     Object.keys(no.f).sort(cmp).forEach(function(k){
-      var n = contar(no.f[k]);
-      box.appendChild(item({pasta: 1, i: IC_PASTA, n: k, s: n + (n === 1 ? ' estudo' : ' estudos')}, function(){
+      box.appendChild(item({pasta: 1, i: IC_PASTA, n: k}, function(){
         estado = {cam: cam.concat(k), doc: null}; history.pushState(estado, ''); desenhar(); window.scrollTo(0, 0);
       }));
     });
@@ -221,7 +209,6 @@ header h2{flex:1;font-size:19px;font-weight:600;white-space:nowrap;overflow:hidd
     mostrar();
   });
   $('voltar').onclick = function(){ history.back(); };
-  $('busca').oninput = desenhar;
 
   function entrar(lista){
     montar(lista);
