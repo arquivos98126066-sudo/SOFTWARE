@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#ffffff">
+<title>Estudos</title>
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#fff;--surface:#f5f5f5;--line:rgba(0,0,0,.08);--text:#111;--muted:#6b7280;--accent:#111;--err:#dc2626}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{font-family:'Outfit',system-ui,sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden}
+[hidden]{display:none!important}
+button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
+
+#lock{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;gap:14px;text-align:center}
+#lock h1{font-size:28px;font-weight:700;letter-spacing:.5px}
+#lock p{color:var(--muted);font-size:15px;margin-bottom:6px}
+#lock input{width:100%;max-width:320px;height:52px;border-radius:14px;border:1px solid var(--line);background:var(--surface);padding:0 16px;font:inherit;font-size:17px;text-align:center;outline:none}
+#lock input:focus{border-color:var(--accent)}
+#lock .ok{width:100%;max-width:320px;height:52px;border-radius:14px;background:var(--accent);color:#fff;font-weight:600;font-size:16px}
+#lock .ok:disabled{opacity:.5}
+#erro{color:var(--err);font-size:14px;min-height:20px}
+
+#app{max-width:640px;margin:0 auto;min-height:100vh}
+header{position:sticky;top:0;z-index:5;background:rgba(255,255,255,.97);backdrop-filter:blur(16px);border-bottom:1px solid var(--line);padding:calc(env(safe-area-inset-top) + 12px) 16px 12px;display:flex;align-items:center;gap:8px}
+header h2{flex:1;font-size:19px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ico{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;background:var(--surface)}
+.ico svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#sair{font-size:13px;color:var(--muted);padding:8px}
+#busca{display:block;width:calc(100% - 32px);margin:14px 16px 4px;height:46px;border-radius:12px;border:1px solid var(--line);background:var(--surface);padding:0 14px;font:inherit;font-size:16px;outline:none}
+#lista{padding:8px 16px 40px;display:flex;flex-direction:column;gap:8px}
+.it{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:14px;border-radius:14px;border:1px solid var(--line);background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.it:active{background:var(--surface)}
+.it .t{flex:1;min-width:0}
+.it .n{font-size:16px;font-weight:500;line-height:1.3}
+.it .s{font-size:13px;color:var(--muted);margin-top:2px}
+.it svg{width:22px;height:22px;flex:none;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;color:var(--muted)}
+.it.pasta svg.p{color:var(--accent)}
+.vazio{color:var(--muted);text-align:center;padding:40px 0;font-size:15px}
+
+#leitor{position:fixed;inset:0;background:#fff;display:flex;flex-direction:column;z-index:20}
+#leitor .bar{padding:calc(env(safe-area-inset-top) + 8px) 12px 8px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--line)}
+#leitor .bar b{flex:1;font-size:15px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#leitor iframe{flex:1;width:100%;border:0}
+</style>
+</head>
+<body>
+
+<div id="lock" hidden>
+  <h1>Estudos</h1>
+  <p>Digite a senha que você recebeu.</p>
+  <input id="senha" type="password" placeholder="Senha" autocomplete="current-password" autocapitalize="off" autocorrect="off" spellcheck="false">
+  <div id="erro"></div>
+  <button class="ok" id="entrar">Entrar</button>
+</div>
+
+<div id="app" hidden>
+  <header>
+    <button class="ico" id="voltar" hidden aria-label="Voltar"><svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg></button>
+    <h2 id="titulo">Estudos</h2>
+    <button id="sair">Sair</button>
+  </header>
+  <input id="busca" type="search" placeholder="Buscar estudo" autocomplete="off">
+  <div id="lista"></div>
+</div>
+
+<div id="leitor" hidden>
+  <div class="bar">
+    <button class="ico" id="fechar" aria-label="Voltar"><svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg></button>
+    <b id="ltitulo"></b>
+  </div>
+  <iframe id="quadro" sandbox="allow-scripts allow-popups allow-popups-to-escape-sandbox"></iframe>
+</div>
+
+<script>
+(function(){
+  var $ = function(i){ return document.getElementById(i); };
+  var B = function(s){ return Uint8Array.from(atob(s), function(c){ return c.charCodeAt(0); }); };
+  var IC_PASTA = '<svg class="p" viewBox="0 0 24 24"><path d="M3.5 7a2 2 0 0 1 2-2H10l2 2.5h6.5a2 2 0 0 1 2 2V17a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2z"/></svg>';
+  var IC_DOC = '<svg viewBox="0 0 24 24"><path d="M7 3.5h7l4 4V19a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 6 19V5A1.5 1.5 0 0 1 7.5 3.5z"/><path d="M13.5 3.5V8H18M9 12.5h6M9 16h6"/></svg>';
+  var IC_SETA = '<svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg>';
+
+  /* guarda a chave já aberta no aparelho: a senha só é pedida na primeira vez */
+  function bd(){
+    return new Promise(function(ok, no){
+      var r = indexedDB.open('estudos', 1);
+      r.onupgradeneeded = function(){ r.result.createObjectStore('k'); };
+      r.onsuccess = function(){ ok(r.result); };
+      r.onerror = function(){ no(r.error); };
+    });
+  }
+  function guardar(k, v){
+    return bd().then(function(d){
+      return new Promise(function(ok, no){
+        var t = d.transaction('k', 'readwrite');
+        if (v === null) t.objectStore('k').delete(k); else t.objectStore('k').put(v, k);
+        t.oncomplete = ok; t.onerror = function(){ no(t.error); };
+      });
+    });
+  }
+  function ler(k){
+    return bd().then(function(d){
+      return new Promise(function(ok, no){
+        var q = d.transaction('k').objectStore('k').get(k);
+        q.onsuccess = function(){ ok(q.result); };
+        q.onerror = function(){ no(q.error); };
+      });
+    });
+  }
+
+  function abrirChave(senha){
+    return fetch('lib/chave.json', {cache: 'no-cache'}).then(function(r){ return r.json(); }).then(function(ch){
+      var w = ch.priv;
+      return crypto.subtle.importKey('raw', new TextEncoder().encode(senha), 'PBKDF2', false, ['deriveKey'])
+        .then(function(base){
+          return crypto.subtle.deriveKey({name: 'PBKDF2', salt: B(w.s), iterations: w.it, hash: 'SHA-256'},
+            base, {name: 'AES-GCM', length: 256}, false, ['decrypt']);
+        })
+        .then(function(k){ return crypto.subtle.decrypt({name: 'AES-GCM', iv: B(w.i)}, k, B(w.c)); })
+        .then(function(der){
+          return crypto.subtle.importKey('pkcs8', der, {name: 'RSA-OAEP', hash: 'SHA-256'}, false, ['decrypt']);
+        });
+    });
+  }
+
+  function carregar(priv){
+    return fetch('lib/lista.json', {cache: 'no-cache'}).then(function(r){ return r.json(); }).then(function(l){
+      return Promise.all(Object.keys(l.itens).map(function(id){
+        return fetch('lib/' + id + '.json').then(function(r){ return r.json(); }).then(function(r){
+          return crypto.subtle.decrypt({name: 'RSA-OAEP'}, priv, B(r.k)).then(function(raw){
+            return crypto.subtle.importKey('raw', raw, 'AES-GCM', false, ['decrypt']);
+          }).then(function(ak){
+            return crypto.subtle.decrypt({name: 'AES-GCM', iv: B(r.i)}, ak, B(r.c));
+          }).then(function(gz){
+            return new Response(new Blob([gz]).stream().pipeThrough(new DecompressionStream('gzip'))).text();
+          }).then(function(t){ return JSON.parse(t); });
+        });
+      }));
+    });
+  }
+
+  /* árvore de pastas */
+  var docs = [], raiz = null;
+  var cmp = function(a, b){ return a.localeCompare(b, 'pt', {numeric: true, sensitivity: 'base'}); };
+  var sem = function(s){ return s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase(); };
+
+  function montar(lista){
+    docs = lista.map(function(d){
+      var seg = d.p.split('/');
+      var nome = seg.pop().replace(/\.html$/i, '');
+      var pastas = seg.filter(function(s){ return s !== 'MATERIAIS'; });
+      return {nome: nome, pastas: pastas, h: d.h};
+    });
+    raiz = {f: {}, d: []};
+    docs.forEach(function(d){
+      var no = raiz;
+      d.pastas.forEach(function(p){ no = no.f[p] || (no.f[p] = {f: {}, d: []}); });
+      no.d.push(d);
+    });
+  }
+  function contar(no){
+    var n = no.d.length;
+    Object.keys(no.f).forEach(function(k){ n += contar(no.f[k]); });
+    return n;
+  }
+  function no_de(cam){
+    var no = raiz;
+    for (var i = 0; i < cam.length; i++){ no = no.f[cam[i]]; if (!no) return raiz; }
+    return no;
+  }
+
+  /* telas */
+  var estado = {cam: [], doc: null};
+  function item(html, fn){
+    var b = document.createElement('button');
+    b.className = 'it' + (html.pasta ? ' pasta' : '');
+    b.innerHTML = html.i + '<div class="t"><div class="n"></div><div class="s"></div></div>' + IC_SETA;
+    b.querySelector('.n').textContent = html.n;
+    b.querySelector('.s').textContent = html.s || '';
+    b.onclick = fn;
+    return b;
+  }
+  function desenhar(){
+    var box = $('lista'), cam = estado.cam, termo = sem($('busca').value.trim());
+    box.innerHTML = '';
+    $('titulo').textContent = cam.length ? cam[cam.length - 1] : 'Estudos';
+    $('voltar').hidden = !cam.length;
+    if (termo){
+      var ach = docs.filter(function(d){ return sem(d.pastas.join(' ') + ' ' + d.nome).indexOf(termo) >= 0; });
+      ach.sort(function(a, b){ return cmp(a.pastas.join('/') + a.nome, b.pastas.join('/') + b.nome); });
+      ach.forEach(function(d){ box.appendChild(item({i: IC_DOC, n: d.nome, s: d.pastas.join(' › ')}, function(){ abrir(d, true); })); });
+      if (!ach.length) box.innerHTML = '<div class="vazio">Nada encontrado.</div>';
+      return;
+    }
+    var no = no_de(cam);
+    Object.keys(no.f).sort(cmp).forEach(function(k){
+      var n = contar(no.f[k]);
+      box.appendChild(item({pasta: 1, i: IC_PASTA, n: k, s: n + (n === 1 ? ' estudo' : ' estudos')}, function(){
+        estado = {cam: cam.concat(k), doc: null}; history.pushState(estado, ''); desenhar(); window.scrollTo(0, 0);
+      }));
+    });
+    no.d.slice().sort(function(a, b){ return cmp(a.nome, b.nome); }).forEach(function(d){
+      box.appendChild(item({i: IC_DOC, n: d.nome}, function(){ abrir(d, true); }));
+    });
+    if (!box.children.length) box.innerHTML = '<div class="vazio">Pasta vazia.</div>';
+  }
+  function abrir(d, empurrar){
+    estado = {cam: estado.cam, doc: docs.indexOf(d)};
+    if (empurrar) history.pushState(estado, '');
+    $('ltitulo').textContent = d.nome;
+    $('quadro').srcdoc = d.h;
+    $('leitor').hidden = false;
+  }
+  function mostrar(){
+    var d = estado.doc !== null && docs[estado.doc];
+    if (d){ $('ltitulo').textContent = d.nome; $('quadro').srcdoc = d.h; $('leitor').hidden = false; }
+    else { $('leitor').hidden = true; $('quadro').srcdoc = ''; desenhar(); }
+  }
+  window.addEventListener('popstate', function(e){
+    estado = e.state || {cam: [], doc: null};
+    mostrar();
+  });
+  $('voltar').onclick = function(){ history.back(); };
+  $('fechar').onclick = function(){ history.back(); };
+  $('busca').oninput = desenhar;
+
+  function entrar(lista){
+    montar(lista);
+    estado = {cam: [], doc: null};
+    history.replaceState(estado, '');
+    $('lock').hidden = true; $('app').hidden = false;
+    desenhar();
+  }
+  function trancar(msg){
+    $('app').hidden = true; $('leitor').hidden = true;
+    $('lock').hidden = false; $('erro').textContent = msg || '';
+    $('senha').value = ''; $('entrar').disabled = false; $('entrar').textContent = 'Entrar';
+  }
+
+  $('entrar').onclick = function(){
+    var s = $('senha').value.trim();
+    if (!s) return;
+    $('entrar').disabled = true; $('entrar').textContent = 'Abrindo…'; $('erro').textContent = '';
+    abrirChave(s).then(function(priv){
+      guardar('chave', priv).catch(function(){});
+      return carregar(priv).then(entrar);
+    }).catch(function(){ trancar('Senha incorreta.'); });
+  };
+  $('senha').addEventListener('keydown', function(e){ if (e.key === 'Enter') $('entrar').click(); });
+  $('sair').onclick = function(){ guardar('chave', null).catch(function(){}).then(function(){ trancar(''); }); };
+
+  /* abertura: se o aparelho já tem a chave, entra direto */
+  ler('chave').catch(function(){ return null; }).then(function(priv){
+    if (!priv) return trancar('');
+    return carregar(priv).then(entrar).catch(function(e){
+      if (e && e.name === 'OperationError'){ guardar('chave', null).catch(function(){}); trancar(''); }
+      else trancar('Sem conexão. Abra de novo quando estiver online.');
+    });
+  });
+
+  if ('serviceWorker' in navigator) navigator.serviceWorker.register('service-worker.js').catch(function(){});
+})();
+</script>
+</body>
+</html>
