@@ -2095,7 +2095,7 @@ window.saveAnswer = window.saveAnswer || function(){};
     try {
       fetch(url, { method: 'POST', body: msg })
         .then(function(r) { if (!r.ok) throw new Error(r.status); return r.json(); })
-        .then(function(j) { _ntfyId = j && j.id; _ntfyOk = true; av.textContent = 'Aviso agendado no celular (ntfy).'; })
+        .then(function(j) { _ntfyId = j && j.id; _ntfyOk = true; salvarTimer({ ntfyId: _ntfyId, ntfyOk: true }); av.textContent = 'Aviso agendado no celular (ntfy).'; })
         .catch(function() { av.classList.add('erro'); av.textContent = 'Não foi possível agendar o aviso no celular.'; });
     } catch (e) {
       av.classList.add('erro'); av.textContent = 'Não foi possível agendar o aviso no celular.';
@@ -2122,6 +2122,7 @@ window.saveAnswer = window.saveAnswer || function(){};
     b.querySelector('.hab-start').hidden = false;
   }
   function pararHabito(b) {
+    limparTimerSalvo();
     pararAlarme();
     if (_habTimer) cancelarNtfy(); else _ntfyId = null; // só cancela se o tempo ainda não acabou
     liberarTimer();
@@ -2130,6 +2131,76 @@ window.saveAnswer = window.saveAnswer || function(){};
   function fmtTempo(ms) {
     var s = Math.max(0, Math.ceil(ms / 1000));
     return String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0');
+  }
+  /* o cronômetro sobrevive a sair do app: o fim fica salvo no aparelho e é retomado ao voltar */
+  function salvarTimer(extra) {
+    try {
+      var s = JSON.parse(localStorage.getItem('rico_timer') || 'null');
+      if (!s) return;
+      for (var k in extra) s[k] = extra[k];
+      localStorage.setItem('rico_timer', JSON.stringify(s));
+    } catch (e) {}
+  }
+  function limparTimerSalvo() { try { localStorage.removeItem('rico_timer'); } catch (e) {} }
+  function mostrarConcluido(b) {
+    var run = b.querySelector('.hab-run');
+    b.querySelector('.hab-start').hidden = true;
+    run.hidden = false;
+    run.classList.add('fim');
+    run.querySelector('.hab-tempo').textContent = 'Concluído';
+    run.querySelector('.hab-barra i').style.width = '100%';
+    run.querySelector('.hab-cancel').textContent = 'Ok';
+    return run;
+  }
+  function ligarTimer(b, fim, total) {
+    var run = b.querySelector('.hab-run'), tempo = run.querySelector('.hab-tempo'), barra = run.querySelector('.hab-barra i');
+    b.querySelector('.hab-start').hidden = true;
+    run.hidden = false;
+    run.classList.remove('fim');
+    run.querySelector('.hab-cancel').textContent = 'Cancela';
+    run.querySelector('.hab-vibaviso').hidden = true;
+    function pinta() {
+      var resto = fim - Date.now();
+      if (resto <= 0) return false;
+      tempo.textContent = fmtTempo(resto);
+      barra.style.width = (100 - resto / total * 100) + '%';
+      return true;
+    }
+    pinta();
+    var iv = setInterval(function() {
+      if (pinta()) return;
+      liberarTimer();
+      limparTimerSalvo();
+      mostrarConcluido(b);
+      // com o aviso do ntfy agendado, quem toca é o app; o alarme da página fica só de reserva
+      if (!_ntfyOk) {
+        var vibrou = tocarAlarme();
+        var av = run.querySelector('.hab-vibaviso');
+        av.textContent = navigator.vibrate ? 'O navegador bloqueou a vibração neste aparelho.' : 'Este navegador não permite vibração.';
+        av.hidden = vibrou !== false;
+      }
+    }, 250);
+    _habTimer = { iv: iv, lock: null };
+    try {
+      if (navigator.wakeLock) navigator.wakeLock.request('screen').then(function(l) {
+        if (_habTimer && _habTimer.iv === iv) _habTimer.lock = l; else l.release();
+      }).catch(function() {});
+    } catch (e) {}
+  }
+  function retomarTimer() {
+    if (_habTimer) return true;
+    var s = null;
+    try { s = JSON.parse(localStorage.getItem('rico_timer') || 'null'); } catch (e) {}
+    if (!s) return true;
+    var b = document.querySelectorAll('#habito-lista .habito-block')[s.idx];
+    if (!b || b.querySelector('.hab-nome').value !== s.nome) return false;
+    document.querySelectorAll('.habito-block').forEach(resetarTimerUI);
+    _ntfyId = s.ntfyId || null;
+    _ntfyOk = !!s.ntfyOk;
+    if (s.fim > Date.now()) ligarTimer(b, s.fim, s.total);
+    else if (Date.now() - s.fim < 1800000) mostrarConcluido(b);
+    else limparTimerSalvo();
+    return true;
   }
   function iniciarHabito(b) {
     var min = durMin(b);
@@ -2140,40 +2211,12 @@ window.saveAnswer = window.saveAnswer || function(){};
     document.querySelectorAll('.habito-block').forEach(resetarTimerUI);
     habAudio(); // destrava o som com o toque do usuário
     var total = min * 60000, fim = Date.now() + total;
-    var run = b.querySelector('.hab-run'), tempo = run.querySelector('.hab-tempo'), barra = run.querySelector('.hab-barra i');
-    b.querySelector('.hab-start').hidden = true;
-    run.hidden = false;
-    run.querySelector('.hab-cancel').textContent = 'Cancela';
-    run.querySelector('.hab-vibaviso').hidden = true;
-    tempo.textContent = fmtTempo(total);
-    barra.style.width = '0%';
-    var iv = setInterval(function() {
-      var resto = fim - Date.now();
-      if (resto > 0) {
-        tempo.textContent = fmtTempo(resto);
-        barra.style.width = (100 - resto / total * 100) + '%';
-        return;
-      }
-      liberarTimer();
-      tempo.textContent = 'Concluído';
-      barra.style.width = '100%';
-      run.classList.add('fim');
-      run.querySelector('.hab-cancel').textContent = 'Ok';
-      // com o aviso do ntfy agendado, quem toca é o app; o alarme da página fica só de reserva
-      if (!_ntfyOk) {
-        var vibrou = tocarAlarme();
-        var av = run.querySelector('.hab-vibaviso');
-        av.textContent = navigator.vibrate ? 'O navegador bloqueou a vibração neste aparelho.' : 'Este navegador não permite vibração.';
-        av.hidden = vibrou !== false;
-      }
-    }, 250);
-    _habTimer = { iv: iv, lock: null };
+    var idx = Array.prototype.indexOf.call(document.querySelectorAll('#habito-lista .habito-block'), b);
+    try { localStorage.setItem('rico_timer', JSON.stringify({ idx: idx, nome: b.querySelector('.hab-nome').value, fim: fim, total: total, min: min, ntfyId: null, ntfyOk: false })); } catch (e) {}
+    b.querySelector('.hab-run .hab-tempo').textContent = fmtTempo(total);
+    b.querySelector('.hab-run .hab-barra i').style.width = '0%';
+    ligarTimer(b, fim, total);
     agendarNtfy(b, min);
-    try {
-      if (navigator.wakeLock) navigator.wakeLock.request('screen').then(function(l) {
-        if (_habTimer && _habTimer.iv === iv) _habTimer.lock = l; else l.release();
-      }).catch(function() {});
-    } catch (e) {}
   }
 
   function addHabito(semFoco) {
@@ -2312,7 +2355,7 @@ window.saveAnswer = window.saveAnswer || function(){};
     try {
       fetch(url, { method: 'POST', body: msg })
         .then(function(r) { if (!r.ok) throw new Error(r.status); return r.json(); })
-        .then(function(j) { _ntfyId = j && j.id; _ntfyOk = true; av.textContent = 'Aviso agendado no celular (ntfy).'; })
+        .then(function(j) { _ntfyId = j && j.id; _ntfyOk = true; salvarTimer({ ntfyId: _ntfyId, ntfyOk: true }); av.textContent = 'Aviso agendado no celular (ntfy).'; })
         .catch(function() { av.classList.add('erro'); av.textContent = 'Não foi possível agendar o aviso no celular.'; });
     } catch (e) {
       av.classList.add('erro'); av.textContent = 'Não foi possível agendar o aviso no celular.';
@@ -2339,6 +2382,7 @@ window.saveAnswer = window.saveAnswer || function(){};
     b.querySelector('.hab-start').hidden = false;
   }
   function pararHabito(b) {
+    limparTimerSalvo();
     pararAlarme();
     if (_habTimer) cancelarNtfy(); else _ntfyId = null; // só cancela se o tempo ainda não acabou
     liberarTimer();
@@ -2347,6 +2391,76 @@ window.saveAnswer = window.saveAnswer || function(){};
   function fmtTempo(ms) {
     var s = Math.max(0, Math.ceil(ms / 1000));
     return String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0');
+  }
+  /* o cronômetro sobrevive a sair do app: o fim fica salvo no aparelho e é retomado ao voltar */
+  function salvarTimer(extra) {
+    try {
+      var s = JSON.parse(localStorage.getItem('rico_timer') || 'null');
+      if (!s) return;
+      for (var k in extra) s[k] = extra[k];
+      localStorage.setItem('rico_timer', JSON.stringify(s));
+    } catch (e) {}
+  }
+  function limparTimerSalvo() { try { localStorage.removeItem('rico_timer'); } catch (e) {} }
+  function mostrarConcluido(b) {
+    var run = b.querySelector('.hab-run');
+    b.querySelector('.hab-start').hidden = true;
+    run.hidden = false;
+    run.classList.add('fim');
+    run.querySelector('.hab-tempo').textContent = 'Concluído';
+    run.querySelector('.hab-barra i').style.width = '100%';
+    run.querySelector('.hab-cancel').textContent = 'Ok';
+    return run;
+  }
+  function ligarTimer(b, fim, total) {
+    var run = b.querySelector('.hab-run'), tempo = run.querySelector('.hab-tempo'), barra = run.querySelector('.hab-barra i');
+    b.querySelector('.hab-start').hidden = true;
+    run.hidden = false;
+    run.classList.remove('fim');
+    run.querySelector('.hab-cancel').textContent = 'Cancela';
+    run.querySelector('.hab-vibaviso').hidden = true;
+    function pinta() {
+      var resto = fim - Date.now();
+      if (resto <= 0) return false;
+      tempo.textContent = fmtTempo(resto);
+      barra.style.width = (100 - resto / total * 100) + '%';
+      return true;
+    }
+    pinta();
+    var iv = setInterval(function() {
+      if (pinta()) return;
+      liberarTimer();
+      limparTimerSalvo();
+      mostrarConcluido(b);
+      // com o aviso do ntfy agendado, quem toca é o app; o alarme da página fica só de reserva
+      if (!_ntfyOk) {
+        var vibrou = tocarAlarme();
+        var av = run.querySelector('.hab-vibaviso');
+        av.textContent = navigator.vibrate ? 'O navegador bloqueou a vibração neste aparelho.' : 'Este navegador não permite vibração.';
+        av.hidden = vibrou !== false;
+      }
+    }, 250);
+    _habTimer = { iv: iv, lock: null };
+    try {
+      if (navigator.wakeLock) navigator.wakeLock.request('screen').then(function(l) {
+        if (_habTimer && _habTimer.iv === iv) _habTimer.lock = l; else l.release();
+      }).catch(function() {});
+    } catch (e) {}
+  }
+  function retomarTimer() {
+    if (_habTimer) return true;
+    var s = null;
+    try { s = JSON.parse(localStorage.getItem('rico_timer') || 'null'); } catch (e) {}
+    if (!s) return true;
+    var b = document.querySelectorAll('#habito-lista .habito-block')[s.idx];
+    if (!b || b.querySelector('.hab-nome').value !== s.nome) return false;
+    document.querySelectorAll('.habito-block').forEach(resetarTimerUI);
+    _ntfyId = s.ntfyId || null;
+    _ntfyOk = !!s.ntfyOk;
+    if (s.fim > Date.now()) ligarTimer(b, s.fim, s.total);
+    else if (Date.now() - s.fim < 1800000) mostrarConcluido(b);
+    else limparTimerSalvo();
+    return true;
   }
   function iniciarHabito(b) {
     var min = durMin(b);
@@ -2357,41 +2471,18 @@ window.saveAnswer = window.saveAnswer || function(){};
     document.querySelectorAll('.habito-block').forEach(resetarTimerUI);
     habAudio(); // destrava o som com o toque do usuário
     var total = min * 60000, fim = Date.now() + total;
-    var run = b.querySelector('.hab-run'), tempo = run.querySelector('.hab-tempo'), barra = run.querySelector('.hab-barra i');
-    b.querySelector('.hab-start').hidden = true;
-    run.hidden = false;
-    run.querySelector('.hab-cancel').textContent = 'Cancela';
-    run.querySelector('.hab-vibaviso').hidden = true;
-    tempo.textContent = fmtTempo(total);
-    barra.style.width = '0%';
-    var iv = setInterval(function() {
-      var resto = fim - Date.now();
-      if (resto > 0) {
-        tempo.textContent = fmtTempo(resto);
-        barra.style.width = (100 - resto / total * 100) + '%';
-        return;
-      }
-      liberarTimer();
-      tempo.textContent = 'Concluído';
-      barra.style.width = '100%';
-      run.classList.add('fim');
-      run.querySelector('.hab-cancel').textContent = 'Ok';
-      // com o aviso do ntfy agendado, quem toca é o app; o alarme da página fica só de reserva
-      if (!_ntfyOk) {
-        var vibrou = tocarAlarme();
-        var av = run.querySelector('.hab-vibaviso');
-        av.textContent = navigator.vibrate ? 'O navegador bloqueou a vibração neste aparelho.' : 'Este navegador não permite vibração.';
-        av.hidden = vibrou !== false;
-      }
-    }, 250);
-    _habTimer = { iv: iv, lock: null };
+    var idx = Array.prototype.indexOf.call(document.querySelectorAll('#habito-lista .habito-block'), b);
+    try { localStorage.setItem('rico_timer', JSON.stringify({ idx: idx, nome: b.querySelector('.hab-nome').value, fim: fim, total: total, min: min, ntfyId: null, ntfyOk: false })); } catch (e) {}
+    b.querySelector('.hab-run .hab-tempo').textContent = fmtTempo(total);
+    b.querySelector('.hab-run .hab-barra i').style.width = '0%';
+    ligarTimer(b, fim, total);
     agendarNtfy(b, min);
-    try {
-      if (navigator.wakeLock) navigator.wakeLock.request('screen').then(function(l) {
-        if (_habTimer && _habTimer.iv === iv) _habTimer.lock = l; else l.release();
-      }).catch(function() {});
-    } catch (e) {}
   }
+
+  (function() {
+    var n = 0, t = setInterval(function() { if (retomarTimer() || ++n > 40) clearInterval(t); }, 500);
+    document.addEventListener('visibilitychange', function() { if (!document.hidden) retomarTimer(); });
+  })();
 
   function addHabito(semFoco) {
     var lista = document.getElementById('habito-lista');
