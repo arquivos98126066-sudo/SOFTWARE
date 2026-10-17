@@ -183,7 +183,6 @@ header h2{flex:1;font-size:19px;font-weight:600;text-transform:uppercase;white-s
     var box = $('lista'), cam = estado.cam;
     box.innerHTML = '';
     $('titulo').textContent = cam.length ? cam[cam.length - 1] : 'Estudos';
-    $('voltar').hidden = !cam.length;
     var no = no_de(cam);
     Object.keys(no.f).sort(cmp).forEach(function(k){
       box.appendChild(item({pasta: 1, i: IC_PASTA, n: k}, function(){
@@ -210,7 +209,9 @@ header h2{flex:1;font-size:19px;font-weight:600;text-transform:uppercase;white-s
     estado = e.state || {cam: [], doc: null};
     mostrar();
   });
-  $('voltar').onclick = function(){ history.back(); };
+  $('voltar').onclick = function(){
+    if (estado.cam.length) history.back(); else location.href = 'index.html';
+  };
   $('fechar').onclick = function(){ history.back(); };
 
   function entrar(lista){
