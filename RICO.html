@@ -3921,8 +3921,20 @@ window.saveAnswer = window.saveAnswer || function(){};
       knob.style.transform = 'translateX(' + x + 'px)';
       estado(ladoEm(e.clientX));
     }, true);
+    var ultimoToque = 0;
     document.addEventListener('pointerup', function(e) {
+      var curto = !!tm;
       clearTimeout(tm); tm = null;
+      if (curto && !aberto) {
+        var dn = e.target && e.target.closest ? e.target.closest('.hab-donut') : null;
+        var bn = dn && dn.closest('.habito-block');
+        if (bn) {
+          var agora = Date.now();
+          if (agora - ultimoToque < 400) { ultimoToque = 0; abrirHab(bn); }
+          else ultimoToque = agora;
+        }
+        return;
+      }
       if (!aberto) return;
       if (moveu && arrasto) escolher(ladoEm(e.clientX));
       else if (moveu) fecharPick();
