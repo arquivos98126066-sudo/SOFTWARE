@@ -208,7 +208,10 @@ header h2{flex:1;font-size:19px;font-weight:600;text-transform:uppercase;white-s
     mostrar();
   });
   $('voltar').onclick = function(){
-    if (estado.cam.length) history.back(); else location.replace('index.html');
+    if (estado.cam.length) { history.back(); return; }
+    var veioDoMenu = false;
+    try { veioDoMenu = history.length > 1 && /(^|\/)(index\.html)?$/.test(new URL(document.referrer).pathname); } catch (e) {}
+    if (veioDoMenu) history.back(); else location.replace('index.html');
   };
 
   function entrar(lista){
