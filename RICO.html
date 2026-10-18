@@ -305,21 +305,16 @@
     color: var(--tx); font-weight: 600; font-size: 14.5px;
   }
   .hab-acoes { position: relative; display: flex; gap: 2px; padding: 4px; margin-top: 14px; background: var(--seg); border-radius: 999px; }
-  .hab-troca {
-    display: flex; align-items: center; justify-content: center; gap: 16px; width: 100%; height: 56px; margin-top: 14px;
-    background: none; color: var(--dark); font-weight: 700; font-size: 14px; letter-spacing: .08em;
-    touch-action: pan-y; -webkit-tap-highlight-color: transparent;
-  }
-  .hab-troca .sw { position: relative; width: 62px; height: 34px; border-radius: 999px; background: var(--seg); flex-shrink: 0; transition: background .2s; }
-  .hab-troca .sw i { position: absolute; top: 3px; left: 3px; width: 28px; height: 28px; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgba(15,27,45,.28); transform: translateX(14px); transition: transform .22s cubic-bezier(.3,.8,.3,1); }
-  .hab-troca.f .sw { background: var(--gold); }
-  .hab-troca.f .sw i { transform: translateX(0); }
-  .hab-troca.n .sw { background: #aab3c2; }
-  .hab-troca.n .sw i { transform: translateX(28px); }
-  .hab-troca.arrasta .sw i { transition: none; }
-  .hab-troca .sw-l { min-width: 44px; color: var(--tx3); transition: color .2s; }
-  .hab-troca .sw-l.fz { text-align: right; }
-  .hab-troca.f .sw-l.fz, .hab-troca.n .sw-l.nz { color: var(--dark); }
+  .hab-pick-ov { position: fixed; inset: 0; z-index: 99985; background: rgba(15,27,45,.55); display: flex; align-items: center; justify-content: center; touch-action: none; -webkit-user-select: none; user-select: none; }
+  .hab-pick-card { width: min(92vw, 360px); padding: 22px 18px 16px; border-radius: 28px; background: #fff; box-shadow: 0 18px 48px rgba(15,27,45,.35); text-align: center; }
+  .hab-pick-row { display: flex; gap: 14px; }
+  .hab-pick-op { flex: 1; height: 96px; border-radius: 22px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 17px; letter-spacing: .08em; background: var(--seg); color: var(--tx3); border: 2px solid transparent; transition: transform .15s, background .15s, color .15s; }
+  .hab-pick-op.on { transform: scale(1.06); }
+  .hab-pick-op.fz.on { background: var(--gold); color: var(--dark); }
+  .hab-pick-op.nz.on { background: #aab3c2; color: var(--dark); }
+  .hab-pick-op.atual { border-color: var(--gold-deep); }
+  .hab-pick-dica { margin-top: 12px; font-size: 12.5px; color: var(--tx2); }
+  .hab-pick-ciclos { margin-top: 6px; height: 40px; padding: 0 18px; border-radius: 999px; font-size: 13.5px; font-weight: 600; color: var(--tx2); }
   .hab-aviso { margin: 12px 4px 0; font-size: 13.5px; line-height: 1.5; color: var(--tx2); }
   .hab-trilha { display: flex; flex-direction: column; align-items: center; margin: 4px 0 18px; }
   .hab-trilha[hidden] { display: none; }
@@ -416,7 +411,7 @@
 
   .final { text-align: center; padding: 36px 0 24px; font-family: var(--f-title); font-size: clamp(1.7rem, 8vw, 2.2rem); font-weight: 600; letter-spacing: .03em; color: var(--gold-deep); white-space: nowrap; }
 
-  footer { background: var(--dark); color: #9aa6b8; text-align: center; padding: 28px 20px calc(28px + env(safe-area-inset-bottom)); font-size: 13px; font-weight: 500; }
+  footer { position: relative; z-index: 901; background: var(--dark); color: #9aa6b8; text-align: center; padding: 28px 20px calc(56px + env(safe-area-inset-bottom)); font-size: 13px; font-weight: 500; }
   footer span { color: var(--gold); font-weight: 600; }
 
   /* ── Menu ── */
@@ -1169,6 +1164,16 @@
 </div>
 
 <!-- JANELA DO GRÁFICO DO HÁBITO (segurar o gráfico) -->
+<div class="hab-pick-ov" id="habPick" hidden>
+  <div class="hab-pick-card">
+    <div class="hab-pick-row">
+      <div class="hab-pick-op fz" data-v="f">FIZ</div>
+      <div class="hab-pick-op nz" data-v="n">NÃO</div>
+    </div>
+    <p class="hab-pick-dica">Arraste até a opção e solte, ou toque nela</p>
+    <button type="button" class="hab-pick-ciclos" id="habPickCiclos">Ver ciclos</button>
+  </div>
+</div>
 <div class="sheet-ov" id="habOv" hidden onclick="fecharHab()"></div>
 <div class="sheet" id="habSheet" role="dialog" aria-modal="true" aria-label="Ciclos" hidden>
   <div class="sheet-handle"></div>
@@ -1839,7 +1844,6 @@ window.saveAnswer = window.saveAnswer || function(){};
       '<div class="hab-progresso">' +
         '<div class="hab-stats" hidden><b class="hab-seq">0</b><b class="hab-total">0</b></div>' +
         '<div class="hab-trilha"></div>' +
-        '<button type="button" class="hab-troca" aria-label="Fiz ou não fiz" onclick="trocaHabito(this.closest(\'.habito-block\'))"><span class="sw-l fz">FIZ</span><span class="sw"><i></i></span><span class="sw-l nz">NÃO</span></button>' +
         '<p class="hab-aviso" hidden>Você marcou dois dias seguidos sem cumprir. A sequência recomeçou.</p>' +
       '</div>';
   }
@@ -1876,9 +1880,7 @@ window.saveAnswer = window.saveAnswer || function(){};
     b.querySelector('.hab-total').textContent = st.total;
     b.querySelector('.hab-aviso').hidden = !st.perdeu;
     var alvo = reg[diaAlvo()];
-    var tr = b.querySelector('.hab-troca');
-    tr.classList.toggle('f', alvo === 'f');
-    tr.classList.toggle('n', alvo === 'n');
+    b._alvo = alvo;
     // gráfico redondo: avança até a meta (30, depois 60...); dourado = fiz, cinza = não fiz
     var G = HAB_META * Math.max(1, Math.ceil(st.run.length / HAB_META));
     var pct = Math.round(st.run.length * 100 / G);
@@ -2032,43 +2034,6 @@ window.saveAnswer = window.saveAnswer || function(){};
   arrastavel('meta-lista', '.meta-block', renumerarMetas);
   arrastavel('area-lista', '.area-block', renumerarAreas);
 
-  /* Fiz/Não: botão deslizante; arrastar a bolinha para o lado troca */
-  (function() {
-    var bt = null, x0 = 0, drag = false, bloqueia = 0;
-    document.addEventListener('pointerdown', function(e) {
-      var t = e.target.closest && e.target.closest('.hab-troca');
-      if (!t) return;
-      bt = t; x0 = e.clientX; drag = false;
-    });
-    document.addEventListener('pointermove', function(e) {
-      if (!bt) return;
-      var dx = e.clientX - x0;
-      if (!drag && Math.abs(dx) < 8) return;
-      drag = true;
-      bt.classList.add('arrasta');
-      var sw = bt.querySelector('.sw'), r = sw.getBoundingClientRect();
-      var x = Math.max(0, Math.min(28, e.clientX - r.left - 3 - 14));
-      bt.querySelector('.sw i').style.transform = 'translateX(' + x + 'px)';
-    });
-    function fim(e) {
-      if (!bt) return;
-      var a = bt; bt = null;
-      if (!drag) return;
-      drag = false; bloqueia = Date.now();
-      var sw = a.querySelector('.sw'), r = sw.getBoundingClientRect();
-      var lado = (e.clientX - r.left) > r.width / 2 ? 'n' : 'f';
-      a.classList.remove('arrasta');
-      a.querySelector('.sw i').style.transform = '';
-      var b = a.closest('.habito-block');
-      var atual = a.classList.contains('f') ? 'f' : (a.classList.contains('n') ? 'n' : '');
-      if (b && atual !== lado) marcarHabito(b, lado);
-    }
-    document.addEventListener('pointerup', fim);
-    document.addEventListener('pointercancel', fim);
-    document.addEventListener('click', function(e) {
-      if (Date.now() - bloqueia < 350 && e.target.closest && e.target.closest('.hab-troca')) { e.stopPropagation(); e.preventDefault(); }
-    }, true);
-  })();
   document.addEventListener('visibilitychange', function() {
     if (document.hidden || !_vibPend) return;
     _vibPend = false;
@@ -2250,6 +2215,7 @@ window.saveAnswer = window.saveAnswer || function(){};
         de: b.querySelector('.hab-de').value,
         ate: b.querySelector('.hab-ate').value,
         min: durMin(b) || 2,
+        ab: b.classList.contains('aberto'),
         reg: b._demo ? {} : Object.assign({}, b._reg || {}),
         zeros: b._demo ? [] : (b._zeros || []).slice()
       });
@@ -2269,6 +2235,7 @@ window.saveAnswer = window.saveAnswer || function(){};
       b.querySelector('.hab-de').value = m.de || '';
       b.querySelector('.hab-ate').value = m.ate || '';
       b.querySelector('.hab-min').value = m.min || 2;
+      b.classList.toggle('aberto', m.ab === true);
       b._demo = false;
       var reg = {};
       if (m.reg) { Object.keys(m.reg).forEach(function(k) { reg[k] = m.reg[k]; }); }
@@ -2515,6 +2482,7 @@ window.saveAnswer = window.saveAnswer || function(){};
         de: b.querySelector('.hab-de').value,
         ate: b.querySelector('.hab-ate').value,
         min: durMin(b) || 2,
+        ab: b.classList.contains('aberto'),
         reg: b._demo ? {} : Object.assign({}, b._reg || {}),
         zeros: b._demo ? [] : (b._zeros || []).slice()
       });
@@ -2534,6 +2502,7 @@ window.saveAnswer = window.saveAnswer || function(){};
       b.querySelector('.hab-de').value = m.de || '';
       b.querySelector('.hab-ate').value = m.ate || '';
       b.querySelector('.hab-min').value = m.min || 2;
+      b.classList.toggle('aberto', m.ab === true);
       b._demo = false;
       var reg = {};
       if (m.reg) { Object.keys(m.reg).forEach(function(k) { reg[k] = m.reg[k]; }); }
@@ -3907,29 +3876,77 @@ window.saveAnswer = window.saveAnswer || function(){};
     fecharHab();
   });
   (function() {
-    var tm = null, x0 = 0, y0 = 0, disparou = false;
+    var tm = null, x0 = 0, y0 = 0, bAlvo = null, aberto = false, moveu = false, arrasto = false;
+    var ov = document.getElementById('habPick');
+    function opEm(x, y) {
+      var el = document.elementFromPoint(x, y);
+      return el && el.closest ? el.closest('.hab-pick-op') : null;
+    }
+    function marcaOp(op) {
+      ov.querySelectorAll('.hab-pick-op').forEach(function(o) { o.classList.toggle('on', o === op); });
+    }
+    function abrirPick(b) {
+      bAlvo = b; aberto = true; moveu = false; arrasto = false;
+      ov.querySelectorAll('.hab-pick-op').forEach(function(o) {
+        o.classList.remove('on');
+        o.classList.toggle('atual', o.getAttribute('data-v') === b._alvo);
+      });
+      ov.hidden = false;
+      if (navigator.vibrate) { try { navigator.vibrate(15); } catch (_) {} }
+    }
+    function fecharPick() { aberto = false; ov.hidden = true; bAlvo = null; marcaOp(null); }
+    function escolher(op) {
+      var b = bAlvo, v = op && op.getAttribute('data-v');
+      fecharPick();
+      if (b && v && b._alvo !== v) marcarHabito(b, v);
+    }
     document.addEventListener('pointerdown', function(e) {
+      if (aberto) return;
       var d = e.target && e.target.closest ? e.target.closest('.hab-donut') : null;
       if (!d) return;
-      x0 = e.clientX; y0 = e.clientY; disparou = false;
+      x0 = e.clientX; y0 = e.clientY;
       clearTimeout(tm);
       tm = setTimeout(function() {
-        tm = null; disparou = true;
+        tm = null;
         try { window.getSelection().removeAllRanges(); } catch (_) {}
-        if (navigator.vibrate) { try { navigator.vibrate(15); } catch (_) {} }
         var b = d.closest('.habito-block');
-        if (b) abrirHab(b);
-      }, 450);
+        if (b) abrirPick(b);
+      }, 220);
     }, true);
     document.addEventListener('pointermove', function(e) {
       if (tm && (Math.abs(e.clientX - x0) > 8 || Math.abs(e.clientY - y0) > 8)) { clearTimeout(tm); tm = null; }
+      if (!aberto) return;
+      if (Math.abs(e.clientX - x0) > 8 || Math.abs(e.clientY - y0) > 8) moveu = true;
+      var op = opEm(e.clientX, e.clientY);
+      if (op) arrasto = true;
+      marcaOp(op);
     }, true);
-    ['pointerup', 'pointercancel'].forEach(function(ev) {
-      document.addEventListener(ev, function() { clearTimeout(tm); tm = null; }, true);
+    document.addEventListener('pointerup', function(e) {
+      if (tm) {
+        clearTimeout(tm); tm = null;
+        var dn = e.target && e.target.closest ? e.target.closest('.hab-donut') : null;
+        var bn = dn && dn.closest('.habito-block');
+        if (bn && !aberto) abrirPick(bn);
+        return;
+      }
+      if (!aberto) return;
+      var op = opEm(e.clientX, e.clientY);
+      if (moveu && arrasto) { escolher(op); }
+      else if (moveu && !op) { fecharPick(); }
+      marcaOp(null);
+    }, true);
+    document.addEventListener('pointercancel', function() { clearTimeout(tm); tm = null; if (aberto && moveu) fecharPick(); }, true);
+    document.addEventListener('touchmove', function(e) { if (aberto) e.preventDefault(); }, { passive: false });
+    ov.addEventListener('click', function(e) {
+      if (!aberto) return;
+      if (e.target.closest('#habPickCiclos')) { var b = bAlvo; fecharPick(); if (b) abrirHab(b); return; }
+      var op = e.target.closest('.hab-pick-op');
+      if (op) escolher(op); else fecharPick();
     });
     document.addEventListener('contextmenu', function(e) {
       if (e.target && e.target.closest && e.target.closest('.hab-donut')) e.preventDefault();
     });
+    document.addEventListener('keydown', function(e) { if (e.key === 'Escape' && aberto) fecharPick(); });
   })();
   document.addEventListener('keydown', function(e) { if (e.key === 'Escape') fecharHab(); });
 
