@@ -1,4 +1,4 @@
-const CACHE_NAME = 'meus-apps-v22';
+const CACHE_NAME = 'meus-apps-v23';
 
 const URLS_TO_CACHE = [
   './',
@@ -19,6 +19,7 @@ const URLS_TO_CACHE = [
   './LER.html',
   './Code.html',
   './manifest.json',
+  './menu.png',
   './icon-192.png',
   './icon-512.png',
   './open-external.js',

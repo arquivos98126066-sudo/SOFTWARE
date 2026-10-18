@@ -201,6 +201,11 @@ body::after {
 }
 .logout-btn:hover { color: #111111; border-color: var(--border-hi); }
 
+.menu-tela { background: #020719; min-height: 100dvh; display: flex; align-items: center; justify-content: center; }
+.menu-box { position: relative; width: 100%; max-width: 560px; }
+.menu-box img { display: block; width: 100%; height: auto; -webkit-user-select: none; user-select: none; }
+.menu-link { position: absolute; display: block; border-radius: 28px; -webkit-tap-highlight-color: transparent; }
+
 .app-wrap {
   display: flex; flex-direction: column;
   min-height: 100dvh;
@@ -454,66 +459,15 @@ html, body { height: 100%; overflow: hidden; }
 <!-- APP -->
 <div id="app-content">
   <button class="logout-btn" onclick="fazerLogout()">Sair</button>
-  <div class="app-wrap">
-
-    <div class="identity" aria-hidden="true"></div>
-
-    <div class="grid">
-
-      <a class="card" href="TAPETE-CRM.html">
-        <div class="card-icon" style="--c1:#fb7185; --c2:#be123c; --sh:rgba(225,29,72,.45);"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="4.5" width="14" height="17" rx="2.6"/><rect x="9" y="2.5" width="6" height="4" rx="1.3"/><path d="M8.7 11.2l1.3 1.3 2.2-2.5M8.7 16.5h6.6"/></svg></div>
-        <div class="card-text">
-          <div class="card-name">Tapete CRM</div>
-          <div class="card-desc">Clientes e registros</div>
-        </div>
-        <span class="card-arrow"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></span>
-      </a>
-
-      <a class="card" href="MEU-CRM.html">
-        <div class="card-icon" style="--c1:#34d399; --c2:#047857; --sh:rgba(4,120,87,.45);"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8.3" r="3.1"/><path d="M3.2 19.2c0-3.2 2.6-5.3 5.8-5.3s5.8 2.1 5.8 5.3"/><circle cx="17.2" cy="9.4" r="2.4"/><path d="M16.4 14.1c2.9-.4 5.2 1.3 5.2 4.2"/></svg></div>
-        <div class="card-text">
-          <div class="card-name">Meu CRM</div>
-          <div class="card-desc">Gestão de clientes</div>
-        </div>
-        <span class="card-arrow"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></span>
-      </a>
-
-      <a class="card" href="DOA.html">
-        <div class="card-icon" style="--c1:#3f3f46; --c2:#050505; --sh:rgba(0,0,0,.5);"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5.5" width="16" height="15" rx="2.8"/><path d="M8 3.5v4M16 3.5v4M4 10.5h16"/><path d="M9 15.4l2.1 2.1 3.9-4"/></svg></div>
-        <div class="card-text">
-          <div class="card-name">PLANO</div>
-          <div class="card-desc">Planejamento</div>
-        </div>
-        <span class="card-arrow"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></span>
-      </a>
-
-      <a class="card" href="ADM.html">
-        <div class="card-icon" style="--c1:#94a3b8; --c2:#334155; --sh:rgba(51,65,85,.45);"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h8.5M17.5 7H20M4 12h3.5M12.5 12H20M4 17h9.5M18.5 17H20"/><circle cx="15" cy="7" r="2.5"/><circle cx="10" cy="12" r="2.5"/><circle cx="16" cy="17" r="2.5"/></svg></div>
-        <div class="card-text">
-          <div class="card-name">ADM</div>
-          <div class="card-desc">Painel administrativo</div>
-        </div>
-        <span class="card-arrow"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></span>
-      </a>
-
-      <a class="card" href="RICO.html">
-        <div class="card-icon" style="--c1:#fcd34d; --c2:#b45309; --sh:rgba(180,83,9,.45);"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 17l5.2-5.2 3.6 3.6L20 8"/><path d="M15 8h5v5"/><path d="M4 21h16"/></svg></div>
-        <div class="card-text">
-          <div class="card-name">RICO</div>
-          <div class="card-desc">Finanças e riqueza</div>
-        </div>
-        <span class="card-arrow"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></span>
-      </a>
-
-      <a class="card" href="LER.html">
-        <div class="card-icon" style="--c1:#818cf8; --c2:#4338ca; --sh:rgba(67,56,202,.45);"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 6.5C10.2 5.3 7.8 4.8 4.5 5v12.5c3.3-.2 5.7.3 7.5 1.5 1.8-1.2 4.2-1.7 7.5-1.5V5c-3.3-.2-5.7.3-7.5 1.5z"/><path d="M12 6.5V19"/></svg></div>
-        <div class="card-text">
-          <div class="card-name">ESTUDO</div>
-          <div class="card-desc">Leitura dos materiais</div>
-        </div>
-        <span class="card-arrow"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></span>
-      </a>
-
+  <div class="menu-tela">
+    <div class="menu-box">
+      <img src="menu.png" alt="Menu: Tapete CRM, Meu CRM, Plano, ADM, Rico e Estudo" draggable="false">
+      <a class="menu-link" href="TAPETE-CRM.html" aria-label="Tapete CRM" style="left:3.57%;top:8.02%;width:47.56%;height:28.07%"></a>
+      <a class="menu-link" href="MEU-CRM.html" aria-label="Meu CRM" style="left:50.54%;top:13.64%;width:46.97%;height:28.07%"></a>
+      <a class="menu-link" href="DOA.html" aria-label="PLANO" style="left:3.57%;top:33.69%;width:46.97%;height:28.07%"></a>
+      <a class="menu-link" href="ADM.html" aria-label="ADM" style="left:49.35%;top:39.04%;width:48.16%;height:29.14%"></a>
+      <a class="menu-link" href="RICO.html" aria-label="RICO" style="left:3.33%;top:59.36%;width:47.56%;height:29.68%"></a>
+      <a class="menu-link" href="LER.html" aria-label="ESTUDO" style="left:49.70%;top:65.24%;width:47.56%;height:30.48%"></a>
     </div>
   </div>
 
