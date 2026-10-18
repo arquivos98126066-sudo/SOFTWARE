@@ -634,9 +634,10 @@
   /* com a janela aberta: o ouro cobre também a borda de baixo e as áreas que rolam */
   html.sheet-open body { background: transparent; }
   html.sheet-open body::after { display: none; }
-  /* no fim da página: sem sombra e com fundo preto atrás do rodapé */
+  /* no fim da página: sombra clara bem leve só na borda de baixo, rodapé preto por baixo dela */
   html.fim-pagina { background: var(--dark); }
-  html.fim-pagina body::after { display: none; }
+  html.fim-pagina footer { z-index: auto; }
+  html.fim-pagina body::after { height: calc(env(safe-area-inset-bottom, 0px) + 16px); background: linear-gradient(to bottom, rgba(251,248,241,0), rgba(251,248,241,.5)); }
   .sheet-ov { top: -90px; bottom: -90px; }
   #sheet { touch-action: manipulation; }
   .question-card, .meta-block, .cycle-block, #sheet, #actSheet, #habSheet { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
