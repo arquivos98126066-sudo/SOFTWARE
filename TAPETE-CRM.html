@@ -2610,6 +2610,19 @@ function renderRegStep(){
   const s = steps[regCurStep];
   if(s && s.default && !REG_DATA[s.id]) REG_DATA[s.id] = s.default;
 
+  // Troca de passo: a tela volta ao topo (dentro do mesmo passo não mexe na rolagem)
+  const _chavePasso = regCurStep + '|' + (s ? s.id : '');
+  if(window._regUltimoPasso !== _chavePasso){
+    window._regUltimoPasso = _chavePasso;
+    const _topo = function(){
+      window.scrollTo(0, 0);
+      if(document.scrollingElement) document.scrollingElement.scrollTop = 0;
+      for(let el = container; el; el = el.parentElement){ if(el.scrollTop > 0) el.scrollTop = 0; }
+    };
+    _topo();
+    requestAnimationFrame(_topo);
+  }
+
   // Botões de navegação — uniformes em todos os steps
   const podeVoltar = regCurStep > 0;
   const stepId = s ? s.id : '';
