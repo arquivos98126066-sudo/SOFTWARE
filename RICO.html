@@ -411,10 +411,7 @@
   .cycle-arrow::before { content: ''; position: absolute; left: 50%; top: 4px; bottom: 12px; width: 1.5px; margin-left: -.75px; border-radius: 2px; background: linear-gradient(to bottom, rgba(224,181,74,0), var(--gold)); }
   .cycle-arrow .ic { width: 18px; height: 18px; transform: rotate(90deg); stroke-width: 2.2; margin-bottom: 0; opacity: .95; }
 
-  .final { text-align: center; padding: 36px 0 24px; font-family: var(--f-title); font-size: clamp(1.7rem, 8vw, 2.2rem); font-weight: 600; letter-spacing: .03em; color: var(--gold-deep); white-space: nowrap; }
-
-  footer { position: relative; z-index: 901; box-shadow: 0 40px 0 var(--dark); background: var(--dark); color: #9aa6b8; text-align: center; padding: 28px 20px calc(28px + env(safe-area-inset-bottom)); font-size: 13px; font-weight: 500; }
-  footer span { color: var(--gold); font-weight: 600; }
+  .final { text-align: center; padding: 56px 0 calc(56px + env(safe-area-inset-bottom)); font-family: var(--f-title); font-size: clamp(1.7rem, 8vw, 2.2rem); font-weight: 600; letter-spacing: .03em; color: var(--gold-deep); white-space: nowrap; }
 
   /* ── Menu ── */
   .menu-btn {
@@ -634,10 +631,6 @@
   /* com a janela aberta: o ouro cobre também a borda de baixo e as áreas que rolam */
   html.sheet-open body { background: transparent; }
   html.sheet-open body::after { display: none; }
-  /* no fim da página: sombra clara bem leve só na borda de baixo, rodapé preto por baixo dela */
-  html.fim-pagina { background: var(--dark); }
-  html.fim-pagina footer { z-index: auto; }
-  html.fim-pagina body::after { height: calc(env(safe-area-inset-bottom, 0px) + 16px); background: linear-gradient(to bottom, rgba(251,248,241,0), rgba(251,248,241,.5)); }
   .sheet-ov { top: -90px; bottom: -90px; }
   #sheet { touch-action: manipulation; }
   .question-card, .meta-block, .cycle-block, #sheet, #actSheet, #habSheet { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
@@ -1148,11 +1141,6 @@
 <div class="section">
   <div class="final">I AM PROSPEROUS</div>
 </div>
-
-<!-- FOOTER -->
-<footer>
-  <span>Born Rich</span> — Proctor Gallagher Institute
-</footer>
 
 <!-- JANELA DA ETAPA DO CICLO -->
 <div class="sheet-ov" id="sheetOv" hidden onclick="fecharSheet()"></div>
@@ -4280,18 +4268,6 @@ window.saveAnswer = window.saveAnswer || function(){};
     e.preventDefault();
     try { window.getSelection().removeAllRanges(); } catch (_) {}
   }, true);
-})();
-</script>
-<script>
-(function() {
-  var h = document.documentElement;
-  function fim() {
-    var f = h.scrollHeight - (window.scrollY + window.innerHeight) <= 3;
-    h.classList.toggle('fim-pagina', f);
-  }
-  window.addEventListener('scroll', fim, { passive: true });
-  window.addEventListener('resize', fim);
-  fim();
 })();
 </script>
 </body>
