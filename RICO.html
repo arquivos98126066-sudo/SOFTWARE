@@ -1173,7 +1173,7 @@
     <span class="pl nz" data-v="n">NÃO</span>
   </div>
 </div>
-<div class="sheet-ov" id="habOv" hidden onclick="fecharHab()"></div>
+<div class="sheet-ov" id="habOv" hidden onclick="if (Date.now() - (window._habT || 0) > 500) fecharHab()"></div>
 <div class="sheet" id="habSheet" role="dialog" aria-modal="true" aria-label="Ciclos" hidden>
   <div class="sheet-handle"></div>
   <div class="hab-h-grid" id="habHGrid"></div>
@@ -3875,7 +3875,7 @@ window.saveAnswer = window.saveAnswer || function(){};
     fecharHab();
   });
   (function() {
-    var tm = null, x0 = 0, y0 = 0, bAlvo = null, aberto = false, moveu = false, arrasto = false;
+    var tm = null, x0 = 0, y0 = 0, bAlvo = null, aberto = false, moveu = false, arrasto = false, abriuEm = 0;
     var ov = document.getElementById('habPick'), card = document.getElementById('habPickCard'), sw = document.getElementById('habPickSw'), knob = sw.querySelector('i');
     function ladoEm(x) { var r = sw.getBoundingClientRect(); return (x - r.left) > r.width / 2 ? 'n' : 'f'; }
     function sobreCard(x, y) { var el = document.elementFromPoint(x, y); return !!(el && el.closest && el.closest('#habPickCard')); }
@@ -3884,7 +3884,7 @@ window.saveAnswer = window.saveAnswer || function(){};
       card.classList.toggle('n', v === 'n');
     }
     function abrirPick(b) {
-      bAlvo = b; aberto = true; moveu = false; arrasto = false;
+      bAlvo = b; aberto = true; moveu = false; arrasto = false; abriuEm = Date.now();
       card.classList.remove('arrasta'); knob.style.transform = '';
       estado(b._alvo);
       ov.hidden = false;
@@ -3942,7 +3942,7 @@ window.saveAnswer = window.saveAnswer || function(){};
     document.addEventListener('pointercancel', function() { clearTimeout(tm); tm = null; if (aberto && moveu) fecharPick(); }, true);
     document.addEventListener('touchmove', function(e) { if (aberto) e.preventDefault(); }, { passive: false });
     ov.addEventListener('click', function(e) {
-      if (!aberto) return;
+      if (!aberto || Date.now() - abriuEm < 500) return;
       var pl = e.target.closest('.pl');
       if (pl) { escolher(pl.getAttribute('data-v')); return; }
       if (e.target.closest('#habPickSw')) { escolher(ladoEm(e.clientX)); return; }
