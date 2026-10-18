@@ -201,8 +201,8 @@ body::after {
 }
 .logout-btn:hover { color: #111111; border-color: var(--border-hi); }
 
-.menu-tela { background: #020719; min-height: 100dvh; display: flex; align-items: center; justify-content: center; }
-.menu-box { position: relative; width: 100%; max-width: 560px; }
+.menu-tela { background: #020719; height: 100dvh; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+.menu-box { position: relative; width: min(100vw, calc(100dvh * 841 / 1870)); }
 .menu-box img { display: block; width: 100%; height: auto; -webkit-user-select: none; user-select: none; }
 .menu-link { position: absolute; display: block; border-radius: 28px; -webkit-tap-highlight-color: transparent; }
 
