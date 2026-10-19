@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="#0f1b2d">
 <title>Born Rich — Caderno de Atividades</title>
 <script src="https://arquivos98126066-sudo.github.io/SOFTWARE/sync-indicator.js"></script>
@@ -32,7 +32,7 @@
 
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
   [hidden] { display: none !important; }
-  html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; background: var(--bg); }
+  html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; background: var(--bg); touch-action: pan-x pan-y; overscroll-behavior-x: none; }
 
   body {
     font-family: var(--f-body);
@@ -1286,8 +1286,9 @@ function coletarDados() {
 
 // ─── Preencher formulário a partir dos dados do Firebase ─────────────────────
 // Só preenche o que está vazio e fora de foco: nunca apaga o que a pessoa já digitou
-function preencherDados(dados) {
+function preencherDados(dados, forcar) {
   if (!dados) return;
+  forcar = !!forcar && !_editou;
 
   if (!_editou) {
     if (dados.q_habitos && dados.q_habitos.habitos && window.restoreHabitos) {
@@ -1307,7 +1308,7 @@ function preencherDados(dados) {
     try { window.restoreCiclo(JSON.parse(dados.q_ciclo.ciclo)); } catch (_) {}
   }
 
-  var livre = function(el) { return el.value === '' && el !== document.activeElement; };
+  var livre = function(el) { return (forcar || el.value === '') && el !== document.activeElement; };
 
   document.querySelectorAll('[data-qid]').forEach(function(card) {
     var qid = card.dataset.qid;
@@ -1399,33 +1400,31 @@ async function carregarDados() {
   var local = await loadLocal('born_rich_' + CADERNO_ID);
   var localTime = local ? (local.updatedAt || 0) : 0;
 
+  /* mostra na hora o que está guardado neste aparelho, sem esperar a nuvem (evita nomes sumindo e voltando) */
+  if (local && local.dados) {
+    respostasCache = local.dados;
+    preencherDados(respostasCache);
+  }
+
   try {
     var snap = await getDoc(doc(db, 'born_rich', CADERNO_ID));
     if (snap.exists()) {
       var cloud = snap.data();
       var cloudTime = cloud.updatedAt || 0;
       if (localTime > cloudTime) {
-        // Local mais recente — usa local e corrige a nuvem
-        respostasCache = local.dados || {};
-        preencherDados(respostasCache);
+        // Local mais recente — já está na tela; corrige a nuvem
         try { await setDoc(doc(db, 'born_rich', CADERNO_ID), local, { merge: true }); } catch(_) {}
       } else {
         // Nuvem igual ou mais recente
         respostasCache = cloud.dados || {};
-        preencherDados(respostasCache);
+        if (!local || cloudTime > localTime) preencherDados(respostasCache, true);
         saveLocal('born_rich_' + CADERNO_ID, cloud);
       }
     } else if (local) {
-      respostasCache = local.dados || {};
-      preencherDados(respostasCache);
       try { await setDoc(doc(db, 'born_rich', CADERNO_ID), local, { merge: true }); } catch(_) {}
     }
   } catch(e) {
-    if (local) {
-      respostasCache = local.dados || {};
-      preencherDados(respostasCache);
-      showToast('Dados carregados localmente', '#b45309');
-    }
+    if (local) showToast('Dados carregados localmente', '#b45309');
     if (window.syncShow) window.syncShow.offline();
   }
 }
@@ -3040,7 +3039,7 @@ window.saveAnswer = window.saveAnswer || function(){};
           if (window.rcMapa.total() < 2) { soltaEm('root'); return; }
           if (!window.rcMapa.estaAberto(ix) || PEND.inst === api) window.rcMapa.foca(ix);
           else soltaEm('root');
-        }, 300) };
+        }, 200) };
         return;
       }
       if (el && el.dataset.id) {
@@ -3052,7 +3051,7 @@ window.saveAnswer = window.saveAnswer || function(){};
           return;
         }
         if (tq) { clearTimeout(tq.t); var antes = tq.id; tq = null; acaoToque(antes); }
-        tq = { id: id, t: setTimeout(function() { var x = tq; tq = null; if (x) acaoToque(x.id); }, 260) };
+        tq = { id: id, t: setTimeout(function() { var x = tq; tq = null; if (x) acaoToque(x.id); }, 200) };
       } else {
         if (tq) { clearTimeout(tq.t); tq = null; }
         selId = null; barId = null; render();
@@ -3556,7 +3555,7 @@ window.saveAnswer = window.saveAnswer || function(){};
     clearTimeout(_tq.timer);
     _tq.idx = k;
     var xr = e.clientX - el.getBoundingClientRect().left;
-    _tq.timer = setTimeout(function() { _tq.timer = null; _tq.idx = null; cicloSimples(k, el, xr); }, 280);
+    _tq.timer = setTimeout(function() { _tq.timer = null; _tq.idx = null; cicloSimples(k, el, xr); }, 200);
   });
 
   cicloHeaderPrimeiro();
@@ -4867,6 +4866,19 @@ window.saveAnswer = window.saveAnswer || function(){};
 </script>
 <!-- VOLTAR DESKTOP --><a id="__btn-voltar" href="OUTROS.html"><svg class="ic" aria-hidden="true"><use href="#i-arrow-left"/></svg>Outros</a><!-- FIM VOLTAR DESKTOP -->
 <script>
+/* trava zoom e rolagem lateral: o app nunca fica maior que a tela nem deslocado */
+(function() {
+  document.addEventListener('touchstart', function(e) { if (e.touches && e.touches.length > 1) e.preventDefault(); }, { passive: false });
+  ['gesturestart', 'gesturechange', 'gestureend'].forEach(function(n) { document.addEventListener(n, function(e) { e.preventDefault(); }); });
+  function zera() {
+    if (window.scrollX) window.scrollTo(0, window.scrollY);
+    if (document.documentElement.scrollLeft) document.documentElement.scrollLeft = 0;
+  }
+  window.addEventListener('scroll', zera, { passive: true });
+  if (window.visualViewport) { visualViewport.addEventListener('resize', zera); visualViewport.addEventListener('scroll', zera); }
+})();
+</script>
+<script>
 /* negrito automático: **texto** vira negrito quando a caixa não está sendo editada */
 (function() {
   var TEM = /\*\*[^*\n][^*]*?\*\*|__[^_\n][^_]*?__|^\[(?: |x|#|-|=|!)\]/m;
@@ -5071,7 +5083,8 @@ window.saveAnswer = window.saveAnswer || function(){};
     });
   }
   window.addEventListener('resize', desenhaSetasMeta);
-  document.addEventListener('click', function() { setTimeout(desenhaSetasMeta, 120); setTimeout(desenhaSetasMeta, 500); });
+  var _dsT = 0;
+  document.addEventListener('click', function() { clearTimeout(_dsT); _dsT = setTimeout(desenhaSetasMeta, 450); });
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(desenhaSetasMeta);
   setTimeout(desenhaSetasMeta, 600);
   new MutationObserver(function(m) {
