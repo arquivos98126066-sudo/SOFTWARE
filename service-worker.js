@@ -1,4 +1,4 @@
-const CACHE_NAME = 'meus-apps-v52';
+const CACHE_NAME = 'meus-apps-v53';
 
 const URLS_TO_CACHE = [
   './',
@@ -25,7 +25,8 @@ const URLS_TO_CACHE = [
   './open-external.js',
   './auth-check.js',
   './firebase-sync.js',
-  './sync-indicator.js'
+  './sync-indicator.js',
+  './app-boost.js'
 ];
 
 self.addEventListener('install', event => {

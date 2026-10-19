@@ -2,7 +2,10 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<script src="app-boost.js"></script>
+<link rel="preload" as="image" href="menu.webp" fetchpriority="high">
+<script>try{if(localStorage.getItem('menu_logado')==='1')document.documentElement.classList.add('dica')}catch(e){}</script>
 <title>Meus Apps</title>
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icon-192.png">
@@ -183,7 +186,7 @@ body::after {
    APP CONTENT
 ============================================= */
 #app-content { display: none; position: relative; z-index: 1; }
-#app-content.show { display: block; }
+#app-content.show, html.dica #app-content { display: block; }
 
 .logout-btn {
   position: fixed;
@@ -204,7 +207,7 @@ body::after {
 .menu-tela { background: #020719; height: 100dvh; overflow: hidden; display: flex; align-items: center; justify-content: center; }
 .menu-box { position: relative; width: min(100vw, calc(100dvh * 841 / 1870)); }
 .menu-box img { display: block; width: 100%; height: auto; -webkit-user-select: none; user-select: none; }
-.menu-link { position: absolute; display: block; border-radius: 28px; -webkit-tap-highlight-color: transparent; }
+.menu-link { position: absolute; display: block; border-radius: 28px; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
 
 .app-wrap {
   display: flex; flex-direction: column;
@@ -523,10 +526,13 @@ html, body { height: 100%; overflow: hidden; }
   window.fazerLogout = async function () { await signOut(auth); };
 
   function mostrarApp() {
+    try { localStorage.setItem('menu_logado', '1'); } catch (e) {}
     document.getElementById('lock-screen').classList.remove('show');
     document.getElementById('app-content').classList.add('show');
   }
   function mostrarLogin() {
+    try { localStorage.removeItem('menu_logado'); } catch (e) {}
+    document.documentElement.classList.remove('dica');
     document.getElementById('app-content').classList.remove('show');
     document.getElementById('lock-screen').classList.add('show');
   }
