@@ -400,7 +400,11 @@
   .mind-connector { width: 2px; height: 14px; background: var(--dark); }
 
   /* primeira tela: só os 3 primeiros blocos; o resto só aparece ao rolar */
-  .tela1 { box-sizing: border-box; display: flex; flex-direction: column; justify-content: space-evenly; min-height: calc(100vh - 38px); min-height: calc(100svh - 38px); }
+  .tela1 { box-sizing: border-box; display: flex; flex-direction: column; justify-content: space-between; padding-bottom: 60px; min-height: calc(100vh - 38px); min-height: calc(100svh - 38px); }
+  .tela1 { gap: 20px; }
+  .tela1 > .planes-table { margin: 16px 0 0; }
+  .tela1 > .diagram-card { margin: 0 0 4px; }
+  .tela1 > .quote-block { margin: 0 0 24px; }
   .tela1-linha { height: 1px; background: var(--bd); margin-bottom: 44px; }
   .planes-table { width: 100%; border-collapse: separate; border-spacing: 0; margin: 16px 0; background: #fff; border: 1px solid var(--bd); border-radius: 22px; overflow: hidden; }
   .planes-table td { padding: 14px 18px; font-size: 14.5px; border-bottom: 1px solid var(--bd); }
