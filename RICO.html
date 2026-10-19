@@ -750,7 +750,7 @@
     font-size: 12px; font-weight: 600; line-height: 1; white-space: nowrap; color: #fff; cursor: pointer; transition: background .15s;
   }
   .rcm-node.sel { background: rgba(224,181,74,.18); }
-  .rcm-node.txt { border-color: #eec968; }
+  .rcm-node.txt { border-color: #f6d97f; }
   .rcm-wrap.zig { animation: cicloEntra .3s ease; }
   .rcm-wrap.zig .rcm-node { overflow: hidden; height: 44px; padding: 0 16px; gap: 10px; font-size: 14.5px; }
   .rcm-wrap.zig .rcm-node.root { height: 44px; padding: 0 22px; font-size: 16px; }
@@ -772,6 +772,7 @@
   .rcm-ib { width: 42px; height: 42px; border: 0; border-radius: 50%; background: transparent; display: grid; place-items: center; cursor: pointer; color: var(--gold); padding: 0; }
   .rcm-ib:active { background: rgba(224,181,74,.16); }
   .rcm-ib:disabled { opacity: .3; pointer-events: none; }
+  .rcm-banner { width: fit-content; margin: 0 0 16px 6px; }
   .rcm-av { align-self: center; padding: 0 12px 0 16px; font-size: 14px; font-weight: 600; color: var(--gold); white-space: nowrap; }
   .rcm-ib svg { width: 20px; height: 20px; stroke: currentColor; stroke-width: 1.7; fill: none; stroke-linecap: round; stroke-linejoin: round; }
   .rcm-scrim { position: fixed; inset: 0; z-index: 1000004; background: rgba(15,27,45,.35); opacity: 0; visibility: hidden; transition: opacity .2s, visibility .2s; }
@@ -2791,6 +2792,7 @@ window.saveAnswer = window.saveAnswer || function(){};
       if (!root || !wrap || !wrap.isConnected) return;
       var velhos = world.querySelectorAll('.rcm-node');
       for (var i = 0; i < velhos.length; i++) velhos[i].remove();
+      if (destId && PEND && bar && !barId && acha(destId)) { barId = destId; movBar = false; montaBar(); }
       if (movKeep && bar && !barId && acha(movKeep)) { barId = movKeep; selId = movKeep; movBar = true; montaBar(); }
       if (selId && !acha(selId)) selId = null;
       var aw0 = wrap.clientWidth || 280;
@@ -3026,7 +3028,18 @@ window.saveAnswer = window.saveAnswer || function(){};
     function toque(e) {
       if (lp) { lp = false; return; }
       var el = e.target.closest ? e.target.closest('.rcm-node') : null;
-      if (destId) { if (el && el.dataset.id) levaNo(destId, el.dataset.id); return; }
+      if (PEND) {
+        if (!el || !el.dataset.id) return;
+        if (el.dataset.id !== 'root') { soltaEm(el.dataset.id); return; }
+        /* círculo de topo: um toque navega pelos mapas; dois toques soltam no primeiro nível dele */
+        if (ROOTTAP && ROOTTAP.inst === api) { clearTimeout(ROOTTAP.t); ROOTTAP = null; soltaEm('root'); return; }
+        if (ROOTTAP) clearTimeout(ROOTTAP.t);
+        ROOTTAP = { inst: api, t: setTimeout(function() {
+          ROOTTAP = null;
+          if (!window.rcMapa.foca(window.rcMapa.indice(api))) soltaEm('root');
+        }, 300) };
+        return;
+      }
       if (el && el.dataset.id) {
         var id = el.dataset.id;
         if (tq && tq.id === id) {
@@ -3061,6 +3074,28 @@ window.saveAnswer = window.saveAnswer || function(){};
       if (n.id === id) return true;
       for (var i = 0; i < n.children.length; i++) if (contem(n.children[i], id)) return true;
       return false;
+    }
+    function reid(n) { n.id = uid(); n.children.forEach(reid); }
+    function tiraNo(id) {
+      var f = acha(id); if (!f || !f.p) return null;
+      f.p.children.splice(f.p.children.indexOf(f.n), 1);
+      salva();
+      return f.n;
+    }
+    function poeNo(alvoId, n) {
+      var a = acha(alvoId); if (!a) return false;
+      reid(n); a.n.children.push(n); a.n.collapsed = false;
+      selId = n.id; barId = null; salva();
+      return true;
+    }
+    function soltaEm(alvoId) {
+      var S = PEND && PEND.inst, id = PEND && PEND.id;
+      if (!S) return;
+      if (S === api) { if (levaNo(id, alvoId)) { PEND = null; } return; }
+      var n = S.tira(id);
+      if (!n) { PEND = null; renderCiclo(); return; }
+      if (!poeNo(alvoId, n)) { S.poe('root', n); }
+      PEND = null; S.soltaMov(); renderCiclo();
     }
     function duplicaNo(id) {
       var f = acha(id); if (!f) return;
@@ -3127,7 +3162,7 @@ window.saveAnswer = window.saveAnswer || function(){};
         lpT = setTimeout(function() {
           lp = true;
           if (tq) { clearTimeout(tq.t); tq = null; }
-          selId = id; barId = id; movBar = false; destId = null; montaBar(); render();
+          selId = id; barId = id; movBar = false; if (PEND) window.rcMapa.cancela(true); montaBar(); render();
         }, 550);
       });
       wrap.addEventListener('pointermove', function(e) {
@@ -3149,8 +3184,8 @@ window.saveAnswer = window.saveAnswer || function(){};
         else if (a === 'edita') { barId = null; render(); abreEditor(id, true); }
         else if (a === 'exclui') excluiNo(id);
         else if (a === 'dup') duplicaNo(id);
-        else if (a === 'levar') { destId = id; montaBar(); posBar(); }
-        else if (a === 'cancela') { destId = null; barId = null; montaBar(); render(); }
+        else if (a === 'levar') { PEND = { inst: api, id: id }; destId = id; montaBar(); posBar(); }
+        else if (a === 'cancela') { window.rcMapa.cancela(); }
       });
       mw.appendChild(wrap); mw.appendChild(bar);
       render();
@@ -3164,7 +3199,7 @@ window.saveAnswer = window.saveAnswer || function(){};
 
     window.addEventListener('resize', render);
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(render);
-    var api = { key: KEY, soltaMov: function() { movKeep = null; movBar = false; destId = null; }, serializa: function() { if (!root) root = carrega(); return JSON.stringify(root); }, montar: montar, salvaNota: salvaNota, fechou: fechou, limpar: limpar, info: function() { return zig ? zInfo : tInfo; } };
+    var api = { key: KEY, soltaMov: function() { movKeep = null; movBar = false; destId = null; }, tira: tiraNo, poe: poeNo, visivel: function() { return !!(wrap && wrap.isConnected && PEND && wrap.querySelector('.rcm-node[data-id="' + PEND.id + '"]')); }, serializa: function() { if (!root) root = carrega(); return JSON.stringify(root); }, montar: montar, salvaNota: salvaNota, fechou: fechou, limpar: limpar, info: function() { return zig ? zInfo : tInfo; } };
     if (vazio) { root = nd('Novo'); root.id = 'root'; salva(); }
     return api;
   }
@@ -3176,6 +3211,7 @@ window.saveAnswer = window.saveAnswer || function(){};
     p: { arr: [], ord: 'rico.proc.ordem', def: 'rico.proc.v1', pre: 'rico.proc.', aberto: -1 }
   };
   var CUR = SETS.m;
+  var PEND = null, ROOTTAP = null;
   function mapasChaves(S) {
     try {
       var a = JSON.parse(localStorage.getItem(S.ord));
@@ -3220,12 +3256,24 @@ window.saveAnswer = window.saveAnswer || function(){};
         var inf = m.info();
         if (zi && inf) { q0 += inf.n; prevCx = (acc && aberto) ? null : inf.lastCx; } else prevCx = null;
       });
+      if (PEND && !PEND.inst.visivel()) {
+        var bn = document.createElement('div');
+        bn.className = 'rcm-pill rcm-banner';
+        bn.innerHTML = '<span class="rcm-av">Toque no destino</span><button type="button" class="rcm-ib" aria-label="Cancelar"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>';
+        bn.querySelector('button').addEventListener('click', function() { window.rcMapa.cancela(); });
+        mw.insertBefore(bn, mw.firstChild);
+      }
     },
     foca: function(i) {
       if (CUR.arr.length < 2) return false;
       CUR.aberto = (CUR.aberto === i) ? -1 : i;
       renderCiclo();
       return true;
+    },
+    cancela: function(semRender) {
+      PEND = null; ROOTTAP = null;
+      SETS.m.arr.concat(SETS.p.arr).forEach(function(m) { m.soltaMov(); });
+      if (!semRender) renderCiclo();
     },
     duplicar: function(i) {
       var S = CUR; mapasGarante(S);
@@ -3235,7 +3283,7 @@ window.saveAnswer = window.saveAnswer || function(){};
       S.arr.splice(i + 1, 0, criaMapa(k, false));
       mapasSalvaOrdem(S);
     },
-    desfoca: function() { SETS.m.aberto = -1; SETS.p.aberto = -1; SETS.m.arr.concat(SETS.p.arr).forEach(function(m) { m.soltaMov(); }); },
+    desfoca: function() { PEND = null; ROOTTAP = null; SETS.m.aberto = -1; SETS.p.aberto = -1; SETS.m.arr.concat(SETS.p.arr).forEach(function(m) { m.soltaMov(); }); },
     salvaNota: function(e) { if (e && e._inst) e._inst.salvaNota(e); },
     indice: function(m) { return CUR.arr.indexOf(m); },
     total: function() { mapasGarante(CUR); return CUR.arr.length; },
