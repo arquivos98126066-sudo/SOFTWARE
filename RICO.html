@@ -772,7 +772,7 @@
   .rcm-ib { width: 42px; height: 42px; border: 0; border-radius: 50%; background: transparent; display: grid; place-items: center; cursor: pointer; color: var(--gold); padding: 0; }
   .rcm-ib:active { background: rgba(224,181,74,.16); }
   .rcm-ib:disabled { opacity: .3; pointer-events: none; }
-  .rcm-banner { width: fit-content; margin: 0 0 16px 6px; }
+  .rcm-banner { width: fit-content; margin: 24px auto 24px; }
   .rcm-av { align-self: center; padding: 0 12px 0 16px; font-size: 14px; font-weight: 600; color: var(--gold); white-space: nowrap; }
   .rcm-ib svg { width: 20px; height: 20px; stroke: currentColor; stroke-width: 1.7; fill: none; stroke-linecap: round; stroke-linejoin: round; }
   .rcm-scrim { position: fixed; inset: 0; z-index: 1000004; background: rgba(15,27,45,.35); opacity: 0; visibility: hidden; transition: opacity .2s, visibility .2s; }
@@ -3036,7 +3036,10 @@ window.saveAnswer = window.saveAnswer || function(){};
         if (ROOTTAP) clearTimeout(ROOTTAP.t);
         ROOTTAP = { inst: api, t: setTimeout(function() {
           ROOTTAP = null;
-          if (!window.rcMapa.foca(window.rcMapa.indice(api))) soltaEm('root');
+          var ix = window.rcMapa.indice(api);
+          if (window.rcMapa.total() < 2) { soltaEm('root'); return; }
+          if (!window.rcMapa.estaAberto(ix) || PEND.inst === api) window.rcMapa.foca(ix);
+          else soltaEm('root');
         }, 300) };
         return;
       }
@@ -3270,6 +3273,7 @@ window.saveAnswer = window.saveAnswer || function(){};
       renderCiclo();
       return true;
     },
+    estaAberto: function(i) { return CUR.aberto === i; },
     cancela: function(semRender) {
       PEND = null; ROOTTAP = null;
       SETS.m.arr.concat(SETS.p.arr).forEach(function(m) { m.soltaMov(); });
