@@ -750,6 +750,7 @@
     font-size: 12px; font-weight: 600; line-height: 1; white-space: nowrap; color: #fff; cursor: pointer; transition: background .15s;
   }
   .rcm-node.sel { background: rgba(224,181,74,.18); }
+  .rcm-node.txt { border-color: #eec968; }
   .rcm-wrap.zig { animation: cicloEntra .3s ease; }
   .rcm-wrap.zig .rcm-node { overflow: hidden; height: 44px; padding: 0 16px; gap: 10px; font-size: 14.5px; }
   .rcm-wrap.zig .rcm-node.root { height: 44px; padding: 0 22px; font-size: 16px; }
@@ -2746,6 +2747,14 @@ window.saveAnswer = window.saveAnswer || function(){};
       }
       return o;
     }
+    function temTexto(n) {
+      var arr = n.i;
+      if (!Array.isArray(arr) && (KEY === 'rico.mapa.v1' || KEY === 'rico.proc.v1')) {
+        var tx = String(n.text || '').trim();
+        for (var j = 0; j < CICLO.length; j++) if (CICLO[j] && String(CICLO[j].t || '').trim() === tx) { arr = CICLO[j].i; break; }
+      }
+      return Array.isArray(arr) && arr.some(function(v) { return String(v == null ? '' : v).trim() !== ''; });
+    }
     function semente() {
       var r = nd('Ciclo Vencedor'); r.id = 'root';
       var comp = null, pilha = [];
@@ -2792,7 +2801,7 @@ window.saveAnswer = window.saveAnswer || function(){};
       var lista = [];
       (function anda(n, p) {
         var el = document.createElement('div');
-        el.className = 'rcm-node' + (n.id === 'root' ? ' root' : '') + (n.id === selId ? ' sel' : '');
+        el.className = 'rcm-node' + (n.id === 'root' ? ' root' : '') + (n.id === selId ? ' sel' : '') + (n.id !== 'root' && temTexto(n) ? ' txt' : '');
         el.dataset.id = n.id;
         if (zig) el.style.maxWidth = (aw0 - 2) + 'px';
         if (n.id !== 'root' && !zig) {
