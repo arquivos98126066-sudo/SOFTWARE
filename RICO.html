@@ -2977,7 +2977,7 @@ window.saveAnswer = window.saveAnswer || function(){};
     function abreEditor(id, edita) {
       var f = acha(id); if (!f) return;
       var n = f.n, k = -1;
-      if (!Array.isArray(n.i) && KEY === 'rico.mapa.v1') {
+      if (!Array.isArray(n.i) && (KEY === 'rico.mapa.v1' || KEY === 'rico.proc.v1')) {
         var tx = String(n.text || '').trim();
         for (var j = 0; j < CICLO.length; j++) if (CICLO[j] && String(CICLO[j].t || '').trim() === tx) { k = j; break; }
       }
@@ -3125,34 +3125,49 @@ window.saveAnswer = window.saveAnswer || function(){};
     return api;
   }
 
-  /* vários mapas, um abaixo do outro (o + do botão amarelo cria outro) */
-  var MAPAS = [];
-  function mapasChaves() {
+  /* vários mapas, um abaixo do outro (o + do botão amarelo cria outro).
+     Mapa Mental e Processo têm cada um o seu conjunto de dados, independentes. */
+  var SETS = {
+    m: { arr: [], ord: 'rico.mapas.ordem', def: 'rico.mapa.v1', pre: 'rico.mapa.', aberto: -1 },
+    p: { arr: [], ord: 'rico.proc.ordem', def: 'rico.proc.v1', pre: 'rico.proc.', aberto: -1 }
+  };
+  var CUR = SETS.m;
+  function mapasChaves(S) {
     try {
-      var a = JSON.parse(localStorage.getItem('rico.mapas.ordem'));
+      var a = JSON.parse(localStorage.getItem(S.ord));
       if (Array.isArray(a) && a.length) return a.filter(function(k) { return typeof k === 'string' && k; });
     } catch (e) {}
-    return ['rico.mapa.v1'];
+    return [S.def];
   }
-  function mapasSalvaOrdem() { try { localStorage.setItem('rico.mapas.ordem', JSON.stringify(MAPAS.map(function(m) { return m.key; }))); } catch (e) {} }
-  function mapasGarante() {
-    if (MAPAS.length) return;
-    var ch = mapasChaves();
-    if (!ch.length) ch = ['rico.mapa.v1'];
-    MAPAS = ch.map(function(k) { return criaMapa(k, false); });
+  function mapasSalvaOrdem(S) { try { localStorage.setItem(S.ord, JSON.stringify(S.arr.map(function(m) { return m.key; }))); } catch (e) {} }
+  function mapasGarante(S) {
+    if (S.arr.length) return;
+    var ch;
+    if (S === SETS.p && localStorage.getItem(S.ord) === null) {
+      /* primeira vez do Processo: nasce como cópia do Mapa Mental atual, depois cada um segue sozinho */
+      ch = mapasChaves(SETS.m).map(function(k) {
+        var nk = k.replace('rico.mapa.', 'rico.proc.');
+        try { var v = localStorage.getItem(k); if (v !== null) localStorage.setItem(nk, v); } catch (e) {}
+        return nk;
+      });
+      try { localStorage.setItem(S.ord, JSON.stringify(ch)); } catch (e) {}
+    } else ch = mapasChaves(S);
+    if (!ch.length) ch = [S.def];
+    S.arr = ch.map(function(k) { return criaMapa(k, false); });
   }
-  var ABERTO = -1, VZ = false;
   window.rcMapa = {
     montar: function(mw, z) {
-      mapasGarante(); mw.innerHTML = ''; VZ = z;
-      if (ABERTO >= MAPAS.length) ABERTO = -1;
+      CUR = z ? SETS.p : SETS.m;
+      var S = CUR, MAPAS = S.arr;
+      mapasGarante(S); MAPAS = S.arr; mw.innerHTML = '';
+      if (S.aberto >= MAPAS.length) S.aberto = -1;
       var acc = MAPAS.length > 1;
       var q0 = 0, prevCx = null;
       var ordem = MAPAS.map(function(m, i) { return i; });
-      if (acc && ABERTO >= 0) ordem = [ABERTO];
+      if (acc && S.aberto >= 0) ordem = [S.aberto];
       ordem.forEach(function(i, pos) {
         var m = MAPAS[i];
-        var aberto = !acc || i === ABERTO;
+        var aberto = !acc || i === S.aberto;
         var zi = z || !aberto;
         var box = document.createElement('div');
         if (pos > 0) box.style.marginTop = (zi ? 36 : 28) + 'px';
@@ -3163,36 +3178,36 @@ window.saveAnswer = window.saveAnswer || function(){};
       });
     },
     foca: function(i) {
-      if (MAPAS.length < 2) return false;
-      ABERTO = (ABERTO === i) ? -1 : i;
+      if (CUR.arr.length < 2) return false;
+      CUR.aberto = (CUR.aberto === i) ? -1 : i;
       renderCiclo();
       return true;
     },
-    desfoca: function() { ABERTO = -1; },
+    desfoca: function() { SETS.m.aberto = -1; SETS.p.aberto = -1; },
     salvaNota: function(e) { if (e && e._inst) e._inst.salvaNota(e); },
-    indice: function(m) { return MAPAS.indexOf(m); },
-    total: function() { mapasGarante(); return MAPAS.length; },
-    fechou: function() { MAPAS.forEach(function(m) { m.fechou(); }); },
+    indice: function(m) { return CUR.arr.indexOf(m); },
+    total: function() { mapasGarante(CUR); return CUR.arr.length; },
+    fechou: function() { SETS.m.arr.concat(SETS.p.arr).forEach(function(m) { m.fechou(); }); },
     adicionar: function(i) {
-      mapasGarante();
-      var k = 'rico.mapa.' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
-      MAPAS.splice(i + 1, 0, criaMapa(k, true));
-      mapasSalvaOrdem();
+      var S = CUR; mapasGarante(S);
+      var k = S.pre + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+      S.arr.splice(i + 1, 0, criaMapa(k, true));
+      mapasSalvaOrdem(S);
     },
     excluir: function(i) {
-      mapasGarante();
-      if (MAPAS.length <= 1) { MAPAS[0].limpar(); return; }
-      ABERTO = -1;
-      var m = MAPAS.splice(i, 1)[0];
+      var S = CUR; mapasGarante(S);
+      if (S.arr.length <= 1) { S.arr[0].limpar(); return; }
+      S.aberto = -1;
+      var m = S.arr.splice(i, 1)[0];
       try { localStorage.removeItem(m.key); } catch (e) {}
-      mapasSalvaOrdem();
+      mapasSalvaOrdem(S);
     },
     mover: function(i, d) {
-      mapasGarante();
+      var S = CUR; mapasGarante(S);
       var j = i + d;
-      if (j < 0 || j >= MAPAS.length) return i;
-      var t = MAPAS[i]; MAPAS[i] = MAPAS[j]; MAPAS[j] = t;
-      mapasSalvaOrdem();
+      if (j < 0 || j >= S.arr.length) return i;
+      var t = S.arr[i]; S.arr[i] = S.arr[j]; S.arr[j] = t;
+      mapasSalvaOrdem(S);
       return j;
     }
   };
