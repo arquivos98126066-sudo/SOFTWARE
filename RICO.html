@@ -2781,6 +2781,7 @@ window.saveAnswer = window.saveAnswer || function(){};
       if (!root || !wrap || !wrap.isConnected) return;
       var velhos = world.querySelectorAll('.rcm-node');
       for (var i = 0; i < velhos.length; i++) velhos[i].remove();
+      if (movKeep && bar && !barId && acha(movKeep)) { barId = movKeep; selId = movKeep; movBar = true; montaBar(); }
       if (selId && !acha(selId)) selId = null;
       var aw0 = wrap.clientWidth || 280;
       var BARH = 54;
@@ -3036,7 +3037,7 @@ window.saveAnswer = window.saveAnswer || function(){};
     var ICO_SOBE = '<svg viewBox="0 0 24 24"><path d="M12 19V5M12 5l-5 5M12 5l5 5"/></svg>';
     var ICO_DESCE = '<svg viewBox="0 0 24 24"><path d="M12 5v14M12 19l-5-5M12 19l5-5"/></svg>';
     var ICO_OK = '<svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7"/></svg>';
-    var movBar = false;
+    var movBar = false, movKeep = null;
     function montaBar() {
       bar.innerHTML = movBar
         ? '<div class="rcm-pill"><button type="button" class="rcm-ib" data-a="sobe" aria-label="Sobe">' + ICO_SOBE + '</button><button type="button" class="rcm-ib" data-a="desce" aria-label="Desce">' + ICO_DESCE + '</button><button type="button" class="rcm-ib" data-a="pronto" aria-label="Pronto">' + ICO_OK + '</button></div>'
@@ -3048,7 +3049,7 @@ window.saveAnswer = window.saveAnswer || function(){};
       var f = acha(id); if (!f) return;
       if (!f.p) {
         var i0 = window.rcMapa.indice(api), j0 = window.rcMapa.mover(i0, d);
-        if (j0 !== i0) { barId = null; movBar = false; renderCiclo(); }
+        if (j0 !== i0) { barId = null; renderCiclo(); }
         return;
       }
       var arr = f.p.children, i = arr.indexOf(f.n), j = i + d;
@@ -3100,10 +3101,10 @@ window.saveAnswer = window.saveAnswer || function(){};
         var a = b.getAttribute('data-a'), id = barId;
         selId = id;
         if (a === 'filho') adiciona(false);
-        else if (a === 'irmao') { movBar = true; montaBar(); posBar(); }
+        else if (a === 'irmao') { movBar = true; movKeep = id; montaBar(); posBar(); }
         else if (a === 'sobe') moveNo(id, -1);
         else if (a === 'desce') moveNo(id, 1);
-        else if (a === 'pronto') { movBar = false; montaBar(); posBar(); }
+        else if (a === 'pronto') { movBar = false; movKeep = null; barId = null; montaBar(); render(); }
         else if (a === 'edita') { barId = null; render(); abreEditor(id, true); }
         else if (a === 'exclui') excluiNo(id);
       });
@@ -3119,7 +3120,7 @@ window.saveAnswer = window.saveAnswer || function(){};
 
     window.addEventListener('resize', render);
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(render);
-    var api = { key: KEY, montar: montar, salvaNota: salvaNota, fechou: fechou, limpar: limpar, info: function() { return zig ? zInfo : tInfo; } };
+    var api = { key: KEY, soltaMov: function() { movKeep = null; movBar = false; }, montar: montar, salvaNota: salvaNota, fechou: fechou, limpar: limpar, info: function() { return zig ? zInfo : tInfo; } };
     if (vazio) { root = nd('Novo'); root.id = 'root'; salva(); }
     return api;
   }
@@ -3182,7 +3183,7 @@ window.saveAnswer = window.saveAnswer || function(){};
       renderCiclo();
       return true;
     },
-    desfoca: function() { SETS.m.aberto = -1; SETS.p.aberto = -1; },
+    desfoca: function() { SETS.m.aberto = -1; SETS.p.aberto = -1; SETS.m.arr.concat(SETS.p.arr).forEach(function(m) { m.soltaMov(); }); },
     salvaNota: function(e) { if (e && e._inst) e._inst.salvaNota(e); },
     indice: function(m) { return CUR.arr.indexOf(m); },
     total: function() { mapasGarante(CUR); return CUR.arr.length; },
