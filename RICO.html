@@ -140,7 +140,7 @@
   .hint-panel.open { display: block; }
 
   /* ── Escolhas ── */
-  .choice-row { display: flex; flex-direction: column; gap: 2px; margin: 0 14px 14px; padding: 4px; background: var(--seg); border-radius: 26px; }
+  .choice-row { display: flex; flex-direction: column; gap: 2px; margin: 0 14px 14px; padding: 12px 6px; background: var(--seg); border-radius: 26px; }
   .choice-label {
     display: flex; align-items: center; justify-content: center; min-height: 44px; padding: 0 16px; border-radius: 999px;
     cursor: pointer; font-size: 14.5px; font-weight: 600; color: #374151; text-align: center;
@@ -193,6 +193,23 @@
     background: none; color: var(--dark); -webkit-text-fill-color: var(--dark);
     caret-color: var(--dark); font-variant-numeric: lining-nums tabular-nums; -webkit-appearance: none; appearance: none;
   }
+
+  /* resposta em texto: compacta e centralizada, cresce conforme o que é escrito */
+  .question-card .answer-area:has(> .fld.area) { display: flex; justify-content: center; }
+  .question-card .answer-area > .fld.area { width: fit-content; min-width: 200px; max-width: 100%; padding: 0 28px; justify-content: center; }
+  .question-card .fld.area textarea { flex: 0 1 auto; field-sizing: content; width: auto; min-width: 144px; max-width: 100%; text-align: center; }
+  .question-card .fld.area textarea.quebrou { text-align: left; }
+    .meta-block .meta-field:has(> .list-fields) { position: relative; }
+  .meta-block .meta-field > .chip { text-transform: uppercase; letter-spacing: .04em; }
+  .meta-block .meta-ta::placeholder { text-transform: uppercase; letter-spacing: .04em; }
+  .meta-block .meta-field:has(> .list-fields) > .chip { height: 30px; padding: 0 16px; font-size: 12.5px; background: var(--gold); color: var(--dark); margin-bottom: 22px; }
+  :is(.question-card, .meta-block) .list-fields > .list-field-row { align-self: center; width: fit-content; min-width: 200px; max-width: calc(100% - 56px); padding: 0 28px 0 18px; justify-content: center; }
+  :is(.question-card, .meta-block) .list-fields > .list-field-row textarea.list-ta { flex: 0 1 auto; field-sizing: content; width: auto; min-width: 120px; max-width: 100%; text-align: center; }
+  :is(.question-card, .meta-block) .list-fields > .list-field-row textarea.list-ta.quebrou { text-align: left; }
+  :is(.question-card, .meta-block) .list-fields > .list-field-row textarea.list-ta { padding: 13px 0; }
+  :is(.question-card, .meta-block) .list-fields > .list-field-row { position: relative; }
+  :is(.question-card, .meta-block) .list-fields > .list-field-row .list-num { position: absolute; top: 50%; transform: translateY(-50%); left: -28px; width: 20px; text-align: center; padding: 0; font-size: 14px; line-height: 24px; color: var(--tx3); pointer-events: none; }
+  :is(.question-card, .meta-block) .list-fields > .list-field-row { padding: 0 28px; }
 
   /* rodapé da resposta */
   .answer-footer { display: flex; align-items: center; justify-content: flex-end; padding: 0 14px 14px; }
@@ -275,7 +292,6 @@
   .hab-min:focus { border-color: #b9c0cc; }
 
   .hab-iniciar { margin-top: 16px; }
-  .habito-block .meta-field:has(.hab-dur), .habito-block .hab-iniciar { display: none; }
   .hab-progresso { margin-top: 6px; padding-top: 18px; border-top: 1px solid var(--bd); }
   .hab-stats { display: flex; gap: 10px; margin-bottom: 14px; }
   .hab-stat { flex: 1; text-align: center; background: #fff; border: 1px solid var(--bd); border-radius: 20px; padding: 12px 6px; }
@@ -305,13 +321,12 @@
     color: var(--tx); font-weight: 600; font-size: 14.5px;
   }
   .hab-acoes { position: relative; display: flex; gap: 2px; padding: 4px; margin-top: 14px; background: var(--seg); border-radius: 999px; }
+  .habito-block .meta-field:has(.hab-dur), .habito-block .hab-iniciar { display: none; }
   .hab-pick-ov { position: fixed; inset: 0; z-index: 99985; background: rgba(15,27,45,.45); display: flex; align-items: center; justify-content: center; touch-action: none; -webkit-user-select: none; user-select: none; }
   .hab-pick-card { display: flex; align-items: center; justify-content: center; gap: 18px; padding: 22px 30px; border-radius: 999px; background: #fff; box-shadow: 0 18px 48px rgba(15,27,45,.35); }
   .hab-pick-card .pl { min-width: 44px; font-weight: 700; font-size: 15px; letter-spacing: .08em; color: var(--tx3); transition: color .2s; }
   .hab-pick-card .pl.fz { text-align: right; }
   .hab-pick-card.f .pl.fz, .hab-pick-card.n .pl.nz { color: var(--dark); }
-  .psw { position: relative; width: 84px; height: 46px; border-radius: 999px; background: var(--seg); flex-shrink: 0; transition: background .2s; }
-  .psw i { position: absolute; top: 4px; left: 4px; width: 38px; height: 38px; border-radius: 50%; background: #fff; box-shadow: 0 1px 4px rgba(15,27,45,.3); transform: translateX(19px); transition: transform .22s cubic-bezier(.3,.8,.3,1); }
   .hab-pick-card.f .psw { background: var(--gold); }
   .hab-pick-card.f .psw i { transform: translateX(0); }
   .hab-pick-card.n .psw { background: #aab3c2; }
@@ -384,10 +399,13 @@
   }
   .mind-connector { width: 2px; height: 14px; background: var(--dark); }
 
+  /* primeira tela: só os 3 primeiros blocos; o resto só aparece ao rolar */
+  .tela1 { box-sizing: border-box; padding-bottom: 60px; min-height: calc(100vh - 40px); min-height: calc(100svh - 40px); }
+  .tela1-linha { height: 1px; background: var(--bd); margin-bottom: 44px; }
   .planes-table { width: 100%; border-collapse: separate; border-spacing: 0; margin: 16px 0; background: #fff; border: 1px solid var(--bd); border-radius: 22px; overflow: hidden; }
   .planes-table td { padding: 14px 18px; font-size: 14.5px; border-bottom: 1px solid var(--bd); }
   .planes-table tr:last-child td { border-bottom: none; }
-  .planes-table td:first-child { font-family: var(--f-title); font-weight: 600; font-size: 16px; background: var(--chip); width: 42%; color: var(--tx); }
+  .planes-table td:first-child { font-family: var(--f-title); font-weight: 600; font-size: 16px; background: var(--chip); width: 42%; color: var(--tx); text-transform: uppercase; }
   .planes-table td:last-child { color: #4b5563; }
 
   /* ── Ciclo ── */
@@ -412,6 +430,11 @@
   .cycle-arrow .ic { width: 18px; height: 18px; transform: rotate(90deg); stroke-width: 2.2; margin-bottom: 0; opacity: .95; }
 
   .final { text-align: center; line-height: 1.2; padding: 0; font-family: var(--f-title); font-size: clamp(1.19rem, 5.6vw, 1.54rem); font-weight: 600; letter-spacing: .03em; color: var(--gold-deep); white-space: nowrap; }
+  .section.sec-final { padding-top: 20px; padding-bottom: calc(32px + env(safe-area-inset-bottom)); }
+  .section.sec-final::before { margin-bottom: 32px; }
+
+  footer { background: var(--dark); color: #9aa6b8; text-align: center; padding: 28px 20px calc(28px + env(safe-area-inset-bottom)); font-size: 13px; font-weight: 500; }
+  footer span { color: var(--gold); font-weight: 600; }
 
   /* ── Menu ── */
   .menu-btn {
@@ -456,8 +479,6 @@
   @media (max-width: 768px) { #__btn-voltar { display: none !important; } }
 
   @media (max-width: 480px) { .section { padding-top: 40px; } }
-  .section.sec-final { padding-top: 20px; padding-bottom: calc(32px + env(safe-area-inset-bottom)); }
-  .section.sec-final::before { margin-bottom: 32px; }
   @media (prefers-reduced-motion: reduce) { * { transition-duration: .01ms !important; animation-duration: .01ms !important; scroll-behavior: auto !important; } }
 
   /* ── Hábitos: bloco um pouco menor (só tamanhos) ── */
@@ -517,6 +538,8 @@
   .act-btn:active { background: var(--chip); }
   .act-btn.pri { background: var(--dark); border-color: var(--dark); color: #fff; }
   .act-btn.del { color: #dc2626; border-color: #fbd0d0; }
+  .cycle-mh { margin-top: 36px; }
+  .cycle-cell { display: flex; flex-wrap: nowrap; justify-content: center; gap: 2px; padding: 5px; margin: 12px 0; max-width: 100%; box-sizing: border-box; align-self: center; background: var(--dark2); border: 1px solid var(--gold); border-radius: 999px; filter: drop-shadow(0 6px 14px rgba(0,0,0,.4)); animation: cicloEntra .22s ease; }
   .act-icons { display: flex; justify-content: center; gap: 14px; padding: 6px 0; }
   .act-ic { width: 56px; height: 56px; border-radius: 50%; border: 1px solid var(--bd-in); background: #fff; color: var(--tx); display: flex; align-items: center; justify-content: center; padding: 0; cursor: pointer; }
   .act-ic svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
@@ -594,8 +617,11 @@
   .cycle-filhos { margin-left: 22px; padding-left: 14px; border-left: 2px solid rgba(224,181,74,.4); display: flex; flex-direction: column; align-items: stretch; }
   .cycle-compl { position: relative; background: var(--dark2); font-family: var(--f-title); font-size: 16px; letter-spacing: .01em; transition: background .2s, color .2s; }
   .cycle-compl .ic { position: absolute; right: 16px; top: 50%; width: 18px; height: 18px; margin-top: -9px; stroke-width: 2; transform: rotate(90deg); transition: transform .25s; }
-  .cycle-compl.aberto { background: var(--gold); color: var(--dark); }
+  .cycle-compl, .cycle-compl.aberto { background: var(--gold); color: var(--dark); }
   .cycle-compl.aberto .ic { transform: rotate(-90deg); }
+  .cycle-chain { margin-left: -12px; }
+  .cycle-chain > .cycle-compl:not(.aberto) { margin-left: 28px; }
+  .cycle-chain > .cycle-compl.aberto { margin-left: 38px; }
   .cycle-chain.anima .cycle-sub > .cycle-item, .cycle-chain.anima .cycle-sub > .cycle-arrow { animation: cicloEntra .28s ease; }
   @keyframes cicloEntra { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; } }
 
@@ -645,6 +671,19 @@
   }
   .question-card > .q-tit:empty::before { content: 'Título'; color: var(--tx3); }
   .question-card[data-sem-num] .q-number { display: none; }
+  /* perguntas recolhidas: o texto fica dentro do número; uma linha em zigue-zague sai do número e aponta para o campo */
+  .question-card:not(.q-aberto):not([data-sem-num]) { position: relative; }
+  .question-card:not(.q-aberto):not([data-sem-num]) .q-text { display: none; }
+  .question-card:not(.q-aberto):not([data-sem-num]) .hint-btn { margin-left: auto; }
+  .question-card:not(.q-aberto):not([data-sem-num]) .question-header { padding-bottom: 10px; }
+  .q-seta .ln { stroke-dasharray: 1; }
+  .q-seta.anima .ln { stroke-dashoffset: 1; animation: qDraw .6s ease-out forwards; }
+  .q-seta.anima .pt { opacity: 0; animation: qPt .2s ease-out .5s forwards; }
+  @keyframes qDraw { to { stroke-dashoffset: 0; } }
+  @keyframes qPt { to { opacity: 1; } }
+  .q-seta { position: absolute; left: 0; top: 0; width: 100%; height: 100%; pointer-events: none; overflow: visible; }
+  .question-card.q-aberto > .q-seta, .question-card[data-sem-num] > .q-seta, .question-card:has(.hint-panel.open) > .q-seta { display: none; }
+  .q-number { cursor: pointer; }
 
   /* ── Editor de texto em tela cheia ── */
   .ed-ov { position: fixed; inset: 0; z-index: 100010; background: var(--bg); overflow: hidden; }
@@ -697,6 +736,53 @@
   .ck[data-s="1"] { background: var(--dark); border-color: var(--dark); }
   .ck[data-s="1"]::after { content: ''; position: absolute; left: 5.5px; top: 2px; width: 5px; height: 9px; border: solid #fff; border-width: 0 2px 2px 0; transform: rotate(45deg); }
   .neg-view em { font-style: italic; }
+
+  /* ── Mapa mental do Ciclo (terceira visão do Complemento) ── */
+  .rcm-wrap { position: relative; margin-top: 24px; overflow: hidden; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+  .rcm-world { position: absolute; left: 0; top: 0; transform-origin: 0 0; }
+  .rcm-links { position: absolute; left: 0; top: 0; width: 1px; height: 1px; overflow: visible; pointer-events: none; }
+  .rcm-node {
+    position: absolute; display: flex; align-items: center; gap: 8px; height: 31px; padding: 0 12px;
+    background: var(--dark2); border: 1px solid var(--gold); border-radius: 999px;
+    font-size: 12px; font-weight: 600; line-height: 1; white-space: nowrap; color: #fff; cursor: pointer; transition: background .15s;
+  }
+  .rcm-node.sel { background: rgba(224,181,74,.18); }
+  .rcm-wrap.zig { animation: cicloEntra .3s ease; }
+  .rcm-wrap.zig .rcm-node { overflow: hidden; height: 44px; padding: 0 16px; gap: 10px; font-size: 14.5px; }
+  .rcm-wrap.zig .rcm-node.root { height: 44px; padding: 0 22px; font-size: 16px; }
+  .rcm-wrap.zig .rcm-node span { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+  .rcm-wrap.zig .rcm-node.sel { background: linear-gradient(rgba(224,181,74,.18), rgba(224,181,74,.18)), var(--dark2); }
+  .rcm-wrap.zig .rcm-node.root { background: var(--gold); }
+  .rcm-wrap.zig .rcm-node.root.sel { background: var(--gold); }
+  .rcm-wrap.zig.aberto .rcm-node.root { background: var(--dark2); color: #fff; font-size: 14.5px; padding: 0 16px; font-weight: 600; font-family: inherit; }
+  .rcm-wrap.zig.aberto .rcm-node.root.sel { background: linear-gradient(rgba(224,181,74,.18), rgba(224,181,74,.18)), var(--dark2); }
+  .rcm-wrap.zig { overflow: visible; }
+  .rcm-wrap.cont { margin-top: 0; overflow: visible; }
+  .rcm-node i { width: 8px; height: 8px; border-radius: 50%; background: var(--gold); flex: none; box-sizing: border-box; }
+  .rcm-node i.oco { background: transparent; border: 2px solid var(--gold); }
+  .rcm-node.root { height: 38px; padding: 0 18px; background: var(--gold); border-color: var(--gold); color: var(--dark); font-family: var(--f-title); font-size: 13px; }
+  .rcm-node.root.sel { background: var(--gold); }
+  .rcm-bar { position: absolute; z-index: 5; display: flex; justify-content: center; margin: 0; left: 0; top: 0; filter: drop-shadow(0 6px 14px rgba(0,0,0,.4)); }
+  .rcm-bar[hidden] { display: none; }
+  .rcm-pill { display: flex; gap: 2px; padding: 5px; background: var(--dark2); border: 1px solid var(--gold); border-radius: 999px; }
+  .rcm-ib { width: 42px; height: 42px; border: 0; border-radius: 50%; background: transparent; display: grid; place-items: center; cursor: pointer; color: var(--gold); padding: 0; }
+  .rcm-ib:active { background: rgba(224,181,74,.16); }
+  .rcm-ib:disabled { opacity: .3; pointer-events: none; }
+  .rcm-ib svg { width: 20px; height: 20px; stroke: currentColor; stroke-width: 1.7; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+  .rcm-scrim { position: fixed; inset: 0; z-index: 1000004; background: rgba(15,27,45,.35); opacity: 0; visibility: hidden; transition: opacity .2s, visibility .2s; }
+  .rcm-scrim.on { opacity: 1; visibility: visible; }
+  .rcm-sheet {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 1000005; max-width: 520px; margin: 0 auto;
+    padding: 22px 20px calc(22px + env(safe-area-inset-bottom)); background: #fff; border-radius: 26px 26px 0 0;
+    display: flex; flex-direction: column; gap: 14px; transform: translateY(110%); visibility: hidden; transition: transform .25s ease, visibility .25s;
+  }
+  .rcm-sheet.on { transform: none; visibility: visible; }
+  .rcm-field { display: flex; align-items: center; gap: 10px; height: 52px; padding: 0 18px; border: 1px solid var(--bd-in); border-radius: 999px; background: #fff; transition: border-color .15s; }
+  .rcm-field:focus-within { border-color: #a8adb8; }
+  .rcm-field svg { width: 18px; height: 18px; stroke: var(--tx3); stroke-width: 1.7; fill: none; stroke-linecap: round; flex: none; }
+  .rcm-field input { flex: 1; min-width: 0; height: 100%; border: 0; outline: 0; background: transparent; font: inherit; font-size: 16px; font-weight: 600; color: var(--tx); -webkit-user-select: text; user-select: text; -webkit-appearance: none; appearance: none; }
+  .rcm-row { display: flex; gap: 10px; }
+  .rcm-row .act-btn { flex: 1; }
 </style>
 </head>
 <body>
@@ -722,59 +808,14 @@
   </defs>
 </svg>
 <div id="tip" aria-hidden="true"></div>
-<button type="button" class="menu-btn" id="menuBtn" aria-label="Menu" data-tip="Menu" onclick="toggleMenu()"><span></span><span></span><span></span></button>
-<div class="menu-overlay" id="menuOverlay" hidden onclick="fecharMenu()"></div>
-<nav class="menu-panel" id="menuPanel" hidden>
-  <button type="button" class="menu-item" onclick="irPara('intro')">O ponto de partida</button>
-  <button type="button" class="menu-item" onclick="irPara('mente')">Como funciona sua mente</button>
-  <button type="button" class="menu-item" onclick="irPara('dinheiro')">Eu e o dinheiro</button>
-  <button type="button" class="menu-item" onclick="irPara('imagem')">O criador de imagens</button>
-  <button type="button" class="menu-item" onclick="irPara('vibracao')">Vibração e atração</button>
-  <button type="button" class="menu-item" onclick="irPara('risco')">Os tomadores de risco</button>
-  <button type="button" class="menu-item" onclick="irPara('vacuo')">A lei do vácuo</button>
-  <button type="button" class="menu-item" onclick="irPara('habitos')">Criação de hábitos</button>
-</nav>
-
-<!-- COVER -->
-<div class="cover" id="topo">
-  <p class="cover-ornament">Proctor Gallagher Institute</p>
-  <h1>I Was<br><span>Born Rich</span></h1>
-  <div class="cover-line"></div>
-  <p class="cover-sub">Caderno de Atividades — Bob Proctor</p>
-</div>
-
-<!-- ══════════════════════════════════════════ -->
-<!-- INTRODUÇÃO -->
-<!-- ══════════════════════════════════════════ -->
-<div class="section" id="intro">
-  <h2 class="section-title">O Ponto de Partida</h2>
-
-  <p class="section-text">Toda mudança real começa por dentro. Antes de ter mais, você precisa <strong>pensar diferente</strong>.</p>
-
-  <div class="quote-block">
-    <p>"A educação não significa ensinar às pessoas o que elas não sabem. Significa ensiná-las a se comportar como não se comportam."</p>
-    <cite>— John Ruskin</cite>
-  </div>
-
-  <p class="section-text">Este programa parte de uma premissa: você possui recursos ricos dormentes dentro de si, esperando para serem desenvolvidos. Cada exercício é direcionado a alterar sua <strong>mente condicionada</strong> — que controla seu estado material.</p>
-
-  <div class="concept-box">
-    <h4>Premissa Central</h4>
-    <p>A riqueza material é um estado normal e natural para você viver. Falta e limitação só existem quando abrimos espaço para elas em nossa mente. A consciência de prosperidade não conhece falta nem limitação.</p>
-  </div>
-</div>
-
 <!-- ══════════════════════════════════════════ -->
 <!-- A MENTE -->
 <!-- ══════════════════════════════════════════ -->
 <div class="section" id="mente">
-  <h2 class="section-title">Como Funciona Sua Mente</h2>
-
-  <p class="section-text">Você vive simultaneamente em três planos distintos de ser:</p>
-
+  <div class="tela1">
   <table class="planes-table">
     <tr><td>Espiritual</td><td>Pensamento</td></tr>
-    <tr><td>Intelectual</td><td>Ideias</td></tr>
+    <tr><td>Intelecto</td><td>Ideias</td></tr>
     <tr><td>Físico</td><td>Resultado</td></tr>
   </table>
 
@@ -790,23 +831,92 @@
     </div>
   </div>
 
-  <div class="concept-box branco">
-    <h4>Mente Consciente — Pensante</h4>
-    <p>A mente consciente é a parte do eu responsável pelos pensamentos, razão e decisões conscientes, pelas ideias, pelos pensamentos passados e futuros, e é a parte que tem o poder de mudar o que está no subconsciente, para que assim mudemos os nossos resultados, pois eles dependem do que está dentro do subconsciente.</p>
+  <div class="quote-block">
+    <p>"Agimos, nos comportamos e sentimos de acordo com o que consideramos ser nossa AUTO-IMAGEM e não nos desviamos desse padrão, por mais que tentemos."</p>
+    <cite>— Dr. Maxwell Maltz</cite>
+  </div>
+  </div>
+  <div class="tela1-linha"></div>
+
+  <div class="question-card" data-qid="q_satisfacao">
+    <div class="question-header">
+      <span class="q-number">1</span>
+      <span class="q-text">Você está satisfeito com os resultados que experimenta na sua vida atualmente?</span>
+      <button type="button" class="hint-btn" onclick="toggleHint(this)" aria-label="Dica" data-tip="Dica"><svg class="ic" aria-hidden="true"><use href="#i-info"/></svg></button>
+    </div>
+    <div class="hint-panel">
+      Os resultados de hoje são a manifestação física das imagens que seu subconsciente sustentou no passado.
+    </div>
+    <div class="choice-row">
+      <label class="choice-label" onclick="selectChoice(this, 'qimg2')"><input type="radio" name="qimg2">ESTOU SATISFEITO</label>
+      <label class="choice-label" onclick="selectChoice(this, 'qimg2')"><input type="radio" name="qimg2">NÃO SATISFEITO</label>
+      <label class="choice-label" onclick="selectChoice(this, 'qimg2')"><input type="radio" name="qimg2">POUCO SATISFEITO</label>
+    </div>
   </div>
 
-  <div class="concept-box branco">
-    <h4>Subconsciente — Controle</h4>
-    <p>O subconsciente é onde moram os nossos hábitos, crenças, valores, princípios, desejos bons e ruins, expectativa e condicionamento. É lá que ficam os hábitos, os desejos e os valores que movem suas ações todos os dias. Essa é a parte onde mora o nosso caráter, é responsável pelos resultados que temos em nossas vidas, sejam bons ou ruins, e ela também influencia o que pensamos em nossa mente consciente.</p>
+  <div class="question-card dynamic-list" data-qid="q_resultados_mudar">
+    <div class="question-header">
+      <span class="q-number">2</span>
+      <span class="q-text">Liste os resultados que você quer mudar na sua vida:</span>
+      <button type="button" class="hint-btn" onclick="toggleHint(this)" aria-label="Dica" data-tip="Dica"><svg class="ic" aria-hidden="true"><use href="#i-info"/></svg></button>
+    </div>
+    <div class="hint-panel">
+      Pense em todas as áreas: financeira, relacionamentos, saúde, carreira, liberdade. Seja específico.
+    </div>
+    <div class="list-fields">
+      <div class="list-field-row multi"><span class="list-num">1</span><textarea class="list-ta" rows="1" oninput="autoGrow(this);agendarSalvamento(this)"></textarea></div>
+      <div class="list-field-row multi"><span class="list-num">2</span><textarea class="list-ta" rows="1" oninput="autoGrow(this);agendarSalvamento(this)"></textarea></div>
+      <div class="list-field-row multi"><span class="list-num">3</span><textarea class="list-ta" rows="1" oninput="autoGrow(this);agendarSalvamento(this)"></textarea></div>
+      <button type="button" class="add-row-btn" onclick="addRow(this)"><svg class="ic" aria-hidden="true"><use href="#i-plus"/></svg>Adiciona</button>
+    </div>
   </div>
 
-  <div class="concept-box branco">
-    <h4>Corpo — O Instrumento da Mente</h4>
-    <p>É a apresentação física de você. Pensamentos e imagens escolhidos conscientemente, impressos no subconsciente, devem mover seu corpo para a ação. Ações determinam resultados.</p>
+  <div class="question-card" data-qid="q_visualizar">
+    <div class="question-header">
+      <span class="q-number">3</span>
+      <span class="q-text">Visualize a pessoa que você quer ser:</span>
+    </div>
+    <div class="answer-area">
+      <label class="fld area"><textarea class="auto-grow" rows="1" aria-label="Resposta" oninput="updateChar(this);agendarSalvamento(this)"></textarea></label>
+    </div>
+  </div>
+
+  <div class="question-card" data-qid="q_descricao_futura">
+    <div class="question-header">
+      <span class="q-number">4</span>
+      <span class="q-text">Faça uma descrição da pessoa que você quer ser:</span>
+      <button type="button" class="hint-btn" onclick="toggleHint(this)" aria-label="Dica" data-tip="Dica"><svg class="ic" aria-hidden="true"><use href="#i-info"/></svg></button>
+    </div>
+    <div class="hint-panel">
+      Escreva no presente, como se já fosse verdade. "Eu sou uma pessoa que..." Seja corajoso e detalhado.
+    </div>
+    <div class="answer-area">
+      <label class="fld area"><textarea class="auto-grow" rows="1" aria-label="Resposta" oninput="updateChar(this);agendarSalvamento(this)"></textarea></label>
+    </div>
+  </div>
+
+  <div class="question-card" data-qid="q_visualizar_desejo">
+    <div class="question-header">
+      <span class="q-number">5</span>
+      <span class="q-text">Visualize o que você deseja:</span>
+    </div>
+    <div class="answer-area">
+      <label class="fld area"><textarea class="auto-grow" rows="1" aria-label="Resposta" oninput="updateChar(this);agendarSalvamento(this)"></textarea></label>
+    </div>
+  </div>
+
+  <div class="question-card" data-qid="q_descricao_ter">
+    <div class="question-header">
+      <span class="q-number">6</span>
+      <span class="q-text">Faça uma descrição do que você deseja:</span>
+    </div>
+    <div class="answer-area">
+      <label class="fld area"><textarea class="auto-grow" rows="1" aria-label="Resposta" oninput="updateChar(this);agendarSalvamento(this)"></textarea></label>
+    </div>
   </div>
 
   <div class="cycle-block">
-    <h4>O Ciclo Vencedor</h4>
+    <h4>O CICLO VENCEDOR</h4>
     <div class="cycle-chain" id="ciclo-lista"></div>
   </div>
 
@@ -816,9 +926,10 @@
 <!-- EU E O DINHEIRO -->
 <!-- ══════════════════════════════════════════ -->
 <div class="section" id="dinheiro">
-  <h2 class="section-title">Eu e o Dinheiro</h2>
-
-  <p class="section-text">Você deve começar a ver o dinheiro como um <strong>servo obediente e diligente</strong> que você pode empregar para ganhar mais dinheiro. Sinta-se confortável ao falar sobre dinheiro — você verdadeiramente nasceu rico.</p>
+  <div class="quote-block">
+    <p>"Pensamentos se tornam coisas. Se você vê na sua mente, você segura nas suas mãos."</p>
+    <cite>— Bob Proctor</cite>
+  </div>
 
   <div class="question-card" data-qid="q_renda_mensal">
     <div class="question-header">
@@ -970,119 +1081,16 @@
 </div>
 
 <!-- ══════════════════════════════════════════ -->
-<!-- O CRIADOR DE IMAGENS -->
-<!-- ══════════════════════════════════════════ -->
-<div class="section" id="imagem">
-  <h2 class="section-title">O Criador de Imagens</h2>
-
-  <p class="section-text">Você nunca vai ir além da imagem que carrega de si. <strong>Mude a imagem</strong> e o resultado muda junto.</p>
-
-  <div class="quote-block">
-    <p>"Agimos, nos comportamos e sentimos de acordo com o que consideramos ser nossa AUTO-IMAGEM e não nos desviamos desse padrão."</p>
-    <cite>— Dr. Maxwell Maltz</cite>
-  </div>
-
-  <p class="section-text">O conhecimento da criação de imagens elimina a competição da sua vida, movendo você do plano competitivo para o plano criativo.</p>
-
-  <div class="question-card" data-qid="q_satisfacao">
-    <div class="question-header">
-      <span class="q-number">1</span>
-      <span class="q-text">Você está satisfeito com os resultados que experimenta na sua vida atualmente?</span>
-      <button type="button" class="hint-btn" onclick="toggleHint(this)" aria-label="Dica" data-tip="Dica"><svg class="ic" aria-hidden="true"><use href="#i-info"/></svg></button>
-    </div>
-    <div class="hint-panel">
-      Os resultados de hoje são a manifestação física das imagens que seu subconsciente sustentou no passado.
-    </div>
-    <div class="choice-row">
-      <label class="choice-label" onclick="selectChoice(this, 'qimg2')"><input type="radio" name="qimg2">Sim, estou satisfeito</label>
-      <label class="choice-label" onclick="selectChoice(this, 'qimg2')"><input type="radio" name="qimg2">Não, quero mudar</label>
-      <label class="choice-label" onclick="selectChoice(this, 'qimg2')"><input type="radio" name="qimg2">Em algumas áreas</label>
-    </div>
-  </div>
-
-  <div class="question-card dynamic-list" data-qid="q_resultados_mudar">
-    <div class="question-header">
-      <span class="q-number">2</span>
-      <span class="q-text">Liste os resultados que você quer mudar na sua vida:</span>
-      <button type="button" class="hint-btn" onclick="toggleHint(this)" aria-label="Dica" data-tip="Dica"><svg class="ic" aria-hidden="true"><use href="#i-info"/></svg></button>
-    </div>
-    <div class="hint-panel">
-      Pense em todas as áreas: financeira, relacionamentos, saúde, carreira, liberdade. Seja específico.
-    </div>
-    <div class="list-fields">
-      <div class="list-field-row multi"><span class="list-num">1</span><textarea class="list-ta" rows="1" oninput="autoGrow(this);agendarSalvamento(this)"></textarea></div>
-      <div class="list-field-row multi"><span class="list-num">2</span><textarea class="list-ta" rows="1" oninput="autoGrow(this);agendarSalvamento(this)"></textarea></div>
-      <div class="list-field-row multi"><span class="list-num">3</span><textarea class="list-ta" rows="1" oninput="autoGrow(this);agendarSalvamento(this)"></textarea></div>
-      <button type="button" class="add-row-btn" onclick="addRow(this)"><svg class="ic" aria-hidden="true"><use href="#i-plus"/></svg>Adiciona</button>
-    </div>
-  </div>
-
-  <div class="question-card" data-qid="q_descricao_futura">
-    <div class="question-header">
-      <span class="q-number">3</span>
-      <span class="q-text">Faça uma descrição escrita da pessoa que você está prestes a se tornar:</span>
-      <button type="button" class="hint-btn" onclick="toggleHint(this)" aria-label="Dica" data-tip="Dica"><svg class="ic" aria-hidden="true"><use href="#i-info"/></svg></button>
-    </div>
-    <div class="hint-panel">
-      Escreva no presente, como se já fosse verdade. "Eu sou uma pessoa que..." Seja corajoso e detalhado.
-    </div>
-    <div class="answer-area">
-      <label class="fld area"><textarea class="auto-grow" rows="1" aria-label="Resposta" oninput="updateChar(this);agendarSalvamento(this)"></textarea></label>
-    </div>
-  </div>
-</div>
-
-<!-- ══════════════════════════════════════════ -->
-<!-- LEI DA VIBRAÇÃO -->
-<!-- ══════════════════════════════════════════ -->
-<div class="section" id="vibracao">
-  <h2 class="section-title">A Lei da Vibração e Atração</h2>
-
-  <p class="section-text">Tudo vibra, nada repousa. O pensamento é uma das formas mais elevadas de vibração. Você atrai para sua vida aquilo com o qual está em vibração harmoniosa.</p>
-
-  <div class="concept-box">
-    <h4>Colheita Proporcional</h4>
-    <p>Cada atitude que você repete no dia a dia cria um caminho. Com o tempo, o que você semeia volta para você em forma de resultado, na mesma medida em que foi plantado.</p>
-  </div>
-</div>
-
-<!-- ══════════════════════════════════════════ -->
 <!-- OS TOMADORES DE RISCO -->
 <!-- ══════════════════════════════════════════ -->
 <div class="section" id="risco">
-  <h2 class="section-title">Os Tomadores de Risco</h2>
-
   <div class="quote-block">
-    <p>"Você perde 100% das chances que não aproveita."</p>
-    <cite>— Wayne Gretzky</cite>
-  </div>
-
-  <div class="como-funciona">
-    <p class="cf-intro">Cada objetivo é montado em três partes: <strong>o que você quer</strong>, <strong>por que quer</strong> e <strong>o que vai fazer</strong>. Quanto mais claro cada passo, mais rápido o objetivo deixa de ser sonho e vira <strong>plano</strong>.</p>
-    <div class="cf-step"><span class="cf-n">1</span><p><strong>Objetivo.</strong> Escreva o resultado que você quer alcançar, de forma específica e como se já fosse seu.</p></div>
-    <div class="cf-step"><span class="cf-n">2</span><p><strong>Por quê.</strong> O motivo é a sua força. Escreva o que você ganha e sente ao conquistar. É ele que sustenta você quando der vontade de desistir.</p></div>
-    <div class="cf-step"><span class="cf-n">3</span><p><strong>Ações.</strong> Liste os passos concretos que você vai dar, começando pelo que pode fazer ainda esta semana.</p></div>
-    <div class="cf-fim"><button type="button" class="btn-main" onclick="addMeta()"><span class="plus"><svg class="ic" aria-hidden="true"><use href="#i-plus"/></svg></span>Novo objetivo</button></div>
+    <p>"Quem não tem coragem de assumir riscos não realizará nada na vida."</p>
+    <cite>— Muhammad Ali</cite>
   </div>
 
   <div id="metas" class="metas">
     <div id="meta-lista"></div>
-  </div>
-
-  <div class="question-card dynamic-list" data-qid="q_riscos">
-    <div class="question-header">
-      <span class="q-text">Liste os riscos que você deve assumido</span>
-      <button type="button" class="hint-btn" onclick="toggleHint(this)" aria-label="Dica" data-tip="Dica"><svg class="ic" aria-hidden="true"><use href="#i-info"/></svg></button>
-    </div>
-    <div class="hint-panel">
-      Liste as coisas específicas que você tem evitado: investir dinheiro, iniciar um negócio, mudar de carreira, aprender nova habilidade.
-    </div>
-    <div class="list-fields">
-      <div class="list-field-row multi"><span class="list-num">1</span><textarea class="list-ta" rows="1" oninput="autoGrow(this);agendarSalvamento(this)"></textarea></div>
-      <div class="list-field-row multi"><span class="list-num">2</span><textarea class="list-ta" rows="1" oninput="autoGrow(this);agendarSalvamento(this)"></textarea></div>
-      <div class="list-field-row multi"><span class="list-num">3</span><textarea class="list-ta" rows="1" oninput="autoGrow(this);agendarSalvamento(this)"></textarea></div>
-      <button type="button" class="add-row-btn" onclick="addRow(this)"><svg class="ic" aria-hidden="true"><use href="#i-plus"/></svg>Adiciona</button>
-    </div>
   </div>
 </div>
 
@@ -1090,21 +1098,9 @@
 <!-- LEI DO VÁCUO -->
 <!-- ══════════════════════════════════════════ -->
 <div class="section" id="vacuo">
-  <h2 class="section-title">A Lei do Vácuo</h2>
-
-  <p class="section-text">O novo só chega onde existe espaço. <strong>Solte o que pesa</strong> e a prosperidade ocupa o lugar.</p>
-
   <div class="quote-block">
     <p>"O elemento crucial desta lei do vácuo da prosperidade é que você deve soltar o velho antes de criar espaço para o novo."</p>
     <cite>— Bob Proctor</cite>
-  </div>
-
-  <div class="como-funciona">
-    <p class="cf-intro">Escolha uma <strong>área da sua vida</strong> e troque, nela, o que te limita pelo que te expande. Faça isso uma área de cada vez.</p>
-    <div class="cf-step"><span class="cf-n">1</span><p><strong>Área.</strong> Escreva o nome da área que você quer trabalhar, como financeira, familiar ou saúde.</p></div>
-    <div class="cf-step"><span class="cf-n">2</span><p><strong>Crenças limitantes.</strong> Liste o que você acredita hoje e que trava essa área. Identificar a crença é o primeiro passo para soltá-la.</p></div>
-    <div class="cf-step"><span class="cf-n">3</span><p><strong>Novas crenças.</strong> Para cada crença limitante, escreva a crença nova que vai ocupar o lugar dela.</p></div>
-    <div class="cf-fim"><button type="button" class="btn-main" onclick="addArea()"><span class="plus"><svg class="ic" aria-hidden="true"><use href="#i-plus"/></svg></span>Nova área</button></div>
   </div>
 
   <div id="areas" class="metas">
@@ -1116,20 +1112,9 @@
 <!-- CRIAÇÃO DE HÁBITOS -->
 <!-- ══════════════════════════════════════════ -->
 <div class="section" id="habitos">
-  <h2 class="section-title">Criação de Hábitos</h2>
-
   <div class="quote-block">
-    <p>"Somos aquilo que fazemos repetidamente. A excelência, então, não é um ato, mas um hábito."</p>
+    <p>"Somos aquilo que fazemos repetidamente. A excelência, então, não é um ato, mas um hábito criado com repetição."</p>
     <cite>— Will Durant</cite>
-  </div>
-
-  <div class="como-funciona">
-    <p class="cf-intro">Um hábito forte começa <strong>claro</strong>: o que você vai fazer, onde e a que horas. Depois, o que conta é a <strong>constância</strong>.</p>
-    <div class="cf-step"><span class="cf-n">1</span><p><strong>Hábito.</strong> Escreva uma ação pequena e específica, que você consiga repetir todos os dias.</p></div>
-    <div class="cf-step"><span class="cf-n">2</span><p><strong>Local e horário.</strong> Defina onde vai fazer e em qual intervalo de horas, por exemplo das 15:40 às 16:40.</p></div>
-    <div class="cf-step"><span class="cf-n">3</span><p><strong>Duração e check.</strong> Defina quantos minutos por dia. Toque em <strong>Inicia</strong> para cronometrar: ao terminar, o alarme toca. Com o app <strong>ntfy</strong>, o aviso chega no celular mesmo com a tela bloqueada. Depois, <strong>você</strong> marca se <strong>fez</strong> ou <strong>não fez</strong> o dia. Cada marca vira um número: dourado se fez, cinza se não fez.</p></div>
-    <div class="cf-step"><span class="cf-n">4</span><p><strong>Regra dos dois dias.</strong> Um dia sem cumprir não quebra nada. Marcar <strong>dois dias seguidos</strong> como não feitos reinicia a sequência.</p></div>
-    <div class="cf-fim"><button type="button" class="btn-main" onclick="addHabito()"><span class="plus"><svg class="ic" aria-hidden="true"><use href="#i-plus"/></svg></span>Novo hábito</button></div>
   </div>
 
   <div id="habitos-box" class="metas">
@@ -1581,7 +1566,7 @@ window.saveAnswer = window.saveAnswer || function(){};
     return '<div class="meta-head"><span class="meta-badge">' + n + '</span></div>' +
       campo('target', 'Objetivo', 'meta-obj') +
       campo('bulb', 'Por quê', 'meta-why') +
-      '<div class="meta-field"><span class="chip">Ações</span><div class="list-fields">' + linhas +
+      '<div class="meta-field"><span class="chip">Atividade</span><div class="list-fields">' + linhas +
       '<button type="button" class="add-row-btn" onclick="addRow(this)">' + ic('plus') + 'Adiciona</button></div></div>';
   }
 
@@ -1684,7 +1669,7 @@ window.saveAnswer = window.saveAnswer || function(){};
     var campo = '<label class="fld">' + ic('layers') + '<textarea class="meta-ta area-nome" rows="1" placeholder="Área" aria-label="Área" ' + ev + '></textarea></label>';
     return '<div class="meta-head"><span class="meta-badge">' + n + '</span></div>' +
       '<div class="meta-field">' + campo + '</div>' +
-      lista('Crenças limitantes') + lista('Novas crenças');
+      lista('Limitantes') + lista('Novas');
   }
 
   function addArea(semFoco) {
@@ -2616,8 +2601,11 @@ window.saveAnswer = window.saveAnswer || function(){};
   ];
   var CICLO = JSON.parse(JSON.stringify(CICLO_PADRAO));
   var _etapa = -1;
+  var _alvo = null;
 
   var _soCompl = false;
+  var _mapa = false;
+  var _zig = false;
   function cicloFimGrupo(k) {
     var f = k;
     while (CICLO[f + 1] && CICLO[f + 1].g) f++;
@@ -2666,14 +2654,24 @@ window.saveAnswer = window.saveAnswer || function(){};
     var cab = -1;
     CICLO.forEach(function(e, k) { if (cab < 0 && e.h && !e.g) cab = k; });
     if (cab < 0) _soCompl = false;
+    if (!_soCompl) _mapa = false;
+    if (!_mapa) _zig = false;
     if (!_soCompl || _foco < 0 || !CICLO[_foco] || !CICLO[_foco].g) _foco = -1;
     if (cab >= 0) {
       var h = document.createElement('span');
       h.className = 'cycle-item cycle-compl' + (_soCompl ? ' aberto' : '');
       h.dataset.idx = cab;
-      h.innerHTML = '<span class="cycle-t"></span>' + ic('chevron-right');
-      h.firstChild.textContent = CICLO[cab].t || 'Nova etapa';
+      h.innerHTML = '<span class="cycle-t"></span>';
+      h.firstChild.textContent = _zig ? 'PROCESSO' : (_mapa ? 'MAPA MENTAL' : (_soCompl ? 'SUBPASTA' : 'MEU CICLO'));
+      if (_mapa && _soCompl) h.dataset.mapa = '0';
       box.appendChild(h);
+    }
+    if (_mapa && _soCompl && cab >= 0) {
+      var mw = document.createElement('div');
+      box.appendChild(mw);
+      if (window.rcMapa) window.rcMapa.montar(mw, _zig);
+      box.classList.add('so-compl');
+      return;
     }
     var sub = document.createElement('div');
     sub.className = 'cycle-sub' + (_soCompl ? ' so-compl' : '');
@@ -2721,9 +2719,484 @@ window.saveAnswer = window.saveAnswer || function(){};
     box.classList.toggle('so-compl', _soCompl);
   }
 
-  function abrirEtapa(k, editavel) {
-    var e = CICLO[k];
+
+  /* ── Mapa mental do Ciclo (terceira visão do Complemento) ── */
+  function criaMapa(KEY, vazio) {
+    var GY = 10, INDENT = 26;
+    var root = null, selId = null, L = {}, wrap = null, world = null, links = null, bar = null, btnSib = null, btnDel = null, barId = null, mwEl = null, slot = null, zq0 = 0, zPrev = null, zInfo = null, tPrev = null, tPos = 0, tMulti = false, tInfo = null, semRaiz = false, soRaiz = false;
+    var sheet = null, scrim = null, txt = null, delB = null, editId = null, zig = false;
+    function uid() { return 'm' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7); }
+    function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
+    function nd(t, k) { return { id: uid(), text: t, collapsed: false, children: k || [] }; }
+    function limpa(n, isRoot) {
+      if (!n || typeof n !== 'object') return null;
+      var o = {
+        id: isRoot ? 'root' : (typeof n.id === 'string' && n.id ? n.id : uid()),
+        text: typeof n.text === 'string' ? n.text.slice(0, 60) : '',
+        collapsed: !!n.collapsed, children: []
+      };
+      if (Array.isArray(n.children)) n.children.forEach(function(c) { var x = limpa(c, false); if (x) o.children.push(x); });
+      if (Array.isArray(n.i)) {
+        o.i = n.i.map(function(v) { return String(v == null ? '' : v); });
+        o.m = Array.isArray(n.m) ? n.m.map(function(x) { return (x && typeof x === 'object') ? x : {}; }) : [];
+      }
+      return o;
+    }
+    function semente() {
+      var r = nd('Ciclo Vencedor'); r.id = 'root';
+      var comp = null, pilha = [];
+      (CICLO || []).forEach(function(e) {
+        if (!e || !String(e.t || '').trim()) return;
+        if (e.h && !e.g) { comp = nd(e.t); pilha = [comp]; return; }
+        if (e.g) {
+          if (!comp) return;
+          var d = e.d || 1, n = nd(e.t);
+          pilha.length = Math.min(pilha.length, d);
+          (pilha[d - 1] || comp).children.push(n);
+          pilha[d] = n;
+          return;
+        }
+        r.children.push(nd(e.t));
+      });
+      if (comp) r.children.push(comp);
+      return r;
+    }
+    function carrega() {
+      try { var s = localStorage.getItem(KEY); if (s) { var r = limpa(JSON.parse(s), true); if (r) return r; } } catch (e) {}
+      return semente();
+    }
+    function salva() { try { localStorage.setItem(KEY, JSON.stringify(root)); } catch (e) {} }
+    function acha(id, n, p) {
+      n = n || root; p = p || null;
+      if (n.id === id) return { n: n, p: p };
+      for (var i = 0; i < n.children.length; i++) { var r = acha(id, n.children[i], n); if (r) return r; }
+      return null;
+    }
+    function filhos(n) { return n.collapsed ? [] : n.children; }
+
+    function render() {
+      if (!root || !wrap || !wrap.isConnected) return;
+      var velhos = world.querySelectorAll('.rcm-node');
+      for (var i = 0; i < velhos.length; i++) velhos[i].remove();
+      if (selId && !acha(selId)) selId = null;
+      var aw0 = wrap.clientWidth || 280;
+      var BARH = 54;
+      slot = null;
+      if (barId && !acha(barId)) barId = null;
+      L = {};
+      var lista = [];
+      (function anda(n, p) {
+        var el = document.createElement('div');
+        el.className = 'rcm-node' + (n.id === 'root' ? ' root' : '') + (n.id === selId ? ' sel' : '');
+        el.dataset.id = n.id;
+        if (zig) el.style.maxWidth = (aw0 - 2) + 'px';
+        if (n.id !== 'root' && !zig) {
+          var d = document.createElement('i');
+          if (n.collapsed && n.children.length) d.className = 'oco';
+          el.appendChild(d);
+        }
+        var sp = document.createElement('span'); sp.textContent = n.text || 'Ideia'; el.appendChild(sp);
+        var m = L[n.id] = { n: n, p: p, el: el };
+        lista.push(m);
+        filhos(n).forEach(function(c) { anda(c, n); });
+      })(root, null);
+      var frag = document.createDocumentFragment();
+      if (soRaiz) lista = lista.filter(function(m) { return m.n.id === 'root'; });
+      if (semRaiz) lista = lista.filter(function(m) { return m.n.id !== 'root'; });
+      lista.forEach(function(m) { frag.appendChild(m.el); });
+      world.appendChild(frag);
+      lista.forEach(function(m) { m.w = m.el.offsetWidth; m.h = m.n.id === 'root' ? 38 : 31; });
+      if (zig) {
+        /* zigue-zague: cada ideia desce uma linha, alternando esquerda e direita; ligações em curva suave */
+        var zy = 0, ZG = 36;
+        lista.forEach(function(m, q) {
+          m.h = 44;
+          var cx = (q + zq0) % 2 ? aw0 * 0.4 : aw0 * 0.6;
+          m.l = clamp(cx - m.w / 2, 0, Math.max(0, aw0 - m.w));
+          m.cx = m.l + m.w / 2;
+          m.yc = zy + m.h / 2; zy += m.h;
+          if (m.n.id === barId) { slot = { x: m.cx, y: zy + 8 }; zy += 8 + BARH; }
+          zy += ZG;
+          m.el.style.left = m.l + 'px'; m.el.style.top = (m.yc - m.h / 2) + 'px';
+        });
+        var zp = '';
+        for (var z = lista.length - 1; z >= 1; z--) {
+          var zc = lista[z], zm = lista[z - 1];
+          var ax = zm.cx, ay = zm.yc + zm.h / 2, bx = zc.cx, by = zc.yc - zc.h / 2, my = (ay + by) / 2;
+          zp += '<path d="M' + ax + ' ' + ay + ' C' + ax + ' ' + my + ' ' + bx + ' ' + my + ' ' + bx + ' ' + by + '" fill="none" stroke="rgba(224,181,74,.85)" stroke-width="1.3" stroke-linecap="round"/>';
+        }
+        if (zPrev != null && lista.length) {
+          /* liga o último círculo do mapa de cima ao "Ciclo Vencedor" deste mapa */
+          var c0 = lista[0];
+          zp += '<path d="M' + zPrev + ' ' + (-ZG) + ' C' + zPrev + ' ' + (-ZG / 2) + ' ' + c0.cx + ' ' + (-ZG / 2) + ' ' + c0.cx + ' ' + (c0.yc - c0.h / 2) + '" fill="none" stroke="rgba(224,181,74,.85)" stroke-width="1.3" stroke-linecap="round"/>';
+        }
+        zInfo = lista.length ? { n: lista.length, lastCx: lista[lista.length - 1].cx } : null;
+        links.innerHTML = zp;
+        world.style.transform = 'none';
+        wrap.style.height = Math.ceil(Math.max(zy - ZG, 1)) + 'px';
+        posBar();
+        return;
+      }
+      var y = 0, bw = 1, slotW = null;
+      (function pos(n, prof) {
+        var m = L[n.id];
+        if (semRaiz && n.id === 'root') { filhos(n).forEach(function(c) { pos(c, 0); }); return; }
+        m.l = prof * INDENT; m.yc = y + m.h / 2; y += m.h + GY;
+        bw = Math.max(bw, m.l + m.w);
+        if (n.id === barId) { slotW = { l: m.l + INDENT, y: y }; y += BARH + GY; }
+        filhos(n).forEach(function(c) { pos(c, prof + 1); });
+      })(root, 0);
+      var bh = Math.max(y - GY, 1);
+      lista.forEach(function(m) { m.el.style.left = m.l + 'px'; m.el.style.top = (m.yc - m.h / 2) + 'px'; });
+      var paths = '';
+      for (var q = lista.length - 1; q >= 0; q--) {
+        var cm = lista[q]; if (!cm.p) continue;
+        var pm = L[cm.p.id]; if (semRaiz && cm.p.id === 'root') continue;
+        var x1 = pm.l + 16, y1 = pm.yc + pm.h / 2, x2 = cm.l, y2 = cm.yc;
+        var rr = Math.max(0, Math.min(12, y2 - y1, x2 - x1));
+        paths += '<path d="M' + x1 + ' ' + y1 + ' V' + (y2 - rr) + ' Q' + x1 + ' ' + y2 + ' ' + (x1 + rr) + ' ' + y2 + ' H' + x2 + '" fill="none" stroke="rgba(224,181,74,.85)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>';
+      }
+      var aw = wrap.clientWidth || 280;
+      var s = clamp(aw / bw, .4, 1.25);
+      var tx = (aw - bw * s) / 2;
+      var lm = lista[lista.length - 1];
+      tInfo = lm ? { n: lista.length, lastCx: tx + (lm.l + lm.w / 2) * s } : null;
+      links.innerHTML = paths;
+      world.style.transform = 'translate(' + tx + 'px,0) scale(' + s + ')';
+      wrap.style.height = Math.ceil(bh * s) + 'px';
+      if (slotW) slot = { x: tx + slotW.l * s, y: slotW.y * s };
+      posBar();
+    }
+
+    /* barra de ações: aparece junto do círculo que foi segurado */
+    function posBar() {
+      var f = barId ? acha(barId) : null;
+      if (!f || !slot || !mwEl || !bar) { if (bar) bar.hidden = true; return; }
+      if (btnSib) btnSib.disabled = false; if (btnDel) btnDel.disabled = !f.p && window.rcMapa.total() <= 1;
+      bar.hidden = false;
+      var bw = bar.offsetWidth, aw = wrap.clientWidth || 280;
+      var left = clamp(zig ? slot.x - bw / 2 : slot.x, 0, Math.max(0, aw - bw));
+      bar.style.left = (wrap.offsetLeft + left) + 'px';
+      bar.style.top = (wrap.offsetTop + slot.y) + 'px';
+    }
+    function excluiNo(id) {
+      var f = acha(id); if (!f) return;
+      if (!f.p) {
+        // o "Ciclo Vencedor" de um mapa: exclui o mapa inteiro
+        if (window.rcMapa.total() > 1 && confirm('Excluir este mapa?')) {
+          barId = null;
+          window.rcMapa.excluir(window.rcMapa.indice(api)); renderCiclo();
+        }
+        return;
+      }
+      if (!confirm('Excluir este item?')) return;
+      var i = f.p.children.indexOf(f.n); if (i > -1) f.p.children.splice(i, 1);
+      selId = f.p.id; barId = null; salva(); render();
+    }
+
+    function adiciona(irmao) {
+      var f = selId ? acha(selId) : null;
+      if (!f) return;
+      var c = nd('Novo');
+      if (irmao) {
+        if (!f.p) return;
+        f.p.children.splice(f.p.children.indexOf(f.n) + 1, 0, c);
+      } else {
+        f.n.collapsed = false; f.n.children.unshift(c);
+      }
+      selId = c.id; barId = null; salva(); render(); abre(c.id);
+    }
+
+    function garanteSheet() {
+      if (sheet) return;
+      scrim = document.createElement('div'); scrim.className = 'rcm-scrim';
+      sheet = document.createElement('div'); sheet.className = 'rcm-sheet';
+      sheet.setAttribute('role', 'dialog'); sheet.setAttribute('aria-modal', 'true');
+      sheet.innerHTML = '<div class="rcm-field"><svg viewBox="0 0 24 24"><path d="M5 8h14M5 12h14M5 16h9"/></svg><input type="text" maxlength="60" autocomplete="off" autocorrect="off" spellcheck="false" aria-label="Texto"></div>' +
+        '<div class="rcm-row"><button type="button" class="act-btn" data-a="del">Excluir</button><button type="button" class="act-btn pri" data-a="ok">Salvar</button></div>';
+      document.body.appendChild(scrim); document.body.appendChild(sheet);
+      txt = sheet.querySelector('input'); delB = sheet.querySelector('[data-a="del"]');
+      sheet.querySelector('[data-a="ok"]').addEventListener('click', confirma);
+      delB.addEventListener('click', exclui);
+      scrim.addEventListener('click', fecha);
+      txt.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') { e.preventDefault(); confirma(); }
+        else if (e.key === 'Escape') fecha();
+      });
+      if (window.visualViewport) {
+        var aj = function() {
+          var vv = window.visualViewport;
+          sheet.style.bottom = Math.max(0, window.innerHeight - vv.height - vv.offsetTop) + 'px';
+        };
+        window.visualViewport.addEventListener('resize', aj);
+        window.visualViewport.addEventListener('scroll', aj);
+      }
+    }
+    function abre(id) {
+      var m = L[id]; if (!m) return;
+      garanteSheet();
+      editId = id;
+      txt.value = m.n.text;
+      delB.textContent = id === 'root' ? 'Limpar' : 'Excluir';
+      scrim.classList.add('on'); sheet.classList.add('on');
+      setTimeout(function() {
+        try { txt.focus(); txt.select(); } catch (e) {}
+        var mm = L[id]; if (!mm || !sheet.classList.contains('on')) return;
+        var rc = mm.el.getBoundingClientRect(), livre = window.innerHeight - sheet.offsetHeight - 24;
+        if (rc.bottom > livre) window.scrollBy({ top: rc.bottom - livre + 12, behavior: 'smooth' });
+      }, 120);
+    }
+    function fecha() {
+      editId = null;
+      if (!sheet) return;
+      scrim.classList.remove('on'); sheet.classList.remove('on');
+      try { txt.blur(); } catch (e) {}
+    }
+    function confirma() {
+      var f = editId ? acha(editId) : null;
+      if (f) { var v = txt.value.trim(); if (v) f.n.text = v; salva(); }
+      fecha(); render();
+    }
+    function exclui() {
+      var f = editId ? acha(editId) : null;
+      if (!f) { fecha(); return; }
+      if (!f.p) { f.n.children = []; selId = 'root'; }
+      else {
+        var i = f.p.children.indexOf(f.n); if (i > -1) f.p.children.splice(i, 1);
+        selId = f.p.id;
+      }
+      salva(); fecha(); render();
+    }
+
+    /* editor completo (a janela das etapas) para um círculo do mapa */
+    var pend = null, tq = null, lp = false, lpT = null, lpXY = null;
+    function abreEditor(id, edita) {
+      var f = acha(id); if (!f) return;
+      var n = f.n, k = -1;
+      if (!Array.isArray(n.i) && KEY === 'rico.mapa.v1') {
+        var tx = String(n.text || '').trim();
+        for (var j = 0; j < CICLO.length; j++) if (CICLO[j] && String(CICLO[j].t || '').trim() === tx) { k = j; break; }
+      }
+      if (k >= 0) {
+        pend = { id: id, ref: CICLO[k] };
+        abrirEtapa(k, edita);
+      } else {
+        pend = { id: id, ref: null };
+        abrirEtapa(0, edita, { t: n.text, i: (n.i || []).slice(), m: (n.m || []).slice(), _no: n, _inst: api });
+      }
+    }
+    function salvaNota(e) {
+      var n = e && e._no; if (!n) return;
+      var t = String(e.t || '').trim();
+      if (t) n.text = t.slice(0, 60);
+      n.i = e.i; n.m = e.m;
+      salva();
+    }
+    function fechou() {
+      var p = pend; pend = null;
+      if (!p) return;
+      var f = acha(p.id);
+      if (f && p.ref && CICLO.indexOf(p.ref) > -1) {
+        var t = String(p.ref.t || '').trim();
+        if (t) { f.n.text = t.slice(0, 60); salva(); }
+      }
+      render();
+    }
+    function acaoToque(id) {
+      selId = id; barId = null;
+      var f = acha(id);
+      if (f && !f.p && window.rcMapa.foca(window.rcMapa.indice(api))) return;
+      if (f && f.n.children.length) { f.n.collapsed = !f.n.collapsed; salva(); }
+      render();
+    }
+    function toque(e) {
+      if (lp) { lp = false; return; }
+      var el = e.target.closest ? e.target.closest('.rcm-node') : null;
+      if (el && el.dataset.id) {
+        var id = el.dataset.id;
+        if (tq && tq.id === id) {
+          clearTimeout(tq.t); tq = null;
+          selId = id; barId = null; render();
+          abreEditor(id, false);
+          return;
+        }
+        if (tq) { clearTimeout(tq.t); var antes = tq.id; tq = null; acaoToque(antes); }
+        tq = { id: id, t: setTimeout(function() { var x = tq; tq = null; if (x) acaoToque(x.id); }, 260) };
+      } else {
+        if (tq) { clearTimeout(tq.t); tq = null; }
+        selId = null; barId = null; render();
+      }
+    }
+
+    var ICO_FILHO = '<svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>';
+    var ICO_IRMAO = '<svg viewBox="0 0 24 24"><path d="M8 20V5M8 5L4.5 8.5M8 5l3.5 3.5M16 4v15M16 19l-3.5-3.5M16 19l3.5-3.5"/></svg>';
+    var ICO_SOBE = '<svg viewBox="0 0 24 24"><path d="M12 19V5M12 5l-5 5M12 5l5 5"/></svg>';
+    var ICO_DESCE = '<svg viewBox="0 0 24 24"><path d="M12 5v14M12 19l-5-5M12 19l5-5"/></svg>';
+    var ICO_OK = '<svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7"/></svg>';
+    var movBar = false;
+    function montaBar() {
+      bar.innerHTML = movBar
+        ? '<div class="rcm-pill"><button type="button" class="rcm-ib" data-a="sobe" aria-label="Sobe">' + ICO_SOBE + '</button><button type="button" class="rcm-ib" data-a="desce" aria-label="Desce">' + ICO_DESCE + '</button><button type="button" class="rcm-ib" data-a="pronto" aria-label="Pronto">' + ICO_OK + '</button></div>'
+        : '<div class="rcm-pill"><button type="button" class="rcm-ib" data-a="filho" aria-label="Adicionar">' + ICO_FILHO + '</button><button type="button" class="rcm-ib" data-a="irmao" aria-label="Mover">' + ICO_IRMAO + '</button><button type="button" class="rcm-ib" data-a="edita" aria-label="Editar">' + ICO_EDIT + '</button><button type="button" class="rcm-ib" data-a="exclui" aria-label="Excluir">' + ICO_LIXO + '</button></div>';
+      btnSib = bar.querySelector('[data-a="irmao"]');
+      btnDel = bar.querySelector('[data-a="exclui"]');
+    }
+    function moveNo(id, d) {
+      var f = acha(id); if (!f) return;
+      if (!f.p) {
+        var i0 = window.rcMapa.indice(api), j0 = window.rcMapa.mover(i0, d);
+        if (j0 !== i0) { barId = null; movBar = false; renderCiclo(); }
+        return;
+      }
+      var arr = f.p.children, i = arr.indexOf(f.n), j = i + d;
+      if (j < 0 || j >= arr.length) return;
+      arr.splice(i, 1); arr.splice(j, 0, f.n);
+      salva(); render();
+    }
+    var ICO_LIXO = '<svg viewBox="0 0 24 24"><path d="M5 7h14M10 7V5h4v2M7 7l1 12h8l1-12"/></svg>';
+    var ICO_EDIT ='<svg viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg>';
+
+    function montar(mw, z, o) {
+      if (!root) root = carrega();
+      zig = !!z; barId = null;
+      zq0 = (o && o.q0) || 0;
+      zPrev = (zig && o && o.prevCx != null) ? o.prevCx : null;
+      tPrev = (!zig && o && o.prevCx != null) ? o.prevCx : null;
+      tPos = 0; tMulti = false; semRaiz = !!(o && o.semRaiz); soRaiz = !!(o && o.soRaiz);
+      mw.innerHTML = '';
+      wrap = document.createElement('div'); wrap.className = 'rcm-wrap' + (zig ? ' zig' : '') + (o && o.cont ? ' cont' : '') + (zig && !soRaiz ? ' aberto' : '') + (zig && o && o.proc ? ' proc' : '');
+      wrap.innerHTML = '<div class="rcm-world"><svg class="rcm-links" xmlns="http://www.w3.org/2000/svg"></svg></div>';
+      world = wrap.firstChild; links = world.firstChild;
+      bar = document.createElement('div'); bar.className = 'rcm-bar'; bar.hidden = true;
+      movBar = false; montaBar();
+      mwEl = mw; mw.style.position = 'relative';
+      wrap.addEventListener('click', toque);
+      wrap.addEventListener('contextmenu', function(e) { e.preventDefault(); });
+      /* segurar um círculo: a barra de ações aparece ali mesmo */
+      wrap.addEventListener('pointerdown', function(e) {
+        lp = false; clearTimeout(lpT);
+        var el = e.target.closest ? e.target.closest('.rcm-node') : null;
+        if (!el || !el.dataset.id) return;
+        var id = el.dataset.id;
+        lpXY = [e.clientX, e.clientY];
+        lpT = setTimeout(function() {
+          lp = true;
+          if (tq) { clearTimeout(tq.t); tq = null; }
+          selId = id; barId = id; movBar = false; montaBar(); render();
+        }, 550);
+      });
+      wrap.addEventListener('pointermove', function(e) {
+        if (lpT && lpXY && (Math.abs(e.clientX - lpXY[0]) > 10 || Math.abs(e.clientY - lpXY[1]) > 10)) { clearTimeout(lpT); lpT = null; }
+      });
+      ['pointerup', 'pointercancel', 'pointerleave'].forEach(function(nm) {
+        wrap.addEventListener(nm, function() { clearTimeout(lpT); lpT = null; });
+      });
+      bar.addEventListener('click', function(e) {
+        var b = e.target.closest ? e.target.closest('button') : null;
+        if (!b || !barId) return;
+        var a = b.getAttribute('data-a'), id = barId;
+        selId = id;
+        if (a === 'filho') adiciona(false);
+        else if (a === 'irmao') { movBar = true; montaBar(); posBar(); }
+        else if (a === 'sobe') moveNo(id, -1);
+        else if (a === 'desce') moveNo(id, 1);
+        else if (a === 'pronto') { movBar = false; montaBar(); posBar(); }
+        else if (a === 'edita') { barId = null; render(); abreEditor(id, true); }
+        else if (a === 'exclui') excluiNo(id);
+      });
+      mw.appendChild(wrap); mw.appendChild(bar);
+      render();
+    }
+
+    function limpar() {
+      if (!root) root = carrega();
+      root.children = []; selId = 'root'; barId = null;
+      salva(); render();
+    }
+
+    window.addEventListener('resize', render);
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(render);
+    var api = { key: KEY, montar: montar, salvaNota: salvaNota, fechou: fechou, limpar: limpar, info: function() { return zig ? zInfo : tInfo; } };
+    if (vazio) { root = nd('Novo'); root.id = 'root'; salva(); }
+    return api;
+  }
+
+  /* vários mapas, um abaixo do outro (o + do botão amarelo cria outro) */
+  var MAPAS = [];
+  function mapasChaves() {
+    try {
+      var a = JSON.parse(localStorage.getItem('rico.mapas.ordem'));
+      if (Array.isArray(a) && a.length) return a.filter(function(k) { return typeof k === 'string' && k; });
+    } catch (e) {}
+    return ['rico.mapa.v1'];
+  }
+  function mapasSalvaOrdem() { try { localStorage.setItem('rico.mapas.ordem', JSON.stringify(MAPAS.map(function(m) { return m.key; }))); } catch (e) {} }
+  function mapasGarante() {
+    if (MAPAS.length) return;
+    var ch = mapasChaves();
+    if (!ch.length) ch = ['rico.mapa.v1'];
+    MAPAS = ch.map(function(k) { return criaMapa(k, false); });
+  }
+  var ABERTO = -1, VZ = false;
+  window.rcMapa = {
+    montar: function(mw, z) {
+      mapasGarante(); mw.innerHTML = ''; VZ = z;
+      if (ABERTO >= MAPAS.length) ABERTO = -1;
+      var acc = MAPAS.length > 1;
+      var q0 = 0, prevCx = null;
+      var ordem = MAPAS.map(function(m, i) { return i; });
+      if (acc && ABERTO >= 0) ordem = [ABERTO];
+      ordem.forEach(function(i, pos) {
+        var m = MAPAS[i];
+        var aberto = !acc || i === ABERTO;
+        var zi = z || !aberto;
+        var box = document.createElement('div');
+        if (pos > 0) box.style.marginTop = (zi ? 36 : 28) + 'px';
+        mw.appendChild(box);
+        m.montar(box, zi, { q0: q0, prevCx: (z && zi) ? prevCx : null, cont: pos > 0, soRaiz: acc && !aberto, proc: !!z });
+        var inf = m.info();
+        if (zi && inf) { q0 += inf.n; prevCx = (acc && aberto) ? null : inf.lastCx; } else prevCx = null;
+      });
+    },
+    foca: function(i) {
+      if (MAPAS.length < 2) return false;
+      ABERTO = (ABERTO === i) ? -1 : i;
+      renderCiclo();
+      return true;
+    },
+    desfoca: function() { ABERTO = -1; },
+    salvaNota: function(e) { if (e && e._inst) e._inst.salvaNota(e); },
+    indice: function(m) { return MAPAS.indexOf(m); },
+    total: function() { mapasGarante(); return MAPAS.length; },
+    fechou: function() { MAPAS.forEach(function(m) { m.fechou(); }); },
+    adicionar: function(i) {
+      mapasGarante();
+      var k = 'rico.mapa.' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+      MAPAS.splice(i + 1, 0, criaMapa(k, true));
+      mapasSalvaOrdem();
+    },
+    excluir: function(i) {
+      mapasGarante();
+      if (MAPAS.length <= 1) { MAPAS[0].limpar(); return; }
+      ABERTO = -1;
+      var m = MAPAS.splice(i, 1)[0];
+      try { localStorage.removeItem(m.key); } catch (e) {}
+      mapasSalvaOrdem();
+    },
+    mover: function(i, d) {
+      mapasGarante();
+      var j = i + d;
+      if (j < 0 || j >= MAPAS.length) return i;
+      var t = MAPAS[i]; MAPAS[i] = MAPAS[j]; MAPAS[j] = t;
+      mapasSalvaOrdem();
+      return j;
+    }
+  };
+
+  function abrirEtapa(k, editavel, ext) {
+    var e = ext || CICLO[k];
     if (!e) return;
+    _alvo = ext || null;
     if (document.getElementById('sheet').hidden) _scrollSheet = window.scrollY;
     document.documentElement.classList.add('sheet-open');
     _etapa = k;
@@ -2767,7 +3240,7 @@ window.saveAnswer = window.saveAnswer || function(){};
   }
 
   function sincronizarEtapa() {
-    var e = CICLO[_etapa];
+    var e = _alvo || CICLO[_etapa];
     if (!e) return;
     e.t = document.getElementById('sheetTitulo').value;
     e.i = Array.prototype.map.call(document.querySelectorAll('#sheetLista .list-ta'), function(t) { return t.value; });
@@ -2778,6 +3251,7 @@ window.saveAnswer = window.saveAnswer || function(){};
       if (r.hasAttribute('data-com-num')) o.c = 1;
       return o;
     });
+    if (_alvo) { if (window.rcMapa && window.rcMapa.salvaNota) window.rcMapa.salvaNota(_alvo); return; }
     var n = document.querySelector('#ciclo-lista .cycle-item[data-idx="' + _etapa + '"]');
     if (n) { var nt = n.querySelector('.cycle-t'); (nt || n).textContent = e.t || 'Nova etapa'; }
     if (window.agendarSalvamento) window.agendarSalvamento(n || document.body);
@@ -2785,13 +3259,14 @@ window.saveAnswer = window.saveAnswer || function(){};
 
   var _scrollSheet = 0, _fechouEm = 0;
   function fecharSheet() {
-    var _ve = CICLO[_etapa];
+    var _ve = _alvo ? null : CICLO[_etapa];
     if (_ve && !_ve.h && !String(_ve.t || '').trim() && !(_ve.i || []).some(function(v) { return String(v || '').trim(); }) && !cicloFilhos(_etapa).length) {
       CICLO.splice(_etapa, 1);
       setTimeout(function() { renderCiclo(); if (window.agendarSalvamento) window.agendarSalvamento(document.body); }, 0);
     }
     window._sheetEdit = false;
     _etapa = -1;
+    _alvo = null;
     document.querySelectorAll('.list-field-row.sel').forEach(function(r) { r.classList.remove('sel'); });
     var sh = document.getElementById('sheet');
     var ativo = document.activeElement;
@@ -2802,6 +3277,7 @@ window.saveAnswer = window.saveAnswer || function(){};
     document.documentElement.classList.remove('sheet-open');
     window.scrollTo(0, _scrollSheet);
     _fechouEm = Date.now();
+    if (window.rcMapa && window.rcMapa.fechou) window.rcMapa.fechou();
   }
   // o toque que fecha a janela não pode passar para o que está atrás dela
   document.addEventListener('click', function(e) {
@@ -2913,7 +3389,7 @@ window.saveAnswer = window.saveAnswer || function(){};
     var it = CICLO[k];
     if (!it) return;
     if (el.classList.contains('cycle-compl')) {
-      if (_foco >= 0) _foco = -1; else _soCompl = false;
+      if (_foco >= 0) _foco = -1; else _mapa = true;
       renderCiclo(); cicloAnima(); return;
     }
     if (el.classList.contains('cycle-foco')) {
@@ -2928,8 +3404,21 @@ window.saveAnswer = window.saveAnswer || function(){};
     var el = e.target && e.target.closest ? e.target.closest('.cycle-item') : null;
     if (!el) return;
     if (el.classList.contains('cycle-vazio')) { addEtapa(); return; }
+    if (el.dataset.mapa !== undefined && _mapa) {
+      if (!_zig) _zig = true;
+      else { _mapa = false; _zig = false; _soCompl = false; _foco = -1; window.rcMapa.desfoca(); }
+      renderCiclo(); cicloAnima(); return;
+    }
     var k = +el.dataset.idx, it = CICLO[k];
     if (!it) return;
+    if (el.classList.contains('cycle-compl') && _mapa && !_zig) {
+      _zig = true;
+      renderCiclo(); cicloAnima(); return;
+    }
+    if (el.classList.contains('cycle-compl') && _mapa) {
+      _mapa = false; _zig = false; _soCompl = false; _foco = -1; if (window.rcMapa) window.rcMapa.desfoca();
+      renderCiclo(); cicloAnima(); return;
+    }
     if (el.classList.contains('cycle-compl') && !_soCompl) {
       _soCompl = true; _foco = -1;
       renderCiclo(); cicloAnima();
@@ -3051,8 +3540,30 @@ window.saveAnswer = window.saveAnswer || function(){};
     else if (pai.id === 'habito-lista') renumerarHabitos();
   }
 
+  var _cel = null, _celAnchor = null;
+  function fecharCelula() { if (_cel) { _cel.remove(); _cel = null; } }
+  function abrirCelula(el, mover) {
+    fecharCelula();
+    var c = document.createElement('div');
+    c.className = 'cycle-cell';
+    _cel = c; _acoExp = false; _celAnchor = el;
+    window._acaoT = Date.now();
+    el.insertAdjacentElement('afterend', c);
+    renderAcoes(!!mover);
+  }
   function abrirMenuItem(el) {
+    fecharCelula();
     if (el.classList && el.classList.contains('cycle-vazio')) return;
+    // segurar o botão amarelo no mapa: adicionar outro mapa, mover ou excluir
+    if (el.dataset && el.dataset.mapa !== undefined && el.classList.contains('cycle-compl') && window.rcMapa) {
+      _acao = {
+        mapa: +el.dataset.mapa,
+        adicionar: function() { window.rcMapa.adicionar(_acao.mapa); renderCiclo(); },
+        excluir: function() { window.rcMapa.excluir(_acao.mapa); renderCiclo(); }
+      };
+      abrirCelula(el);
+      return;
+    }
     // segurar em qualquer parte da linha abre as ações da linha
     if (el.classList.contains('list-field-row')) el = el.querySelector('.list-num');
     if (el.classList.contains('q-number')) {
@@ -3073,6 +3584,7 @@ window.saveAnswer = window.saveAnswer || function(){};
         },
         editar: function() {
           fecharAcoes();
+          cartao.classList.add('q-aberto');
           var ta = cartao.querySelector('textarea:not(.list-ta)');
           if (ta) { abrirEditor(ta, (cartao.querySelector(':scope > .q-tit') || {}).textContent, cartao); return; }
           cartao.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -3087,9 +3599,7 @@ window.saveAnswer = window.saveAnswer || function(){};
           salvarAlt();
         }
       };
-      _acoExp = false; renderAcoes(false);
-      document.getElementById('actOv').hidden = false; window._acaoT = Date.now();
-      document.getElementById('actSheet').hidden = false;
+      abrirCelula(cartao);
       return;
     }
     if (el.classList.contains('fld') && el.classList.contains('area')) {
@@ -3144,9 +3654,7 @@ window.saveAnswer = window.saveAnswer || function(){};
         reNum(); sync();
         nova.querySelector('textarea').focus();
       };
-      _acoExp = false; renderAcoes(false);
-      document.getElementById('actOv').hidden = false; window._acaoT = Date.now();
-      document.getElementById('actSheet').hidden = false;
+      abrirCelula(linha);
       return;
     }
     if (el.classList.contains('cycle-item')) {
@@ -3215,6 +3723,9 @@ window.saveAnswer = window.saveAnswer || function(){};
           renderCiclo(); salvarAlt();
         }
       };
+      // as ações aparecem como uma célula logo abaixo da etapa
+      abrirCelula(el);
+      return;
     } else {
       var bloco = el.closest('.meta-block');
       if (!bloco) return;
@@ -3243,9 +3754,7 @@ window.saveAnswer = window.saveAnswer || function(){};
         }
       };
     }
-    _acoExp = false; renderAcoes(false);
-    document.getElementById('actOv').hidden = false; window._acaoT = Date.now();
-    document.getElementById('actSheet').hidden = false;
+    abrirCelula(bloco);
   }
 
   function btnAcao(texto, cls, fn) {
@@ -3282,7 +3791,42 @@ window.saveAnswer = window.saveAnswer || function(){};
     if (_acao.titulo) ib('tit', 'Título', tem, function() { if (_acao) { _acao.titulo(); renderAcoes(false); } });
     return wrap;
   }
+  function renderCelulaIcones(movendo) {
+    var box = _cel;
+    box.innerHTML = '';
+    var ib = function(path, rotulo, fn, cor) {
+      var b = document.createElement('button');
+      b.type = 'button'; b.className = 'rcm-ib'; b.setAttribute('aria-label', rotulo);
+      b.innerHTML = '<svg viewBox="0 0 24 24">' + path + '</svg>';
+      if (cor) b.style.color = cor;
+      b.onclick = fn;
+      box.appendChild(b);
+    };
+    if (!movendo) {
+      if (_acao && _acao.editar) ib('<path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/>', 'Editar', function() { if (_acao) _acao.editar(); });
+      if (_acao && _acao.numerar) ib(ICONES_ACAO.hash, 'Número', function() { if (_acao) { _acao.numerar(); renderAcoes(false); } });
+      if (_acao && _acao.titulo) ib(ICONES_ACAO.tit, 'Título', function() { if (_acao) { _acao.titulo(); renderAcoes(false); } });
+      if (_acao && _acao.mover) ib('<path d="M8 20V5M8 5L4.5 8.5M8 5l3.5 3.5M16 4v15M16 19l-3.5-3.5M16 19l3.5-3.5"/>', 'Mover', function() { renderAcoes(true); });
+      if (_acao && _acao.adicionar) ib('<path d="M12 5v14M5 12h14"/>', 'Adicionar', function() { if (_acao) { _acao.adicionar(); fecharAcoes(); } });
+      ib('<path d="M5 7h14M10 7V5h4v2M7 7l1 12h8l1-12"/>', 'Excluir', function() {
+        if (!_acao || !confirm('Excluir este item?')) return;
+        var f = _acao.excluir;
+        f();
+        fecharAcoes();
+      }, '#f87171');
+    } else {
+      var reCel = function() {
+        if (!_cel || !_acao) return;
+        var it = (_acao.linhaRef || _acao.cartaoRef || (_celAnchor && _celAnchor.classList.contains('meta-block') ? _celAnchor : null)) || document.querySelector(_acao.mapa !== undefined ? '#ciclo-lista .cycle-compl[data-mapa="' + _acao.mapa + '"]' : '#ciclo-lista .cycle-item[data-idx="' + _acao.idx + '"]');
+        if (it) { var ac = _acao; abrirCelula(it, true); _acao = ac; }
+      };
+      ib('<path d="M12 19V5M12 5l-5 5M12 5l5 5"/>', 'Sobe', function() { if (_acao) { _acao.mover(-1); reCel(); } });
+      ib('<path d="M12 5v14M12 19l-5-5M12 19l5-5"/>', 'Desce', function() { if (_acao) { _acao.mover(1); reCel(); } });
+      ib('<path d="M5 12.5l4.5 4.5L19 7"/>', 'Pronto', fecharAcoes);
+    }
+  }
   function renderAcoes(movendo) {
+    if (_cel) { renderCelulaIcones(movendo); return; }
     var box = document.getElementById('actList');
     box.innerHTML = '';
     if (!movendo) {
@@ -3304,8 +3848,13 @@ window.saveAnswer = window.saveAnswer || function(){};
         fecharAcoes();
       }));
     } else {
-      box.appendChild(btnAcao('Sobe', 'act-btn', function() { if (_acao) _acao.mover(-1); }));
-      box.appendChild(btnAcao('Desce', 'act-btn', function() { if (_acao) _acao.mover(1); }));
+      var reCel = function() {
+        if (!_cel || !_acao) return;
+        var it = document.querySelector('#ciclo-lista .cycle-item[data-idx="' + _acao.idx + '"]');
+        if (it) abrirCelula(it, true);
+      };
+      box.appendChild(btnAcao('Sobe', 'act-btn', function() { if (_acao) { _acao.mover(-1); reCel(); } }));
+      box.appendChild(btnAcao('Desce', 'act-btn', function() { if (_acao) { _acao.mover(1); reCel(); } }));
       box.appendChild(btnAcao('Pronto', 'act-btn pri', fecharAcoes));
     }
   }
@@ -3950,6 +4499,7 @@ window.saveAnswer = window.saveAnswer || function(){};
   document.addEventListener('keydown', function(e) { if (e.key === 'Escape') fecharHab(); });
 
   function fecharAcoes() {
+    fecharCelula();
     _acao = null; _acoExp = false;
     document.getElementById('actSheet').hidden = true;
     document.getElementById('actOv').hidden = true;
@@ -4027,6 +4577,10 @@ window.saveAnswer = window.saveAnswer || function(){};
     if (e.target && e.target.closest && e.target.closest('#actSheet')) { _pressFired = false; return; }
     if (_pressFired && alvoSegurar(e.target)) { e.preventDefault(); e.stopPropagation(); _pressFired = false; return; }
     if (_pressFired) { _pressFired = false; e.preventDefault(); e.stopPropagation(); return; }
+    // célula de ações aberta: toque fora dela fecha
+    if (_cel && Date.now() - (window._acaoT || 0) > 400 && !(e.target.closest && e.target.closest('.cycle-cell'))) {
+      e.preventDefault(); e.stopPropagation(); fecharAcoes(); return;
+    }
     // menu de ações aberto: toque fora dele fecha
     if (!document.getElementById('actSheet').hidden && Date.now() - (window._acaoT || 0) > 400 && !(e.target.closest && e.target.closest('#actSheet'))) {
       e.preventDefault(); e.stopPropagation(); fecharAcoes(); return;
@@ -4041,7 +4595,8 @@ window.saveAnswer = window.saveAnswer || function(){};
 
   /* menu hambúrguer */
   function fecharMenu() {
-    document.getElementById('menuPanel').hidden = true;
+    var mp = document.getElementById('menuPanel'); if (!mp) return;
+    mp.hidden = true;
     document.getElementById('menuOverlay').hidden = true;
     document.getElementById('menuBtn').classList.remove('open');
   }
@@ -4271,6 +4826,156 @@ window.saveAnswer = window.saveAnswer || function(){};
     try { window.getSelection().removeAllRanges(); } catch (_) {}
   }, true);
 })();
+  /* tocar no número mostra ou esconde o texto da pergunta */
+  document.addEventListener('click', function(e) {
+    var n = e.target && e.target.closest ? e.target.closest('.q-number') : null;
+    if (!n) return;
+    var c = n.closest('.question-card');
+    if (!c || c.hasAttribute('data-sem-num')) return;
+    c.classList.toggle('q-aberto');
+    desenhaSetas(true);
+  });
+  var _qgN = 0;
+  function desenhaSetas(anima) {
+    anima = anima === true;
+    document.querySelectorAll('.question-card').forEach(function(c) {
+      var old = c.querySelector(':scope > .q-seta'); if (old) old.remove();
+      if (c.classList.contains('q-aberto') || c.hasAttribute('data-sem-num')) return;
+      var n = c.querySelector('.q-number');
+      var alvo = Array.prototype.find.call(c.children, function(x) { return !x.matches('.question-header, .hint-panel, .q-tit, .q-seta'); });
+      if (alvo && !alvo.querySelector('.choice-label')) alvo = alvo.querySelector('.money-field, textarea, input, .list-field-row') || alvo;
+      if (!n || !alvo || !c.offsetWidth) return;
+      var cr = c.getBoundingClientRect(), nr = n.getBoundingClientRect(), ar = alvo.getBoundingClientRect();
+      var x0 = nr.right - cr.left + 4, y0 = nr.top - cr.top + nr.height / 2;
+      var xt = ar.left - cr.left + ar.width / 2, yt = ar.top - cr.top - 2;
+      if (yt - y0 < 18 || xt - x0 < 30) return;
+      var tp = yt - 6, rr = Math.max(0, Math.min(14, tp - y0 - 8, xt - x0));
+      var d = 'M' + x0 + ' ' + y0 + ' H' + (xt - rr) + ' Q' + xt + ' ' + y0 + ' ' + xt + ' ' + (y0 + rr) + ' V' + tp;
+      var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      svg.setAttribute('class', 'q-seta' + (anima && _tipoSeta === 1 ? ' anima' : '')); svg.setAttribute('aria-hidden', 'true');
+      svg.innerHTML = setaHTML(d, xt, tp);
+      c.insertBefore(svg, c.firstChild);
+    });
+  }
+  desenhaSetas();
+  window.addEventListener('resize', desenhaSetas);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(desenhaSetas);
+  setTimeout(desenhaSetas, 400);
+  var _zzT = null;
+  new MutationObserver(function(m) {
+    if (!m.some(function(x) { return x.type === 'childList' && !(x.addedNodes[0] && x.addedNodes[0].classList && x.addedNodes[0].classList.contains('q-seta')) && !(x.removedNodes[0] && x.removedNodes[0].classList && x.removedNodes[0].classList.contains('q-seta')); })) return;
+    clearTimeout(_zzT); _zzT = setTimeout(function() { desenhaSetas(); alinhaNums(); }, 80);
+  }).observe(document.body, { childList: true, subtree: true });
+  /* resposta em texto: centralizada em uma linha; ao quebrar a linha, o texto começa pela esquerda */
+  function ajustaQuebra(t) { t.classList.toggle('quebrou', t.scrollHeight > 60); }
+  function ajustaQuebraTodas() { document.querySelectorAll('.question-card .fld.area textarea, :is(.question-card, .meta-block) .list-fields > .list-field-row textarea.list-ta').forEach(ajustaQuebra); }
+  document.addEventListener('input', function(e) {
+    var t = e.target;
+    if (t && t.matches && t.matches('.question-card .fld.area textarea, :is(.question-card, .meta-block) .list-fields > .list-field-row textarea.list-ta')) ajustaQuebra(t);
+  });
+  window.addEventListener('resize', ajustaQuebraTodas);
+  setTimeout(ajustaQuebraTodas, 500);
+  /* números das listas: todos na mesma coluna, alinhados à esquerda da linha mais larga */
+  /* texto que quebra em 2+ linhas: encolhe a celulazinha até o menor tamanho que mantém as mesmas linhas (sobra igual nos dois lados) */
+  function apertaLinhas() {
+    document.querySelectorAll(':is(.question-card, .meta-block) .list-fields > .list-field-row textarea.list-ta').forEach(function(t) {
+      t.style.width = ''; t.style.height = 'auto';
+      if (!t.offsetWidth) return;
+      ajustaQuebra(t);
+      if (t.scrollHeight <= 60) { autoGrow(t); return; }
+      var H = t.scrollHeight, lo = 60, hi = t.offsetWidth;
+      while (hi - lo > 1) {
+        var mid = Math.floor((lo + hi) / 2);
+        t.style.width = mid + 'px';
+        if (t.scrollHeight <= H) hi = mid; else lo = mid;
+      }
+      t.style.width = Math.min(hi + 2, t.parentNode.clientWidth) + 'px';
+      autoGrow(t);
+    });
+  }
+  function alinhaNums() {
+    apertaLinhas();
+    document.querySelectorAll(':is(.question-card, .meta-block) .list-fields').forEach(function(lf) {
+      var rows = [].filter.call(lf.querySelectorAll(':scope > .list-field-row'), function(r) { return r.offsetWidth; });
+      if (!rows.length) return;
+      rows.forEach(function(r) { r.style.alignSelf = ''; r.style.marginLeft = ''; });
+      var min = Math.min.apply(null, rows.map(function(r) { return r.getBoundingClientRect().left; }));
+      var cs = getComputedStyle(lf);
+      var base = lf.getBoundingClientRect().left + parseFloat(cs.borderLeftWidth || 0) + parseFloat(cs.paddingLeft || 0);
+      rows.forEach(function(r) { r.style.alignSelf = 'flex-start'; r.style.marginLeft = Math.max(0, min - base) + 'px'; });
+    });
+  }
+  document.addEventListener('input', function() { requestAnimationFrame(alinhaNums); });
+  window.addEventListener('resize', alinhaNums);
+  [300, 800, 1600].forEach(function(t) { setTimeout(alinhaNums, t); });
+  /* mantém tudo alinhado sempre que o tamanho muda (carregar, abrir bloco, fonte, dados salvos) */
+  var _alT = 0, _roVistos = new WeakSet();
+  function agendaAlinha() { cancelAnimationFrame(_alT); _alT = requestAnimationFrame(alinhaNums); }
+  var _ro = window.ResizeObserver ? new ResizeObserver(agendaAlinha) : null;
+  function observaListas() {
+    if (!_ro) return;
+    document.querySelectorAll(':is(.question-card, .meta-block) .list-fields, :is(.question-card, .meta-block) .list-fields > .list-field-row, :is(.question-card, .meta-block) .list-fields > .list-field-row textarea.list-ta').forEach(function(e) {
+      if (!_roVistos.has(e)) { _roVistos.add(e); _ro.observe(e); }
+    });
+  }
+  observaListas(); agendaAlinha();
+  new MutationObserver(function() { observaListas(); agendaAlinha(); }).observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ['class', 'hidden'] });
+  window.addEventListener('load', function() { observaListas(); agendaAlinha(); setTimeout(agendaAlinha, 400); });
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(agendaAlinha);
+  document.addEventListener('visibilitychange', function() { if (!document.hidden) agendaAlinha(); });
+  /* nomes das listas (Ações, Crenças...): linha reta que sai do nome e aponta para a primeira célula */
+  function desenhaSetasMeta() {
+    document.querySelectorAll('.meta-block .meta-field').forEach(function(f) {
+      var old = f.querySelector(':scope > .q-seta'); if (old) old.remove();
+      var chip = f.querySelector(':scope > .chip'), lf = f.querySelector(':scope > .list-fields');
+      if (!chip || !lf || !f.offsetWidth) return;
+      var alvo = lf.querySelector('.list-field-row'); if (!alvo) return;
+      var fr = f.getBoundingClientRect(), cr = chip.getBoundingClientRect(), ar = alvo.getBoundingClientRect();
+      var x0 = cr.right - fr.left + 4, y0 = cr.top - fr.top + cr.height / 2;
+      var xt = ar.left - fr.left + ar.width / 2, yt = ar.top - fr.top - 2;
+      var tp = yt - 6, d;
+      if (xt - x0 >= 8) {
+        var rr = Math.max(0, Math.min(14, tp - y0 - 8, xt - x0));
+        d = 'M' + x0 + ' ' + y0 + ' H' + (xt - rr) + ' Q' + xt + ' ' + y0 + ' ' + xt + ' ' + (y0 + rr) + ' V' + tp;
+      } else if (xt > cr.left - fr.left + 8) {
+        d = 'M' + xt + ' ' + (cr.bottom - fr.top + 2) + ' V' + tp;
+      } else return;
+      if (tp - y0 < 12) return;
+      var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      svg.setAttribute('class', 'q-seta'); svg.setAttribute('aria-hidden', 'true');
+      svg.innerHTML = setaHTML(d, xt, tp);
+      f.insertBefore(svg, f.firstChild);
+    });
+  }
+  window.addEventListener('resize', desenhaSetasMeta);
+  document.addEventListener('click', function() { setTimeout(desenhaSetasMeta, 120); setTimeout(desenhaSetasMeta, 500); });
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(desenhaSetasMeta);
+  setTimeout(desenhaSetasMeta, 600);
+  new MutationObserver(function(m) {
+    if (!m.some(function(x) { return x.type === 'childList' && !(x.addedNodes[0] && x.addedNodes[0].classList && x.addedNodes[0].classList.contains('q-seta')) && !(x.removedNodes[0] && x.removedNodes[0].classList && x.removedNodes[0].classList.contains('q-seta')); })) return;
+    clearTimeout(window._zzM); window._zzM = setTimeout(desenhaSetasMeta, 100);
+  }).observe(document.body, { childList: true, subtree: true });
+  /* três estilos de seta para escolher (provisório) */
+  var _tipoSeta = 1, _sgN = 0;
+  _tipoSeta = 3;
+  function setaHTML(d, xt, tp) {
+    var c = '#d9a93a', t = 3;
+    var m = /^M([\d.\-]+) ([\d.\-]+)/.exec(d), ox = m ? +m[1] : xt, oy = m ? +m[2] : tp - 20;
+    var chev = function(w) { return '<path d="M' + (xt - 5) + ' ' + (tp - 6) + ' L' + xt + ' ' + tp + ' L' + (xt + 5) + ' ' + (tp - 6) + '" fill="none" stroke="' + (t === 3 ? 'url(#sg' + _sgN + 'b)' : c) + '" stroke-width="' + w + '" stroke-linecap="round" stroke-linejoin="round"/>'; };
+    if (t === 2) {
+      return '<circle cx="' + ox + '" cy="' + oy + '" r="2.6" fill="' + c + '"/>' +
+        '<path d="' + d + '" fill="none" stroke="' + c + '" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>' + chev(1.4);
+    }
+    if (t === 3) {
+      var g = 'sg' + (++_sgN);
+      return '<defs><linearGradient id="' + g + '" gradientUnits="userSpaceOnUse" x1="' + ox + '" y1="' + oy + '" x2="' + xt + '" y2="' + tp + '"><stop offset="0" stop-color="' + c + '" stop-opacity=".18"/><stop offset=".55" stop-color="' + c + '" stop-opacity=".9"/><stop offset="1" stop-color="' + c + '"/></linearGradient>' +
+        '<linearGradient id="' + g + 'b" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="' + c + '"/><stop offset="1" stop-color="' + c + '"/></linearGradient></defs>' +
+        '<path d="' + d + '" fill="none" stroke="url(#' + g + ')" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>' +
+        '<path d="M' + (xt - 6) + ' ' + (tp - 7) + ' L' + xt + ' ' + tp + ' L' + (xt + 6) + ' ' + (tp - 7) + '" fill="none" stroke="' + c + '" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>';
+    }
+    return '<path class="ln" d="' + d + '" pathLength="1" fill="none" stroke="' + c + '" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>' +
+      '<path class="pt" d="M' + (xt - 5) + ' ' + (tp - 6) + ' L' + xt + ' ' + tp + ' L' + (xt + 5) + ' ' + (tp - 6) + '" fill="none" stroke="' + c + '" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>';
+  }
 </script>
 </body>
 </html>
