@@ -767,20 +767,35 @@
   .rcm-node i.oco { background: transparent; border: 2px solid var(--gold); }
   .rcm-node.root { height: 38px; padding: 0 18px; background: var(--gold); border-color: var(--gold); color: var(--dark); font-family: var(--f-title); font-size: 13px; }
   .rcm-node.root.sel { background: var(--gold); }
-  .rcm-conf { position: fixed; inset: 0; z-index: 9999; background: rgba(15,27,45,.6); display: flex; align-items: flex-end; justify-content: center; padding: 16px; box-sizing: border-box; }
-  .rcm-conf-card { width: 100%; max-width: 440px; max-height: 82vh; overflow-y: auto; background: #fff; border-radius: 24px; padding: 20px; box-sizing: border-box; color: var(--dark); }
-  .rcm-conf-card h3 { margin: 0 0 12px; font: 700 18px var(--f-title); }
-  .rcm-conf-card h4 { margin: 16px 0 8px; font: 700 11px var(--f-title); text-transform: uppercase; letter-spacing: .06em; color: var(--tx3); }
-  .rcm-conf-card ol, .rcm-conf-card ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
-  .rcm-conf-card li { display: flex; align-items: baseline; gap: 10px; font-size: 14px; line-height: 1.35; }
-  .rcm-conf-card li b { flex: none; width: 22px; height: 22px; border-radius: 50%; background: var(--gold); color: var(--dark); font-size: 12px; display: grid; place-items: center; }
-  .rcm-conf-card li i { flex: none; font-style: normal; font-weight: 700; font-size: 11px; text-transform: uppercase; background: var(--dark2); color: var(--gold); border-radius: 999px; padding: 2px 8px; }
-  .rcm-conf-card li span em { display: block; font-style: normal; color: var(--tx3); font-size: 13px; margin-top: 2px; white-space: pre-wrap; }
-  .rcm-conf-card textarea { width: 100%; box-sizing: border-box; border: 1px solid var(--bd-in); border-radius: 16px; padding: 12px; font: 400 15px/1.4 inherit; font-family: inherit; color: var(--dark); resize: vertical; background: #fff; }
-  .rcm-conf-card li.vz { color: var(--tx3); }
-  .rcm-conf-bt { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; }
-  .rcm-conf-bt button { flex: 1 1 40%; height: 46px; border-radius: 999px; border: 1px solid var(--bd-in); background: #fff; font: 600 14px var(--f-title); color: var(--dark); }
-  .rcm-conf-bt button.sim { flex-basis: 100%; background: var(--gold); border-color: var(--gold); }
+  .rcm-conf { position: fixed; inset: 0; z-index: 9999; background: rgba(15,27,45,.55); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); display: flex; align-items: flex-end; justify-content: center; padding: 14px; box-sizing: border-box; animation: rcmConfIn .2s ease; }
+  @keyframes rcmConfIn { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes rcmCardIn { from { transform: translateY(24px); opacity: 0; } to { transform: none; opacity: 1; } }
+  .rcm-conf-card { position: relative; width: 100%; max-width: 440px; max-height: 84vh; overflow-y: auto; scrollbar-width: none; background: var(--bg); border: 1px solid var(--bd); border-radius: 30px; padding: 26px 20px 20px; box-sizing: border-box; color: var(--dark); box-shadow: 0 24px 60px rgba(15,27,45,.35); animation: rcmCardIn .26s cubic-bezier(.2,.8,.2,1); }
+  .rcm-conf-card::-webkit-scrollbar { display: none; }
+  .rcm-conf-card::before { content: ''; position: absolute; top: 9px; left: 50%; width: 38px; height: 4px; margin-left: -19px; border-radius: 4px; background: var(--bd); }
+  .rcm-conf-card h3 { margin: 4px 0 14px; font: 700 20px/1.2 var(--f-title); text-align: center; }
+  .rcm-conf-kick { margin: 2px 0 6px; text-align: center; font: 700 11px var(--f-title); letter-spacing: .14em; text-transform: uppercase; color: var(--gold-deep); }
+  .rcm-conf-card h4 { display: flex; align-items: center; gap: 10px; margin: 18px 0 12px; font: 700 11px var(--f-title); text-transform: uppercase; letter-spacing: .12em; color: var(--tx2); }
+  .rcm-conf-card h4::after { content: ''; flex: 1; height: 1px; background: var(--bd); }
+  .rcm-conf-card ol, .rcm-conf-card ul { list-style: none; margin: 0; padding: 0; }
+  .rcm-conf-card ol { position: relative; display: flex; flex-direction: column; gap: 12px; }
+  .rcm-conf-card ol::before { content: ''; position: absolute; left: 13px; top: 14px; bottom: 14px; width: 2px; background: linear-gradient(var(--gold), var(--gold-light)); border-radius: 2px; opacity: .6; }
+  .rcm-conf-card ul { display: flex; flex-direction: column; gap: 8px; }
+  .rcm-conf-card li { position: relative; display: flex; align-items: flex-start; gap: 12px; font-size: 14.5px; line-height: 1.35; }
+  .rcm-conf-card ol li b { flex: none; position: relative; width: 28px; height: 28px; border-radius: 50%; background: var(--grad); color: #fff; font: 700 13px var(--f-title); display: grid; place-items: center; box-shadow: 0 0 0 4px var(--bg); }
+  .rcm-conf-card ol li span { flex: 1; min-width: 0; padding-top: 3px; font-weight: 600; }
+  .rcm-conf-card li span em { display: block; margin-top: 6px; padding: 9px 12px; border-radius: 14px; background: #fff; border: 1px solid var(--bd); font-style: normal; font-weight: 400; color: var(--tx2); font-size: 13.5px; line-height: 1.4; white-space: pre-wrap; }
+  .rcm-conf-card ul li { align-items: center; padding: 10px 12px; border-radius: 16px; background: #fff; border: 1px solid var(--bd); }
+  .rcm-conf-card li i { flex: none; font-style: normal; font-weight: 700; font-size: 10.5px; letter-spacing: .06em; text-transform: uppercase; background: var(--dark2); color: var(--gold); border-radius: 999px; padding: 3px 9px; }
+  .rcm-conf-card li.vz { justify-content: center; color: var(--tx3); background: transparent; border-style: dashed; }
+  .rcm-conf-card textarea { display: block; width: 100%; box-sizing: border-box; field-sizing: content; min-height: 50px; max-height: 40vh; border: 1px solid var(--bd-in); border-radius: 26px; background: #fff; padding: 13px 18px; font: 400 14px/24px var(--f-body); color: var(--dark); text-align: center; outline: none; resize: none; overflow: hidden; }
+  .rcm-conf-card textarea:focus { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(224,181,74,.22); }
+  .rcm-conf-card textarea.quebrou { text-align: left; }
+  .rcm-conf-bt { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
+  .rcm-conf-bt button { flex: 1 1 40%; height: 48px; border-radius: 999px; border: 1px solid var(--bd-in); background: #fff; font: 600 14.5px var(--f-body); color: var(--dark); cursor: pointer; transition: transform .1s ease, background .15s ease; }
+  .rcm-conf-bt button:active { transform: scale(.97); background: var(--chip); }
+  .rcm-conf-bt button.sim { flex-basis: 100%; height: 52px; border: 0; background: var(--grad); color: #fff; font-weight: 700; font-size: 15.5px; letter-spacing: .02em; box-shadow: 0 8px 18px rgba(138,98,18,.28); }
+  .rcm-conf-bt button.sim:active { background: var(--grad); filter: brightness(.95); }
   .rcm-bar { position: absolute; z-index: 5; display: flex; justify-content: center; margin: 0; left: 0; top: 0; filter: drop-shadow(0 6px 14px rgba(0,0,0,.4)); }
   .rcm-bar[hidden] { display: none; }
   .rcm-pill { display: flex; gap: 2px; padding: 5px; background: var(--dark2); border: 1px solid var(--gold); border-radius: 999px; }
@@ -3336,7 +3351,7 @@ window.saveAnswer = window.saveAnswer || function(){};
       var ov = document.createElement('div'); ov.className = 'rcm-conf';
       var caminho = corpo.map(function(x, q) { var ls = String(x).split('\n'), rp = /^Resposta: /.test(ls[1] || '') ? ls.slice(1).join('\n').slice(10) : ''; return '<li><b>' + (q + 1) + '</b><span>' + escH(ls[0].replace(/^\(|\)$/g, '')) + (rp ? '<em>' + escH(rp) + '</em>' : '') + '</span></li>'; }).join('');
       var mud = muda.length ? muda.map(function(m) { return '<li><i>' + escH(m.k) + '</i><span>' + escH(m.d) + '</span></li>'; }).join('') : '<li class="vz">Nenhuma mudança desde a última cópia.</li>';
-      ov.innerHTML = '<div class="rcm-conf-card"><h3>' + (parcial ? 'Copiando' : 'Confirmar cópia') + '</h3><h4>Você escolheu</h4><ol>' + caminho + '</ol><h4>Mudanças e instruções</h4><ul>' + mud + '</ul><div class="rcm-conf-bt"><button type="button" class="sim">' + 'Copiar' + '</button><button type="button" class="nao">Cancelar</button><button type="button" class="volta">Voltar</button></div></div>';
+      ov.innerHTML = '<div class="rcm-conf-card">' + (parcial ? '<div class="rcm-conf-kick">Copiando</div>' : '') + '<h4>Você escolheu</h4><ol>' + caminho + '</ol><h4>Mudanças e instruções</h4><ul>' + mud + '</ul><div class="rcm-conf-bt"><button type="button" class="sim">' + 'Copiar' + '</button><button type="button" class="nao">Cancelar</button><button type="button" class="volta">Voltar</button></div></div>';
       document.body.appendChild(ov);
       ov.querySelector('.nao').onclick = function() { ov.remove(); };
       ov.querySelector('.volta').onclick = function() { ov.remove(); ac.voltar(); };
@@ -3359,9 +3374,9 @@ window.saveAnswer = window.saveAnswer || function(){};
     function pedeResposta(f) {
       var velho = document.querySelector('.rcm-conf'); if (velho) velho.remove();
       var ov = document.createElement('div'); ov.className = 'rcm-conf';
-      ov.innerHTML = '<div class="rcm-conf-card"><h3>' + escH(f.n.text) + '</h3><textarea rows="5" placeholder="Escreva aqui"></textarea><div class="rcm-conf-bt"><button type="button" class="sim">OK</button><button type="button" class="nao">Cancelar</button><button type="button" class="volta">Pular</button></div></div>';
+      ov.innerHTML = '<div class="rcm-conf-card"><h3>' + escH(f.n.text) + '</h3><textarea rows="1" placeholder="Escreva aqui"></textarea><div class="rcm-conf-bt"><button type="button" class="sim">OK</button><button type="button" class="nao">Cancelar</button><button type="button" class="volta">Pular</button></div></div>';
       document.body.appendChild(ov);
-      var ta = ov.querySelector('textarea'); setTimeout(function() { try { ta.focus(); } catch (e) {} }, 60);
+      var ta = ov.querySelector('textarea'); ta.addEventListener('input', function() { if (!(window.CSS && CSS.supports && CSS.supports('field-sizing', 'content'))) (window.autoGrow || function() {})(ta); ta.classList.toggle('quebrou', ta.scrollHeight > 56); }); setTimeout(function() { try { ta.focus(); } catch (e) {} }, 60);
       ov.querySelector('.nao').onclick = function() { ov.remove(); };
       ov.querySelector('.volta').onclick = function() { ov.remove(); escolheEtapa(f, ''); };
       ov.querySelector('.sim').onclick = function() { var v = ta.value.trim(); ov.remove(); escolheEtapa(f, v); };
