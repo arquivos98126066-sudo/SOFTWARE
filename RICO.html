@@ -3209,13 +3209,13 @@ window.saveAnswer = window.saveAnswer || function(){};
       et.cur = Math.max(0, Math.min(et.cur - 1, et.s.length - 1));
       p.children = et.s[et.cur];
     }
-    function reiniciaFluxo(n) { n.et.cur = 0; n.et.desc = []; n.et.esc = []; n.et.fim = false; n.children = n.et.s[0]; n.et.run = true; }
+    function reiniciaFluxo(n) { n.et.cur = 0; n.et.desc = []; n.et.esc = []; n.et.fim = false; n.et.ver = null; n.children = n.et.s[0]; n.et.run = true; }
     function etapasMostra(id) { selId = id; barId = id; salva(); montaBar(); render(); }
     function etapasNo(id) { /* segurar: cria a próxima etapa (se a última já estiver vazia, só vai até ela) */
       var f = acha(id); if (!f) return;
       var n = f.n;
-      if (n.et && n.et.desc && n.et.desc.length) { n.children = n.et.s[n.et.cur]; n.et.desc = []; }
-      if (n.et) n.et.fim = false;
+      if (n.et && ((n.et.desc && n.et.desc.length) || n.et.ver != null)) { n.children = n.et.s[n.et.cur]; n.et.desc = []; n.et.esc = []; }
+      if (n.et) { n.et.fim = false; n.et.ver = null; }
       if (!n.et) { if (!n.children.length) return; n.et = { s: [n.children], cur: 0, run: false, esc: [] }; }
       n.et.s[n.et.cur] = n.children;
       var ult = n.et.s.length - 1;
@@ -3226,6 +3226,14 @@ window.saveAnswer = window.saveAnswer || function(){};
     function etapasVai(id) { /* tocar: navega 1, 2, 3 ... e volta ao 1 */
       var f = acha(id); if (!f || !f.n.et) return;
       var n = f.n;
+      var dq = n.et.desc ? n.et.desc.length : 0;
+      if (dq > 0 || n.et.fim) {
+        /* já escolheu algo: alterna entre as listas dos níveis já percorridos, do mais fundo ao primeiro e de novo */
+        var vq = n.et.ver == null ? dq : n.et.ver, nq = (vq + 1) % (dq + 1);
+        var lq = nq === 0 ? n.et.s[n.et.cur] : (acha(n.et.desc[nq - 1]) || { n: { children: n.children } }).n.children;
+        n.et.ver = nq; n.children = lq; n.collapsed = false;
+        etapasMostra(id); return;
+      }
       if (n.et.s.length < 2) { reiniciaFluxo(n); n.collapsed = false; etapasMostra(id); return; }
       if (n.et.desc && n.et.desc.length) { n.children = n.et.s[n.et.cur]; n.et.desc = []; }
       n.et.fim = false;
@@ -3410,6 +3418,9 @@ window.saveAnswer = window.saveAnswer || function(){};
       var p = f.p, et = p.et;
       var tx = textoDe(f.n);
       var pos = p.children.indexOf(f.n) + 1;
+      var dN = et.desc ? et.desc.length : 0, lvN = et.ver == null ? dN : et.ver;
+      if (lvN < dN) { et.esc = et.esc.slice(0, lvN); et.desc = et.desc.slice(0, lvN); et.fim = false; }
+      et.ver = null;
       var linha = '(' + (f.n.text || '') + ')' + (resp !== undefined ? '\nResposta: ' + (resp || 'sem resposta') : (pos > 0 ? '\nOpção ' + pos : '') + (tx ? '\n' + tx : ''));
       if (et.fim) { et.esc[et.esc.length - 1] = linha; selId = p.id; barId = null; render(); abreConfirma(p, false); return; }
       et.esc.push(linha);
@@ -3463,7 +3474,7 @@ window.saveAnswer = window.saveAnswer || function(){};
       var nb = barId ? acha(barId) : null;
       bar.innerHTML = movBar
         ? '<div class="rcm-pill"><button type="button" class="rcm-ib" data-a="sobe" aria-label="Sobe">' + ICO_SOBE + '</button><button type="button" class="rcm-ib" data-a="desce" aria-label="Desce">' + ICO_DESCE + '</button><button type="button" class="rcm-ib" data-a="pronto" aria-label="Pronto">' + ICO_OK + '</button></div>'
-        : '<div class="rcm-pill"><button type="button" class="rcm-ib" data-a="filho" aria-label="Adicionar">' + ICO_FILHO + '</button><button type="button" class="rcm-ib" data-a="irmao" aria-label="Mover">' + ICO_IRMAO + '</button>' + (proc && nb && (!nb.p || nb.n.et || nb.n.children.length) ? '<button type="button" class="rcm-ib" data-a="etapas" aria-label="Etapas">' + ICO_ETAPAS + (nb && nb.n.et ? '<b class="rcm-bd">' + (nb.n.et.cur + 1) + '</b>' : '') + '</button>' : '') + (proc && nb && !nb.p && nb.n.et && nb.n.et.esc.length ? '<button type="button" class="rcm-ib" data-a="parcial" aria-label="Copiar até aqui">' + ICO_DUP + '</button>' : '') + '<button type="button" class="rcm-ib" data-a="edita" aria-label="Editar">' + ICO_EDIT + '</button></div>';
+        : '<div class="rcm-pill"><button type="button" class="rcm-ib" data-a="filho" aria-label="Adicionar">' + ICO_FILHO + '</button><button type="button" class="rcm-ib" data-a="irmao" aria-label="Mover">' + ICO_IRMAO + '</button>' + (proc && nb && (!nb.p || nb.n.et || nb.n.children.length) ? '<button type="button" class="rcm-ib" data-a="etapas" aria-label="Etapas">' + ICO_ETAPAS + (nb && nb.n.et ? '<b class="rcm-bd">' + ((nb.n.et.desc && (nb.n.et.desc.length || nb.n.et.fim)) ? (nb.n.et.ver == null ? nb.n.et.desc.length : nb.n.et.ver) + 1 : nb.n.et.cur + 1) + '</b>' : '') + '</button>' : '') + (proc && nb && !nb.p && nb.n.et && nb.n.et.esc.length ? '<button type="button" class="rcm-ib" data-a="parcial" aria-label="Copiar até aqui">' + ICO_DUP + '</button>' : '') + '<button type="button" class="rcm-ib" data-a="edita" aria-label="Editar">' + ICO_EDIT + '</button></div>';
       if (destId) bar.innerHTML = '<div class="rcm-pill"><span class="rcm-av">Toque no destino</span><button type="button" class="rcm-ib" data-a="cancela" aria-label="Cancelar">' + ICO_X + '</button></div>';
       btnSib = bar.querySelector('[data-a="irmao"]');
       btnLev = bar.querySelector('[data-a="levar"],[data-a="etapas"]');
