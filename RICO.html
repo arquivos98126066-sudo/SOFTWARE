@@ -2879,7 +2879,7 @@ window.saveAnswer = window.saveAnswer || function(){};
       FL = {};
       (function anda(n, dentro) {
         if (dentro) FL[n.id] = 1;
-        var d = dentro || !!(n.et && n.et.run);
+        var d = dentro || !!n.et;
         (n.et ? [].concat.apply([], n.et.s) : n.children).forEach(function(c) { anda(c, d); });
       })(root, false);
     }
@@ -3131,7 +3131,7 @@ window.saveAnswer = window.saveAnswer || function(){};
       var f = acha(id);
       if (f && !f.p) {
         var ix = window.rcMapa.indice(api);
-        if (f.n.et && ((f.n.et.desc && f.n.et.desc.length) || f.n.et.fim) && window.rcMapa.estaAberto(ix)) { reiniciaFluxo(f.n); salva(); render(); return; }
+        if (f.n.et && ((f.n.et.desc && f.n.et.desc.length) || f.n.et.fim || !f.n.et.run) && window.rcMapa.estaAberto(ix)) { reiniciaFluxo(f.n); salva(); render(); return; }
         if (f.n.et && !window.rcMapa.estaAberto(ix)) { reiniciaFluxo(f.n); salva(); }
         if (window.rcMapa.foca(ix)) return;
       }
@@ -3226,6 +3226,7 @@ window.saveAnswer = window.saveAnswer || function(){};
     function etapasVai(id) { /* tocar: navega 1, 2, 3 ... e volta ao 1 */
       var f = acha(id); if (!f || !f.n.et) return;
       var n = f.n;
+      if (n.et.s.length < 2) { reiniciaFluxo(n); n.collapsed = false; etapasMostra(id); return; }
       if (n.et.desc && n.et.desc.length) { n.children = n.et.s[n.et.cur]; n.et.desc = []; }
       n.et.fim = false;
       n.et.s[n.et.cur] = n.children;
@@ -3408,7 +3409,8 @@ window.saveAnswer = window.saveAnswer || function(){};
       /* escolher uma célula: se ela tem opções dentro, desce para elas; se não, segue para a próxima etapa ou chega ao final (trava e pede confirmação) */
       var p = f.p, et = p.et;
       var tx = textoDe(f.n);
-      var linha = '(' + (f.n.text || '') + ')' + (resp !== undefined ? '\nResposta: ' + (resp || 'sem resposta') : (tx ? '\n' + tx : ''));
+      var pos = p.children.indexOf(f.n) + 1;
+      var linha = '(' + (f.n.text || '') + ')' + (resp !== undefined ? '\nResposta: ' + (resp || 'sem resposta') : (pos > 0 ? '\nOpção ' + pos : '') + (tx ? '\n' + tx : ''));
       if (et.fim) { et.esc[et.esc.length - 1] = linha; selId = p.id; barId = null; render(); abreConfirma(p, false); return; }
       et.esc.push(linha);
       var sub = f.n.et ? f.n.et.s[0] : f.n.children;
@@ -3634,6 +3636,19 @@ window.saveAnswer = window.saveAnswer || function(){};
           });
           localStorage.setItem('rico.seed.fundo', '1');
         }
+        if (localStorage.getItem('rico.seed.limpa') === null) {
+          ['ouro', 'vendas', 'atracao', 'estudo', 'mindset', 'ajuda', 'riqueza', 'anthropic'].forEach(function(nm) {
+            var kk = 'rico.proc.' + nm, svv = localStorage.getItem(kk);
+            if (!svv) return;
+            var mq = JSON.parse(svv);
+            (function ca(n) {
+              if (Array.isArray(n.i) && n.i.length > 1 && /^(Opção( \d+)?: |Pergunta: |Material: |Tema \d+: )/.test(n.i[0])) { n.i.shift(); if (Array.isArray(n.m)) n.m.shift(); }
+              (n.et ? [].concat.apply([], n.et.s) : n.children || []).forEach(ca);
+            })(mq);
+            localStorage.setItem(kk, JSON.stringify(mq)); localStorage.removeItem(kk + '.foto');
+          });
+          localStorage.setItem('rico.seed.limpa', '1');
+        }
         if (mudou) localStorage.setItem(S.ord, JSON.stringify(ch));
       } catch (e) {}
     }
@@ -3644,7 +3659,7 @@ window.saveAnswer = window.saveAnswer || function(){};
     var u = 0;
     function c(it, idx) {
       u++;
-      var n = { id: pre + u, text: it[0], collapsed: false, children: [], i: [it[3] || ('Opção ' + (idx + 1) + ': ' + it[0]), 'Serve para: ' + it[1]], m: [] };
+      var n = { id: pre + u, text: it[0], collapsed: false, children: [], i: ['Serve para: ' + it[1]], m: [] };
       (it[2] || []).forEach(function(f, j) { n.children.push(c(f, j)); });
       return n;
     }
@@ -3681,7 +3696,7 @@ window.saveAnswer = window.saveAnswer || function(){};
       if (usar) usar.children = (usar.children || []).concat(s1);
     }
     var sabN = acha(s0, 'ouro3');
-    if (sabN && !(sabN.children || []).some(function(c) { return c.text === 'Obtenção'; })) sabN.children = SAB()[2].map(function(f, j) { return { id: 'ouroB' + (j + 1), text: f[0], collapsed: false, children: [], i: ['Opção ' + (j + 1) + ': ' + f[0], 'Serve para: ' + f[1]], m: [] }; }).concat(sabN.children || []);
+    if (sabN && !(sabN.children || []).some(function(c) { return c.text === 'Obtenção'; })) sabN.children = SAB()[2].map(function(f, j) { return { id: 'ouroB' + (j + 1), text: f[0], collapsed: false, children: [], i: ['Serve para: ' + f[1]], m: [] }; }).concat(sabN.children || []);
     (function a2(n) { if (serve[n.text] && Array.isArray(n.i) && !n.i.some(function(x) { return /^Serve para/.test(x); })) { n.i.push(serve[n.text]); if (Array.isArray(n.m)) n.m.push({}); } (n.children || []).forEach(a2); })({ children: s0, text: '', i: null });
     mp.text = 'OURO'; mp.children = s0; mp.et = { s: [s0], cur: 0, run: false, esc: [] };
     return mp;
