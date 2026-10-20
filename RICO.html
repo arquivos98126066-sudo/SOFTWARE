@@ -756,7 +756,7 @@
   }
   .rcm-node.txt { border-color: #f6d97f; }
   .rcm-wrap.zig { animation: cicloEntra .3s ease; }
-  .rcm-wrap.zig .rcm-node { overflow: hidden; width: max-content; height: auto; min-height: 44px; padding: 8px 16px; gap: 10px; font-size: 14.5px; white-space: normal; text-align: center; justify-content: center; }
+  .rcm-wrap.zig .rcm-node { overflow: hidden; width: max-content; height: auto; min-height: 44px; padding: 8px 19px; gap: 10px; font-size: 14.5px; white-space: normal; text-align: center; justify-content: center; }
   .rcm-wrap.zig .rcm-node.root { height: auto; min-height: 44px; padding: 8px 22px; font-size: 16px; }
   .rcm-wrap.zig .rcm-node span { min-width: 0; line-height: 1.3; overflow-wrap: break-word; text-wrap: balance; }
   .rcm-wrap.zig .rcm-node.root { background: var(--dark2); color: #fff; font-size: 14.5px; padding: 8px 16px; font-weight: 600; font-family: inherit; }
@@ -2919,6 +2919,15 @@ window.saveAnswer = window.saveAnswer || function(){};
       if (semRaiz) lista = lista.filter(function(m) { return m.n.id !== 'root'; });
       lista.forEach(function(m) { frag.appendChild(m.el); });
       world.appendChild(frag);
+      if (zig) lista.forEach(function(m) {
+        /* nome que quebrou em mais de uma linha: a célula encolhe até a linha mais comprida, com o mesmo vão nos dois lados */
+        if (m.el.offsetHeight <= 48) return;
+        var sp = m.el.querySelector('span'), rg = document.createRange(), mx = 0;
+        rg.selectNodeContents(sp);
+        Array.prototype.forEach.call(rg.getClientRects(), function(q) { mx = Math.max(mx, q.width); });
+        var cs = getComputedStyle(m.el);
+        m.el.style.width = Math.ceil(mx + parseFloat(cs.paddingLeft) + parseFloat(cs.paddingRight) + 2) + 'px';
+      });
       lista.forEach(function(m) { m.w = m.el.offsetWidth; m.h = m.n.id === 'root' ? 38 : 31; });
       if (zig) {
         /* zigue-zague: cada ideia desce uma linha, alternando esquerda e direita; ligações em curva suave */
