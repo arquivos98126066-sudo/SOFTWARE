@@ -3256,6 +3256,13 @@ window.saveAnswer = window.saveAnswer || function(){};
       anda(r);
       return out;
     }
+    /* instrução entre colchetes numa célula vale uma vez: sai com a cópia e o pedaço é tirado da célula (caixinhas [ ] e [x] não contam) */
+    function limpaColchetes(n) {
+      var re = /\[[^\]\n]{2,}\]/g;
+      if (Array.isArray(n.i)) n.i = n.i.map(function(v) { return String(v == null ? '' : v).replace(re, '').replace(/ {2,}/g, ' ').replace(/\s+$/, ''); });
+      if (n.id !== 'root' && re.test(n.text || '')) { var t = String(n.text).replace(re, '').replace(/ {2,}/g, ' ').trim(); if (t) n.text = t; }
+      (n.et ? [].concat.apply([], n.et.s) : n.children).forEach(limpaColchetes);
+    }
     function mudancasCopia() {
       var ant = null, atual = achata(root), out = [];
       try { var sv = localStorage.getItem(KEY + '.foto'); if (sv) ant = JSON.parse(sv); } catch (e) {}
@@ -3270,6 +3277,8 @@ window.saveAnswer = window.saveAnswer || function(){};
         });
         Object.keys(ant).forEach(function(id) { if (!atual[id]) out.push('Célula apagada (' + ant[id].c + '): (' + ant[id].n + ')'); });
       }
+      limpaColchetes(root);
+      atual = achata(root);
       try { localStorage.setItem(KEY + '.foto', JSON.stringify(atual)); } catch (e) {}
       return out;
     }
