@@ -2773,6 +2773,7 @@ window.saveAnswer = window.saveAnswer || function(){};
         collapsed: !!n.collapsed, children: []
       };
       if (n.novo && !isRoot) o.novo = 1;
+      if (typeof n.ant === 'string' && !isRoot) o.ant = n.ant.slice(0, 60);
       if (Array.isArray(n.children)) n.children.forEach(function(c) { var x = limpa(c, false); if (x) o.children.push(x); });
       if (Array.isArray(n.i)) {
         o.i = n.i.map(function(v) { return String(v == null ? '' : v); });
@@ -3010,9 +3011,16 @@ window.saveAnswer = window.saveAnswer || function(){};
       scrim.classList.remove('on'); sheet.classList.remove('on');
       try { txt.blur(); } catch (e) {}
     }
+    /* guarda o nome antigo (o primeiro desde a última cópia) para a skill ver o que mudou */
+    function renome(n, v) {
+      if (v === n.text) return;
+      if (!n.novo && n.ant === undefined) n.ant = n.text;
+      n.text = v;
+      if (n.ant === v) delete n.ant;
+    }
     function confirma() {
       var f = editId ? acha(editId) : null;
-      if (f) { var v = txt.value.trim(); if (v) f.n.text = v; salva(); }
+      if (f) { var v = txt.value.trim(); if (v) renome(f.n, v); salva(); }
       fecha(); render();
     }
     function exclui() {
@@ -3046,7 +3054,7 @@ window.saveAnswer = window.saveAnswer || function(){};
     function salvaNota(e) {
       var n = e && e._no; if (!n) return;
       var t = String(e.t || '').trim();
-      if (t) n.text = t.slice(0, 60);
+      if (t) renome(n, t.slice(0, 60));
       n.i = e.i; n.m = e.m;
       salva();
     }
@@ -3056,7 +3064,7 @@ window.saveAnswer = window.saveAnswer || function(){};
       var f = acha(p.id);
       if (f && p.ref && CICLO.indexOf(p.ref) > -1) {
         var t = String(p.ref.t || '').trim();
-        if (t) { f.n.text = t.slice(0, 60); salva(); }
+        if (t) { renome(f.n, t.slice(0, 60)); salva(); }
       }
       render();
     }
@@ -3254,7 +3262,10 @@ window.saveAnswer = window.saveAnswer || function(){};
           var tx = textoDe(n);
           out.push('Célula nova (' + ctx + '): (' + (n.text || '') + ')' + (tx ? '\n' + tx : ''));
           delete n.novo;
+        } else if (typeof n.ant === 'string') {
+          out.push('Nome alterado (' + ctx + '): (' + n.ant + ') passou a (' + (n.text || '') + ')');
         }
+        delete n.ant;
         if (n.et) n.et.s.forEach(function(st, k) { st.forEach(function(c) { anda(c, 'mapa ' + (root.text || '') + ', etapa ' + (k + 1) + (n === root ? '' : ', dentro de ' + (n.text || ''))); }); });
         else n.children.forEach(function(c) { anda(c, 'mapa ' + (root.text || '') + (n === root ? '' : ', dentro de ' + (n.text || ''))); });
       }
