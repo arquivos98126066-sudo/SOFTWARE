@@ -3052,7 +3052,10 @@ window.saveAnswer = window.saveAnswer || function(){};
         f.n.collapsed = false; f.n.children.unshift(c);
         if (proc && zig && f.p) { if (camOn) { focoFix = true; focoEntra(f.n.id); } abreId = f.n.id; }
       }
-      selId = c.id; barId = null; salva(); render(); abre(c.id);
+      selId = c.id; barId = null; salva();
+      /* mapa fechado só mostra a raiz: abre o mapa para o filho novo aparecer */
+      if (!irmao && soRaiz && !f.p) window.rcMapa.foca(window.rcMapa.indice(api));
+      render(); abre(c.id);
     }
 
     function garanteSheet() {
