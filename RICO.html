@@ -3428,7 +3428,28 @@ window.saveAnswer = window.saveAnswer || function(){};
       try { localStorage.setItem(S.ord, JSON.stringify(ch)); } catch (e) {}
     } else ch = mapasChaves(S);
     if (!ch.length) ch = [S.def];
+    if (S === SETS.p) {
+      /* teste: mapa "Ouro" com etapas (menu da skill, material e tema), entra uma vez só */
+      try {
+        if (localStorage.getItem('rico.seed.ouro') === null) {
+          var k = 'rico.proc.ouro';
+          localStorage.setItem(k, JSON.stringify(semeiaOuro()));
+          localStorage.setItem('rico.seed.ouro', '1');
+          if (ch.indexOf(k) < 0) ch.push(k);
+          localStorage.setItem(S.ord, JSON.stringify(ch));
+        }
+      } catch (e) {}
+    }
     S.arr = ch.map(function(k) { return criaMapa(k, false); });
+  }
+  function semeiaOuro() {
+    var u = 0;
+    function no(t, tx) { u++; return { id: 'ouro' + u, text: t, collapsed: false, children: [], i: [tx], m: [] }; }
+    var temas = ['Resultado, ação e modelagem', 'Decisão, ação e dor e prazer', 'Rituais emocionais e procrastinação', 'Estado emocional e corpo', 'Foco e perguntas', 'Crenças e mudança duradoura', 'Valores e regras', 'Metas', 'Dinheiro: crenças e meta', 'Dinheiro: plano e hábitos', 'Medo, fracasso e rejeição', 'Confiança e solução de problemas', 'Relações e rumo de vida'];
+    var s0 = [no('Analisar material', 'Opção 1: analisar um material'), no('Usar material guardado', 'Opção 2: usar um material guardado'), no('Sabedoria', 'Opção 3: sabedoria')];
+    var s1 = [no('Você Nasceu Rico', 'Material: Você Nasceu Rico'), no('Fênix', 'Material: Seminário Fênix'), no('Tony Robbins', 'Material: Tony Robbins')];
+    var s2 = temas.map(function(t, j) { return no(t, 'Tema ' + (j + 1) + ': ' + t); });
+    return { id: 'root', text: 'Ouro', collapsed: false, children: s0, et: { s: [s0, s1, s2], cur: 0, run: false, esc: [] } };
   }
   window.rcMapa = {
     tela: function() { return CUR === SETS.p ? 'Processo' : 'Mapa mental'; },
