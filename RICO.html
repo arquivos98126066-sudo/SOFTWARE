@@ -979,6 +979,8 @@
         <button type="button" class="rcm-ib" data-m="duplicar" aria-label="Duplicar" data-tip="Duplicar"><svg viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2.5"/><path d="M5 15V7a2 2 0 0 1 2-2h8"/></svg></button>
         <button type="button" class="rcm-ib" data-m="excluir" aria-label="Excluir" data-tip="Excluir"><svg viewBox="0 0 24 24"><path d="M5 7h14M10 7V5h4v2M7 7l1 12h8l1-12"/></svg></button>
         <button type="button" class="rcm-ib" data-m="copiar" aria-label="Copiar" data-tip="Copiar"><svg viewBox="0 0 24 24"><path d="M4 14v4.5A1.5 1.5 0 0 0 5.5 20h13a1.5 1.5 0 0 0 1.5-1.5V14"/><path d="M12 15V4M8 8l4-4 4 4"/></svg></button>
+        <button type="button" class="rcm-ib" data-h="desfaz" aria-label="Desfazer" data-tip="Desfazer" disabled><svg viewBox="0 0 24 24"><path d="M19 12H5"/><path d="M11 6l-6 6 6 6"/></svg></button>
+        <button type="button" class="rcm-ib" data-h="refaz" aria-label="Refazer" data-tip="Refazer" disabled><svg viewBox="0 0 24 24"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg></button>
       </div>
     </div>
     <div class="cycle-chain" id="ciclo-lista"></div>
@@ -1487,8 +1489,68 @@ async function carregarDados() {
   }
 }
 
+// ─── Desfazer e Refazer (vale para o Rico inteiro: mapas, textos, hábitos, metas) ─────
+var _hAtual = null, _hDesf = [], _hRef = [], _hT = null, _hOk = false, _hAplicando = false;
+function hChaves() {
+  var out = [];
+  try { for (var i = 0; i < localStorage.length; i++) { var k = localStorage.key(i); if (k && k.indexOf('rico.') === 0 && k.indexOf('rico.seed.') !== 0 && !/\.foto$/.test(k)) out.push(k); } } catch (e) {}
+  return out;
+}
+function hFoto() {
+  var m = {};
+  hChaves().forEach(function(k) { m[k] = localStorage.getItem(k); });
+  return JSON.stringify({ d: coletarDados(), m: m });
+}
+function hBotoes() {
+  var d = document.querySelector('[data-h="desfaz"]'), r = document.querySelector('[data-h="refaz"]');
+  if (d) d.disabled = !(_hOk && _hDesf.length);
+  if (r) r.disabled = !(_hOk && _hRef.length);
+}
+function hVerifica() {
+  clearTimeout(_hT);
+  if (!_hOk || _hAplicando) return;
+  var s; try { s = hFoto(); } catch (e) { return; }
+  if (s === _hAtual) return;
+  _hDesf.push(_hAtual); if (_hDesf.length > 40) _hDesf.shift();
+  _hRef = []; _hAtual = s; hBotoes();
+}
+function hAgenda() { if (!_hOk || _hAplicando) return; clearTimeout(_hT); _hT = setTimeout(hVerifica, 500); }
+function hAplica(txt) {
+  _hAplicando = true;
+  try {
+    var o = JSON.parse(txt);
+    try { if (document.activeElement && document.activeElement.blur) document.activeElement.blur(); } catch (e) {}
+    hChaves().forEach(function(k) { if (!(k in o.m)) { try { localStorage.removeItem(k); } catch (e) {} } });
+    Object.keys(o.m).forEach(function(k) { try { localStorage.setItem(k, o.m[k]); } catch (e) {} });
+    document.querySelectorAll('.choice-label.selected').forEach(function(l) { l.classList.remove('selected'); });
+    var ed = _editou; _editou = false;
+    try { preencherDados(o.d, true); } finally { _editou = ed; }
+    if (window.rcMapa && window.rcMapa.recarrega) window.rcMapa.recarrega();
+    respostasCache = o.d;
+    try { _editou = true; salvarNoFirebase(); } catch (e) {}
+  } finally { _hAplicando = false; }
+  try { _hAtual = hFoto(); } catch (e) { _hAtual = txt; }
+  hBotoes();
+}
+function hDesfaz() { hVerifica(); if (!_hDesf.length) return; _hRef.push(_hAtual); hAplica(_hDesf.pop()); }
+function hRefaz() { hVerifica(); if (!_hRef.length) return; _hDesf.push(_hAtual); hAplica(_hRef.pop()); }
+function hInicia() { if (_hOk) return; _hOk = true; try { _hAtual = hFoto(); } catch (e) { _hAtual = null; _hOk = false; } hBotoes(); }
+(function() {
+  var si = Storage.prototype.setItem, ri = Storage.prototype.removeItem;
+  Storage.prototype.setItem = function(k) { var r = si.apply(this, arguments); if (this === window.localStorage && typeof k === 'string' && k.indexOf('rico.') === 0) hAgenda(); return r; };
+  Storage.prototype.removeItem = function(k) { var r = ri.apply(this, arguments); if (this === window.localStorage && typeof k === 'string' && k.indexOf('rico.') === 0) hAgenda(); return r; };
+  document.addEventListener('click', function(e) {
+    var b = e.target.closest ? e.target.closest('[data-h]') : null;
+    if (b) { e.stopPropagation(); e.preventDefault(); if (!b.disabled) { if (b.getAttribute('data-h') === 'desfaz') hDesfaz(); else hRefaz(); } return; }
+    hAgenda();
+  }, true);
+  document.addEventListener('input', hAgenda, true);
+  document.addEventListener('change', hAgenda, true);
+})();
+
 // ─── INIT ─────────────────────────────────────────────────────────────────────
-carregarDados();
+carregarDados().then(hInicia, hInicia);
+setTimeout(hInicia, 12000);
 // Sincroniza automaticamente ao voltar online
 window.addEventListener('online', function() {
   var dados = coletarDados();
@@ -4028,6 +4090,7 @@ window.saveAnswer = window.saveAnswer || function(){};
       return true;
     },
     estaAberto: function(i) { return CUR.aberto === i; },
+    recarrega: function() { SETS.m.arr = []; SETS.p.arr = []; PEND = null; ROOTTAP = null; renderCiclo(); },
     cancela: function(semRender) {
       PEND = null; ROOTTAP = null;
       SETS.m.arr.concat(SETS.p.arr).forEach(function(m) { m.soltaMov(); });
