@@ -2927,12 +2927,12 @@ window.saveAnswer = window.saveAnswer || function(){};
       var frag = document.createDocumentFragment();
       /* montando camadas dentro de uma célula: só o caminho até ela e o que tem dentro; o nome dela fica amarelo */
       if (focoId && !acha(focoId)) focoId = null;
-      var foId = proc && zig ? (focoId || (barId && (acha(barId) || {}).n && acha(barId).n.et ? barId : null)) : null, foF = foId ? acha(foId) : null;
-      if (foF && foF.p) {
-        var keepF = { root: 1 }; keepF[foId] = 1;
-        foF.n.children.forEach(function(c) { keepF[c.id] = 1; });
+      /* Processo: entrou numa célula, só aparecem os filhos dela (ela, a raiz e as irmãs somem); sem foco, a raiz e o primeiro nível */
+      if (proc && zig) {
+        var foF = focoId ? acha(focoId) : null, keepF = {};
+        if (foF) { foF.n.children.forEach(function(c) { keepF[c.id] = 1; }); }
+        else { keepF.root = 1; root.children.forEach(function(c) { keepF[c.id] = 1; }); }
         lista = lista.filter(function(m) { return keepF[m.n.id]; });
-        lista.forEach(function(m) { if (m.n.id === foId) m.el.classList.add('foco'); });
       }
       if (soRaiz) lista = lista.filter(function(m) { return m.n.id === 'root'; });
       if (semRaiz) lista = lista.filter(function(m) { return m.n.id !== 'root'; });
@@ -3046,7 +3046,7 @@ window.saveAnswer = window.saveAnswer || function(){};
         f.p.children.splice(f.p.children.indexOf(f.n) + 1, 0, c);
       } else {
         f.n.collapsed = false; f.n.children.unshift(c);
-        if (proc && zig && f.p) focoId = f.n.id;
+        if (proc && zig && f.p) focoEntra(f.n.id);
       }
       selId = c.id; barId = null; salva(); render(); abre(c.id);
     }
@@ -3166,7 +3166,7 @@ window.saveAnswer = window.saveAnswer || function(){};
         if (window.rcMapa.foca(ix)) return;
       }
       if (f && f.p && f.p.et && f.p.et.run && !f.p.collapsed) { if (/\?\s*$/.test(f.n.text || '')) pedeResposta(f); else escolheEtapa(f); return; }
-      if (proc && zig && f && f.p && FL[f.n.id] && (f.n.children.length || f.n.et)) { focoId = f.n.id; f.n.collapsed = false; render(); return; }
+      if (proc && zig && f && f.p && (f.n.children.length || (FL[f.n.id] && f.n.et))) { focoEntra(f.n.id); f.n.collapsed = false; selId = null; render(); return; }
       if (f && (f.n.children.length || f.n.et)) {
         f.n.collapsed = !f.n.collapsed;
         if (!f.n.collapsed && f.n.et && !f.p) reiniciaFluxo(f.n);
@@ -3291,6 +3291,8 @@ window.saveAnswer = window.saveAnswer || function(){};
       root.children = topo ? (topo.et ? topo.et.s[0] : topo.children) : et.s[et.cur];
       selId = 'root'; barId = null; salva(); render();
     }
+    function focoEntra(id) { if (focoId !== id) { focoId = id; try { history.pushState({ _foco: 1 }, ''); } catch (e) {} } }
+    window.addEventListener('popstate', function() { if (focoId && wrap && wrap.isConnected) focoVolta(); });
     function focoVolta() { /* sobe um nível: do foco para o pai; na raiz, volta à lista normal */
       var f = focoId ? acha(focoId) : null;
       var pa = f && f.p; focoId = pa && pa.id !== 'root' ? pa.id : null;
