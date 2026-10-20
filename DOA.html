@@ -237,6 +237,13 @@ document.addEventListener('click',function(e){
   #pl-html .rows { display: flex; flex-direction: column; gap: 8px; }
   #pl-html .row .row-ico { color: var(--brand); }
   #pl-html .pl-h-add .row-main { color: var(--tx2); border-style: dashed; }
+  #pl-html .row.sel { border-color: var(--brand); box-shadow: 0 0 0 2px rgba(80,72,180,.25); }
+  #pl-html .row-main { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+  .pl-h-bar { display: flex; justify-content: center; margin: -2px 0 2px; }
+  .pl-h-pill { display: flex; gap: 2px; padding: 5px; background: var(--dark, #131c2e); border-radius: 999px; box-shadow: 0 6px 14px rgba(15,27,45,.25); }
+  .pl-h-pill button { width: 42px; height: 42px; border: 0; border-radius: 50%; background: transparent; display: grid; place-items: center; color: #fff; padding: 0; }
+  .pl-h-pill button:active { background: rgba(255,255,255,.16); }
+  .pl-h-pill svg { width: 20px; height: 20px; stroke: currentColor; stroke-width: 1.7; fill: none; stroke-linecap: round; stroke-linejoin: round; }
   #html-view { display: none; position: fixed; inset: 0; z-index: 700; background: var(--bg); flex-direction: column; }
   #html-view.open { display: flex; }
   #html-view iframe { flex: 1; width: 100%; border: 0; background: #fff; }
@@ -501,6 +508,10 @@ document.addEventListener('click',function(e){
     <symbol id="i-dots" viewBox="0 0 24 24"><circle cx="5.5" cy="12" r="1.2" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.2" fill="currentColor" stroke="none"/><circle cx="18.5" cy="12" r="1.2" fill="currentColor" stroke="none"/></symbol>
     <symbol id="i-dots-v" viewBox="0 0 24 24"><circle cx="12" cy="5.5" r="1.2" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.2" fill="currentColor" stroke="none"/><circle cx="12" cy="18.5" r="1.2" fill="currentColor" stroke="none"/></symbol>
     <symbol id="i-code" viewBox="0 0 24 24"><path d="M8 7l-5 5 5 5M16 7l5 5-5 5M14 4l-4 16"/></symbol>
+    <symbol id="i-arrow-up" viewBox="0 0 24 24"><path d="M12 19V5M6 11l6-6 6 6"/></symbol>
+    <symbol id="i-arrow-down" viewBox="0 0 24 24"><path d="M12 5v14M6 13l6 6 6-6"/></symbol>
+    <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 4v11M7 11l5 5 5-5M5 20h14"/></symbol>
+    <symbol id="i-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 012-2h9"/></symbol>
     <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
     <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 002 2h6a2 2 0 002-2l1-12M9 7V4h6v3"/></symbol>
     <symbol id="i-folder" viewBox="0 0 24 24"><path d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V7z"/></symbol>
@@ -1653,24 +1664,52 @@ function htmlLer(){
   htmlSalva(seed); return seed;
 }
 function htmlSalva(a){ try { localStorage.setItem(HTML_KEY, JSON.stringify(a)); } catch(e){ alert('Não coube no aparelho: ' + e.message); } }
+var _htmlSel = null, _htmlApos = null;
 function htmlRender(){
   var box = document.getElementById('pl-html'); if(!box) return;
   if(_pl_currentFolderId !== null){ box.innerHTML = ''; return; }
   var lista = htmlLer();
+  if(_htmlSel && !lista.some(function(x){ return x.id === _htmlSel; })) _htmlSel = null;
   box.innerHTML = '<div class="pl-h-title">HTMLs</div><div class="rows"></div>';
   var rows = box.querySelector('.rows');
   lista.forEach(function(h){
-    var row = document.createElement('div'); row.className = 'row has-edit';
-    row.innerHTML = '<button type="button" class="row-main">' + ic('code', 'row-ico') + '<span class="row-name">' + p_esc(h.nome) + '</span>' + ic('chevron-right', 'row-chev') + '</button>' +
-      '<button type="button" class="row-edit" aria-label="Editar HTML" data-tip="Editar HTML">' + ic('dots-v') + '</button>';
-    row.querySelector('.row-main').onclick = function(){ htmlAbre(h.id); };
-    row.querySelector('.row-edit').onclick = function(){ htmlEdita(h.id); };
+    var row = document.createElement('div'); row.className = 'row' + (h.id === _htmlSel ? ' sel' : '');
+    row.innerHTML = '<button type="button" class="row-main">' + ic('code', 'row-ico') + '<span class="row-name">' + p_esc(h.nome) + '</span>' + ic('chevron-right', 'row-chev') + '</button>';
+    var btn = row.querySelector('.row-main'), t = null, seg = false, x0 = 0, y0 = 0;
+    btn.addEventListener('pointerdown', function(e){ seg = false; x0 = e.clientX; y0 = e.clientY; clearTimeout(t); t = setTimeout(function(){ seg = true; _htmlSel = (_htmlSel === h.id ? null : h.id); htmlRender(); }, 450); });
+    btn.addEventListener('pointermove', function(e){ if(Math.abs(e.clientX - x0) > 10 || Math.abs(e.clientY - y0) > 10) clearTimeout(t); });
+    ['pointerup', 'pointercancel', 'pointerleave'].forEach(function(n){ btn.addEventListener(n, function(){ clearTimeout(t); }); });
+    btn.addEventListener('contextmenu', function(e){ e.preventDefault(); });
+    btn.onclick = function(){ if(seg){ seg = false; return; } if(_htmlSel){ _htmlSel = null; htmlRender(); return; } htmlAbre(h.id); };
     rows.appendChild(row);
+    if(h.id === _htmlSel){
+      var bar = document.createElement('div'); bar.className = 'pl-h-bar';
+      bar.innerHTML = '<div class="pl-h-pill"><button type="button" data-a="add" aria-label="Adicionar HTML abaixo">' + ic('plus') + '</button><button type="button" data-a="up" aria-label="Subir">' + ic('arrow-up') + '</button><button type="button" data-a="dn" aria-label="Descer">' + ic('arrow-down') + '</button><button type="button" data-a="ren" aria-label="Renomear">' + ic('pencil') + '</button><button type="button" data-a="dl" aria-label="Baixar HTML">' + ic('download') + '</button><button type="button" data-a="cp" aria-label="Copiar código">' + ic('copy') + '</button><button type="button" data-a="del" aria-label="Remover">' + ic('trash') + '</button></div>';
+      bar.querySelector('[data-a=add]').onclick = function(){ _htmlApos = h.id; document.getElementById('html-file').click(); };
+      bar.querySelector('[data-a=up]').onclick = function(){ htmlMove(h.id, -1); };
+      bar.querySelector('[data-a=dn]').onclick = function(){ htmlMove(h.id, 1); };
+      bar.querySelector('[data-a=dl]').onclick = function(){ htmlCodigo(h, function(c){ var u = URL.createObjectURL(new Blob([c], {type: 'text/html'})), l = document.createElement('a'); l.href = u; l.download = h.nome + '.html'; document.body.appendChild(l); l.click(); l.remove(); setTimeout(function(){ URL.revokeObjectURL(u); }, 4000); }); };
+      bar.querySelector('[data-a=cp]').onclick = function(){ htmlCodigo(h, function(c){ var ok = function(){ toast('Código copiado'); }; if(navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(c).then(ok); else { var t = document.createElement('textarea'); t.value = c; document.body.appendChild(t); t.select(); document.execCommand('copy'); t.remove(); ok(); } }); };
+      bar.querySelector('[data-a=ren]').onclick = function(){ htmlEdita(h.id); };
+      bar.querySelector('[data-a=del]').onclick = function(){ htmlEdita(h.id, true); };
+      rows.appendChild(bar);
+    }
   });
-  var add = document.createElement('div'); add.className = 'row pl-h-add';
-  add.innerHTML = '<button type="button" class="row-main">' + ic('plus', 'row-ico') + '<span class="row-name">Adicionar HTML</span></button>';
-  add.querySelector('button').onclick = function(){ document.getElementById('html-file').click(); };
-  rows.appendChild(add);
+  if(!lista.length){
+    var add = document.createElement('div'); add.className = 'row pl-h-add';
+    add.innerHTML = '<button type="button" class="row-main">' + ic('plus', 'row-ico') + '<span class="row-name">Adicionar HTML</span></button>';
+    add.querySelector('button').onclick = function(){ _htmlApos = null; document.getElementById('html-file').click(); };
+    rows.appendChild(add);
+  }
+}
+function htmlMove(id, d){
+  var a = htmlLer(), i = a.findIndex(function(x){ return x.id === id; }), j = i + d;
+  if(i < 0 || j < 0 || j >= a.length) return;
+  var t = a[i]; a[i] = a[j]; a[j] = t; htmlSalva(a); htmlRender();
+}
+function htmlCodigo(h, fn){
+  if(h.html != null) return fn(h.html);
+  fetch(h.src).then(function(r){ return r.text(); }).then(fn).catch(function(){ toast('Não consegui ler o HTML'); });
 }
 function htmlAbre(id){
   var h = htmlLer().find(function(x){ return x.id === id; }); if(!h) return;
@@ -1684,21 +1723,23 @@ function htmlFecha(){
   document.getElementById('html-view').classList.remove('open');
   fr.removeAttribute('srcdoc'); fr.src = 'about:blank';
 }
-function htmlEdita(id){
+function htmlEdita(id, apagar){
   var a = htmlLer(), h = a.find(function(x){ return x.id === id; }); if(!h) return;
-  var n = prompt('Nome do HTML (apague o nome para remover)', h.nome);
+  var n = apagar ? '' : prompt('Novo nome', h.nome);
   if(n === null) return;
   n = n.trim();
-  if(!n){ if(confirm('Remover "' + h.nome + '" da lista?')){ a = a.filter(function(x){ return x.id !== id; }); htmlSalva(a); htmlRender(); } return; }
-  h.nome = n; htmlSalva(a); htmlRender();
+  if(!n){ if(confirm('Remover "' + h.nome + '" da lista?')){ a = a.filter(function(x){ return x.id !== id; }); _htmlSel = null; htmlSalva(a); htmlRender(); } return; }
+  h.nome = n; _htmlSel = null; htmlSalva(a); htmlRender();
 }
 document.getElementById('html-file').addEventListener('change', function(e){
   var f = e.target.files && e.target.files[0]; e.target.value = ''; if(!f) return;
   var r = new FileReader();
   r.onload = function(){
     var a = htmlLer();
-    a.push({id:'h' + Date.now(), nome: f.name.replace(/\.html?$/i, ''), html: String(r.result)});
-    htmlSalva(a); htmlRender();
+    var novo = {id:'h' + Date.now(), nome: f.name.replace(/\.html?$/i, ''), html: String(r.result)};
+    var k = _htmlApos ? a.findIndex(function(x){ return x.id === _htmlApos; }) : -1;
+    if(k >= 0) a.splice(k + 1, 0, novo); else a.push(novo);
+    _htmlApos = null; _htmlSel = null; htmlSalva(a); htmlRender();
   };
   r.readAsText(f);
 });
