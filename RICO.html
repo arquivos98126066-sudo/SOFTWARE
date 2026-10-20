@@ -2826,10 +2826,21 @@ window.saveAnswer = window.saveAnswer || function(){};
       for (var i = 0; i < n.children.length; i++) { var r = acha(id, n.children[i], n); if (r) return r; }
       return null;
     }
-    function filhos(n) { return n.collapsed ? [] : n.children; }
+    /* fluxo (mapa com etapas em uso): só a lista de opções de agora aparece, sem as camadas de dentro */
+    var FL = {};
+    function marcaFluxo() {
+      FL = {};
+      (function anda(n, dentro) {
+        if (dentro) FL[n.id] = 1;
+        var d = dentro || !!(n.et && n.et.run);
+        (n.et ? [].concat.apply([], n.et.s) : n.children).forEach(function(c) { anda(c, d); });
+      })(root, false);
+    }
+    function filhos(n) { return n.collapsed ? [] : (FL[n.id] && !n.et ? [] : n.children); }
 
     function render() {
       if (!root || !wrap || !wrap.isConnected) return;
+      marcaFluxo();
       var velhos = world.querySelectorAll('.rcm-node');
       for (var i = 0; i < velhos.length; i++) velhos[i].remove();
       if (destId && PEND && bar && !barId && acha(destId)) { barId = destId; movBar = false; montaBar(); }
@@ -3068,13 +3079,14 @@ window.saveAnswer = window.saveAnswer || function(){};
       var f = acha(id);
       if (f && !f.p) {
         var ix = window.rcMapa.indice(api);
-        if (f.n.et && !window.rcMapa.estaAberto(ix)) { f.n.et.cur = 0; f.n.children = f.n.et.s[0]; f.n.et.run = f.n.et.s.length > 1; f.n.et.esc = []; salva(); }
+        if (f.n.et && f.n.et.desc && f.n.et.desc.length && window.rcMapa.estaAberto(ix)) { reiniciaFluxo(f.n); salva(); render(); return; }
+        if (f.n.et && !window.rcMapa.estaAberto(ix)) { reiniciaFluxo(f.n); salva(); }
         if (window.rcMapa.foca(ix)) return;
       }
       if (f && f.p && f.p.et && f.p.et.run && !f.p.collapsed) { escolheEtapa(f); return; }
       if (f && (f.n.children.length || f.n.et)) {
         f.n.collapsed = !f.n.collapsed;
-        if (!f.n.collapsed && f.n.et) { f.n.et.cur = 0; f.n.children = f.n.et.s[0]; f.n.et.run = f.n.et.s.length > 1; f.n.et.esc = []; }
+        if (!f.n.collapsed && f.n.et) reiniciaFluxo(f.n);
         salva();
       }
       render();
@@ -3138,17 +3150,19 @@ window.saveAnswer = window.saveAnswer || function(){};
     /* etapas (só no Processo): cada etapa é uma lista de opções; ao reabrir, começa da primeira e cada escolha abre a seguinte */
     function etapaVazia(p) { /* apagou o último item de uma etapa: a etapa some e os números se ajustam */
       var et = p.et;
-      if (!et || p.children.length || et.s.length < 2) return;
+      if (!et || (et.desc && et.desc.length) || p.children.length || et.s.length < 2) return;
       et.s.splice(et.cur, 1);
       et.esc = [];
       if (et.s.length < 2) { p.children = et.s[0]; delete p.et; return; }
       et.cur = Math.max(0, Math.min(et.cur - 1, et.s.length - 1));
       p.children = et.s[et.cur];
     }
+    function reiniciaFluxo(n) { n.et.cur = 0; n.et.desc = []; n.et.esc = []; n.children = n.et.s[0]; n.et.run = true; }
     function etapasMostra(id) { selId = id; barId = id; salva(); montaBar(); render(); }
     function etapasNo(id) { /* segurar: cria a próxima etapa (se a última já estiver vazia, só vai até ela) */
       var f = acha(id); if (!f) return;
       var n = f.n;
+      if (n.et && n.et.desc && n.et.desc.length) { n.children = n.et.s[n.et.cur]; n.et.desc = []; }
       if (!n.et) { if (!n.children.length) return; n.et = { s: [n.children], cur: 0, run: false, esc: [] }; }
       n.et.s[n.et.cur] = n.children;
       var ult = n.et.s.length - 1;
@@ -3159,6 +3173,7 @@ window.saveAnswer = window.saveAnswer || function(){};
     function etapasVai(id) { /* tocar: navega 1, 2, 3 ... e volta ao 1 */
       var f = acha(id); if (!f || !f.n.et) return;
       var n = f.n;
+      if (n.et.desc && n.et.desc.length) { n.children = n.et.s[n.et.cur]; n.et.desc = []; }
       n.et.s[n.et.cur] = n.children;
       n.et.cur = (n.et.cur + 1) % n.et.s.length; n.children = n.et.s[n.et.cur];
       n.et.run = false; n.collapsed = false;
@@ -3282,13 +3297,17 @@ window.saveAnswer = window.saveAnswer || function(){};
       return out;
     }
     function escolheEtapa(f) {
+      /* escolher uma célula: se ela tem opções dentro, desce para elas; se não, segue para a próxima etapa ou termina e copia */
       var p = f.p, et = p.et;
       var tx = textoDe(f.n);
-      et.esc[et.cur] = '(' + (f.n.text || '') + ')' + (tx ? '\n' + tx : '');
-      if (et.cur + 1 < et.s.length) { et.cur++; p.children = et.s[et.cur]; }
+      et.esc.push('(' + (f.n.text || '') + ')' + (tx ? '\n' + tx : ''));
+      var sub = f.n.et ? f.n.et.s[0] : f.n.children;
+      if (sub && sub.length) {
+        et.desc = et.desc || []; et.desc.push(f.n.id); p.children = sub;
+      } else if (!(et.desc && et.desc.length) && et.cur + 1 < et.s.length) { et.cur++; p.children = et.s[et.cur]; }
       else {
-        et.cur = 0; p.children = et.s[0];
         var tudo = et.esc.filter(Boolean).concat(mudancasCopia()).join('\n\n');
+        et.cur = 0; et.desc = []; et.esc = []; p.children = et.s[0];
         if (tudo) copiaTexto(tudo);
       }
       selId = p.id; barId = null; salva(); render();
@@ -3465,39 +3484,146 @@ window.saveAnswer = window.saveAnswer || function(){};
     } else ch = mapasChaves(S);
     if (!ch.length) ch = [S.def];
     if (S === SETS.p) {
-      /* mapa "Ouro" (teste): entra uma vez; a versão 2 acrescenta "Serve para" nas células que já existem */
+      /* mapas das skills (Ouro, Vendas...): entram uma vez; a versão 3 põe as camadas dependentes (material > tema) */
       try {
-        var fl = localStorage.getItem('rico.seed.ouro'), k = 'rico.proc.ouro';
+        var fl = localStorage.getItem('rico.seed.ouro'), k = 'rico.proc.ouro', mudou = false;
         if (fl === null) {
           localStorage.setItem(k, JSON.stringify(semeiaOuro()));
-          localStorage.setItem('rico.seed.ouro', '2');
-          if (ch.indexOf(k) < 0) ch.push(k);
-          localStorage.setItem(S.ord, JSON.stringify(ch));
-        } else if (fl === '1') {
+          localStorage.setItem('rico.seed.ouro', '3'); mudou = true;
+        } else if (fl !== '3') {
           var sv = localStorage.getItem(k);
-          if (sv) {
-            var mp = JSON.parse(sv), serve = {};
-            (function a1(n) { if (Array.isArray(n.i)) { var l = n.i.filter(function(x) { return /^Serve para/.test(x); })[0]; if (l) serve[n.id] = l; } (n.et ? [].concat.apply([], n.et.s) : n.children).forEach(a1); })(semeiaOuro());
-            (function a2(n) { if (serve[n.id] && Array.isArray(n.i) && !n.i.some(function(x) { return /^Serve para/.test(x); })) { n.i.push(serve[n.id]); if (Array.isArray(n.m)) n.m.push({}); } (n.et ? [].concat.apply([], n.et.s) : n.children).forEach(a2); })(mp);
-            localStorage.setItem(k, JSON.stringify(mp));
-            localStorage.removeItem(k + '.foto');
-          }
-          localStorage.setItem('rico.seed.ouro', '2');
+          if (sv) { localStorage.setItem(k, JSON.stringify(migraOuro(JSON.parse(sv)))); localStorage.removeItem(k + '.foto'); }
+          localStorage.setItem('rico.seed.ouro', '3');
         }
+        if (mudou && ch.indexOf(k) < 0) ch.push(k);
+        if (localStorage.getItem('rico.seed.skills') === null) {
+          semeiaSkills().forEach(function(m) {
+            localStorage.setItem(m.k, JSON.stringify(m.r));
+            if (ch.indexOf(m.k) < 0) ch.push(m.k);
+          });
+          localStorage.setItem('rico.seed.skills', '1'); mudou = true;
+        }
+        if (mudou) localStorage.setItem(S.ord, JSON.stringify(ch));
       } catch (e) {}
     }
     S.arr = ch.map(function(k) { return criaMapa(k, false); });
   }
-  function semeiaOuro() {
+  /* mapa de uma skill: [nome, serve para, [opções de dentro], texto da célula (opcional)]; sem texto, vira "Opção N: nome" */
+  function semeiaMapa(raiz, pre, itens) {
     var u = 0;
-    function no(t, tx, serve) { u++; return { id: 'ouro' + u, text: t, collapsed: false, children: [], i: [tx, 'Serve para: ' + serve], m: [] }; }
+    function c(it, idx) {
+      u++;
+      var n = { id: pre + u, text: it[0], collapsed: false, children: [], i: [it[3] || ('Opção ' + (idx + 1) + ': ' + it[0]), 'Serve para: ' + it[1]], m: [] };
+      (it[2] || []).forEach(function(f, j) { n.children.push(c(f, j)); });
+      return n;
+    }
+    var s0 = itens.map(c);
+    return { id: 'root', text: raiz, collapsed: false, children: s0, et: { s: [s0], cur: 0, run: false, esc: [] } };
+  }
+  var SAB = function() { return ['Sabedoria', 'obter ou criar conhecimento da skill.', [['Obtenção', 'ler o conhecimento que você colou, organizar as ideias e colocar cada uma na parte certa da skill.'], ['Criação', 'criar uma página HTML com todo o conhecimento que a skill já tem, para você ver e ajustar.']]]; };
+  function semeiaOuro() {
     var temas = ['Resultado, ação e modelagem', 'Decisão, ação e dor e prazer', 'Rituais emocionais e procrastinação', 'Estado emocional e corpo', 'Foco e perguntas', 'Crenças e mudança duradoura', 'Valores e regras', 'Metas', 'Dinheiro: crenças e meta', 'Dinheiro: plano e hábitos', 'Medo, fracasso e rejeição', 'Confiança e solução de problemas', 'Relações e rumo de vida'];
-    var s0 = [no('Analisar material', 'Opção 1: analisar um material', 'analisar um material novo ou refazer um que já existe e extrair o ouro dele.'), no('Usar material guardado', 'Opção 2: usar um material guardado', 'abrir um material já analisado, escolher o tema e fazer os exercícios.'), no('Sabedoria', 'Opção 3: sabedoria', 'obter ou criar conhecimento da skill (Obtenção e Criação).')];
-    var s1 = [no('Você Nasceu Rico', 'Material: Você Nasceu Rico', 'trabalhar os exercícios do material Você Nasceu Rico.'), no('Fênix', 'Material: Seminário Fênix', 'trabalhar os temas do Seminário Fênix (temas ainda não gravados).'), no('Tony Robbins', 'Material: Tony Robbins', 'trabalhar o programa de áudio de 30 dias do Tony Robbins.')];
-    var s2 = temas.map(function(t, j) { return no(t, 'Tema ' + (j + 1) + ': ' + t, 'fazer os exercícios do tema ' + t + '.'); });
-    var bd = no('Bom dia', 'Opção: bom dia', 'dar bom dia.'); bd.i = ['Serve para: dar bom dia.']; s0[2].children.push(bd);
-    var nv = no('Novo', 'Opção: novo', 'ainda não definido.'); nv.i = ['Serve para: ainda não definido.']; s1[2].children.push(nv);
-    return { id: 'root', text: 'Ouro', collapsed: false, children: s0, et: { s: [s0, s1, s2], cur: 0, run: false, esc: [] } };
+    var sab = SAB(); sab[2].push(['Bom dia', 'dar bom dia.', [], 'Opção: bom dia']);
+    return semeiaMapa('OURO', 'ouro', [
+      ['Analisar material', 'analisar um material novo ou refazer um que já existe e extrair o ouro dele.', [], 'Opção 1: analisar um material'],
+      ['Usar material guardado', 'abrir um material já analisado, escolher o tema e fazer os exercícios.', [
+        ['Você Nasceu Rico', 'trabalhar os exercícios do material Você Nasceu Rico.', [], 'Material: Você Nasceu Rico'],
+        ['Fênix', 'trabalhar os temas do Seminário Fênix (temas ainda não gravados).', [], 'Material: Seminário Fênix'],
+        ['Tony Robbins', 'trabalhar o programa de áudio de 30 dias do Tony Robbins.', temas.map(function(t, j) { return [t, 'fazer os exercícios do tema ' + t + '.', [], 'Tema ' + (j + 1) + ': ' + t]; }).concat([['Novo', 'ainda não definido.', [], 'Opção: novo']]), 'Material: Tony Robbins']
+      ], 'Opção 2: usar um material guardado'],
+      sab
+    ]);
+  }
+  /* mapa Ouro que já estava no aparelho: ajusta para camadas (materiais dentro de "Usar material guardado", temas dentro do Tony Robbins), nome em maiúsculo e "Serve para" */
+  function migraOuro(mp) {
+    var serve = {};
+    (function a1(n) { if (Array.isArray(n.i)) { var l = n.i.filter(function(x) { return /^Serve para/.test(x); })[0]; if (l) serve[n.text] = l; } n.children.forEach(a1); })(semeiaOuro());
+    var st = (mp.et && mp.et.s) || [mp.children || []];
+    var s0 = st[0] || [], s1 = st[1] || [], s2 = st[2] || [];
+    function acha(lista, id) { for (var q = 0; q < lista.length; q++) if (lista[q].id === id) return lista[q]; return null; }
+    var usar = acha(s0, 'ouro2'), tony = acha(s1, 'ouro6');
+    if (st.length > 1) {
+      if (tony) tony.children = s2.concat(tony.children || []);
+      if (usar) usar.children = (usar.children || []).concat(s1);
+    }
+    var sabN = acha(s0, 'ouro3');
+    if (sabN && !(sabN.children || []).some(function(c) { return c.text === 'Obtenção'; })) sabN.children = SAB()[2].map(function(f, j) { return { id: 'ouroB' + (j + 1), text: f[0], collapsed: false, children: [], i: ['Opção ' + (j + 1) + ': ' + f[0], 'Serve para: ' + f[1]], m: [] }; }).concat(sabN.children || []);
+    (function a2(n) { if (serve[n.text] && Array.isArray(n.i) && !n.i.some(function(x) { return /^Serve para/.test(x); })) { n.i.push(serve[n.text]); if (Array.isArray(n.m)) n.m.push({}); } (n.children || []).forEach(a2); })({ children: s0, text: '', i: null });
+    mp.text = 'OURO'; mp.children = s0; mp.et = { s: [s0], cur: 0, run: false, esc: [] };
+    return mp;
+  }
+  function semeiaSkills() {
+    return [
+      { k: 'rico.proc.vendas', r: semeiaMapa('VENDAS', 'vend', [
+        ['Conhecimento', 'guardar e melhorar o que você sabe do produto.', [
+          ['Produto', 'ver, adicionar ou melhorar as informações do produto.', [
+            ['Ver informações', 'mostrar o que está guardado do produto: quantidade, preço, para que serve, vantagens, benefícios e características.'],
+            ['Adicionar informação', 'guardar uma informação nova de um produto.'],
+            ['Sugestões para vender mais', 'analisar o produto e pesquisar fora características, vantagens e usos que você ainda não viu.']]],
+          ['Convicção', 'guiar você a acreditar que o produto vale 10 vezes o que o cliente paga.']]],
+        ['Sondagem', 'conversar com o cliente antes de apresentar: rapport e diagnóstico.', [
+          ['Rapport', 'criar conexão com o cliente.', [
+            ['Quebra-gelo', 'abrir a conversa de forma leve.', [
+              ['Situação', 'puxar assunto pelo que está ao redor (tempo, cidade, lugar).'],
+              ['Conselho', 'pedir uma informação ou opinião para abrir conversa.'],
+              ['Pesquisa', 'fazer uma pesquisa rápida com perguntas leves que abrem conversa.']]],
+            ['Falar sobre si', 'fazer a pessoa falar dela.', [
+              ['Atenção', 'ouvir de verdade e entender.'],
+              ['Importante', 'fazer a pessoa se sentir importante (elogio, gesto, presente).'],
+              ['Incomum', 'encontrar coisas em comum (time, cidade, gostos).']]]]],
+          ['Diagnóstico', 'descobrir dores, desejos, valores, objeções e hobbies do cliente.']]],
+        ['Apresentação', 'apresentar o produto e fechar a venda, na ordem do fluxo.', [
+          ['Apresentação', 'apresentar pelo método Afirmação, Porquê, Significado.'],
+          ['Testamento', 'testar se o cliente está quente ou frio antes de oferecer.'],
+          ['Proposta', 'mostrar o valor e o preço, perguntar qual fica melhor e ficar em silêncio depois do custo.'],
+          ['Objeção', 'quebrar a objeção do cliente.'],
+          ['Fechamento', 'fechar a venda ("prefere no Pix ou no cartão?"); se não fechou, volta para objeção.']]],
+        ['Pós-venda', 'cuidar do cliente depois da compra.', [
+          ['Follow-up', 'recuperar quem não respondeu.'],
+          ['Onboarding', 'onboarding do cliente (detalhe não confirmado).'],
+          ['LTV', 'LTV do cliente (detalhe não confirmado).']]],
+        ['CRM da Conexão', 'guardar e buscar fichas de contatos.', [
+          ['Novo contato', 'cadastrar um contato novo, um campo por vez.'],
+          ['Buscar', 'achar um contato por nome ou característica e sugerir como abordar.'],
+          ['Completar', 'preencher os campos vazios de uma ficha.']]],
+        SAB()]) },
+      { k: 'rico.proc.atracao', r: semeiaMapa('ATRAÇÃO', 'atra', [
+        ['Negócio', 'Perfil da Empresa no Google: acesso, análise, perfil novo e boas práticas.'],
+        ['Criativos', 'trabalhar criativos (detalhe não confirmado).'],
+        ['Lead', 'prospecção: nichos, cidades e análise de leads.'],
+        ['Ads', 'Google Ads, Rede de Pesquisa.'],
+        ['Clientes', 'pesquisa com clientes.'],
+        ['Site', 'landing pages.'],
+        ['Pesquisa', 'pesquisa de mercado.'],
+        ['Dados', 'análise de números.'],
+        ['Meta', 'Meta Ads.'],
+        ['Social', 'Instagram, método RETINA.'],
+        SAB()]) },
+      { k: 'rico.proc.estudo', r: semeiaMapa('ESTUDO', 'estu', [
+        ['Rodada completa', 'gerar a rodada completa: 1 semana de ESCOLA, 1 de 40 DIAS, 1 de VERSOS e 3 capítulos de cada livro.'],
+        ['Específica', 'gerar só uma área que você escolher.', [
+          ['40 DIAS', 'estudos do programa de 40 dias.'],
+          ['EBOOKS', 'capítulos do livro Grande Mestre.'],
+          ['ESCOLA', 'estudos da escola, por semana.'],
+          ['PROFETICO', 'capítulos do livro Os Dois Mistérios.'],
+          ['REAVIVADO', 'capítulos do livro Reavivamento.'],
+          ['VERSOS', 'estudos dos 70 versículos, em ordem.']]],
+        ['Comando do celular', 'montar o comando do Termux que baixa os HTMLs para o celular.'],
+        ['Comando do notebook', 'montar o comando do PowerShell que baixa os HTMLs para o notebook.']]) },
+      { k: 'rico.proc.mindset', r: semeiaMapa('MINDSET', 'mind', [
+        ['Erro', 'colar um erro para eu achar a causa e resolver.'],
+        ['Resultado de outro aparelho', 'colar o resultado do Claude Code do celular ou do notebook para eu decidir o próximo passo.'],
+        ['Pedido ou dúvida', 'colar um pedido ou uma dúvida para eu analisar e decidir.']]) },
+      { k: 'rico.proc.ajuda', r: semeiaMapa('AJUDA', 'ajud', [
+        ['Informações', 'espaço guardado para depois; hoje responde "Aguardando...".'],
+        SAB()]) },
+      { k: 'rico.proc.riqueza', r: semeiaMapa('RIQUEZA', 'riqu', [
+        ['Informações', 'espaço guardado para depois; hoje responde "Aguardando...".'],
+        SAB()]) },
+      { k: 'rico.proc.anthropic', r: semeiaMapa('ANTHROPIC', 'anth', [
+        ['n8n', 'criar e ajustar automações no n8n.'],
+        SAB()]) }
+    ];
   }
   window.rcMapa = {
     tela: function() { return CUR === SETS.p ? 'Processo' : 'Mapa mental'; },
