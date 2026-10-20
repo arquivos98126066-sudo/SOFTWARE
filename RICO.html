@@ -3038,7 +3038,7 @@ window.saveAnswer = window.saveAnswer || function(){};
       if (!confirm('Excluir este item?')) return;
       var i = f.p.children.indexOf(f.n); if (i > -1) f.p.children.splice(i, 1);
       etapaVazia(f.p);
-      selId = f.p.id; barId = null; salva(); render();
+      selId = f.p.id; barId = null; focoAposExcluir(f.n.id, f.p); salva(); render();
     }
 
     function adiciona(irmao) {
@@ -3109,13 +3109,27 @@ window.saveAnswer = window.saveAnswer || function(){};
       if (f) { var v = txt.value.trim(); if (v) f.n.text = v; salva(); }
       fecha(); render();
     }
+    /* apagou o último filho do nível em que você está: sobe um nível de cada vez, em vez de voltar ao começo */
+    function focoAposExcluir(delId, pai) {
+      if (!focoId) return;
+      if (focoId === delId) focoId = pai && pai.id !== 'root' ? pai.id : null;
+      var g = 0;
+      while (focoId && g++ < 60) {
+        var ff = acha(focoId);
+        if (!ff) { focoId = null; break; }
+        if (ff.n.children.length) break;
+        focoId = ff.p && ff.p.id !== 'root' ? ff.p.id : null;
+      }
+      if (!focoId) focoFix = false;
+      abreId = null;
+    }
     function exclui() {
       var f = editId ? acha(editId) : null;
       if (!f) { fecha(); return; }
       if (!f.p) { f.n.children = []; selId = 'root'; }
       else {
         var i = f.p.children.indexOf(f.n); if (i > -1) f.p.children.splice(i, 1);
-        selId = f.p.id;
+        selId = f.p.id; focoAposExcluir(f.n.id, f.p);
       }
       salva(); fecha(); render();
     }
