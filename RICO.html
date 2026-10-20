@@ -622,6 +622,7 @@
   .cycle-compl .ic { position: absolute; right: 16px; top: 50%; width: 18px; height: 18px; margin-top: -9px; stroke-width: 2; transform: rotate(90deg); transition: transform .25s; }
   .cycle-compl, .cycle-compl.aberto { background: var(--gold); color: var(--dark); }
   .cycle-compl.aberto .ic { transform: rotate(-90deg); }
+  .cycle-compl.tit-esc, .cycle-compl.tit-esc.aberto { background: var(--dark2); color: #fff; font-family: inherit; font-size: 14.5px; font-weight: 600; letter-spacing: 0; }
   .cycle-chain { margin-left: -12px; }
   .cycle-chain > .cycle-compl:not(.aberto) { margin-left: 28px; }
   .cycle-chain > .cycle-compl.aberto { margin-left: 38px; }
@@ -756,8 +757,8 @@
   .rcm-wrap.zig .rcm-node.root { height: 44px; padding: 0 22px; font-size: 16px; }
   .rcm-wrap.zig .rcm-node span { min-width: 0; overflow: hidden; text-overflow: ellipsis; line-height: 1.4; padding-bottom: 2px; }
   .rcm-wrap.zig .rcm-node.sel { background: linear-gradient(rgba(224,181,74,.18), rgba(224,181,74,.18)), var(--dark2); }
-  .rcm-wrap.zig .rcm-node.root { background: var(--dark2); color: #fff; font-size: 14.5px; padding: 0 16px; font-weight: 600; font-family: inherit; }
-  .rcm-wrap.zig .rcm-node.root.sel { background: linear-gradient(rgba(224,181,74,.18), rgba(224,181,74,.18)), var(--dark2); }
+  .rcm-wrap.zig .rcm-node.root { background: var(--gold); }
+  .rcm-wrap.zig .rcm-node.root.sel { background: var(--gold); }
   .rcm-wrap.zig { overflow: visible; }
   .rcm-wrap.cont { margin-top: 0; overflow: visible; }
   .rcm-node i { width: 8px; height: 8px; border-radius: 50%; background: var(--gold); flex: none; box-sizing: border-box; }
@@ -2664,7 +2665,7 @@ window.saveAnswer = window.saveAnswer || function(){};
     if (!_soCompl || _foco < 0 || !CICLO[_foco] || !CICLO[_foco].g) _foco = -1;
     if (cab >= 0) {
       var h = document.createElement('span');
-      h.className = 'cycle-item cycle-compl' + (_soCompl ? ' aberto' : '');
+      h.className = 'cycle-item cycle-compl' + (_soCompl ? ' aberto' : '') + (_mapa ? ' tit-esc' : '');
       h.dataset.idx = cab;
       h.innerHTML = '<span class="cycle-t"></span>';
       h.firstChild.textContent = _zig ? 'PROCESSO' : (_mapa ? 'MAPA MENTAL' : (_soCompl ? 'SUBPASTA' : 'MEU CICLO'));
