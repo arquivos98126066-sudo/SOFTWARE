@@ -3100,15 +3100,24 @@ window.saveAnswer = window.saveAnswer || function(){};
     }
     function reid(n) { n.id = uid(); (n.et ? [].concat.apply([], n.et.s) : n.children).forEach(reid); }
     /* etapas (só no Processo): cada etapa é uma lista de opções; ao reabrir, começa da primeira e cada escolha abre a seguinte */
-    function etapasNo(id) {
+    function etapasMostra(id) { selId = id; barId = id; salva(); montaBar(); render(); }
+    function etapasNo(id) { /* segurar: cria a próxima etapa (se a última já estiver vazia, só vai até ela) */
       var f = acha(id); if (!f) return;
       var n = f.n;
-      if (!n.et) n.et = { s: [n.children], cur: 0, run: false, esc: [] };
-      if (!n.children.length) { selId = id; barId = id; montaBar(); render(); return; }
+      if (!n.et) { if (!n.children.length) return; n.et = { s: [n.children], cur: 0, run: false, esc: [] }; }
       n.et.s[n.et.cur] = n.children;
-      n.et.s.push([]); n.et.cur = n.et.s.length - 1; n.children = n.et.s[n.et.cur];
+      var ult = n.et.s.length - 1;
+      if (!n.et.s[ult].length) n.et.cur = ult; else { n.et.s.push([]); n.et.cur = ult + 1; }
+      n.children = n.et.s[n.et.cur]; n.et.run = false; n.collapsed = false;
+      etapasMostra(id);
+    }
+    function etapasVai(id) { /* tocar: navega 1, 2, 3 ... e volta ao 1 */
+      var f = acha(id); if (!f || !f.n.et) return;
+      var n = f.n;
+      n.et.s[n.et.cur] = n.children;
+      n.et.cur = (n.et.cur + 1) % n.et.s.length; n.children = n.et.s[n.et.cur];
       n.et.run = false; n.collapsed = false;
-      selId = id; barId = id; salva(); montaBar(); render();
+      etapasMostra(id);
     }
     function escolheEtapa(f) {
       var p = f.p, et = p.et;
@@ -3216,8 +3225,18 @@ window.saveAnswer = window.saveAnswer || function(){};
       ['pointerup', 'pointercancel', 'pointerleave'].forEach(function(nm) {
         wrap.addEventListener(nm, function() { clearTimeout(lpT); lpT = null; });
       });
+      var etT = null, etHeld = false;
+      bar.addEventListener('pointerdown', function(e) {
+        var b = e.target.closest ? e.target.closest('button') : null;
+        etHeld = false; clearTimeout(etT);
+        if (!b || b.getAttribute('data-a') !== 'etapas' || !barId) return;
+        var id0 = barId;
+        etT = setTimeout(function() { etT = null; etHeld = true; if (barId === id0) etapasNo(id0); }, 500);
+      });
+      ['pointerup', 'pointercancel', 'pointerleave'].forEach(function(nm) { bar.addEventListener(nm, function() { clearTimeout(etT); etT = null; }); });
       bar.addEventListener('click', function(e) {
         var b = e.target.closest ? e.target.closest('button') : null;
+        if (etHeld) { etHeld = false; return; }
         if (!b || !barId) return;
         var a = b.getAttribute('data-a'), id = barId;
         selId = id;
@@ -3229,7 +3248,7 @@ window.saveAnswer = window.saveAnswer || function(){};
         else if (a === 'edita') { barId = null; render(); abreEditor(id, true); }
         else if (a === 'exclui') excluiNo(id);
         else if (a === 'dup') duplicaNo(id);
-        else if (a === 'etapas') etapasNo(id);
+        else if (a === 'etapas') etapasVai(id);
         else if (a === 'levar') { PEND = { inst: api, id: id }; destId = id; montaBar(); posBar(); }
         else if (a === 'cancela') { window.rcMapa.cancela(); }
       });
