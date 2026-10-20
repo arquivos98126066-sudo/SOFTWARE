@@ -767,6 +767,18 @@
   .rcm-node i.oco { background: transparent; border: 2px solid var(--gold); }
   .rcm-node.root { height: 38px; padding: 0 18px; background: var(--gold); border-color: var(--gold); color: var(--dark); font-family: var(--f-title); font-size: 13px; }
   .rcm-node.root.sel { background: var(--gold); }
+  .rcm-conf { position: fixed; inset: 0; z-index: 9999; background: rgba(15,27,45,.6); display: flex; align-items: flex-end; justify-content: center; padding: 16px; box-sizing: border-box; }
+  .rcm-conf-card { width: 100%; max-width: 440px; max-height: 82vh; overflow-y: auto; background: #fff; border-radius: 24px; padding: 20px; box-sizing: border-box; color: var(--dark); }
+  .rcm-conf-card h3 { margin: 0 0 12px; font: 700 18px var(--f-title); }
+  .rcm-conf-card h4 { margin: 16px 0 8px; font: 700 11px var(--f-title); text-transform: uppercase; letter-spacing: .06em; color: var(--tx3); }
+  .rcm-conf-card ol, .rcm-conf-card ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+  .rcm-conf-card li { display: flex; align-items: baseline; gap: 10px; font-size: 14px; line-height: 1.35; }
+  .rcm-conf-card li b { flex: none; width: 22px; height: 22px; border-radius: 50%; background: var(--gold); color: var(--dark); font-size: 12px; display: grid; place-items: center; }
+  .rcm-conf-card li i { flex: none; font-style: normal; font-weight: 700; font-size: 11px; text-transform: uppercase; background: var(--dark2); color: var(--gold); border-radius: 999px; padding: 2px 8px; }
+  .rcm-conf-card li.vz { color: var(--tx3); }
+  .rcm-conf-bt { display: flex; gap: 10px; margin-top: 20px; }
+  .rcm-conf-bt button { flex: 1; height: 46px; border-radius: 999px; border: 1px solid var(--bd-in); background: #fff; font: 600 14px var(--f-title); color: var(--dark); }
+  .rcm-conf-bt button.sim { background: var(--gold); border-color: var(--gold); }
   .rcm-bar { position: absolute; z-index: 5; display: flex; justify-content: center; margin: 0; left: 0; top: 0; filter: drop-shadow(0 6px 14px rgba(0,0,0,.4)); }
   .rcm-bar[hidden] { display: none; }
   .rcm-pill { display: flex; gap: 2px; padding: 5px; background: var(--dark2); border: 1px solid var(--gold); border-radius: 999px; }
@@ -3260,10 +3272,13 @@ window.saveAnswer = window.saveAnswer || function(){};
       }
       if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(t).then(ok, velho); else velho();
     }
-    /* foto do mapa na última cópia: ao copiar, o que entrou, mudou de nome ou de texto, foi movido ou apagado vai no fim do texto, uma vez só */
+    /* foto do mapa na última cópia: o que entrou, mudou de nome ou de texto, foi movido ou apagado vai no fim do texto, uma vez só (depois que você aprova) */
+    var RE_COL = /\[[^\]\n]{2,}\]/g;
+    function semColchetes(t) { return String(t == null ? '' : t).replace(RE_COL, '').replace(/ {2,}/g, ' ').trim(); }
+    function nomeDe(c) { return semColchetes(c.text) || String(c.text || ''); }
     function achata(r) {
       var out = {};
-      function reg(c, n, k) { out[c.id] = { n: c.text || '', t: textoDe(c), c: 'mapa ' + (r.text || '') + (k ? ', etapa ' + k : '') + (n === r ? '' : ', dentro de ' + (n.text || '')), p: n.id }; anda(c); }
+      function reg(c, n, k) { out[c.id] = { n: nomeDe(c), t: notasDe(c).map(semColchetes).filter(Boolean).join('\n'), c: 'mapa ' + (r.text || '') + (k ? ', etapa ' + k : '') + (n === r ? '' : ', dentro de ' + (n.text || '')), p: n.id, pn: n === r ? '' : (n.text || '') }; anda(c); }
       function anda(n) {
         if (n.et) n.et.s.forEach(function(st, k) { st.forEach(function(c) { reg(c, n, k + 1); }); });
         else n.children.forEach(function(c) { reg(c, n, 0); });
@@ -3271,30 +3286,56 @@ window.saveAnswer = window.saveAnswer || function(){};
       anda(r);
       return out;
     }
-    /* instrução entre colchetes numa célula vale uma vez: sai com a cópia e o pedaço é tirado da célula (caixinhas [ ] e [x] não contam) */
+    /* instrução entre colchetes numa célula vale uma vez: sai na cópia e, depois que você aprova, o pedaço é tirado da célula (caixinhas [ ] e [x] não contam) */
     function limpaColchetes(n) {
-      var re = /\[[^\]\n]{2,}\]/g;
-      if (Array.isArray(n.i)) n.i = n.i.map(function(v) { return String(v == null ? '' : v).replace(re, '').replace(/ {2,}/g, ' ').replace(/\s+$/, ''); });
-      if (n.id !== 'root' && re.test(n.text || '')) { var t = String(n.text).replace(re, '').replace(/ {2,}/g, ' ').trim(); if (t) n.text = t; }
+      if (Array.isArray(n.i)) n.i = n.i.map(function(v) { return String(v == null ? '' : v).replace(RE_COL, '').replace(/ {2,}/g, ' ').replace(/\s+$/, ''); });
+      if (n.id !== 'root') { var t = semColchetes(n.text); if (t && t !== n.text) n.text = t; }
       (n.et ? [].concat.apply([], n.et.s) : n.children).forEach(limpaColchetes);
     }
-    function mudancasCopia() {
+    function instrucoes() {
+      var out = [], at = achata(root);
+      (function anda(n) {
+        (n.et ? [].concat.apply([], n.et.s) : n.children).forEach(function(c) {
+          var peds = [];
+          (String(c.text || '').match(RE_COL) || []).forEach(function(x) { peds.push(x); });
+          (Array.isArray(c.i) ? c.i : []).forEach(function(l) { (String(l || '').match(RE_COL) || []).forEach(function(x) { peds.push(x); }); });
+          if (peds.length) out.push({ k: 'Instrução', d: nomeDe(c) + ': ' + peds.join(' '), t: 'Instrução (' + (at[c.id] ? at[c.id].c : 'mapa ' + (root.text || '')) + '): (' + nomeDe(c) + ') ' + peds.join(' ') });
+          anda(c);
+        });
+      })(root);
+      return out;
+    }
+    /* só calcula, não muda nada: o que mudou desde a foto e as instruções entre colchetes */
+    function calculaMudancas() {
       var ant = null, atual = achata(root), out = [];
       try { var sv = localStorage.getItem(KEY + '.foto'); if (sv) ant = JSON.parse(sv); } catch (e) {}
       if (ant) {
         Object.keys(atual).forEach(function(id) {
           var a = atual[id], b = ant[id];
-          if (!b) { out.push('Célula nova (' + a.c + '): (' + a.n + ')' + (a.t ? '\n' + a.t : '')); return; }
-          if (a.n !== b.n) out.push('Nome alterado (' + a.c + '): (' + b.n + ') passou a (' + a.n + ')');
-          if (a.t !== b.t) out.push('Texto alterado (' + a.c + '): (' + a.n + ')\nAntes: ' + (b.t || '(vazio)') + '\nAgora: ' + (a.t || '(vazio)'));
-          if (a.p !== b.p) out.push('Célula movida (' + b.c + ' para ' + a.c + '): (' + a.n + ')');
+          if (!b) { out.push({ k: 'Nova', d: a.n + (a.pn ? ' (dentro de ' + a.pn + ')' : ''), t: 'Célula nova (' + a.c + '): (' + a.n + ')' + (a.t ? '\n' + a.t : '') }); return; }
+          if (a.n !== b.n) out.push({ k: 'Nome', d: b.n + ' passou a ' + a.n, t: 'Nome alterado (' + a.c + '): (' + b.n + ') passou a (' + a.n + ')' });
+          if (a.t !== b.t) out.push({ k: 'Texto', d: a.n, t: 'Texto alterado (' + a.c + '): (' + a.n + ')\nAntes: ' + (b.t || '(vazio)') + '\nAgora: ' + (a.t || '(vazio)') });
+          if (a.p !== b.p) out.push({ k: 'Movida', d: a.n, t: 'Célula movida (' + b.c + ' para ' + a.c + '): (' + a.n + ')' });
         });
-        Object.keys(ant).forEach(function(id) { if (!atual[id]) out.push('Célula apagada (' + ant[id].c + '): (' + ant[id].n + ')'); });
+        Object.keys(ant).forEach(function(id) { if (!atual[id]) out.push({ k: 'Apagada', d: ant[id].n, t: 'Célula apagada (' + ant[id].c + '): (' + ant[id].n + ')' }); });
       }
+      return out.concat(instrucoes());
+    }
+    /* depois do "aprovar": tira os colchetes e refaz a foto */
+    function confirmaMudancas() {
       limpaColchetes(root);
-      atual = achata(root);
-      try { localStorage.setItem(KEY + '.foto', JSON.stringify(atual)); } catch (e) {}
-      return out;
+      try { localStorage.setItem(KEY + '.foto', JSON.stringify(achata(root))); } catch (e) {}
+    }
+    function escH(t) { return String(t == null ? '' : t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+    function confirmaCopia(corpo, muda, ok) {
+      var velho = document.querySelector('.rcm-conf'); if (velho) velho.remove();
+      var ov = document.createElement('div'); ov.className = 'rcm-conf';
+      var caminho = corpo.map(function(x, q) { return '<li><b>' + (q + 1) + '</b><span>' + escH(String(x).split('\n')[0].replace(/^\(|\)$/g, '')) + '</span></li>'; }).join('');
+      var mud = muda.length ? muda.map(function(m) { return '<li><i>' + escH(m.k) + '</i><span>' + escH(m.d) + '</span></li>'; }).join('') : '<li class="vz">Nenhuma mudança desde a última cópia.</li>';
+      ov.innerHTML = '<div class="rcm-conf-card"><h3>Confirmar cópia</h3><h4>Você escolheu</h4><ol>' + caminho + '</ol><h4>Mudanças e instruções</h4><ul>' + mud + '</ul><div class="rcm-conf-bt"><button type="button" class="nao">Não aprovar</button><button type="button" class="sim">Aprovar e copiar</button></div></div>';
+      document.body.appendChild(ov);
+      ov.querySelector('.nao').onclick = function() { ov.remove(); };
+      ov.querySelector('.sim').onclick = function() { ov.remove(); ok(); };
     }
     function escolheEtapa(f) {
       /* escolher uma célula: se ela tem opções dentro, desce para elas; se não, segue para a próxima etapa ou termina e copia */
@@ -3306,9 +3347,10 @@ window.saveAnswer = window.saveAnswer || function(){};
         et.desc = et.desc || []; et.desc.push(f.n.id); p.children = sub;
       } else if (!(et.desc && et.desc.length) && et.cur + 1 < et.s.length) { et.cur++; p.children = et.s[et.cur]; }
       else {
-        var tudo = et.esc.filter(Boolean).concat(mudancasCopia()).join('\n\n');
+        var corpo = et.esc.filter(Boolean), muda = calculaMudancas();
+        var tudo = corpo.concat(muda.map(function(m) { return m.t; })).join('\n\n');
         et.cur = 0; et.desc = []; et.esc = []; p.children = et.s[0];
-        if (tudo) copiaTexto(tudo);
+        confirmaCopia(corpo, muda, function() { confirmaMudancas(); salva(); if (tudo) copiaTexto(tudo); render(); });
       }
       selId = p.id; barId = null; salva(); render();
     }
