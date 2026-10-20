@@ -2790,8 +2790,8 @@ window.saveAnswer = window.saveAnswer || function(){};
     var bl = document.querySelector('.cycle-block');
     if (!bl) return;
     var r = bl.getBoundingClientRect();
-    /* posição ideal: o bloco fica o mais embaixo possível sem cortar, no máximo a 58% da tela, com os cartões de cima aparecendo; se for maior que a tela, fica no topo */
-    var H = window.innerHeight, d = Math.max(18, Math.min(Math.round(H * 0.587), H - bl.offsetHeight - 24));
+    /* posição ideal: o bloco fica no meio da tela (um pouco acima do centro), com cartões em cima e embaixo; se for maior que a tela, fica no topo */
+    var H = window.innerHeight, d = Math.max(18, Math.round((H - bl.offsetHeight) * 0.45));
     if (Math.abs(r.top - d) > 8) window.scrollBy(0, r.top - d);
   }
   (function() {
