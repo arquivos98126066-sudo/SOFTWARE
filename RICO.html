@@ -749,15 +749,12 @@
     background: var(--dark2); border: 1px solid var(--gold); border-radius: 999px;
     font-size: 12px; font-weight: 600; line-height: 1; white-space: nowrap; color: #fff; cursor: pointer; transition: background .15s;
   }
-  .rcm-node.sel { background: rgba(224,181,74,.18); }
   .rcm-node.txt { border-color: #f6d97f; }
   .rcm-wrap.zig { animation: cicloEntra .3s ease; }
   .rcm-wrap.zig .rcm-node { overflow: hidden; height: 44px; padding: 0 16px; gap: 10px; font-size: 14.5px; }
   .rcm-wrap.zig .rcm-node.root { height: 44px; padding: 0 22px; font-size: 16px; }
   .rcm-wrap.zig .rcm-node span { min-width: 0; overflow: hidden; text-overflow: ellipsis; line-height: 1.4; padding-bottom: 2px; }
-  .rcm-wrap.zig .rcm-node.sel { background: linear-gradient(rgba(224,181,74,.18), rgba(224,181,74,.18)), var(--dark2); }
   .rcm-wrap.zig .rcm-node.root { background: var(--dark2); color: #fff; font-size: 14.5px; padding: 0 16px; font-weight: 600; font-family: inherit; }
-  .rcm-wrap.zig .rcm-node.root.sel { background: linear-gradient(rgba(224,181,74,.18), rgba(224,181,74,.18)), var(--dark2); }
   .rcm-wrap.zig.aberto .rcm-node.root, .rcm-wrap.zig.aberto .rcm-node.root.sel { background: var(--gold); color: var(--dark); font-size: 16px; padding: 0 22px; font-weight: 600; font-family: var(--f-title); }
   .rcm-wrap.zig { overflow: visible; }
   .rcm-wrap.cont { margin-top: 0; overflow: visible; }
@@ -2677,6 +2674,7 @@ window.saveAnswer = window.saveAnswer || function(){};
       box.appendChild(mw);
       if (window.rcMapa) window.rcMapa.montar(mw, _zig);
       box.classList.add('so-compl');
+      if (_ajustaTopo) { _ajustaTopo = false; ajustaTopoCiclo(); }
       return;
     }
     var sub = document.createElement('div');
@@ -2723,7 +2721,24 @@ window.saveAnswer = window.saveAnswer || function(){};
     }
     if (temAlgo) box.appendChild(sub);
     box.classList.toggle('so-compl', _soCompl);
+    if (_ajustaTopo) { _ajustaTopo = false; ajustaTopoCiclo(); }
   }
+  /* ciclo grande, tocado lá embaixo: volta o topo do ciclo para o alto da tela (posição ideal) */
+  var _ajustaTopo = false, _ajustaT = null;
+  function ajustaTopoCiclo() {
+    var bl = document.querySelector('.cycle-block');
+    if (!bl) return;
+    var r = bl.getBoundingClientRect();
+    if (r.top < 0) window.scrollBy(0, r.top - 18);
+  }
+  (function() {
+    var lista = document.getElementById('ciclo-lista');
+    if (!lista) return;
+    lista.addEventListener('click', function() {
+      _ajustaTopo = true; clearTimeout(_ajustaT);
+      _ajustaT = setTimeout(function() { _ajustaTopo = false; }, 600);
+    }, true);
+  })();
 
 
   /* ── Mapa mental do Ciclo (terceira visão do Complemento) ── */
