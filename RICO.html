@@ -779,11 +779,11 @@
   .rcm-conf-card h4::after { content: ''; flex: 1; height: 1px; background: var(--bd); }
   .rcm-conf-card ol, .rcm-conf-card ul { list-style: none; margin: 0; padding: 0; }
   .rcm-conf-card ol { position: relative; display: flex; flex-direction: column; gap: 12px; }
-  .rcm-conf-card ol::before { content: ''; position: absolute; left: 13px; top: 14px; bottom: 14px; width: 2px; background: linear-gradient(var(--gold), var(--gold-light)); border-radius: 2px; opacity: .6; }
+  .rcm-conf-card ol::before { content: ''; position: absolute; left: 9px; top: 10px; bottom: 10px; width: 2px; background: linear-gradient(var(--gold), var(--gold-light)); border-radius: 2px; opacity: .6; }
   .rcm-conf-card ul { display: flex; flex-direction: column; gap: 8px; }
   .rcm-conf-card li { position: relative; display: flex; align-items: flex-start; gap: 12px; font-size: 14.5px; line-height: 1.35; }
-  .rcm-conf-card ol li b { flex: none; position: relative; width: 28px; height: 28px; border-radius: 50%; background: var(--grad); color: #fff; font: 700 13px var(--f-title); display: grid; place-items: center; box-shadow: 0 0 0 4px var(--bg); }
-  .rcm-conf-card ol li span { flex: 1; min-width: 0; padding-top: 3px; font-weight: 600; }
+  .rcm-conf-card ol li b { flex: none; position: relative; width: 20px; height: 20px; border-radius: 50%; background: var(--grad); color: #fff; font: 700 10.5px var(--f-title); display: grid; place-items: center; box-shadow: 0 0 0 3px var(--bg); }
+  .rcm-conf-card ol li span { flex: 1; min-width: 0; padding-top: 0; line-height: 20px; font-weight: 600; }
   .rcm-conf-card li span em { display: block; margin-top: 6px; padding: 9px 12px; border-radius: 14px; background: #fff; border: 1px solid var(--bd); font-style: normal; font-weight: 400; color: var(--tx2); font-size: 13.5px; line-height: 1.4; white-space: pre-wrap; }
   .rcm-conf-card ul li { align-items: center; padding: 10px 12px; border-radius: 16px; background: #fff; border: 1px solid var(--bd); }
   .rcm-conf-card li i { flex: none; font-style: normal; font-weight: 700; font-size: 10.5px; letter-spacing: .06em; text-transform: uppercase; background: var(--dark2); color: var(--gold); border-radius: 999px; padding: 3px 9px; }
@@ -3374,7 +3374,7 @@ window.saveAnswer = window.saveAnswer || function(){};
     function pedeResposta(f) {
       var velho = document.querySelector('.rcm-conf'); if (velho) velho.remove();
       var ov = document.createElement('div'); ov.className = 'rcm-conf';
-      ov.innerHTML = '<div class="rcm-conf-card"><h3>' + escH(f.n.text) + '</h3><textarea rows="1" placeholder="Escreva aqui"></textarea><div class="rcm-conf-bt"><button type="button" class="sim">OK</button><button type="button" class="nao">Cancelar</button><button type="button" class="volta">Pular</button></div></div>';
+      ov.innerHTML = '<div class="rcm-conf-card"><h3>' + escH(f.n.text) + '</h3><textarea rows="1"></textarea><div class="rcm-conf-bt"><button type="button" class="sim">OK</button><button type="button" class="nao">Cancelar</button><button type="button" class="volta">Pular</button></div></div>';
       document.body.appendChild(ov);
       var ta = ov.querySelector('textarea'); ta.addEventListener('input', function() { if (!(window.CSS && CSS.supports && CSS.supports('field-sizing', 'content'))) (window.autoGrow || function() {})(ta); ta.classList.toggle('quebrou', ta.scrollHeight > 56); }); setTimeout(function() { try { ta.focus(); } catch (e) {} }, 60);
       ov.querySelector('.nao').onclick = function() { ov.remove(); };
