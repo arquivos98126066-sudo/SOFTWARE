@@ -754,6 +754,7 @@
     background: var(--dark2); border: 1px solid var(--gold); border-radius: 999px;
     font-size: 12px; font-weight: 600; line-height: 1; white-space: nowrap; color: #fff; cursor: pointer; transition: background .15s;
   }
+  .rcm-wrap.zig .rcm-node.foco, .rcm-wrap.zig .rcm-node.foco.sel { color: var(--gold); }
   .rcm-node.txt { border-color: #f6d97f; }
   .rcm-wrap.zig { animation: cicloEntra .3s ease; }
   .rcm-wrap.zig .rcm-node { overflow: hidden; width: max-content; height: auto; min-height: 44px; padding: 8px 19px; gap: 10px; font-size: 14.5px; white-space: normal; text-align: center; justify-content: center; }
@@ -2923,6 +2924,14 @@ window.saveAnswer = window.saveAnswer || function(){};
         filhos(n).forEach(function(c) { anda(c, n); });
       })(root, null);
       var frag = document.createDocumentFragment();
+      /* montando camadas dentro de uma célula: só o caminho até ela e o que tem dentro; o nome dela fica amarelo */
+      var foF = barId && proc && zig ? acha(barId) : null;
+      if (foF && foF.p && foF.n.et) {
+        var keepF = {}; Object.keys(FLK).forEach(function(k) { keepF[k] = 1; });
+        foF.n.children.forEach(function(c) { keepF[c.id] = 1; });
+        lista = lista.filter(function(m) { return keepF[m.n.id]; });
+        lista.forEach(function(m) { if (m.n.id === barId) m.el.classList.add('foco'); });
+      }
       if (soRaiz) lista = lista.filter(function(m) { return m.n.id === 'root'; });
       if (semRaiz) lista = lista.filter(function(m) { return m.n.id !== 'root'; });
       lista.forEach(function(m) { frag.appendChild(m.el); });
