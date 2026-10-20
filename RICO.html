@@ -3334,7 +3334,7 @@ window.saveAnswer = window.saveAnswer || function(){};
       var ov = document.createElement('div'); ov.className = 'rcm-conf';
       var caminho = corpo.map(function(x, q) { return '<li><b>' + (q + 1) + '</b><span>' + escH(String(x).split('\n')[0].replace(/^\(|\)$/g, '')) + '</span></li>'; }).join('');
       var mud = muda.length ? muda.map(function(m) { return '<li><i>' + escH(m.k) + '</i><span>' + escH(m.d) + '</span></li>'; }).join('') : '<li class="vz">Nenhuma mudança desde a última cópia.</li>';
-      ov.innerHTML = '<div class="rcm-conf-card"><h3>' + (parcial ? 'Copiar até aqui' : 'Confirmar cópia') + '</h3><h4>Você escolheu</h4><ol>' + caminho + '</ol><h4>Mudanças e instruções</h4><ul>' + mud + '</ul><div class="rcm-conf-bt"><button type="button" class="sim">' + (parcial ? 'Copiar até aqui' : 'Copiar') + '</button><button type="button" class="nao">Cancelar</button><button type="button" class="volta">Voltar tudo</button></div></div>';
+      ov.innerHTML = '<div class="rcm-conf-card"><h3>' + (parcial ? 'Copiando' : 'Confirmar cópia') + '</h3><h4>Você escolheu</h4><ol>' + caminho + '</ol><h4>Mudanças e instruções</h4><ul>' + mud + '</ul><div class="rcm-conf-bt"><button type="button" class="sim">' + 'Copiar' + '</button><button type="button" class="nao">Cancelar</button><button type="button" class="volta">Voltar</button></div></div>';
       document.body.appendChild(ov);
       ov.querySelector('.nao').onclick = function() { ov.remove(); };
       ov.querySelector('.volta').onclick = function() { ov.remove(); ac.voltar(); };
