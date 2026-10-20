@@ -4397,7 +4397,7 @@ window.saveAnswer = window.saveAnswer || function(){};
     var t = document.getElementById('modoTitulo'), bar = document.getElementById('modoBar');
     if (!t || !bar) return;
     function marca() {
-      Array.prototype.forEach.call(bar.querySelectorAll('.rcm-ib'), function(b) { b.classList.toggle('on', b.getAttribute('data-m') === window._rcModo); });
+      Array.prototype.forEach.call(bar.querySelectorAll('.rcm-ib'), function(b) { b.classList.toggle('on', b.hasAttribute('data-m') && b.getAttribute('data-m') === window._rcModo); });
     }
     function alterna() {
       var abre = bar.hidden;
