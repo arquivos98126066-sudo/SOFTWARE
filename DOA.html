@@ -570,13 +570,7 @@ window._carregarProcessoNuvem = carregarProcessoNuvem;
   </div>
 </div>
 
-<div id="html-view">
-  <div class="topbar">
-    <button class="rbtn" onclick="htmlFecha()" aria-label="Volta" data-tip="Volta"><svg class="ic"><use href="#i-arrow-left"/></svg></button>
-    <span class="tb-title" id="html-view-title"></span>
-  </div>
-  <iframe id="html-view-frame" sandbox="allow-scripts allow-forms allow-popups allow-downloads"></iframe>
-</div>
+<div id="html-view"></div>
 <input type="file" id="html-file" accept=".html,.htm,text/html" hidden>
 
 <!-- ══ PROCESSO ══ -->
@@ -1714,15 +1708,20 @@ function htmlCodigo(h, fn){
 }
 function htmlAbre(id){
   var h = htmlLer().find(function(x){ return x.id === id; }); if(!h) return;
-  var fr = document.getElementById('html-view-frame');
-  document.getElementById('html-view-title').textContent = h.nome;
-  if(h.src){ fr.removeAttribute('srcdoc'); fr.src = h.src; } else { fr.removeAttribute('src'); fr.srcdoc = h.html; }
-  document.getElementById('html-view').classList.add('open');
+  /* iframe novo a cada abertura: assim ele não acumula histórico e o botão voltar do celular só fecha o HTML */
+  var box = document.getElementById('html-view');
+  box.innerHTML = '';
+  var fr = document.createElement('iframe'); fr.id = 'html-view-frame';
+  fr.setAttribute('sandbox', 'allow-scripts allow-forms allow-popups allow-downloads');
+  box.appendChild(fr);
+  if(h.src) fr.src = h.src; else fr.srcdoc = h.html;
+  box.classList.add('open');
+  try { history.pushState({htmlView: 1}, ''); } catch(e){}
 }
 function htmlFecha(){
-  var fr = document.getElementById('html-view-frame');
-  document.getElementById('html-view').classList.remove('open');
-  fr.removeAttribute('srcdoc'); fr.src = 'about:blank';
+  var box = document.getElementById('html-view');
+  if(!box.classList.contains('open')) return;
+  box.classList.remove('open'); box.innerHTML = '';
 }
 function htmlEdita(id, apagar){
   var a = htmlLer(), h = a.find(function(x){ return x.id === id; }); if(!h) return;
@@ -1732,6 +1731,7 @@ function htmlEdita(id, apagar){
   if(!n){ if(confirm('Remover "' + h.nome + '" da lista?')){ a = a.filter(function(x){ return x.id !== id; }); _htmlSel = null; htmlSalva(a); htmlRender(); } return; }
   h.nome = n; _htmlSel = null; htmlSalva(a); htmlRender();
 }
+window.addEventListener('popstate', function(){ htmlFecha(); });
 document.getElementById('html-file').addEventListener('change', function(e){
   var f = e.target.files && e.target.files[0]; e.target.value = ''; if(!f) return;
   var r = new FileReader();
