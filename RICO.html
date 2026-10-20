@@ -3174,6 +3174,7 @@ window.saveAnswer = window.saveAnswer || function(){};
       }
       if (f && f.p && f.p.et && f.p.et.run && !f.p.collapsed) { if (/\?\s*$/.test(f.n.text || '')) pedeResposta(f); else escolheEtapa(f); return; }
       if (proc && zig && f && f.p && (f.n.children.length || (FL[f.n.id] && f.n.et))) { focoFix = camOn; abreId = null; focoEntra(f.n.id); f.n.collapsed = false; selId = null; render(); return; }
+      if (proc && zig && !camOn && f && f.p && !f.n.children.length && !f.n.et) { render(); abreCopiaTrilha(caminhoAte(focoId).concat([linhaDe(f.n)])); return; }
       if (f && (f.n.children.length || f.n.et)) {
         f.n.collapsed = !f.n.collapsed;
         if (!f.n.collapsed && f.n.et && !f.p) reiniciaFluxo(f.n);
@@ -3461,6 +3462,20 @@ window.saveAnswer = window.saveAnswer || function(){};
         voltar: function() { reiniciaFluxo(p); selId = p.id; salva(); render(); }
       });
     }
+    /* Processo montado por você (sem etapas): o caminho até a célula vira a cópia; no último nível a cópia sobe sozinha */
+    function linhaDe(n) { var tx = textoDe(n); return '(' + (n.text || '') + ')' + (tx ? '\n' + tx : ''); }
+    function caminhoAte(id) {
+      var out = [], f = id ? acha(id) : null;
+      while (f && f.p) { out.unshift(linhaDe(f.n)); f = acha(f.p.id); }
+      return out;
+    }
+    function abreCopiaTrilha(corpo) {
+      var muda = calculaMudancas(), tudo = corpo.concat(muda.map(function(m) { return m.t; })).join('\n\n');
+      confirmaCopia(corpo, muda, true, {
+        copiar: function() { confirmaMudancas(); salva(); if (tudo) copiaTexto(tudo); render(); },
+        voltar: function() { focoId = null; focoFix = false; abreId = null; selId = 'root'; barId = null; salva(); render(); }
+      });
+    }
     function copiaParcial(id) {
       var f = acha(id); if (!f || !f.n.et || !f.n.et.esc.length) return;
       barId = null; selId = id; render(); abreConfirma(f.n, true);
@@ -3537,7 +3552,7 @@ window.saveAnswer = window.saveAnswer || function(){};
       var nb = barId ? acha(barId) : null;
       bar.innerHTML = movBar
         ? '<div class="rcm-pill"><button type="button" class="rcm-ib" data-a="sobe" aria-label="Sobe">' + ICO_SOBE + '</button><button type="button" class="rcm-ib" data-a="desce" aria-label="Desce">' + ICO_DESCE + '</button><button type="button" class="rcm-ib" data-a="pronto" aria-label="Pronto">' + ICO_OK + '</button></div>'
-        : '<div class="rcm-pill">' + (false ? '' : (proc && root && root.et && root.et.desc && root.et.desc.length ? '<button type="button" class="rcm-ib" data-a="voltaFluxo" aria-label="Voltar">' + ICO_VOLTA + '</button>' : '')) + (proc && zig && focoId ? '<button type="button" class="rcm-ib" data-a="voltaFoco" aria-label="Voltar">' + ICO_VOLTA + '</button>' : '') + '<button type="button" class="rcm-ib" data-a="filho" aria-label="Adicionar">' + ICO_FILHO + '</button><button type="button" class="rcm-ib" data-a="irmao" aria-label="Mover">' + ICO_IRMAO + '</button>' + (proc && zig && nb && nb.p ? '<button type="button" class="rcm-ib' + (camOn ? ' on' : '') + '" data-a="cam" aria-label="Camadas">' + ICO_ETAPAS + '</button>' : '') + (false ? '<button type="button" class="rcm-ib" data-a="etapas" aria-label="Etapas">' + ICO_ETAPAS + (nb && nb.n.et ? '<b class="rcm-bd">' + ((nb.n.et.desc && (nb.n.et.desc.length || nb.n.et.fim)) ? (nb.n.et.ver == null ? nb.n.et.desc.length : nb.n.et.ver) + 1 : nb.n.et.cur + 1) + '</b>' : '') + '</button>' : '') + (proc && nb && !nb.p && nb.n.et && nb.n.et.esc.length ? '<button type="button" class="rcm-ib" data-a="parcial" aria-label="Copiar até aqui">' + ICO_DUP + '</button>' : '') + '<button type="button" class="rcm-ib" data-a="edita" aria-label="Editar">' + ICO_EDIT + '</button></div>';
+        : '<div class="rcm-pill">' + (false ? '' : (proc && root && root.et && root.et.desc && root.et.desc.length ? '<button type="button" class="rcm-ib" data-a="voltaFluxo" aria-label="Voltar">' + ICO_VOLTA + '</button>' : '')) + (proc && zig && focoId ? '<button type="button" class="rcm-ib" data-a="voltaFoco" aria-label="Voltar">' + ICO_VOLTA + '</button>' : '') + '<button type="button" class="rcm-ib" data-a="filho" aria-label="Adicionar">' + ICO_FILHO + '</button><button type="button" class="rcm-ib" data-a="irmao" aria-label="Mover">' + ICO_IRMAO + '</button>' + (proc && zig && nb && nb.p ? '<button type="button" class="rcm-ib' + (camOn ? ' on' : '') + '" data-a="cam" aria-label="Camadas">' + ICO_ETAPAS + '</button>' : '') + (proc && zig && nb && nb.p && (focoId || !root.et) ? '<button type="button" class="rcm-ib" data-a="copiaAqui" aria-label="Copiar até aqui">' + ICO_DUP + '</button>' : '') + (false ? '<button type="button" class="rcm-ib" data-a="etapas" aria-label="Etapas">' + ICO_ETAPAS + (nb && nb.n.et ? '<b class="rcm-bd">' + ((nb.n.et.desc && (nb.n.et.desc.length || nb.n.et.fim)) ? (nb.n.et.ver == null ? nb.n.et.desc.length : nb.n.et.ver) + 1 : nb.n.et.cur + 1) + '</b>' : '') + '</button>' : '') + (proc && nb && !nb.p && nb.n.et && nb.n.et.esc.length ? '<button type="button" class="rcm-ib" data-a="parcial" aria-label="Copiar até aqui">' + ICO_DUP + '</button>' : '') + '<button type="button" class="rcm-ib" data-a="edita" aria-label="Editar">' + ICO_EDIT + '</button></div>';
       if (destId) bar.innerHTML = '<div class="rcm-pill"><span class="rcm-av">Toque no destino</span><button type="button" class="rcm-ib" data-a="cancela" aria-label="Cancelar">' + ICO_X + '</button></div>';
       btnSib = bar.querySelector('[data-a="irmao"]');
       btnLev = bar.querySelector('[data-a="levar"],[data-a="etapas"]');
@@ -3618,6 +3633,7 @@ window.saveAnswer = window.saveAnswer || function(){};
         else if (a === 'exclui') excluiNo(id);
         else if (a === 'dup') duplicaNo(id);
         else if (a === 'voltaFoco') focoVolta();
+        else if (a === 'copiaAqui') { var fz = acha(id); if (fz) { var cp = caminhoAte(focoId); if (id !== focoId) cp.push(linhaDe(fz.n)); barId = null; render(); abreCopiaTrilha(cp); } }
         else if (a === 'cam') {
           camOn = !camOn; abreId = null;
           if (camOn) { focoFix = true; focoEntra(id); } else { focoFix = false; focoId = null; barId = null; }
