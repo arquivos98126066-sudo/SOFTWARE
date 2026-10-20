@@ -3144,12 +3144,40 @@ window.saveAnswer = window.saveAnswer || function(){};
       n.et.run = false; n.collapsed = false;
       etapasMostra(id);
     }
+    function textoDe(n) {
+      var arr = n.i;
+      if (!Array.isArray(arr) && (KEY === 'rico.mapa.v1' || KEY === 'rico.proc.v1' || KEY.indexOf('rico.proc.') === 0 || KEY.indexOf('rico.mapa.') === 0)) {
+        var tx = String(n.text || '').trim();
+        for (var j = 0; j < CICLO.length; j++) if (CICLO[j] && String(CICLO[j].t || '').trim() === tx) { arr = CICLO[j].i; break; }
+      }
+      return (Array.isArray(arr) ? arr : []).map(function(v) { return String(v == null ? '' : v).trim(); }).filter(Boolean).join('\n');
+    }
+    function copiaTexto(t) {
+      function ok() {
+        if (window.showToast) { window.showToast('Copiado para a área de transferência'); return; }
+        var el = document.getElementById('toast'); if (!el) return;
+        el.textContent = 'Copiado para a área de transferência'; el.classList.add('show');
+        setTimeout(function() { el.classList.remove('show'); }, 2200);
+      }
+      function velho() {
+        try {
+          var ta = document.createElement('textarea'); ta.value = t; ta.setAttribute('readonly', ''); ta.style.cssText = 'position:fixed;left:-9999px;top:0;opacity:0';
+          document.body.appendChild(ta); ta.select(); ta.setSelectionRange(0, t.length);
+          var r = document.execCommand('copy'); ta.remove();
+          if (r) ok();
+        } catch (e) {}
+      }
+      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(t).then(ok, velho); else velho();
+    }
     function escolheEtapa(f) {
       var p = f.p, et = p.et;
-      et.esc[et.cur] = f.n.text;
+      var tx = textoDe(f.n);
+      et.esc[et.cur] = tx ? (f.n.text + '\n' + tx) : '';
       if (et.cur + 1 < et.s.length) { et.cur++; p.children = et.s[et.cur]; }
       else {
         et.cur = 0; p.children = et.s[0];
+        var tudo = et.esc.filter(Boolean).join('\n\n');
+        if (tudo) copiaTexto(tudo);
       }
       selId = p.id; barId = null; salva(); render();
     }
