@@ -3377,8 +3377,7 @@ window.saveAnswer = window.saveAnswer || function(){};
       root.children = topo ? (topo.et ? topo.et.s[0] : topo.children) : et.s[et.cur];
       selId = 'root'; barId = null; salva(); render();
     }
-    function focoEntra(id) { if (focoId !== id) { focoId = id; try { history.pushState({ _foco: 1 }, ''); } catch (e) {} } }
-    window.addEventListener('popstate', function() { if (focoId && wrap && wrap.isConnected) focoVolta(); });
+    function focoEntra(id) { focoId = id; }
     function focoVolta() { /* sobe um nível: do foco para o pai; na raiz, volta à lista normal */
       var f = focoId ? acha(focoId) : null;
       var pa = f && f.p; focoId = pa && pa.id !== 'root' ? pa.id : null; abreId = null; if (!focoId) focoFix = false;
