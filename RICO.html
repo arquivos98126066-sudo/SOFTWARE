@@ -2896,7 +2896,7 @@ window.saveAnswer = window.saveAnswer || function(){};
     function posBar() {
       var f = barId ? acha(barId) : null;
       if (!f || !slot || !mwEl || !bar) { if (bar) bar.hidden = true; return; }
-      if (btnSib) btnSib.disabled = false; if (btnLev) btnLev.disabled = !f.p; if (btnDel) btnDel.disabled = !f.p && window.rcMapa.total() <= 1;
+      if (btnSib) btnSib.disabled = false; if (btnLev) btnLev.disabled = btnLev.getAttribute('data-a') === 'etapas' ? false : !f.p; if (btnDel) btnDel.disabled = !f.p && window.rcMapa.total() <= 1;
       bar.hidden = false;
       var bw = bar.offsetWidth, aw = wrap.clientWidth || 280;
       var left = clamp(zig ? slot.x - bw / 2 : slot.x, 0, Math.max(0, aw - bw));
@@ -3029,7 +3029,11 @@ window.saveAnswer = window.saveAnswer || function(){};
     function acaoToque(id) {
       selId = id; barId = null;
       var f = acha(id);
-      if (f && !f.p && window.rcMapa.foca(window.rcMapa.indice(api))) return;
+      if (f && !f.p) {
+        var ix = window.rcMapa.indice(api);
+        if (f.n.et && !window.rcMapa.estaAberto(ix)) { f.n.et.cur = 0; f.n.children = f.n.et.s[0]; f.n.et.run = f.n.et.s.length > 1; f.n.et.esc = []; salva(); }
+        if (window.rcMapa.foca(ix)) return;
+      }
       if (f && f.p && f.p.et && f.p.et.run && !f.p.collapsed) { escolheEtapa(f); return; }
       if (f && (f.n.children.length || f.n.et)) {
         f.n.collapsed = !f.n.collapsed;
@@ -3096,7 +3100,7 @@ window.saveAnswer = window.saveAnswer || function(){};
     function reid(n) { n.id = uid(); (n.et ? [].concat.apply([], n.et.s) : n.children).forEach(reid); }
     /* etapas (só no Processo): cada etapa é uma lista de opções; ao reabrir, começa da primeira e cada escolha abre a seguinte */
     function etapasNo(id) {
-      var f = acha(id); if (!f || !f.p) return;
+      var f = acha(id); if (!f) return;
       var n = f.n;
       if (!n.et) n.et = { s: [n.children], cur: 0, run: false, esc: [] };
       if (!n.children.length) { selId = id; barId = id; montaBar(); render(); return; }
@@ -3109,7 +3113,11 @@ window.saveAnswer = window.saveAnswer || function(){};
       var p = f.p, et = p.et;
       et.esc[et.cur] = f.n.text;
       if (et.cur + 1 < et.s.length) { et.cur++; p.children = et.s[et.cur]; }
-      else { et.run = false; et.cur = 0; p.children = et.s[0]; p.collapsed = true; }
+      else {
+        et.run = false; et.cur = 0; p.children = et.s[0];
+        if (!p.p) { if (!window.rcMapa.foca(window.rcMapa.indice(api))) p.collapsed = true; }
+        else p.collapsed = true;
+      }
       selId = p.id; barId = null; salva(); render();
     }
     function tiraNo(id) {
