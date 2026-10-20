@@ -2893,7 +2893,7 @@ window.saveAnswer = window.saveAnswer || function(){};
         return false;
       })(root);
     }
-    function filhos(n) { return n.collapsed || (FLR[n.id] && !FLK[n.id]) ? [] : (FL[n.id] && !n.et ? [] : n.children); }
+    function filhos(n) { return n.collapsed || (FL[n.id] && !FLK[n.id]) ? [] : n.children; }
 
     function render() {
       if (!root || !wrap || !wrap.isConnected) return;
@@ -3165,6 +3165,7 @@ window.saveAnswer = window.saveAnswer || function(){};
         if (window.rcMapa.foca(ix)) return;
       }
       if (f && f.p && f.p.et && f.p.et.run && !f.p.collapsed) { if (/\?\s*$/.test(f.n.text || '')) pedeResposta(f); else escolheEtapa(f); return; }
+      if (proc && zig && f && f.p && FL[f.n.id] && (f.n.children.length || f.n.et)) { focoId = f.n.id; f.n.collapsed = false; render(); return; }
       if (f && (f.n.children.length || f.n.et)) {
         f.n.collapsed = !f.n.collapsed;
         if (!f.n.collapsed && f.n.et && !f.p) reiniciaFluxo(f.n);
@@ -3275,9 +3276,23 @@ window.saveAnswer = window.saveAnswer || function(){};
       if (f.p) focoId = id;
       etapasMostra(id);
     }
+    function achaTudo(id, n) {
+      n = n || root;
+      if (n.id === id) return n;
+      var lst = n.et ? [].concat.apply([], n.et.s) : n.children;
+      for (var i = 0; i < lst.length; i++) { var r = achaTudo(id, lst[i]); if (r) return r; }
+      return null;
+    }
+    function fluxoVolta() { /* sobe um nível da descida do fluxo: tira a última escolha e mostra a lista de cima */
+      var et = root.et; if (!et || !et.desc || !et.desc.length) return;
+      et.desc.pop(); et.esc.pop(); et.fim = false; et.ver = null;
+      var topo = et.desc.length ? achaTudo(et.desc[et.desc.length - 1]) : null;
+      root.children = topo ? (topo.et ? topo.et.s[0] : topo.children) : et.s[et.cur];
+      selId = 'root'; barId = null; salva(); render();
+    }
     function focoVolta() { /* sobe um nível: do foco para o pai; na raiz, volta à lista normal */
       var f = focoId ? acha(focoId) : null;
-      var pa = f && f.p; focoId = pa && pa.id !== 'root' && pa.et ? pa.id : null;
+      var pa = f && f.p; focoId = pa && pa.id !== 'root' ? pa.id : null;
       selId = focoId || 'root'; barId = null; salva(); render();
     }
     function notasDe(n) {
@@ -3512,7 +3527,7 @@ window.saveAnswer = window.saveAnswer || function(){};
       var nb = barId ? acha(barId) : null;
       bar.innerHTML = movBar
         ? '<div class="rcm-pill"><button type="button" class="rcm-ib" data-a="sobe" aria-label="Sobe">' + ICO_SOBE + '</button><button type="button" class="rcm-ib" data-a="desce" aria-label="Desce">' + ICO_DESCE + '</button><button type="button" class="rcm-ib" data-a="pronto" aria-label="Pronto">' + ICO_OK + '</button></div>'
-        : '<div class="rcm-pill">' + (proc && focoId ? '<button type="button" class="rcm-ib" data-a="voltaFoco" aria-label="Voltar">' + ICO_VOLTA + '</button>' : '') + '<button type="button" class="rcm-ib" data-a="filho" aria-label="Adicionar">' + ICO_FILHO + '</button><button type="button" class="rcm-ib" data-a="irmao" aria-label="Mover">' + ICO_IRMAO + '</button>' + (proc && nb ? '<button type="button" class="rcm-ib" data-a="etapas" aria-label="Etapas">' + ICO_ETAPAS + (nb && nb.n.et ? '<b class="rcm-bd">' + ((nb.n.et.desc && (nb.n.et.desc.length || nb.n.et.fim)) ? (nb.n.et.ver == null ? nb.n.et.desc.length : nb.n.et.ver) + 1 : nb.n.et.cur + 1) + '</b>' : '') + '</button>' : '') + (proc && nb && !nb.p && nb.n.et && nb.n.et.esc.length ? '<button type="button" class="rcm-ib" data-a="parcial" aria-label="Copiar até aqui">' + ICO_DUP + '</button>' : '') + '<button type="button" class="rcm-ib" data-a="edita" aria-label="Editar">' + ICO_EDIT + '</button></div>';
+        : '<div class="rcm-pill">' + (proc && focoId ? '<button type="button" class="rcm-ib" data-a="voltaFoco" aria-label="Voltar">' + ICO_VOLTA + '</button>' : (proc && root && root.et && root.et.desc && root.et.desc.length ? '<button type="button" class="rcm-ib" data-a="voltaFluxo" aria-label="Voltar">' + ICO_VOLTA + '</button>' : '')) + '<button type="button" class="rcm-ib" data-a="filho" aria-label="Adicionar">' + ICO_FILHO + '</button><button type="button" class="rcm-ib" data-a="irmao" aria-label="Mover">' + ICO_IRMAO + '</button>' + (proc && nb ? '<button type="button" class="rcm-ib" data-a="etapas" aria-label="Etapas">' + ICO_ETAPAS + (nb && nb.n.et ? '<b class="rcm-bd">' + ((nb.n.et.desc && (nb.n.et.desc.length || nb.n.et.fim)) ? (nb.n.et.ver == null ? nb.n.et.desc.length : nb.n.et.ver) + 1 : nb.n.et.cur + 1) + '</b>' : '') + '</button>' : '') + (proc && nb && !nb.p && nb.n.et && nb.n.et.esc.length ? '<button type="button" class="rcm-ib" data-a="parcial" aria-label="Copiar até aqui">' + ICO_DUP + '</button>' : '') + '<button type="button" class="rcm-ib" data-a="edita" aria-label="Editar">' + ICO_EDIT + '</button></div>';
       if (destId) bar.innerHTML = '<div class="rcm-pill"><span class="rcm-av">Toque no destino</span><button type="button" class="rcm-ib" data-a="cancela" aria-label="Cancelar">' + ICO_X + '</button></div>';
       btnSib = bar.querySelector('[data-a="irmao"]');
       btnLev = bar.querySelector('[data-a="levar"],[data-a="etapas"]');
@@ -3593,6 +3608,7 @@ window.saveAnswer = window.saveAnswer || function(){};
         else if (a === 'exclui') excluiNo(id);
         else if (a === 'dup') duplicaNo(id);
         else if (a === 'voltaFoco') focoVolta();
+        else if (a === 'voltaFluxo') fluxoVolta();
         else if (a === 'etapas') etapasVai(id);
         else if (a === 'parcial') copiaParcial(id);
         else if (a === 'levar') { PEND = { inst: api, id: id }; destId = id; montaBar(); posBar(); }
