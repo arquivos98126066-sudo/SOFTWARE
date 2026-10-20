@@ -775,6 +775,8 @@
   .rcm-conf-card li { display: flex; align-items: baseline; gap: 10px; font-size: 14px; line-height: 1.35; }
   .rcm-conf-card li b { flex: none; width: 22px; height: 22px; border-radius: 50%; background: var(--gold); color: var(--dark); font-size: 12px; display: grid; place-items: center; }
   .rcm-conf-card li i { flex: none; font-style: normal; font-weight: 700; font-size: 11px; text-transform: uppercase; background: var(--dark2); color: var(--gold); border-radius: 999px; padding: 2px 8px; }
+  .rcm-conf-card li span em { display: block; font-style: normal; color: var(--tx3); font-size: 13px; margin-top: 2px; white-space: pre-wrap; }
+  .rcm-conf-card textarea { width: 100%; box-sizing: border-box; border: 1px solid var(--bd-in); border-radius: 16px; padding: 12px; font: 400 15px/1.4 inherit; font-family: inherit; color: var(--dark); resize: vertical; background: #fff; }
   .rcm-conf-card li.vz { color: var(--tx3); }
   .rcm-conf-bt { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; }
   .rcm-conf-bt button { flex: 1 1 40%; height: 46px; border-radius: 999px; border: 1px solid var(--bd-in); background: #fff; font: 600 14px var(--f-title); color: var(--dark); }
@@ -3095,7 +3097,7 @@ window.saveAnswer = window.saveAnswer || function(){};
         if (f.n.et && !window.rcMapa.estaAberto(ix)) { reiniciaFluxo(f.n); salva(); }
         if (window.rcMapa.foca(ix)) return;
       }
-      if (f && f.p && f.p.et && f.p.et.run && !f.p.collapsed) { escolheEtapa(f); return; }
+      if (f && f.p && f.p.et && f.p.et.run && !f.p.collapsed) { if (/\?\s*$/.test(f.n.text || '')) pedeResposta(f); else escolheEtapa(f); return; }
       if (f && (f.n.children.length || f.n.et)) {
         f.n.collapsed = !f.n.collapsed;
         if (!f.n.collapsed && f.n.et) reiniciaFluxo(f.n);
@@ -3332,7 +3334,7 @@ window.saveAnswer = window.saveAnswer || function(){};
     function confirmaCopia(corpo, muda, parcial, ac) {
       var velho = document.querySelector('.rcm-conf'); if (velho) velho.remove();
       var ov = document.createElement('div'); ov.className = 'rcm-conf';
-      var caminho = corpo.map(function(x, q) { return '<li><b>' + (q + 1) + '</b><span>' + escH(String(x).split('\n')[0].replace(/^\(|\)$/g, '')) + '</span></li>'; }).join('');
+      var caminho = corpo.map(function(x, q) { var ls = String(x).split('\n'), rp = /^Resposta: /.test(ls[1] || '') ? ls.slice(1).join('\n').slice(10) : ''; return '<li><b>' + (q + 1) + '</b><span>' + escH(ls[0].replace(/^\(|\)$/g, '')) + (rp ? '<em>' + escH(rp) + '</em>' : '') + '</span></li>'; }).join('');
       var mud = muda.length ? muda.map(function(m) { return '<li><i>' + escH(m.k) + '</i><span>' + escH(m.d) + '</span></li>'; }).join('') : '<li class="vz">Nenhuma mudança desde a última cópia.</li>';
       ov.innerHTML = '<div class="rcm-conf-card"><h3>' + (parcial ? 'Copiando' : 'Confirmar cópia') + '</h3><h4>Você escolheu</h4><ol>' + caminho + '</ol><h4>Mudanças e instruções</h4><ul>' + mud + '</ul><div class="rcm-conf-bt"><button type="button" class="sim">' + 'Copiar' + '</button><button type="button" class="nao">Cancelar</button><button type="button" class="volta">Voltar</button></div></div>';
       document.body.appendChild(ov);
@@ -3353,11 +3355,22 @@ window.saveAnswer = window.saveAnswer || function(){};
       var f = acha(id); if (!f || !f.n.et || !f.n.et.esc.length) return;
       barId = null; selId = id; render(); abreConfirma(f.n, true);
     }
-    function escolheEtapa(f) {
+    /* pergunta (célula com ? no nome): abre um campo para escrever; OK e Pular escolhem a célula, Cancelar fica onde está */
+    function pedeResposta(f) {
+      var velho = document.querySelector('.rcm-conf'); if (velho) velho.remove();
+      var ov = document.createElement('div'); ov.className = 'rcm-conf';
+      ov.innerHTML = '<div class="rcm-conf-card"><h3>' + escH(f.n.text) + '</h3><textarea rows="5" placeholder="Escreva aqui"></textarea><div class="rcm-conf-bt"><button type="button" class="sim">OK</button><button type="button" class="nao">Cancelar</button><button type="button" class="volta">Pular</button></div></div>';
+      document.body.appendChild(ov);
+      var ta = ov.querySelector('textarea'); setTimeout(function() { try { ta.focus(); } catch (e) {} }, 60);
+      ov.querySelector('.nao').onclick = function() { ov.remove(); };
+      ov.querySelector('.volta').onclick = function() { ov.remove(); escolheEtapa(f, ''); };
+      ov.querySelector('.sim').onclick = function() { var v = ta.value.trim(); ov.remove(); escolheEtapa(f, v); };
+    }
+    function escolheEtapa(f, resp) {
       /* escolher uma célula: se ela tem opções dentro, desce para elas; se não, segue para a próxima etapa ou chega ao final (trava e pede confirmação) */
       var p = f.p, et = p.et;
       var tx = textoDe(f.n);
-      var linha = '(' + (f.n.text || '') + ')' + (tx ? '\n' + tx : '');
+      var linha = '(' + (f.n.text || '') + ')' + (resp !== undefined ? '\nResposta: ' + (resp || 'sem resposta') : (tx ? '\n' + tx : ''));
       if (et.fim) { et.esc[et.esc.length - 1] = linha; selId = p.id; barId = null; render(); abreConfirma(p, false); return; }
       et.esc.push(linha);
       var sub = f.n.et ? f.n.et.s[0] : f.n.children;
@@ -3571,6 +3584,18 @@ window.saveAnswer = window.saveAnswer || function(){};
           }
           localStorage.setItem('rico.seed.skills', '2');
         }
+        if (localStorage.getItem('rico.seed.fundo') === null) {
+          var todos = [{ k: 'rico.proc.ouro', r: semeiaOuro() }].concat(semeiaSkills());
+          todos.forEach(function(m) {
+            var sv2 = localStorage.getItem(m.k);
+            if (!sv2) return;
+            var mm = JSON.parse(sv2), lista = mm.et ? mm.et.s[0] : mm.children;
+            mesclaFundo(lista, m.r.children);
+            if (!mm.et) mm.children = lista;
+            localStorage.setItem(m.k, JSON.stringify(mm)); localStorage.removeItem(m.k + '.foto');
+          });
+          localStorage.setItem('rico.seed.fundo', '1');
+        }
         if (mudou) localStorage.setItem(S.ord, JSON.stringify(ch));
       } catch (e) {}
     }
@@ -3589,11 +3614,14 @@ window.saveAnswer = window.saveAnswer || function(){};
     return { id: 'root', text: raiz, collapsed: false, children: s0, et: { s: [s0], cur: 0, run: false, esc: [] } };
   }
   var SAB = function() { return ['Sabedoria', 'obter ou criar conhecimento da skill.', [['Obtenção', 'ler o conhecimento que você colou, organizar as ideias e colocar cada uma na parte certa da skill.'], ['Criação', 'criar uma página HTML com todo o conhecimento que a skill já tem, para você ver e ajustar.']]]; };
+  /* pergunta: célula com "?" no nome. Ao escolher, abre um campo para escrever a resposta, que vai na cópia */
+  function Q(nome, serve, filhos) { return [nome, serve, filhos || [], 'Pergunta: ' + nome]; }
+  function cadeia(qs, fim) { var r = fim || []; for (var q = qs.length - 1; q >= 0; q--) r = [Q(qs[q][0], qs[q][1], r)]; return r; }
   function semeiaOuro() {
     var temas = ['Resultado, ação e modelagem', 'Decisão, ação e dor e prazer', 'Rituais emocionais e procrastinação', 'Estado emocional e corpo', 'Foco e perguntas', 'Crenças e mudança duradoura', 'Valores e regras', 'Metas', 'Dinheiro: crenças e meta', 'Dinheiro: plano e hábitos', 'Medo, fracasso e rejeição', 'Confiança e solução de problemas', 'Relações e rumo de vida'];
     var sab = SAB(); sab[2].push(['Bom dia', 'dar bom dia.', [], 'Opção: bom dia']);
     return semeiaMapa('OURO', 'ouro', [
-      ['Analisar material', 'analisar um material novo ou refazer um que já existe e extrair o ouro dele.', [], 'Opção 1: analisar um material'],
+      ['Analisar material', 'analisar um material novo ou refazer um que já existe e extrair o ouro dele.', cadeia([['Qual é o material?', 'dizer a pasta ou o nome do material que vai ser analisado.']]), 'Opção 1: analisar um material'],
       ['Usar material guardado', 'abrir um material já analisado, escolher o tema e fazer os exercícios.', [
         ['Você Nasceu Rico', 'trabalhar os exercícios do material Você Nasceu Rico.', [], 'Material: Você Nasceu Rico'],
         ['Fênix', 'trabalhar os temas do Seminário Fênix (temas ainda não gravados).', [], 'Material: Seminário Fênix'],
@@ -3621,14 +3649,49 @@ window.saveAnswer = window.saveAnswer || function(){};
     return mp;
   }
   function semeiaSkills() {
+    function nomeCidade(fim) { return cadeia([['Qual o nome do negócio?', 'dizer o nome do negócio do cliente.'], ['Qual a cidade?', 'dizer a cidade do negócio.']], fim); }
+    function consciencia() {
+      var img = function() { return [['Tenho imagem', 'enviar a imagem para o criativo ser feito em cima dela.'], ['Não tenho imagem', 'seguir sem imagem.']]; };
+      return cadeia([['Qual nível de consciência?', 'escolher de 1 a 5: inconsciente, consciente do problema, consciente da solução, consciente do produto ou totalmente consciente.']], [
+        ['Imagem', 'imagem nas 3 versões: feed 4:5, stories 9:16 e reels 9:16.', img()],
+        ['Vídeo para Instagram', 'vídeo 9:16 para o Instagram.'],
+        ['Carrossel', 'criativo em carrossel.', img()],
+        ['Rede de pesquisa', 'anúncio de pesquisa do Google Ads.']]);
+    }
+    function menuSocial() {
+      return [
+        ['Organizar perfil', 'organizar o perfil do Instagram do cliente (entrega em texto).', cadeia([['O cliente tem autoridade?', 'resultados, tempo de mercado, número de clientes, prêmios ou certificações.']])],
+        ['Organizar destaques', 'organizar os destaques do Instagram (entrega em HTML).'],
+        ['Criar conteúdo (RETINA)', 'criar conteúdo pelo método RETINA (entrega em HTML).', cadeia([
+          ['Quais tipos RETINA?', 'Relacionamento, Engajamento, Transformação, Interação 1x1, Níveis de consciência e Autoridade (um, vários ou todos).'],
+          ['Qual o objetivo do conteúdo?', 'vender, gerar mensagens no WhatsApp, crescer seguidores ou autoridade.'],
+          ['Tem tema específico?', 'opcional.']], [
+          ['Reels', '1080x1920 (9:16), de 15 a 60 segundos.'],
+          ['Carrossel', '1080x1350 (4:5) ou 1080x1440 (3:4), de 5 a 10 lâminas.'],
+          ['Post único', '1080x1350 (4:5).'],
+          ['Stories', '1080x1920 (9:16), até 60 segundos por story.']])]
+      ];
+    }
+    function sondagemSocial() {
+      return cadeia([
+        ['Qual é o seu nome?', 'dizer o nome do cliente.'],
+        ['Onde você mora?', 'cidade e estado.'],
+        ['O que você vende?', 'pode ser resposta simples ou detalhada.'],
+        ['Quais as características do que vende?', 'diferenciais, preço, entrega e qualidade.'],
+        ['Você já conhece seu público-alvo?', 'se não, eu pesquiso na web o que esse público busca.'],
+        ['Qual o público-alvo?', 'opcional.'],
+        ['Quais as dores?', 'opcional.'],
+        ['Quais os desejos?', 'opcional.'],
+        ['Quais as objeções?', 'opcional.']], menuSocial());
+    }
     return [
       { k: 'rico.proc.vendas', r: semeiaMapa('VENDAS', 'vend', [
         ['Conhecimento', 'guardar e melhorar o que você sabe do produto.', [
           ['Produto', 'ver, adicionar ou melhorar as informações do produto.', [
             ['Ver informações', 'mostrar o que está guardado do produto: quantidade, preço, para que serve, vantagens, benefícios e características.'],
-            ['Adicionar informação', 'guardar uma informação nova de um produto.'],
+            ['Adicionar informação', 'guardar uma informação nova de um produto.', cadeia([['Qual produto?', 'dizer o produto que vai receber a informação.'], ['O que adicionar?', 'dizer a informação nova do produto.']])],
             ['Sugestões para vender mais', 'analisar o produto e pesquisar fora características, vantagens e usos que você ainda não viu.']]],
-          ['Convicção', 'guiar você a acreditar que o produto vale 10 vezes o que o cliente paga.']]],
+          ['Convicção', 'guiar você a acreditar que o produto vale 10 vezes o que o cliente paga.', cadeia([['Qual produto?', 'dizer o produto que vai ganhar a convicção.']])]]],
         ['Sondagem', 'conversar com o cliente antes de apresentar: rapport e diagnóstico.', [
           ['Rapport', 'criar conexão com o cliente.', [
             ['Quebra-gelo', 'abrir a conversa de forma leve.', [
@@ -3651,49 +3714,91 @@ window.saveAnswer = window.saveAnswer || function(){};
           ['Onboarding', 'onboarding do cliente (detalhe não confirmado).'],
           ['LTV', 'LTV do cliente (detalhe não confirmado).']]],
         ['CRM da Conexão', 'guardar e buscar fichas de contatos.', [
-          ['Novo contato', 'cadastrar um contato novo, um campo por vez.'],
-          ['Buscar', 'achar um contato por nome ou característica e sugerir como abordar.'],
-          ['Completar', 'preencher os campos vazios de uma ficha.']]],
+          ['Novo contato', 'cadastrar um contato novo, um campo por vez (os campos eu pergunto no chat).'],
+          ['Buscar', 'achar um contato por nome ou característica e sugerir como abordar.', cadeia([['Quem você quer encontrar?', 'dizer o nome ou uma característica do contato.']])],
+          ['Completar', 'preencher os campos vazios de uma ficha.', cadeia([['Qual o nome do contato?', 'dizer o nome da ficha que vai ser completada.']])]]],
         SAB()]) },
       { k: 'rico.proc.atracao', r: semeiaMapa('ATRAÇÃO', 'atra', [
         ['Negócio', 'Perfil da Empresa no Google: acesso, análise, perfil novo e boas práticas.', [
-          ['Solicitar acesso', 'pedir acesso ao Perfil da Empresa no Google do cliente.'],
-          ['Analisar e otimizar', 'analisar o perfil, dar nota por área e otimizar para chegar ao topo.'],
-          ['Criar perfil novo', 'criar um Perfil da Empresa novo e fazer a verificação.'],
-          ['Boas práticas', 'manter o perfil no topo.']]],
-        ['Criativos', 'trabalhar criativos (detalhe não confirmado).'],
+          ['Solicitar acesso', 'pedir acesso ao Perfil da Empresa no Google do cliente.', nomeCidade()],
+          ['Analisar e otimizar', 'analisar o perfil, dar nota por área e otimizar para chegar ao topo.', nomeCidade()],
+          ['Criar perfil novo', 'criar um Perfil da Empresa novo e fazer a verificação.', nomeCidade([['Atende no local', 'a loja recebe clientes e mostra o endereço no perfil.'], ['Só delivery', 'esconde o endereço e usa área de atendimento.']])],
+          ['Boas práticas', 'manter o perfil no topo.', nomeCidade()]]],
+        ['Criativos', 'criar criativos para anúncios.', [
+          ['Pesquisa de público salva', 'usar um público que já foi pesquisado e salvo.', cadeia([['Qual público salvo?', 'dizer qual dos públicos salvos usar.']], consciencia())],
+          ['Pesquisa de público nova', 'criar um público novo antes do criativo.', cadeia([
+            ['Seu nome ou nome do negócio?', 'dizer o nome.'],
+            ['Cidade e estado onde atende?', 'dizer a cidade e o estado.'],
+            ['O que vende?', 'dizer o produto ou serviço.'],
+            ['Quais as características do que vende?', 'diferenciais, preço médio, como entrega e o que torna o produto especial.']], consciencia())]]],
         ['Lead', 'prospecção: nichos, cidades e análise de leads.', [
-          ['Analisar novo nicho', 'pesquisar e sugerir 3 nichos do mesmo ramo ligados ao que você vende.'],
-          ['Buscar nicho existente', 'escolher um nicho salvo e o estado e gerar a lista de cidades.'],
+          ['Analisar novo nicho', 'pesquisar e sugerir 3 nichos do mesmo ramo ligados ao que você vende.', cadeia([['O que você vende?', 'dizer o produto ou serviço.'], ['Para quem você vende?', 'dizer o público.'], ['Quais as características?', 'dizer as características do que vende.']])],
+          ['Buscar nicho existente', 'escolher um nicho salvo e o estado e gerar a lista de cidades.', cadeia([['Qual nicho salvo?', 'escolher um dos nichos já salvos.'], ['Qual estado?', 'escolher o estado para listar as cidades.']])],
           ['Analisar leads', 'ler os prints dos leads e montar a análise, o texto de ligação e a mensagem.']]],
-        ['Ads', 'Google Ads, Rede de Pesquisa.'],
-        ['Clientes', 'pesquisa com clientes.'],
-        ['Site', 'landing pages.'],
-        ['Pesquisa', 'pesquisa de mercado.'],
-        ['Dados', 'análise de números.'],
+        ['Ads', 'Google Ads, Rede de Pesquisa.', cadeia([
+          ['Cliente, tipo de negócio e cidade?', 'dizer o cliente, o tipo de negócio e a cidade.'],
+          ['Qual o objetivo?', 'ligações, visitas ao site, mensagens no WhatsApp ou visitas à loja.'],
+          ['A conta tem conversão configurada?', 'conversão é o aviso que conta quando alguém liga, manda mensagem ou compra.'],
+          ['Produto ou serviço e diferencial?', 'dizer o produto ou serviço principal e o diferencial.'],
+          ['Região: cidade e raio em km?', 'dizer a cidade e o raio em quilômetros.'],
+          ['Orçamento por dia?', 'dizer quanto gastar por dia.'],
+          ['Dias e horários de funcionamento?', 'dizer quando o negócio funciona.'],
+          ['Para onde vai o clique?', 'site, ligação ou WhatsApp.']])],
+        ['Clientes', 'pesquisa com clientes.', cadeia([
+          ['O que quer descobrir sobre os clientes?', 'dizer a dúvida que a pesquisa vai responder.'],
+          ['Para qual nicho e cidade?', 'dizer o nicho e a cidade.'],
+          ['Quem vai responder?', 'dono do negócio, cliente final ou os dois.'],
+          ['Quantos participantes?', 'sugestão: de 5 a 8 pessoas por grupo; formulário, a partir de 30 respostas.']], [
+          ['Entrevista rápida por WhatsApp', '3 a 5 perguntas, áudio ou texto (recomendado).'],
+          ['Formulário', 'Google Forms, bom para muita gente, menos profundo.'],
+          ['Observação', 'ver como a pessoa usa o cardápio ou a página.'],
+          ['Análise de avaliações do Google', 'ler avaliações de 3 a 5 concorrentes e anotar elogios e reclamações.']])],
+        ['Site', 'landing pages.', cadeia([
+          ['Qual produto você vende?', 'obrigatória.'],
+          ['Quais as especificações do produto?', 'obrigatória.'],
+          ['Cidade e estado?', 'obrigatória.'],
+          ['Para quem e para que vende?', 'opcional; sem resposta, eu pesquiso.'],
+          ['O que mais tira o sono do público?', 'opcional; sem resposta, eu pesquiso.'],
+          ['O que o público mais deseja?', 'opcional; sem resposta, eu pesquiso.'],
+          ['Quais as objeções comuns?', 'opcional; sem resposta, eu pesquiso.']])],
+        ['Pesquisa', 'pesquisa de mercado.', cadeia([
+          ['Qual tema quer pesquisar?', 'dizer o tema.'],
+          ['Qual cidade, estado ou região?', 'padrão: Brasil.']], [
+          ['Rápida', '3 ajudantes (padrão, gasta menos).'],
+          ['Completa', '5 ou mais ajudantes (gasta bem mais).']])],
+        ['Dados', 'análise de números.', cadeia([['Qual é o dado a analisar?', 'arquivo, print, link ou texto colado.']])],
         ['Meta', 'Meta Ads.', [
-          ['Anúncio no Meta Ads', 'subir um anúncio no Meta Ads.'],
-          ['Qualquer outra tarefa', 'fazer outra tarefa de Meta Ads.']]],
+          ['Anúncio no Meta Ads', 'subir um anúncio no Meta Ads.', cadeia([
+            ['Cliente, conta de anúncio e Página?', 'dizer o cliente, a conta de anúncio e a Página do Facebook ou Instagram.'],
+            ['Objetivo do negócio?', 'pedidos no WhatsApp, mensagens, visitas no site, cadastros ou ser conhecido na cidade.'],
+            ['Produto ou oferta e diferencial?', 'dizer o produto ou a oferta e o diferencial.'],
+            ['Público?', 'cidade, raio em km, idade, sexo e interesses.'],
+            ['Orçamento por dia e duração?', 'dizer quanto por dia e por quantos dias.'],
+            ['Destino do clique?', 'WhatsApp, Instagram ou site.'],
+            ['Criativo?', 'caminho da imagem ou do vídeo.']], [
+            ['Posicionamentos automático', 'recomendado.'],
+            ['Posicionamentos manual', 'você escolhe onde o anúncio aparece.']])],
+          ['Qualquer outra tarefa', 'fazer outra tarefa de Meta Ads.', cadeia([['O que você precisa fazer?', 'dizer o pedido.']])]]],
         ['Social', 'Instagram, método RETINA.', [
-          ['Organizar perfil', 'organizar o perfil do Instagram do cliente (entrega em texto).'],
-          ['Organizar destaques', 'organizar os destaques do Instagram (entrega em HTML).'],
-          ['Criar conteúdo (RETINA)', 'criar conteúdo pelo método RETINA (entrega em HTML).']]],
+          ['Cliente existente', 'usar um cliente que já tem perfil salvo.', cadeia([['Qual cliente?', 'dizer qual cliente da lista.']], menuSocial())],
+          ['Novo cliente', 'cadastrar um cliente novo.', sondagemSocial()]]],
         SAB()]) },
       { k: 'rico.proc.estudo', r: semeiaMapa('ESTUDO', 'estu', [
         ['Rodada completa', 'gerar a rodada completa: 1 semana de ESCOLA, 1 de 40 DIAS, 1 de VERSOS e 3 capítulos de cada livro.'],
         ['Específica', 'gerar só uma área que você escolher.', [
-          ['40 DIAS', 'estudos do programa de 40 dias.'],
-          ['EBOOKS', 'capítulos do livro Grande Mestre.'],
-          ['ESCOLA', 'estudos da escola, por semana.'],
-          ['PROFETICO', 'capítulos do livro Os Dois Mistérios.'],
-          ['REAVIVADO', 'capítulos do livro Reavivamento.'],
-          ['VERSOS', 'estudos dos 70 versículos, em ordem.']]],
-        ['Comando do celular', 'montar o comando do Termux que baixa os HTMLs para o celular.'],
-        ['Comando do notebook', 'montar o comando do PowerShell que baixa os HTMLs para o notebook.']]) },
+          ['40 DIAS', 'estudos do programa de 40 dias.', cadeia([['Quantas semanas?', 'dizer quantas semanas gerar.']])],
+          ['EBOOKS', 'capítulos do livro Grande Mestre.', cadeia([['Quantos capítulos?', 'dizer quantos capítulos gerar.']])],
+          ['ESCOLA', 'estudos da escola, por semana.', cadeia([['Quantas semanas?', 'dizer quantas semanas gerar.']])],
+          ['PROFETICO', 'capítulos do livro Os Dois Mistérios.', cadeia([['Quantos capítulos?', 'dizer quantos capítulos gerar.']])],
+          ['REAVIVADO', 'capítulos do livro Reavivamento.', cadeia([['Quantos capítulos?', 'dizer quantos capítulos gerar.']])],
+          ['VERSOS', 'estudos dos 70 versículos, em ordem.', cadeia([['Quantas semanas?', 'dizer quantas semanas gerar.']])]]],
+        ['Comando do celular', 'montar o comando do Termux que baixa os HTMLs para o celular.', cadeia([['Quer tudo ou só uma parte?', 'tudo, ou uma parte (ex.: ESCOLA semana 04).']])],
+        ['Comando do notebook', 'montar o comando do PowerShell que baixa os HTMLs para o notebook.', cadeia([['Quer tudo ou só uma parte?', 'tudo, ou uma parte (ex.: ESCOLA semana 04).']])],
+        ['Estudo de um versículo', 'escrever o estudo de um versículo.', cadeia([['Qual é o versículo?', 'dizer o versículo.']])]]) },
       { k: 'rico.proc.mindset', r: semeiaMapa('MINDSET', 'mind', [
-        ['Erro', 'colar um erro para eu achar a causa e resolver.'],
-        ['Resultado de outro aparelho', 'colar o resultado do Claude Code do celular ou do notebook para eu decidir o próximo passo.'],
-        ['Pedido ou dúvida', 'colar um pedido ou uma dúvida para eu analisar e decidir.']]) },
+        ['Erro', 'colar um erro para eu achar a causa e resolver.', cadeia([['Qual é o erro?', 'colar o erro.']])],
+        ['Resultado de outro aparelho', 'colar o resultado do Claude Code do celular ou do notebook para eu decidir o próximo passo.', cadeia([['Qual é o resultado?', 'colar o resultado.']])],
+        ['Pedido ou dúvida', 'colar um pedido ou uma dúvida para eu analisar e decidir.', cadeia([['Qual é o pedido ou a dúvida?', 'escrever o pedido ou a dúvida.']])]]) },
       { k: 'rico.proc.ajuda', r: semeiaMapa('AJUDA', 'ajud', [
         ['Informações', 'espaço guardado para depois; hoje responde "Aguardando...".'],
         SAB()]) },
@@ -3701,9 +3806,22 @@ window.saveAnswer = window.saveAnswer || function(){};
         ['Informações', 'espaço guardado para depois; hoje responde "Aguardando...".'],
         SAB()]) },
       { k: 'rico.proc.anthropic', r: semeiaMapa('ANTHROPIC', 'anth', [
-        ['n8n', 'criar e ajustar automações no n8n.'],
+        ['n8n', 'criar e ajustar automações no n8n.', cadeia([['O que você faz repetidamente e quer automatizar?', 'contar a rotina que vai ser automatizada.']])],
         SAB()]) }
     ];
+  }
+  /* mapas que já estavam no aparelho: acrescenta o fundo (perguntas e opções) só nas células que ainda não têm nada dentro, sem mexer no que você mudou */
+  function mesclaFundo(g, sem) {
+    var cont = 0;
+    function clone(n) { var y = JSON.parse(JSON.stringify(n)); (function nov(z) { z.id = 'f' + Date.now().toString(36) + (++cont); (z.children || []).forEach(nov); })(y); return y; }
+    (function mescla(a, b) {
+      b.forEach(function(sn) {
+        var gn = a.filter(function(x) { return x.text === sn.text; })[0];
+        if (!gn) return;
+        if (!(gn.children || []).length && (sn.children || []).length) gn.children = sn.children.map(clone);
+        else mescla(gn.children || [], sn.children || []);
+      });
+    })(g, sem);
   }
   window.rcMapa = {
     tela: function() { return CUR === SETS.p ? 'Processo' : 'Mapa mental'; },
