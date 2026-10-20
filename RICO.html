@@ -768,6 +768,8 @@
   .rcm-bar[hidden] { display: none; }
   .rcm-pill { display: flex; gap: 2px; padding: 5px; background: var(--dark2); border: 1px solid var(--gold); border-radius: 999px; }
   .rcm-ib { width: 42px; height: 42px; border: 0; border-radius: 50%; background: transparent; display: grid; place-items: center; cursor: pointer; color: var(--gold); padding: 0; }
+  .rcm-ib { position: relative; }
+  .rcm-bd { position: absolute; right: 3px; top: 3px; min-width: 15px; height: 15px; border-radius: 8px; background: var(--gold); color: var(--dark); font: 700 10px/15px sans-serif; text-align: center; }
   .rcm-ib:active { background: rgba(224,181,74,.16); }
   .rcm-ib:disabled { opacity: .3; pointer-events: none; }
   .rcm-banner { width: fit-content; margin: 24px auto 24px; }
@@ -2727,7 +2729,7 @@ window.saveAnswer = window.saveAnswer || function(){};
   function criaMapa(KEY, vazio) {
     var GY = 10, INDENT = 26;
     var root = null, selId = null, L = {}, wrap = null, world = null, links = null, bar = null, btnSib = null, btnDel = null, barId = null, mwEl = null, slot = null, zq0 = 0, zPrev = null, zInfo = null, tPrev = null, tPos = 0, tMulti = false, tInfo = null, semRaiz = false, soRaiz = false;
-    var sheet = null, scrim = null, txt = null, delB = null, editId = null, zig = false;
+    var sheet = null, scrim = null, txt = null, delB = null, editId = null, zig = false, proc = false;
     function uid() { return 'm' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7); }
     function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
     function nd(t, k) { return { id: uid(), text: t, collapsed: false, children: k || [] }; }
@@ -2742,6 +2744,15 @@ window.saveAnswer = window.saveAnswer || function(){};
       if (Array.isArray(n.i)) {
         o.i = n.i.map(function(v) { return String(v == null ? '' : v); });
         o.m = Array.isArray(n.m) ? n.m.map(function(x) { return (x && typeof x === 'object') ? x : {}; }) : [];
+      }
+      if (n.et && Array.isArray(n.et.s)) {
+        var et = { s: [], cur: 0, run: false, esc: [] };
+        n.et.s.forEach(function(st) { et.s.push((Array.isArray(st) ? st : []).map(function(c) { return limpa(c, false); }).filter(Boolean)); });
+        if (et.s.length) {
+          et.cur = clamp(+n.et.cur || 0, 0, et.s.length - 1);
+          et.esc = Array.isArray(n.et.esc) ? n.et.esc.map(String) : [];
+          o.et = et; o.children = et.s[et.cur];
+        }
       }
       return o;
     }
@@ -3019,7 +3030,12 @@ window.saveAnswer = window.saveAnswer || function(){};
       selId = id; barId = null;
       var f = acha(id);
       if (f && !f.p && window.rcMapa.foca(window.rcMapa.indice(api))) return;
-      if (f && f.n.children.length) { f.n.collapsed = !f.n.collapsed; salva(); }
+      if (f && f.p && f.p.et && f.p.et.run && !f.p.collapsed) { escolheEtapa(f); return; }
+      if (f && (f.n.children.length || f.n.et)) {
+        f.n.collapsed = !f.n.collapsed;
+        if (!f.n.collapsed && f.n.et) { f.n.et.cur = 0; f.n.children = f.n.et.s[0]; f.n.et.run = f.n.et.s.length > 1; f.n.et.esc = []; }
+        salva();
+      }
       render();
     }
     function toque(e) {
@@ -3066,16 +3082,36 @@ window.saveAnswer = window.saveAnswer || function(){};
     var ICO_X = '<svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>';
     var movBar = false, movKeep = null, destId = null, btnLev = null;
     function clona(n) {
-      var o = { id: uid(), text: n.text, collapsed: !!n.collapsed, children: n.children.map(clona) };
+      var o = { id: uid(), text: n.text, collapsed: !!n.collapsed, children: n.et ? [] : n.children.map(clona) };
+      if (n.et) { o.et = { s: n.et.s.map(function(st) { return st.map(clona); }), cur: n.et.cur, run: false, esc: [] }; o.children = o.et.s[o.et.cur]; }
       if (Array.isArray(n.i)) { o.i = n.i.slice(); o.m = JSON.parse(JSON.stringify(n.m || [])); }
       return o;
     }
     function contem(n, id) {
       if (n.id === id) return true;
-      for (var i = 0; i < n.children.length; i++) if (contem(n.children[i], id)) return true;
+      var tudo = n.et ? [].concat.apply([], n.et.s) : n.children;
+      for (var i = 0; i < tudo.length; i++) if (contem(tudo[i], id)) return true;
       return false;
     }
-    function reid(n) { n.id = uid(); n.children.forEach(reid); }
+    function reid(n) { n.id = uid(); (n.et ? [].concat.apply([], n.et.s) : n.children).forEach(reid); }
+    /* etapas (só no Processo): cada etapa é uma lista de opções; ao reabrir, começa da primeira e cada escolha abre a seguinte */
+    function etapasNo(id) {
+      var f = acha(id); if (!f || !f.p) return;
+      var n = f.n;
+      if (!n.et) n.et = { s: [n.children], cur: 0, run: false, esc: [] };
+      if (!n.children.length) { selId = id; barId = id; montaBar(); render(); return; }
+      n.et.s[n.et.cur] = n.children;
+      n.et.s.push([]); n.et.cur = n.et.s.length - 1; n.children = n.et.s[n.et.cur];
+      n.et.run = false; n.collapsed = false;
+      selId = id; barId = id; salva(); montaBar(); render();
+    }
+    function escolheEtapa(f) {
+      var p = f.p, et = p.et;
+      et.esc[et.cur] = f.n.text;
+      if (et.cur + 1 < et.s.length) { et.cur++; p.children = et.s[et.cur]; }
+      else { et.run = false; et.cur = 0; p.children = et.s[0]; p.collapsed = true; }
+      selId = p.id; barId = null; salva(); render();
+    }
     function tiraNo(id) {
       var f = acha(id); if (!f || !f.p) return null;
       f.p.children.splice(f.p.children.indexOf(f.n), 1);
@@ -3112,13 +3148,15 @@ window.saveAnswer = window.saveAnswer || function(){};
       selId = id; barId = null; destId = null; salva(); render();
       return true;
     }
+    var ICO_ETAPAS = '<svg viewBox="0 0 24 24"><path d="M12 4l8 4-8 4-8-4z"/><path d="M4 12l8 4 8-4"/><path d="M4 16l8 4 8-4"/></svg>';
     function montaBar() {
+      var nb = barId ? acha(barId) : null;
       bar.innerHTML = movBar
         ? '<div class="rcm-pill"><button type="button" class="rcm-ib" data-a="sobe" aria-label="Sobe">' + ICO_SOBE + '</button><button type="button" class="rcm-ib" data-a="desce" aria-label="Desce">' + ICO_DESCE + '</button><button type="button" class="rcm-ib" data-a="pronto" aria-label="Pronto">' + ICO_OK + '</button></div>'
-        : '<div class="rcm-pill"><button type="button" class="rcm-ib" data-a="filho" aria-label="Adicionar">' + ICO_FILHO + '</button><button type="button" class="rcm-ib" data-a="irmao" aria-label="Mover">' + ICO_IRMAO + '</button><button type="button" class="rcm-ib" data-a="levar" aria-label="Mover para">' + ICO_LEVAR + '</button><button type="button" class="rcm-ib" data-a="dup" aria-label="Duplicar">' + ICO_DUP + '</button><button type="button" class="rcm-ib" data-a="edita" aria-label="Editar">' + ICO_EDIT + '</button><button type="button" class="rcm-ib" data-a="exclui" aria-label="Excluir">' + ICO_LIXO + '</button></div>';
+        : '<div class="rcm-pill"><button type="button" class="rcm-ib" data-a="filho" aria-label="Adicionar">' + ICO_FILHO + '</button><button type="button" class="rcm-ib" data-a="irmao" aria-label="Mover">' + ICO_IRMAO + '</button>' + (proc ? '<button type="button" class="rcm-ib" data-a="etapas" aria-label="Etapas">' + ICO_ETAPAS + (nb && nb.n.et ? '<b class="rcm-bd">' + (nb.n.et.cur + 1) + '</b>' : '') + '</button>' : '<button type="button" class="rcm-ib" data-a="levar" aria-label="Mover para">' + ICO_LEVAR + '</button>') + '<button type="button" class="rcm-ib" data-a="dup" aria-label="Duplicar">' + ICO_DUP + '</button><button type="button" class="rcm-ib" data-a="edita" aria-label="Editar">' + ICO_EDIT + '</button><button type="button" class="rcm-ib" data-a="exclui" aria-label="Excluir">' + ICO_LIXO + '</button></div>';
       if (destId) bar.innerHTML = '<div class="rcm-pill"><span class="rcm-av">Toque no destino</span><button type="button" class="rcm-ib" data-a="cancela" aria-label="Cancelar">' + ICO_X + '</button></div>';
       btnSib = bar.querySelector('[data-a="irmao"]');
-      btnLev = bar.querySelector('[data-a="levar"]');
+      btnLev = bar.querySelector('[data-a="levar"],[data-a="etapas"]');
       btnDel = bar.querySelector('[data-a="exclui"]');
     }
     function moveNo(id, d) {
@@ -3138,7 +3176,7 @@ window.saveAnswer = window.saveAnswer || function(){};
 
     function montar(mw, z, o) {
       if (!root) root = carrega();
-      zig = !!z; barId = null;
+      zig = !!z; barId = null; proc = !!(zig && o && o.proc);
       zq0 = (o && o.q0) || 0;
       zPrev = (zig && o && o.prevCx != null) ? o.prevCx : null;
       tPrev = (!zig && o && o.prevCx != null) ? o.prevCx : null;
@@ -3184,6 +3222,7 @@ window.saveAnswer = window.saveAnswer || function(){};
         else if (a === 'edita') { barId = null; render(); abreEditor(id, true); }
         else if (a === 'exclui') excluiNo(id);
         else if (a === 'dup') duplicaNo(id);
+        else if (a === 'etapas') etapasNo(id);
         else if (a === 'levar') { PEND = { inst: api, id: id }; destId = id; montaBar(); posBar(); }
         else if (a === 'cancela') { window.rcMapa.cancela(); }
       });
