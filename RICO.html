@@ -2931,6 +2931,7 @@ window.saveAnswer = window.saveAnswer || function(){};
       }
       if (!confirm('Excluir este item?')) return;
       var i = f.p.children.indexOf(f.n); if (i > -1) f.p.children.splice(i, 1);
+      etapaVazia(f.p);
       selId = f.p.id; barId = null; salva(); render();
     }
 
@@ -3115,6 +3116,15 @@ window.saveAnswer = window.saveAnswer || function(){};
     }
     function reid(n) { n.id = uid(); (n.et ? [].concat.apply([], n.et.s) : n.children).forEach(reid); }
     /* etapas (só no Processo): cada etapa é uma lista de opções; ao reabrir, começa da primeira e cada escolha abre a seguinte */
+    function etapaVazia(p) { /* apagou o último item de uma etapa: a etapa some e os números se ajustam */
+      var et = p.et;
+      if (!et || p.children.length || et.s.length < 2) return;
+      et.s.splice(et.cur, 1);
+      et.esc = [];
+      if (et.s.length < 2) { p.children = et.s[0]; delete p.et; return; }
+      et.cur = Math.max(0, Math.min(et.cur - 1, et.s.length - 1));
+      p.children = et.s[et.cur];
+    }
     function etapasMostra(id) { selId = id; barId = id; salva(); montaBar(); render(); }
     function etapasNo(id) { /* segurar: cria a próxima etapa (se a última já estiver vazia, só vai até ela) */
       var f = acha(id); if (!f) return;
