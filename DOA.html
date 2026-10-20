@@ -229,7 +229,17 @@ document.addEventListener('click',function(e){
     padding: 8px 12px calc(28px + env(safe-area-inset-bottom));
     display: flex; flex-direction: column;
   }
-  #pl-list { flex: 1; touch-action: pan-y; }
+  #pl-list { flex: 0 0 auto; touch-action: pan-y; }
+
+  /* ── HTMLs na tela de Processos (abrem à parte, sem misturar com o Plano) ── */
+  #pl-html { margin-top: 22px; flex-shrink: 0; }
+  #pl-html .pl-h-title { font-size: 12.5px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--tx3); padding: 0 8px 10px; }
+  #pl-html .rows { display: flex; flex-direction: column; gap: 8px; }
+  #pl-html .row .row-ico { color: var(--brand); }
+  #pl-html .pl-h-add .row-main { color: var(--tx2); border-style: dashed; }
+  #html-view { display: none; position: fixed; inset: 0; z-index: 700; background: var(--bg); flex-direction: column; }
+  #html-view.open { display: flex; }
+  #html-view iframe { flex: 1; width: 100%; border: 0; background: #fff; }
 
   .crumbbar { display: none; align-items: center; gap: 8px; flex-shrink: 0; margin-bottom: 8px; }
   .crumb {
@@ -490,6 +500,7 @@ document.addEventListener('click',function(e){
     <symbol id="i-chevron-right" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></symbol>
     <symbol id="i-dots" viewBox="0 0 24 24"><circle cx="5.5" cy="12" r="1.2" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.2" fill="currentColor" stroke="none"/><circle cx="18.5" cy="12" r="1.2" fill="currentColor" stroke="none"/></symbol>
     <symbol id="i-dots-v" viewBox="0 0 24 24"><circle cx="12" cy="5.5" r="1.2" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.2" fill="currentColor" stroke="none"/><circle cx="12" cy="18.5" r="1.2" fill="currentColor" stroke="none"/></symbol>
+    <symbol id="i-code" viewBox="0 0 24 24"><path d="M8 7l-5 5 5 5M16 7l5 5-5 5M14 4l-4 16"/></symbol>
     <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
     <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 002 2h6a2 2 0 002-2l1-12M9 7V4h6v3"/></symbol>
     <symbol id="i-folder" viewBox="0 0 24 24"><path d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V7z"/></symbol>
@@ -544,8 +555,18 @@ window._carregarProcessoNuvem = carregarProcessoNuvem;
       <div class="crumb"></div>
     </div>
     <div id="pl-list" class="rows"></div>
+    <div id="pl-html"></div>
   </div>
 </div>
+
+<div id="html-view">
+  <div class="topbar">
+    <button class="rbtn" onclick="htmlFecha()" aria-label="Volta" data-tip="Volta"><svg class="ic"><use href="#i-arrow-left"/></svg></button>
+    <span class="tb-title" id="html-view-title"></span>
+  </div>
+  <iframe id="html-view-frame" sandbox="allow-scripts allow-forms allow-popups allow-downloads"></iframe>
+</div>
+<input type="file" id="html-file" accept=".html,.htm,text/html" hidden>
 
 <!-- ══ PROCESSO ══ -->
 <div id="processo-overlay">
@@ -1624,9 +1645,68 @@ function pl_navGoBack(){
   pl_renderList();
 }
 
+// ── HTMLs soltos (funcionam à parte; só ficam guardados aqui) ──
+var HTML_KEY = 'doa_htmls_v1';
+function htmlLer(){
+  try { var a = JSON.parse(localStorage.getItem(HTML_KEY)); if(Array.isArray(a)) return a; } catch(e){}
+  var seed = [{id:'h-leads', nome:'Leads', src:'plano-html/Leads.html'}, {id:'h-cidades', nome:'Cidades', src:'plano-html/Cidades.html'}];
+  htmlSalva(seed); return seed;
+}
+function htmlSalva(a){ try { localStorage.setItem(HTML_KEY, JSON.stringify(a)); } catch(e){ alert('Não coube no aparelho: ' + e.message); } }
+function htmlRender(){
+  var box = document.getElementById('pl-html'); if(!box) return;
+  if(_pl_currentFolderId !== null){ box.innerHTML = ''; return; }
+  var lista = htmlLer();
+  box.innerHTML = '<div class="pl-h-title">HTMLs</div><div class="rows"></div>';
+  var rows = box.querySelector('.rows');
+  lista.forEach(function(h){
+    var row = document.createElement('div'); row.className = 'row has-edit';
+    row.innerHTML = '<button type="button" class="row-main">' + ic('code', 'row-ico') + '<span class="row-name">' + p_esc(h.nome) + '</span>' + ic('chevron-right', 'row-chev') + '</button>' +
+      '<button type="button" class="row-edit" aria-label="Editar HTML" data-tip="Editar HTML">' + ic('dots-v') + '</button>';
+    row.querySelector('.row-main').onclick = function(){ htmlAbre(h.id); };
+    row.querySelector('.row-edit').onclick = function(){ htmlEdita(h.id); };
+    rows.appendChild(row);
+  });
+  var add = document.createElement('div'); add.className = 'row pl-h-add';
+  add.innerHTML = '<button type="button" class="row-main">' + ic('plus', 'row-ico') + '<span class="row-name">Adicionar HTML</span></button>';
+  add.querySelector('button').onclick = function(){ document.getElementById('html-file').click(); };
+  rows.appendChild(add);
+}
+function htmlAbre(id){
+  var h = htmlLer().find(function(x){ return x.id === id; }); if(!h) return;
+  var fr = document.getElementById('html-view-frame');
+  document.getElementById('html-view-title').textContent = h.nome;
+  if(h.src){ fr.removeAttribute('srcdoc'); fr.src = h.src; } else { fr.removeAttribute('src'); fr.srcdoc = h.html; }
+  document.getElementById('html-view').classList.add('open');
+}
+function htmlFecha(){
+  var fr = document.getElementById('html-view-frame');
+  document.getElementById('html-view').classList.remove('open');
+  fr.removeAttribute('srcdoc'); fr.src = 'about:blank';
+}
+function htmlEdita(id){
+  var a = htmlLer(), h = a.find(function(x){ return x.id === id; }); if(!h) return;
+  var n = prompt('Nome do HTML (apague o nome para remover)', h.nome);
+  if(n === null) return;
+  n = n.trim();
+  if(!n){ if(confirm('Remover "' + h.nome + '" da lista?')){ a = a.filter(function(x){ return x.id !== id; }); htmlSalva(a); htmlRender(); } return; }
+  h.nome = n; htmlSalva(a); htmlRender();
+}
+document.getElementById('html-file').addEventListener('change', function(e){
+  var f = e.target.files && e.target.files[0]; e.target.value = ''; if(!f) return;
+  var r = new FileReader();
+  r.onload = function(){
+    var a = htmlLer();
+    a.push({id:'h' + Date.now(), nome: f.name.replace(/\.html?$/i, ''), html: String(r.result)});
+    htmlSalva(a); htmlRender();
+  };
+  r.readAsText(f);
+});
+
 function pl_renderList(){
   var list = document.getElementById('pl-list');
   list.innerHTML = '';
+  htmlRender();
 
   p_paintCrumbBar('pl-crumbbar', _pl_currentFolderId);
 

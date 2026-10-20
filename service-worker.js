@@ -1,4 +1,4 @@
-const CACHE_NAME = 'meus-apps-v94';
+const CACHE_NAME = 'meus-apps-v95';
 
 const URLS_TO_CACHE = [
   './',
@@ -15,6 +15,8 @@ const URLS_TO_CACHE = [
   './RICO.html',
   './Workshop.html',
   './DOA.html',
+  './plano-html/Leads.html',
+  './plano-html/Cidades.html',
   './ESTUDO.html',
   './LER.html',
   './Code.html',

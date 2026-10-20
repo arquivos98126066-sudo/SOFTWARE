@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#f3f5f8">
+<title>Esteticista - São Paulo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@500;600;700;800&family=DM+Sans:wght@400..700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f3f5f8;--card:#fff;--tx:#0f172a;--tx2:#6b7280;--bd:#e6e9ef;--main:#111;--chip:#f1f4f8;--chipTx:#334155;--track:#eceff4}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--tx);font:400 16px/1.6 'DM Sans',system-ui,sans-serif;overflow-x:hidden}
+button{font-family:inherit}
+svg.i{flex:none;width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.top{position:sticky;top:0;z-index:20;padding:calc(10px + env(safe-area-inset-top)) 16px 16px;background:linear-gradient(to bottom,var(--bg) 78%,rgba(243,245,248,0))}
+.hd{max-width:680px;margin:0 auto;padding:16px 18px 18px;border:1px solid var(--bd);border-radius:24px;background:linear-gradient(180deg,#fff,#f7f9fc);box-shadow:0 14px 34px -20px rgba(15,23,42,.22)}
+.hd-row{display:flex;align-items:center;gap:12px}
+.hd-l{flex:1;min-width:0}
+.nv{position:absolute;left:-8px;top:-8px;z-index:1;height:20px;padding:0 7px;border:1px solid var(--bd);border-radius:999px;background:#fff;color:var(--chipTx);font:700 10.5px/18px 'Barlow',sans-serif;letter-spacing:.04em}
+.hw{position:relative;flex:none;width:58px;height:58px;margin-right:4px}
+.mais{position:absolute;right:-8px;bottom:-8px;width:26px;height:26px;display:grid;place-items:center;padding:0;border:2px solid #fff;border-radius:50%;background:#111;color:#fff;cursor:pointer}
+.mais::before{content:"";position:absolute;inset:-10px}
+.mais svg{width:13px;height:13px;stroke-width:2.6}
+.hero{flex:none;width:58px;height:58px;display:grid;place-items:center;padding:0;border:1px solid var(--bd);border-radius:50%;background:var(--chip);cursor:pointer}
+.hero svg{width:46px;height:46px;stroke:#1e293b;stroke-width:1.7;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.pc{opacity:0;transition:opacity .35s}
+.pc.on{opacity:1}
+.pc .f{fill:var(--a,#dfe5ee)}
+.pc.g{stroke:var(--g,#16a34a)}
+.sp{stroke:var(--g,#16a34a);opacity:0;transition:opacity .35s}
+.sp.on{opacity:1}
+.pc.g .f{fill:var(--g,#16a34a);fill-opacity:.16}
+.hd-t{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;font:600 21px/1.1 'Barlow',sans-serif;color:var(--tx)}
+.hd-c{display:inline-flex;align-items:center;height:24px;padding:0 10px;border-radius:999px;background:var(--chip);color:var(--chipTx);font:700 11px 'DM Sans',sans-serif;letter-spacing:.08em}
+.prog{display:flex;align-items:baseline;gap:5px;font:700 40px/1 'Barlow',sans-serif;background:linear-gradient(135deg,#15803d,#22c55e,#4ade80);-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent}
+.prog small{font:600 16px 'Barlow',sans-serif;-webkit-text-fill-color:var(--tx2);color:var(--tx2)}
+.bar{height:8px;margin-top:16px;border-radius:999px;background:var(--track);overflow:hidden}
+.bar i{display:block;height:100%;width:0;border-radius:999px;background:linear-gradient(90deg,#15803d,#22c55e,#4ade80);transition:width .3s}
+
+.prog{font-size:30px}
+.prog small{font-size:14px}
+main{max-width:680px;margin:0 auto;padding:0 16px calc(40px + env(safe-area-inset-bottom))}
+#lista{list-style:none;margin:0;padding:0}
+.bx{margin:0 0 10px;background:var(--card);border:1px solid var(--bd);border-radius:24px;overflow:hidden}
+.bh{display:flex;align-items:center;gap:10px;width:100%;min-height:56px;padding:0 18px;border:0;background:transparent;color:var(--tx);text-align:left;cursor:pointer;font:600 15px 'DM Sans',sans-serif}
+.bt{flex:1;text-transform:uppercase;letter-spacing:.06em;font-size:13.5px}
+.bn{font:600 13.5px 'Barlow',sans-serif;color:var(--tx2)}
+.bx.ok .bn{color:#15803d}
+.chev{width:20px;height:20px;stroke:var(--tx2);transition:transform .25s}
+.bx.aberto .chev{transform:rotate(180deg)}
+.vb{display:grid;grid-template-rows:0fr;transition:grid-template-rows .3s ease}
+.bx.aberto .vb{grid-template-rows:1fr}
+.vi{overflow:hidden;min-height:0}
+.rows{list-style:none;margin:0;padding:0 0 6px}
+.rows li+li{border-top:1px solid #f0f2f6}
+.rows button{display:flex;align-items:center;gap:12px;width:100%;min-height:48px;padding:6px 18px;border:0;background:transparent;color:var(--tx);text-align:left;cursor:pointer}
+.rows button:active{background:#f7f9fc}
+.tx{flex:1;min-width:0;font:400 14.5px/1.35 'DM Sans',sans-serif}
+.ck{flex:none;width:26px;height:26px;display:grid;place-items:center;border:1.5px solid #d5dae3;border-radius:50%;background:#fff;transition:.15s}
+.ck svg{width:14px;height:14px;stroke:#fff;stroke-width:2.6;fill:none;stroke-linecap:round;stroke-linejoin:round;opacity:0;transform:scale(.5);transition:.15s}
+li.on .ck{background:var(--main);border-color:var(--main)}
+li.on .ck svg{opacity:1;transform:none}
+li.on .tx{color:var(--tx2)}
+@keyframes pula{0%{transform:none}25%{transform:scale(1.2) rotate(-9deg)}50%{transform:scale(1.2) rotate(9deg)}75%{transform:scale(1.08) rotate(-4deg)}100%{transform:none}}
+.hero.pula{animation:pula .7s ease}
+#toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom));transform:translateX(-50%) translateY(16px);padding:0 20px;height:40px;display:flex;align-items:center;border-radius:999px;background:#111;color:#fff;font:600 13.5px 'DM Sans',sans-serif;opacity:0;pointer-events:none;transition:.2s}
+#toast.v{opacity:1;transform:translateX(-50%)}
+#t1{text-transform:uppercase;letter-spacing:.06em}
+</style></head><body>
+<header class="top"><div class="hd">
+  <div class="hd-row"><div class="hw"><span class="nv" id="nv">Nv 0</span><button type="button" class="hero" id="hero" aria-label="Nível"><svg viewBox="0 0 64 64" aria-hidden="true">
+  <g class="pc g" data-k="9"><circle cx="32" cy="32" r="29" stroke-dasharray="3 4"/></g>
+  <g class="pc g" data-k="8"><path d="M26 28c-8-7-15-5-18 2 6 0 8 5 11 9M38 28c8-7 15-5 18 2-6 0-8 5-11 9"/></g>
+  <g class="pc g" data-k="6"><path class="f" d="M26 27l-7 24 13-5 13 5-7-24z"/></g>
+  <circle cx="32" cy="16" r="6.5"/><path d="M26 26h12l-1 15H27zM26 27l-8 10M38 27l8 10M28 41l-3 16M36 41l3 16"/>
+  <g class="pc" data-k="1"><path class="f" d="M25.5 16.5a6.5 6.5 0 0 1 13 0zM25.5 16.5v4M38.5 16.5v4M29 19h6"/></g>
+  <g class="pc" data-k="7"><path class="f" d="M23 49h7v7h-7zM34 49h7v7h-7z"/></g>
+  <g class="pc" data-k="2"><path class="f" d="M26 26h12l-1 15H27z"/><path d="M32 26v15"/></g>
+  <g class="pc" data-k="3"><circle class="f" cx="26" cy="27" r="3"/><circle class="f" cx="38" cy="27" r="3"/><path d="M27 38h10"/></g>
+  <g class="pc" data-k="4"><path class="f" d="M8 32h12v9c0 5-6 8-6 8s-6-3-6-8z"/><circle cx="14" cy="39" r="1.6"/></g>
+  <g class="pc" data-k="5"><path d="M52 14v24M47 38h10M52 38v6"/></g>
+  <g class="pc g" data-k="6"><path d="M26 10l3 3 3-5 3 5 3-3v4H26z"/></g>
+</svg></button></div><div class="hd-l"><div class="hd-t"><span id="t1"></span></div></div><div class="prog" id="t3"></div></div>
+  <div class="bar"><i id="bar"></i></div>
+</div></header>
+<main><ul id="lista"></ul></main><div id="toast">Copiado</div>
+<script>
+const D={"chave": "pros:cid:TESTE:SP:ESTETICISTA", "titulo": "Esteticista em São Paulo", "linhas": [{"texto": "Esteticista em Cândido Mota, São Paulo", "pop": 30144}, {"texto": "Esteticista em Piraju, São Paulo", "pop": 30324}, {"texto": "Esteticista em Biritiba Mirim, São Paulo", "pop": 30599}, {"texto": "Esteticista em Serra Negra, São Paulo", "pop": 31155}, {"texto": "Esteticista em Guararapes, São Paulo", "pop": 31902}, {"texto": "Esteticista em Osvaldo Cruz, São Paulo", "pop": 32123}, {"texto": "Esteticista em Rio das Pedras, São Paulo", "pop": 32386}, {"texto": "Esteticista em Bariri, São Paulo", "pop": 32406}, {"texto": "Esteticista em Cachoeira Paulista, São Paulo", "pop": 32579}, {"texto": "Esteticista em Descalvado, São Paulo", "pop": 32685}, {"texto": "Esteticista em Guararema, São Paulo", "pop": 32785}, {"texto": "Esteticista em Aguaí, São Paulo", "pop": 32884}, {"texto": "Esteticista em São Miguel Arcanjo, São Paulo", "pop": 32943}, {"texto": "Esteticista em Aparecida, São Paulo", "pop": 33067}, {"texto": "Esteticista em Ibaté, São Paulo", "pop": 33204}, {"texto": "Esteticista em Barrinha, São Paulo", "pop": 33414}, {"texto": "Esteticista em Américo Brasiliense, São Paulo", "pop": 33663}, {"texto": "Esteticista em Araçoiaba da Serra, São Paulo", "pop": 33989}, {"texto": "Esteticista em Pitangueiras, São Paulo", "pop": 34311}, {"texto": "Esteticista em Cravinhos, São Paulo", "pop": 34356}, {"texto": "Esteticista em Barra Bonita, São Paulo", "pop": 35102}, {"texto": "Esteticista em Adamantina, São Paulo", "pop": 35701}, {"texto": "Esteticista em Presidente Venceslau, São Paulo", "pop": 35728}, {"texto": "Esteticista em Promissão, São Paulo", "pop": 35957}, {"texto": "Esteticista em Santa Fé do Sul, São Paulo", "pop": 36458}, {"texto": "Esteticista em Ilhabela, São Paulo", "pop": 36766}, {"texto": "Esteticista em São Manuel, São Paulo", "pop": 38099}, {"texto": "Esteticista em José Bonifácio, São Paulo", "pop": 38111}, {"texto": "Esteticista em Pontal, São Paulo", "pop": 38206}, {"texto": "Esteticista em Ituverava, São Paulo", "pop": 38379}, {"texto": "Esteticista em Iperó, São Paulo", "pop": 38527}, {"texto": "Esteticista em Guariba, São Paulo", "pop": 38740}, {"texto": "Esteticista em Tietê, São Paulo", "pop": 38749}, {"texto": "Esteticista em Agudos, São Paulo", "pop": 39084}, {"texto": "Esteticista em Orlândia, São Paulo", "pop": 39099}, {"texto": "Esteticista em Novo Horizonte, São Paulo", "pop": 39548}, {"texto": "Esteticista em São Pedro, São Paulo", "pop": 40054}, {"texto": "Esteticista em Presidente Epitácio, São Paulo", "pop": 40267}, {"texto": "Esteticista em Itápolis, São Paulo", "pop": 40429}, {"texto": "Esteticista em Jarinu, São Paulo", "pop": 40433}, {"texto": "Esteticista em Espírito Santo do Pinhal, São Paulo", "pop": 40547}, {"texto": "Esteticista em Guaíra, São Paulo", "pop": 40547}, {"texto": "Esteticista em Vargem Grande do Sul, São Paulo", "pop": 41283}, {"texto": "Esteticista em Socorro, São Paulo", "pop": 41633}, {"texto": "Esteticista em Paraguaçu Paulista, São Paulo", "pop": 42014}, {"texto": "Esteticista em Garça, São Paulo", "pop": 43051}, {"texto": "Esteticista em Pedreira, São Paulo", "pop": 44433}, {"texto": "Esteticista em Itararé, São Paulo", "pop": 45111}, {"texto": "Esteticista em Rio Grande da Serra, São Paulo", "pop": 45331}, {"texto": "Esteticista em Salto de Pirapora, São Paulo", "pop": 45373}, {"texto": "Esteticista em Serrana, São Paulo", "pop": 45734}, {"texto": "Esteticista em Pederneiras, São Paulo", "pop": 46439}, {"texto": "Esteticista em Cerquilho, São Paulo", "pop": 46547}, {"texto": "Esteticista em Dracena, São Paulo", "pop": 46800}, {"texto": "Esteticista em Jardinópolis, São Paulo", "pop": 47354}, {"texto": "Esteticista em Capão Bonito, São Paulo", "pop": 47415}, {"texto": "Esteticista em Santa Cruz do Rio Pardo, São Paulo", "pop": 47833}, {"texto": "Esteticista em Campos do Jordão, São Paulo", "pop": 47932}, {"texto": "Esteticista em Monte Alto, São Paulo", "pop": 48787}, {"texto": "Esteticista em Cabreúva, São Paulo", "pop": 48815}, {"texto": "Esteticista em São Joaquim da Barra, São Paulo", "pop": 49948}, {"texto": "Esteticista em Jales, São Paulo", "pop": 50132}, {"texto": "Esteticista em Capivari, São Paulo", "pop": 51415}, {"texto": "Esteticista em Mairinque, São Paulo", "pop": 52092}, {"texto": "Esteticista em Vargem Grande Paulista, São Paulo", "pop": 52574}, {"texto": "Esteticista em Taquaritinga, São Paulo", "pop": 53212}, {"texto": "Esteticista em São José do Rio Pardo, São Paulo", "pop": 53437}, {"texto": "Esteticista em Artur Nogueira, São Paulo", "pop": 53686}, {"texto": "Esteticista em Tremembé, São Paulo", "pop": 53734}, {"texto": "Esteticista em Porto Ferreira, São Paulo", "pop": 54005}, {"texto": "Esteticista em Piedade, São Paulo", "pop": 54291}, {"texto": "Esteticista em Santa Isabel, São Paulo", "pop": 54775}, {"texto": "Esteticista em Louveira, São Paulo", "pop": 55314}, {"texto": "Esteticista em Olímpia, São Paulo", "pop": 57028}, {"texto": "Esteticista em Porto Feliz, São Paulo", "pop": 58837}, {"texto": "Esteticista em Batatais, São Paulo", "pop": 59999}, {"texto": "Esteticista em Cosmópolis, São Paulo", "pop": 61196}, {"texto": "Esteticista em Andradina, São Paulo", "pop": 61761}, {"texto": "Esteticista em Registro, São Paulo", "pop": 62101}, {"texto": "Esteticista em Ibitinga, São Paulo", "pop": 62353}, {"texto": "Esteticista em Jaguariúna, São Paulo", "pop": 62764}, {"texto": "Esteticista em Penápolis, São Paulo", "pop": 63523}, {"texto": "Esteticista em Boituva, São Paulo", "pop": 64240}, {"texto": "Esteticista em Nova Odessa, São Paulo", "pop": 64924}, {"texto": "Esteticista em Mongaguá, São Paulo", "pop": 65321}, {"texto": "Esteticista em Tupã, São Paulo", "pop": 65447}, {"texto": "Esteticista em Mirassol, São Paulo", "pop": 66102}, {"texto": "Esteticista em Bertioga, São Paulo", "pop": 67941}, {"texto": "Esteticista em Monte Mor, São Paulo", "pop": 68311}, {"texto": "Esteticista em Lençóis Paulista, São Paulo", "pop": 68724}, {"texto": "Esteticista em Embu-Guaçu, São Paulo", "pop": 69041}, {"texto": "Esteticista em Mococa, São Paulo", "pop": 69415}, {"texto": "Esteticista em Amparo, São Paulo", "pop": 69859}, {"texto": "Esteticista em Peruíbe, São Paulo", "pop": 70891}, {"texto": "Esteticista em Jaboticabal, São Paulo", "pop": 73479}, {"texto": "Esteticista em Fernandópolis, São Paulo", "pop": 73706}, {"texto": "Esteticista em Itapira, São Paulo", "pop": 74145}, {"texto": "Esteticista em Pirassununga, São Paulo", "pop": 75701}, {"texto": "Esteticista em Itupeva, São Paulo", "pop": 75776}, {"texto": "Esteticista em Cruzeiro, São Paulo", "pop": 76381}, {"texto": "Esteticista em Lins, São Paulo", "pop": 76946}, {"texto": "Esteticista em Ibiúna, São Paulo", "pop": 77936}, {"texto": "Esteticista em Bebedouro, São Paulo", "pop": 78298}, {"texto": "Esteticista em Vinhedo, São Paulo", "pop": 79477}, {"texto": "Esteticista em Campo Limpo Paulista, São Paulo", "pop": 79890}, {"texto": "Esteticista em Matão, São Paulo", "pop": 81144}, {"texto": "Esteticista em São Roque, São Paulo", "pop": 81387}, {"texto": "Esteticista em São Sebastião, São Paulo", "pop": 84514}, {"texto": "Esteticista em Lorena, São Paulo", "pop": 87551}, {"texto": "Esteticista em Arujá, São Paulo", "pop": 90644}, {"texto": "Esteticista em Itapeva, São Paulo", "pop": 92454}, {"texto": "Esteticista em Mogi Mirim, São Paulo", "pop": 95929}, {"texto": "Esteticista em São João da Boa Vista, São Paulo", "pop": 96365}, {"texto": "Esteticista em Avaré, São Paulo", "pop": 96764}, {"texto": "Esteticista em Ubatuba, São Paulo", "pop": 97541}, {"texto": "Esteticista em Mairiporã, São Paulo", "pop": 98241}, {"texto": "Esteticista em Caieiras, São Paulo", "pop": 98810}, {"texto": "Esteticista em Cajamar, São Paulo", "pop": 99249}, {"texto": "Esteticista em Caçapava, São Paulo", "pop": 100422}, {"texto": "Esteticista em Votuporanga, São Paulo", "pop": 100935}, {"texto": "Esteticista em Leme, São Paulo", "pop": 101734}, {"texto": "Esteticista em Assis, São Paulo", "pop": 105051}, {"texto": "Esteticista em Poá, São Paulo", "pop": 106288}, {"texto": "Esteticista em Ourinhos, São Paulo", "pop": 106941}, {"texto": "Esteticista em Cubatão, São Paulo", "pop": 114681}, {"texto": "Esteticista em Paulínia, São Paulo", "pop": 117554}, {"texto": "Esteticista em Ribeirão Pires, São Paulo", "pop": 119023}, {"texto": "Esteticista em Itanhaém, São Paulo", "pop": 119274}, {"texto": "Esteticista em Catanduva, São Paulo", "pop": 119368}, {"texto": "Esteticista em Várzea Paulista, São Paulo", "pop": 119923}, {"texto": "Esteticista em Jandira, São Paulo", "pop": 121848}, {"texto": "Esteticista em Guaratinguetá, São Paulo", "pop": 122100}, {"texto": "Esteticista em Birigui, São Paulo", "pop": 123655}, {"texto": "Esteticista em Barretos, São Paulo", "pop": 127276}, {"texto": "Esteticista em Itatiba, São Paulo", "pop": 127729}, {"texto": "Esteticista em Tatuí, São Paulo", "pop": 129640}, {"texto": "Esteticista em Sertãozinho, São Paulo", "pop": 132692}, {"texto": "Esteticista em Valinhos, São Paulo", "pop": 132862}, {"texto": "Esteticista em Votorantim, São Paulo", "pop": 134103}, {"texto": "Esteticista em Araras, São Paulo", "pop": 136113}, {"texto": "Esteticista em Jaú, São Paulo", "pop": 137486}, {"texto": "Esteticista em Salto, São Paulo", "pop": 141994}, {"texto": "Esteticista em Caraguatatuba, São Paulo", "pop": 143291}, {"texto": "Esteticista em Franco da Rocha, São Paulo", "pop": 150648}, {"texto": "Esteticista em Botucatu, São Paulo", "pop": 151600}, {"texto": "Esteticista em Mogi Guaçu, São Paulo", "pop": 160841}, {"texto": "Esteticista em Itapecerica da Serra, São Paulo", "pop": 163187}, {"texto": "Esteticista em Itapetininga, São Paulo", "pop": 164687}, {"texto": "Esteticista em Santana de Parnaíba, São Paulo", "pop": 165193}, {"texto": "Esteticista em Atibaia, São Paulo", "pop": 168162}, {"texto": "Esteticista em Francisco Morato, São Paulo", "pop": 171806}, {"texto": "Esteticista em São Caetano do Sul, São Paulo", "pop": 173216}, {"texto": "Esteticista em Pindamonhangaba, São Paulo", "pop": 173267}, {"texto": "Esteticista em Itu, São Paulo", "pop": 175483}, {"texto": "Esteticista em Bragança Paulista, São Paulo", "pop": 186631}, {"texto": "Esteticista em Ferraz de Vasconcelos, São Paulo", "pop": 186816}, {"texto": "Esteticista em Santa Bárbara d'Oeste, São Paulo", "pop": 189562}, {"texto": "Esteticista em Araçatuba, São Paulo", "pop": 208987}, {"texto": "Esteticista em Rio Claro, São Paulo", "pop": 210794}, {"texto": "Esteticista em Presidente Prudente, São Paulo", "pop": 235264}, {"texto": "Esteticista em Itapevi, São Paulo", "pop": 243967}, {"texto": "Esteticista em Marília, São Paulo", "pop": 247992}, {"texto": "Esteticista em Americana, São Paulo", "pop": 248392}, {"texto": "Esteticista em Hortolândia, São Paulo", "pop": 250195}, {"texto": "Esteticista em Jacareí, São Paulo", "pop": 251848}, {"texto": "Esteticista em Araraquara, São Paulo", "pop": 254508}, {"texto": "Esteticista em Embu das Artes, São Paulo", "pop": 260113}, {"texto": "Esteticista em São Carlos, São Paulo", "pop": 267441}, {"texto": "Esteticista em Indaiatuba, São Paulo", "pop": 271322}, {"texto": "Esteticista em Taboão da Serra, São Paulo", "pop": 286201}, {"texto": "Esteticista em Cotia, São Paulo", "pop": 291704}, {"texto": "Esteticista em Sumaré, São Paulo", "pop": 292307}, {"texto": "Esteticista em Guarujá, São Paulo", "pop": 294780}, {"texto": "Esteticista em Limeira, São Paulo", "pop": 301780}, {"texto": "Esteticista em Suzano, São Paulo", "pop": 321600}, {"texto": "Esteticista em Taubaté, São Paulo", "pop": 323380}, {"texto": "Esteticista em Barueri, São Paulo", "pop": 336015}, {"texto": "Esteticista em São Vicente, São Paulo", "pop": 338253}, {"texto": "Esteticista em Franca, São Paulo", "pop": 366534}, {"texto": "Esteticista em Praia Grande, São Paulo", "pop": 371190}, {"texto": "Esteticista em Itaquaquecetuba, São Paulo", "pop": 384436}, {"texto": "Esteticista em Bauru, São Paulo", "pop": 394028}, {"texto": "Esteticista em Carapicuíba, São Paulo", "pop": 398772}, {"texto": "Esteticista em Diadema, São Paulo", "pop": 403802}, {"texto": "Esteticista em Mauá, São Paulo", "pop": 429064}, {"texto": "Esteticista em Santos, São Paulo", "pop": 429528}, {"texto": "Esteticista em Piracicaba, São Paulo", "pop": 442635}, {"texto": "Esteticista em Jundiaí, São Paulo", "pop": 465277}, {"texto": "Esteticista em Mogi das Cruzes, São Paulo", "pop": 472255}, {"texto": "Esteticista em São José do Rio Preto, São Paulo", "pop": 506466}, {"texto": "Esteticista em São José dos Campos, São Paulo", "pop": 729153}, {"texto": "Esteticista em Ribeirão Preto, São Paulo", "pop": 734538}, {"texto": "Esteticista em Osasco, São Paulo", "pop": 761441}, {"texto": "Esteticista em Sorocaba, São Paulo", "pop": 766390}, {"texto": "Esteticista em Santo André, São Paulo", "pop": 784290}, {"texto": "Esteticista em São Bernardo do Campo, São Paulo", "pop": 842558}, {"texto": "Esteticista em Campinas, São Paulo", "pop": 1189761}, {"texto": "Esteticista em Guarulhos, São Paulo", "pop": 1351284}, {"texto": "Esteticista em São Paulo, São Paulo", "pop": 11911337}]};
+let marc={};const BL=[];
+try{marc=JSON.parse(localStorage.getItem(D.chave)||"{}")}catch(e){}
+function salva(){try{localStorage.setItem(D.chave,JSON.stringify(marc))}catch(e){}}
+function copia(t){
+  try{if(navigator.clipboard&&window.isSecureContext){navigator.clipboard.writeText(t).catch(()=>velha(t));return}}catch(e){}
+  velha(t);
+}
+function velha(t){try{const a=document.createElement("textarea");a.value=t;a.style.position="fixed";a.style.opacity="0";document.body.appendChild(a);a.select();document.execCommand("copy");a.remove()}catch(e){}}
+let tt;function aviso(){const e=document.getElementById("toast");e.classList.add("v");clearTimeout(tt);tt=setTimeout(()=>e.classList.remove("v"),1400)}
+let pv=null,cnt=0;
+const UN={1:1,2:3,3:6,4:9,5:12,6:20,7:16,8:28,9:36};let MAXN=20,ult=null;
+const FX=[[0,"#ecc79c","#b45309"],[12,"#dfe5ee","#64748b"],[24,"#fde68a","#d97706"],[36,"#bae6fd","#0891b2"]];
+const SP=[[9,9],[55,9],[5,30],[59,30],[9,53],[55,53],[20,4],[44,4]];
+(function(){const g=document.getElementById("hero").querySelector("svg"),NS="http://www.w3.org/2000/svg";
+  SP.forEach(p=>{const e=document.createElementNS(NS,"path");e.setAttribute("d","M"+(p[0]-2.5)+" "+p[1]+"h5M"+p[0]+" "+(p[1]-2.5)+"v5");e.setAttribute("class","sp");g.appendChild(e)})})();
+function nivel(v){const sv=document.getElementById("hero").querySelector("svg"),st=Math.round(v*50/(MAXN||1));let f=FX[0];FX.forEach(x=>{if(st>=x[0])f=x});
+  sv.style.setProperty("--a",f[1]);sv.style.setProperty("--g",f[2]);
+  document.querySelectorAll(".pc").forEach(g=>g.classList.toggle("on",UN[+g.dataset.k]<=st));
+  document.querySelectorAll(".sp").forEach((g,k)=>g.classList.toggle("on",st>=8+k*5));
+  document.getElementById("nv").textContent="Nv "+v;
+  if(ult!=null&&v>ult){const h=document.getElementById("hero");h.classList.remove("pula");void h.offsetWidth;h.classList.add("pula");setTimeout(()=>h.classList.remove("pula"),800)}
+  ult=v}
+const avanca=p=>()=>{const b=pv==null?Math.min(MAXN,cnt):pv;pv=b+p>MAXN?0:b+p;nivel(pv)};
+document.getElementById("hero").onclick=avanca(5);
+function prog(){const n=D.linhas.filter(l=>marc[l.texto]).length,t=D.linhas.length;
+  BL.forEach(b=>{const k=b.g.filter(l=>marc[l.texto]).length;b.n.textContent=k+"/"+b.g.length;b.el.classList.toggle("ok",k===b.g.length)});
+  cnt=BL.filter(b=>b.g.every(l=>marc[l.texto])).length;pv=null;nivel(Math.min(MAXN,cnt));
+  document.getElementById("t3").innerHTML=n+'<small>/ '+t+'</small>';document.getElementById("bar").style.width=(t?100*n/t:0)+"%"}
+document.getElementById("t1").textContent=((D.titulo||"").match(/\bem\s+(.+)$/)||[])[1]||D.titulo||"";
+const ul=document.getElementById("lista");
+for(let i=0;i<D.linhas.length;i+=10){
+  const g=D.linhas.slice(i,i+10),bx=document.createElement("li");bx.className="bx";
+  const h=document.createElement("button");h.type="button";h.className="bh";
+  h.innerHTML='<span class="bt"></span><span class="bn"></span><svg class="i chev" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>';
+  h.querySelector(".bt").textContent="Nível "+(i/10+1);
+  h.onclick=()=>bx.classList.toggle("aberto");
+  const vb=document.createElement("div"),vi=document.createElement("div"),rows=document.createElement("ul");
+  vb.className="vb";vi.className="vi";rows.className="rows";
+  g.forEach(l=>{
+    const li=document.createElement("li"),b=document.createElement("button");b.type="button";
+    b.innerHTML='<span class="ck"><svg viewBox="0 0 16 16"><path d="M3 8.5l3.2 3L13 4.5"/></svg></span><span class="tx"></span>';
+    b.querySelector(".tx").textContent=((l.texto||"").match(/\bem\s+(.+?),[^,]*$/)||[])[1]||l.texto;
+    if(marc[l.texto])li.classList.add("on");
+    b.onclick=()=>{
+      if(marc[l.texto]){delete marc[l.texto];li.classList.remove("on")}
+      else{marc[l.texto]=1;li.classList.add("on");copia(l.texto);aviso()}
+      salva();prog();
+    };
+    li.appendChild(b);rows.appendChild(li);
+  });
+  vi.appendChild(rows);vb.appendChild(vi);bx.appendChild(h);bx.appendChild(vb);ul.appendChild(bx);
+  BL.push({g,el:bx,n:h.querySelector(".bn")});
+}
+MAXN=BL.length||1;
+prog();
+</script></body></html>
