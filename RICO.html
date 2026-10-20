@@ -2874,16 +2874,24 @@ window.saveAnswer = window.saveAnswer || function(){};
       return null;
     }
     /* fluxo (mapa com etapas em uso): só a lista de opções de agora aparece, sem as camadas de dentro */
-    var FL = {};
+    var FL = {}, FLR = {}, FLK = {};
     function marcaFluxo() {
-      FL = {};
-      (function anda(n, dentro) {
+      FL = {}; FLR = {};
+      (function anda(n, dentro, rodando) {
         if (dentro) FL[n.id] = 1;
-        var d = dentro || !!n.et;
-        (n.et ? [].concat.apply([], n.et.s) : n.children).forEach(function(c) { anda(c, d); });
-      })(root, false);
+        if (rodando && n.et) FLR[n.id] = 1;
+        var d = dentro || !!n.et, r = rodando || !!(n.et && n.et.run);
+        (n.et ? [].concat.apply([], n.et.s) : n.children).forEach(function(c) { anda(c, d, r); });
+      })(root, false, false);
+      /* enquanto a barra está aberta numa célula, o caminho até ela fica à vista para dar para montar as camadas de dentro */
+      FLK = {};
+      if (barId) (function cam(n) {
+        if (n.id === barId) { FLK[n.id] = 1; return true; }
+        for (var i = 0; i < n.children.length; i++) if (cam(n.children[i])) { FLK[n.id] = 1; return true; }
+        return false;
+      })(root);
     }
-    function filhos(n) { return n.collapsed ? [] : (FL[n.id] && !n.et ? [] : n.children); }
+    function filhos(n) { return n.collapsed || (FLR[n.id] && !FLK[n.id]) ? [] : (FL[n.id] && !n.et ? [] : n.children); }
 
     function render() {
       if (!root || !wrap || !wrap.isConnected) return;
@@ -3147,7 +3155,7 @@ window.saveAnswer = window.saveAnswer || function(){};
       if (f && f.p && f.p.et && f.p.et.run && !f.p.collapsed) { if (/\?\s*$/.test(f.n.text || '')) pedeResposta(f); else escolheEtapa(f); return; }
       if (f && (f.n.children.length || f.n.et)) {
         f.n.collapsed = !f.n.collapsed;
-        if (!f.n.collapsed && f.n.et) reiniciaFluxo(f.n);
+        if (!f.n.collapsed && f.n.et && !f.p) reiniciaFluxo(f.n);
         salva();
       }
       render();
@@ -3225,7 +3233,7 @@ window.saveAnswer = window.saveAnswer || function(){};
       var n = f.n;
       if (n.et && ((n.et.desc && n.et.desc.length) || n.et.ver != null)) { n.children = n.et.s[n.et.cur]; n.et.desc = []; n.et.esc = []; }
       if (n.et) { n.et.fim = false; n.et.ver = null; }
-      if (!n.et) { if (!n.children.length) return; n.et = { s: [n.children], cur: 0, run: false, esc: [] }; }
+      if (!n.et) { if (!n.children.length && !f.p) return; n.et = { s: [n.children], cur: 0, run: false, esc: [] }; }
       n.et.s[n.et.cur] = n.children;
       var ult = n.et.s.length - 1;
       if (!n.et.s[ult].length) n.et.cur = ult; else { n.et.s.push([]); n.et.cur = ult + 1; }
@@ -3233,7 +3241,8 @@ window.saveAnswer = window.saveAnswer || function(){};
       etapasMostra(id);
     }
     function etapasVai(id) { /* tocar: navega 1, 2, 3 ... e volta ao 1 */
-      var f = acha(id); if (!f || !f.n.et) return;
+      var f = acha(id); if (!f) return;
+      if (!f.n.et) { if (f.p) etapasNo(id); return; }
       var n = f.n;
       var dq = n.et.desc ? n.et.desc.length : 0;
       if (dq > 0 || n.et.fim) {
@@ -3243,7 +3252,7 @@ window.saveAnswer = window.saveAnswer || function(){};
         n.et.ver = nq; n.children = lq; n.collapsed = false;
         etapasMostra(id); return;
       }
-      if (n.et.s.length < 2) { reiniciaFluxo(n); n.collapsed = false; etapasMostra(id); return; }
+      if (n.et.s.length < 2) { if (!f.p) { reiniciaFluxo(n); n.collapsed = false; etapasMostra(id); } return; }
       if (n.et.desc && n.et.desc.length) { n.children = n.et.s[n.et.cur]; n.et.desc = []; }
       n.et.fim = false;
       n.et.s[n.et.cur] = n.children;
@@ -3483,7 +3492,7 @@ window.saveAnswer = window.saveAnswer || function(){};
       var nb = barId ? acha(barId) : null;
       bar.innerHTML = movBar
         ? '<div class="rcm-pill"><button type="button" class="rcm-ib" data-a="sobe" aria-label="Sobe">' + ICO_SOBE + '</button><button type="button" class="rcm-ib" data-a="desce" aria-label="Desce">' + ICO_DESCE + '</button><button type="button" class="rcm-ib" data-a="pronto" aria-label="Pronto">' + ICO_OK + '</button></div>'
-        : '<div class="rcm-pill"><button type="button" class="rcm-ib" data-a="filho" aria-label="Adicionar">' + ICO_FILHO + '</button><button type="button" class="rcm-ib" data-a="irmao" aria-label="Mover">' + ICO_IRMAO + '</button>' + (proc && nb && (!nb.p || nb.n.et || nb.n.children.length) ? '<button type="button" class="rcm-ib" data-a="etapas" aria-label="Etapas">' + ICO_ETAPAS + (nb && nb.n.et ? '<b class="rcm-bd">' + ((nb.n.et.desc && (nb.n.et.desc.length || nb.n.et.fim)) ? (nb.n.et.ver == null ? nb.n.et.desc.length : nb.n.et.ver) + 1 : nb.n.et.cur + 1) + '</b>' : '') + '</button>' : '') + (proc && nb && !nb.p && nb.n.et && nb.n.et.esc.length ? '<button type="button" class="rcm-ib" data-a="parcial" aria-label="Copiar até aqui">' + ICO_DUP + '</button>' : '') + '<button type="button" class="rcm-ib" data-a="edita" aria-label="Editar">' + ICO_EDIT + '</button></div>';
+        : '<div class="rcm-pill"><button type="button" class="rcm-ib" data-a="filho" aria-label="Adicionar">' + ICO_FILHO + '</button><button type="button" class="rcm-ib" data-a="irmao" aria-label="Mover">' + ICO_IRMAO + '</button>' + (proc && nb ? '<button type="button" class="rcm-ib" data-a="etapas" aria-label="Etapas">' + ICO_ETAPAS + (nb && nb.n.et ? '<b class="rcm-bd">' + ((nb.n.et.desc && (nb.n.et.desc.length || nb.n.et.fim)) ? (nb.n.et.ver == null ? nb.n.et.desc.length : nb.n.et.ver) + 1 : nb.n.et.cur + 1) + '</b>' : '') + '</button>' : '') + (proc && nb && !nb.p && nb.n.et && nb.n.et.esc.length ? '<button type="button" class="rcm-ib" data-a="parcial" aria-label="Copiar até aqui">' + ICO_DUP + '</button>' : '') + '<button type="button" class="rcm-ib" data-a="edita" aria-label="Editar">' + ICO_EDIT + '</button></div>';
       if (destId) bar.innerHTML = '<div class="rcm-pill"><span class="rcm-av">Toque no destino</span><button type="button" class="rcm-ib" data-a="cancela" aria-label="Cancelar">' + ICO_X + '</button></div>';
       btnSib = bar.querySelector('[data-a="irmao"]');
       btnLev = bar.querySelector('[data-a="levar"],[data-a="etapas"]');
