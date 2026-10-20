@@ -3100,7 +3100,7 @@ window.saveAnswer = window.saveAnswer || function(){};
       if (!confirm('Excluir este item?')) return;
       var i = f.p.children.indexOf(f.n); if (i > -1) f.p.children.splice(i, 1);
       etapaVazia(f.p);
-      selId = f.p.id; barId = null; focoAposExcluir(f.n.id, f.p); salva(); render();
+      selId = f.p.id; barId = null; focoAposExcluir(f.n.id, f.p); salva(); render(); subeProc();
     }
 
     function adiciona(irmao) {
@@ -3230,12 +3230,13 @@ window.saveAnswer = window.saveAnswer || function(){};
       }
       render();
     }
+    function subeProc() { if (proc && zig && window.ajustaTopoCiclo) window.ajustaTopoCiclo(); }
     function acaoToque(id) {
       /* escolher opção no fluxo ou abrir o mapa: bloco vai para a posição ideal; recolher ou abrir um ramo: o círculo tocado fica parado onde estava na tela */
       var f0 = acha(id), fluxo = !!(f0 && (!f0.p || (f0.p.et && f0.p.et.run && !f0.p.collapsed)));
       var el0 = world ? world.querySelector('.rcm-node[data-id="' + id + '"]') : null, y0 = el0 ? el0.getBoundingClientRect().top : null;
       acaoToque0(id);
-      if (fluxo) { if (window.ajustaTopoCiclo) window.ajustaTopoCiclo(); return; }
+      if (fluxo || (proc && zig)) { if (window.ajustaTopoCiclo) window.ajustaTopoCiclo(); return; }
       var el1 = y0 !== null && world ? world.querySelector('.rcm-node[data-id="' + id + '"]') : null;
       if (el1) { var dy = el1.getBoundingClientRect().top - y0; if (Math.abs(dy) > 1) window.scrollBy({ top: dy, behavior: 'instant' }); }
     }
@@ -3709,12 +3710,12 @@ window.saveAnswer = window.saveAnswer || function(){};
         else if (a === 'edita') { barId = null; render(); abreEditor(id, true); }
         else if (a === 'exclui') excluiNo(id);
         else if (a === 'dup') duplicaNo(id);
-        else if (a === 'voltaFoco') focoVolta();
+        else if (a === 'voltaFoco') { focoVolta(); subeProc(); }
         else if (a === 'copiaAqui') { var fz = acha(id); if (fz) { var cp = caminhoAte(focoId); if (fz.p && id !== focoId) cp.push(linhaDe(fz.n)); barId = null; render(); abreCopiaTrilha(cp); } }
         else if (a === 'cam') {
           camOn = !camOn; abreId = null;
           if (camOn) { focoFix = true; focoEntra(id); } else { focoFix = false; focoId = null; barId = null; }
-          montaBar(); render();
+          montaBar(); render(); subeProc();
         }
         else if (a === 'voltaFluxo') fluxoVolta();
         else if (a === 'etapas') etapasVai(id);
