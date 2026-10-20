@@ -2928,10 +2928,10 @@ window.saveAnswer = window.saveAnswer || function(){};
       var frag = document.createDocumentFragment();
       /* montando camadas dentro de uma célula: só o caminho até ela e o que tem dentro; o nome dela fica amarelo */
       if (focoId && !acha(focoId)) focoId = null;
-      /* Processo: entrou numa célula, só aparecem os filhos dela (ela, a raiz e as irmãs somem); sem foco, a raiz e o primeiro nível */
+      /* Processo: entrou numa célula, ficam a raiz de cima e os filhos dela (ela e as irmãs somem); sem foco, a raiz e o primeiro nível */
       if (proc && zig) {
         var foF = focoId ? acha(focoId) : null, keepF = {};
-        if (foF) { foF.n.children.forEach(function(c) { keepF[c.id] = 1; }); if (focoFix) keepF[focoId] = 1; }
+        if (foF) { keepF.root = 1; foF.n.children.forEach(function(c) { keepF[c.id] = 1; }); if (focoFix) keepF[focoId] = 1; }
         else { keepF.root = 1; root.children.forEach(function(c) { keepF[c.id] = 1; }); }
         var abF = abreId ? acha(abreId) : null;
         if (abF && keepF[abreId]) abF.n.children.forEach(function(c) { keepF[c.id] = 1; });
