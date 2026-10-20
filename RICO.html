@@ -2725,6 +2725,7 @@ window.saveAnswer = window.saveAnswer || function(){};
   }
   /* ciclo grande, tocado lá embaixo: volta o topo do ciclo para o alto da tela (posição ideal) */
   var _ajustaTopo = false, _ajustaT = null;
+  window.ajustaTopoCiclo = ajustaTopoCiclo;
   function ajustaTopoCiclo() {
     var bl = document.querySelector('.cycle-block');
     if (!bl) return;
@@ -3044,6 +3045,10 @@ window.saveAnswer = window.saveAnswer || function(){};
       render();
     }
     function acaoToque(id) {
+      acaoToque0(id);
+      if (window.ajustaTopoCiclo) window.ajustaTopoCiclo();
+    }
+    function acaoToque0(id) {
       selId = id; barId = null;
       var f = acha(id);
       if (f && !f.p) {
