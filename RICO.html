@@ -4233,6 +4233,24 @@ window.saveAnswer = window.saveAnswer || function(){};
     if (_acao.titulo) ib('tit', 'Título', tem, function() { if (_acao) { _acao.titulo(); renderAcoes(false); } });
     return wrap;
   }
+  function copiaBloco(t) {
+    var msg = t ? 'Texto copiado' : 'Bloco sem texto';
+    var fim = function() {
+      if (window.showToast) { window.showToast(msg); return; }
+      var el = document.getElementById('toast');
+      if (el) { el.textContent = msg; el.classList.add('show'); setTimeout(function() { el.classList.remove('show'); }, 1800); }
+    };
+    if (!t) { fim(); return; }
+    var velho = function() {
+      var ta = document.createElement('textarea');
+      ta.value = t; ta.style.cssText = 'position:fixed;left:-9999px;top:0;opacity:0';
+      document.body.appendChild(ta); ta.select();
+      try { document.execCommand('copy'); } catch (e) {}
+      ta.remove(); fim();
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(t).then(fim, velho);
+    else velho();
+  }
   function renderCelulaIcones(movendo) {
     var box = _cel;
     box.innerHTML = '';
@@ -4251,6 +4269,13 @@ window.saveAnswer = window.saveAnswer || function(){};
       if (_acao && _acao.titulo) ib(ICONES_ACAO.tit, 'Título', function() { if (_acao) { _acao.titulo(); renderAcoes(false); } });
       if (_acao && _acao.mover) ib('<path d="M8 20V5M8 5L4.5 8.5M8 5l3.5 3.5M16 4v15M16 19l-3.5-3.5M16 19l3.5-3.5"/>', 'Mover', function() { renderAcoes(true); });
       if (_acao && _acao.adicionar) ib('<path d="M12 5v14M5 12h14"/>', 'Adicionar', function() { if (_acao) { _acao.adicionar(); fecharAcoes(); } });
+      if (_acao && (_acao.linhaRef || _acao.cartaoRef)) ib('<rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h8"/>', 'Copiar texto', function() {
+        var ref = _acao && (_acao.linhaRef || _acao.cartaoRef);
+        var tas = ref ? ref.querySelectorAll('textarea') : [], v = [];
+        Array.prototype.forEach.call(tas, function(t) { if (t.value && t.value.trim()) v.push(t.value.trim()); });
+        copiaBloco(v.join('\n'));
+        fecharAcoes();
+      });
       if (!(_acao && _acao.semModo)) ib('<path d="M5 7h14M10 7V5h4v2M7 7l1 12h8l1-12"/>', 'Excluir', function() {
         if (!_acao || !confirm('Excluir este item?')) return;
         var f = _acao.excluir;
