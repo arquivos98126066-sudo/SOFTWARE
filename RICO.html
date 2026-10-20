@@ -3118,8 +3118,13 @@ window.saveAnswer = window.saveAnswer || function(){};
       render();
     }
     function acaoToque(id) {
+      /* escolher opção no fluxo ou abrir o mapa: bloco vai para a posição ideal; recolher ou abrir um ramo: o círculo tocado fica parado onde estava na tela */
+      var f0 = acha(id), fluxo = !!(f0 && (!f0.p || (f0.p.et && f0.p.et.run && !f0.p.collapsed)));
+      var el0 = world ? world.querySelector('.rcm-node[data-id="' + id + '"]') : null, y0 = el0 ? el0.getBoundingClientRect().top : null;
       acaoToque0(id);
-      if (window.ajustaTopoCiclo) window.ajustaTopoCiclo();
+      if (fluxo) { if (window.ajustaTopoCiclo) window.ajustaTopoCiclo(); return; }
+      var el1 = y0 !== null && world ? world.querySelector('.rcm-node[data-id="' + id + '"]') : null;
+      if (el1) { var dy = el1.getBoundingClientRect().top - y0; if (Math.abs(dy) > 1) window.scrollBy({ top: dy, behavior: 'instant' }); }
     }
     function acaoToque0(id) {
       selId = id; barId = null;
