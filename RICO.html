@@ -3177,7 +3177,7 @@ window.saveAnswer = window.saveAnswer || function(){};
     function escolheEtapa(f) {
       var p = f.p, et = p.et;
       var tx = textoDe(f.n);
-      et.esc[et.cur] = (f.n.text || '') + (tx ? '\n' + tx : '');
+      et.esc[et.cur] = '(' + (f.n.text || '') + ')' + (tx ? '\n' + tx : '');
       if (et.cur + 1 < et.s.length) { et.cur++; p.children = et.s[et.cur]; }
       else {
         et.cur = 0; p.children = et.s[0];
