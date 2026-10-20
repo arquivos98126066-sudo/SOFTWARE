@@ -414,7 +414,11 @@
 
   /* ── Ciclo ── */
   .cycle-block { background: var(--dark); border-radius: 24px; padding: 20px; margin: 76px 0 20px; color: #fff; }
-  .cycle-block h4 { color: var(--gold); font-family: var(--f-title); margin-bottom: 24px; font-size: 18px; font-weight: 600; }
+  .cycle-block h4 { position: relative; color: var(--gold); font-family: var(--f-title); margin-bottom: 24px; font-size: 18px; font-weight: 600; cursor: pointer; outline: none; }
+  .cycle-block h4::before { content: ''; position: absolute; left: -8px; right: -8px; top: -12px; bottom: -12px; }
+  .modo-bar { display: flex; justify-content: center; margin: -6px 0 26px; filter: drop-shadow(0 6px 14px rgba(0,0,0,.4)); animation: cicloEntra .22s ease; }
+  .modo-bar[hidden] { display: none; }
+  .cycle-item.mv, .rcm-node.mv { background: rgba(224,181,74,.22); box-shadow: 0 0 0 2px var(--gold); }
   .cycle-chain { position: relative; display: flex; flex-direction: column; align-items: stretch; }
   .cycle-sub { position: relative; display: flex; flex-direction: column; align-items: stretch; padding-left: 28px; margin-top: 30px; }
   .cycle-sub::before {
@@ -439,6 +443,7 @@
 
   footer { background: var(--dark); color: #9aa6b8; text-align: center; padding: 28px 20px calc(28px + env(safe-area-inset-bottom)); font-size: 13px; font-weight: 500; }
   footer span { color: var(--gold); font-weight: 600; }
+
 
   /* ── Menu ── */
   .menu-btn {
@@ -770,6 +775,7 @@
   .rcm-bd { position: absolute; right: 6px; top: 6px; min-width: 10px; height: 10px; padding: 0 1px; box-sizing: border-box; border-radius: 6px; background: var(--gold); color: var(--dark); font: 700 7px/10px sans-serif; text-align: center; }
   .rcm-ib:active { background: rgba(224,181,74,.16); }
   .rcm-ib:disabled { opacity: .3; pointer-events: none; }
+  .rcm-ib.on, .rcm-ib.on:active { background: var(--gold); color: var(--dark); }
   .rcm-banner { width: fit-content; margin: 24px auto 24px; }
   .rcm-av { align-self: center; padding: 0 12px 0 16px; font-size: 14px; font-weight: 600; color: var(--gold); white-space: nowrap; }
   .rcm-ib svg { width: 20px; height: 20px; stroke: currentColor; stroke-width: 1.7; fill: none; stroke-linecap: round; stroke-linejoin: round; }
@@ -920,7 +926,15 @@
   </div>
 
   <div class="cycle-block">
-    <h4>O CICLO VENCEDOR</h4>
+    <h4 id="modoTitulo" role="button" tabindex="0" aria-expanded="false">O CICLO VENCEDOR</h4>
+    <div class="modo-bar" id="modoBar" hidden>
+      <div class="rcm-pill">
+        <button type="button" class="rcm-ib" data-m="mover" aria-label="Mover" data-tip="Mover"><svg viewBox="0 0 24 24"><path d="M4 7.5a1.5 1.5 0 0 1 1.5-1.5H10l2 2.2h6.5A1.5 1.5 0 0 1 20 9.7v8.8a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 18.5z"/><path d="M12 11.5v5M9.8 14.5l2.2 2.2 2.2-2.2"/></svg></button>
+        <button type="button" class="rcm-ib" data-m="duplicar" aria-label="Duplicar" data-tip="Duplicar"><svg viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2.5"/><path d="M5 15V7a2 2 0 0 1 2-2h8"/></svg></button>
+        <button type="button" class="rcm-ib" data-m="excluir" aria-label="Excluir" data-tip="Excluir"><svg viewBox="0 0 24 24"><path d="M5 7h14M10 7V5h4v2M7 7l1 12h8l1-12"/></svg></button>
+        <button type="button" class="rcm-ib" data-m="copiar" aria-label="Copiar" data-tip="Copiar"><svg viewBox="0 0 24 24"><path d="M4 14v4.5A1.5 1.5 0 0 0 5.5 20h13a1.5 1.5 0 0 0 1.5-1.5V14"/><path d="M12 15V4M8 8l4-4 4 4"/></svg></button>
+      </div>
+    </div>
     <div class="cycle-chain" id="ciclo-lista"></div>
   </div>
 
@@ -2648,6 +2662,7 @@ window.saveAnswer = window.saveAnswer || function(){};
     s.innerHTML = '<span class="cycle-t"></span>';
     s.firstChild.textContent = e.t || 'Nova etapa';
     if (comNum && e.g) s.classList.add(cicloFilhos(k).length ? 'tem-filhos' : 'sem-filhos');
+    if (window._rcSrc && window._rcSrc.ref === e) s.classList.add('mv');
     return s;
   }
   function renderCiclo() {
@@ -2658,7 +2673,7 @@ window.saveAnswer = window.saveAnswer || function(){};
     CICLO.forEach(function(e, k) { if (cab < 0 && e.h && !e.g) cab = k; });
     if (cab < 0) _soCompl = false;
     if (!_soCompl) _mapa = false;
-    if (!_mapa) _zig = false;
+    if (!_mapa) { _zig = false; }
     if (!_soCompl || _foco < 0 || !CICLO[_foco] || !CICLO[_foco].g) _foco = -1;
     if (cab >= 0) {
       var h = document.createElement('span');
@@ -2828,7 +2843,7 @@ window.saveAnswer = window.saveAnswer || function(){};
       var lista = [];
       (function anda(n, p) {
         var el = document.createElement('div');
-        el.className = 'rcm-node' + (n.id === 'root' ? ' root' : '') + (n.id === selId ? ' sel' : '') + (n.id !== 'root' && temTexto(n) ? ' txt' : '');
+        el.className = 'rcm-node' + (n.id === 'root' ? ' root' : '') + (n.id === selId ? ' sel' : '') + (n.id !== 'root' && temTexto(n) ? ' txt' : '') + (window._rcSrc && window._rcSrc.tipo === 'no' && window._rcSrc.inst === api && window._rcSrc.id === n.id ? ' mv' : '');
         el.dataset.id = n.id;
         if (zig) el.style.maxWidth = (aw0 - 2) + 'px';
         if (n.id !== 'root' && !zig) {
@@ -3149,13 +3164,69 @@ window.saveAnswer = window.saveAnswer || function(){};
       n.et.run = false; n.collapsed = false;
       etapasMostra(id);
     }
-    function textoDe(n) {
+    function notasDe(n) {
       var arr = n.i;
       if (!Array.isArray(arr) && (KEY === 'rico.mapa.v1' || KEY === 'rico.proc.v1' || KEY.indexOf('rico.proc.') === 0 || KEY.indexOf('rico.mapa.') === 0)) {
         var tx = String(n.text || '').trim();
         for (var j = 0; j < CICLO.length; j++) if (CICLO[j] && String(CICLO[j].t || '').trim() === tx) { arr = CICLO[j].i; break; }
       }
-      return (Array.isArray(arr) ? arr : []).map(function(v) { return String(v == null ? '' : v).trim(); }).filter(Boolean).join('\n');
+      return (Array.isArray(arr) ? arr : []).map(function(v) { return String(v == null ? '' : v).trim(); }).filter(Boolean);
+    }
+    function textoDe(n) { return notasDe(n).join('\n'); }
+    function linhasNo(n, ind, out) {
+      if (!n) return;
+      var t = String(n.text || '').trim();
+      if (t) out.push({ d: ind, t: t });
+      notasDe(n).forEach(function(x) { out.push({ d: ind + 1, t: x, nota: 1 }); });
+      if (n.et && Array.isArray(n.et.s)) {
+        n.et.s.forEach(function(et, k) { out.push({ d: ind + 1, t: '[Etapa ' + (k + 1) + ']', etapa: 1 }); (et || []).forEach(function(c) { linhasNo(c, ind + 2, out); }); });
+      } else (n.children || []).forEach(function(c) { linhasNo(c, ind + 1, out); });
+    }
+    function caminhoDe(id) {
+      var r = [];
+      (function anda(n, ac) {
+        var nx = ac.concat([String(n.text || '').trim() || 'Ideia']);
+        if (n.id === id) { r = nx; return true; }
+        var fil = n.et ? [].concat.apply([], n.et.s) : n.children;
+        for (var i = 0; i < fil.length; i++) if (anda(fil[i], nx)) return true;
+        return false;
+      })(root, []);
+      return r;
+    }
+    function copiaNo(id) {
+      var f = acha(id); if (!f) return;
+      var cam = caminhoDe(id), nome = cam.pop() || 'Ideia';
+      var ent = [];
+      linhasNo(f.n, 0, ent);
+      window.rcCopiar(window.rcMontaCopia('O Ciclo Vencedor > ' + [window.rcMapa.tela()].concat(cam).join(' > '), '"' + nome + '" (a célula) e tudo que está dentro dela', ent), 'Célula copiada');
+    }
+    function modoNo(id) {
+      var m = window._rcModo, f = acha(id); if (!f) return;
+      if (m === 'copiar') { copiaNo(id); return; }
+      if (m === 'excluir') { excluiNo(id); return; }
+      if (m !== 'mover' && m !== 'duplicar') return;
+      var S = window._rcSrc;
+      if (!S || S.tipo !== 'no' || !S.inst.existe(S.id)) {
+        if (!f.p) return;
+        window._rcSrc = { tipo: 'no', inst: api, id: id };
+        render(); return;
+      }
+      if (S.inst === api && S.id === id) { window._rcSrc = null; render(); return; }
+      if (m === 'duplicar') {
+        var c = S.inst.clonaNo(S.id);
+        if (!c) { window._rcSrc = null; render(); return; }
+        poeNo(id, c); render();
+        if (window.showToast) window.showToast('Duplicado');
+        return;
+      }
+      if (S.inst === api) { var a0 = acha(S.id); if (a0 && contem(a0.n, id)) return; }
+      var n = S.inst.tira(S.id);
+      if (!n) { window._rcSrc = null; render(); return; }
+      if (!poeNo(id, n)) S.inst.poe('root', n);
+      var outra = S.inst !== api;
+      window._rcSrc = null;
+      if (outra) renderCiclo(); else render();
+      if (window.showToast) window.showToast('Movido');
     }
     function copiaTexto(t) {
       function ok() {
@@ -3227,7 +3298,7 @@ window.saveAnswer = window.saveAnswer || function(){};
       var nb = barId ? acha(barId) : null;
       bar.innerHTML = movBar
         ? '<div class="rcm-pill"><button type="button" class="rcm-ib" data-a="sobe" aria-label="Sobe">' + ICO_SOBE + '</button><button type="button" class="rcm-ib" data-a="desce" aria-label="Desce">' + ICO_DESCE + '</button><button type="button" class="rcm-ib" data-a="pronto" aria-label="Pronto">' + ICO_OK + '</button></div>'
-        : '<div class="rcm-pill"><button type="button" class="rcm-ib" data-a="filho" aria-label="Adicionar">' + ICO_FILHO + '</button><button type="button" class="rcm-ib" data-a="irmao" aria-label="Mover">' + ICO_IRMAO + '</button>' + (proc ? '<button type="button" class="rcm-ib" data-a="etapas" aria-label="Etapas">' + ICO_ETAPAS + (nb && nb.n.et ? '<b class="rcm-bd">' + (nb.n.et.cur + 1) + '</b>' : '') + '</button>' : '<button type="button" class="rcm-ib" data-a="levar" aria-label="Mover para">' + ICO_LEVAR + '</button>') + '<button type="button" class="rcm-ib" data-a="dup" aria-label="Duplicar">' + ICO_DUP + '</button><button type="button" class="rcm-ib" data-a="edita" aria-label="Editar">' + ICO_EDIT + '</button><button type="button" class="rcm-ib" data-a="exclui" aria-label="Excluir">' + ICO_LIXO + '</button></div>';
+        : '<div class="rcm-pill"><button type="button" class="rcm-ib" data-a="filho" aria-label="Adicionar">' + ICO_FILHO + '</button><button type="button" class="rcm-ib" data-a="irmao" aria-label="Mover">' + ICO_IRMAO + '</button>' + (proc ? '<button type="button" class="rcm-ib" data-a="etapas" aria-label="Etapas">' + ICO_ETAPAS + (nb && nb.n.et ? '<b class="rcm-bd">' + (nb.n.et.cur + 1) + '</b>' : '') + '</button>' : '') + '<button type="button" class="rcm-ib" data-a="edita" aria-label="Editar">' + ICO_EDIT + '</button></div>';
       if (destId) bar.innerHTML = '<div class="rcm-pill"><span class="rcm-av">Toque no destino</span><button type="button" class="rcm-ib" data-a="cancela" aria-label="Cancelar">' + ICO_X + '</button></div>';
       btnSib = bar.querySelector('[data-a="irmao"]');
       btnLev = bar.querySelector('[data-a="levar"],[data-a="etapas"]');
@@ -3274,6 +3345,7 @@ window.saveAnswer = window.saveAnswer || function(){};
         lpT = setTimeout(function() {
           lp = true;
           if (tq) { clearTimeout(tq.t); tq = null; }
+          if (window._rcModo) { modoNo(id); return; }
           selId = id; barId = id; movBar = false; if (PEND) window.rcMapa.cancela(true); montaBar(); render();
         }, 550);
       });
@@ -3322,7 +3394,7 @@ window.saveAnswer = window.saveAnswer || function(){};
 
     window.addEventListener('resize', render);
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(render);
-    var api = { key: KEY, soltaMov: function() { movKeep = null; movBar = false; destId = null; }, tira: tiraNo, poe: poeNo, visivel: function() { return !!(wrap && wrap.isConnected && PEND && wrap.querySelector('.rcm-node[data-id="' + PEND.id + '"]')); }, serializa: function() { if (!root) root = carrega(); return JSON.stringify(root); }, montar: montar, salvaNota: salvaNota, fechou: fechou, limpar: limpar, info: function() { return zig ? zInfo : tInfo; } };
+    var api = { key: KEY, existe: function(id) { if (!root) root = carrega(); return !!acha(id); }, clonaNo: function(id) { var f = acha(id); return f ? clona(f.n) : null; }, linhas: function() { if (!root) root = carrega(); var o = []; linhasNo(root, 0, o); return o; }, soltaMov: function() { movKeep = null; movBar = false; destId = null; }, tira: tiraNo, poe: poeNo, visivel: function() { return !!(wrap && wrap.isConnected && PEND && wrap.querySelector('.rcm-node[data-id="' + PEND.id + '"]')); }, serializa: function() { if (!root) root = carrega(); return JSON.stringify(root); }, montar: montar, salvaNota: salvaNota, fechou: fechou, limpar: limpar, info: function() { return zig ? zInfo : tInfo; } };
     if (vazio) { root = nd('Novo'); root.id = 'root'; salva(); }
     return api;
   }
@@ -3359,6 +3431,9 @@ window.saveAnswer = window.saveAnswer || function(){};
     S.arr = ch.map(function(k) { return criaMapa(k, false); });
   }
   window.rcMapa = {
+    tela: function() { return CUR === SETS.p ? 'Processo' : 'Mapa mental'; },
+    todasLinhas: function() { return [].concat.apply([], CUR.arr.map(function(m) { return m.linhas(); })); },
+    raizes: function() { return CUR.arr.map(function(m) { try { return JSON.parse(m.serializa()); } catch (e) { return null; } }).filter(Boolean); },
     montar: function(mw, z) {
       CUR = z ? SETS.p : SETS.m;
       var S = CUR, MAPAS = S.arr;
@@ -3697,6 +3772,30 @@ window.saveAnswer = window.saveAnswer || function(){};
   });
   document.addEventListener('keydown', function(e) { if (e.key === 'Escape' && _etapa >= 0) fecharSheet(); });
   renderCiclo();
+  (function() {
+    var t = document.getElementById('modoTitulo'), bar = document.getElementById('modoBar');
+    if (!t || !bar) return;
+    function marca() {
+      Array.prototype.forEach.call(bar.querySelectorAll('.rcm-ib'), function(b) { b.classList.toggle('on', b.getAttribute('data-m') === window._rcModo); });
+    }
+    function alterna() {
+      var abre = bar.hidden;
+      bar.hidden = !abre;
+      t.setAttribute('aria-expanded', abre ? 'true' : 'false');
+      if (!abre) { window._rcModo = null; window._rcSrc = null; }
+      marca(); renderCiclo();
+    }
+    t.addEventListener('click', alterna);
+    t.addEventListener('keydown', function(e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); alterna(); } });
+    bar.addEventListener('click', function(e) {
+      var b = e.target.closest ? e.target.closest('.rcm-ib') : null;
+      if (!b) return;
+      var m = b.getAttribute('data-m');
+      window._rcModo = window._rcModo === m ? null : m;
+      window._rcSrc = null;
+      marca(); renderCiclo();
+    });
+  })();
 
   // segurar uma caixa de resposta mostra o botão de mais; ele adiciona outra caixa logo abaixo
   function limparMais() {
@@ -3794,8 +3893,107 @@ window.saveAnswer = window.saveAnswer || function(){};
     el.insertAdjacentElement('afterend', c);
     renderAcoes(!!mover);
   }
+  /* ── Modos do título "O CICLO VENCEDOR": Mover, Duplicar, Excluir e Copiar (valem segurando uma célula) ── */
+  function cicloBloco(k) { var it = CICLO[k]; return it.g ? CICLO.slice(k, cicloFimNo(k) + 1) : [it]; }
+  function cicloNomeItem(it) { return String(it.t || '').trim() || 'Nova etapa'; }
+  function cicloAviso(t) { if (window.showToast) window.showToast(t); }
+  function cicloCaminho(k) {
+    var cam = ['O Ciclo Vencedor', 'Meu ciclo'], it = CICLO[k], pais = [];
+    if (it.g) {
+      cam.push('Subpasta');
+      var p = cicloPai(k);
+      while (p >= 0) { pais.unshift(cicloNomeItem(CICLO[p])); p = cicloPai(p); }
+    }
+    return cam.concat(pais);
+  }
+  function cicloLinhas(bloco, d0) {
+    var out = [];
+    bloco.forEach(function(x) {
+      var rel = Math.max(0, (x.g ? (x.d || 1) : 0) - d0);
+      out.push({ d: rel, t: cicloNomeItem(x) });
+      (x.i || []).forEach(function(n) {
+        var y = String(n == null ? '' : n).replace(/\s+$/, '');
+        if (y.trim()) out.push({ d: rel + 1, t: y.trim(), nota: 1 });
+      });
+    });
+    return out;
+  }
+  function cicloCopiaItem(k) {
+    var it = CICLO[k]; if (!it) return;
+    var d0 = it.g ? (it.d || 1) : 0;
+    window.rcCopiar(window.rcMontaCopia(cicloCaminho(k).join(' > '), '"' + cicloNomeItem(it) + '" (a célula) e tudo que está dentro dela', cicloLinhas(cicloBloco(k), d0)), 'Célula copiada');
+  }
+  function cicloCopiaTela(cab) {
+    var txt;
+    if (_mapa) {
+      txt = window.rcMontaCopia('O Ciclo Vencedor > ' + window.rcMapa.tela(), 'todos os mapas desta tela (cada ideia com seus textos e tudo que está dentro dela)', window.rcMapa.todasLinhas());
+    } else if (_soCompl) {
+      var base = _foco >= 0 ? _foco : cab;
+      var lista = CICLO.slice(base + (base === cab ? 1 : 0), cicloFimNo(base) + 1).filter(function(e) { return e.g; });
+      var cam = _foco >= 0 ? cicloCaminho(_foco).concat([cicloNomeItem(CICLO[_foco])]) : ['O Ciclo Vencedor', 'Meu ciclo', 'Subpasta'];
+      txt = window.rcMontaCopia(cam.join(' > '), 'tudo que está dentro deste local', window.rcCicloTexto(lista));
+    } else {
+      txt = window.rcMontaCopia('O Ciclo Vencedor > Meu ciclo', 'todas as etapas do Meu ciclo, com seus textos e a subpasta e tudo que está dentro dela', window.rcCicloTexto(CICLO));
+    }
+    window.rcCopiar(txt, 'Copiado');
+  }
+  function cicloExcluiItem(k) {
+    var it = CICLO[k]; if (!it || it.h) return;
+    if (!confirm('Excluir este item?')) return;
+    var fr = _foco >= 0 ? CICLO[_foco] : null;
+    if (it.g) CICLO.splice(k, cicloFimNo(k) - k + 1); else CICLO.splice(k, 1);
+    _foco = fr ? CICLO.indexOf(fr) : -1;
+    if (window._rcSrc && window._rcSrc.ref && CICLO.indexOf(window._rcSrc.ref) < 0) window._rcSrc = null;
+    renderCiclo(); salvarAlt();
+  }
+  function cicloSolta(kAlvo) {
+    var S = window._rcSrc, m = window._rcModo, a = CICLO[kAlvo];
+    var ks = S ? CICLO.indexOf(S.ref) : -1;
+    if (ks < 0 || !a) { window._rcSrc = null; renderCiclo(); return; }
+    var bloco = cicloBloco(ks), d0 = S.ref.g ? (S.ref.d || 1) : 0, ka0 = CICLO.indexOf(a);
+    if (m === 'mover' && ka0 >= ks && ka0 < ks + bloco.length) return;
+    var itens = JSON.parse(JSON.stringify(bloco));
+    var dentro = !!(a.g || a.h), dRaiz = a.g ? (a.d || 1) + 1 : 1;
+    itens.forEach(function(x) {
+      if (dentro) {
+        var d = (x.g ? (x.d || 1) : 0) - d0 + dRaiz;
+        x.g = 1; if (d > 1) x.d = d; else delete x.d;
+      } else { delete x.g; delete x.d; }
+    });
+    var fr = _foco >= 0 ? CICLO[_foco] : null;
+    if (m === 'mover') CICLO.splice(ks, bloco.length);
+    var ka = CICLO.indexOf(a);
+    var pos = a.g ? cicloFimNo(ka) + 1 : (a.h ? cicloFimGrupo(ka) + 1 : ka + 1);
+    Array.prototype.splice.apply(CICLO, [pos, 0].concat(itens));
+    _foco = fr ? CICLO.indexOf(fr) : -1;
+    if (m === 'mover') window._rcSrc = null;
+    renderCiclo(); salvarAlt();
+    cicloAviso(m === 'mover' ? 'Movido' : 'Duplicado');
+  }
+  /* devolve true quando o modo ativo tratou o toque longo */
+  function modoCiclo(el) {
+    var m = window._rcModo;
+    if (!m || !el.classList || !el.classList.contains('cycle-item') || el.classList.contains('cycle-vazio')) return false;
+    var k = +el.dataset.idx, it = CICLO[k];
+    if (!it) return false;
+    var S = window._rcSrc, temSrc = !!(S && S.tipo === 'ciclo' && CICLO.indexOf(S.ref) > -1);
+    if (el.classList.contains('cycle-compl')) {
+      if (m === 'copiar') { cicloCopiaTela(k); return true; }
+      if ((m === 'mover' || m === 'duplicar') && temSrc && el.dataset.mapa === undefined) { cicloSolta(k); return true; }
+      return false;
+    }
+    if (m === 'copiar') { cicloCopiaItem(k); return true; }
+    if (m === 'excluir') { cicloExcluiItem(k); return true; }
+    if (m === 'mover' || m === 'duplicar') {
+      if (!temSrc) { window._rcSrc = { tipo: 'ciclo', ref: it }; renderCiclo(); return true; }
+      if (S.ref === it) { window._rcSrc = null; renderCiclo(); return true; }
+      cicloSolta(k); return true;
+    }
+    return false;
+  }
   function abrirMenuItem(el) {
     fecharCelula();
+    if (window._rcModo && modoCiclo(el)) return;
     if (el.classList && el.classList.contains('cycle-vazio')) return;
     // segurar o botão amarelo no mapa: adicionar outro mapa, mover ou excluir
     if (el.dataset && el.dataset.mapa !== undefined && el.classList.contains('cycle-compl') && window.rcMapa) {
@@ -3902,6 +4100,7 @@ window.saveAnswer = window.saveAnswer || function(){};
     }
     if (el.classList.contains('cycle-item')) {
       _acao = {
+        semModo: true,
         idx: +el.dataset.idx,
         adicionar: function() {
           var it = CICLO[_acao.idx];
@@ -4044,6 +4243,7 @@ window.saveAnswer = window.saveAnswer || function(){};
       if (cor) b.style.color = cor;
       b.onclick = fn;
       box.appendChild(b);
+      return b;
     };
     if (!movendo) {
       if (_acao && _acao.editar) ib('<path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/>', 'Editar', function() { if (_acao) _acao.editar(); });
@@ -4051,7 +4251,7 @@ window.saveAnswer = window.saveAnswer || function(){};
       if (_acao && _acao.titulo) ib(ICONES_ACAO.tit, 'Título', function() { if (_acao) { _acao.titulo(); renderAcoes(false); } });
       if (_acao && _acao.mover) ib('<path d="M8 20V5M8 5L4.5 8.5M8 5l3.5 3.5M16 4v15M16 19l-3.5-3.5M16 19l3.5-3.5"/>', 'Mover', function() { renderAcoes(true); });
       if (_acao && _acao.adicionar) ib('<path d="M12 5v14M5 12h14"/>', 'Adicionar', function() { if (_acao) { _acao.adicionar(); fecharAcoes(); } });
-      ib('<path d="M5 7h14M10 7V5h4v2M7 7l1 12h8l1-12"/>', 'Excluir', function() {
+      if (!(_acao && _acao.semModo)) ib('<path d="M5 7h14M10 7V5h4v2M7 7l1 12h8l1-12"/>', 'Excluir', function() {
         if (!_acao || !confirm('Excluir este item?')) return;
         var f = _acao.excluir;
         f();
@@ -4084,7 +4284,7 @@ window.saveAnswer = window.saveAnswer || function(){};
       box.appendChild(be);
       box.appendChild(btnAcao('Move', 'act-btn', function() { renderAcoes(true); }));
       if (_acao && _acao.adicionar) box.appendChild(btnAcao('Adiciona', 'act-btn', function() { if (_acao) { _acao.adicionar(); fecharAcoes(); } }));
-      box.appendChild(btnAcao('Exclui', 'act-btn del', function() {
+      if (!(_acao && _acao.semModo)) box.appendChild(btnAcao('Exclui', 'act-btn del', function() {
         if (!_acao || !confirm('Excluir este item?')) return;
         var f = _acao.excluir;
         f();
@@ -5233,6 +5433,68 @@ window.saveAnswer = window.saveAnswer || function(){};
     return '<path class="ln" d="' + d + '" pathLength="1" fill="none" stroke="' + c + '" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>' +
       '<path class="pt" d="M' + (xt - 5) + ' ' + (tp - 6) + ' L' + xt + ' ' + tp + ' L' + (xt + 5) + ' ' + (tp - 6) + '" fill="none" stroke="' + c + '" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>';
   }
+</script>
+
+<script>
+/* Apoio dos modos de copiar do título "O CICLO VENCEDOR" */
+(function () {
+  function limpo(v) { return String(v == null ? '' : v).replace(/\s+$/g, '').trim(); }
+  function aviso(msg) {
+    if (window.showToast) { window.showToast(msg); return; }
+    var el = document.getElementById('toast'); if (!el) return;
+    el.textContent = msg; el.classList.add('show'); setTimeout(function () { el.classList.remove('show'); }, 2600);
+  }
+  function copia(t, rotulo) {
+    var msg = (rotulo || 'Copiado') + ' (' + t.length + ' letras). Cole na Claude.';
+    function velho() {
+      try {
+        var ta = document.createElement('textarea'); ta.value = t; ta.setAttribute('readonly', ''); ta.style.cssText = 'position:fixed;left:-9999px;top:0;opacity:0';
+        document.body.appendChild(ta); ta.select(); ta.setSelectionRange(0, t.length);
+        var r = document.execCommand('copy'); ta.remove();
+        aviso(r ? msg : 'Não consegui copiar');
+      } catch (e) { aviso('Não consegui copiar'); }
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(t).then(function () { aviso(msg); }, velho); else velho();
+  }
+  window.rcCopiar = function (t, rotulo) { copia(t, rotulo); };
+  window.rcCicloTexto = function (lista) {
+    var out = [];
+    (lista || []).forEach(function (e) {
+      if (!e) return;
+      var d = e.g ? (e.d || 1) : 0;
+      var t = limpo(e.t); if (t) out.push({ d: d, t: t });
+      (e.i || []).forEach(function (x) { var y = limpo(x); if (y) out.push({ d: d + 1, t: y, nota: 1 }); });
+    });
+    return out;
+  };
+  /* monta o texto final: cabeçalho + árvore, tudo dentro de um bloco de código */
+  window.rcArvore = function (ent) {
+    var out = [], pre = [];
+    ent = ent || [];
+    for (var i = 0; i < ent.length; i++) {
+      var e = ent[i], d = e.d, ult = true;
+      for (var j = i + 1; j < ent.length; j++) { if (ent[j].d < d) break; if (ent[j].d === d) { ult = false; break; } }
+      var base = ''; for (var k = 1; k < d; k++) base += (pre[k] == null ? '   ' : pre[k]);
+      var cab = d === 0 ? '' : (ult ? '└─ ' : '├─ ');
+      var cont = d === 0 ? '   ' : (ult ? '   ' : '│  ') + '   ';
+      var marca = e.nota ? '• ' : '';
+      var ls = String(e.t).split('\n');
+      out.push(base + cab + marca + ls[0]);
+      for (var m = 1; m < ls.length; m++) out.push(base + cont + (e.nota ? '  ' : '') + ls[m]);
+      pre[d] = d === 0 ? '' : (ult ? '   ' : '│  ');
+      pre.length = d + 1;
+    }
+    return out.join('\n');
+  };
+  window.rcMontaCopia = function (local, copiado, ent) {
+    var cerca = '```';
+    return cerca + '\n' +
+      'LOCAL: ' + local + '\n' +
+      'COPIADO: ' + copiado + '\n' +
+      'COMO LER: cada ├─ e └─ é uma célula filha da célula de cima (mais à direita = mais dentro). Linhas com • são os textos escritos dentro da célula. [Etapa N] é uma etapa do processo.\n\n' +
+      (window.rcArvore(ent) || '(vazio)') + '\n' + cerca;
+  };
+})();
 </script>
 </body>
 </html>
