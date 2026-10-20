@@ -2772,7 +2772,6 @@ window.saveAnswer = window.saveAnswer || function(){};
         text: typeof n.text === 'string' ? n.text.slice(0, 60) : '',
         collapsed: !!n.collapsed, children: []
       };
-      if (n.novo && !isRoot) o.novo = 1;
       if (Array.isArray(n.children)) n.children.forEach(function(c) { var x = limpa(c, false); if (x) o.children.push(x); });
       if (Array.isArray(n.i)) {
         o.i = n.i.map(function(v) { return String(v == null ? '' : v); });
@@ -3246,19 +3245,32 @@ window.saveAnswer = window.saveAnswer || function(){};
       }
       if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(t).then(ok, velho); else velho();
     }
-    /* células marcadas como novas (botão de camadas numa célula sem filhos): entram na cópia uma vez e a marca some */
-    function novosCopia() {
-      var out = [];
-      function anda(n, ctx) {
-        if (n.novo) {
-          var tx = textoDe(n);
-          out.push('Célula nova (' + ctx + '): (' + (n.text || '') + ')' + (tx ? '\n' + tx : ''));
-          delete n.novo;
-        }
-        if (n.et) n.et.s.forEach(function(st, k) { st.forEach(function(c) { anda(c, 'mapa ' + (root.text || '') + ', etapa ' + (k + 1) + (n === root ? '' : ', dentro de ' + (n.text || ''))); }); });
-        else n.children.forEach(function(c) { anda(c, 'mapa ' + (root.text || '') + (n === root ? '' : ', dentro de ' + (n.text || ''))); });
+    /* foto do mapa na última cópia: ao copiar, o que entrou, mudou de nome ou de texto, foi movido ou apagado vai no fim do texto, uma vez só */
+    function achata(r) {
+      var out = {};
+      function reg(c, n, k) { out[c.id] = { n: c.text || '', t: textoDe(c), c: 'mapa ' + (r.text || '') + (k ? ', etapa ' + k : '') + (n === r ? '' : ', dentro de ' + (n.text || '')), p: n.id }; anda(c); }
+      function anda(n) {
+        if (n.et) n.et.s.forEach(function(st, k) { st.forEach(function(c) { reg(c, n, k + 1); }); });
+        else n.children.forEach(function(c) { reg(c, n, 0); });
       }
-      anda(root, '');
+      anda(r);
+      return out;
+    }
+    function mudancasCopia() {
+      var ant = null, atual = achata(root), out = [];
+      try { var sv = localStorage.getItem(KEY + '.foto'); if (sv) ant = JSON.parse(sv); } catch (e) {}
+      if (!ant && KEY === 'rico.proc.ouro') ant = achata(semeiaOuro());
+      if (ant) {
+        Object.keys(atual).forEach(function(id) {
+          var a = atual[id], b = ant[id];
+          if (!b) { out.push('Célula nova (' + a.c + '): (' + a.n + ')' + (a.t ? '\n' + a.t : '')); return; }
+          if (a.n !== b.n) out.push('Nome alterado (' + a.c + '): (' + b.n + ') passou a (' + a.n + ')');
+          if (a.t !== b.t) out.push('Texto alterado (' + a.c + '): (' + a.n + ')\nAntes: ' + (b.t || '(vazio)') + '\nAgora: ' + (a.t || '(vazio)'));
+          if (a.p !== b.p) out.push('Célula movida (' + b.c + ' para ' + a.c + '): (' + a.n + ')');
+        });
+        Object.keys(ant).forEach(function(id) { if (!atual[id]) out.push('Célula apagada (' + ant[id].c + '): (' + ant[id].n + ')'); });
+      }
+      try { localStorage.setItem(KEY + '.foto', JSON.stringify(atual)); } catch (e) {}
       return out;
     }
     function escolheEtapa(f) {
@@ -3268,7 +3280,7 @@ window.saveAnswer = window.saveAnswer || function(){};
       if (et.cur + 1 < et.s.length) { et.cur++; p.children = et.s[et.cur]; }
       else {
         et.cur = 0; p.children = et.s[0];
-        var tudo = et.esc.filter(Boolean).concat(novosCopia()).join('\n\n');
+        var tudo = et.esc.filter(Boolean).concat(mudancasCopia()).join('\n\n');
         if (tudo) copiaTexto(tudo);
       }
       selId = p.id; barId = null; salva(); render();
@@ -3314,7 +3326,7 @@ window.saveAnswer = window.saveAnswer || function(){};
       var nb = barId ? acha(barId) : null;
       bar.innerHTML = movBar
         ? '<div class="rcm-pill"><button type="button" class="rcm-ib" data-a="sobe" aria-label="Sobe">' + ICO_SOBE + '</button><button type="button" class="rcm-ib" data-a="desce" aria-label="Desce">' + ICO_DESCE + '</button><button type="button" class="rcm-ib" data-a="pronto" aria-label="Pronto">' + ICO_OK + '</button></div>'
-        : '<div class="rcm-pill"><button type="button" class="rcm-ib" data-a="filho" aria-label="Adicionar">' + ICO_FILHO + '</button><button type="button" class="rcm-ib" data-a="irmao" aria-label="Mover">' + ICO_IRMAO + '</button>' + (proc ? '<button type="button" class="rcm-ib' + (nb && nb.n.novo ? ' on' : '') + '" data-a="etapas" aria-label="' + (nb && nb.p && !nb.n.et && !nb.n.children.length ? 'Marcar como nova' : 'Etapas') + '">' + ICO_ETAPAS + (nb && nb.n.et ? '<b class="rcm-bd">' + (nb.n.et.cur + 1) + '</b>' : '') + '</button>' : '') + '<button type="button" class="rcm-ib" data-a="edita" aria-label="Editar">' + ICO_EDIT + '</button></div>';
+        : '<div class="rcm-pill"><button type="button" class="rcm-ib" data-a="filho" aria-label="Adicionar">' + ICO_FILHO + '</button><button type="button" class="rcm-ib" data-a="irmao" aria-label="Mover">' + ICO_IRMAO + '</button>' + (proc ? '<button type="button" class="rcm-ib" data-a="etapas" aria-label="Etapas">' + ICO_ETAPAS + (nb && nb.n.et ? '<b class="rcm-bd">' + (nb.n.et.cur + 1) + '</b>' : '') + '</button>' : '') + '<button type="button" class="rcm-ib" data-a="edita" aria-label="Editar">' + ICO_EDIT + '</button></div>';
       if (destId) bar.innerHTML = '<div class="rcm-pill"><span class="rcm-av">Toque no destino</span><button type="button" class="rcm-ib" data-a="cancela" aria-label="Cancelar">' + ICO_X + '</button></div>';
       btnSib = bar.querySelector('[data-a="irmao"]');
       btnLev = bar.querySelector('[data-a="levar"],[data-a="etapas"]');
@@ -3394,11 +3406,7 @@ window.saveAnswer = window.saveAnswer || function(){};
         else if (a === 'edita') { barId = null; render(); abreEditor(id, true); }
         else if (a === 'exclui') excluiNo(id);
         else if (a === 'dup') duplicaNo(id);
-        else if (a === 'etapas') {
-          var fe = acha(id);
-          if (fe && fe.p && !fe.n.et && !fe.n.children.length) { if (fe.n.novo) delete fe.n.novo; else fe.n.novo = 1; etapasMostra(id); }
-          else etapasVai(id);
-        }
+        else if (a === 'etapas') etapasVai(id);
         else if (a === 'levar') { PEND = { inst: api, id: id }; destId = id; montaBar(); posBar(); }
         else if (a === 'cancela') { window.rcMapa.cancela(); }
       });
