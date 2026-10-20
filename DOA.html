@@ -1673,8 +1673,9 @@ function htmlRender(){
   box.innerHTML = '<div class="pl-h-title">HTMLs</div><div class="rows"></div>';
   var rows = box.querySelector('.rows');
   lista.forEach(function(h){
-    var row = document.createElement('div'); row.className = 'row' + (h.id === _htmlSel ? ' sel' : '');
-    row.innerHTML = '<button type="button" class="row-main">' + ic('code', 'row-ico') + '<span class="row-name">' + p_esc(h.nome) + '</span>' + ic('chevron-right', 'row-chev') + '</button>';
+    var row = document.createElement('div'); row.className = 'row has-edit' + (h.id === _htmlSel ? ' sel' : '');
+    row.innerHTML = '<button type="button" class="row-main">' + ic('code', 'row-ico') + '<span class="row-name">' + p_esc(h.nome) + '</span>' + ic('chevron-right', 'row-chev') + '</button><button type="button" class="row-edit" aria-label="Opções" data-tip="Opções">' + ic('dots-v') + '</button>';
+    row.querySelector('.row-edit').onclick = function(){ _htmlSel = (_htmlSel === h.id ? null : h.id); htmlRender(); };
     var btn = row.querySelector('.row-main'), t = null, seg = false, x0 = 0, y0 = 0;
     btn.addEventListener('pointerdown', function(e){ seg = false; x0 = e.clientX; y0 = e.clientY; clearTimeout(t); t = setTimeout(function(){ seg = true; _htmlSel = (_htmlSel === h.id ? null : h.id); htmlRender(); }, 450); });
     btn.addEventListener('pointermove', function(e){ if(Math.abs(e.clientX - x0) > 10 || Math.abs(e.clientY - y0) > 10) clearTimeout(t); });
