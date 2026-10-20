@@ -3266,7 +3266,6 @@ window.saveAnswer = window.saveAnswer || function(){};
     function mudancasCopia() {
       var ant = null, atual = achata(root), out = [];
       try { var sv = localStorage.getItem(KEY + '.foto'); if (sv) ant = JSON.parse(sv); } catch (e) {}
-      if (!ant && KEY === 'rico.proc.ouro') ant = achata(semeiaOuro());
       if (ant) {
         Object.keys(atual).forEach(function(id) {
           var a = atual[id], b = ant[id];
@@ -3466,14 +3465,24 @@ window.saveAnswer = window.saveAnswer || function(){};
     } else ch = mapasChaves(S);
     if (!ch.length) ch = [S.def];
     if (S === SETS.p) {
-      /* teste: mapa "Ouro" com etapas (menu da skill, material e tema), entra uma vez só */
+      /* mapa "Ouro" (teste): entra uma vez; a versão 2 acrescenta "Serve para" nas células que já existem */
       try {
-        if (localStorage.getItem('rico.seed.ouro') === null) {
-          var k = 'rico.proc.ouro';
+        var fl = localStorage.getItem('rico.seed.ouro'), k = 'rico.proc.ouro';
+        if (fl === null) {
           localStorage.setItem(k, JSON.stringify(semeiaOuro()));
-          localStorage.setItem('rico.seed.ouro', '1');
+          localStorage.setItem('rico.seed.ouro', '2');
           if (ch.indexOf(k) < 0) ch.push(k);
           localStorage.setItem(S.ord, JSON.stringify(ch));
+        } else if (fl === '1') {
+          var sv = localStorage.getItem(k);
+          if (sv) {
+            var mp = JSON.parse(sv), serve = {};
+            (function a1(n) { if (Array.isArray(n.i)) { var l = n.i.filter(function(x) { return /^Serve para/.test(x); })[0]; if (l) serve[n.id] = l; } (n.et ? [].concat.apply([], n.et.s) : n.children).forEach(a1); })(semeiaOuro());
+            (function a2(n) { if (serve[n.id] && Array.isArray(n.i) && !n.i.some(function(x) { return /^Serve para/.test(x); })) { n.i.push(serve[n.id]); if (Array.isArray(n.m)) n.m.push({}); } (n.et ? [].concat.apply([], n.et.s) : n.children).forEach(a2); })(mp);
+            localStorage.setItem(k, JSON.stringify(mp));
+            localStorage.removeItem(k + '.foto');
+          }
+          localStorage.setItem('rico.seed.ouro', '2');
         }
       } catch (e) {}
     }
@@ -3481,11 +3490,13 @@ window.saveAnswer = window.saveAnswer || function(){};
   }
   function semeiaOuro() {
     var u = 0;
-    function no(t, tx) { u++; return { id: 'ouro' + u, text: t, collapsed: false, children: [], i: [tx], m: [] }; }
+    function no(t, tx, serve) { u++; return { id: 'ouro' + u, text: t, collapsed: false, children: [], i: [tx, 'Serve para: ' + serve], m: [] }; }
     var temas = ['Resultado, ação e modelagem', 'Decisão, ação e dor e prazer', 'Rituais emocionais e procrastinação', 'Estado emocional e corpo', 'Foco e perguntas', 'Crenças e mudança duradoura', 'Valores e regras', 'Metas', 'Dinheiro: crenças e meta', 'Dinheiro: plano e hábitos', 'Medo, fracasso e rejeição', 'Confiança e solução de problemas', 'Relações e rumo de vida'];
-    var s0 = [no('Analisar material', 'Opção 1: analisar um material'), no('Usar material guardado', 'Opção 2: usar um material guardado'), no('Sabedoria', 'Opção 3: sabedoria')];
-    var s1 = [no('Você Nasceu Rico', 'Material: Você Nasceu Rico'), no('Fênix', 'Material: Seminário Fênix'), no('Tony Robbins', 'Material: Tony Robbins')];
-    var s2 = temas.map(function(t, j) { return no(t, 'Tema ' + (j + 1) + ': ' + t); });
+    var s0 = [no('Analisar material', 'Opção 1: analisar um material', 'analisar um material novo ou refazer um que já existe e extrair o ouro dele.'), no('Usar material guardado', 'Opção 2: usar um material guardado', 'abrir um material já analisado, escolher o tema e fazer os exercícios.'), no('Sabedoria', 'Opção 3: sabedoria', 'obter ou criar conhecimento da skill (Obtenção e Criação).')];
+    var s1 = [no('Você Nasceu Rico', 'Material: Você Nasceu Rico', 'trabalhar os exercícios do material Você Nasceu Rico.'), no('Fênix', 'Material: Seminário Fênix', 'trabalhar os temas do Seminário Fênix (temas ainda não gravados).'), no('Tony Robbins', 'Material: Tony Robbins', 'trabalhar o programa de áudio de 30 dias do Tony Robbins.')];
+    var s2 = temas.map(function(t, j) { return no(t, 'Tema ' + (j + 1) + ': ' + t, 'fazer os exercícios do tema ' + t + '.'); });
+    var bd = no('Bom dia', 'Opção: bom dia', 'dar bom dia.'); bd.i = ['Serve para: dar bom dia.']; s0[2].children.push(bd);
+    var nv = no('Novo', 'Opção: novo', 'ainda não definido.'); nv.i = ['Serve para: ainda não definido.']; s1[2].children.push(nv);
     return { id: 'root', text: 'Ouro', collapsed: false, children: s0, et: { s: [s0, s1, s2], cur: 0, run: false, esc: [] } };
   }
   window.rcMapa = {
