@@ -226,7 +226,7 @@ document.addEventListener('click',function(e){
   #proc-list-overlay.pl-open { display: flex; }
   .pl-body {
     flex: 1; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch;
-    padding: 8px 12px calc(28px + env(safe-area-inset-bottom));
+    padding: calc(12px + env(safe-area-inset-top)) 12px calc(28px + env(safe-area-inset-bottom));
     display: flex; flex-direction: column;
   }
   #pl-list { flex: 0 0 auto; touch-action: pan-y; }
@@ -558,9 +558,6 @@ window._carregarProcessoNuvem = carregarProcessoNuvem;
 <script src="plano-hub.js"></script>
 <!-- ══ TELA DE PROCESSOS ══ -->
 <div id="proc-list-overlay">
-  <div class="topbar">
-    <span class="tb-title">Processos</span>
-  </div>
   <div class="pl-body">
     <div class="crumbbar" id="pl-crumbbar">
       <button class="rbtn line" onclick="pl_navGoBack()" aria-label="Volta" data-tip="Volta"><svg class="ic"><use href="#i-arrow-left"/></svg></button>
