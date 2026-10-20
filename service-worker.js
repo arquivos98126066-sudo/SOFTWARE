@@ -1,4 +1,4 @@
-const CACHE_NAME = 'meus-apps-v99';
+const CACHE_NAME = 'meus-apps-v100';
 
 const URLS_TO_CACHE = [
   './',
@@ -18,6 +18,7 @@ const URLS_TO_CACHE = [
   './plano-hub.js',
   './plano-html/Leads.html',
   './plano-html/Cidades.html',
+  './plano-html/Site.html',
   './ESTUDO.html',
   './LER.html',
   './Code.html',

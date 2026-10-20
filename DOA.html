@@ -1656,7 +1656,7 @@ var HTML_KEY = 'doa_htmls_v1';
 var HTML_SEEDS = [
   {id:'h-leads', nome:'Leads', src:'plano-html/Leads.html'},
   {id:'h-cidades', nome:'Cidades', src:'plano-html/Cidades.html'},
-  {id:'h-website', nome:'Website', src:'WEBSITE.html'}
+  {id:'h-site', nome:'Site', src:'plano-html/Site.html'}
 ];
 function htmlLer(){
   var a = null, vistos;
@@ -1672,6 +1672,8 @@ function htmlLer(){
     try { localStorage.setItem(HTML_KEY + '_seeds', JSON.stringify(vistos)); } catch(e){}
     htmlSalva(a);
   }
+  /* o WEBSITE.html entrou por engano na v99: sai da lista de quem já tinha recebido */
+  if(a.some(function(x){ return x.id === 'h-website'; })){ a = a.filter(function(x){ return x.id !== 'h-website'; }); htmlSalva(a); }
   return a;
 }
 function htmlSalva(a){ try { localStorage.setItem(HTML_KEY, JSON.stringify(a)); } catch(e){ alert('Não coube no aparelho: ' + e.message); } }
