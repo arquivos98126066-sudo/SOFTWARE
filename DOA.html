@@ -555,6 +555,7 @@ window._salvarProcessoNuvem = salvarProcessoNuvem;
 window._carregarProcessoNuvem = carregarProcessoNuvem;
 </script>
 
+<script src="plano-hub.js"></script>
 <!-- ══ TELA DE PROCESSOS ══ -->
 <div id="proc-list-overlay">
   <div class="topbar">
@@ -1652,10 +1653,26 @@ function pl_navGoBack(){
 
 // ── HTMLs soltos (funcionam à parte; só ficam guardados aqui) ──
 var HTML_KEY = 'doa_htmls_v1';
+var HTML_SEEDS = [
+  {id:'h-leads', nome:'Leads', src:'plano-html/Leads.html'},
+  {id:'h-cidades', nome:'Cidades', src:'plano-html/Cidades.html'},
+  {id:'h-website', nome:'Website', src:'WEBSITE.html'}
+];
 function htmlLer(){
-  try { var a = JSON.parse(localStorage.getItem(HTML_KEY)); if(Array.isArray(a)) return a; } catch(e){}
-  var seed = [{id:'h-leads', nome:'Leads', src:'plano-html/Leads.html'}, {id:'h-cidades', nome:'Cidades', src:'plano-html/Cidades.html'}];
-  htmlSalva(seed); return seed;
+  var a = null, vistos;
+  try { a = JSON.parse(localStorage.getItem(HTML_KEY)); } catch(e){}
+  if(!Array.isArray(a)) a = null;
+  try { vistos = JSON.parse(localStorage.getItem(HTML_KEY + '_seeds')); } catch(e){}
+  if(!Array.isArray(vistos)) vistos = a ? ['h-leads', 'h-cidades'] : [];
+  /* modelo novo que entra no código chega uma vez só; se você apagar, não volta */
+  var novos = HTML_SEEDS.filter(function(x){ return vistos.indexOf(x.id) < 0; });
+  if(!a || novos.length){
+    a = (a || []).concat(novos);
+    vistos = vistos.concat(novos.map(function(x){ return x.id; }));
+    try { localStorage.setItem(HTML_KEY + '_seeds', JSON.stringify(vistos)); } catch(e){}
+    htmlSalva(a);
+  }
+  return a;
 }
 function htmlSalva(a){ try { localStorage.setItem(HTML_KEY, JSON.stringify(a)); } catch(e){ alert('Não coube no aparelho: ' + e.message); } }
 var _htmlSel = null, _htmlApos = null;
@@ -1706,6 +1723,7 @@ function htmlCodigo(h, fn){
   if(h.html != null) return fn(h.html);
   fetch(h.src).then(function(r){ return r.text(); }).then(fn).catch(function(){ toast('Não consegui ler o HTML'); });
 }
+var _htmlAberto = null;
 function htmlAbre(id){
   var h = htmlLer().find(function(x){ return x.id === id; }); if(!h) return;
   /* iframe novo a cada abertura: assim ele não acumula histórico e o botão voltar do celular só fecha o HTML */
@@ -1715,14 +1733,40 @@ function htmlAbre(id){
   fr.setAttribute('sandbox', 'allow-scripts allow-forms allow-popups allow-downloads');
   box.appendChild(fr);
   if(h.src) fr.src = h.src; else fr.srcdoc = h.html;
+  _htmlAberto = h.id;
   box.classList.add('open');
   try { history.pushState({htmlView: 1}, ''); } catch(e){}
 }
 function htmlFecha(){
   var box = document.getElementById('html-view');
   if(!box.classList.contains('open')) return;
-  box.classList.remove('open'); box.innerHTML = '';
+  box.classList.remove('open'); box.innerHTML = ''; _htmlAberto = null;
 }
+
+// ── Hub: o Plano é o carteiro entre os HTMLs e os apps ──
+Hub.entrar('plano');
+Hub.entregaLocal = function(m){
+  /* para o HTML que está aberto agora: entrega na hora */
+  if(_htmlAberto && (m.para === _htmlAberto || m.para === '*') && m.de !== _htmlAberto){
+    var fr = document.getElementById('html-view-frame');
+    if(fr && fr.contentWindow){ fr.contentWindow.postMessage({planoHub: 1, nome: _htmlAberto, msg: m}, '*'); return m.para !== '*' ? true : false; }
+  }
+  return false;
+};
+window.addEventListener('message', function(e){
+  var fr = document.getElementById('html-view-frame');
+  if(!fr || e.source !== fr.contentWindow || !e.data || !e.data.planoHub || !_htmlAberto) return;
+  if(e.data.pronto){
+    fr.contentWindow.postMessage({planoHub: 1, nome: _htmlAberto}, '*');
+    Hub.retira(_htmlAberto).forEach(function(m){ fr.contentWindow.postMessage({planoHub: 1, nome: _htmlAberto, msg: m}, '*'); });
+    return;
+  }
+  if(e.data.msg){ var m = e.data.msg; m.de = _htmlAberto; Hub.rotear(m); }
+});
+if(Hub._bc && Hub._bc()) Hub._bc().addEventListener('message', function(e){
+  var m = e.data; if(m && _htmlAberto && (m.para === _htmlAberto || m.para === '*')){ Hub.retira(_htmlAberto); Hub.entregaLocal(m); }
+});
+
 function htmlEdita(id, apagar){
   var a = htmlLer(), h = a.find(function(x){ return x.id === id; }); if(!h) return;
   var n = apagar ? '' : prompt('Novo nome', h.nome);
