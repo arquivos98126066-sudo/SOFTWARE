@@ -3367,7 +3367,7 @@ window.saveAnswer = window.saveAnswer || function(){};
       var ov = document.createElement('div'); ov.className = 'rcm-conf';
       var caminho = corpo.map(function(x, q) { var ls = String(x).split('\n'), rp = /^Resposta: /.test(ls[1] || '') ? ls.slice(1).join('\n').slice(10) : ''; return '<li><b>' + (q + 1) + '</b><span>' + escH(ls[0].replace(/^\(|\)$/g, '')) + (rp ? '<em>' + escH(rp) + '</em>' : '') + '</span></li>'; }).join('');
       var mud = muda.length ? muda.map(function(m) { return '<li><i>' + escH(m.k) + '</i><span>' + escH(m.d) + '</span></li>'; }).join('') : '<li class="vz">Nenhuma mudança desde a última cópia.</li>';
-      ov.innerHTML = '<div class="rcm-conf-card">' + (parcial ? '<div class="rcm-conf-kick">Copiando</div>' : '') + '<h4>Você escolheu</h4><ol>' + caminho + '</ol><h4>Mudanças e instruções</h4><ul>' + mud + '</ul><div class="rcm-conf-bt"><button type="button" class="sim">Copia</button><button type="button" class="nao">Cancela</button><button type="button" class="volta">Volta</button></div></div>';
+      ov.innerHTML = '<div class="rcm-conf-card">' + '<h4>Você escolheu</h4><ol>' + caminho + '</ol><h4>Mudanças e instruções</h4><ul>' + mud + '</ul><div class="rcm-conf-bt"><button type="button" class="sim">Copiado</button><button type="button" class="nao">Cancela</button><button type="button" class="volta">Volta</button></div></div>';
       document.body.appendChild(ov);
       ov.querySelector('.nao').onclick = function() { ov.remove(); };
       ov.querySelector('.volta').onclick = function() { ov.remove(); ac.voltar(); };
