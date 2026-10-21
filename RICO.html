@@ -3427,7 +3427,7 @@ window.saveAnswer = window.saveAnswer || function(){};
       if (m !== 'mover' && m !== 'duplicar') return;
       var S = window._rcSrc;
       if (!S || S.tipo !== 'no' || !S.inst.existe(S.id)) {
-        if (!f.p) return;
+        if (!f.p && m !== 'duplicar') return;
         window._rcSrc = { tipo: 'no', inst: api, id: id };
         render(); return;
       }
@@ -4096,6 +4096,20 @@ window.saveAnswer = window.saveAnswer || function(){};
       SETS.m.arr.concat(SETS.p.arr).forEach(function(m) { m.soltaMov(); });
       if (!semRender) renderCiclo();
     },
+    /* cópia guardada (Duplicar): vira um mapa novo, no fim da lista do Processo */
+    colaProcesso: function() {
+      var S = window._rcSrc;
+      if (!S || S.tipo !== 'no' || !S.inst || !S.inst.existe(S.id)) return false;
+      var P = SETS.p; mapasGarante(P);
+      var c = S.inst.clonaNo(S.id); if (!c) return false;
+      c.id = 'root';
+      var k = P.pre + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+      try { localStorage.setItem(k, JSON.stringify(c)); } catch (e) { return false; }
+      P.arr.push(criaMapa(k, false));
+      mapasSalvaOrdem(P);
+      window._rcSrc = null;
+      return true;
+    },
     duplicar: function(i) {
       var S = CUR; mapasGarante(S);
       var src = S.arr[i]; if (!src) return;
@@ -4602,6 +4616,11 @@ window.saveAnswer = window.saveAnswer || function(){};
     if (el.classList.contains('cycle-compl')) {
       if (m === 'copiar') { cicloCopiaTela(k); return true; }
       if ((m === 'mover' || m === 'duplicar') && temSrc && el.dataset.mapa === undefined) { cicloSolta(k); return true; }
+      /* segurar o botão PROCESSO com uma célula guardada no Duplicar: ela entra como mapa novo do Processo */
+      if (m === 'duplicar' && el.dataset.mapa !== undefined && S && S.tipo === 'no' && window.rcMapa && window.rcMapa.tela() === 'Processo') {
+        if (window.rcMapa.colaProcesso()) { renderCiclo(); if (window.showToast) window.showToast('Duplicado'); }
+        return true;
+      }
       return false;
     }
     if (m === 'copiar') { cicloCopiaItem(k); return true; }
