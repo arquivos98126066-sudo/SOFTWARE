@@ -4096,11 +4096,11 @@ window.saveAnswer = window.saveAnswer || function(){};
       SETS.m.arr.concat(SETS.p.arr).forEach(function(m) { m.soltaMov(); });
       if (!semRender) renderCiclo();
     },
-    /* cópia guardada (Duplicar): vira um mapa novo, no fim da lista do Processo */
-    colaProcesso: function() {
+    /* cópia guardada (Duplicar): vira um mapa novo, no fim da lista da tela aberta (Processo ou Mapa mental) */
+    colaMapa: function() {
       var S = window._rcSrc;
       if (!S || S.tipo !== 'no' || !S.inst || !S.inst.existe(S.id)) return false;
-      var P = SETS.p; mapasGarante(P);
+      var P = CUR; mapasGarante(P);
       var c = S.inst.clonaNo(S.id); if (!c) return false;
       c.id = 'root';
       var k = P.pre + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
@@ -4616,9 +4616,9 @@ window.saveAnswer = window.saveAnswer || function(){};
     if (el.classList.contains('cycle-compl')) {
       if (m === 'copiar') { cicloCopiaTela(k); return true; }
       if ((m === 'mover' || m === 'duplicar') && temSrc && el.dataset.mapa === undefined) { cicloSolta(k); return true; }
-      /* segurar o botão PROCESSO com uma célula guardada no Duplicar: ela entra como mapa novo do Processo */
-      if (m === 'duplicar' && el.dataset.mapa !== undefined && S && S.tipo === 'no' && window.rcMapa && window.rcMapa.tela() === 'Processo') {
-        if (window.rcMapa.colaProcesso()) { renderCiclo(); if (window.showToast) window.showToast('Duplicado'); }
+      /* segurar o botão PROCESSO ou MAPA MENTAL com uma célula guardada no Duplicar: ela entra como mapa novo daquela tela */
+      if (m === 'duplicar' && el.dataset.mapa !== undefined && S && S.tipo === 'no' && window.rcMapa) {
+        if (window.rcMapa.colaMapa()) { renderCiclo(); if (window.showToast) window.showToast('Duplicado'); }
         return true;
       }
       return false;
