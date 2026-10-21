@@ -2868,6 +2868,12 @@ window.saveAnswer = window.saveAnswer || function(){};
 
 
   /* ── Mapa mental do Ciclo (terceira visão do Complemento) ── */
+  /* célula que vem do Processo para o Mapa mental: sem fluxo de etapas, vira árvore conectada normal */
+  function planifica(n) {
+    if (n.et) { n.children = [].concat.apply([], n.et.s); delete n.et; }
+    n.children.forEach(planifica);
+    return n;
+  }
   function criaMapa(KEY, vazio) {
     var GY = 10, INDENT = 26;
     var root = null, selId = null, L = {}, wrap = null, world = null, links = null, bar = null, btnSib = null, btnDel = null, barId = null, focoId = null, camOn = false, focoFix = false, abreId = null, mwEl = null, slot = null, zq0 = 0, zPrev = null, zInfo = null, tPrev = null, tPos = 0, tMulti = false, tInfo = null, semRaiz = false, soRaiz = false;
@@ -3597,6 +3603,7 @@ window.saveAnswer = window.saveAnswer || function(){};
     }
     function poeNo(alvoId, n) {
       var a = acha(alvoId); if (!a) return false;
+      if (!zig) planifica(n);
       reid(n); a.n.children.push(n); a.n.collapsed = false;
       selId = n.id; barId = null; salva();
       return true;
@@ -4103,6 +4110,7 @@ window.saveAnswer = window.saveAnswer || function(){};
       var P = CUR; mapasGarante(P);
       var c = S.inst.clonaNo(S.id); if (!c) return false;
       c.id = 'root';
+      if (P === SETS.m) planifica(c);
       var k = P.pre + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
       try { localStorage.setItem(k, JSON.stringify(c)); } catch (e) { return false; }
       P.arr.push(criaMapa(k, false));
