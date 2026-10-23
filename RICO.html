@@ -852,7 +852,7 @@
   .cycle-block .cycle-chain .rcm-node.root,
   .cycle-block .cycle-chain .rcm-wrap.zig.aberto .rcm-node.root, .cycle-block .cycle-chain .rcm-wrap.zig.aberto .rcm-node.root.sel { background: #b07a14; border-color: #b07a14; color: #fff; }
   .cycle-block .rcm-links path { stroke: #b07a14; stroke-width: 1.6; }
-  .cycle-block .rcm-links path.tx { stroke: #956210; stroke-width: 1.6; }
+  .cycle-block .rcm-links path.tx { stroke: #8a5a0c; stroke-width: 2.3; }
   /* barras de ações (lápis, #, T, mover, +, copiar, lixeira): sempre brancas, em qualquer lugar */
   .cycle-cell, .rcm-pill { background: #fff; border-color: var(--bd); filter: none; box-shadow: 0 8px 20px -10px rgba(15,27,45,.35); }
   .cycle-cell .rcm-ib, .rcm-pill .rcm-ib { color: var(--dark); }
@@ -3137,7 +3137,7 @@ window.saveAnswer = window.saveAnswer || function(){};
         var x1 = pm.l + 16, y1 = pm.yc + pm.h / 2, x2 = cm.l, y2 = cm.yc;
         var rr = Math.max(0, Math.min(12, y2 - y1, x2 - x1));
         paths += '<path d="M' + x1 + ' ' + y1 + ' V' + (y2 - rr) + ' Q' + x1 + ' ' + y2 + ' ' + (x1 + rr) + ' ' + y2 + ' H' + x2 + '" fill="none" stroke="rgba(224,181,74,.85)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>';
-        if (cm.n.id !== 'root' && rr >= 6 && temTexto(cm.n)) ov += trechoFinal(function(t) { return [x1 + rr * t * t, y2 - rr * (1 - t) * (1 - t)]; }, x2, y2, 0, 8);
+        if (cm.n.id !== 'root' && rr >= 6 && temTexto(cm.n)) ov += trechoFinal(function(t) { return [x1 + rr * t * t, y2 - rr * (1 - t) * (1 - t)]; }, x2, y2, 0, 12);
       }
       var aw = wrap.clientWidth || 280;
       var s = clamp(aw / bw, .4, 1.25);
@@ -6289,10 +6289,10 @@ window.saveAnswer = window.saveAnswer || function(){};
     }
     if (t === 3) {
       var g = 'sg' + (++_sgN);
-      return '<defs><linearGradient id="' + g + '" gradientUnits="userSpaceOnUse" x1="' + ox + '" y1="' + oy + '" x2="' + xt + '" y2="' + tp + '"><stop offset="0" stop-color="' + c + '" stop-opacity=".18"/><stop offset=".55" stop-color="' + c + '" stop-opacity=".9"/><stop offset="1" stop-color="' + c + '"/></linearGradient>' +
+      return '<defs><linearGradient id="' + g + '" gradientUnits="userSpaceOnUse" x1="' + ox + '" y1="' + oy + '" x2="' + xt + '" y2="' + tp + '"><stop offset="0" stop-color="' + c + '" stop-opacity=".45"/><stop offset=".55" stop-color="' + c + '" stop-opacity=".95"/><stop offset="1" stop-color="' + c + '"/></linearGradient>' +
         '<linearGradient id="' + g + 'b" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="' + c + '"/><stop offset="1" stop-color="' + c + '"/></linearGradient></defs>' +
-        '<path d="' + d + '" fill="none" stroke="url(#' + g + ')" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>' +
-        '<path d="M' + (xt - 6) + ' ' + (tp - 7) + ' L' + xt + ' ' + tp + ' L' + (xt + 6) + ' ' + (tp - 7) + '" fill="none" stroke="' + c + '" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>';
+        '<path d="' + d + '" fill="none" stroke="url(#' + g + ')" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>' +
+        '<path d="M' + (xt - 6) + ' ' + (tp - 7) + ' L' + xt + ' ' + tp + ' L' + (xt + 6) + ' ' + (tp - 7) + '" fill="none" stroke="' + c + '" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>';
     }
     return '<path class="ln" d="' + d + '" pathLength="1" fill="none" stroke="' + c + '" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>' +
       '<path class="pt" d="M' + (xt - 5) + ' ' + (tp - 6) + ' L' + xt + ' ' + tp + ' L' + (xt + 5) + ' ' + (tp - 6) + '" fill="none" stroke="' + c + '" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>';
