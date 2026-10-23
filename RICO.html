@@ -2922,7 +2922,7 @@ window.saveAnswer = window.saveAnswer || function(){};
         if (f.n.et && !window.rcMapa.estaAberto(ix)) { reiniciaFluxo(f.n); salva(); }
         if (window.rcMapa.foca(ix)) return;
       }
-      if (f && f.p && f.p.et && f.p.et.run && !f.p.collapsed) { if (f.n.q || /\?\s*$/.test(f.n.text || '')) pedeResposta(f); else escolheEtapa(f); return; }
+      if (f && f.p && f.p.et && f.p.et.run && !f.p.collapsed) { if (f.n.q) pedeResposta(f); else escolheEtapa(f); return; }
       if (proc && zig && f && f.p && (f.n.children.length || (FL[f.n.id] && f.n.et))) { focoFix = camOn; abreId = null; focoEntra(f.n.id); f.n.collapsed = false; selId = null; render(); return; }
       if (proc && zig && !camOn && f && f.p && !f.n.children.length && !f.n.et) { render(); if (f.n.q) { pedeResposta(f, function(r) { abreCopiaTrilha(caminhoAte(focoId).concat(['(' + (f.n.text || '') + ')\nResposta: ' + (r || 'sem resposta')])); }); return; } abreCopiaTrilha(caminhoAte(focoId).concat([linhaDe(f.n)])); return; }
       if (f && (f.n.children.length || f.n.et)) {
@@ -3268,7 +3268,7 @@ window.saveAnswer = window.saveAnswer || function(){};
     /* pergunta (célula com ? no nome): abre um campo para escrever; OK e Pular escolhem a célula, Cancelar fica onde está */
     function pedeResposta(f, cb) {
       var velho = document.querySelector('.rcm-conf'); if (velho) velho.remove();
-      var ov = document.createElement('div'); ov.className = 'rcm-conf';
+      var ov = document.createElement('div'); ov.className = 'rcm-conf'; ov.style.paddingBottom = '40px';
       ov.innerHTML = '<div class="rcm-conf-card"><h3>' + escH(f.n.text) + '</h3><textarea rows="1"></textarea><div class="rcm-conf-bt"><button type="button" class="sim">OK</button><button type="button" class="nao">Cancela</button><button type="button" class="volta">Pula</button></div></div>';
       document.body.appendChild(ov);
       var ta = ov.querySelector('textarea'); ta.addEventListener('input', function() { if (!(window.CSS && CSS.supports && CSS.supports('field-sizing', 'content'))) (window.autoGrow || function() {})(ta); ta.classList.toggle('quebrou', ta.scrollHeight > 56); }); setTimeout(function() { try { ta.focus(); } catch (e) {} }, 60);
@@ -6086,4 +6086,4 @@ window.saveAnswer = window.saveAnswer || function(){};
 })();
 </script>
 </body>
-                                                                                                                                        </html>
+  </html>
