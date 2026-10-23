@@ -4270,14 +4270,12 @@ window.saveAnswer = window.saveAnswer || function(){};
       if (!n) {
         /* nada marcado: só desliga o modo, não vai para lugar nenhum */
         M.ativo = false; M.ult = null; msPisca(blk, "desliga");
-        if (window.showToast) window.showToast('Nenhum selecionado');
         return;
       }
       var elp = null;
       vis.forEach(function(x) { if (x.dataset.id === M.ult) elp = x; });
       if (!elp) elp = vis[vis.length - 1];
       M.ativo = false;
-      if (window.showToast) window.showToast(n + ' selecionado(s) — próxima camada');
       elp.click();
       return;
     }
@@ -4287,7 +4285,6 @@ window.saveAnswer = window.saveAnswer || function(){};
     var nx = msProxFoco();
     if (nx < 0) {
       M.ativo = false; renderCiclo(); msPisca(blk, "desliga");
-      if (window.showToast) window.showToast(M.sel.length + ' selecionado(s)');
       return;
     }
     _foco = nx; renderCiclo(); cicloAnima();
@@ -4316,7 +4313,6 @@ window.saveAnswer = window.saveAnswer || function(){};
     var M = window._rcMS;
     if (M && M.sessao && e.target && e.target.closest && e.target.closest('#modoTitulo')) {
       M.ativo = false; M.sessao = false;
-      if (window.showToast) window.showToast(Object.keys(M.ids).length + ' selecionado(s)');
     }
   });
   document.addEventListener('click', function(e) {
@@ -6238,4 +6234,4 @@ window.saveAnswer = window.saveAnswer || function(){};
 })();
 </script>
 </body>
-  </html>
+          </html>
