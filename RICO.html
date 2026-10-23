@@ -2526,6 +2526,7 @@ window.saveAnswer = window.saveAnswer || function(){};
         collapsed: !!n.collapsed, children: []
       };
       if (Array.isArray(n.children)) n.children.forEach(function(c) { var x = limpa(c, false); if (x) o.children.push(x); });
+      if (n.q === true) o.q = true;
       if (Array.isArray(n.i)) {
         o.i = n.i.map(function(v) { return String(v == null ? '' : v); });
         o.m = Array.isArray(n.m) ? n.m.map(function(x) { return (x && typeof x === 'object') ? x : {}; }) : [];
@@ -2919,7 +2920,7 @@ window.saveAnswer = window.saveAnswer || function(){};
         if (f.n.et && !window.rcMapa.estaAberto(ix)) { reiniciaFluxo(f.n); salva(); }
         if (window.rcMapa.foca(ix)) return;
       }
-      if (f && f.p && f.p.et && f.p.et.run && !f.p.collapsed) { if (/\?\s*$/.test(f.n.text || '')) pedeResposta(f); else escolheEtapa(f); return; }
+      if (f && f.p && f.p.et && f.p.et.run && !f.p.collapsed) { if (f.n.q || /\?\s*$/.test(f.n.text || '')) pedeResposta(f); else escolheEtapa(f); return; }
       if (proc && zig && f && f.p && (f.n.children.length || (FL[f.n.id] && f.n.et))) { focoFix = camOn; abreId = null; focoEntra(f.n.id); f.n.collapsed = false; selId = null; render(); return; }
       if (proc && zig && !camOn && f && f.p && !f.n.children.length && !f.n.et) { render(); abreCopiaTrilha(caminhoAte(focoId).concat([linhaDe(f.n)])); return; }
       if (f && (f.n.children.length || f.n.et)) {
@@ -2984,6 +2985,7 @@ window.saveAnswer = window.saveAnswer || function(){};
     function clona(n) {
       var o = { id: uid(), text: n.text, collapsed: !!n.collapsed, children: n.et ? [] : n.children.map(clona) };
       if (n.et) { o.et = { s: n.et.s.map(function(st) { return st.map(clona); }), cur: n.et.cur, run: false, esc: [] }; o.children = o.et.s[o.et.cur]; }
+      if (n.q) o.q = true;
       if (Array.isArray(n.i)) { o.i = n.i.slice(); o.m = JSON.parse(JSON.stringify(n.m || [])); }
       return o;
     }
@@ -3321,12 +3323,13 @@ window.saveAnswer = window.saveAnswer || function(){};
       selId = id; barId = null; destId = null; salva(); render();
       return true;
     }
+    var ICO_PERG = '<svg viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6"/><path d="M15 15l5 5"/><path d="M8 10.5h5"/></svg>';
     var ICO_ETAPAS = '<svg viewBox="0 0 24 24"><path d="M12 4l8 4-8 4-8-4z"/><path d="M4 12l8 4 8-4"/><path d="M4 16l8 4 8-4"/></svg>';
     function montaBar() {
       var nb = barId ? acha(barId) : null;
       bar.innerHTML = movBar
         ? '<div class="rcm-pill"><button type="button" class="rcm-ib" data-a="sobe" aria-label="Sobe">' + ICO_SOBE + '</button><button type="button" class="rcm-ib" data-a="desce" aria-label="Desce">' + ICO_DESCE + '</button>' + (nb && !nb.p ? '<button type="button" class="rcm-ib" data-a="paraPasta" aria-label="Pasta">' + ICO_LEVAR + '</button>' : '') + '<button type="button" class="rcm-ib" data-a="pronto" aria-label="Pronto">' + ICO_OK + '</button></div>'
-        : '<div class="rcm-pill">' + (false ? '' : (proc && root && root.et && root.et.desc && root.et.desc.length ? '<button type="button" class="rcm-ib" data-a="voltaFluxo" aria-label="Voltar">' + ICO_VOLTA + '</button>' : '')) + (proc && zig && focoId && !camOn ? '<button type="button" class="rcm-ib" data-a="voltaFoco" aria-label="Voltar">' + ICO_VOLTA + '</button>' : '') + ((proc && zig && nb && nb.p && !camOn) || (proc && soRaiz && nb && !nb.p) || (ehPasta && nb && !nb.p) ? '' : '<button type="button" class="rcm-ib" data-a="filho" aria-label="Adicionar">' + ICO_FILHO + '</button>') + '<button type="button" class="rcm-ib" data-a="irmao" aria-label="Mover">' + ICO_IRMAO + '</button>' + (proc && zig && nb && nb.p ? '<button type="button" class="rcm-ib' + (camOn ? ' on' : '') + '" data-a="cam" aria-label="Camadas">' + ICO_ETAPAS + '</button>' : '') + (proc && zig && nb && !soRaiz && !camOn && (nb.p ? (focoId || !root.et) : !(nb.n.et && nb.n.et.esc.length)) ? '<button type="button" class="rcm-ib" data-a="copiaAqui" aria-label="Copiar até aqui">' + ICO_DUP + '</button>' : '') + (false ? '<button type="button" class="rcm-ib" data-a="etapas" aria-label="Etapas">' + ICO_ETAPAS + (nb && nb.n.et ? '<b class="rcm-bd">' + ((nb.n.et.desc && (nb.n.et.desc.length || nb.n.et.fim)) ? (nb.n.et.ver == null ? nb.n.et.desc.length : nb.n.et.ver) + 1 : nb.n.et.cur + 1) + '</b>' : '') + '</button>' : '') + (proc && !soRaiz && nb && !nb.p && nb.n.et && nb.n.et.esc.length ? '<button type="button" class="rcm-ib" data-a="parcial" aria-label="Copiar até aqui">' + ICO_DUP + '</button>' : '') + '<button type="button" class="rcm-ib" data-a="edita" aria-label="Editar">' + ICO_EDIT + '</button></div>';
+        : '<div class="rcm-pill">' + (false ? '' : (proc && root && root.et && root.et.desc && root.et.desc.length ? '<button type="button" class="rcm-ib" data-a="voltaFluxo" aria-label="Voltar">' + ICO_VOLTA + '</button>' : '')) + (proc && zig && focoId && !camOn ? '<button type="button" class="rcm-ib" data-a="voltaFoco" aria-label="Voltar">' + ICO_VOLTA + '</button>' : '') + ((proc && zig && nb && nb.p && !camOn) || (proc && soRaiz && nb && !nb.p) || (ehPasta && nb && !nb.p) ? '' : '<button type="button" class="rcm-ib" data-a="filho" aria-label="Adicionar">' + ICO_FILHO + '</button>') + '<button type="button" class="rcm-ib" data-a="irmao" aria-label="Mover">' + ICO_IRMAO + '</button>' + (proc && zig && nb && nb.p ? '<button type="button" class="rcm-ib' + (camOn ? ' on' : '') + '" data-a="cam" aria-label="Camadas">' + ICO_ETAPAS + '</button>' : '') + (proc && zig && nb && !soRaiz && !camOn && (nb.p ? (focoId || !root.et) : !(nb.n.et && nb.n.et.esc.length)) ? '<button type="button" class="rcm-ib" data-a="copiaAqui" aria-label="Copiar até aqui">' + ICO_DUP + '</button>' : '') + (false ? '<button type="button" class="rcm-ib" data-a="etapas" aria-label="Etapas">' + ICO_ETAPAS + (nb && nb.n.et ? '<b class="rcm-bd">' + ((nb.n.et.desc && (nb.n.et.desc.length || nb.n.et.fim)) ? (nb.n.et.ver == null ? nb.n.et.desc.length : nb.n.et.ver) + 1 : nb.n.et.cur + 1) + '</b>' : '') + '</button>' : '') + (proc && !soRaiz && nb && !nb.p && nb.n.et && nb.n.et.esc.length ? '<button type="button" class="rcm-ib" data-a="parcial" aria-label="Copiar até aqui">' + ICO_DUP + '</button>' : '') + '<button type="button" class="rcm-ib" data-a="edita" aria-label="Editar">' + ICO_EDIT + '</button>' + (proc && zig && nb && nb.p ? '<button type="button" class="rcm-ib' + (nb.n.q ? ' on' : '') + '" data-a="pergunta" aria-label="Pergunta">' + ICO_PERG + '</button>' : '') + '</div>';
       if (destId) bar.innerHTML = '<div class="rcm-pill"><span class="rcm-av">Toque no destino</span><button type="button" class="rcm-ib" data-a="cancela" aria-label="Cancelar">' + ICO_X + '</button></div>';
       btnSib = bar.querySelector('[data-a="irmao"]');
       btnLev = bar.querySelector('[data-a="levar"],[data-a="etapas"]');
@@ -3404,6 +3407,7 @@ window.saveAnswer = window.saveAnswer || function(){};
         else if (a === 'desce') moveNo(id, 1);
         else if (a === 'pronto') { movBar = false; movKeep = null; barId = null; montaBar(); render(); }
         else if (a === 'edita') { barId = null; render(); abreEditor(id, true); }
+        else if (a === 'pergunta') { var fq = acha(id); if (fq && fq.p) { if (fq.n.q) delete fq.n.q; else fq.n.q = true; salva(); montaBar(); render(); } }
         else if (a === 'exclui') excluiNo(id);
         else if (a === 'dup') duplicaNo(id);
         else if (a === 'voltaFoco') { focoVolta(); subeProc(); }
