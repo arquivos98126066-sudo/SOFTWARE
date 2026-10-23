@@ -2952,6 +2952,13 @@ window.saveAnswer = window.saveAnswer || function(){};
         var id = el.dataset.id;
         if (tq && tq.id === id) {
           clearTimeout(tq.t); tq = null;
+          /* modo Duplicar com este item já marcado: dois toques duplicam ali mesmo (em vez de abrir o editor) */
+          var _S = window._rcSrc;
+          if (window._rcModo === 'duplicar' && _S && _S.tipo === 'no' && _S.inst === api && _S.id === id) {
+            window._rcSrc = null; duplicaNo(id);
+            if (window.showToast) window.showToast('Duplicado');
+            return;
+          }
           selId = id; barId = null; render();
           abreEditor(id, false);
           return;
@@ -3089,6 +3096,7 @@ window.saveAnswer = window.saveAnswer || function(){};
       linhasNo(f.n, 0, ent);
       window.rcCopiar(window.rcMontaCopia('O Ciclo Vencedor > ' + [window.rcMapa.tela()].concat(cam).join(' > '), '"' + nome + '" (a célula) e tudo que está dentro dela', ent), 'Célula copiada');
     }
+    var dupT = null;
     function modoNo(id) {
       var m = window._rcModo, f = acha(id); if (!f) return;
       if (m === 'copiar') { copiaNo(id); return; }
@@ -3099,7 +3107,15 @@ window.saveAnswer = window.saveAnswer || function(){};
         window._rcSrc = { tipo: 'no', inst: api, id: id };
         render(); return;
       }
-      if (S.inst === api && S.id === id) { window._rcSrc = null; render(); return; }
+      if (S.inst === api && S.id === id) {
+        /* Duplicar: dois toques no item já marcado duplicam ali mesmo; um toque só desmarca */
+        if (m === 'duplicar') {
+          if (dupT) { clearTimeout(dupT); dupT = null; window._rcSrc = null; duplicaNo(id); if (window.showToast) window.showToast('Duplicado'); return; }
+          dupT = setTimeout(function() { dupT = null; if (window._rcSrc && window._rcSrc.id === id) { window._rcSrc = null; render(); } }, 380);
+          return;
+        }
+        window._rcSrc = null; render(); return;
+      }
       /* círculo de fora (mapa ou pasta): só pode ir para uma pasta */
       if (S.id === 'root' && m === 'mover') {
         if (id !== 'root') return;
@@ -6035,4 +6051,4 @@ window.saveAnswer = window.saveAnswer || function(){};
 })();
 </script>
 </body>
-                                                                                                                                                                    </html>
+  </html>
