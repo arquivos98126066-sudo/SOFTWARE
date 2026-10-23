@@ -3511,8 +3511,12 @@ window.saveAnswer = window.saveAnswer || function(){};
       if (S.inst === api && S.id === id) { window._rcSrc = null; render(); return; }
       /* círculo de fora (mapa ou pasta): só pode ir para uma pasta */
       if (S.id === 'root' && m === 'mover') {
-        if (!ehPasta || id !== 'root') return;
-        if (window.rcMapa.soltaPasta(api, S.inst)) window._rcSrc = null;
+        if (id !== 'root') return;
+        if (ehPasta) { if (window.rcMapa.soltaPasta(api, S.inst)) window._rcSrc = null; return; }
+        if (S.inst !== api && window.rcMapa.agrupaPasta(api, S.inst)) {
+          window._rcSrc = null; renderCiclo();
+          if (window.showToast) window.showToast('Movido para Pasta');
+        }
         return;
       }
       if (ehPasta && id === 'root') return;
@@ -4205,7 +4209,7 @@ window.saveAnswer = window.saveAnswer || function(){};
       if (!semRender) renderCiclo();
     },
     /* cópia guardada (Duplicar): vira um mapa novo, no fim da lista da tela aberta (Processo ou Mapa mental) */
-    colaMapa: function() {
+    colaMapa: function(mover) {
       var S = window._rcSrc;
       if (!S || S.tipo !== 'no' || !S.inst || !S.inst.existe(S.id)) return false;
       var P = CUR; mapasGarante(P);
@@ -4217,6 +4221,20 @@ window.saveAnswer = window.saveAnswer || function(){};
       P.arr.push(criaMapa(k, false));
       mapasSalvaOrdem(P);
       if (P.pasta) { var mtc = metaGet(P); mtc.p[k] = P.pasta; metaSet(P, mtc); }
+      if (mover) {
+        if (S.id === 'root') {
+          var oS = SETS.m.arr.indexOf(S.inst) > -1 ? SETS.m : (SETS.p.arr.indexOf(S.inst) > -1 ? SETS.p : null);
+          if (oS && oS !== P) {
+            var ix = oS.arr.indexOf(S.inst);
+            if (oS.arr.length > 1) {
+              oS.arr.splice(ix, 1);
+              try { localStorage.removeItem(S.inst.key); } catch (e) {}
+              var mo = metaGet(oS); delete mo.p[S.inst.key]; delete mo.f[S.inst.key]; metaSet(oS, mo);
+              mapasSalvaOrdem(oS); oS.aberto = -1;
+            } else { S.inst.limpar(); }
+          }
+        } else { S.inst.tira(S.id); }
+      }
       window._rcSrc = null;
       return true;
     },
@@ -4252,6 +4270,24 @@ window.saveAnswer = window.saveAnswer || function(){};
       mapasSalvaOrdem(S);
       var mt = metaGet(S); mt.f[k] = 1; if (S.pasta) mt.p[k] = S.pasta; metaSet(S, mt);
       S.aberto = -1;
+    },
+    /* mover um mapa para cima de outro mapa (não pasta): nasce uma pasta nova no lugar do alvo, com os dois dentro */
+    agrupaPasta: function(alvo, orig) {
+      var S = CUR; mapasGarante(S);
+      var ia = S.arr.indexOf(alvo), io = S.arr.indexOf(orig);
+      if (ia < 0 || io < 0 || alvo === orig) return false;
+      var mt = metaGet(S), ak = alvo.key, ok = orig.key;
+      for (var c = mt.p[ak] || null, n = 0; c && n < 99; c = mt.p[c] || null, n++) if (c === ok) return false;
+      var k = novaChave(S, 'p');
+      try { localStorage.setItem(k, JSON.stringify({ id: 'root', text: 'Pasta', collapsed: false, children: [] })); } catch (e) { return false; }
+      S.arr.splice(ia, 0, criaMapa(k, false));
+      mt.f[k] = 1;
+      if (mt.p[ak]) mt.p[k] = mt.p[ak]; else delete mt.p[k];
+      mt.p[ak] = k; mt.p[ok] = k;
+      metaSet(S, mt); mapasSalvaOrdem(S);
+      SETS.m.arr.concat(SETS.p.arr).forEach(function(m) { m.soltaMov(); });
+      S.aberto = -1; PEND = null; ROOTTAP = null;
+      return true;
     },
     iniciaPasta: function(inst) {
       SETS.m.arr.concat(SETS.p.arr).forEach(function(m) { m.soltaMov(); });
@@ -4571,7 +4607,7 @@ window.saveAnswer = window.saveAnswer || function(){};
     function viewAtual() { return _zig ? 'proc' : (_mapa ? 'mapa' : (_soCompl ? 'sub' : 'meu')); }
     function cicloVai(v) {
       _soCompl = v !== 'meu'; _mapa = v === 'proc' || v === 'mapa'; _zig = v === 'proc'; _foco = -1;
-      window._rcSrc = null;
+      if (!(window._rcModo && window._rcSrc && window._rcSrc.tipo === 'no')) window._rcSrc = null;
       if (window.rcMapa) window.rcMapa.desfoca();
       renderCiclo(); cicloAnima();
     }
@@ -4814,8 +4850,8 @@ window.saveAnswer = window.saveAnswer || function(){};
       if (m === 'copiar') { cicloCopiaTela(k); return true; }
       if ((m === 'mover' || m === 'duplicar') && temSrc && el.dataset.mapa === undefined) { cicloSolta(k); return true; }
       /* segurar o botão PROCESSO ou MAPA MENTAL com uma célula guardada no Duplicar: ela entra como mapa novo daquela tela */
-      if (m === 'duplicar' && el.dataset.mapa !== undefined && S && S.tipo === 'no' && window.rcMapa) {
-        if (window.rcMapa.colaMapa()) { renderCiclo(); if (window.showToast) window.showToast('Duplicado'); }
+      if ((m === 'duplicar' || m === 'mover') && el.dataset.mapa !== undefined && S && S.tipo === 'no' && window.rcMapa) {
+        if (window.rcMapa.colaMapa(m === 'mover')) { renderCiclo(); if (window.showToast) window.showToast(m === 'mover' ? 'Movido' : 'Duplicado'); }
         return true;
       }
       return false;
@@ -6378,4 +6414,4 @@ window.saveAnswer = window.saveAnswer || function(){};
 })();
 </script>
 </body>
-    </html>
+  </html>
