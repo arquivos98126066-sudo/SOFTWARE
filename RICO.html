@@ -769,8 +769,7 @@
   .rcm-wrap.zig.aberto .rcm-node.root, .rcm-wrap.zig.aberto .rcm-node.root.sel { background: var(--gold); color: var(--dark); font-size: 16px; padding: 8px 22px; font-weight: 600; font-family: var(--f-title); }
   .rcm-wrap.zig { overflow: visible; }
   .rcm-wrap.cont { margin-top: 0; overflow: visible; }
-  .rcm-node i { width: 8px; height: 8px; border-radius: 50%; background: var(--gold); flex: none; box-sizing: border-box; }
-  .rcm-node i.oco { background: transparent; border: 2px solid var(--gold); }
+  .rcm-node i { width: 8px; height: 8px; border-radius: 50%; background: transparent; border: 2px solid var(--gold); flex: none; box-sizing: border-box; }
   .rcm-node.root { height: 38px; padding: 0 18px; background: var(--gold); border-color: var(--gold); color: var(--dark); font-family: var(--f-title); font-size: 13px; }
   .rcm-node.root.sel { background: var(--gold); }
   .rcm-conf { position: fixed; inset: 0; z-index: 9999; background: rgba(15,27,45,.55); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); display: flex; align-items: flex-end; justify-content: center; padding: 14px; box-sizing: border-box; animation: rcmConfIn .2s ease; }
@@ -852,7 +851,7 @@
   .cycle-block .cycle-chain .rcm-node.root,
   .cycle-block .cycle-chain .rcm-wrap.zig.aberto .rcm-node.root, .cycle-block .cycle-chain .rcm-wrap.zig.aberto .rcm-node.root.sel { background: #b07a14; border-color: #b07a14; color: #fff; }
   .cycle-block .rcm-links path { stroke: #b07a14; stroke-width: 1.6; }
-  .cycle-block .rcm-links path.tx { stroke: #8a5a0c; stroke-width: 2.3; }
+  .cycle-block .rcm-links path.tx { stroke: #b07a14; stroke-width: 1.6; }
   /* barras de ações (lápis, #, T, mover, +, copiar, lixeira): sempre brancas, em qualquer lugar */
   .cycle-cell, .rcm-pill { background: #fff; border-color: var(--bd); filter: none; box-shadow: 0 8px 20px -10px rgba(15,27,45,.35); }
   .cycle-cell .rcm-ib, .rcm-pill .rcm-ib { color: var(--dark); }
@@ -868,8 +867,9 @@
   .cycle-block .cycle-sub::before { border-color: #b07a14; }
   .cycle-block .cycle-sub::after { filter: brightness(.7); }
   .cycle-block .rcm-wrap.zig .rcm-node.foco, .cycle-block .rcm-wrap.zig .rcm-node.foco.sel { color: var(--gold-deep); }
-  .cycle-block .rcm-node i { background: #b07a14; }
-  .cycle-block .rcm-node i.oco { background: transparent; border-color: #b07a14; }
+  .cycle-block .rcm-node i { background: transparent; border: 2px solid #b07a14; }
+  .cycle-block .rcm-node i.fil { border-color: #e6c26a; }
+  .cycle-block .rcm-node i.tx { border-color: #3b4a63; }
   .cycle-block .cycle-item, .cycle-block .rcm-node { background: #fff; border-color: var(--bd); color: var(--tx); }
   .cycle-block .cycle-item.cycle-compl, .cycle-block .cycle-compl.aberto { background: var(--gold); border-color: var(--gold); color: var(--dark); }
   .cycle-block .rcm-node.root { background: var(--gold); border-color: var(--gold); color: var(--dark); }
@@ -3052,7 +3052,9 @@ window.saveAnswer = window.saveAnswer || function(){};
         if (zig) el.style.maxWidth = (aw0 - 2) + 'px';
         if (n.id !== 'root' && !zig) {
           var d = document.createElement('i');
-          if (n.collapsed && n.children.length) d.className = 'oco';
+          var _fi = !!(n.children && n.children.length), _tt = temTexto(n);
+          if (_fi && _tt) d.className = 'tx';
+          else if (_fi || _tt) d.className = 'fil';
           el.appendChild(d);
         }
         var sp = document.createElement('span'); sp.textContent = n.text || 'Ideia'; el.appendChild(sp);
@@ -6376,4 +6378,4 @@ window.saveAnswer = window.saveAnswer || function(){};
 })();
 </script>
 </body>
-</html>
+  </html>
