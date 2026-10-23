@@ -673,11 +673,11 @@
   .rcm-bar[hidden]{ display: none; }
   .rcm-pill{ display: flex; gap: 2px; padding: 5px; background: var(--dark2); border: 1px solid var(--gold); border-radius: 999px; }
   .rcm-ib{ width: 42px; height: 42px; border: 0; border-radius: 50%; background: transparent; display: grid; place-items: center; cursor: pointer; color: var(--gold); padding: 0; }
-  .rcm-ib{ position: relative; }
+  .rcm-ib{ position: relative; transition: color .15s; }
   .rcm-bd{ position: absolute; right: 6px; top: 6px; min-width: 10px; height: 10px; padding: 0 1px; box-sizing: border-box; border-radius: 6px; background: var(--gold); color: var(--dark); font: 700 7px/10px sans-serif; text-align: center; }
-  .rcm-ib:active{ background: rgba(224,181,74,.16); }
+  .rcm-ib:active{ background: transparent; color: #c4952d; }
   .rcm-ib:disabled{ opacity: .3; pointer-events: none; }
-  .rcm-ib.on, .rcm-ib.on:active{ background: var(--gold); color: var(--dark); }
+  .rcm-ib.on, .rcm-ib.on:active{ background: transparent; color: #c4952d; }
   .rcm-banner{ width: fit-content; margin: 24px auto 24px; }
   .rcm-av{ align-self: center; padding: 0 12px 0 16px; font-size: 14px; font-weight: 600; color: var(--gold); white-space: nowrap; }
   .rcm-ib svg{ width: 20px; height: 20px; stroke: currentColor; stroke-width: 1.7; fill: none; stroke-linecap: round; stroke-linejoin: round; }
@@ -705,8 +705,8 @@
   /* barras de ações (lápis, #, T, mover, +, copiar, lixeira): sempre brancas, em qualquer lugar */
   .cycle-cell, .rcm-pill{ background: #fff; border-color: var(--bd); filter: none; box-shadow: 0 8px 20px -10px rgba(15,27,45,.35); }
   .cycle-cell .rcm-ib, .rcm-pill .rcm-ib{ color: var(--dark); }
-  .cycle-cell .rcm-ib:active, .rcm-pill .rcm-ib:active{ background: var(--chip); }
-  .cycle-cell .rcm-ib.on, .cycle-cell .rcm-ib.on:active, .rcm-pill .rcm-ib.on, .rcm-pill .rcm-ib.on:active{ background: var(--dark); color: #fff; }
+  .cycle-cell .rcm-ib:active, .rcm-pill .rcm-ib:active{ background: transparent; color: #c4952d; }
+  .cycle-cell .rcm-ib.on, .cycle-cell .rcm-ib.on:active, .rcm-pill .rcm-ib.on, .rcm-pill .rcm-ib.on:active{ background: transparent; color: #c4952d; }
   .rcm-pill .rcm-av{ color: var(--tx); }
   .rcm-bar, .modo-bar{ filter: none; }
   /* números das perguntas e dos blocos: mesmo dourado escuro, texto branco */
@@ -732,8 +732,8 @@
   .cycle-block .rcm-pill, .cycle-block .cycle-cell{ background: #fff; border-color: var(--bd); filter: none; }
   .cycle-block .rcm-bar, .cycle-block .modo-bar{ filter: none; }
   .cycle-block .rcm-ib{ color: var(--dark); }
-  .cycle-block .rcm-ib:active{ background: var(--chip); }
-  .cycle-block .rcm-ib.on, .cycle-block .rcm-ib.on:active{ background: var(--dark); color: #fff; }
+  .cycle-block .rcm-ib:active{ background: transparent; color: #c4952d; }
+  .cycle-block .rcm-ib.on, .cycle-block .rcm-ib.on:active{ background: transparent; color: #c4952d; }
   .cycle-block .rcm-av{ color: var(--tx); }
   .cycle-block .cycle-sub::before{ border-color: rgba(196,149,45,.7); }</style>
 </head>
@@ -787,6 +787,7 @@
         <button type="button" class="rcm-ib" data-m="duplicar" aria-label="Duplicar" data-tip="Duplicar"><svg viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2.5"/><path d="M5 15V7a2 2 0 0 1 2-2h8"/></svg></button>
         <button type="button" class="rcm-ib" data-m="excluir" aria-label="Excluir" data-tip="Excluir"><svg viewBox="0 0 24 24"><path d="M5 7h14M10 7V5h4v2M7 7l1 12h8l1-12"/></svg></button>
         <button type="button" class="rcm-ib" data-m="copiar" aria-label="Copiar" data-tip="Copiar"><svg viewBox="0 0 24 24"><path d="M4 14v4.5A1.5 1.5 0 0 0 5.5 20h13a1.5 1.5 0 0 0 1.5-1.5V14"/><path d="M12 15V4M8 8l4-4 4 4"/></svg></button>
+        <button type="button" class="rcm-ib" data-p="fixar" aria-label="Fixar tela" data-tip="Fixar tela"><svg viewBox="0 0 24 24"><circle cx="12" cy="6.5" r="3.5"/><path d="M12 10v10.5"/></svg></button>
         <button type="button" class="rcm-ib" data-h="desfaz" aria-label="Desfazer" data-tip="Desfazer" disabled><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M13.5 8.5L10 12l3.5 3.5"/></svg></button>
         <button type="button" class="rcm-ib" data-h="refaz" aria-label="Refazer" data-tip="Refazer" disabled><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M10.5 8.5L14 12l-3.5 3.5"/></svg></button>
       </div>
@@ -2632,7 +2633,9 @@ window.saveAnswer = window.saveAnswer || function(){};
         if (zig) el.style.maxWidth = (aw0 - 2) + 'px';
         if (n.id !== 'root' && !zig) {
           var d = document.createElement('i');
-          var _fi = !!(n.children && n.children.length), _tt = temTexto(n);
+          /* bolinha: célula só conta enquanto está escondida (recolhida ou dentro do fluxo); depois de aberta, já está à vista e não é mais "tem mais dentro" */
+          var _fi = !!(n.children && n.children.length) && !!(n.collapsed || (FL[n.id] && !FLK[n.id])), _tt = temTexto(n);
+          if (VZ[n.id]) { if (vazioReal(n)) { _fi = false; _tt = false; } else delete VZ[n.id]; }
           if (_fi && _tt) d.className = 'tx';
           else if (_fi || _tt) d.className = 'fil';
           el.appendChild(d);
@@ -2897,7 +2900,15 @@ window.saveAnswer = window.saveAnswer || function(){};
       var el1 = y0 !== null && world ? world.querySelector('.rcm-node[data-id="' + id + '"]') : null;
       if (el1) { var dy = el1.getBoundingClientRect().top - y0; if (Math.abs(dy) > 1) window.scrollBy({ top: dy, behavior: 'instant' }); }
     }
+    /* bolinha: ao abrir um item, confere na hora o que ele tem dentro; vazio (sem célula e sem texto) vira amarela */
+    var VZ = {};
+    function vazioReal(n) {
+      if (n.children && n.children.length) return false;
+      if (n.et) return false;
+      return !(Array.isArray(n.i) && n.i.some(function(v) { return String(v == null ? '' : v).trim() !== ''; }));
+    }
     function acaoToque0(id) {
+      if (id !== 'root') VZ[id] = 1;
       if (focoId && id === focoId) { focoVolta(); return; }
       selId = id; barId = null;
       var f = acha(id);
@@ -3830,6 +3841,8 @@ window.saveAnswer = window.saveAnswer || function(){};
       if (mtd.f[kd]) mtd.f[k] = 1;
       metaSet(S, mtd);
     },
+    estado: function() { return { m: { pasta: SETS.m.pasta || null, aberto: SETS.m.aberto }, p: { pasta: SETS.p.pasta || null, aberto: SETS.p.aberto } }; },
+    restaura: function(e) { if (!e) return; ['m', 'p'].forEach(function(k) { if (e[k]) { SETS[k].pasta = e[k].pasta || null; SETS[k].aberto = typeof e[k].aberto === 'number' ? e[k].aberto : -1; } }); },
     desfoca: function() { SETS.m.pasta = null; SETS.p.pasta = null; PEND = null; ROOTTAP = null; SETS.m.aberto = -1; SETS.p.aberto = -1; SETS.m.arr.concat(SETS.p.arr).forEach(function(m) { m.soltaMov(); }); },
     salvaNota: function(e) { if (e && e._inst) e._inst.salvaNota(e); },
     indice: function(m) { return CUR.arr.indexOf(m); },
@@ -4161,7 +4174,7 @@ window.saveAnswer = window.saveAnswer || function(){};
     var t = document.getElementById('modoTitulo'), bar = document.getElementById('modoBar');
     if (!t || !bar) return;
     function marca() {
-      Array.prototype.forEach.call(bar.querySelectorAll('.rcm-ib'), function(b) { b.classList.toggle('on', b.hasAttribute('data-m') && b.getAttribute('data-m') === window._rcModo); });
+      Array.prototype.forEach.call(bar.querySelectorAll('.rcm-ib'), function(b) { if (b.hasAttribute('data-p')) { b.classList.toggle('on', !!pinGet()); return; } b.classList.toggle('on', b.hasAttribute('data-m') && b.getAttribute('data-m') === window._rcModo); });
     }
     function alterna() {
       var abre = bar.hidden;
@@ -4172,7 +4185,7 @@ window.saveAnswer = window.saveAnswer || function(){};
     }
     /* um toque no título: seletor com as 4 telas; dois toques: modos (Mover, Duplicar, Excluir, Copiar) */
     var VIEWS = [
-      ['proc', 'Processo', '<rect x="3.5" y="4" width="7" height="5" rx="2"/><rect x="13.5" y="15" width="7" height="5" rx="2"/><path d="M7 9v3.5a2 2 0 0 0 2 2h4.5M11.5 12.5l2.2 2-2.2 2"/>'],
+      ['proc', 'Processo', '<rect x="3" y="3.5" width="8" height="5" rx="1.8"/><rect x="14" y="15.5" width="7" height="5" rx="1.8"/><path d="M7 8.5V16a2 2 0 0 0 2 2h2.3M9.4 16.3l2 1.7-2 1.7"/>'],
       ['mapa', 'Mapa Mental', '<circle cx="12" cy="12" r="3"/><circle cx="5" cy="6" r="1.8"/><circle cx="19" cy="7" r="1.8"/><circle cx="12" cy="20" r="1.8"/><path d="M9.8 10.2L6.3 7.2M14.8 10.8l3-2.6M12 15v3.2"/>'],
       ['meu', 'Meu Ciclo', '<path d="M19.5 12a7.5 7.5 0 1 1-2.4-5.5"/><path d="M19.5 4.5v4h-4"/>'],
       ['sub', 'Subpasta', '<path d="M4 7.5A1.5 1.5 0 0 1 5.5 6H10l2 2.2h6.5A1.5 1.5 0 0 1 20 9.7v8.8a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 18.5z"/>']
@@ -4226,12 +4239,58 @@ window.saveAnswer = window.saveAnswer || function(){};
       tapT = setTimeout(function() { tapT = null; abreSel(); }, 280);
     });
     /* ao abrir ou voltar para o app: só os 4 cards, nenhum marcado */
-    abreSel(true);
-    window.addEventListener('pageshow', function(e) { if (e.persisted && !sel) abreSel(true); });
+    /* Fixar tela: lembra a visão escolhida e reabre nela ao atualizar/sair, até desativar */
+    var PIN = 'fixarTelaRico', pend = null;
+    try { var _o = localStorage.getItem('rico.fixarTela'); if (_o) { if (!localStorage.getItem(PIN)) localStorage.setItem(PIN, _o); localStorage.removeItem('rico.fixarTela'); } } catch (e) {}
+    var pb = bar.querySelector('[data-p="fixar"]');
+    function pinGet() { try { var r = localStorage.getItem(PIN); if (!r) return null; try { var o = JSON.parse(r); if (o && o.v) return o; } catch (x) {} return { v: r }; } catch (e) { return null; } }
+    function pinSalva(v) { if (pend) return; try { localStorage.setItem(PIN, JSON.stringify({ v: v || viewAtual(), e: window.rcMapa ? window.rcMapa.estado() : null, y: lastY, f: _foco })); } catch (e) {} }
+    var lastY = 0, pronto = false, scT = null;
+    function irY() { window.scrollTo(0, lastY); }
+    function pinMarca() { if (pb) pb.classList.toggle('on', !!pinGet()); }
+    var _vai = cicloVai;
+    cicloVai = function(v) {
+      var fix = !!pinGet(), R = window.rcMapa, d = R && R.desfoca;
+      if (fix && R) R.desfoca = function() {};
+      try { _vai(v); } finally { if (fix && R) R.desfoca = d; }
+      if (fix) pinSalva(v);
+    };
+    if (window.rcMapa) { var _mt = window.rcMapa.montar; window.rcMapa.montar = function() {
+        if (pend && window.rcMapa.restaura) window.rcMapa.restaura(pend.e);
+        var r = _mt.apply(this, arguments);
+        if (pend) setTimeout(irY, 60); else if (pinGet()) pinSalva();
+        return r;
+      }; }
+    if (pb) pb.addEventListener('click', function(e) {
+      e.stopPropagation();
+      try { if (pinGet()) localStorage.removeItem(PIN); else { lastY = window.scrollY || 0; pinSalva(); } } catch (x) {}
+      pinMarca();
+    });
+    pinMarca();
+    window.addEventListener('scroll', function() {
+      if (!pronto || pend) return;
+      clearTimeout(scT); scT = setTimeout(function() { lastY = window.scrollY || 0; if (pinGet()) pinSalva(); }, 250);
+    }, { passive: true });
+    var pv = pinGet();
+    function solta() {
+      if (!pend) return; pend = null; pronto = true;
+      ['pointerdown', 'touchstart', 'keydown', 'wheel'].forEach(function(n) { document.removeEventListener(n, solta, true); });
+    }
+    if (pv) {
+      lastY = pv.y || 0; pend = pv;
+      ['pointerdown', 'touchstart', 'keydown', 'wheel'].forEach(function(n) { document.addEventListener(n, solta, true); });
+      setTimeout(solta, 12000);
+      fechaSel(); _vai(pv.v);
+      if (pv.e && window.rcMapa) window.rcMapa.restaura(pv.e);
+      if (typeof pv.f === 'number') _foco = pv.f;
+      renderCiclo();
+      requestAnimationFrame(irY); setTimeout(irY, 300); setTimeout(irY, 800); setTimeout(irY, 1800);
+    } else { pronto = true; abreSel(true); }
+    window.addEventListener('pageshow', function(e) { if (e.persisted && !sel && !pinGet()) abreSel(true); });
     t.addEventListener('keydown', function(e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); alterna(); } });
     bar.addEventListener('click', function(e) {
       var b = e.target.closest ? e.target.closest('.rcm-ib') : null;
-      if (!b) return;
+      if (!b || b.hasAttribute('data-p')) return;
       var m = b.getAttribute('data-m');
       window._rcModo = window._rcModo === m ? null : m;
       window._rcSrc = null;
@@ -5976,4 +6035,4 @@ window.saveAnswer = window.saveAnswer || function(){};
 })();
 </script>
 </body>
-  </html>
+                                                                                                                                                                    </html>
