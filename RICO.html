@@ -452,6 +452,17 @@ if ((sessionStorage.getItem('troca') === (window.RICO_INST === 'p' ? 'RICOP' : '
   .rd-ov .ln:has(> .nm), .rd-ov .ln:has(> .bl), .rd-ov .ln:has(> .ds){ padding-left: 30px; text-indent: -30px; }
   .rd-ov .ln:has(> .ck){ padding-left: 28px; text-indent: -28px; }
   .rd-ov .ln.done{ text-decoration: line-through; text-decoration-thickness: 1.5px; color: #9a948a; }
+  /* item numerado vira cartão como no estudo: número e título no alto, e o texto que vem embaixo dentro do cartão, com a barra do lado */
+  .rd-ov .ln.rd-nh{ position: relative; margin-top: 8px; padding: 15px 16px 15px 54px; text-indent: 0; min-height: 52px; box-sizing: border-box; background: #fbfaf7; border: 1px solid #e2ddd1; border-radius: 26px; font-family: 'DM Sans', system-ui, sans-serif; font-size: 16px; line-height: 1.35; }
+  .rd-ov .ln.rd-nh:first-child{ margin-top: 0; }
+  .rd-ov .ln.rd-nh > .nm{ position: absolute; left: 16px; top: 12px; margin: 0; width: 26px; min-width: 26px; height: 26px; font: 700 12px/26px 'DM Sans', system-ui, sans-serif; }
+  .rd-ov .ln.rd-nh.rd-ab{ border-bottom-width: 0; border-radius: 26px 26px 0 0; padding-bottom: 8px; }
+  .rd-ov .ln.rd-nb{ position: relative; box-sizing: border-box; background: #fbfaf7; border: solid #e2ddd1; border-width: 0 1px; padding: 0 16px 0 47px; text-indent: 0; font-family: 'DM Sans', system-ui, sans-serif; font-size: 16px; line-height: 1.55; }
+  .rd-ov .ln.rd-nb::before{ content: ''; position: absolute; left: 29px; top: 0; bottom: 0; width: 2px; border-radius: 2px; background: #e2ddd1; }
+  .rd-ov .ln.rd-nb:has(> .bl), .rd-ov .ln.rd-nb:has(> .ds), .rd-ov .ln.rd-nb:has(> .nm){ padding-left: 77px; text-indent: -30px; }
+  .rd-ov .ln.rd-nb:has(> .ck){ padding-left: 75px; text-indent: -28px; }
+  .rd-ov .ln.rd-nb.gap{ --gap: 10px; }
+  .rd-ov .ln.rd-nl{ border-bottom-width: 1px; border-radius: 0 0 26px 26px; padding-bottom: 16px; }
   .rd-tx[data-q]{ position: relative; margin: 14px 0 14px; padding: 18px 20px 16px 22px; background: #fbfaf7; border: 1px solid #e2ddd1; border-radius: 24px; overflow: hidden; font-family: 'DM Sans', system-ui, sans-serif; font-style: normal; font-size: 15px; line-height: 1.65; color: #444; }
   .rd-tx[data-q]::before{ content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 30px; box-sizing: border-box; border-left: 3px solid #7b2d26; border-radius: 23px 0 0 23px; pointer-events: none; }
   .rd-tx[data-q]:has(+ .rd-tx[data-q]){ margin-bottom: 10px; }
@@ -468,7 +479,7 @@ if ((sessionStorage.getItem('troca') === (window.RICO_INST === 'p' ? 'RICOP' : '
   .rd-bar[hidden]{ display: none; }
   .rd-ov.rd-edit{ -webkit-user-select: text; user-select: text; -webkit-touch-callout: default; }
   .rd-edit .rd-tx, .rd-edit .rd-t, .rd-edit .rd-h{ outline: none; caret-color: #211e19; }
-    .rd-edit .rd-tx > div:has(> br:only-child){ height: 18px; line-height: 18px; }
+    .rd-edit .rd-tx > div:has(> br:only-child){ height: var(--gap, 18px); line-height: var(--gap, 18px); }
   .rd-tx .ln.gap{ --gap: 18px; }
   .rd-edit .rd-t, .rd-edit .rd-h{ display: block; width: fit-content; min-width: 90px; max-width: 100%; }
   .rd-edit .rd-t:empty::before, .rd-edit .rd-h:empty::before{ content: attr(data-ph); color: #9a948a; }
@@ -4542,6 +4553,7 @@ window.saveAnswer = window.saveAnswer || function(){};
     if (ed) h += '<div class="rd-tools"><div class="rd-linha"><div class="rd-grupo" data-g="main"><button type="button" data-t="T" aria-label="Título"><b>T</b></button><button type="button" data-t="n" aria-label="Numeração"><svg viewBox="0 0 24 24"><path d="M11 6h9M11 12h9M11 18h9M4.5 5.5l1.5-1v5M4 14.2c.6-1 2.3-.8 2.1.4-.3 1-1.6 1.5-2.1 2.4h2.4"/></svg></button><button type="button" data-t="p" aria-label="Marcadores"><svg viewBox="0 0 24 24"><path d="M11 6h9M11 12h9M11 18h9"/><circle cx="5.5" cy="6" r=".9" fill="currentColor"/><circle cx="5.5" cy="12" r=".9" fill="currentColor"/><circle cx="5.5" cy="18" r=".9" fill="currentColor"/></svg></button><button type="button" data-t="d" aria-label="Traço"><svg viewBox="0 0 24 24"><path d="M4 6h3M11 6h9M4 12h3M11 12h9M4 18h3M11 18h9"/></svg></button><button type="button" data-t="q" aria-label="Citação"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button></div><div class="rd-grupo" data-g="estilo" hidden><button type="button" data-t="b" aria-label="Negrito"><svg viewBox="0 0 24 24"><path d="M7 5h6a3.5 3.5 0 010 7H7zM7 12h7a3.5 3.5 0 010 7H7z"/></svg></button><button type="button" data-t="i" aria-label="Itálico"><svg viewBox="0 0 24 24"><path d="M10 5h7M7 19h7M14 5l-4 14"/></svg></button><button type="button" data-t="c" aria-label="Check"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M8.2 12.4l2.6 2.6 5-5.2"/></svg></button><button type="button" data-t="lixo" hidden aria-label="Apagar o marcado"><svg viewBox="0 0 24 24"><path d="M5 7h14M10 7V5h4v2M7 7l1 12h8l1-12"/></svg></button><button type="button" data-t="cpall" aria-label="Copiar tudo"><svg viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2.5"/><path d="M5 15V7a2.5 2.5 0 012.5-2.5H15M12.5 14.5h4M14.5 12.5v4"/></svg></button><button type="button" data-t="copia" aria-label="Modo copiar"><svg viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2.5"/><path d="M5 15V7a2.5 2.5 0 012.5-2.5H15"/></svg></button></div><button type="button" data-t="estilo" aria-label="Alternar ferramentas"><svg viewBox="0 0 24 24"><rect x="4.5" y="4.5" width="6" height="6" rx="1.5"/><rect x="13.5" y="4.5" width="6" height="6" rx="1.5"/><rect x="4.5" y="13.5" width="6" height="6" rx="1.5"/><rect x="13.5" y="13.5" width="6" height="6" rx="1.5"/></svg></button></div></div>';
     h += '<button type="button" data-fechar hidden onclick="fecharLeitura()" aria-label="Fechar"></button></div>';
     ov.innerHTML = h;
+    rdCartoesTodos();
     if (ed) { _rd.mudoAte = Date.now() + 1100; rdModoTeclado(); setTimeout(rdModoTeclado, 1150); }
   }
   /* teclado: a barra sobe junto e a linha onde está o cursor vai para a parte de cima da área visível, para ver mais texto abaixo */
@@ -4616,6 +4628,24 @@ window.saveAnswer = window.saveAnswer || function(){};
     rdModoTeclado();
   }
   /* deixa as linhas do bloco sempre no formato da leitura: cada linha é uma div .ln; linha vazia é .ln.gap com <br>; sem divs dentro de divs */
+  /* marca as linhas de cada item numerado: título (rd-nh), texto de baixo (rd-nb) e se tem texto embaixo (rd-ab, rd-nl na última) */
+  function rdCartoes(bl) {
+    if (!bl || bl.hasAttribute('data-q')) return;
+    var ls = Array.prototype.slice.call(bl.children).filter(function(c) { return c.classList && c.classList.contains('ln'); }), i = 0, k;
+    ls.forEach(function(l) { l.classList.remove('rd-nh', 'rd-nb', 'rd-nl', 'rd-ab'); });
+    var num = function(l) { return !!l.querySelector(':scope > .nm'); };
+    while (i < ls.length) {
+      if (!num(ls[i])) { i++; continue; }
+      ls[i].classList.add('rd-nh');
+      var j = i + 1, ult = -1;
+      while (j < ls.length && !num(ls[j])) { ls[j].classList.add('rd-nb'); if (!ls[j].classList.contains('gap')) ult = j; j++; }
+      for (k = ult + 1; k < j; k++) ls[k].classList.remove('rd-nb');
+      if (ult > i) { ls[i].classList.add('rd-ab'); ls[ult].classList.add('rd-nl'); }
+      else for (k = i + 1; k < j; k++) ls[k].classList.remove('rd-nb');
+      i = j;
+    }
+  }
+  function rdCartoesTodos() { var ov = document.getElementById('rdOv'); if (ov) ov.querySelectorAll('.rd-tx').forEach(rdCartoes); }
   function rdNormaliza(bl) {
     if (!bl) return;
     /* o teclado do celular pode colar estilos próprios (altura de linha, fonte) nas linhas novas: tiro tudo, o desenho é só o da leitura */
@@ -4636,6 +4666,7 @@ window.saveAnswer = window.saveAnswer || function(){};
       if (vazio) { c.classList.add('gap'); if (!c.querySelector('br')) { c.textContent = ''; c.appendChild(document.createElement('br')); } }
       else c.classList.remove('gap');
     });
+    rdCartoes(bl);
   }
   function rdFoco(el, fim) {
     try { el.focus(); var r = document.createRange(); r.selectNodeContents(el); r.collapse(!fim); var s = window.getSelection(); s.removeAllRanges(); s.addRange(r); } catch (_) {}
@@ -4985,6 +5016,7 @@ window.saveAnswer = window.saveAnswer || function(){};
       if (off) c = off; else if (b.getAttribute('data-i') !== '-1') c = 0;
       Array.prototype.forEach.call(b.querySelectorAll('.ln > .nm:not([data-rc])'), function(nm) { if (nm.getAttribute('data-r') === '1') c = 1; else c++; nm.textContent = c; });
     });
+    rdCartoesTodos();
   }
   /* aplica a ferramenta armada na linha tocada */
   function rdAplica(ln, bl) {
@@ -5009,7 +5041,7 @@ window.saveAnswer = window.saveAnswer || function(){};
       if (!cp.trim()) return;
       cp = (cp.length > 4 && cp.indexOf(mk) === 0 && cp.slice(-2) === mk) ? cp.slice(2, -2) : mk + cp + mk;
       lines[pos] = pf + cp;
-      bl.innerHTML = rtHtml(rtParse(lines.join('\n')), null);
+      bl.innerHTML = rtHtml(rtParse(lines.join('\n')), null); rdCartoes(bl);
       try { var a1 = document.activeElement; if (a1 && a1.blur) a1.blur(); } catch (_) {}
       rdAgenda(); return;
     }
@@ -5018,7 +5050,7 @@ window.saveAnswer = window.saveAnswer || function(){};
     var atual = lines[pos] || '', mm = /^\[( |x|#|-|=|!)\] ?/.exec(atual), corpo = mm ? atual.slice(mm[0].length) : atual;
     var igual = mm && (t === 'c' ? (mm[1] === ' ' || mm[1] === 'x') : mm[0].trim() === pre.trim());
     lines[pos] = igual ? corpo : pre + corpo;
-    bl.innerHTML = rtHtml(rtParse(lines.join('\n')), null);
+    bl.innerHTML = rtHtml(rtParse(lines.join('\n')), null); rdCartoes(bl);
     try { var a = document.activeElement; if (a && a.blur) a.blur(); } catch (_) {}
     rdAgenda();
   }
