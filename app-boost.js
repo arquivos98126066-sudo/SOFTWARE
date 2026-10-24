@@ -340,6 +340,17 @@ window.Alterna = (function () {
       if (!eu) return;
       vibra(25); A.ir('menu');
     },
+    /* faixa invisivel embaixo: vai ao menu e guarda de onde saiu, para o app abrir igual quando voce tocar nele no menu */
+    botao: function () {
+      if (!eu) return;
+      try {
+        var v = JSON.parse(localStorage.getItem('alterna.volta') || '{}'), t = Date.now();
+        var c = CODIGO[eu]; if (c) v[c] = t;
+        if (eu === 'ricop') v.DOA = t;
+        localStorage.setItem('alterna.volta', JSON.stringify(v));
+      } catch (e) {}
+      vibra(25); A.ir('menu');
+    },
     quebra: function () {
       if (!eu) return;
       var s = ler();
@@ -351,6 +362,20 @@ window.Alterna = (function () {
     window.AlternaGestos.vaiVolta(A.zig);
     window.AlternaGestos.v(A.menu);
     window.AlternaGestos.doisDedos(A.quebra);
+    /* faixa transparente por cima de tudo, na base da tela: o toque nao passa para o que esta embaixo */
+    var faixa = function () {
+      if (document.getElementById('alterna-base')) return;
+      var d = document.createElement('div'); d.id = 'alterna-base';
+      d.style.cssText = 'position:fixed;left:0;right:0;bottom:0;height:calc(24px + env(safe-area-inset-bottom,0px));z-index:2147483647;background:transparent;touch-action:none;-webkit-tap-highlight-color:transparent;';
+      var tocou = false;
+      d.addEventListener('touchstart', function (e) { e.stopPropagation(); tocou = true; }, { passive: true });
+      d.addEventListener('touchend', function (e) { e.stopPropagation(); if (e.cancelable) e.preventDefault(); if (tocou) { tocou = false; A.botao(); } });
+      d.addEventListener('touchcancel', function () { tocou = false; }, { passive: true });
+      d.addEventListener('click', function (e) { e.stopPropagation(); e.preventDefault(); if (!('ontouchstart' in window)) A.botao(); });
+      d.addEventListener('mousedown', function (e) { e.stopPropagation(); });
+      document.documentElement.appendChild(d);
+    };
+    if (document.documentElement) faixa(); else document.addEventListener('DOMContentLoaded', faixa);
   }
 
   /* ----- Tapete CRM, Meu CRM e ADM: voltam na tela e na rolagem em que estavam ----- */

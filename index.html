@@ -629,6 +629,15 @@ input { -webkit-user-select: text; user-select: text; }
   var alvo = null, tm = null, x0 = 0, y0 = 0, longo = false, confirmaTm = null, abriuEm = 0;
   function aviso(t) { avisoEl.textContent = t; avisoEl.className = 'on'; clearTimeout(avisoTm); avisoTm = setTimeout(function () { avisoEl.className = ''; }, 2600); }
   function arq(a) { return a.getAttribute('href'); }
+  /* app que saiu pela faixa de baixo abre na mesma posicao (vale 1 hora, uma vez) */
+  document.addEventListener('click', function (e) {
+    var l = e.target.closest && e.target.closest('a.menu-link'); if (!l) return;
+    var C = { 'TAPETE-CRM.html': 'TAPETE', 'MEU-CRM.html': 'CRM', 'DOA.html': 'DOA', 'ADM.html': 'ADM', 'RICO.html': 'RICO', 'LER.html': 'LER' };
+    try {
+      var c = C[(l.getAttribute('href') || '').split('?')[0]], v = JSON.parse(localStorage.getItem('alterna.volta') || '{}');
+      if (c && v[c] && Date.now() - v[c] < 3600000) { sessionStorage.setItem('troca', c); delete v[c]; localStorage.setItem('alterna.volta', JSON.stringify(v)); }
+    } catch (x) {}
+  }, true);
   function urlDe(a) { return new URL(arq(a), location.href).href; }
   function enviada(a) {
     if (!window.caches) return Promise.resolve(false);
