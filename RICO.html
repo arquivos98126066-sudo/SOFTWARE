@@ -3065,9 +3065,9 @@ window.saveAnswer = window.saveAnswer || function(){};
         var tx = String(n.text || '').trim();
         for (var j = 0; j < CICLO.length; j++) if (CICLO[j] && String(CICLO[j].t || '').trim() === tx) { k = j; break; }
       }
-      if (!edita && window.abrirLeitura) {
+      if (window.abrirLeitura) {
         var dl = k >= 0 ? cicloParaLeitura(CICLO[k]) : cicloParaLeitura({ t: n.text, i: n.i || [], m: n.m || [] });
-        var ropt = window.__rdOpts || {}; window.__rdOpts = null; ropt.ctx = { key: KEY, id: id };
+        var ropt = window.__rdOpts || {}; window.__rdOpts = null; ropt.ctx = { key: KEY, id: id }; if (edita) ropt.edit = true;
         window.abrirLeitura(dl, function(x) {
           if (k >= 0) { CICLO[k].t = x.t; CICLO[k].i = x.i; CICLO[k].m = x.m; var ff = acha(id); if (ff && String(x.t || '').trim()) ff.n.text = String(x.t).trim().slice(0, 60); salva(); render(); if (window.renderCiclo) window.renderCiclo(); if (window.agendarSalvamento) window.agendarSalvamento(document.body); }
           else { x._no = n; salvaNota(x); delete x._no; render(); }
