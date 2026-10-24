@@ -2670,7 +2670,43 @@ abrirProcesso();
       if (p && Date.now() - t0 < 1500 && ehV(p)) aoFazer();
     }, {passive: true});
   }
-  gestoV(function(){ try { navigator.vibrate && navigator.vibrate(25); } catch(e){} location.replace('LER.html'); });
+  gestoV(function(){
+    try {
+      var ov = document.getElementById('processo-overlay');
+      var pb = document.querySelector('.pl-body');
+      localStorage.setItem('troca.estado.DOA', JSON.stringify({
+        pasta: _pl_currentFolderId, htmlPasta: _htmlPasta, listY: pb ? pb.scrollTop : 0,
+        proc: ov && ov.classList.contains('popen') ? localStorage.getItem('doa_active_proc_id') : null,
+        canvasY: p_canvasEl.scrollTop, html: _htmlAberto
+      }));
+      sessionStorage.setItem('troca', 'LER'); navigator.vibrate && navigator.vibrate(25);
+    } catch(e){}
+    location.replace('LER.html');
+  });
+  /* volta no mesmo lugar em que o Plano ficou (pasta, processo aberto, rolagem e HTML aberto) */
+  (function(){
+    var s = null;
+    try { if (sessionStorage.getItem('troca') !== 'DOA') return; sessionStorage.removeItem('troca'); s = JSON.parse(localStorage.getItem('troca.estado.DOA') || 'null'); } catch(e){}
+    if (!s) return;
+    var tentativas = 0;
+    (function tenta(){
+      if (!p_procs.length && tentativas++ < 40) { setTimeout(tenta, 100); return; }
+      if (s.pasta !== null && s.pasta !== undefined && p_procs.some(function(x){ return x.id === s.pasta; })) _pl_currentFolderId = s.pasta;
+      if (s.htmlPasta && htmlTodos().some(function(x){ return x.id === s.htmlPasta && x.pasta; })) _htmlPasta = s.htmlPasta;
+      pl_renderList();
+      var pb = document.querySelector('.pl-body'); if (pb) pb.scrollTop = s.listY || 0;
+      if (s.proc){
+        var it = p_procs.filter(function(x){ return String(x.id) === String(s.proc) && x.type === 'process'; })[0];
+        if (it){
+          p_procIdx = p_procs.indexOf(it); localStorage.setItem('doa_active_proc_id', String(it.id));
+          p_syncAlias(); p_activeIdx = null; _abrirProcessoCanvas();
+          setTimeout(function(){ p_canvasEl.scrollTop = s.canvasY || 0; }, 150);
+          setTimeout(function(){ p_canvasEl.scrollTop = s.canvasY || 0; }, 600);
+        }
+      }
+      if (s.html && htmlLer().some(function(x){ return x.id === s.html; })) htmlAbre(s.html);
+    })();
+  })();
 })();
 </script>
 </body>
