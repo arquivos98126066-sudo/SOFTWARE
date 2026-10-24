@@ -367,10 +367,20 @@ window.Alterna = (function () {
       var d = document.createElement('div'); d.id = 'alterna-base';
       d.style.cssText = 'position:fixed;left:0;right:0;bottom:0;height:calc(44px + env(safe-area-inset-bottom,0px));z-index:2147483647;background:transparent;touch-action:none;-webkit-tap-highlight-color:transparent;';
       var tocou = false, ultimo = 0;
+      /* botoes que ficam por baixo da faixa (menu inferior do app) continuam funcionando: o toque e repassado a eles */
+      var passa = function (x, y) {
+        try {
+          var l = document.elementsFromPoint(x, y), el = null, i;
+          for (i = 0; i < l.length; i++) if (l[i] !== d && l[i].id !== 'alterna-base') { el = l[i]; break; }
+          for (i = 0; el && el !== document.body && i < 6; i++, el = el.parentElement) {
+            if (el.matches && el.matches('button,a[href],input,select,textarea,label,summary,[onclick],[role=button],[role=tab]') || getComputedStyle(el).cursor === 'pointer') { el.click(); return; }
+          }
+        } catch (e) {}
+      };
       /* dois toques seguidos (ate 0,5 s): um toque so nao faz nada, para nao sair sem querer */
       var toque = function () { var t = Date.now(); if (t - ultimo < 500) { ultimo = 0; A.botao(); } else ultimo = t; };
       d.addEventListener('touchstart', function (e) { e.stopPropagation(); tocou = true; }, { passive: true });
-      d.addEventListener('touchend', function (e) { e.stopPropagation(); if (e.cancelable) e.preventDefault(); if (tocou) { tocou = false; toque(); } });
+      d.addEventListener('touchend', function (e) { e.stopPropagation(); if (e.cancelable) e.preventDefault(); if (tocou) { tocou = false; var c = e.changedTouches && e.changedTouches[0]; if (c) passa(c.clientX, c.clientY); toque(); } });
       d.addEventListener('touchcancel', function () { tocou = false; }, { passive: true });
       d.addEventListener('click', function (e) { e.stopPropagation(); e.preventDefault(); if (!('ontouchstart' in window)) toque(); });
       d.addEventListener('mousedown', function (e) { e.stopPropagation(); });

@@ -32,6 +32,7 @@ Vale para os 6 apps do menu (Tapete CRM, Meu CRM, Plano/DOA, ADM, Rico, Estudo/L
 - Sem puxar para atualizar (`overscroll-behavior-y:contain`).
 - Nomes e textos não podem aparecer "carregando": Rico esconde a página até os textos do aparelho entrarem nos campos (`rico-esconde` solto por `__ricoRevela`); Tapete, Meu CRM e ADM escondem (`alterna-quieto`) até o DOM ficar quieto 160 ms depois do load (limite 1,2 s). App novo com dados em IndexedDB: mesmo cuidado.
 - Rico grava uma cópia síncrona (`ricoc_*` no localStorage) além do IndexedDB, porque sair rápido pela faixa de baixo podia perder a gravação assíncrona e os nomes voltavam da nuvem (piscando).
+- Faixa da base repassa o toque a botões que ficam por baixo (menu inferior do app, ex.: Registra e Hoje do Tapete); a primeira tela do Tapete (Registra) monta antes de esperar a nuvem (`loadConfig`), senão ficava a tela inicial vazia/errada. O passo do Registra só volta quando a saída foi por troca de app.
 - Voltar do celular = abrir do começo; só a faixa de baixo guarda a posição (regra dele, 24/10/2026).
 - Abrir o app instalado sem logo do Chrome nem barra: manifest com id, scope, display standalone e background_color igual à cor do menu (#020719). Se ainda aparecer, o atalho foi criado fora do app instalado: remover e instalar de novo pelo Chrome (Instalar app).
 

@@ -5279,12 +5279,8 @@ window.limparAgendamento = limparAgendamento;
 
 // ── INIT ──────────────────────────────────────────────────────────────────────
 window.addEventListener('DOMContentLoaded', async () => {
-  await loadConfig();
-  startRealtimeSync();
-  syncPending();
-
-  // Restaura estado do formulário se estava em REGISTRA
-  const saved = (() => { try{ return JSON.parse(sessionStorage.getItem('_regState')||'null'); }catch(_){return null;} })();
+  // Restaura estado do formulário se estava em REGISTRA (só quando voltou por uma troca de app; voltar do celular abre do começo)
+  const saved = (() => { try{ if(sessionStorage.getItem('troca')!=='TAPETE') return null; return JSON.parse(sessionStorage.getItem('_regState')||'null'); }catch(_){return null;} })();
   let restaurou = false;
   if(saved && saved.curScreen === 'registrar' && saved.regCurStep > 0){
     try{
@@ -5309,7 +5305,25 @@ window.addEventListener('DOMContentLoaded', async () => {
   if(!restaurou){
     showScreen('registrar'); setNav(0); initForm(); renderRegStep();
   }
+  /* a tela já está montada: configuração e nuvem vêm depois, sem deixar a tela vazia esperando */
+  await loadConfig();
+  startRealtimeSync();
+  syncPending();
 });
+
+/* sair por troca de app guarda o passo do Registra (a flag troca faz o app abrir nele) */
+(function(){
+  function guarda(){
+    try{
+      if(curScreen==='registrar'){
+        sessionStorage.setItem('_regState', JSON.stringify({curScreen:'registrar', regCurStep, regData:{...REG_DATA}, curTipo, curBorda, tempFoto, tempImgIA}));
+      } else sessionStorage.removeItem('_regState');
+    }catch(_){}
+  }
+  window.addEventListener('load', function(){
+    if(window.Alterna){ var antes = Alterna.aoSair; Alterna.aoSair = function(d){ guarda(); if(antes) antes(d); }; }
+  });
+})();
 
 // Salva estado quando sai do app
 document.addEventListener('visibilitychange', ()=>{
