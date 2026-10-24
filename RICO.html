@@ -4349,11 +4349,6 @@ window.saveAnswer = window.saveAnswer || function(){};
           var tirou = false;
           _rd.cpR = (_rd.cpR || []).filter(function(r) { if (!tirou && dentro(r)) { tirou = true; return false; } return true; });
           if (!tirou && _rd.cpCur && dentro(_rd.cpCur)) { _rd.cpCur = null; _rd.cpAll = false; tirou = true; try { window.getSelection().removeAllRanges(); } catch (_) {} var bq2 = ov.querySelector('[data-t="cpall"]'); if (bq2) bq2.classList.remove('on'); }
-          if (!tirou && !cpT.rolando && !(ev.target.closest && ev.target.closest('.ck'))) {
-            /* toque rápido numa linha parada marca a linha inteira (azul); rolar e marcar mais embaixo não depende das alças do celular */
-            var el0 = document.elementFromPoint(c0.clientX, c0.clientY), ln1 = el0 && el0.closest ? el0.closest('#rdOv .rd-tx > .ln, #rdOv .rd-t, #rdOv .rd-h') : null;
-            if (ln1) { var rl = document.createRange(); rl.selectNodeContents(ln1); rl._ln = ln1; (_rd.cpR = _rd.cpR || []).push(rl); tirou = true; try { window.getSelection().removeAllRanges(); } catch (_) {} }
-          }
           if (tirou) rdCopiaMarca();
         }
       }, { passive: true });
@@ -4605,6 +4600,21 @@ window.saveAnswer = window.saveAnswer || function(){};
     if (fim && at === bl) rdFoco(bl, true);
   }
   /* modo copiar: seleção nativa sem teclado; trechos selecionados em momentos diferentes se acumulam e ficam marcados */
+  function rdTxtRange(r) {
+    var out = '', ant = null;
+    rdCopiaLinhas().forEach(function(el) {
+      if (!r.intersectsNode(el)) return;
+      var q = document.createRange(); q.selectNodeContents(el);
+      if (r.compareBoundaryPoints(Range.START_TO_START, q) > 0) q.setStart(r.startContainer, r.startOffset);
+      if (r.compareBoundaryPoints(Range.END_TO_END, q) < 0) q.setEnd(r.endContainer, r.endOffset);
+      var dv = document.createElement('div'); dv.appendChild(q.cloneContents());
+      dv.querySelectorAll('.nm,.ck,.bl,.ds').forEach(function(x) { x.remove(); });
+      var t = dv.textContent.trim(); if (!t) return;
+      var mesmo = ant && el.parentNode === ant.parentNode;
+      out += (out ? (mesmo ? '\n' : '\n\n') : '') + t; ant = el;
+    });
+    return out;
+  }
   function rdCopiaTxt(tudo) {
     var ov = document.getElementById('rdOv');
     if (!tudo && _rd.cpR) {
@@ -4614,6 +4624,7 @@ window.saveAnswer = window.saveAnswer || function(){};
       var tx = '', antes = null;
       rs.forEach(function(r) {
         var t1 = r.toString().trim();
+        if (!r._ln) { t1 = rdTxtRange(r); if (!t1) return; tx += (tx ? '\n\n' : '') + t1; antes = null; return; }
         if (r._ln && r._ln.classList.contains('ln')) { var c = r._ln.cloneNode(true), nm = c.querySelector('.nm'), pf = nm ? nm.textContent + '. ' : ''; c.querySelectorAll('.nm,.ck,.bl,.ds').forEach(function(x) { x.remove(); }); t1 = (pf + c.textContent).trim(); }
         if (!t1) return;
         var mesmo = antes && r._ln && antes.parentNode === r._ln.parentNode;
@@ -4641,30 +4652,47 @@ window.saveAnswer = window.saveAnswer || function(){};
   /* modo copiar: segurar numa linha e arrastar marca as linhas por onde o dedo passa; perto da borda a tela rola sozinha */
   function rdCopiaLinhas() { return Array.prototype.slice.call(document.querySelectorAll('#rdOv .rd-col > .rd-t, #rdOv .rd-col > .rd-h, #rdOv .rd-col > .rd-tx > .ln')); }
   function rdCopiaRange(el) { var rl = document.createRange(); rl.selectNodeContents(el); rl._ln = el; return rl; }
+  function rdCopiaPonto(x, y) {
+    var col = document.querySelector('#rdOv .rd-col'), r0 = null;
+    x = Math.min(Math.max(x, 2), innerWidth - 2); y = Math.min(Math.max(y, 2), innerHeight - 2);
+    try { if (document.caretRangeFromPoint) r0 = document.caretRangeFromPoint(x, y); else if (document.caretPositionFromPoint) { var cp = document.caretPositionFromPoint(x, y); if (cp) { r0 = document.createRange(); r0.setStart(cp.offsetNode, cp.offset); } } } catch (_) {}
+    if (!r0 || !col || !col.contains(r0.startContainer)) return null;
+    var n = r0.startContainer; if (n.nodeType !== 3) { var w = document.createTreeWalker(n, NodeFilter.SHOW_TEXT, null), t = w.nextNode(); if (!t) return null; return { n: t, o: 0 }; }
+    var el = n.parentNode; if (el && el.closest && el.closest('.nm,.ck,.bl,.ds')) return null;
+    return { n: n, o: r0.startOffset };
+  }
+  function rdCopiaPalavra(p) {
+    var v = p.n.nodeValue, i = p.o, j = p.o;
+    while (i > 0 && /\S/.test(v.charAt(i - 1))) i--;
+    while (j < v.length && /\S/.test(v.charAt(j))) j++;
+    return { a: { n: p.n, o: i }, b: { n: p.n, o: j } };
+  }
   function rdCopiaDragOn() {
     var ov = document.getElementById('rdOv'); if (!ov || !_rd || _rd.cpH) return;
-    var d = null, tm = null, iv = null, fx = 0, fy = 0, lnEm = function(x, y) { var e = document.elementFromPoint(Math.min(Math.max(x, 2), innerWidth - 2), Math.min(Math.max(y, 2), innerHeight - 2)); return e && e.closest ? e.closest('#rdOv .rd-t, #rdOv .rd-h, #rdOv .rd-tx > .ln') : null; };
+    var d = null, tm = null, iv = null, fx = 0, fy = 0;
+    var antes = function(p, q) { var r = document.createRange(); r.setStart(p.n, p.o); r.collapse(true); var r2 = document.createRange(); r2.setStart(q.n, q.o); r2.collapse(true); return r.compareBoundaryPoints(Range.START_TO_START, r2) <= 0; };
     var atual = function() {
-      if (!d) return; var fim = lnEm(fx, fy) || d.fim; d.fim = fim;
-      var todas = rdCopiaLinhas(), i = todas.indexOf(d.ini), j = todas.indexOf(fim); if (i < 0 || j < 0) return;
-      _rd.cpPrev = todas.slice(Math.min(i, j), Math.max(i, j) + 1).map(rdCopiaRange); rdCopiaMarca();
+      if (!d) return; var c = rdCopiaPonto(fx, fy); if (c) d.cur = c;
+      var ini = antes(d.cur, d.pa) ? d.cur : d.pa, fim = antes(d.cur, d.pa) ? d.pb : d.cur;
+      var rg = document.createRange(); try { rg.setStart(ini.n, ini.o); rg.setEnd(fim.n, fim.o); } catch (_) { return; }
+      _rd.cpPrev = [rg]; rdCopiaMarca();
     };
     var para = function() { clearTimeout(tm); tm = null; clearInterval(iv); iv = null; };
     var h = {
       ts: function(ev) {
         if (!_rd || !_rd.copia || (ev.target.closest && ev.target.closest('.rd-tools')) || ev.touches.length !== 1) return;
-        var t = ev.touches[0]; fx = t.clientX; fy = t.clientY; var x0 = fx, y0 = fy, ini = lnEm(fx, fy); d = null; para();
-        if (!ini) return;
+        var t = ev.touches[0]; fx = t.clientX; fy = t.clientY; h.x0 = fx; h.y0 = fy; d = null; para();
+        var p0 = rdCopiaPonto(fx, fy); if (!p0) return;
         tm = setTimeout(function() {
-          tm = null; d = { ini: ini, fim: ini }; if (navigator.vibrate) { try { navigator.vibrate(15); } catch (_) {} }
-          _rd.cpPrev = [rdCopiaRange(ini)]; rdCopiaMarca();
+          tm = null; var pw = rdCopiaPalavra(p0); d = { pa: pw.a, pb: pw.b, cur: p0 };
+          if (navigator.vibrate) { try { navigator.vibrate(15); } catch (_) {} }
+          atual();
           iv = setInterval(function() {
             if (!d) return; var zona = 120, topo = 90, base = innerHeight - 90, v = 0;
             if (fy < topo + zona) v = -Math.min(24, (topo + zona - fy) / zona * 24); else if (fy > base - zona) v = Math.min(24, (fy - (base - zona)) / zona * 24);
             if (v) { ov.scrollTop += v; atual(); }
           }, 16);
         }, 320);
-        h.x0 = x0; h.y0 = y0;
       },
       tm: function(ev) {
         var t = ev.touches[0]; fx = t.clientX; fy = t.clientY;
@@ -4673,7 +4701,7 @@ window.saveAnswer = window.saveAnswer || function(){};
       },
       te: function() {
         clearTimeout(tm); tm = null; clearInterval(iv); iv = null;
-        if (d && _rd) { (_rd.cpPrev || []).forEach(function(rl) { if (!(_rd.cpR || []).some(function(o) { return o._ln === rl._ln; })) (_rd.cpR = _rd.cpR || []).push(rl); }); _rd.cpPrev = []; rdCopiaMarca(); }
+        if (d && _rd) { (_rd.cpPrev || []).forEach(function(rl) { if (!rl.collapsed) (_rd.cpR = _rd.cpR || []).push(rl); }); _rd.cpPrev = []; rdCopiaMarca(); }
         d = null;
       }
     };
