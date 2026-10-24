@@ -1752,25 +1752,6 @@ function htmlRender(){
   }
 }
 
-/* lista (ou pasta) vazia: segurar o dedo na parte livre da tela já abre a escolha do arquivo para adicionar */
-(function(){
-  var body = document.querySelector('.pl-body'), tm = null, x0 = 0, y0 = 0, seg = false;
-  if(!body) return;
-  function vazio(){ return _pl_currentFolderId === null && !htmlFilhos(htmlTodos(), _htmlPasta).length; }
-  function zera(){ clearTimeout(tm); tm = null; }
-  body.addEventListener('pointerdown', function(e){
-    seg = false; zera();
-    if(e.target.closest && e.target.closest('.row, button, input, textarea, a')) return;
-    if(!vazio()) return;
-    x0 = e.clientX; y0 = e.clientY;
-    tm = setTimeout(function(){ tm = null; seg = true; if(navigator.vibrate){ try { navigator.vibrate(12); } catch(_){} } }, 450);
-  });
-  body.addEventListener('pointermove', function(e){ if(tm && (Math.abs(e.clientX - x0) > 10 || Math.abs(e.clientY - y0) > 10)) zera(); });
-  body.addEventListener('pointerup', function(){ zera(); if(seg){ seg = false; _htmlApos = null; document.getElementById('html-file').click(); } });
-  body.addEventListener('pointercancel', function(){ zera(); seg = false; });
-  body.addEventListener('contextmenu', function(e){ if(!(e.target.closest && e.target.closest('input, textarea'))) e.preventDefault(); });
-})();
-
 /* segurar e arrastar: em cima do meio de outro vira pasta (ou entra na pasta); nas bordas reordena; faixa do topo tira da pasta */
 function htmlLigaLinha(row, h){
   var btn = row.querySelector('.row-main'), t = null, seg = false, arr = false, x0 = 0, y0 = 0, lx = 0, ly = 0, gx = 0, gy = 0;
