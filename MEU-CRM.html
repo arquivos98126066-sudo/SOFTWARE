@@ -1266,6 +1266,11 @@ function initListeners() {
         state[key] = filtered;
         saveLocal('meucrm_state_' + colName, state[key]);
       }
+      /* nada mudou desde o último desenho: não redesenha (evita piscar e pulo da tela) */
+      const _sig = (state[key] || []).map(c => c.id + ':' + (c.updatedAt || c.createdAt || 0)).join('|');
+      window._crmSig = window._crmSig || {};
+      if (window._crmSig[key] === _sig) return;
+      window._crmSig[key] = _sig;
       renderPage(currentPage);
       updateBadges();
     }, async err => {

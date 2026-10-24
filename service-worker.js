@@ -1,4 +1,4 @@
-const CACHE_NAME = 'meus-apps-v176';
+const CACHE_NAME = 'meus-apps-v178';
 // HTMLs enviados pelo menu (segurar o app > Enviar um novo): ficam fora da limpeza de versões antigas
 const ENVIADOS = 'apps-enviados';
 
@@ -92,7 +92,7 @@ self.addEventListener('fetch', event => {
       return response;
     });
     event.waitUntil(rede.catch(() => {}));
-    const cached = await caches.match(req);
+    const cached = await caches.match(req, {ignoreSearch: true});
     return cached || rede;
   })());
 });

@@ -614,11 +614,18 @@ async function iniciarListeners() {
       try { await setDoc(docLanc, { itens: merged, _t: Date.now() }); } catch(_) {}
     }
     garantirEstrutura();
+    /* nada mudou desde o último desenho: não redesenha (evita piscar e pulo da tela) */
+    var _sigL = JSON.stringify(merged);
+    if (_sigL === window._admSigL) return;
+    window._admSigL = _sigL;
     renderHistorico(); renderRelatorio(); atualizarHeader();
   }, function(e) { console.error('Listener lancamentos:', e); });
 
   onSnapshot(docConfig, function(snap) {
     if (snap.exists()) {
+      var _sigC = JSON.stringify(snap.data());
+      if (_sigC === window._admSigC) return;
+      window._admSigC = _sigC;
       _cache.adm = snap.data();
       idbSet('config', _cache.adm);
       garantirEstrutura();

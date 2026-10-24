@@ -6,9 +6,14 @@
 <meta name="theme-color" content="#fbf8f1">
 <script src="app-boost.js"></script>
 <script>
+/* o mesmo Rico abre em dois lugares (menu e Plano): os dados são os mesmos, mas cada um tem a sua tela (pino, mapa aberto, posição) */
+window.RICO_INST = /[?&]i=plano\b/.test(location.search) ? 'p' : 'm';
+window.RICO_PIN = window.RICO_INST === 'p' ? 'fixarTelaRico.p' : 'fixarTelaRico';
+</script>
+<script>
 /* reaberto por troca de app com rolagem guardada: esconde até a página estar na posição, para não aparecer no topo e pular */
-try { var _pinY = 0; try { var _pj = JSON.parse(localStorage.getItem('fixarTelaRico') || 'null'); _pinY = _pj && _pj.y > 0 ? _pj.y : 0; } catch (e) {}
-if ((sessionStorage.getItem('viaPlano') === '1' && parseFloat(sessionStorage.getItem('rico.y')) > 0) || _pinY > 0) {
+try { var _pinY = 0; try { var _pj = JSON.parse(localStorage.getItem(window.RICO_PIN) || 'null'); _pinY = _pj && _pj.y > 0 ? _pj.y : 0; } catch (e) {}
+if ((window.RICO_INST === 'p' && parseFloat(sessionStorage.getItem('rico.y')) > 0) || _pinY > 0) {
   var _e = document.createElement('style'); _e.id = 'rico-esconde'; _e.textContent = 'html{visibility:hidden}'; document.head.appendChild(_e);
   /* durante a volta, a animação de entrada das células já nasce terminada: não pisca ao desenhar de novo */
   document.documentElement.classList.add('rico-restaura');
@@ -2606,7 +2611,19 @@ window.saveAnswer = window.saveAnswer || function(){};
       return r;
     }
     function carrega() {
-      try { var s = localStorage.getItem(KEY); if (s) { var raw = JSON.parse(s), r = limpa(raw, true); if (r) { retomaFluxo(r, raw); return r; } } } catch (e) {}
+      try {
+        var s = localStorage.getItem(KEY);
+        if (s) {
+          var raw = JSON.parse(s);
+          /* a posição vem da chave desta tela; sem ela, a tela do Plano começa limpa e a do menu usa a salva junto */
+          if (raw && raw.et) {
+            var ps = null; try { ps = JSON.parse(localStorage.getItem(KPOSI) || 'null'); } catch (x) {}
+            if (ps && typeof ps === 'object') { ['cur', 'esc', 'desc', 'vista', 'pilha'].forEach(function(k) { if (k in ps) raw.et[k] = ps[k]; else delete raw.et[k]; }); }
+            else if (window.RICO_INST === 'p') { delete raw.et.desc; delete raw.et.vista; delete raw.et.pilha; raw.et.cur = 0; raw.et.esc = []; }
+          }
+          var r = limpa(raw, true); if (r) { retomaFluxo(r, raw); return r; }
+        }
+      } catch (e) {}
       return semente();
     }
     /* onde está a lista que aparece agora (dono + camada): fica salvo para voltar ao mesmo ponto depois de sair do app */
@@ -2620,20 +2637,28 @@ window.saveAnswer = window.saveAnswer || function(){};
       })(root);
       return r;
     }
-    function salva() { try { if (root && root.et) root.et.vista = vistaDe(); localStorage.setItem(KEY, JSON.stringify(root)); } catch (e) {} }
+    /* a posição dentro do Processo (nível, caminho escolhido) é de cada tela: fica numa chave própria, fora dos dados compartilhados */
+    var KPOSI = 'ui.' + window.RICO_INST + '.' + KEY + '.pos';
+    function posSalva() {
+      try {
+        if (!root || !root.et) { localStorage.removeItem(KPOSI); return; }
+        var e = root.et; localStorage.setItem(KPOSI, JSON.stringify({ cur: e.cur, esc: e.esc, desc: e.desc, vista: e.vista, pilha: e.pilha }));
+      } catch (x) {}
+    }
+    function salva() { try { if (root && root.et) root.et.vista = vistaDe(); localStorage.setItem(KEY, JSON.stringify(root)); posSalva(); } catch (e) {} }
     /* com "Fixar tela" ligado, lembra também em qual célula você entrou e qual está aberta (fica fora das chaves rico.* para não entrar no desfazer nem na nuvem) */
-    var KUI = 'ui.' + KEY, uiLido = false;
+    var KUI = 'ui.' + window.RICO_INST + '.' + KEY, KPOS = KUI + '.pos', uiLido = false;
     function uiSalva() {
       if (!uiLido) return;
       try {
-        if (!localStorage.getItem('fixarTelaRico')) { localStorage.removeItem(KUI); return; }
+        if (!localStorage.getItem(window.RICO_PIN)) { localStorage.removeItem(KUI); return; }
         localStorage.setItem(KUI, JSON.stringify({ f: focoId, ff: focoFix, a: abreId, c: camOn, s: selId }));
       } catch (e) {}
     }
     function uiLe() {
       if (uiLido) return; uiLido = true;
       try {
-        if (!localStorage.getItem('fixarTelaRico')) return;
+        if (!localStorage.getItem(window.RICO_PIN)) return;
         var u = JSON.parse(localStorage.getItem(KUI) || 'null'); if (!u || !root) return;
         if (u.f && acha(u.f)) { focoId = u.f; focoFix = !!u.ff; camOn = !!u.c; }
         if (u.a && acha(u.a)) abreId = u.a;
@@ -4535,7 +4560,7 @@ window.saveAnswer = window.saveAnswer || function(){};
     });
     /* ao abrir ou voltar para o app: só os 4 cards, nenhum marcado */
     /* Fixar tela: lembra a visão escolhida e reabre nela ao atualizar/sair, até desativar */
-    var PIN = 'fixarTelaRico', pend = null;
+    var PIN = window.RICO_PIN, pend = null;
     try { var _o = localStorage.getItem('rico.fixarTela'); if (_o) { if (!localStorage.getItem(PIN)) localStorage.setItem(PIN, _o); localStorage.removeItem('rico.fixarTela'); } } catch (e) {}
     var pb = bar.querySelector('[data-p="fixar"]');
     function pinGet() { try { var r = localStorage.getItem(PIN); if (!r) return null; try { var o = JSON.parse(r); if (o && o.v) return o; } catch (x) {} return { v: r }; } catch (e) { return null; } }
@@ -6370,7 +6395,7 @@ window.saveAnswer = window.saveAnswer || function(){};
 
 /* aberto pelo Plano: tocar com dois dedos ao mesmo tempo troca para o Estudo (e de lá, volta direto para o Rico) */
 (function(){
-  try { if (sessionStorage.getItem('viaPlano') !== '1') return; } catch(e){ return; }
+  if (window.RICO_INST !== 'p') return;
   function gestoDoisDedos(aoFazer){
     var t1 = 0, ini = null;
     function longe(e){
@@ -6397,7 +6422,7 @@ window.saveAnswer = window.saveAnswer || function(){};
   gestoDoisDedos(function(){
     try {
       sessionStorage.setItem('troca', 'LER'); sessionStorage.setItem('rico.y', String(window.scrollY || 0)); navigator.vibrate && navigator.vibrate(25);
-      var pj = JSON.parse(localStorage.getItem('fixarTelaRico') || 'null'); if (pj && pj.v) { pj.y = window.scrollY || 0; localStorage.setItem('fixarTelaRico', JSON.stringify(pj)); }
+      var pj = JSON.parse(localStorage.getItem(window.RICO_PIN) || 'null'); if (pj && pj.v) { pj.y = window.scrollY || 0; localStorage.setItem(window.RICO_PIN, JSON.stringify(pj)); }
     } catch(e){}
     if (window.Voltar) Voltar.sai('LER.html'); else location.replace('LER.html');
   });
@@ -6405,7 +6430,7 @@ window.saveAnswer = window.saveAnswer || function(){};
 /* reaberto pelo Plano: volta na rolagem em que você deixou */
 (function(){
   var y = 0, tocou = false;
-  try { if (sessionStorage.getItem('viaPlano') !== '1') return; y = parseFloat(sessionStorage.getItem('rico.y')) || 0; sessionStorage.removeItem('rico.y'); } catch(e){ return; }
+  try { if (window.RICO_INST !== 'p') return; y = parseFloat(sessionStorage.getItem('rico.y')) || 0; sessionStorage.removeItem('rico.y'); } catch(e){ return; }
   if (!y) return;
   document.addEventListener('touchstart', function(){ tocou = true; }, {passive: true});
   function ir(){ if (!tocou && Math.abs(window.scrollY - y) > 2) window.scrollTo({top: y, behavior: 'instant'}); }

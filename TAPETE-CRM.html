@@ -2116,6 +2116,10 @@ function startRealtimeSync() {
       setTimeout(atualizarBadges, 300);
       saveLocal('tapete_crm_clients_cache', clients);
     }
+    /* nada mudou desde o último desenho: não redesenha (evita piscar e pulo da tela) */
+    const _sig = clients.map(c => c.id + ':' + (c.updatedAt||0)).join('|');
+    if(_sig === window._tapSig) return;
+    window._tapSig = _sig;
     if(curScreen==='home') renderHome();
     if(curScreen==='clientes') renderAllClients();
     if(curScreen==='fila') renderFila();
