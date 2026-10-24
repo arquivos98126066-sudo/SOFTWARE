@@ -450,9 +450,9 @@ if ((sessionStorage.getItem('troca') === (window.RICO_INST === 'p' ? 'RICOP' : '
   .rd-ov .ln:has(> .nm), .rd-ov .ln:has(> .bl), .rd-ov .ln:has(> .ds){ padding-left: 30px; text-indent: -30px; }
   .rd-ov .ln:has(> .ck){ padding-left: 28px; text-indent: -28px; }
   .rd-ov .ln.done{ text-decoration: none; color: inherit; }
-  .rd-tx[data-q]{ position: relative; margin: 9px 0 9px; padding: 18px 20px 16px 22px; background: #fbfaf7; border: 1px solid #e2ddd1; border-radius: 24px; overflow: hidden; font-family: 'DM Sans', system-ui, sans-serif; font-style: normal; font-size: 15px; line-height: 1.65; color: #444; }
+  .rd-tx[data-q]{ position: relative; margin: 14px 0 14px; padding: 18px 20px 16px 22px; background: #fbfaf7; border: 1px solid #e2ddd1; border-radius: 24px; overflow: hidden; font-family: 'DM Sans', system-ui, sans-serif; font-style: normal; font-size: 15px; line-height: 1.65; color: #444; }
   .rd-tx[data-q]::before{ content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 30px; box-sizing: border-box; border-left: 3px solid #7b2d26; border-radius: 23px 0 0 23px; pointer-events: none; }
-  .rd-tx[data-q]:has(+ .rd-tx[data-q]){ margin-bottom: 4px; }
+  .rd-tx[data-q]:has(+ .rd-tx[data-q]){ margin-bottom: 10px; }
   .rd-tx[data-q] + .rd-tx[data-q]{ margin-top: 0; }
   .rd-ov.rd-q{ touch-action: none; }
   .rd-ln-pre, .rd-pre{ background: rgba(33,30,25,.10); border-radius: 6px; }
@@ -4278,7 +4278,7 @@ window.saveAnswer = window.saveAnswer || function(){};
         if (alvoT) { try { alvoT.addEventListener('touchend', function(e) { if (e.cancelable) e.preventDefault(); solta(); }, { once: true, passive: false }); alvoT.addEventListener('touchcancel', solta, { once: true }); } catch (_) {} }
         if (_rd.edit) return;
         var tp = ov.scrollTop;
-        _rd.edit = true; _rd.tool = null; rdPinta(); ov.scrollTop = tp;
+        _rd.edit = true; _rd.tool = null; _rd.digita = false; rdPinta(); ov.scrollTop = tp;
         /* sem cursor nem teclado ao segurar: só liga a edição; o cursor vem do toque seguinte */
         try { var a0 = document.activeElement; if (a0 && a0.blur) a0.blur(); window.getSelection().removeAllRanges(); } catch (_) {}
         _rd.cur = null;
@@ -4290,8 +4290,8 @@ window.saveAnswer = window.saveAnswer || function(){};
         if (s3 && s3.rangeCount) { try { s3.removeAllRanges(); } catch (_) {} }
       });
       ov.addEventListener('touchstart', function(ev) {
-        if (!_rd || _rd.edit || (ev.target.closest && ev.target.closest('.rd-tools'))) return;
-        segurou = false; var t = ev.touches[0]; xy = { x: t.clientX, y: t.clientY }; alvoT = ev.target;
+        segurou = false;
+        if (!_rd || _rd.edit || (ev.target.closest && ev.target.closest('.rd-tools'))) return; var t = ev.touches[0]; xy = { x: t.clientX, y: t.clientY }; alvoT = ev.target;
         clearTimeout(tm); tm = setTimeout(function() { tm = null; segurou = true; if (navigator.vibrate) { try { navigator.vibrate(20); } catch (_) {} } seg(xy.x, xy.y); }, 450);
       }, { passive: true });
       ov.addEventListener('touchmove', function(ev) {
@@ -4300,6 +4300,20 @@ window.saveAnswer = window.saveAnswer || function(){};
       ov.addEventListener('touchend', function(ev) { clearTimeout(tm); tm = null; if (segurou && ev.cancelable) ev.preventDefault(); }, { passive: false });
       ov.addEventListener('touchcancel', function() { clearTimeout(tm); tm = null; }, { passive: true });
       ov.addEventListener('contextmenu', function(ev) { ev.preventDefault(); });
+      /* tocar na bolinha do check marca e desmarca (na leitura e na edição) */
+      ov.addEventListener('click', function(ev) {
+        var ck = ev.target.closest ? ev.target.closest('.ck') : null;
+        if (!ck || !_rd) return;
+        ev.preventDefault(); ev.stopPropagation(); ult = 0;
+        var on = ck.getAttribute('data-s') !== '1', ln = ck.closest('.ln'), bl = ln && ln.closest('.rd-tx');
+        ck.setAttribute('data-s', on ? '1' : '0'); if (ln) ln.classList.toggle('done', on);
+        if (_rd.edit) { rdAgenda(); return; }
+        var idx = bl ? +bl.getAttribute('data-i') : -1, li = ln ? Array.prototype.indexOf.call(bl.children, ln) : -1;
+        if (idx >= 0 && li >= 0 && _rd.e.i && _rd.e.i[idx] != null) {
+          var ls = String(_rd.e.i[idx]).split('\n');
+          if (ls[li] != null) { ls[li] = ls[li].replace(/^\[( |x)\]/, on ? '[x]' : '[ ]'); _rd.e.i[idx] = ls.join('\n'); if (_rd.salvar) { try { _rd.salvar(_rd.e); } catch (_) {} } }
+        }
+      }, true);
       ov.addEventListener('click', function(ev) {
         if (!_rd) return;
         if (segurou) { segurou = false; ult = 0; ev.preventDefault(); return; }
@@ -4356,18 +4370,18 @@ window.saveAnswer = window.saveAnswer || function(){};
           ov.querySelectorAll('.rd-pre').forEach(function(l) { l.classList.remove('rd-pre'); });
           var todas = Array.prototype.slice.call(ov.querySelectorAll('.rd-tx > .ln')), i = todas.indexOf(d.a), j = todas.indexOf(d.b);
           if (i >= 0 && j >= 0) rdCita(todas[Math.min(i, j)], todas[Math.max(i, j)]);
-          _rd.tool = null; ov.classList.remove('rd-q'); ov_limpaOn();
+          _rd.tool = null; ov.classList.remove('rd-q'); ov_limpaOn(); rdModoTeclado();
           return;
         }
         if (_rd.edit && _rd.tool === 'q' && !(ev.target.closest && ev.target.closest('.rd-tools'))) { if (ev.cancelable) ev.preventDefault(); return; }
         /* duas batidas rápidas no texto: sai da edição e volta para a leitura */
-        if (_rd.edit && !_rd.tool && !(ev.target.closest && ev.target.closest('.rd-tools'))) {
+        if (_rd.edit && !_rd.tool && !_rd.digita && !(ev.target.closest && ev.target.closest('.rd-tools, .ck'))) {
           var c = ev.changedTouches && ev.changedTouches[0]; if (!c) return;
           var agora = Date.now();
           if (agora - ultToque < 380 && Math.abs(c.clientX - ultX) < 45 && Math.abs(c.clientY - ultY) < 45) {
             ultToque = 0;
             if (ev.cancelable) ev.preventDefault();
-            clearTimeout(_rd.tm); rdSalva(); _rd.edit = false; _rd.tool = null; rdPinta();
+            clearTimeout(_rd.tm); rdSalva(); _rd.edit = false; _rd.tool = null; _rd.digita = false; rdPinta();
             try { var a1 = document.activeElement; if (a1 && a1.blur) a1.blur(); window.getSelection().removeAllRanges(); } catch (_) {}
             return;
           }
@@ -4390,7 +4404,7 @@ window.saveAnswer = window.saveAnswer || function(){};
       });
       ov.addEventListener('input', function() { rdAgenda(); });
       /* com ferramenta selecionada nunca há cursor nem teclado */
-      ov.addEventListener('focusin', function(ev) { if (_rd && _rd.edit && _rd.tool && !(ev.target.closest && ev.target.closest('.rd-tools'))) { try { ev.target.blur(); window.getSelection().removeAllRanges(); } catch (_) {} } });
+      ov.addEventListener('focusin', function(ev) { if (_rd && _rd.edit && (_rd.tool || !_rd.digita) && !_rd.fmt && !(ev.target.closest && ev.target.closest('.rd-tools'))) { try { ev.target.blur(); window.getSelection().removeAllRanges(); } catch (_) {} } });
       ov.addEventListener('focusout', function(ev) {
         var bl = ev.target && ev.target.closest ? ev.target.closest('.rd-tx') : null;
         if (bl && _rd && _rd.edit) setTimeout(function() { if (bl.isConnected && !bl.contains(document.activeElement)) rdRepinta(bl); }, 0);
@@ -4415,10 +4429,10 @@ window.saveAnswer = window.saveAnswer || function(){};
     ov.hidden = false;
   }
   function rdEsc(x) { return String(x == null ? '' : x).replace(/[&<>]/g, function(c) { return c === '&' ? '&amp;' : (c === '<' ? '&lt;' : '&gt;'); }); }
-  function rdBloco(v, idx, c, ed, q) {
-    var corpo = rtHtml(rtParse(String(v || '')), null);
-    if (c && !ed) { corpo = corpo.replace(/^(<div class="ln[^"]*" data-l="\d+">)/, '$1<span class="nm" contenteditable="false">' + c + '</span>'); }
-    return '<div class="rd-tx" data-i="' + idx + '"' + (q ? ' data-q' : '') + (ed ? ' contenteditable="true"' : '') + '>' + corpo + '</div>';
+  function rdBloco(v, idx, c, ed, q, off) {
+    var corpo = rtHtml(rtParse(String(v || '')), null, off);
+    if (c && !ed) { corpo = corpo.replace(/^(<div class="ln[^"]*" data-l="\d+">)/, '$1<span class="nm" data-rc="1" contenteditable="false">' + c + '</span>'); }
+    return '<div class="rd-tx" data-i="' + idx + '"' + (off ? ' data-n="' + off + '"' : '') + (q ? ' data-q' : '') + (ed ? ' contenteditable="true"' : '') + '>' + corpo + '</div>';
   }
   function rdPinta() {
     var ov = document.getElementById('rdOv'), e = _rd.e, ed = _rd.edit, h = '<div class="rd-col">';
@@ -4434,11 +4448,12 @@ window.saveAnswer = window.saveAnswer || function(){};
       if (st || (ed && m.t === '')) h += '<h3 class="rd-h"' + (ed ? ' contenteditable="true" data-ph="Título" data-i="' + idx + '"' : '') + '>' + rdEsc(String(m.t || '').trim()) + '</h3>';
       if (m.c) nl++;
       if (!ed && !String(v || '').trim()) return;
-      h += rdBloco(v, idx, m.c ? nl : 0, ed, m.q);
+      h += rdBloco(v, idx, m.c ? nl : 0, ed, m.q, m.n || 0);
     });
-    if (ed) h += '<div class="rd-tools"><div class="rd-linha"><button type="button" data-t="estilo" aria-label="Negrito, itálico e check"><b>Aa</b></button><div class="rd-grupo" data-g="main"><button type="button" data-t="T" aria-label="Título"><b>T</b></button><button type="button" data-t="n" aria-label="Numeração"><svg viewBox="0 0 24 24"><path d="M11 6h9M11 12h9M11 18h9M4.5 5.5l1.5-1v5M4 14.2c.6-1 2.3-.8 2.1.4-.3 1-1.6 1.5-2.1 2.4h2.4"/></svg></button><button type="button" data-t="p" aria-label="Marcadores"><svg viewBox="0 0 24 24"><path d="M11 6h9M11 12h9M11 18h9"/><circle cx="5.5" cy="6" r=".9" fill="currentColor"/><circle cx="5.5" cy="12" r=".9" fill="currentColor"/><circle cx="5.5" cy="18" r=".9" fill="currentColor"/></svg></button><button type="button" data-t="d" aria-label="Traço"><svg viewBox="0 0 24 24"><path d="M4 6h3M11 6h9M4 12h3M11 12h9M4 18h3M11 18h9"/></svg></button><button type="button" data-t="q" aria-label="Citação"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button></div><div class="rd-grupo" data-g="estilo" hidden><button type="button" data-t="b" aria-label="Negrito"><svg viewBox="0 0 24 24"><path d="M7 5h6a3.5 3.5 0 010 7H7zM7 12h7a3.5 3.5 0 010 7H7z"/></svg></button><button type="button" data-t="i" aria-label="Itálico"><svg viewBox="0 0 24 24"><path d="M10 5h7M7 19h7M14 5l-4 14"/></svg></button><button type="button" data-t="c" aria-label="Check"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M8.2 12.4l2.6 2.6 5-5.2"/></svg></button></div><button type="button" data-t="ok" class="ok" aria-label="Pronto"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7"/></svg></button></div></div>';
+    if (ed) h += '<div class="rd-tools"><div class="rd-linha"><button type="button" data-t="estilo" aria-label="Negrito, itálico e check"><b>Aa</b></button><div class="rd-grupo" data-g="main"><button type="button" data-t="T" aria-label="Título"><b>T</b></button><button type="button" data-t="n" aria-label="Numeração"><svg viewBox="0 0 24 24"><path d="M11 6h9M11 12h9M11 18h9M4.5 5.5l1.5-1v5M4 14.2c.6-1 2.3-.8 2.1.4-.3 1-1.6 1.5-2.1 2.4h2.4"/></svg></button><button type="button" data-t="p" aria-label="Marcadores"><svg viewBox="0 0 24 24"><path d="M11 6h9M11 12h9M11 18h9"/><circle cx="5.5" cy="6" r=".9" fill="currentColor"/><circle cx="5.5" cy="12" r=".9" fill="currentColor"/><circle cx="5.5" cy="18" r=".9" fill="currentColor"/></svg></button><button type="button" data-t="d" aria-label="Traço"><svg viewBox="0 0 24 24"><path d="M4 6h3M11 6h9M4 12h3M11 12h9M4 18h3M11 18h9"/></svg></button><button type="button" data-t="q" aria-label="Citação"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button></div><div class="rd-grupo" data-g="estilo" hidden><button type="button" data-t="b" aria-label="Negrito"><svg viewBox="0 0 24 24"><path d="M7 5h6a3.5 3.5 0 010 7H7zM7 12h7a3.5 3.5 0 010 7H7z"/></svg></button><button type="button" data-t="i" aria-label="Itálico"><svg viewBox="0 0 24 24"><path d="M10 5h7M7 19h7M14 5l-4 14"/></svg></button><button type="button" data-t="c" aria-label="Check"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M8.2 12.4l2.6 2.6 5-5.2"/></svg></button><button type="button" data-t="digita" aria-label="Digitar"><svg viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg></button></div><button type="button" data-t="ok" class="ok" aria-label="Pronto"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7"/></svg></button></div></div>';
     h += '<button type="button" data-fechar hidden onclick="fecharLeitura()" aria-label="Fechar"></button></div>';
     ov.innerHTML = h;
+    if (ed) { _rd.mudoAte = Date.now() + 1100; rdModoTeclado(); setTimeout(rdModoTeclado, 1150); }
   }
   /* teclado: a barra sobe junto e a linha onde está o cursor vai para a parte de cima da área visível, para ver mais texto abaixo */
   function rdTeclado() {
@@ -4462,6 +4477,51 @@ window.saveAnswer = window.saveAnswer || function(){};
   }
   if (window.visualViewport) { window.visualViewport.addEventListener('resize', function() { rdTeclado(); setTimeout(rdCentra, 60); }); window.visualViewport.addEventListener('scroll', rdTeclado); }
   document.addEventListener('selectionchange', function() { if (_rd && _rd.edit) { clearTimeout(_rd.tc); _rd.tc = setTimeout(rdCentra, 120); } });
+  /* teclado só quando tocar no texto sem ferramenta: com ferramenta ou leque Aa aberto, os campos ficam com inputmode none (aceitam foco e seleção, mas não abrem o teclado) */
+  function rdModoAtual() {
+    var ov = document.getElementById('rdOv'), ge = ov && ov.querySelector('[data-g="estilo"]');
+    if (_rd && _rd.digita) return 'text';
+    return (_rd && (_rd.tool || (ge && !ge.hidden) || (_rd.mudoAte && Date.now() < _rd.mudoAte))) ? 'none' : 'text';
+  }
+  function rdModoTeclado() {
+    var ov = document.getElementById('rdOv'); if (!ov || !_rd) return;
+    var m = rdModoAtual();
+    ov.querySelectorAll('.rd-tx[contenteditable], .rd-t[contenteditable], .rd-h[contenteditable]').forEach(function(e) { e.setAttribute('inputmode', m); });
+  }
+  function rdPosDe(no, off) {
+    var el = no.nodeType === 1 ? no : no.parentNode, ln = el && el.closest ? el.closest('.ln') : null, bl = ln && ln.closest('.rd-tx');
+    if (!ln || !bl) return null;
+    var r = document.createRange(); r.selectNodeContents(ln); try { r.setEnd(no, off); } catch (_) { return null; }
+    var bls = Array.prototype.slice.call(document.querySelectorAll('#rdOv .rd-tx'));
+    return { bi: bls.indexOf(bl), li: Array.prototype.indexOf.call(bl.children, ln), off: r.toString().length };
+  }
+  function rdNoDe(p) {
+    var bls = document.querySelectorAll('#rdOv .rd-tx'), bl = bls[p.bi], ln = bl && bl.children[p.li];
+    if (!ln) return null;
+    var w = document.createTreeWalker(ln, NodeFilter.SHOW_TEXT, null), n, acc = 0, ult = null;
+    while ((n = w.nextNode())) { if (n.parentNode.closest && n.parentNode.closest('.ck,.nm,.bl,.ds')) continue; ult = n; var l = n.nodeValue.length; if (acc + l >= p.off) return { n: n, o: p.off - acc }; acc += l; }
+    return ult ? { n: ult, o: ult.nodeValue.length } : { n: ln, o: 0 };
+  }
+  document.addEventListener('selectionchange', function() {
+    if (!_rd || !_rd.edit) return;
+    var ov4 = document.getElementById('rdOv'), ge4 = ov4 && ov4.querySelector('[data-g="estilo"]');
+    if (ge4 && !ge4.hidden) return;
+    var s4 = window.getSelection(); if (!s4 || !s4.rangeCount) return;
+    var n = s4.anchorNode; n = n && (n.nodeType === 1 ? n : n.parentNode);
+    if (!(n && n.closest && n.closest('#rdOv .rd-tx'))) return;
+    var r4 = s4.getRangeAt(0);
+    if (!r4.collapsed) { var a = rdPosDe(r4.startContainer, r4.startOffset), b = rdPosDe(r4.endContainer, r4.endOffset); _rd.rngO = (a && b) ? { a: a, b: b } : null; }
+    else if (document.activeElement && ov4.contains(document.activeElement)) _rd.rngO = null;
+  });
+  /* lápis do leque Aa: ligado = toque no texto põe o cursor e abre o teclado; desligado = sem cursor e sem teclado */
+  function rdDigita(on) {
+    var ov = document.getElementById('rdOv'); if (!_rd || !ov) return;
+    _rd.digita = !!on;
+    var b = ov.querySelector('[data-t="digita"]'); if (b) b.classList.toggle('on', !!on);
+    if (on) { _rd.tool = null; ov.classList.remove('rd-q'); ov_limpaOn(); }
+    else { try { var a = document.activeElement; if (a && a.blur && ov.contains(a)) a.blur(); } catch (_) {} }
+    rdModoTeclado();
+  }
   function rdFoco(el, fim) {
     try { el.focus(); var r = document.createRange(); r.selectNodeContents(el); r.collapse(!fim); var s = window.getSelection(); s.removeAllRanges(); s.addRange(r); } catch (_) {}
   }
@@ -4475,6 +4535,7 @@ window.saveAnswer = window.saveAnswer || function(){};
       var idx = +el.getAttribute('data-i'), txt = rtDeDom(el, false).replace(/​/g, '');
       var o = {}, v = velho[idx]; if (v && v.c) o.c = 1;
       if (el.hasAttribute('data-q')) o.q = 1;
+      var nm1 = el.querySelector('.ln > .nm:not([data-rc])'); if (nm1 && +nm1.textContent > 1 && nm1.getAttribute('data-r') !== '1') o.n = (+nm1.textContent) - 1;
       if (pend) o.t = pend;
       pend = null;
       if (!txt.trim() && !o.t) return;
@@ -4497,20 +4558,40 @@ window.saveAnswer = window.saveAnswer || function(){};
   function rdArma(t) {
     var ov = document.getElementById('rdOv');
     _rd.tool = (_rd.tool === t) ? null : t;
+    if (_rd.tool) { _rd.digita = false; var bd = ov.querySelector('[data-t="digita"]'); if (bd) bd.classList.remove('on'); }
     ov.querySelectorAll('.rd-tools [data-t]').forEach(function(b) { var x = b.getAttribute('data-t'); b.classList.toggle('on', x === _rd.tool); });
     /* ferramenta armada: sem teclado até desarmar */
+    rdModoTeclado();
     if (_rd.tool) { try { var a = document.activeElement; if (a && a.blur && ov.contains(a)) a.blur(); } catch (_) {} }
   }
   function rdFerr(t) {
     var ov = document.getElementById('rdOv'), sel = window.getSelection();
-    if (t === 'ok') { clearTimeout(_rd.tm); rdSalva(); _rd.edit = false; _rd.tool = null; ov.classList.remove('rd-q'); rdPinta(); return; }
+    if (t === 'ok') { clearTimeout(_rd.tm); rdSalva(); _rd.edit = false; _rd.tool = null; _rd.digita = false; ov.classList.remove('rd-q'); rdPinta(); return; }
     if (t === 'estilo') {
       var gm = ov.querySelector('[data-g="main"]'), ge = ov.querySelector('[data-g="estilo"]');
       var abre = ge.hidden; ge.hidden = !abre; gm.hidden = abre;
       ov.querySelector('[data-t="estilo"]').classList.toggle('on', abre);
+      rdModoTeclado();
+      if (abre) { try { var a2 = document.activeElement; if (a2 && a2.blur && ov.contains(a2)) a2.blur(); } catch (_) {} }
       return;
     }
-    if (t === 'b' || t === 'i') { try { document.execCommand(t === 'b' ? 'bold' : 'italic'); } catch (_) {} rdAgenda(); return; }
+    if (t === 'digita') { rdDigita(!_rd.digita); return; }
+    if (t === 'b' || t === 'i') {
+      /* sem teclado: volta o foco ao texto (inputmode none) e restaura a seleção guardada */
+      try {
+        _rd.fmt = true;
+        var f0 = document.activeElement;
+        if (!(f0 && f0.isContentEditable) && _rd.rngO) {
+          var na = rdNoDe(_rd.rngO.a), nb = rdNoDe(_rd.rngO.b);
+          var blA = document.querySelectorAll('#rdOv .rd-tx')[_rd.rngO.a.bi];
+          if (na && nb && blA) { blA.focus(); var rr = document.createRange(); rr.setStart(na.n, na.o); rr.setEnd(nb.n, nb.o); var s5 = window.getSelection(); s5.removeAllRanges(); s5.addRange(rr); }
+        }
+        document.execCommand(t === 'b' ? 'bold' : 'italic');
+      } catch (_) {}
+      _rd.fmt = false;
+      if (!_rd.digita) { try { var f1 = document.activeElement; if (f1 && f1.blur && f1.isContentEditable) f1.blur(); } catch (_) {} }
+      rdAgenda(); return;
+    }
     if (t === 'q') {
       var sq = window.getSelection();
       if (sq && sq.rangeCount && !sq.isCollapsed && _rd.tool !== 'q') { rdCita(); return; }
@@ -4557,7 +4638,18 @@ window.saveAnswer = window.saveAnswer || function(){};
       });
     });
     try { sel.removeAllRanges(); } catch (_) {}
+    rdRenumera();
+    rdModoTeclado();
     rdAgenda();
+  }
+  /* numeração contínua entre os pedaços de um mesmo texto (depois de dividir por título ou citação) */
+  function rdRenumera() {
+    var ov = document.getElementById('rdOv'), c = 0;
+    ov.querySelectorAll('.rd-col > .rd-tx').forEach(function(b) {
+      var off = +b.getAttribute('data-n') || 0;
+      if (off) c = off; else if (b.getAttribute('data-i') !== '-1') c = 0;
+      Array.prototype.forEach.call(b.querySelectorAll('.ln > .nm:not([data-rc])'), function(nm) { if (nm.getAttribute('data-r') === '1') c = 1; else c++; nm.textContent = c; });
+    });
   }
   /* aplica a ferramenta armada na linha tocada */
   function rdAplica(ln, bl) {
@@ -4574,8 +4666,8 @@ window.saveAnswer = window.saveAnswer || function(){};
         bl.parentNode.insertBefore(h3, bl.nextSibling);
         bl.parentNode.insertBefore(resto, h3.nextSibling);
       }
-      _rd.tool = null; ov_limpaOn();
-      rdFoco(h3); rdAgenda(); return;
+      _rd.tool = null; ov_limpaOn(); rdRenumera();
+      rdDigita(true); rdFoco(h3); rdAgenda(); return;
     }
     var pre = { c: '[ ] ', n: '[#] ', p: '[-] ', d: '[=] ' }[t];
     if (!pre) return;
@@ -5609,8 +5701,8 @@ window.saveAnswer = window.saveAnswer || function(){};
     return '';
   }
   function rtInline(ln, li) { return rtMk(ln, li, 1) + rtSeg(ln, 0, ln.P.length); }
-  function rtHtml(pm, ferr) {
-    var k = 0, num = 0;
+  function rtHtml(pm, ferr, off) {
+    var k = 0, num = off || 0;
     return pm.lines.map(function(ln, li) {
       var vazia = ln.P.trim() === '' && ln.m === null;
       if (ln.m === 'n') { if (ln.r) num = 1; else num++; }
