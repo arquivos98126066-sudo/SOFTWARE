@@ -247,7 +247,12 @@ document.addEventListener('click',function(e){
   #pl-html .row.alvo-antes { box-shadow: 0 -4px 0 -1px var(--brand); }
   #pl-html .row.alvo-depois { box-shadow: 0 4px 0 -1px var(--brand); }
   .pl-h-fant { position: fixed; z-index: 900; margin: 0; pointer-events: none; opacity: .95; box-shadow: 0 12px 30px rgba(15,27,45,.25); }
-  #pl-h-tirar { position: fixed; left: 12px; right: 12px; top: calc(env(safe-area-inset-top) + 10px); height: 52px; z-index: 890; border-radius: 999px; display: none; align-items: center; justify-content: center; gap: 10px; background: var(--dark, #131c2e); color: #fff; font-size: 14px; font-weight: 600; opacity: .93; }
+  #proc-list-overlay { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+  #proc-list-overlay input, #proc-list-overlay textarea { -webkit-user-select: text; user-select: text; }
+  .pl-h-fab { position: fixed; right: 22px; bottom: calc(env(safe-area-inset-bottom) + 30px); z-index: 520; width: 54px; height: 54px; border: 0; border-radius: 50%; background: var(--dark, #131c2e); color: #fff; display: grid; place-items: center; padding: 0; box-shadow: 0 10px 24px rgba(15,27,45,.32); }
+  .pl-h-fab:active { transform: scale(.94); }
+  .pl-h-fab svg { width: 24px; height: 24px; stroke: currentColor; stroke-width: 1.9; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+  #pl-h-tirar { position: fixed; left: 12px; right: 12px; top: calc(env(safe-area-inset-top) + 10px); height: 52px; z-index: 890; border-radius: 999px; display: none; align-items: center; justify-content: center; gap: 10px; background: var(--dark, #131c2e); color: #fff; font-size: 14px; font-weight: 700; letter-spacing: .06em; opacity: .93; }
   #pl-h-tirar.on { display: flex; }
   #pl-h-tirar.alvo { background: var(--brand); }
   #pl-h-tirar .ic { width: 20px; height: 20px; stroke: currentColor; fill: none; }
@@ -1739,12 +1744,32 @@ function htmlRender(){
     }
   });
   if(!lista.length){
-    var add = document.createElement('div'); add.className = 'row pl-h-add';
-    add.innerHTML = '<button type="button" class="row-main">' + ic('plus', 'row-ico') + '<span class="row-name">Adicionar HTML</span></button>';
-    add.querySelector('button').onclick = function(){ _htmlApos = null; document.getElementById('html-file').click(); };
-    rows.appendChild(add);
+    /* lista vazia: um botão redondo flutuante com o mais, sem linha de texto */
+    var fab = document.createElement('button'); fab.type = 'button'; fab.className = 'pl-h-fab'; fab.setAttribute('aria-label', 'Adicionar HTML');
+    fab.innerHTML = ic('plus');
+    fab.onclick = function(){ _htmlApos = null; document.getElementById('html-file').click(); };
+    box.appendChild(fab);
   }
 }
+
+/* lista (ou pasta) vazia: segurar o dedo na parte livre da tela já abre a escolha do arquivo para adicionar */
+(function(){
+  var body = document.querySelector('.pl-body'), tm = null, x0 = 0, y0 = 0, seg = false;
+  if(!body) return;
+  function vazio(){ return _pl_currentFolderId === null && !htmlFilhos(htmlTodos(), _htmlPasta).length; }
+  function zera(){ clearTimeout(tm); tm = null; }
+  body.addEventListener('pointerdown', function(e){
+    seg = false; zera();
+    if(e.target.closest && e.target.closest('.row, button, input, textarea, a')) return;
+    if(!vazio()) return;
+    x0 = e.clientX; y0 = e.clientY;
+    tm = setTimeout(function(){ tm = null; seg = true; if(navigator.vibrate){ try { navigator.vibrate(12); } catch(_){} } }, 450);
+  });
+  body.addEventListener('pointermove', function(e){ if(tm && (Math.abs(e.clientX - x0) > 10 || Math.abs(e.clientY - y0) > 10)) zera(); });
+  body.addEventListener('pointerup', function(){ zera(); if(seg){ seg = false; _htmlApos = null; document.getElementById('html-file').click(); } });
+  body.addEventListener('pointercancel', function(){ zera(); seg = false; });
+  body.addEventListener('contextmenu', function(e){ if(!(e.target.closest && e.target.closest('input, textarea'))) e.preventDefault(); });
+})();
 
 /* segurar e arrastar: em cima do meio de outro vira pasta (ou entra na pasta); nas bordas reordena; faixa do topo tira da pasta */
 function htmlLigaLinha(row, h){
@@ -1778,7 +1803,7 @@ function htmlLigaLinha(row, h){
     row.classList.remove('pegado'); row.classList.add('arr');
     if(_htmlPasta){
       tirar = document.getElementById('pl-h-tirar');
-      if(!tirar){ tirar = document.createElement('div'); tirar.id = 'pl-h-tirar'; tirar.innerHTML = ic('folder-in') + '<span>Soltar aqui para tirar da pasta</span>'; document.body.appendChild(tirar); }
+      if(!tirar){ tirar = document.createElement('div'); tirar.id = 'pl-h-tirar'; tirar.innerHTML = ic('folder-in') + '<span>VOLTAR PARA A LISTA</span>'; document.body.appendChild(tirar); }
       tirar.classList.add('on');
     }
     arr = true; gx = e.clientX; gy = e.clientY; lx = gx; ly = gy;
