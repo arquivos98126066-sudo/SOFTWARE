@@ -34,3 +34,52 @@ Vale para os 6 apps do menu (Tapete CRM, Meu CRM, Plano/DOA, ADM, Rico, Estudo/L
 - Mudança de design: mostrar imagem antes e esperar o "pode fazer". Função e correção: fazer.
 - Antes de publicar: rodar a checagem de sintaxe dos scripts, abrir o app no teste sem erros novos, testar o fluxo mexido e subir a versão do cache. Publicar na main do SOFTWARE e conferir que o GitHub tem o mesmo commit.
 - Responder em árvore (CLAUDE.md do repositório Claude), sem emoji, sem caminhos nem código, dizendo o que foi testado e o que não foi confirmado.
+
+---
+
+# Erros que já aconteceram (leia antes de mexer)
+
+Lista do que deu errado ao deixar os apps rápidos, firmes e sem piscar, e a solução que funcionou. Ler antes de mexer em app ou HTML. Cada item: o erro, o porquê, o que fazer.
+
+## Piscar, pular e tremer
+- Rolagem que desliza sozinha ao voltar: o CSS tinha scroll-behavior smooth, então scrollTo animava. Usar sempre scrollTo({top, behavior:'instant'}).
+- Tela aparecia no topo e depois pulava para o lugar guardado: mostrava antes de posicionar. Esconder (visibility:hidden) até a página montar e a rolagem estar no alvo; soltar depois de load e fontes; limite de segurança de 1,5 s.
+- Animação de entrada das células repetia a cada redesenho (dois piscos): durante a volta usar animation-delay negativo (-5s). Nunca usar animation:none e remover depois: ao remover a animação recomeça. O override só sai depois de passar a duração.
+- Seta que mudava de tamanho depois de abrir (pulo de 46 px): nascer no tamanho típico no HTML e só redesenhar se a diferença passar de 3 px.
+- Reposicionar a rolagem várias vezes (300, 800, 1800 ms) puxava a tela de volta enquanto o usuário já rolava (tremida para cima e para baixo): parar no primeiro toque.
+- O navegador mexe na rolagem sozinho quando o conteúdo cresce (scroll anchoring) e dava pulinho ao restaurar: overflow-anchor:none enquanto restaura, voltar ao normal no primeiro toque.
+- Conteúdo que monta depois (HTML do Plano como o Leads): tirar a foto do estado e restaurar só quando o DOM parar de mudar (MutationObserver quieto por 140 ms) e mostrar só quando a rolagem alvo é alcançável.
+- Lista mostrava "Sem processos" e depois descia quando os dados chegavam: esconder a lista até os dados do aparelho carregarem.
+- Firebase onSnapshot redesenhava a cada envio, mesmo igual (piscar na abertura): comparar assinatura (ids e updatedAt, ou JSON pequeno) e não redesenhar se nada mudou. Feito no Plano, Tapete CRM, Meu CRM, ADM e Rico.
+- Puxar para atualizar recarregava a página e piscava: overscroll-behavior-y:contain em todos os apps.
+- Ouvinte de touchstart ou touchmove não passivo no document faz TODA rolagem esperar o app (travadas). Só ligar enquanto a ação precisa (seletor aberto, arrastando). Pinça já é bloqueada por touch-action:pan-x pan-y.
+
+## Gestos e alternar apps
+- Em iframe com sandbox sem allow-same-origin o toque não chega à página de fora e o armazenamento fica bloqueado: injetar o gesto dentro do HTML e avisar o pai por postMessage. O Rico abre como página, não como iframe, senão não grava dados.
+- Troca com location.replace deixava passos fantasmas no histórico (voltar não chegava ao menu): cada pushState leva a profundidade em history.state._d e a troca desfaz com history.go(-d) antes (Voltar.sai).
+- Flag de troca pendente reabria o Rico ao entrar pelo menu: a flag só é criada pelo gesto, consumida ao chegar e apagada pelo menu.
+- Dois lugares para o mesmo app (Rico no menu e no Plano) compartilhavam o estado de tela (pino, mapa aberto): chaves por instância (?i=plano) para a tela; os dados continuam os mesmos.
+- A posição dentro do Processo (nível, caminho) estava dentro dos dados compartilhados: passou para chave própria da instância.
+- Gesto não deve ser bloqueado só por tocar num input (ADM tem input em toda a tela): bloquear só com o input focado.
+- Gesto novo: testar com toque simulado contra rolagem vertical, só ida, diagonal e tremida pequena.
+- "Dois cliques" para ele é tocar com dois dedos juntos (o gesto antigo), não toque duplo. Quando um termo for ambíguo, usar a palavra dele ou perguntar.
+
+## Barra do celular e cores
+- theme-color do Rico dizia escuro e a página é creme: ler a cor real do fundo (CorBarra) em vez do aviso. O menu mantém a cor com data-fixa.
+
+## Service worker e HTML enviado
+- HTML enviado pelo menu fica no cache apps-enviados; o service worker injeta o app-boost nele. Usar caches.match(..., {ignoreSearch:true}) para endereços com ?i=plano.
+- Sempre subir o número do cache a cada publicação.
+
+## Dados
+- Os mapas do Rico (rico.proc.* e rico.mapa.*), a lista de HTMLs do Plano e as versões enviadas pelo menu ficam só no aparelho (localStorage e cache). O Firebase guarda respostas, metas, áreas, hábitos e ciclo. Perder o celular perde o resto, a menos que seja exportado.
+- Chaves ui.* guardam estado de tela e ficam fora de rico.* para não entrar no desfazer nem na nuvem.
+
+## Como testei (repetir)
+- Playwright com 412x915, Firebase simulado, toque por CDP (Input.dispatchTouchEvent), gravação de quadros (Page.startScreencast) para contar telas diferentes na volta, amostragem de rolagem e visibilidade a cada 40 ms.
+- Teste que só diz "abre sem erro" não pega piscada: gravar a volta.
+
+## Erros meus de processo
+- Ao refatorar cortando blocos por posição apaguei uma função usada por outra parte (salvaEstadoPlano). Depois de refatorar: procurar as funções usadas e rodar o fluxo.
+- Não confirmar no celular dele: dizer "não medi no celular", pedir para fechar e abrir o app duas ou três vezes por causa do cache.
+- Mudança de design só com imagem antes e o "pode fazer".
