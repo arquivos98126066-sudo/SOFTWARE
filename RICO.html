@@ -1411,7 +1411,9 @@ async function carregarDados() {
       } else {
         // Nuvem igual ou mais recente
         respostasCache = cloud.dados || {};
-        if (!local || cloudTime > localTime) preencherDados(respostasCache, true);
+        /* nuvem igual ao que já está na tela: não redesenha (evita piscar) */
+        var _igual = false; try { _igual = !!local && JSON.stringify(cloud.dados || {}) === JSON.stringify(local.dados || {}); } catch (_) {}
+        if ((!local || cloudTime > localTime) && !_igual) preencherDados(respostasCache, true);
         saveLocal('born_rich_' + CADERNO_ID, cloud);
       }
     } else if (local) {
