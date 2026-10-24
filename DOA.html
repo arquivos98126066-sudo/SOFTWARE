@@ -2669,30 +2669,43 @@ window.p_autoGrow = p_autoGrow;
 
 abrirProcesso();
 
-/* teste: tocar com dois dedos ao mesmo tempo troca para o Estudo */
+/* ir e voltar com o dedo na horizontal troca para o Estudo */
 (function(){
-  function gestoDoisDedos(aoFazer){
-    var t1 = 0, ini = null;
-    function longe(e){
-      for (var i = 0; i < e.touches.length; i++){
-        var t = e.touches[i], o = ini.p[t.identifier];
-        if (o && Math.hypot(t.clientX - o.x, t.clientY - o.y) > 24) return true;
+  function gestoVaiVolta(aoFazer){
+    var pts = null, t0 = 0;
+    /* ir para um lado e voltar: um traço horizontal grande, de ida e volta, mais ou menos reto */
+    function ehVaiVolta(p){
+      if (p.length < 5) return false;
+      var x0 = p[0].x, m = 0, minY = p[0].y, maxY = p[0].y, i;
+      for (i = 1; i < p.length; i++){
+        if (Math.abs(p[i].x - x0) > Math.abs(p[m].x - x0)) m = i;
+        if (p[i].y < minY) minY = p[i].y;
+        if (p[i].y > maxY) maxY = p[i].y;
       }
-      return false;
+      var ida = p[m].x - x0, aida = Math.abs(ida), fim = p[p.length - 1];
+      if (aida < 100) return false;
+      if (m < 2 || m > p.length - 3) return false;
+      if ((fim.x - p[m].x) * ida > 0) return false;
+      if (Math.abs(p[m].x - fim.x) < aida * 0.7) return false;
+      if (maxY - minY > Math.max(70, aida * 0.55)) return false;
+      return true;
+    }
+    function fim(){
+      var p = pts; pts = null;
+      if (p && Date.now() - t0 <= 1600 && ehVaiVolta(p)) aoFazer();
     }
     document.addEventListener('touchstart', function(e){
-      if (e.touches.length === 1){ t1 = Date.now(); ini = null; return; }
-      if (e.touches.length === 2 && (e.changedTouches.length === 2 || Date.now() - t1 <= 300)){
-        ini = {t: Date.now(), p: {}};
-        for (var i = 0; i < 2; i++) ini.p[e.touches[i].identifier] = {x: e.touches[i].clientX, y: e.touches[i].clientY};
-      } else ini = null;
+      if (e.touches.length !== 1 || /^(INPUT|TEXTAREA|SELECT)$/.test((e.target.tagName || ''))) { pts = null; return; }
+      var t = e.touches[0]; pts = [{x: t.clientX, y: t.clientY}]; t0 = Date.now();
     }, {passive: true});
-    document.addEventListener('touchmove', function(e){ if (ini && longe(e)) ini = null; }, {passive: true});
-    document.addEventListener('touchend', function(e){
-      var g = ini; ini = null;
-      if (g && Date.now() - g.t <= 500) aoFazer();
+    document.addEventListener('touchmove', function(e){
+      if (!pts) return;
+      if (e.touches.length !== 1) { pts = null; return; }
+      var t = e.touches[0], u = pts[pts.length - 1];
+      if (Math.hypot(t.clientX - u.x, t.clientY - u.y) >= 5) pts.push({x: t.clientX, y: t.clientY});
     }, {passive: true});
-    document.addEventListener('touchcancel', function(){ ini = null; }, {passive: true});
+    document.addEventListener('touchend', fim, {passive: true});
+    document.addEventListener('touchcancel', fim, {passive: true});
   }
   function salvaEstadoPlano(){
     try {
@@ -2712,7 +2725,7 @@ abrirProcesso();
     try { sessionStorage.setItem('troca', 'LER'); navigator.vibrate && navigator.vibrate(25); } catch(e){}
     if (window.Voltar) Voltar.sai('LER.html'); else location.replace('LER.html');
   }
-  gestoDoisDedos(trocaParaEstudo);
+  gestoVaiVolta(trocaParaEstudo);
   /* dentro dos HTMLs abertos em tela cheia o toque não chega ao Plano: o gesto vai junto dentro de cada um e avisa por mensagem */
   /* guarda e devolve o estado de qualquer HTML aberto aqui: cartões abertos, campos, caixas rolando e a rolagem da página.
      Roda dentro do HTML (por isso é montado como texto); manda o estado ao Plano e o recebe de volta ao reabrir. */
@@ -2801,7 +2814,7 @@ abrirProcesso();
   }
   window.planoInjeta = function(html, abs, E){
     var json = JSON.stringify(E || null).replace(/</g, '\\u003c');
-    var tag = '<script>(' + gestoDoisDedos.toString() + ')(function(){ parent.postMessage({planoTroca: 1, planoE: window.__planoLe ? window.__planoLe() : null}, "*"); });' +
+    var tag = '<script>(' + gestoVaiVolta.toString() + ')(function(){ parent.postMessage({planoTroca: 1, planoE: window.__planoLe ? window.__planoLe() : null}, "*"); });' +
       '(' + estadoFrame.toString() + ')(' + json + ');' +
       'document.addEventListener("click", function(e){ var a = e.target.closest && e.target.closest("a[href]"); if (a && a.getAttribute("href").charAt(0) === "#"){ e.preventDefault(); var t = document.getElementById(a.getAttribute("href").slice(1)); if (t) t.scrollIntoView({behavior: "smooth"}); } }, true);<\/script>';
     if (abs && !/<base[\s>]/i.test(html)) html = html.replace(/<head[^>]*>/i, function(m){ return m + '<base href="' + abs + '">'; });

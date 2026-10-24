@@ -6396,33 +6396,46 @@ window.saveAnswer = window.saveAnswer || function(){};
 })();
 
 
-/* aberto pelo Plano: tocar com dois dedos ao mesmo tempo troca para o Estudo (e de lá, volta direto para o Rico) */
+/* aberto pelo Plano: ir e voltar com o dedo na horizontal troca para o Estudo (e de lá, volta direto para o Rico) */
 (function(){
   if (window.RICO_INST !== 'p') return;
-  function gestoDoisDedos(aoFazer){
-    var t1 = 0, ini = null;
-    function longe(e){
-      for (var i = 0; i < e.touches.length; i++){
-        var t = e.touches[i], o = ini.p[t.identifier];
-        if (o && Math.hypot(t.clientX - o.x, t.clientY - o.y) > 24) return true;
+  function gestoVaiVolta(aoFazer){
+    var pts = null, t0 = 0;
+    /* ir para um lado e voltar: um traço horizontal grande, de ida e volta, mais ou menos reto */
+    function ehVaiVolta(p){
+      if (p.length < 5) return false;
+      var x0 = p[0].x, m = 0, minY = p[0].y, maxY = p[0].y, i;
+      for (i = 1; i < p.length; i++){
+        if (Math.abs(p[i].x - x0) > Math.abs(p[m].x - x0)) m = i;
+        if (p[i].y < minY) minY = p[i].y;
+        if (p[i].y > maxY) maxY = p[i].y;
       }
-      return false;
+      var ida = p[m].x - x0, aida = Math.abs(ida), fim = p[p.length - 1];
+      if (aida < 100) return false;
+      if (m < 2 || m > p.length - 3) return false;
+      if ((fim.x - p[m].x) * ida > 0) return false;
+      if (Math.abs(p[m].x - fim.x) < aida * 0.7) return false;
+      if (maxY - minY > Math.max(70, aida * 0.55)) return false;
+      return true;
+    }
+    function fim(){
+      var p = pts; pts = null;
+      if (p && Date.now() - t0 <= 1600 && ehVaiVolta(p)) aoFazer();
     }
     document.addEventListener('touchstart', function(e){
-      if (e.touches.length === 1){ t1 = Date.now(); ini = null; return; }
-      if (e.touches.length === 2 && (e.changedTouches.length === 2 || Date.now() - t1 <= 300)){
-        ini = {t: Date.now(), p: {}};
-        for (var i = 0; i < 2; i++) ini.p[e.touches[i].identifier] = {x: e.touches[i].clientX, y: e.touches[i].clientY};
-      } else ini = null;
+      if (e.touches.length !== 1 || /^(INPUT|TEXTAREA|SELECT)$/.test((e.target.tagName || ''))) { pts = null; return; }
+      var t = e.touches[0]; pts = [{x: t.clientX, y: t.clientY}]; t0 = Date.now();
     }, {passive: true});
-    document.addEventListener('touchmove', function(e){ if (ini && longe(e)) ini = null; }, {passive: true});
-    document.addEventListener('touchend', function(e){
-      var g = ini; ini = null;
-      if (g && Date.now() - g.t <= 500) aoFazer();
+    document.addEventListener('touchmove', function(e){
+      if (!pts) return;
+      if (e.touches.length !== 1) { pts = null; return; }
+      var t = e.touches[0], u = pts[pts.length - 1];
+      if (Math.hypot(t.clientX - u.x, t.clientY - u.y) >= 5) pts.push({x: t.clientX, y: t.clientY});
     }, {passive: true});
-    document.addEventListener('touchcancel', function(){ ini = null; }, {passive: true});
+    document.addEventListener('touchend', fim, {passive: true});
+    document.addEventListener('touchcancel', fim, {passive: true});
   }
-  gestoDoisDedos(function(){
+  gestoVaiVolta(function(){
     try {
       sessionStorage.setItem('troca', 'LER'); sessionStorage.setItem('rico.y', String(window.scrollY || 0)); navigator.vibrate && navigator.vibrate(25);
       var pj = JSON.parse(localStorage.getItem(window.RICO_PIN) || 'null'); if (pj && pj.v) { pj.y = window.scrollY || 0; localStorage.setItem(window.RICO_PIN, JSON.stringify(pj)); }
