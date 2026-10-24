@@ -10,6 +10,9 @@
 try { var _pinY = 0; try { var _pj = JSON.parse(localStorage.getItem('fixarTelaRico') || 'null'); _pinY = _pj && _pj.y > 0 ? _pj.y : 0; } catch (e) {}
 if ((sessionStorage.getItem('viaPlano') === '1' && parseFloat(sessionStorage.getItem('rico.y')) > 0) || _pinY > 0) {
   var _e = document.createElement('style'); _e.id = 'rico-esconde'; _e.textContent = 'html{visibility:hidden}'; document.head.appendChild(_e);
+  /* durante a volta, a animação de entrada das células já nasce terminada: não pisca ao desenhar de novo */
+  document.documentElement.classList.add('rico-restaura');
+  setTimeout(function(){ document.documentElement.classList.remove('rico-restaura'); }, 2200);
   setTimeout(function(){ var x = document.getElementById('rico-esconde'); if (x) x.remove(); }, 1500);
 } } catch (e) {}
 </script>
@@ -628,6 +631,7 @@ if ((sessionStorage.getItem('viaPlano') === '1' && parseFloat(sessionStorage.get
   .rcm-wrap.zig .rcm-node.foco, .rcm-wrap.zig .rcm-node.foco.sel{ color: var(--gold); }
   .rcm-node.txt{ border-color: #f6d97f; }
   .rcm-wrap.zig{ animation: cicloEntra .3s ease; }
+  html.rico-restaura .rcm-wrap, html.rico-restaura .rcm-wrap *, html.rico-restaura .cycle-block *, html.rico-restaura .modo-bar{ animation-delay: -5s !important; }
   .rcm-wrap.zig .rcm-node{ overflow: hidden; width: max-content; height: auto; min-height: 44px; padding: 8px 19px; gap: 10px; font-size: 14.5px; white-space: normal; text-align: center; justify-content: center; }
   .rcm-wrap.zig .rcm-node.root{ height: auto; min-height: 44px; padding: 8px 22px; font-size: 16px; }
   .rcm-wrap.zig .rcm-node span{ min-width: 0; line-height: 1.3; overflow-wrap: break-word; text-wrap: balance; }
@@ -4575,7 +4579,7 @@ window.saveAnswer = window.saveAnswer || function(){};
       if (pv.e && window.rcMapa) window.rcMapa.restaura(pv.e);
       if (typeof pv.f === 'number') _foco = pv.f;
       renderCiclo();
-      irY(); requestAnimationFrame(function() { irY(); var x = document.getElementById('rico-esconde'); if (x) x.remove(); }); setTimeout(irY, 300); setTimeout(irY, 800); setTimeout(irY, 1800);
+      irY(); requestAnimationFrame(irY); setTimeout(irY, 300); setTimeout(irY, 800); setTimeout(irY, 1800);
     } else { pronto = true; abreSel(true); }
     window.addEventListener('pageshow', function(e) { if (e.persisted && !sel && !pinGet()) abreSel(true); });
     t.addEventListener('keydown', function(e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); alterna(); } });
@@ -6351,7 +6355,12 @@ window.saveAnswer = window.saveAnswer || function(){};
     /* a frase de baixo só aparece ao rolar: começa depois do fim da tela */
     var q=document.querySelector('.quote-block'); if(q){ q.style.marginTop='0px'; var fim=cyc.getBoundingClientRect().bottom+window.scrollY; var falta=window.innerHeight+12-(q.getBoundingClientRect().top+window.scrollY); q.style.marginTop=Math.max(0,Math.round(falta))+'px'; }
   }
-  liga(); window.addEventListener('resize',liga); window.addEventListener('load',liga); if(document.fonts&&document.fonts.ready) document.fonts.ready.then(liga);
+  var feitos = 0;
+  function revela(){ liga(); if (++feitos < 2) return; requestAnimationFrame(function(){ requestAnimationFrame(function(){ var x = document.getElementById('rico-esconde'); if (x) x.remove(); }); }); }
+  liga(); window.addEventListener('resize',liga);
+  /* só mostra a página (quando ela estava escondida para voltar ao lugar) depois que fontes e arquivos terminaram e tudo está no tamanho final */
+  if (document.readyState === 'complete') revela(); else window.addEventListener('load', revela);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(revela); else revela();
 })();
 
 
@@ -6396,7 +6405,7 @@ window.saveAnswer = window.saveAnswer || function(){};
   if (!y) return;
   document.addEventListener('touchstart', function(){ tocou = true; }, {passive: true});
   function ir(){ if (!tocou && Math.abs(window.scrollY - y) > 2) window.scrollTo({top: y, behavior: 'instant'}); }
-  ir(); var _x = document.getElementById('rico-esconde'); if (_x) _x.remove();
+  ir();
   window.addEventListener('load', function(){ [0, 400, 1200].forEach(function(t){ setTimeout(ir, t); }); });
 })();
 </script>
