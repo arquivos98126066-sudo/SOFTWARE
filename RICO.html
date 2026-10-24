@@ -4349,6 +4349,12 @@ window.saveAnswer = window.saveAnswer || function(){};
           var tirou = false;
           _rd.cpR = (_rd.cpR || []).filter(function(r) { if (!tirou && dentro(r)) { tirou = true; return false; } return true; });
           if (!tirou && _rd.cpCur && dentro(_rd.cpCur)) { _rd.cpCur = null; _rd.cpAll = false; tirou = true; try { window.getSelection().removeAllRanges(); } catch (_) {} var bq2 = ov.querySelector('[data-t="cpall"]'); if (bq2) bq2.classList.remove('on'); }
+          if (!tirou && !cpT.rolando) {
+            /* toque rápido fora de qualquer trecho marcado: desmarca tudo (se ainda não copiou) */
+            _rd.cpR = []; _rd.cpCur = null; _rd.cpPrev = []; _rd.cpAll = false; tirou = true;
+            var bq3 = ov.querySelector('[data-t="cpall"]'); if (bq3) bq3.classList.remove('on');
+            try { window.getSelection().removeAllRanges(); } catch (_) {}
+          }
           if (tirou) rdCopiaMarca();
         }
       }, { passive: true });
@@ -4681,7 +4687,7 @@ window.saveAnswer = window.saveAnswer || function(){};
     var h = {
       ts: function(ev) {
         if (!_rd || !_rd.copia || (ev.target.closest && ev.target.closest('.rd-tools')) || ev.touches.length !== 1) return;
-        var t = ev.touches[0]; fx = t.clientX; fy = t.clientY; h.x0 = fx; h.y0 = fy; d = null; para();
+        var t = ev.touches[0]; fx = t.clientX; fy = t.clientY; h.x0 = fx; h.y0 = fy; d = null; para(); _rd.cpPrev = [];
         var p0 = rdCopiaPonto(fx, fy); if (!p0) return;
         tm = setTimeout(function() {
           tm = null; var pw = rdCopiaPalavra(p0); d = { pa: pw.a, pb: pw.b, cur: p0 };
