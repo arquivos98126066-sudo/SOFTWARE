@@ -558,6 +558,7 @@ svg{fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-l
     var q = $('quadro'), n = document.createElement('iframe');
     n.id = 'quadro'; n.setAttribute('sandbox', q.getAttribute('sandbox'));
     docY = y || 0;
+    if (docY > 0) { n.style.visibility = 'hidden'; setTimeout(function(){ n.style.visibility = ''; }, 1300); }
     n.srcdoc = h ? h + gestoNoEstudo(docY) : h;
     q.parentNode.replaceChild(n, q);
     if (window.CorBarra) { if (h) CorBarra.de(h); else CorBarra.volta(); }
@@ -582,9 +583,10 @@ svg{fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-l
     montar(lista);
     estado = {cam: [], doc: null};
     history.replaceState(estado, '');
+    var yLista = restauraTroca();
+    if (yLista === false) desenhar();
     $('carga').hidden = true; $('app').hidden = false;
-    desenhar();
-    restauraTroca();
+    if (yLista) window.scrollTo({top: yLista, behavior: 'instant'});
   }
   carregar().then(entrar).catch(function(){
     $('carga').innerHTML = '<div class="vazio">Sem conexão. Abra de novo quando estiver online.</div>';
@@ -623,17 +625,17 @@ svg{fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-l
   }
   function restauraTroca(){
     var s = null;
-    try { if (sessionStorage.getItem('troca') !== 'LER') return; sessionStorage.removeItem('troca'); s = JSON.parse(localStorage.getItem(KT) || 'null'); } catch(e){}
-    if (!s) return;
+    try { if (sessionStorage.getItem('troca') !== 'LER') return false; sessionStorage.removeItem('troca'); s = JSON.parse(localStorage.getItem(KT) || 'null'); } catch(e){}
+    if (!s) return false;
     var cam = Array.isArray(s.cam) ? s.cam : [];
     estado = {cam: [], doc: null}; history.replaceState(estado, '');
     for (var i = 1; i <= cam.length; i++){ estado = {cam: cam.slice(0, i), doc: null}; history.pushState(estado, ''); }
     desenhar();
-    window.scrollTo(0, s.listY || 0);
     if (s.p){
       var d = docs.filter(function(x){ return x.p === s.p; })[0];
       if (d){ abrir(d, true, s.docY || 0); $('leitor').hidden = false; }
     }
+    return s.listY || 1;
   }
   function sairParaMenu(){
     salvaTroca();
@@ -644,13 +646,14 @@ svg{fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-l
   /* dentro do estudo: reconhece o V, avisa a rolagem e volta para onde estava */
   function gestoNoEstudo(y){
     return '<style>html{overscroll-behavior-y:contain}</style><script>(' + gestoDoisDedos.toString() + ')(function(){ parent.postMessage({estudoSair: 1}, "*"); });' +
-      '(function(){ var y0 = ' + (+y || 0) + ', t = 0; addEventListener("load", function(){ if (y0) scrollTo({top: y0, behavior: "instant"}); });' +
+      '(function(){ var y0 = ' + (+y || 0) + ', t = 0; function ir(){ if (y0) scrollTo({top: y0, behavior: "instant"}); parent.postMessage({estudoPronto: 1}, "*"); } document.addEventListener("DOMContentLoaded", ir); addEventListener("load", ir);' +
       'addEventListener("scroll", function(){ if (t) return; t = setTimeout(function(){ t = 0; parent.postMessage({estudoY: window.scrollY}, "*"); }, 250); }, {passive: true}); })();<\/script>';
   }
   window.addEventListener('message', function(e){
     var q = $('quadro');
     if (!e.data || !q || e.source !== q.contentWindow) return;
     if (e.data.estudoSair) sairParaMenu();
+    else if (e.data.estudoPronto) q.style.visibility = '';
     else if (typeof e.data.estudoY === 'number') docY = e.data.estudoY;
   });
 

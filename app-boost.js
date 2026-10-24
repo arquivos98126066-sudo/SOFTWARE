@@ -51,6 +51,7 @@ var CorBarra = window.CorBarra = (function () {
     return null;
   }
   return {
+    cor: function (html) { return acha(String(html || '')); },
     de: function (html) { var c = acha(String(html || '')); alvo(); if (c) meta.setAttribute('content', c); else CorBarra.volta(); },
     volta: function () { if (meta && orig != null) meta.setAttribute('content', orig); }
   };

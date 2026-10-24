@@ -7,7 +7,8 @@
 <script src="app-boost.js"></script>
 <script>
 /* reaberto por troca de app com rolagem guardada: esconde até a página estar na posição, para não aparecer no topo e pular */
-try { if (sessionStorage.getItem('viaPlano') === '1' && parseFloat(sessionStorage.getItem('rico.y')) > 0) {
+try { var _pinY = 0; try { var _pj = JSON.parse(localStorage.getItem('fixarTelaRico') || 'null'); _pinY = _pj && _pj.y > 0 ? _pj.y : 0; } catch (e) {}
+if ((sessionStorage.getItem('viaPlano') === '1' && parseFloat(sessionStorage.getItem('rico.y')) > 0) || _pinY > 0) {
   var _e = document.createElement('style'); _e.id = 'rico-esconde'; _e.textContent = 'html{visibility:hidden}'; document.head.appendChild(_e);
   setTimeout(function(){ var x = document.getElementById('rico-esconde'); if (x) x.remove(); }, 1500);
 } } catch (e) {}
@@ -2616,6 +2617,25 @@ window.saveAnswer = window.saveAnswer || function(){};
       return r;
     }
     function salva() { try { if (root && root.et) root.et.vista = vistaDe(); localStorage.setItem(KEY, JSON.stringify(root)); } catch (e) {} }
+    /* com "Fixar tela" ligado, lembra também em qual célula você entrou e qual está aberta (fica fora das chaves rico.* para não entrar no desfazer nem na nuvem) */
+    var KUI = 'ui.' + KEY, uiLido = false;
+    function uiSalva() {
+      if (!uiLido) return;
+      try {
+        if (!localStorage.getItem('fixarTelaRico')) { localStorage.removeItem(KUI); return; }
+        localStorage.setItem(KUI, JSON.stringify({ f: focoId, ff: focoFix, a: abreId, c: camOn, s: selId }));
+      } catch (e) {}
+    }
+    function uiLe() {
+      if (uiLido) return; uiLido = true;
+      try {
+        if (!localStorage.getItem('fixarTelaRico')) return;
+        var u = JSON.parse(localStorage.getItem(KUI) || 'null'); if (!u || !root) return;
+        if (u.f && acha(u.f)) { focoId = u.f; focoFix = !!u.ff; camOn = !!u.c; }
+        if (u.a && acha(u.a)) abreId = u.a;
+        if (u.s && acha(u.s)) selId = u.s;
+      } catch (e) {}
+    }
     function retomaFluxo(r, raw) {
       if (!r.et || !raw.et) return;
       var por = {};
@@ -2674,6 +2694,7 @@ window.saveAnswer = window.saveAnswer || function(){};
     }
     function render() {
       if (!root || !wrap || !wrap.isConnected) return;
+      uiSalva();
       marcaFluxo();
       var velhos = world.querySelectorAll('.rcm-node');
       for (var i = 0; i < velhos.length; i++) velhos[i].remove();
@@ -3493,6 +3514,7 @@ window.saveAnswer = window.saveAnswer || function(){};
 
     function montar(mw, z, o) {
       if (!root) root = carrega();
+      uiLe();
       zig = !!z; barId = null; proc = !!(zig && o && o.proc);
       zq0 = (o && o.q0) || 0;
       zPrev = (zig && o && o.prevCx != null) ? o.prevCx : null;
@@ -4515,7 +4537,7 @@ window.saveAnswer = window.saveAnswer || function(){};
     function pinGet() { try { var r = localStorage.getItem(PIN); if (!r) return null; try { var o = JSON.parse(r); if (o && o.v) return o; } catch (x) {} return { v: r }; } catch (e) { return null; } }
     function pinSalva(v) { if (pend) return; try { localStorage.setItem(PIN, JSON.stringify({ v: v || viewAtual(), e: window.rcMapa ? window.rcMapa.estado() : null, y: lastY, f: _foco })); } catch (e) {} }
     var lastY = 0, pronto = false, scT = null;
-    function irY() { window.scrollTo(0, lastY); }
+    function irY() { window.scrollTo({ top: lastY, behavior: 'instant' }); }
     function pinMarca() { if (pb) pb.classList.toggle('on', !!pinGet()); }
     var _vai = cicloVai;
     cicloVai = function(v) {
@@ -4553,7 +4575,7 @@ window.saveAnswer = window.saveAnswer || function(){};
       if (pv.e && window.rcMapa) window.rcMapa.restaura(pv.e);
       if (typeof pv.f === 'number') _foco = pv.f;
       renderCiclo();
-      requestAnimationFrame(irY); setTimeout(irY, 300); setTimeout(irY, 800); setTimeout(irY, 1800);
+      irY(); requestAnimationFrame(function() { irY(); var x = document.getElementById('rico-esconde'); if (x) x.remove(); }); setTimeout(irY, 300); setTimeout(irY, 800); setTimeout(irY, 1800);
     } else { pronto = true; abreSel(true); }
     window.addEventListener('pageshow', function(e) { if (e.persisted && !sel && !pinGet()) abreSel(true); });
     t.addEventListener('keydown', function(e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); alterna(); } });
@@ -6360,7 +6382,10 @@ window.saveAnswer = window.saveAnswer || function(){};
     document.addEventListener('touchcancel', function(){ ini = null; }, {passive: true});
   }
   gestoDoisDedos(function(){
-    try { sessionStorage.setItem('troca', 'LER'); sessionStorage.setItem('rico.y', String(window.scrollY || 0)); navigator.vibrate && navigator.vibrate(25); } catch(e){}
+    try {
+      sessionStorage.setItem('troca', 'LER'); sessionStorage.setItem('rico.y', String(window.scrollY || 0)); navigator.vibrate && navigator.vibrate(25);
+      var pj = JSON.parse(localStorage.getItem('fixarTelaRico') || 'null'); if (pj && pj.v) { pj.y = window.scrollY || 0; localStorage.setItem('fixarTelaRico', JSON.stringify(pj)); }
+    } catch(e){}
     if (window.Voltar) Voltar.sai('LER.html'); else location.replace('LER.html');
   });
 })();

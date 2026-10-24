@@ -4,6 +4,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <script src="app-boost.js"></script>
+<script>
+/* chegou por troca de app: não mostra a lista por um instante, para não aparecer e pular para o lugar guardado */
+try { if (sessionStorage.getItem('troca') === 'DOA') {
+  var _e = document.createElement('style'); _e.id = 'plano-esconde'; _e.textContent = 'html{visibility:hidden}'; document.head.appendChild(_e);
+  setTimeout(function(){ var x = document.getElementById('plano-esconde'); if (x) x.remove(); }, 1500);
+} } catch (e) {}
+</script>
 <meta name="theme-color" content="#f3f5f8">
 <title>Meu Plano — Modelo de Negócio</title>
 <script>
@@ -1898,16 +1905,18 @@ function htmlAbre(id, estado){
   }
   /* iframe novo a cada abertura: assim ele não acumula histórico e o botão voltar do celular só fecha o HTML */
   var box = document.getElementById('html-view');
-  box.innerHTML = '';
+  box.innerHTML = ''; box.style.background = '';
   var fr = document.createElement('iframe'); fr.id = 'html-view-frame';
   fr.setAttribute('sandbox', 'allow-scripts allow-forms allow-popups allow-downloads');
   box.appendChild(fr);
+  if(estado){ fr.style.visibility = 'hidden'; setTimeout(function(){ fr.style.visibility = ''; }, 1500); }
   if(h.src){
     /* carrega o código e abre com o gesto de troca dentro; se falhar, abre direto */
     fetch(h.src).then(function(r){ return r.text(); }).then(function(t){
+      if(estado && window.CorBarra && CorBarra.cor){ var cc = CorBarra.cor(t); if(cc) box.style.background = cc; }
       if(_htmlAberto === h.id && window.planoInjeta) fr.srcdoc = window.planoInjeta(t, new URL(h.src, location.href).href, estado); else if(_htmlAberto === h.id) fr.src = h.src;
     }).catch(function(){ fr.src = h.src; });
-  } else fr.srcdoc = window.planoInjeta ? window.planoInjeta(h.html, null, estado) : h.html;
+  } else { if(estado && window.CorBarra && CorBarra.cor){ var cc2 = CorBarra.cor(h.html); if(cc2) box.style.background = cc2; } fr.srcdoc = window.planoInjeta ? window.planoInjeta(h.html, null, estado) : h.html; }
   _htmlAberto = h.id;
   if(window.CorBarra) htmlCodigo(h, function(t){ if(_htmlAberto === h.id) CorBarra.de(t); });
   box.classList.add('open');
@@ -2751,9 +2760,19 @@ abrirProcesso();
       if (E.y && Math.abs(window.scrollY - E.y) > 2) scrollTo({top: E.y, behavior: 'instant'});
     }
     addEventListener('touchstart', function(){ tocou = true; }, {passive: true});
+    var iniciou = false;
+    function inicia(){
+      if (iniciou) return; iniciou = true;
+      tira(); poe();
+      parent.postMessage({planoPronto: 1}, '*');
+    }
+    /* o estado volta assim que a página montou (sem esperar imagens e fontes) e a rolagem é refeita quando tudo carregou */
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function(){ setTimeout(inicia, 120); });
+    else setTimeout(inicia, 120);
     addEventListener('load', function(){
-      setTimeout(function(){ tira(); poe(); }, 1200);
-      setTimeout(reaplicaRolagem, 1700); setTimeout(reaplicaRolagem, 2800);
+      inicia();
+      setTimeout(function(){ poe(); }, 500);
+      setTimeout(reaplicaRolagem, 300); setTimeout(reaplicaRolagem, 1000);
     });
     window.__planoLe = le;
     document.addEventListener('visibilitychange', function(){ if (document.hidden) parent.postMessage({planoE: le()}, '*'); });
@@ -2770,6 +2789,7 @@ abrirProcesso();
   window.addEventListener('message', function(e){
     var fr = document.getElementById('html-view-frame');
     if (!fr || e.source !== fr.contentWindow || !e.data) return;
+    if (e.data.planoPronto){ fr.style.visibility = ''; }
     if (e.data.planoE) _htmlE = e.data.planoE;
     if (e.data.planoTroca) trocaParaEstudo();
   });
@@ -2778,7 +2798,7 @@ abrirProcesso();
   (function(){
     var s = null;
     try { if (sessionStorage.getItem('troca') !== 'DOA') return; sessionStorage.removeItem('troca'); s = JSON.parse(localStorage.getItem('troca.estado.DOA') || 'null'); } catch(e){}
-    if (!s || (s.ts && Date.now() - s.ts > 3600000)) return;
+    if (!s || (s.ts && Date.now() - s.ts > 3600000)) { var _y = document.getElementById('plano-esconde'); if (_y) _y.remove(); return; }
     var tentativas = 0;
     (function tenta(){
       if (!p_procs.length && tentativas++ < 40) { setTimeout(tenta, 100); return; }
@@ -2796,6 +2816,7 @@ abrirProcesso();
         }
       }
       if (s.html && htmlLer().some(function(x){ return x.id === s.html; })) htmlAbre(s.html, s.htmlE || null);
+      var _x = document.getElementById('plano-esconde'); if (_x) setTimeout(function(){ _x.remove(); }, 60);
     })();
   })();
 })();
