@@ -4386,11 +4386,12 @@ window.saveAnswer = window.saveAnswer || function(){};
         }
       }, { passive: true });
       /* segurar o botão de número: a próxima numeração recomeça do 1 ([!]); sem segurar, a contagem continua de onde parou */
-      var lpN = null;
+      var lpN = null, lpX = 0, lpY = 0;
       ov.addEventListener('touchstart', function(ev) {
         clearTimeout(lpN); if (_rd) _rd.holdN = false;
         var bN = ev.target.closest ? ev.target.closest('.rd-tools [data-t="n"]') : null;
         if (!bN || !_rd || !_rd.edit) return;
+        lpX = ev.touches[0].clientX; lpY = ev.touches[0].clientY;
         lpN = setTimeout(function() {
           if (!_rd) return; _rd.holdN = true; if (navigator.vibrate) { try { navigator.vibrate(20); } catch (_) {} }
           if (_rd.tool !== 'n') rdArma('n');
@@ -4398,8 +4399,8 @@ window.saveAnswer = window.saveAnswer || function(){};
           var b2 = ov.querySelector('[data-t="n"]'); if (b2) { b2.classList.add('rst', 'on'); }
         }, 450);
       }, { passive: true });
-      var fimLpN = function() { clearTimeout(lpN); };
-      ov.addEventListener('touchmove', fimLpN, { passive: true }); ov.addEventListener('touchcancel', fimLpN, { passive: true });
+      /* o dedo de verdade treme um pouco: só cancela se andar mais de 14 px */
+      ov.addEventListener('touchmove', function(ev) { var t = ev.touches[0]; if (lpN && t && (Math.abs(t.clientX - lpX) > 14 || Math.abs(t.clientY - lpY) > 14)) { clearTimeout(lpN); lpN = null; } }, { passive: true });
       ov.addEventListener('mousedown', evita);
       ov.addEventListener('touchstart', evita, { passive: false });
       ov.addEventListener('touchend', function(ev) {
