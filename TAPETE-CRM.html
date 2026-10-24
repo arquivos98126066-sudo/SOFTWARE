@@ -1348,7 +1348,7 @@
 </div>
 
 <!-- ── REGISTRA ── -->
-<div class="screen" id="screen-registrar" onclick="regFocusActive()">
+<div class="screen" id="screen-registrar" onclick="regFocusActive(event)">
   <input id="reg-ghost-input" type="text" inputmode="text"
     style="position:absolute;opacity:0;pointer-events:none;width:1px;height:1px;top:60px;left:0"
     onkeydown="regKeyDown(event,'__ghost')" oninput="regGhostInput(this)">
@@ -2712,7 +2712,9 @@ function renderRegStep(){
 window.renderRegStep = renderRegStep;
 
 // Quando o usuário toca em qualquer lugar da tela registrar, foca o input ativo
-function regFocusActive(){
+function regFocusActive(ev){
+  /* toque na parte vazia de baixo não reabre o teclado: só dentro da pergunta (o teclado continua abrindo sozinho a cada passo) */
+  if(ev && ev.target && ev.target.closest && !ev.target.closest('#reg-step-active')) return;
   const steps = regActiveSteps();
   const s = steps[regCurStep];
   if(s && s.type==='tamanho'){

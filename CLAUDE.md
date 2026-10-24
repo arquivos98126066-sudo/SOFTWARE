@@ -35,6 +35,7 @@ Vale para os 6 apps do menu (Tapete CRM, Meu CRM, Plano/DOA, ADM, Rico, Estudo/L
 - Faixa da base: existe só nos 140 px do meio da tela (`#alterna-base`); dois toques seguidos vão ao menu e guardam a posição. As laterais ficam livres de propósito: o menu inferior do Tapete (Registra/Hoje) recebe o toque direto, sem camada por cima (qualquer camada ou repasse por código deixava o toque leve falhar).
 - A primeira tela do Tapete (Registra) monta antes de esperar a nuvem (`loadConfig`), senão ficava a tela inicial vazia/errada. O passo do Registra só volta quando a saída foi por troca de app.
 - Rico ao voltar: a página só aparece depois do DOM ficar quieto 160 ms e da rolagem estar no lugar (`__ricoExtra`); nada de reposicionar depois de aparecer (era a "mexidinha" para cima e para baixo).
+- Tapete, Registra: tocar na área vazia abaixo da pergunta não reabre o teclado; só tocar dentro da pergunta reabre (o teclado continua abrindo sozinho a cada passo).
 - Voltar do celular = abrir do começo; só a faixa de baixo guarda a posição (regra dele, 24/10/2026).
 - Abrir o app instalado sem logo do Chrome nem barra: manifest com id, scope, display standalone e background_color igual à cor do menu (#020719). Se ainda aparecer, o atalho foi criado fora do app instalado: remover e instalar de novo pelo Chrome (Instalar app).
 
