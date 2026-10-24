@@ -2724,6 +2724,16 @@ function regFocusActive(ev){
   }
 }
 window.regFocusActive = regFocusActive;
+/* toque fora da pergunta (parte vazia, menu de baixo) nunca deixa o teclado subir: tira o foco do campo */
+document.addEventListener('touchstart', function(e){
+  try{
+    if(curScreen!=='registrar') return;
+    const a=document.activeElement;
+    if(!a || !/^(INPUT|TEXTAREA)$/.test(a.tagName)) return;
+    if(e.target.closest && (e.target.closest('#reg-step-active') || e.target.closest('input,textarea'))) return;
+    a.blur();
+  }catch(_){}
+}, {passive:true, capture:true});
 
 // Ghost input: captura digitação quando o input real ainda não existe
 function regGhostInput(el){
