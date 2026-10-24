@@ -1686,7 +1686,7 @@ function htmlLer(){
   return a;
 }
 function htmlSalva(a){ try { localStorage.setItem(HTML_KEY, JSON.stringify(a)); } catch(e){ alert('Não coube no aparelho: ' + e.message); } }
-var _htmlSel = null, _htmlPasta = null;
+var _htmlSel = null, _htmlPasta = null, _htmlApos = null;
 /* pastas dentro dos HTMLs: cada item guarda "pai" (id da pasta onde está; vazio = fora de todas) */
 function htmlTodos(){
   var a = htmlLer(), ids = {};
@@ -1730,8 +1730,9 @@ function htmlRender(){
     rows.appendChild(row);
     if(h.id === _htmlSel){
       var bar = document.createElement('div'); bar.className = 'pl-h-bar';
-      bar.innerHTML = '<div class="pl-h-pill"><button type="button" data-a="ren" aria-label="Renomear">' + ic('pencil') + '</button>' + (pasta ? '' : '<button type="button" data-a="dl" aria-label="Baixar HTML">' + ic('download') + '</button><button type="button" data-a="cp" aria-label="Copiar código">' + ic('copy') + '</button>') + '<button type="button" data-a="del" aria-label="Remover">' + ic('trash') + '</button></div>';
+      bar.innerHTML = '<div class="pl-h-pill"><button type="button" data-a="add" aria-label="Adicionar HTML abaixo">' + ic('plus') + '</button><button type="button" data-a="ren" aria-label="Renomear">' + ic('pencil') + '</button>' + (pasta ? '' : '<button type="button" data-a="dl" aria-label="Baixar HTML">' + ic('download') + '</button><button type="button" data-a="cp" aria-label="Copiar código">' + ic('copy') + '</button>') + '<button type="button" data-a="del" aria-label="Remover">' + ic('trash') + '</button></div>';
       var q = function(s){ return bar.querySelector('[data-a=' + s + ']'); };
+      q('add').onclick = function(){ _htmlApos = h.id; document.getElementById('html-file').click(); };
       q('ren').onclick = function(){ htmlEdita(h.id); };
       q('del').onclick = function(){ htmlEdita(h.id, true); };
       if(!pasta){
@@ -1741,10 +1742,12 @@ function htmlRender(){
       rows.appendChild(bar);
     }
   });
-  var add = document.createElement('div'); add.className = 'row pl-h-add';
-  add.innerHTML = '<button type="button" class="row-main">' + ic('plus', 'row-ico') + '<span class="row-name">Adicionar HTML</span></button>';
-  add.querySelector('button').onclick = function(){ document.getElementById('html-file').click(); };
-  rows.appendChild(add);
+  if(!lista.length){
+    var add = document.createElement('div'); add.className = 'row pl-h-add';
+    add.innerHTML = '<button type="button" class="row-main">' + ic('plus', 'row-ico') + '<span class="row-name">Adicionar HTML</span></button>';
+    add.querySelector('button').onclick = function(){ _htmlApos = null; document.getElementById('html-file').click(); };
+    rows.appendChild(add);
+  }
 }
 
 /* segurar e arrastar: em cima do meio de outro vira pasta (ou entra na pasta); nas bordas reordena; faixa do topo tira da pasta */
@@ -1927,8 +1930,9 @@ document.getElementById('html-file').addEventListener('change', function(e){
     var a = htmlTodos();
     var novo = {id:'h' + Date.now(), nome: f.name.replace(/\.html?$/i, ''), html: String(r.result)};
     if(_htmlPasta) novo.pai = _htmlPasta;
-    a.push(novo);
-    _htmlSel = null; htmlSalva(a); htmlRender();
+    var k = _htmlApos ? a.findIndex(function(x){ return x.id === _htmlApos; }) : -1;
+    if(k >= 0) a.splice(k + 1, 0, novo); else a.push(novo);
+    _htmlApos = null; _htmlSel = null; htmlSalva(a); htmlRender();
   };
   r.readAsText(f);
 });
