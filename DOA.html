@@ -1712,19 +1712,15 @@ function htmlRender(){
   var lista = htmlFilhos(todos, _htmlPasta);
   if(_htmlSel && !lista.some(function(x){ return x.id === _htmlSel; })) _htmlSel = null;
   box.innerHTML = '<div class="rows"></div>';
-  var tit;
-  if(_htmlPasta){
-    tit = document.createElement('button'); tit.type = 'button'; tit.className = 'pl-h-title up';
-    tit.innerHTML = ic('arrow-left') + '<span>' + p_esc(['HTMLs'].concat(htmlCaminho(todos, _htmlPasta)).join(' › ')) + '</span>';
-    tit.onclick = htmlSobe;
-  } else { tit = document.createElement('div'); tit.className = 'pl-h-title'; tit.textContent = 'HTMLs'; }
-  box.insertBefore(tit, box.firstChild);
+  if(!_htmlPasta){
+    var tit = document.createElement('div'); tit.className = 'pl-h-title'; tit.textContent = 'HTMLs';
+    box.insertBefore(tit, box.firstChild);
+  }
   var rows = box.querySelector('.rows');
   lista.forEach(function(h){
     var pasta = !!h.pasta;
     var row = document.createElement('div'); row.className = 'row has-edit' + (h.id === _htmlSel ? ' sel' : ''); row.dataset.hid = h.id;
-    var n = pasta ? htmlFilhos(todos, h.id).length : 0;
-    row.innerHTML = '<button type="button" class="row-main">' + ic(pasta ? 'folder' : 'code', 'row-ico') + '<span class="row-name">' + p_esc(h.nome) + '</span>' + (pasta ? '<span class="chip">' + n + (n === 1 ? ' item' : ' itens') + '</span>' : '') + ic('chevron-right', 'row-chev') + '</button><button type="button" class="row-edit" aria-label="Opções" data-tip="Opções">' + ic('dots-v') + '</button>';
+    row.innerHTML = '<button type="button" class="row-main">' + ic(pasta ? 'folder' : 'code', 'row-ico') + '<span class="row-name">' + p_esc(h.nome) + '</span>' + ic('chevron-right', 'row-chev') + '</button><button type="button" class="row-edit" aria-label="Opções" data-tip="Opções">' + ic('dots-v') + '</button>';
     row.querySelector('.row-edit').onclick = function(){ _htmlSel = (_htmlSel === h.id ? null : h.id); htmlRender(); };
     htmlLigaLinha(row, h);
     rows.appendChild(row);
@@ -1826,7 +1822,7 @@ function htmlLigaLinha(row, h){
   btn.onclick = function(){
     if(seg){ seg = false; return; }
     if(_htmlSel){ _htmlSel = null; htmlRender(); return; }
-    if(h.pasta){ _htmlPasta = h.id; htmlRender(); return; }
+    if(h.pasta){ _htmlPasta = h.id; _htmlSel = null; try { history.pushState({htmlPasta: h.id}, ''); } catch(e){} htmlRender(); return; }
     htmlAbre(h.id);
   };
 }
@@ -1922,7 +1918,10 @@ function htmlEdita(id, apagar){
   n = n.trim(); if(!n) return;
   h.nome = n; _htmlSel = null; htmlSalva(a); htmlRender();
 }
-window.addEventListener('popstate', function(){ htmlFecha(); });
+window.addEventListener('popstate', function(){
+  if(document.getElementById('html-view').classList.contains('open')){ htmlFecha(); return; }
+  if(_htmlPasta !== null) htmlSobe();
+});
 document.getElementById('html-file').addEventListener('change', function(e){
   var f = e.target.files && e.target.files[0]; e.target.value = ''; if(!f) return;
   var r = new FileReader();
