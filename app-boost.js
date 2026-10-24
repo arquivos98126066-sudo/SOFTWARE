@@ -35,8 +35,6 @@ var CorBarra = window.CorBarra = (function () {
     return m ? m[0] : null;
   }
   function acha(html) {
-    var m = html.match(/<meta[^>]+name=["']theme-color["'][^>]*>/i);
-    if (m) { var c = m[0].match(/content=["']([^"']+)["']/i); if (c) return c[1]; }
     var css = (html.match(/<style[^>]*>[\s\S]*?<\/style>/gi) || []).join('\n');
     var v = vars(css);
     var b = css.match(/(?:^|[}\s,])body\s*{[^}]*?background(?:-color)?\s*:\s*([^;}]+)/i)
@@ -47,7 +45,10 @@ var CorBarra = window.CorBarra = (function () {
       var c2 = cor(t);
       if (c2) return c2;
     }
-    return v['--bg'] ? cor(v['--bg']) : null;
+    if (v['--bg'] && cor(v['--bg'])) return cor(v['--bg']);
+    var m = html.match(/<meta[^>]+name=["']theme-color["'][^>]*>/i);
+    if (m) { var c = m[0].match(/content=["']([^"']+)["']/i); if (c) return c[1]; }
+    return null;
   }
   return {
     de: function (html) { var c = acha(String(html || '')); alvo(); if (c) meta.setAttribute('content', c); else CorBarra.volta(); },
