@@ -435,7 +435,6 @@ if ((sessionStorage.getItem('troca') === (window.RICO_INST === 'p' ? 'RICOP' : '
   .rd-col{ max-width: 560px; margin: 0 auto; padding: calc(14px + env(safe-area-inset-top)) 22px calc(120px + env(safe-area-inset-bottom)); color: var(--tx); }
   .rd-t, .rd-h{ display: table; margin-left: auto; margin-right: auto; text-align: center; font-family: 'Inter', system-ui, sans-serif; font-style: normal; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: #211e19; line-height: 1.2; padding-bottom: 12px; border-bottom: 1px solid #c9c2b0; overflow-wrap: anywhere; }
   .rd-t{ font-size: 15.5px; margin-top: 18px; margin-bottom: 0; }
-  .rd-t + .rd-tx, .rd-h + .rd-tx{ margin-top: 18px; }
   .rd-h{ font-size: 14px; margin-top: 30px; margin-bottom: 0; }
   .rd-tx{ margin-top: .55rem; font-family: 'Inter', system-ui, sans-serif; font-style: normal; font-size: 16px; line-height: 1.75; color: #211e19; text-wrap: pretty; }
   .rd-tx strong{ font-weight: 700; color: #211e19; }
@@ -467,8 +466,7 @@ if ((sessionStorage.getItem('troca') === (window.RICO_INST === 'p' ? 'RICOP' : '
   .rd-bar[hidden]{ display: none; }
   .rd-ov.rd-edit{ -webkit-user-select: text; user-select: text; -webkit-touch-callout: default; }
   .rd-edit .rd-tx, .rd-edit .rd-t, .rd-edit .rd-h{ outline: none; caret-color: #211e19; }
-  .rd-edit .rd-tx:has(> .ln.gap:only-child){ min-height: 18px; }
-  .rd-edit .rd-tx > div:has(> br:only-child){ height: 14px; line-height: 14px; }
+    .rd-edit .rd-tx > div:has(> br:only-child){ height: 6px; line-height: 6px; }
   .rd-tx .ln.gap{ --gap: 6px; }
   .rd-edit .rd-t, .rd-edit .rd-h{ display: block; width: fit-content; min-width: 90px; max-width: 100%; }
   .rd-edit .rd-t:empty::before, .rd-edit .rd-h:empty::before{ content: attr(data-ph); color: #9a948a; }
