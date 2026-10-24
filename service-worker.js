@@ -1,4 +1,4 @@
-const CACHE_NAME = 'meus-apps-v150';
+const CACHE_NAME = 'meus-apps-v152';
 // HTMLs enviados pelo menu (segurar o app > Enviar um novo): ficam fora da limpeza de versões antigas
 const ENVIADOS = 'apps-enviados';
 
@@ -74,7 +74,15 @@ self.addEventListener('fetch', event => {
   event.respondWith((async () => {
     if (isLocal) {
       const enviado = await caches.open(ENVIADOS).then(c => c.match(req, {ignoreSearch: true})).catch(() => null);
-      if (enviado) return enviado;
+      if (enviado) {
+        const tipo = enviado.headers.get('content-type') || '';
+        if (!/html/i.test(tipo)) return enviado;
+        /* HTML enviado pelo menu: garante o app-boost (barra do celular com a cor da página) */
+        const txt = await enviado.clone().text();
+        if (txt.indexOf('app-boost.js') !== -1) return enviado;
+        const novo = /<head[^>]*>/i.test(txt) ? txt.replace(/<head[^>]*>/i, m => m + '<script src="app-boost.js"></script>') : '<script src="app-boost.js"></script>' + txt;
+        return new Response(novo, {status: 200, headers: {'content-type': 'text/html; charset=utf-8'}});
+      }
     }
     const rede = fetch(req.url, isLocal ? {cache: 'no-store'} : undefined).then(response => {
       if (response && (response.status === 200 || response.type === 'opaque')) {

@@ -55,3 +55,26 @@ var CorBarra = window.CorBarra = (function () {
     volta: function () { if (meta && orig != null) meta.setAttribute('content', orig); }
   };
 })();
+
+/* Barra do celular acompanha a cor de fundo da própria página (vale para todo app, inclusive os enviados pelo menu) */
+(function () {
+  function fundo() {
+    var el = document.body, c = '';
+    [document.body, document.documentElement].some(function (e) {
+      if (!e) return false;
+      c = getComputedStyle(e).backgroundColor;
+      return c && c !== 'transparent' && !/rgba\([^)]*,\s*0\)$/.test(c);
+    });
+    return c && c !== 'transparent' && !/rgba\([^)]*,\s*0\)$/.test(c) ? c : null;
+  }
+  function aplica() {
+    var m = document.querySelector('meta[name="theme-color"]');
+    if (m && m.hasAttribute('data-fixa')) return;
+    var c = fundo(); if (!c) return;
+    if (!m) { m = document.createElement('meta'); m.name = 'theme-color'; document.head.appendChild(m); }
+    if (m.getAttribute('content') !== c) m.setAttribute('content', c);
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', aplica); else aplica();
+  window.addEventListener('load', aplica);
+  document.addEventListener('visibilitychange', function () { if (!document.hidden) aplica(); });
+})();
