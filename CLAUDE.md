@@ -35,6 +35,10 @@ Vale para os 6 apps do menu (Tapete CRM, Meu CRM, Plano/DOA, ADM, Rico, Estudo/L
 - Antes de publicar: rodar a checagem de sintaxe dos scripts, abrir o app no teste sem erros novos, testar o fluxo mexido e subir a versão do cache. Publicar na main do SOFTWARE e conferir que o GitHub tem o mesmo commit.
 - Responder em árvore (CLAUDE.md do repositório Claude), sem emoji, sem caminhos nem código, dizendo o que foi testado e o que não foi confirmado.
 
+## 6. Dados só do aparelho
+- Todo dado novo que ficar só no aparelho (localStorage, cache) tem que entrar na cópia automática do app-boost (`AparelhoBackup`: coleções aparelho_rico, aparelho_plano, aparelho_menu, aparelho_backup no Firestore, só acrescenta e atualiza, limite de 900 mil caracteres por documento). App novo com dado local: acrescentar a chave na função `coleta()`.
+- Backup de verdade: branch backup-codigo-AAAA-MM-DD (SOFTWARE) e backup-firebase-AAAA-MM-DD (Claude), nunca apagar; ver MDS/SYSTEM/Backup.md.
+
 ---
 
 # Erros que já aconteceram (leia antes de mexer)
