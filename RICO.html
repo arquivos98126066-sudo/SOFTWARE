@@ -3543,9 +3543,16 @@ window.saveAnswer = window.saveAnswer || function(){};
     /* pergunta (célula com ? no nome): abre um campo para escrever; OK e Pular escolhem a célula, Cancelar fica onde está */
     function pedeResposta(f, cb) {
       var velho = document.querySelector('.rcm-conf'); if (velho) velho.remove();
-      var ov = document.createElement('div'); ov.className = 'rcm-conf'; ov.style.paddingBottom = '40px';
+      var ov = document.createElement('div'); ov.className = 'rcm-conf'; ov.style.paddingBottom = (rcKbGet() + 40) + 'px';
       ov.innerHTML = '<div class="rcm-conf-card"><h3>' + escH(f.n.text) + '</h3><textarea rows="1"></textarea><div class="rcm-conf-bt"><button type="button" class="sim" aria-label="OK" title="OK"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7"/></svg></button><button type="button" class="nao" aria-label="Cancela" title="Cancela"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button><button type="button" class="volta" aria-label="Pula" title="Pula"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></div></div>';
       document.body.appendChild(ov);
+      /* já nasce na altura final do teclado (guardada) e acompanha a altura real, para a janela não subir depois */
+      var vvp = window.visualViewport, ajp = function() {
+        if (!ov.isConnected) { if (vvp) { vvp.removeEventListener('resize', ajp); vvp.removeEventListener('scroll', ajp); } return; }
+        var kb = vvp ? Math.max(0, window.innerHeight - vvp.height - vvp.offsetTop) : 0;
+        if (kb > 150) { try { localStorage.setItem('ui.kbh', String(Math.round(kb))); } catch (_) {} ov.style.paddingBottom = (kb + 40) + 'px'; }
+      };
+      if (vvp) { vvp.addEventListener('resize', ajp); vvp.addEventListener('scroll', ajp); }
       var ta = ov.querySelector('textarea'); ta.addEventListener('input', function() { if (!(window.CSS && CSS.supports && CSS.supports('field-sizing', 'content'))) (window.autoGrow || function() {})(ta); ta.classList.toggle('quebrou', ta.scrollHeight > 56); }); setTimeout(function() { try { ta.focus(); } catch (e) {} }, 60);
       ov.querySelector('.nao').onclick = function() { ov.remove(); };
       ov.querySelector('.volta').onclick = function() { ov.remove(); if (cb) cb(''); else escolheEtapa(f, ''); };
