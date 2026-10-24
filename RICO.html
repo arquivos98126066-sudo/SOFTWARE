@@ -808,6 +808,9 @@ if ((sessionStorage.getItem('troca') === (window.RICO_INST === 'p' ? 'RICOP' : '
     display: flex; flex-direction: column; gap: 14px; transform: translateY(110%); visibility: hidden; transition: transform .25s ease, visibility .25s;
   }
   .rcm-sheet.on{ transform: none; visibility: visible; }
+  /* janelinha do nome: já nasce no lugar certo, em cima do teclado, sem subir de baixo */
+  .rcm-sheet.rcm-direto{ transform: none; opacity: 0; transition: opacity .1s, visibility .1s; }
+  .rcm-sheet.rcm-direto.on{ opacity: 1; }
   .rcm-field{ display: flex; align-items: center; gap: 10px; height: 52px; padding: 0 18px; border: 1px solid var(--bd-in); border-radius: 999px; background: #fff; transition: border-color .15s; }
   .rcm-field:focus-within{ border-color: #a8adb8; }
   .rcm-field svg{ width: 18px; height: 18px; stroke: var(--tx3); stroke-width: 1.7; fill: none; stroke-linecap: round; flex: none; }
@@ -2988,7 +2991,7 @@ window.saveAnswer = window.saveAnswer || function(){};
     function garanteSheet() {
       if (sheet) return;
       scrim = document.createElement('div'); scrim.className = 'rcm-scrim';
-      sheet = document.createElement('div'); sheet.className = 'rcm-sheet';
+      sheet = document.createElement('div'); sheet.className = 'rcm-sheet rcm-direto';
       sheet.setAttribute('role', 'dialog'); sheet.setAttribute('aria-modal', 'true');
       sheet.innerHTML = '<div class="rcm-field"><svg viewBox="0 0 24 24"><path d="M5 8h14M5 12h14M5 16h9"/></svg><input type="text" maxlength="60" autocomplete="off" autocorrect="off" spellcheck="false" aria-label="Texto"></div>' +
         '<div class="rcm-row"><button type="button" class="act-btn" data-a="del">Excluir</button><button type="button" class="act-btn pri" data-a="ok">Salvar</button></div>';
@@ -3002,10 +3005,7 @@ window.saveAnswer = window.saveAnswer || function(){};
         else if (e.key === 'Escape') fecha();
       });
       if (window.visualViewport) {
-        var aj = function() {
-          var vv = window.visualViewport;
-          sheet.style.bottom = Math.max(0, window.innerHeight - vv.height - vv.offsetTop) + 'px';
-        };
+        var aj = function() { rcKbAjusta(sheet); };
         window.visualViewport.addEventListener('resize', aj);
         window.visualViewport.addEventListener('scroll', aj);
       }
@@ -3016,6 +3016,7 @@ window.saveAnswer = window.saveAnswer || function(){};
       editId = id;
       txt.value = m.n.text;
       delB.textContent = id === 'root' ? 'Limpar' : 'Excluir';
+      sheet.style.bottom = rcKbGet() + 'px';
       scrim.classList.add('on'); sheet.classList.add('on');
       setTimeout(function() {
         try { txt.focus(); var pf = function() { var fimN = txt.value.length; try { txt.setSelectionRange(fimN, fimN); } catch (e2) {} }; pf(); setTimeout(pf, 80); setTimeout(pf, 250); } catch (e) {}
@@ -4262,15 +4263,23 @@ window.saveAnswer = window.saveAnswer || function(){};
     }
   };
 
+  /* altura do teclado guardada no aparelho: a janelinha do nome já abre no lugar final, sem pulo */
+  function rcKbGet() { var v = 0; try { v = +localStorage.getItem('ui.kbh') || 0; } catch (_) {} return v > 150 ? v : Math.round(window.innerHeight * 0.4); }
+  function rcKbAjusta(sh) {
+    var vv = window.visualViewport; if (!vv) return;
+    var kb = Math.max(0, window.innerHeight - vv.height - vv.offsetTop);
+    if (kb > 150) { try { localStorage.setItem('ui.kbh', String(Math.round(kb))); } catch (_) {} sh.style.bottom = kb + 'px'; }
+    else if (kb < 20 && document.activeElement && sh.contains(document.activeElement) === false) sh.style.bottom = '0px';
+  }
   /* trocar o nome de uma célula do Ciclo (lápis): janelinha com o campo do nome, igual à do mapa */
   function rcPedeNome(atual, aoSalvar) {
     var scrim = document.createElement('div'); scrim.className = 'rcm-scrim on';
-    var sh = document.createElement('div'); sh.className = 'rcm-sheet on'; sh.setAttribute('role', 'dialog'); sh.setAttribute('aria-modal', 'true');
+    var sh = document.createElement('div'); sh.className = 'rcm-sheet rcm-direto on'; sh.style.bottom = rcKbGet() + 'px'; sh.setAttribute('role', 'dialog'); sh.setAttribute('aria-modal', 'true');
     sh.innerHTML = '<div class="rcm-field"><svg viewBox="0 0 24 24"><path d="M5 8h14M5 12h14M5 16h9"/></svg><input type="text" maxlength="60" autocomplete="off" autocorrect="off" spellcheck="false" aria-label="Nome"></div>' +
       '<div class="rcm-row"><button type="button" class="act-btn" data-a="no">Cancelar</button><button type="button" class="act-btn pri" data-a="ok">Salvar</button></div>';
     document.body.appendChild(scrim); document.body.appendChild(sh);
     var inp = sh.querySelector('input'); inp.value = atual || '';
-    var vv = window.visualViewport, aj = function() { if (vv) sh.style.bottom = Math.max(0, window.innerHeight - vv.height - vv.offsetTop) + 'px'; };
+    var vv = window.visualViewport, aj = function() { rcKbAjusta(sh); };
     if (vv) { vv.addEventListener('resize', aj); vv.addEventListener('scroll', aj); }
     var fecha = function() { if (vv) { vv.removeEventListener('resize', aj); vv.removeEventListener('scroll', aj); } try { inp.blur(); } catch (_) {} scrim.remove(); sh.remove(); };
     var ok = function() { var v = inp.value.trim(); fecha(); if (v) aoSalvar(v.slice(0, 60)); };
