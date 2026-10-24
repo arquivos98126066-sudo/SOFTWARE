@@ -4279,7 +4279,7 @@ window.saveAnswer = window.saveAnswer || function(){};
         if (alvoT) { try { alvoT.addEventListener('touchend', function(e) { if (e.cancelable) e.preventDefault(); solta(); }, { once: true, passive: false }); alvoT.addEventListener('touchcancel', solta, { once: true }); } catch (_) {} }
         if (_rd.edit) return;
         var tp = ov.scrollTop;
-        _rd.edit = true; _rd.tool = null; _rd.digita = false; rdPinta(); ov.scrollTop = tp;
+        _rd.edit = true; _rd.tool = null; _rd.digita = false; _rd.copia = false; rdPinta(); ov.scrollTop = tp;
         /* sem cursor nem teclado ao segurar: só liga a edição; o cursor vem do toque seguinte */
         try { var a0 = document.activeElement; if (a0 && a0.blur) a0.blur(); window.getSelection().removeAllRanges(); } catch (_) {}
         _rd.cur = null;
@@ -4332,6 +4332,7 @@ window.saveAnswer = window.saveAnswer || function(){};
         var b = ev.target.closest ? ev.target.closest('.rd-tools button') : null;
         if (b && _rd) rdFerr(b.getAttribute('data-t'));
       };
+      ov.addEventListener('touchstart', function(ev) { if (_rd && _rd.cpAll && !(ev.target.closest && ev.target.closest('.rd-tools'))) _rd.cpAll = false; }, { passive: true });
       ov.addEventListener('mousedown', evita);
       ov.addEventListener('touchstart', evita, { passive: false });
       ov.addEventListener('touchend', function(ev) {
@@ -4376,7 +4377,7 @@ window.saveAnswer = window.saveAnswer || function(){};
         }
         if (_rd.edit && _rd.tool === 'q' && !(ev.target.closest && ev.target.closest('.rd-tools'))) { if (ev.cancelable) ev.preventDefault(); return; }
         /* duas batidas rápidas no texto: sai da edição e volta para a leitura */
-        if (_rd.edit && !_rd.tool && !_rd.digita && !(ev.target.closest && ev.target.closest('.rd-tools, .ck'))) {
+        if (_rd.edit && !_rd.tool && !_rd.digita && !_rd.copia && !(ev.target.closest && ev.target.closest('.rd-tools, .ck'))) {
           var c = ev.changedTouches && ev.changedTouches[0]; if (!c) return;
           var agora = Date.now();
           if (agora - ultToque < 380 && Math.abs(c.clientX - ultX) < 45 && Math.abs(c.clientY - ultY) < 45) {
@@ -4451,7 +4452,7 @@ window.saveAnswer = window.saveAnswer || function(){};
       if (!ed && !String(v || '').trim()) return;
       h += rdBloco(v, idx, m.c ? nl : 0, ed, m.q, m.n || 0);
     });
-    if (ed) h += '<div class="rd-tools"><div class="rd-linha"><button type="button" data-t="estilo" aria-label="Negrito, itálico e check"><b>Aa</b></button><div class="rd-grupo" data-g="main"><button type="button" data-t="T" aria-label="Título"><b>T</b></button><button type="button" data-t="n" aria-label="Numeração"><svg viewBox="0 0 24 24"><path d="M11 6h9M11 12h9M11 18h9M4.5 5.5l1.5-1v5M4 14.2c.6-1 2.3-.8 2.1.4-.3 1-1.6 1.5-2.1 2.4h2.4"/></svg></button><button type="button" data-t="p" aria-label="Marcadores"><svg viewBox="0 0 24 24"><path d="M11 6h9M11 12h9M11 18h9"/><circle cx="5.5" cy="6" r=".9" fill="currentColor"/><circle cx="5.5" cy="12" r=".9" fill="currentColor"/><circle cx="5.5" cy="18" r=".9" fill="currentColor"/></svg></button><button type="button" data-t="d" aria-label="Traço"><svg viewBox="0 0 24 24"><path d="M4 6h3M11 6h9M4 12h3M11 12h9M4 18h3M11 18h9"/></svg></button><button type="button" data-t="q" aria-label="Citação"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button></div><div class="rd-grupo" data-g="estilo" hidden><button type="button" data-t="b" aria-label="Negrito"><svg viewBox="0 0 24 24"><path d="M7 5h6a3.5 3.5 0 010 7H7zM7 12h7a3.5 3.5 0 010 7H7z"/></svg></button><button type="button" data-t="i" aria-label="Itálico"><svg viewBox="0 0 24 24"><path d="M10 5h7M7 19h7M14 5l-4 14"/></svg></button><button type="button" data-t="c" aria-label="Check"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M8.2 12.4l2.6 2.6 5-5.2"/></svg></button><button type="button" data-t="digita" aria-label="Digitar"><svg viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg></button></div></div></div>';
+    if (ed) h += '<div class="rd-tools"><div class="rd-linha"><button type="button" data-t="estilo" aria-label="Negrito, itálico e check"><b>Aa</b></button><div class="rd-grupo" data-g="main"><button type="button" data-t="T" aria-label="Título"><b>T</b></button><button type="button" data-t="n" aria-label="Numeração"><svg viewBox="0 0 24 24"><path d="M11 6h9M11 12h9M11 18h9M4.5 5.5l1.5-1v5M4 14.2c.6-1 2.3-.8 2.1.4-.3 1-1.6 1.5-2.1 2.4h2.4"/></svg></button><button type="button" data-t="p" aria-label="Marcadores"><svg viewBox="0 0 24 24"><path d="M11 6h9M11 12h9M11 18h9"/><circle cx="5.5" cy="6" r=".9" fill="currentColor"/><circle cx="5.5" cy="12" r=".9" fill="currentColor"/><circle cx="5.5" cy="18" r=".9" fill="currentColor"/></svg></button><button type="button" data-t="d" aria-label="Traço"><svg viewBox="0 0 24 24"><path d="M4 6h3M11 6h9M4 12h3M11 12h9M4 18h3M11 18h9"/></svg></button><button type="button" data-t="q" aria-label="Citação"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button></div><div class="rd-grupo" data-g="estilo" hidden><button type="button" data-t="b" aria-label="Negrito"><svg viewBox="0 0 24 24"><path d="M7 5h6a3.5 3.5 0 010 7H7zM7 12h7a3.5 3.5 0 010 7H7z"/></svg></button><button type="button" data-t="i" aria-label="Itálico"><svg viewBox="0 0 24 24"><path d="M10 5h7M7 19h7M14 5l-4 14"/></svg></button><button type="button" data-t="c" aria-label="Check"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M8.2 12.4l2.6 2.6 5-5.2"/></svg></button><button type="button" data-t="digita" aria-label="Digitar"><svg viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg></button><button type="button" data-t="copia" aria-label="Modo copiar"><svg viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2.5"/><path d="M5 15V7a2.5 2.5 0 012.5-2.5H15"/></svg></button></div><div class="rd-grupo" data-g="copia" hidden><button type="button" data-t="cpall" aria-label="Selecionar tudo"><svg viewBox="0 0 24 24"><path d="M4 8V6a2 2 0 012-2h2M16 4h2a2 2 0 012 2v2M20 16v2a2 2 0 01-2 2h-2M8 20H6a2 2 0 01-2-2v-2M8 12h8"/></svg></button><button type="button" data-t="cpdo" aria-label="Copiar"><svg viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2.5"/><path d="M5 15V7a2.5 2.5 0 012.5-2.5H15"/></svg></button><button type="button" data-t="cpfim" aria-label="Sair do modo copiar"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div></div></div>';
     h += '<button type="button" data-fechar hidden onclick="fecharLeitura()" aria-label="Fechar"></button></div>';
     ov.innerHTML = h;
     if (ed) { _rd.mudoAte = Date.now() + 1100; rdModoTeclado(); setTimeout(rdModoTeclado, 1150); }
@@ -4568,7 +4569,35 @@ window.saveAnswer = window.saveAnswer || function(){};
   function rdFerr(t) {
     var ov = document.getElementById('rdOv'), sel = window.getSelection();
     if (t === 'ok') { clearTimeout(_rd.tm); rdSalva(); _rd.edit = false; _rd.tool = null; _rd.digita = false; ov.classList.remove('rd-q'); rdPinta(); return; }
+    if (t === 'copia' || t === 'cpfim') {
+      _rd.cpAll = false;
+      var gm0 = ov.querySelector('[data-g="main"]'), ge0 = ov.querySelector('[data-g="estilo"]'), gc0 = ov.querySelector('[data-g="copia"]'), liga = t === 'copia';
+      _rd.copia = liga; _rd.tool = null; ov.classList.remove('rd-q'); ov_limpaOn(); rdDigita(false);
+      gc0.hidden = !liga; ge0.hidden = true; gm0.hidden = liga;
+      try { var a3 = document.activeElement; if (a3 && a3.blur) a3.blur(); } catch (_) {}
+      rdModoTeclado(); return;
+    }
+    if (t === 'cpall') {
+      var col = ov.querySelector('.rd-col'), rg = document.createRange(), ult = col.querySelectorAll('.rd-t, .rd-h, .rd-tx'); rg.setStartBefore(ult[0]); rg.setEndAfter(ult[ult.length - 1]); _rd.cpAll = true;
+      var sl = window.getSelection(); sl.removeAllRanges(); sl.addRange(rg); return;
+    }
+    if (t === 'cpdo') {
+      var s6 = window.getSelection(), tx = s6 && s6.rangeCount && !s6.isCollapsed && !_rd.cpAll ? s6.toString() : '';
+      if (!tx) {
+        var ps = [];
+        ov.querySelectorAll('.rd-col > *').forEach(function(el) {
+          if (el.classList.contains('rd-t') || el.classList.contains('rd-h')) ps.push(el.textContent.trim());
+          else if (el.classList.contains('rd-tx')) ps.push(Array.prototype.map.call(el.children, function(l) { var c = l.cloneNode(true), nm = c.querySelector('.nm'), pf = nm ? nm.textContent + '. ' : ''; c.querySelectorAll('.nm,.ck,.bl,.ds').forEach(function(x) { x.remove(); }); return pf + c.textContent; }).join('\n'));
+        });
+        tx = ps.join('\n\n');
+      }
+      var fim = function() { var bb = ov.querySelector('[data-t="cpdo"]'); if (bb) { bb.classList.add('on'); setTimeout(function() { bb.classList.remove('on'); }, 900); } };
+      var velho = function() { try { var ta = document.createElement('textarea'); ta.value = tx; ta.style.cssText = 'position:fixed;opacity:0;left:-999px'; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove(); fim(); } catch (_) {} };
+      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(tx).then(fim, velho); else velho();
+      return;
+    }
     if (t === 'estilo') {
+      if (_rd.copia) { rdFerr('cpfim'); return; }
       var gm = ov.querySelector('[data-g="main"]'), ge = ov.querySelector('[data-g="estilo"]');
       var abre = ge.hidden; ge.hidden = !abre; gm.hidden = abre;
       ov.querySelector('[data-t="estilo"]').classList.toggle('on', abre);
