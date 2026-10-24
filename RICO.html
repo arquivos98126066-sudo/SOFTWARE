@@ -5045,22 +5045,39 @@ window.saveAnswer = window.saveAnswer || function(){};
   }
   /* numeração por arrasto: a primeira linha marcada vira o título numerado e as outras ficam como o texto de baixo, dentro do mesmo cartão; o que vem antes e depois fica em blocos separados */
   function rdNumera(l1, l2) {
-    var ov = document.getElementById('rdOv'), bl = l1.parentNode;
-    if (!bl || !bl.classList.contains('rd-tx')) return;
-    var kids = Array.prototype.slice.call(bl.children), i1 = kids.indexOf(l1), i2 = l2.parentNode === bl ? kids.indexOf(l2) : kids.length - 1;
-    if (i1 < 0 || i2 < i1) i2 = i1;
-    var lines = rtDeDom(bl, false).split('\n'), sel = lines.slice(i1, i2 + 1), antes = lines.slice(0, i1).join('\n').replace(/(\n\s*)+$/, ''), depois = lines.slice(i2 + 1).join('\n').replace(/^(\s*\n)+/, '');
-    /* o primeiro parágrafo (até a primeira linha em branco): cada linha vira um número; os parágrafos depois da linha em branco ficam como texto do último número */
-    var k0 = 0, fp = [], k;
+    var ov = document.getElementById('rdOv'), todas = Array.prototype.slice.call(ov.querySelectorAll('.rd-tx > .ln')), i = todas.indexOf(l1), j = todas.indexOf(l2), t;
+    if (i < 0 || j < 0) return;
+    if (j < i) { t = i; i = j; j = t; }
+    var usa = [], blocos = [], k;
+    for (k = i; k <= j; k++) {
+      var b = todas[k].parentNode, ub = blocos[blocos.length - 1];
+      if (b !== ub) { if (ub && ub.nextElementSibling !== b) break; blocos.push(b); }
+      usa.push(todas[k]);
+    }
+    if (!usa.length) return;
+    var B0 = blocos[0], Bn = blocos[blocos.length - 1], sel = [], antes = '', depois = '';
+    blocos.forEach(function(bl, n) {
+      var kids = Array.prototype.slice.call(bl.children), lines = rtDeDom(bl, false).split('\n');
+      var a0 = n === 0 ? kids.indexOf(usa[0]) : 0, z0 = n === blocos.length - 1 ? kids.indexOf(usa[usa.length - 1]) : kids.length - 1;
+      if (a0 < 0) a0 = 0; if (z0 < a0) z0 = a0;
+      if (n === 0) antes = lines.slice(0, a0).join('\n').replace(/(\n\s*)+$/, '');
+      if (n === blocos.length - 1) depois = lines.slice(z0 + 1).join('\n').replace(/^(\s*\n)+/, '');
+      if (n > 0) sel.push('');
+      sel = sel.concat(lines.slice(a0, z0 + 1));
+    });
+    /* o primeiro parágrafo (até a primeira linha em branco): cada linha vira um número; o que vem depois fica como texto do último número */
+    var k0 = 0, fp = [];
     while (k0 < sel.length && !sel[k0].trim()) k0++;
     for (k = k0; k < sel.length && sel[k].trim(); k++) fp.push(k);
     var tira = fp.length && fp.every(function(q) { return /^\[(#|!)\]/.test(sel[q]); });
     fp.forEach(function(q) { var m2 = /^\[( |x|#|-|=|!)\] ?/.exec(sel[q]), cp = m2 ? sel[q].slice(m2[0].length) : sel[q]; sel[q] = tira ? cp : '[#] ' + cp; });
     var selTxt = sel.join('\n').replace(/(\n\s*)+$/, '');
     var mk = function(txt) { var d = document.createElement('div'); d.className = 'rd-tx'; d.setAttribute('contenteditable', 'true'); d.setAttribute('data-i', '-1'); d.innerHTML = rtHtml(rtParse(txt), null); return d; };
+    var pos = Bn.nextSibling;
+    blocos.slice(1).forEach(function(bl) { bl.parentNode.removeChild(bl); });
     var sb;
-    if (antes.trim()) { bl.innerHTML = rtHtml(rtParse(antes), null); sb = mk(selTxt); bl.parentNode.insertBefore(sb, bl.nextSibling); }
-    else { bl.innerHTML = rtHtml(rtParse(selTxt), null); sb = bl; }
+    if (antes.trim()) { B0.innerHTML = rtHtml(rtParse(antes), null); sb = mk(selTxt); B0.parentNode.insertBefore(sb, B0.nextSibling); }
+    else { B0.innerHTML = rtHtml(rtParse(selTxt), null); sb = B0; }
     if (depois.trim()) sb.parentNode.insertBefore(mk(depois), sb.nextSibling);
     rdRenumera(); rdAgenda();
   }
