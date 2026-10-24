@@ -4436,7 +4436,28 @@ window.saveAnswer = window.saveAnswer || function(){};
         var ln = ev.target.closest ? ev.target.closest('.ln') : null, bl = ln ? ln.closest('.rd-tx') : null;
         if (ln && bl && ln.parentNode === bl) { ev.preventDefault(); rdAplica(ln, bl); }
       });
-      ov.addEventListener('input', function() { rdAgenda(); });
+      ov.addEventListener('input', function(ev) { var b0 = ev.target && ev.target.closest ? ev.target.closest('#rdOv .rd-tx') : null; if (b0) rdNormaliza(b0); rdAgenda(); });
+      /* Enter: eu mesmo faço a quebra de linha, para o desenho ser sempre o mesmo da leitura (o teclado do celular cria linhas de formatos diferentes e o espaço ficava irregular) */
+      ov.addEventListener('beforeinput', function(ev) {
+        if (!_rd || !_rd.edit || (ev.inputType !== 'insertParagraph' && ev.inputType !== 'insertLineBreak')) return;
+        var sl = window.getSelection(); if (!sl || !sl.rangeCount) return;
+        var an = sl.anchorNode; an = an && (an.nodeType === 1 ? an : an.parentNode);
+        var bl = an && an.closest ? an.closest('#rdOv .rd-tx') : null; if (!bl) return;
+        ev.preventDefault();
+        var rg = sl.getRangeAt(0); if (!rg.collapsed) rg.deleteContents();
+        rdNormaliza(bl);
+        var nd = rg.startContainer, ln = (nd.nodeType === 1 ? nd : nd.parentNode).closest('.ln');
+        if (!ln || ln.parentNode !== bl) { ln = bl.lastElementChild; if (!ln) return; rg = document.createRange(); rg.selectNodeContents(ln); rg.collapse(false); }
+        var cauda = document.createRange(); cauda.setStart(rg.startContainer, rg.startOffset); cauda.setEnd(ln, ln.childNodes.length);
+        var frag = cauda.extractContents(), nova = document.createElement('div');
+        nova.className = 'ln'; nova.appendChild(frag);
+        nova.querySelectorAll('.nm,.ck,.bl,.ds').forEach(function(x) { x.remove(); });
+        ln.parentNode.insertBefore(nova, ln.nextSibling);
+        rdNormaliza(bl);
+        var d2 = document.createRange(); d2.setStart(nova.firstChild && nova.firstChild.nodeType === 3 ? nova.firstChild : nova, 0); d2.collapse(true);
+        sl.removeAllRanges(); sl.addRange(d2);
+        rdAgenda(); rdCentraLogo();
+      }, true);
       /* apagar no começo de um bloco junta com o de cima (cada bloco é um campo separado, o navegador não junta sozinho) */
       ov.addEventListener('beforeinput', function(ev) {
         if (!_rd || !_rd.edit || ev.inputType !== 'deleteContentBackward') return;
@@ -4592,6 +4613,25 @@ window.saveAnswer = window.saveAnswer || function(){};
     var b = ov.querySelector('[data-t="T"]'); if (b) b.classList.toggle('on', !!on);
     else { try { var a = document.activeElement; if (a && a.blur && ov.contains(a)) a.blur(); } catch (_) {} }
     rdModoTeclado();
+  }
+  /* deixa as linhas do bloco sempre no formato da leitura: cada linha é uma div .ln; linha vazia é .ln.gap com <br>; sem divs dentro de divs */
+  function rdNormaliza(bl) {
+    if (!bl) return;
+    var ant = window.getSelection(), salvo = null;
+    Array.prototype.slice.call(bl.childNodes).forEach(function(c) {
+      if (c.nodeType === 3) { if (!c.nodeValue.trim()) { c.remove(); return; } var w = document.createElement('div'); w.className = 'ln'; bl.insertBefore(w, c); w.appendChild(c); c = w; }
+      else if (c.nodeType !== 1) return;
+      if (c.tagName === 'BR') { var wb = document.createElement('div'); wb.className = 'ln gap'; wb.appendChild(c.cloneNode()); bl.replaceChild(wb, c); return; }
+      var filhos = c.querySelectorAll ? c.querySelectorAll(':scope > div') : [];
+      Array.prototype.slice.call(filhos).forEach(function(f) { f.className = 'ln'; bl.insertBefore(f, c.nextSibling); });
+    });
+    Array.prototype.slice.call(bl.children).forEach(function(c) {
+      if (c.tagName !== 'DIV') return;
+      if (!/(^| )ln( |$)/.test(c.className)) c.className = (c.className + ' ln').trim();
+      var vazio = !c.textContent.replace(/[\u200b\s]/g, '') && !c.querySelector('.ck,.nm,.bl,.ds');
+      if (vazio) { c.classList.add('gap'); if (!c.querySelector('br')) { c.textContent = ''; c.appendChild(document.createElement('br')); } }
+      else c.classList.remove('gap');
+    });
   }
   function rdFoco(el, fim) {
     try { el.focus(); var r = document.createRange(); r.selectNodeContents(el); r.collapse(!fim); var s = window.getSelection(); s.removeAllRanges(); s.addRange(r); } catch (_) {}
