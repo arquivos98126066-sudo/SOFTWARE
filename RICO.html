@@ -450,6 +450,15 @@ if ((sessionStorage.getItem('troca') === (window.RICO_INST === 'p' ? 'RICOP' : '
   .rd-ov .ln.done{ text-decoration: none; color: inherit; }
   .rd-bar{ display: flex; justify-content: center; margin-top: 16px; }
   .rd-bar[hidden]{ display: none; }
+  .rd-ov.rd-edit{ -webkit-user-select: text; user-select: text; -webkit-touch-callout: default; }
+  .rd-edit .rd-tx, .rd-edit .rd-t, .rd-edit .rd-h{ outline: none; caret-color: #211e19; }
+  .rd-edit .rd-tx{ min-height: 30px; }
+  .rd-edit .rd-t, .rd-edit .rd-h{ display: block; width: fit-content; min-width: 90px; max-width: 100%; }
+  .rd-edit .rd-t:empty::before, .rd-edit .rd-h:empty::before{ content: attr(data-ph); color: #9a948a; }
+  .rd-tools{ position: fixed; left: 0; right: 0; bottom: calc(52px + env(safe-area-inset-bottom)); z-index: 3; display: flex; justify-content: center; gap: 6px; padding: 0 10px; pointer-events: none; }
+  .rd-tools button{ pointer-events: auto; flex: none; width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--bd-in); background: #fff; color: #211e19; display: grid; place-items: center; padding: 0; box-shadow: 0 10px 20px -12px rgba(15,27,45,.5); font-size: 15px; }
+  .rd-tools button svg{ width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .rd-tools button.ok{ background: #211e19; color: #fff; }
   .sheet{
     position: fixed; left: 12px; right: 12px; bottom: calc(12px + env(safe-area-inset-bottom)); z-index: 99971;
     max-height: calc(100svh - 48px); overflow-y: auto; background: #fff; border: 1px solid var(--bd);
@@ -3012,7 +3021,10 @@ window.saveAnswer = window.saveAnswer || function(){};
       }
       if (!edita && window.abrirLeitura) {
         var dl = k >= 0 ? CICLO[k] : { t: n.text, i: n.i || [], m: n.m || [] };
-        window.abrirLeitura(dl, function() { abreEditor(id, true); });
+        window.abrirLeitura(dl, function(x) {
+          if (k >= 0) { var ff = acha(id); if (ff && String(x.t || '').trim()) ff.n.text = String(x.t).trim().slice(0, 60); salva(); render(); if (window.renderCiclo) window.renderCiclo(); if (window.agendarSalvamento) window.agendarSalvamento(document.body); }
+          else { x._no = n; salvaNota(x); delete x._no; render(); }
+        });
         return;
       }
       if (k >= 0) {
@@ -4231,24 +4243,26 @@ window.saveAnswer = window.saveAnswer || function(){};
     if (window.negritoTodos) { window.negritoTodos(); setTimeout(window.negritoTodos, 50); }
   }
 
-  /* leitura limpa do círculo do mapa: título da célula, subtítulos e texto com os marcadores do editor */
-  function abrirLeitura(e, aoEditar) {
+  /* leitura limpa do círculo do mapa: título da célula, subtítulos e texto com os marcadores do editor; o lápis edita ali mesmo */
+  var _rd = null;
+  function abrirLeitura(e, salvar) {
     var ov = document.getElementById('rdOv');
     if (!ov) {
       ov = document.createElement('div'); ov.className = 'rd-ov'; ov.id = 'rdOv'; ov.hidden = true;
       document.body.appendChild(ov);
       var ult = 0, tm = null, xy = null, segurou = false;
-      var mostra = function() { var b = ov.querySelector('.rd-bar'); if (b) b.hidden = false; };
       ov.addEventListener('touchstart', function(ev) {
+        if (!_rd || _rd.edit) return;
         segurou = false; var t = ev.touches[0]; xy = { x: t.clientX, y: t.clientY };
-        clearTimeout(tm); tm = setTimeout(function() { tm = null; segurou = true; mostra(); }, 450);
+        clearTimeout(tm); tm = setTimeout(function() { tm = null; segurou = true; var b = ov.querySelector('.rd-bar'); if (b) b.hidden = false; }, 450);
       }, { passive: true });
       ov.addEventListener('touchmove', function(ev) {
         var t = ev.touches[0]; if (xy && (Math.abs(t.clientX - xy.x) > 8 || Math.abs(t.clientY - xy.y) > 8)) { clearTimeout(tm); tm = null; }
       }, { passive: true });
       ['touchend', 'touchcancel'].forEach(function(n) { ov.addEventListener(n, function() { clearTimeout(tm); tm = null; }, { passive: true }); });
-      ov.addEventListener('contextmenu', function(ev) { ev.preventDefault(); });
+      ov.addEventListener('contextmenu', function(ev) { if (!_rd || !_rd.edit) ev.preventDefault(); });
       ov.addEventListener('click', function(ev) {
+        if (!_rd || _rd.edit) return;
         if (segurou) { segurou = false; ult = 0; return; }
         var b = ev.target.closest ? ev.target.closest('button') : null;
         if (b) { ult = 0; return; }
@@ -4258,35 +4272,145 @@ window.saveAnswer = window.saveAnswer || function(){};
         if (agora - ult < 380) { ult = 0; fecharLeitura(); return; }
         ult = agora;
       });
+      /* barra de baixo (só na edição): não tira o foco do texto */
+      var evita = function(ev) { if (ev.target.closest && ev.target.closest('.rd-tools')) ev.preventDefault(); };
+      var tocou = 0;
+      var aciona = function(ev) {
+        var b = ev.target.closest ? ev.target.closest('.rd-tools button') : null;
+        if (b && _rd) rdFerr(b.getAttribute('data-t'));
+      };
+      ov.addEventListener('mousedown', evita);
+      ov.addEventListener('touchstart', evita, { passive: false });
+      ov.addEventListener('touchend', function(ev) {
+        if (!ev.target.closest || !ev.target.closest('.rd-tools')) return;
+        ev.preventDefault(); tocou = Date.now(); aciona(ev);
+      }, { passive: false });
+      ov.addEventListener('click', function(ev) { if (Date.now() - tocou > 600) aciona(ev); });
+      ov.addEventListener('input', function() { rdAgenda(); });
+      ov.addEventListener('focusout', function(ev) {
+        var bl = ev.target && ev.target.closest ? ev.target.closest('.rd-tx') : null;
+        if (bl && _rd && _rd.edit) setTimeout(function() { if (bl.isConnected && !bl.contains(document.activeElement)) rdRepinta(bl); }, 0);
+      });
+      ov.addEventListener('keydown', function(ev) {
+        if (ev.key === 'Enter' && _rd && _rd.edit && ev.target.closest && ev.target.closest('.rd-t, .rd-h')) { ev.preventDefault(); var n = ev.target.nextElementSibling; while (n && !n.classList.contains('rd-tx')) n = n.nextElementSibling; if (n) rdFoco(n); }
+      });
+      ov.addEventListener('paste', function(ev) {
+        var tit = ev.target.closest ? ev.target.closest('.rd-t, .rd-h') : null;
+        if (tit && _rd && _rd.edit) { ev.preventDefault(); var tx0 = ((ev.clipboardData || window.clipboardData).getData('text/plain') || '').replace(/\s+/g, ' '); try { document.execCommand('insertText', false, tx0); } catch (_) {} return; }
+        var bl = ev.target.closest ? ev.target.closest('.rd-tx') : null;
+        if (!bl || !_rd || !_rd.edit) return;
+        ev.preventDefault();
+        var tx = (ev.clipboardData || window.clipboardData).getData('text/plain') || '';
+        try { document.execCommand('insertText', false, tx); } catch (_) {}
+        setTimeout(function() { rdRepinta(bl, true); rdAgenda(); }, 0);
+      });
     }
-    var esc = function(x) { return String(x == null ? '' : x).replace(/[&<>]/g, function(c) { return c === '&' ? '&amp;' : (c === '<' ? '&lt;' : '&gt;'); }); };
-    var h = '<div class="rd-col">';
-    if (String(e.t || '').trim()) h += '<h2 class="rd-t">' + esc(String(e.t).trim()) + '</h2>';
-    h += '<div class="rd-bar" hidden><div class="rcm-pill"><button type="button" class="rcm-ib" data-a="edita" aria-label="Editar"><svg viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg></button><button type="button" class="rcm-ib" data-a="fecha" aria-label="Fechar"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div></div>';
-    var nl = 0;
-    (e.i && e.i.length ? e.i : []).forEach(function(v, idx) {
-      var m = (e.m || [])[idx] || {};
-      if (m.t && String(m.t).trim()) h += '<h3 class="rd-h">' + esc(String(m.t).trim()) + '</h3>';
-      if (!String(v || '').trim()) return;
-      var corpo = rtHtml(rtParse(String(v)), null);
-      if (m.c) { nl++; corpo = corpo.replace(/^(<div class="ln[^"]*" data-l="\d+">)/, '$1<span class="nm" contenteditable="false">' + nl + '</span>'); }
-      h += '<div class="rd-tx">' + corpo + '</div>';
-    });
-    h += '<button type="button" data-fechar hidden onclick="fecharLeitura()" aria-label="Fechar"></button></div>';
-    ov.innerHTML = h;
-    ov._edita = aoEditar || null;
-    ov.querySelector('.rd-bar').addEventListener('click', function(ev) {
-      var b = ev.target.closest ? ev.target.closest('button') : null; if (!b) return;
-      var a = b.getAttribute('data-a'), f = ov._edita;
-      fecharLeitura();
-      if (a === 'edita' && f) setTimeout(f, 0);
-    });
+    _rd = { e: e, salvar: salvar || null, edit: false, tm: null };
+    rdPinta();
     ov.scrollTop = 0;
     ov.hidden = false;
   }
+  function rdEsc(x) { return String(x == null ? '' : x).replace(/[&<>]/g, function(c) { return c === '&' ? '&amp;' : (c === '<' ? '&lt;' : '&gt;'); }); }
+  function rdBloco(v, idx, c, ed) {
+    var corpo = rtHtml(rtParse(String(v || '')), null);
+    if (c && !ed) { corpo = corpo.replace(/^(<div class="ln[^"]*" data-l="\d+">)/, '$1<span class="nm" contenteditable="false">' + c + '</span>'); }
+    return '<div class="rd-tx"' + (ed ? ' contenteditable="true" data-i="' + idx + '"' : '') + '>' + corpo + '</div>';
+  }
+  function rdPinta() {
+    var ov = document.getElementById('rdOv'), e = _rd.e, ed = _rd.edit, h = '<div class="rd-col">';
+    ov.classList.toggle('rd-edit', ed);
+    var tt = String(e.t || '').trim();
+    if (tt || ed) h += '<h2 class="rd-t"' + (ed ? ' contenteditable="true" data-ph="Título"' : '') + '>' + rdEsc(tt) + '</h2>';
+    if (!ed) h += '<div class="rd-bar" hidden><div class="rcm-pill"><button type="button" class="rcm-ib" data-a="edita" aria-label="Editar"><svg viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg></button><button type="button" class="rcm-ib" data-a="fecha" aria-label="Fechar"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div></div>';
+    var nl = 0, rows = (e.i && e.i.length ? e.i : []);
+    if (ed && !rows.length) rows = [''];
+    rows.forEach(function(v, idx) {
+      var m = (e.m || [])[idx] || {};
+      var st = m.t && String(m.t).trim();
+      if (st || (ed && m.t === '')) h += '<h3 class="rd-h"' + (ed ? ' contenteditable="true" data-ph="Título" data-i="' + idx + '"' : '') + '>' + rdEsc(String(m.t || '').trim()) + '</h3>';
+      if (m.c) nl++;
+      if (!ed && !String(v || '').trim()) return;
+      h += rdBloco(v, idx, m.c ? nl : 0, ed);
+    });
+    if (ed) h += '<div class="rd-tools"><button type="button" data-t="b" aria-label="Negrito"><svg viewBox="0 0 24 24"><path d="M7 5h6a3.5 3.5 0 010 7H7zM7 12h7a3.5 3.5 0 010 7H7z"/></svg></button><button type="button" data-t="i" aria-label="Itálico"><svg viewBox="0 0 24 24"><path d="M10 5h7M7 19h7M14 5l-4 14"/></svg></button><button type="button" data-t="T" aria-label="Título"><b>T</b></button><button type="button" data-t="c" aria-label="Check"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M8.2 12.4l2.6 2.6 5-5.2"/></svg></button><button type="button" data-t="n" aria-label="Numeração"><svg viewBox="0 0 24 24"><path d="M11 6h9M11 12h9M11 18h9M4.5 5.5l1.5-1v5M4 14.2c.6-1 2.3-.8 2.1.4-.3 1-1.6 1.5-2.1 2.4h2.4"/></svg></button><button type="button" data-t="p" aria-label="Marcadores"><svg viewBox="0 0 24 24"><path d="M11 6h9M11 12h9M11 18h9"/><circle cx="5.5" cy="6" r=".9" fill="currentColor"/><circle cx="5.5" cy="12" r=".9" fill="currentColor"/><circle cx="5.5" cy="18" r=".9" fill="currentColor"/></svg></button><button type="button" data-t="d" aria-label="Traço"><svg viewBox="0 0 24 24"><path d="M4 6h3M11 6h9M4 12h3M11 12h9M4 18h3M11 18h9"/></svg></button><button type="button" data-t="+" aria-label="Novo texto"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button><button type="button" data-t="ok" class="ok" aria-label="Pronto"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7"/></svg></button></div>';
+    h += '<button type="button" data-fechar hidden onclick="fecharLeitura()" aria-label="Fechar"></button></div>';
+    ov.innerHTML = h;
+    var bar = ov.querySelector('.rd-bar');
+    if (bar) bar.addEventListener('click', function(ev) {
+      var b = ev.target.closest ? ev.target.closest('button') : null; if (!b) return;
+      if (b.getAttribute('data-a') === 'edita') { _rd.edit = true; rdPinta(); var bl = ov.querySelector('.rd-tx'); if (bl) rdFoco(bl); }
+      else fecharLeitura();
+    });
+  }
+  function rdFoco(el, fim) {
+    try { el.focus(); var r = document.createRange(); r.selectNodeContents(el); r.collapse(!fim); var s = window.getSelection(); s.removeAllRanges(); s.addRange(r); } catch (_) {}
+  }
+  /* lê a tela e devolve para os dados */
+  function rdColeta() {
+    var ov = document.getElementById('rdOv'), e = _rd.e, i = [], m = [], velho = e.m || [], velhoI = e.i || [];
+    var t = ov.querySelector('.rd-t'); if (t) e.t = t.textContent.replace(/\s+/g, ' ').trim();
+    var pend = null;
+    Array.prototype.forEach.call(ov.querySelectorAll('.rd-col > .rd-h, .rd-col > .rd-tx'), function(el) {
+      if (el.classList.contains('rd-h')) { pend = el.textContent.replace(/\s+/g, ' ').trim(); return; }
+      var idx = +el.getAttribute('data-i'), txt = rtDeDom(el, false).replace(/​/g, '');
+      var o = {}, v = velho[idx]; if (v && v.c) o.c = 1;
+      if (pend) o.t = pend;
+      pend = null;
+      if (!txt.trim() && !o.t) return;
+      i.push(txt); m.push(o);
+    });
+    e.i = i; e.m = m;
+  }
+  function rdSalva() {
+    if (!_rd || !_rd.salvar) return;
+    try { rdColeta(); _rd.salvar(_rd.e); } catch (_) {}
+  }
+  function rdAgenda() { if (!_rd || !_rd.edit) return; clearTimeout(_rd.tm); _rd.tm = setTimeout(rdSalva, 500); }
+  function rdRepinta(bl, fim) {
+    var tx = rtDeDom(bl, false);
+    var sel = window.getSelection(), at = sel && sel.anchorNode && sel.anchorNode.parentNode && sel.anchorNode.parentNode.closest ? sel.anchorNode.parentNode.closest('.rd-tx') : null;
+    bl.innerHTML = rtHtml(rtParse(tx), null);
+    if (fim && at === bl) rdFoco(bl, true);
+  }
+  function rdFerr(t) {
+    var ov = document.getElementById('rdOv'), sel = window.getSelection();
+    if (t === 'ok') { clearTimeout(_rd.tm); rdSalva(); _rd.edit = false; rdPinta(); return; }
+    if (t === 'b' || t === 'i') { try { document.execCommand(t === 'b' ? 'bold' : 'italic'); } catch (_) {} rdAgenda(); return; }
+    var no = sel && sel.anchorNode ? (sel.anchorNode.nodeType === 1 ? sel.anchorNode : sel.anchorNode.parentNode) : null;
+    var bl = no && no.closest ? no.closest('.rd-tx') : null;
+    if (t === '+') {
+      var novo = document.createElement('div'); novo.className = 'rd-tx'; novo.setAttribute('contenteditable', 'true');
+      novo.setAttribute('data-i', '-1'); novo.innerHTML = '<div class="ln gap"><br></div>';
+      var ref = bl || ov.querySelector('.rd-col > .rd-tx:last-of-type');
+      if (ref && ref.parentNode) ref.parentNode.insertBefore(novo, ref.nextSibling); else ov.querySelector('.rd-col').insertBefore(novo, ov.querySelector('.rd-tools'));
+      rdFoco(novo); rdAgenda(); return;
+    }
+    if (t === 'T') {
+      if (!bl) bl = ov.querySelector('.rd-col > .rd-tx');
+      if (!bl) return;
+      var ant = bl.previousElementSibling;
+      if (ant && ant.classList.contains('rd-h')) { rdFoco(ant, true); return; }
+      var h3 = document.createElement('h3'); h3.className = 'rd-h'; h3.setAttribute('contenteditable', 'true'); h3.setAttribute('data-ph', 'Título');
+      bl.parentNode.insertBefore(h3, bl); rdFoco(h3); rdAgenda(); return;
+    }
+    if (!bl) return;
+    var ln = no.closest('.ln');
+    if (!ln || ln.parentNode !== bl) return;
+    var pos = Array.prototype.indexOf.call(bl.children, ln);
+    var lines = rtDeDom(bl, false).split('\n');
+    var pre = { c: '[ ] ', n: '[#] ', p: '[-] ', d: '[=] ' }[t];
+    var atual = lines[pos] || '', mm = /^\[( |x|#|-|=|!)\] ?/.exec(atual), corpo = mm ? atual.slice(mm[0].length) : atual;
+    var igual = mm && (pre === '[ ] ' ? (mm[1] === ' ' || mm[1] === 'x') : pre === mm[0].trim() + ' ' || mm[0] === pre);
+    lines[pos] = igual ? corpo : pre + corpo;
+    bl.innerHTML = rtHtml(rtParse(lines.join('\n')), null);
+    var alvo = bl.children[pos]; if (alvo) rdFoco(alvo, true);
+    rdAgenda();
+  }
   function fecharLeitura() {
     var ov = document.getElementById('rdOv');
-    if (ov) ov.hidden = true;
+    if (_rd && _rd.edit) { clearTimeout(_rd.tm); rdSalva(); }
+    if (ov) { ov.hidden = true; ov.classList.remove('rd-edit'); }
+    _rd = null;
     if (window.rcMapa && window.rcMapa.fechou) window.rcMapa.fechou();
   }
   window.abrirLeitura = abrirLeitura; window.fecharLeitura = fecharLeitura;
