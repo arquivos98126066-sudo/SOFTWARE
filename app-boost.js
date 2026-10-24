@@ -221,7 +221,7 @@ window.AlternaGestos = {
       if (p && Date.now() - t0 <= 2200 && ehVaiVolta(p)) aoFazer();
     }
     document.addEventListener('touchstart', function(e){
-      if (e.touches.length !== 1 || /^(INPUT|TEXTAREA|SELECT)$/.test((e.target.tagName || ''))) { pts = null; return; }
+      if (e.touches.length !== 1 || (e.target === document.activeElement && /^(INPUT|TEXTAREA|SELECT)$/.test((e.target.tagName || '')))) { pts = null; return; }
       var t = e.touches[0]; pts = [{x: t.clientX, y: t.clientY}]; t0 = Date.now();
     }, {passive: true});
     document.addEventListener('touchmove', function(e){
@@ -229,6 +229,38 @@ window.AlternaGestos = {
       if (e.touches.length !== 1) { pts = null; return; }
       var t = e.touches[0], u = pts[pts.length - 1];
       if (Math.hypot(t.clientX - u.x, t.clientY - u.y) >= 5) pts.push({x: t.clientX, y: t.clientY});
+    }, {passive: true});
+    document.addEventListener('touchend', fimToque, {passive: true});
+    document.addEventListener('touchcancel', fimToque, {passive: true});
+  },
+  v: function gestoV(aoFazer){
+    var pts = null, t0 = 0;
+    function reto(a, b){ return Math.hypot(b.x - a.x, b.y - a.y); }
+    function ehV(p){
+      if (p.length < 6) return false;
+      var n = p.length, v = 0, minx = p[0].x, maxx = p[0].x;
+      for (var i = 1; i < n; i++){ if (p[i].y > p[v].y) v = i; if (p[i].x < minx) minx = p[i].x; if (p[i].x > maxx) maxx = p[i].x; }
+      if (v < n * 0.1 || v > n * 0.9) return false;
+      var a = p[0], b = p[v], c = p[n - 1];
+      var desce = b.y - a.y, sobe = b.y - c.y;
+      if (desce < 80 || sobe < 50 || sobe < desce * 0.3 || sobe > desce * 3) return false;
+      if (maxx - minx < 35) return false;
+      var cam = 0; for (var k = 1; k < n; k++) cam += reto(p[k - 1], p[k]);
+      return cam <= (reto(a, b) + reto(b, c)) * 2.2;
+    }
+    function fimToque(){
+      var p = pts; pts = null;
+      if (p && Date.now() - t0 <= 1500 && ehV(p)) aoFazer();
+    }
+    document.addEventListener('touchstart', function(e){
+      if (e.touches.length !== 1 || (e.target === document.activeElement && /^(INPUT|TEXTAREA|SELECT)$/.test((e.target.tagName || '')))) { pts = null; return; }
+      var t = e.touches[0]; pts = [{x: t.clientX, y: t.clientY}]; t0 = Date.now();
+    }, {passive: true});
+    document.addEventListener('touchmove', function(e){
+      if (!pts) return;
+      if (e.touches.length !== 1) { pts = null; return; }
+      var t = e.touches[0], u = pts[pts.length - 1];
+      if (Math.hypot(t.clientX - u.x, t.clientY - u.y) >= 6) pts.push({x: t.clientX, y: t.clientY});
     }, {passive: true});
     document.addEventListener('touchend', fimToque, {passive: true});
     document.addEventListener('touchcancel', fimToque, {passive: true});
@@ -261,7 +293,7 @@ window.AlternaGestos = {
 window.Alterna = (function () {
   var K = 'alterna.v1', VALE = 30 * 60 * 1000;
   var URLS = { tapete: 'TAPETE-CRM.html', crm: 'MEU-CRM.html', plano: 'DOA.html', adm: 'ADM.html', rico: 'RICO.html', ricop: 'RICO.html?i=plano', estudo: 'LER.html', menu: 'index.html' };
-  var CODIGO = { plano: 'DOA', estudo: 'LER', rico: 'RICO', ricop: 'RICOP' };
+  var CODIGO = { plano: 'DOA', estudo: 'LER', rico: 'RICO', ricop: 'RICOP', tapete: 'TAPETE', crm: 'CRM', adm: 'ADM' };
   function quem() {
     var f = (location.pathname.split('/').pop() || '').toLowerCase();
     if (f === 'tapete-crm.html') return 'tapete';
@@ -303,6 +335,11 @@ window.Alterna = (function () {
       s.o = eu; s.t = Date.now(); grava(s);
       vibra(25); A.ir('menu');
     },
+    /* V: de qualquer app (ou HTML do Plano) volta ao menu dos 6, sem mexer nas conexões */
+    menu: function () {
+      if (!eu) return;
+      vibra(25); A.ir('menu');
+    },
     quebra: function () {
       if (!eu) return;
       var s = ler();
@@ -312,7 +349,64 @@ window.Alterna = (function () {
   };
   if (eu) {
     window.AlternaGestos.vaiVolta(A.zig);
+    window.AlternaGestos.v(A.menu);
     window.AlternaGestos.doisDedos(A.quebra);
+  }
+
+  /* ----- Tapete CRM, Meu CRM e ADM: voltam na tela e na rolagem em que estavam ----- */
+  var GEN = { tapete: 'TAPETE', crm: 'CRM', adm: 'ADM' };
+  if (eu && GEN[eu]) {
+    var KE = 'alterna.est.' + eu, chegou = false, tocou = false, estilo = null;
+    try { chegou = sessionStorage.getItem('troca') === GEN[eu]; } catch (e) {}
+    function cam(el) { var p = []; while (el && el !== document.body && el.parentNode) { var i = 0, s2 = el; while ((s2 = s2.previousElementSibling)) i++; p.unshift(i); el = el.parentNode; } return p.join('.'); }
+    function ach(c) { var el = document.body, a = c ? c.split('.') : []; for (var i = 0; i < a.length; i++) el = el && el.children[+a[i]]; return el || null; }
+    var SEGURAS = { home: 1, clientes: 1, config: 1, fila: 1, registrar: 1 };
+    function tela() {
+      var e;
+      if (eu === 'tapete') { e = document.querySelector('.screen.active'); return e && e.id ? e.id.replace('screen-', '') : null; }
+      if (eu === 'crm') { e = document.querySelector('.page.active'); return e && e.id ? e.id.replace('page-', '') : null; }
+      e = document.querySelector('.pnl.on'); return e && e.id ? +e.id.replace('p', '') : null;
+    }
+    function poeTela(t) {
+      try {
+        if (t === null || t === undefined) return;
+        if (eu === 'tapete') { if (SEGURAS[t] && window.showScreen && tela() !== t) { window.showScreen(t, false); if (window.setNav && (t === 'registrar' || t === 'home')) window.setNav(t === 'registrar' ? 0 : 1); } }
+        else if (eu === 'crm') { if (window.navigate && tela() !== t) window.navigate(t); }
+        else if (window.irPara && tela() !== t) window.irPara(t);
+      } catch (e) {}
+    }
+    A.aoSair = function () {
+      try {
+        var rolos = [], l = document.body ? document.body.querySelectorAll('*') : [];
+        for (var i = 0; i < l.length; i++) { var e = l[i]; if (e.scrollTop > 0 && e.scrollHeight > e.clientHeight + 4) rolos.push([cam(e), e.scrollTop]); }
+        localStorage.setItem(KE, JSON.stringify({ t: tela(), y: window.scrollY || 0, r: rolos, ts: Date.now() }));
+      } catch (e) {}
+    };
+    if (chegou) {
+      /* não mostra a tela por um instante: ela só aparece já na tela e na rolagem certas */
+      estilo = document.createElement('style'); estilo.textContent = 'html{visibility:hidden}';
+      (document.head || document.documentElement).appendChild(estilo);
+      document.addEventListener('touchstart', function () { tocou = true; }, { passive: true, capture: true });
+      var revela = function () { if (estilo) { estilo.remove(); estilo = null; } };
+      setTimeout(revela, 1600);
+      var feito = false;
+      var aplica = function () {
+        if (feito) return; feito = true;
+        var s2 = null;
+        try { sessionStorage.removeItem('troca'); s2 = JSON.parse(localStorage.getItem(KE) || 'null'); } catch (e) {}
+        if (!s2 || (s2.ts && Date.now() - s2.ts > 3600000)) { revela(); return; }
+        poeTela(s2.t);
+        var rola = function () {
+          if (tocou) return;
+          (s2.r || []).forEach(function (r) { var e = ach(r[0]); if (e && Math.abs(e.scrollTop - r[1]) > 2) e.scrollTo({ top: r[1], behavior: 'instant' }); });
+          if (s2.y && Math.abs(window.scrollY - s2.y) > 2) window.scrollTo({ top: s2.y, behavior: 'instant' });
+        };
+        requestAnimationFrame(function () { rola(); requestAnimationFrame(function () { rola(); revela(); setTimeout(rola, 300); setTimeout(rola, 900); }); });
+      };
+      /* espera o app montar a primeira tela com os dados do aparelho */
+      var inicia = function () { setTimeout(aplica, 350); };
+      if (document.readyState === 'complete') inicia(); else window.addEventListener('load', inicia);
+    }
   }
   return A;
 })();

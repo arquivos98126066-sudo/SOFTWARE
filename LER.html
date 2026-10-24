@@ -619,6 +619,7 @@ svg{fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-l
   function gestoNoEstudo(y){
     var G = window.AlternaGestos;
     return '<style>html{overscroll-behavior-y:contain}</style><script>(' + G.vaiVolta.toString() + ')(function(){ parent.postMessage({alternaZig: 1}, "*"); });' +
+      '(' + G.v.toString() + ')(function(){ parent.postMessage({alternaMenu: 1}, "*"); });' +
       '(' + G.doisDedos.toString() + ')(function(){ parent.postMessage({alternaQuebra: 1}, "*"); });' +
       '(function(){ var y0 = ' + (+y || 0) + ', t = 0; function ir(){ if (y0) scrollTo({top: y0, behavior: "instant"}); parent.postMessage({estudoPronto: 1}, "*"); } document.addEventListener("DOMContentLoaded", ir); addEventListener("load", ir);' +
       'addEventListener("scroll", function(){ if (t) return; t = setTimeout(function(){ t = 0; parent.postMessage({estudoY: window.scrollY}, "*"); }, 250); }, {passive: true}); })();<\/script>';
@@ -627,6 +628,7 @@ svg{fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-l
     var q = $('quadro');
     if (!e.data || !q || e.source !== q.contentWindow) return;
     if (e.data.alternaZig) Alterna.zig();
+    else if (e.data.alternaMenu) Alterna.menu();
     else if (e.data.alternaQuebra) Alterna.quebra();
     else if (e.data.estudoPronto) q.style.visibility = '';
     else if (typeof e.data.estudoY === 'number') docY = e.data.estudoY;

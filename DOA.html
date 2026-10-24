@@ -2774,6 +2774,7 @@ abrirProcesso();
     var json = JSON.stringify(E || null).replace(/</g, '\\u003c');
     var G = window.AlternaGestos;
     var tag = '<script>(' + G.vaiVolta.toString() + ')(function(){ parent.postMessage({alternaZig: 1, planoE: window.__planoLe ? window.__planoLe() : null}, "*"); });' +
+      '(' + G.v.toString() + ')(function(){ parent.postMessage({alternaMenu: 1, planoE: window.__planoLe ? window.__planoLe() : null}, "*"); });' +
       '(' + G.doisDedos.toString() + ')(function(){ parent.postMessage({alternaQuebra: 1}, "*"); });' +
       '(' + estadoFrame.toString() + ')(' + json + ');' +
       'document.addEventListener("click", function(e){ var a = e.target.closest && e.target.closest("a[href]"); if (a && a.getAttribute("href").charAt(0) === "#"){ e.preventDefault(); var t = document.getElementById(a.getAttribute("href").slice(1)); if (t) t.scrollIntoView({behavior: "smooth"}); } }, true);<\/script>';
@@ -2786,6 +2787,7 @@ abrirProcesso();
     if (e.data.planoPronto){ fr.style.visibility = ''; }
     if (e.data.planoE) _htmlE = e.data.planoE;
     if (e.data.alternaZig && window.Alterna) Alterna.zig();
+    else if (e.data.alternaMenu && window.Alterna) Alterna.menu();
     else if (e.data.alternaQuebra && window.Alterna) Alterna.quebra();
   });
   try { sessionStorage.removeItem('viaPlano'); } catch(e){}
