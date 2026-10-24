@@ -4397,29 +4397,36 @@ window.saveAnswer = window.saveAnswer || function(){};
         todas.forEach(function(l, k) { l.classList.toggle('rd-pre', k >= lo && k <= hi); });
       };
       ov.addEventListener('touchstart', function(ev) {
-        if (!_rd || !_rd.edit || _rd.tool !== 'q' || (ev.target.closest && ev.target.closest('.rd-tools'))) { if (_rd) _rd.dr = null; return; }
+        if (!_rd || !_rd.edit || (_rd.tool !== 'q' && _rd.tool !== 'n') || (ev.target.closest && ev.target.closest('.rd-tools'))) { if (_rd) _rd.dr = null; return; }
         var t = ev.touches[0], ln = linhaEm(t.clientX, t.clientY);
-        _rd.dr = ln ? { a: ln, b: ln } : null;
+        _rd.dr = ln ? { a: ln, b: ln } : null; _rd.drx = t.clientX; _rd.dry = t.clientY;
         if (ln) marca(ln, ln);
+        clearInterval(_rd.drIv);
+        if (ln) _rd.drIv = setInterval(function() {
+          if (!_rd || !_rd.dr) { clearInterval(_rd && _rd.drIv); return; }
+          var zona = 120, topo = 90, base = innerHeight - 90, v = 0, y = _rd.dry;
+          if (y < topo + zona) v = -Math.min(24, (topo + zona - y) / zona * 24); else if (y > base - zona) v = Math.min(24, (y - (base - zona)) / zona * 24);
+          if (v) { ov.scrollTop += v; var l2 = linhaEm(_rd.drx, _rd.dry); if (l2) { _rd.dr.b = l2; marca(_rd.dr.a, l2); } }
+        }, 16);
       }, { passive: true });
       ov.addEventListener('touchmove', function(ev) {
         if (!_rd || !_rd.dr) return;
         if (ev.cancelable) ev.preventDefault();
-        var t = ev.touches[0], ln = linhaEm(t.clientX, t.clientY);
+        var t = ev.touches[0], ln = linhaEm(t.clientX, t.clientY); _rd.drx = t.clientX; _rd.dry = t.clientY;
         if (ln) { _rd.dr.b = ln; marca(_rd.dr.a, ln); }
       }, { passive: false });
       ov.addEventListener('touchend', function(ev) {
         if (!_rd) return;
         if (_rd.dr) {
-          var d = _rd.dr; _rd.dr = null;
+          var d = _rd.dr; _rd.dr = null; clearInterval(_rd.drIv);
           if (ev.cancelable) ev.preventDefault();
           ov.querySelectorAll('.rd-pre').forEach(function(l) { l.classList.remove('rd-pre'); });
           var todas = Array.prototype.slice.call(ov.querySelectorAll('.rd-tx > .ln')), i = todas.indexOf(d.a), j = todas.indexOf(d.b);
-          if (i >= 0 && j >= 0) rdCita(todas[Math.min(i, j)], todas[Math.max(i, j)]);
+          if (i >= 0 && j >= 0) { if (_rd.tool === 'n') rdNumera(todas[Math.min(i, j)], todas[Math.max(i, j)]); else rdCita(todas[Math.min(i, j)], todas[Math.max(i, j)]); }
           _rd.tool = null; ov.classList.remove('rd-q'); ov_limpaOn(); rdModoTeclado();
           return;
         }
-        if (_rd.edit && _rd.tool === 'q' && !(ev.target.closest && ev.target.closest('.rd-tools'))) { if (ev.cancelable) ev.preventDefault(); return; }
+        if (_rd.edit && (_rd.tool === 'q' || _rd.tool === 'n') && !(ev.target.closest && ev.target.closest('.rd-tools'))) { if (ev.cancelable) ev.preventDefault(); return; }
         /* duas batidas rápidas no texto: sai da edição e volta para a leitura */
         if (_rd.edit && !_rd.tool && !_rd.digita && !_rd.copia && !(ev.target.closest && ev.target.closest('.rd-tools, .ck'))) {
           var c = ev.changedTouches && ev.changedTouches[0]; if (!c) return;
@@ -4437,14 +4444,14 @@ window.saveAnswer = window.saveAnswer || function(){};
       var tx0 = null;
       ov.addEventListener('touchstart', function(ev) { var t = ev.touches[0]; tx0 = { x: t.clientX, y: t.clientY }; }, { passive: true });
       ov.addEventListener('touchend', function(ev) {
-        if (!_rd || !_rd.edit || !_rd.tool || _rd.tool === 'q' || !tx0 || (ev.target.closest && ev.target.closest('.rd-tools'))) return;
+        if (!_rd || !_rd.edit || !_rd.tool || _rd.tool === 'q' || _rd.tool === 'n' || !tx0 || (ev.target.closest && ev.target.closest('.rd-tools'))) return;
         var c = ev.changedTouches && ev.changedTouches[0]; if (!c || Math.abs(c.clientX - tx0.x) > 10 || Math.abs(c.clientY - tx0.y) > 10) return;
         var el = document.elementFromPoint(c.clientX, c.clientY), ln = el && el.closest ? el.closest('.ln') : null, bl = ln ? ln.closest('.rd-tx') : null;
         if (ln && bl && ln.parentNode === bl) { ev.preventDefault(); rdAplica(ln, bl); }
         else ev.preventDefault();
       }, { passive: false });
       ov.addEventListener('click', function(ev) {
-        if (!_rd || !_rd.edit || !_rd.tool || (ev.target.closest && ev.target.closest('.rd-tools'))) return;
+        if (!_rd || !_rd.edit || !_rd.tool || _rd.tool === 'n' || (ev.target.closest && ev.target.closest('.rd-tools'))) return;
         var ln = ev.target.closest ? ev.target.closest('.ln') : null, bl = ln ? ln.closest('.rd-tx') : null;
         if (ln && bl && ln.parentNode === bl) { ev.preventDefault(); rdAplica(ln, bl); }
       });
@@ -4963,7 +4970,7 @@ window.saveAnswer = window.saveAnswer || function(){};
       if (sq && sq.rangeCount && !sq.isCollapsed && _rd.tool !== 'q') { rdCita(); return; }
     }
     rdArma(t);
-    ov.classList.toggle('rd-q', _rd.tool === 'q');
+    ov.classList.toggle('rd-q', _rd.tool === 'q' || _rd.tool === 'n');
   }
   /* citação: o trecho selecionado vira bloco de citação (como no estudo); selecionar de novo dentro de uma citação desfaz */
   function rdCita(l1, l2) {
@@ -5017,6 +5024,23 @@ window.saveAnswer = window.saveAnswer || function(){};
       Array.prototype.forEach.call(b.querySelectorAll('.ln > .nm:not([data-rc])'), function(nm) { if (nm.getAttribute('data-r') === '1') c = 1; else c++; nm.textContent = c; });
     });
     rdCartoesTodos();
+  }
+  /* numeração por arrasto: a primeira linha marcada vira o título numerado e as outras ficam como o texto de baixo, dentro do mesmo cartão; o que vem antes e depois fica em blocos separados */
+  function rdNumera(l1, l2) {
+    var ov = document.getElementById('rdOv'), bl = l1.parentNode;
+    if (!bl || !bl.classList.contains('rd-tx')) return;
+    var kids = Array.prototype.slice.call(bl.children), i1 = kids.indexOf(l1), i2 = l2.parentNode === bl ? kids.indexOf(l2) : kids.length - 1;
+    if (i1 < 0 || i2 < i1) i2 = i1;
+    var lines = rtDeDom(bl, false).split('\n'), sel = lines.slice(i1, i2 + 1), antes = lines.slice(0, i1).join('\n').replace(/(\n\s*)+$/, ''), depois = lines.slice(i2 + 1).join('\n').replace(/^(\s*\n)+/, '');
+    var mm = /^\[( |x|#|-|=|!)\] ?/.exec(sel[0] || ''), corpo = mm ? sel[0].slice(mm[0].length) : (sel[0] || '');
+    if (sel.length === 1 && mm && mm[1] === '#') sel[0] = corpo; else sel[0] = '[#] ' + corpo;
+    var selTxt = sel.join('\n').replace(/(\n\s*)+$/, '');
+    var mk = function(txt) { var d = document.createElement('div'); d.className = 'rd-tx'; d.setAttribute('contenteditable', 'true'); d.setAttribute('data-i', '-1'); d.innerHTML = rtHtml(rtParse(txt), null); return d; };
+    var sb;
+    if (antes.trim()) { bl.innerHTML = rtHtml(rtParse(antes), null); sb = mk(selTxt); bl.parentNode.insertBefore(sb, bl.nextSibling); }
+    else { bl.innerHTML = rtHtml(rtParse(selTxt), null); sb = bl; }
+    if (depois.trim()) sb.parentNode.insertBefore(mk(depois), sb.nextSibling);
+    rdRenumera(); rdAgenda();
   }
   /* aplica a ferramenta armada na linha tocada */
   function rdAplica(ln, bl) {
