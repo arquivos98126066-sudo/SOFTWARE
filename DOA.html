@@ -126,6 +126,7 @@ document.addEventListener('click',function(e){
 },true);
 </script>
 <style>
+html,body{overscroll-behavior-y:contain}
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 
   :root {
@@ -2630,6 +2631,47 @@ window.p_autoGrow = p_autoGrow;
 })();
 
 abrirProcesso();
+
+/* teste: desenhar um V (ou U) com o dedo troca para o Estudo */
+(function(){
+  function gestoV(aoFazer){
+    var pts = null, t0 = 0;
+    function reto(a, b){ return Math.hypot(b.x - a.x, b.y - a.y); }
+    function ehV(p){
+      if (p.length < 6) return false;
+      var n = p.length, v = 0, minx = p[0].x, maxx = p[0].x;
+      for (var i = 1; i < n; i++){ if (p[i].y > p[v].y) v = i; if (p[i].x < minx) minx = p[i].x; if (p[i].x > maxx) maxx = p[i].x; }
+      if (v < n * 0.1 || v > n * 0.9) return false;
+      var a = p[0], b = p[v], c = p[n - 1];
+      var desce = b.y - a.y, sobe = b.y - c.y;
+      /* V ou U, mesmo mal feito: desce, vira e sobe, com algum deslocamento para o lado */
+      if (desce < 80 || sobe < 50 || sobe < desce * 0.3 || sobe > desce * 3) return false;
+      if (maxx - minx < 35) return false;
+      var cam = 0; for (var k = 1; k < n; k++) cam += reto(p[k - 1], p[k]);
+      return cam <= (reto(a, b) + reto(b, c)) * 2.2;
+    }
+    document.addEventListener('touchstart', function(e){
+      if (e.touches.length !== 1 || /^(INPUT|TEXTAREA)$/.test((e.target.tagName || ''))) { pts = null; return; }
+      var t = e.touches[0]; pts = [{x: t.clientX, y: t.clientY}]; t0 = Date.now();
+    }, {passive: true});
+    document.addEventListener('touchmove', function(e){
+      if (!pts) return;
+      if (e.touches.length !== 1) { pts = null; return; }
+      var t = e.touches[0], u = pts[pts.length - 1];
+      if (Math.hypot(t.clientX - u.x, t.clientY - u.y) >= 6) pts.push({x: t.clientX, y: t.clientY});
+    }, {passive: true});
+    document.addEventListener('touchend', function(){
+      var p = pts; pts = null;
+      if (p && Date.now() - t0 < 1500 && ehV(p)) aoFazer();
+    }, {passive: true});
+    /* se o navegador tomar o toque (rolagem), vale o que já foi desenhado */
+    document.addEventListener('touchcancel', function(){
+      var p = pts; pts = null;
+      if (p && Date.now() - t0 < 1500 && ehV(p)) aoFazer();
+    }, {passive: true});
+  }
+  gestoV(function(){ try { navigator.vibrate && navigator.vibrate(25); } catch(e){} location.replace('LER.html'); });
+})();
 </script>
 </body>
 </html>

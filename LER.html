@@ -625,7 +625,7 @@ svg{fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-l
       if (p && Date.now() - t0 < 1500 && ehV(p)) aoFazer();
     }, {passive: true});
   }
-  function sairParaMenu(){ try { navigator.vibrate && navigator.vibrate(25); } catch(e){} location.replace('index.html'); }
+  function sairParaMenu(){ try { navigator.vibrate && navigator.vibrate(25); } catch(e){} location.replace('DOA.html'); }
   gestoV(sairParaMenu);
   var GESTO_NO_ESTUDO = '<style>html{overscroll-behavior-y:contain}</style><script>(' + gestoV.toString() + ')(function(){ parent.postMessage({estudoSair: 1}, "*"); });<\/script>';
   window.addEventListener('message', function(e){
