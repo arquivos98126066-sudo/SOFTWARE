@@ -638,7 +638,7 @@ svg{fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-l
   function sairParaMenu(){
     salvaTroca();
     try { sessionStorage.setItem('troca', 'DOA'); navigator.vibrate && navigator.vibrate(25); } catch(e){}
-    location.replace('DOA.html');
+    if (window.Voltar) Voltar.sai('DOA.html'); else location.replace('DOA.html');
   }
   gestoDoisDedos(sairParaMenu);
   /* dentro do estudo: reconhece o V, avisa a rolagem e volta para onde estava */

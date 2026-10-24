@@ -1884,17 +1884,17 @@ function htmlCodigo(h, fn){
   fetch(h.src).then(function(r){ return r.text(); }).then(fn).catch(function(){ toast('Não consegui ler o HTML'); });
 }
 var _htmlAberto = null;
-var _htmlY = 0;
-function htmlAbre(id, y){
+var _htmlE = null;
+function htmlAbre(id, estado){
   var h = htmlLer().find(function(x){ return x.id === id; }); if(!h) return;
-  _htmlY = y || 0;
+  _htmlE = estado || null;
   /* app de verdade (Rico): abre a própria página, com os mesmos dados; o voltar do celular traz o Plano de volta no mesmo lugar */
   if(h.app){
     if(window.salvaEstadoPlano) window.salvaEstadoPlano();
     /* o Plano fica registrado como "dentro do Rico": ao voltar pela troca, reabre o Rico direto */
-    try { var st = JSON.parse(localStorage.getItem('troca.estado.DOA') || '{}'); st.html = h.id; st.htmlY = 0; localStorage.setItem('troca.estado.DOA', JSON.stringify(st)); } catch(e){}
+    try { var st = JSON.parse(localStorage.getItem('troca.estado.DOA') || '{}'); st.html = h.id; st.htmlE = null; localStorage.setItem('troca.estado.DOA', JSON.stringify(st)); } catch(e){}
     try { sessionStorage.setItem('troca', 'DOA'); sessionStorage.setItem('viaPlano', '1'); } catch(e){}
-    location.href = h.src; return;
+    location.replace(h.src); return;
   }
   /* iframe novo a cada abertura: assim ele não acumula histórico e o botão voltar do celular só fecha o HTML */
   var box = document.getElementById('html-view');
@@ -1905,9 +1905,9 @@ function htmlAbre(id, y){
   if(h.src){
     /* carrega o código e abre com o gesto de troca dentro; se falhar, abre direto */
     fetch(h.src).then(function(r){ return r.text(); }).then(function(t){
-      if(_htmlAberto === h.id && window.planoInjeta) fr.srcdoc = window.planoInjeta(t, new URL(h.src, location.href).href, y); else if(_htmlAberto === h.id) fr.src = h.src;
+      if(_htmlAberto === h.id && window.planoInjeta) fr.srcdoc = window.planoInjeta(t, new URL(h.src, location.href).href, estado); else if(_htmlAberto === h.id) fr.src = h.src;
     }).catch(function(){ fr.src = h.src; });
-  } else fr.srcdoc = window.planoInjeta ? window.planoInjeta(h.html, null, y) : h.html;
+  } else fr.srcdoc = window.planoInjeta ? window.planoInjeta(h.html, null, estado) : h.html;
   _htmlAberto = h.id;
   if(window.CorBarra) htmlCodigo(h, function(t){ if(_htmlAberto === h.id) CorBarra.de(t); });
   box.classList.add('open');
@@ -2687,7 +2687,7 @@ abrirProcesso();
         ts: Date.now(),
         pasta: _pl_currentFolderId, htmlPasta: _htmlPasta, listY: pb ? pb.scrollTop : 0,
         proc: ov && ov.classList.contains('popen') ? localStorage.getItem('doa_active_proc_id') : null,
-        canvasY: p_canvasEl.scrollTop, html: _htmlAberto, htmlY: _htmlY
+        canvasY: p_canvasEl.scrollTop, html: _htmlAberto, htmlE: _htmlE
       }));
     } catch(e){}
   }
@@ -2695,15 +2695,74 @@ abrirProcesso();
   function trocaParaEstudo(){
     salvaEstadoPlano();
     try { sessionStorage.setItem('troca', 'LER'); navigator.vibrate && navigator.vibrate(25); } catch(e){}
-    location.replace('LER.html');
+    if (window.Voltar) Voltar.sai('LER.html'); else location.replace('LER.html');
   }
   gestoDoisDedos(trocaParaEstudo);
   /* dentro dos HTMLs abertos em tela cheia o toque não chega ao Plano: o gesto vai junto dentro de cada um e avisa por mensagem */
-  window.planoInjeta = function(html, abs, y){
-    var tag = '<script>(' + gestoDoisDedos.toString() + ')(function(){ parent.postMessage({planoTroca: 1, y: window.scrollY}, "*"); });' +
-      '(function(){ var y0 = ' + (+y || 0) + ', t = 0, tocou = false; function ir(){ if (y0 && !tocou && Math.abs(window.scrollY - y0) > 2) scrollTo(0, y0); }' +
-      'addEventListener("touchstart", function(){ tocou = true; }, {passive: true}); addEventListener("load", function(){ ir(); setTimeout(ir, 300); setTimeout(ir, 1000); setTimeout(ir, 2200); });' +
-      'addEventListener("scroll", function(){ if (t) return; t = setTimeout(function(){ t = 0; parent.postMessage({planoY: window.scrollY}, "*"); }, 250); }, {passive: true}); })();' +
+  /* guarda e devolve o estado de qualquer HTML aberto aqui: cartões abertos, campos, caixas rolando e a rolagem da página.
+     Roda dentro do HTML (por isso é montado como texto); manda o estado ao Plano e o recebe de volta ao reabrir. */
+  function estadoFrame(E){
+    function cam(el){ var p = []; while (el && el !== document.body && el.parentNode){ var i = 0, s = el; while ((s = s.previousElementSibling)) i++; p.unshift(i); el = el.parentNode; } return p.join('.'); }
+    function ach(c){ var el = document.body, a = c ? c.split('.') : []; for (var i = 0; i < a.length; i++) el = el && el.children[+a[i]]; return el || null; }
+    var base = null, tocou = false;
+    function todos(){ return document.body ? document.body.querySelectorAll('*') : []; }
+    function tira(){
+      base = {}; var l = todos();
+      for (var i = 0; i < l.length; i++){ var e = l[i]; base[cam(e)] = [e.getAttribute('class') || '', e.getAttribute('style') || '', e.hasAttribute('hidden') ? 1 : 0]; }
+    }
+    function le(){
+      var out = {c: [], f: [], s: [], y: window.scrollY || 0}, l = todos();
+      for (var i = 0; i < l.length; i++){
+        var e = l[i], tg = e.tagName, p = null;
+        function pp(){ return p === null ? (p = cam(e)) : p; }
+        if (base){
+          var c = e.getAttribute('class') || '', st = e.getAttribute('style') || '', h = e.hasAttribute('hidden') ? 1 : 0, b = base[pp()];
+          if (b && (c !== b[0] || st !== b[1] || h !== b[2])) out.c.push([pp(), c, st, h]);
+        }
+        if (tg === 'INPUT' || tg === 'TEXTAREA' || tg === 'SELECT'){
+          if (e.type === 'password' || e.type === 'file') continue;
+          var ck = tg === 'INPUT' && (e.type === 'checkbox' || e.type === 'radio');
+          out.f.push([pp(), ck ? (e.checked ? 1 : 0) : e.value, ck ? 'ck' : 'v']);
+        } else if (tg === 'DETAILS') out.f.push([pp(), e.open ? 1 : 0, 'd']);
+        if (e.scrollTop > 0 && e.scrollHeight > e.clientHeight) out.s.push([pp(), e.scrollTop]);
+      }
+      return out;
+    }
+    function poe(){
+      if (!E) return;
+      (E.c || []).forEach(function(r){
+        var e = ach(r[0]); if (!e) return;
+        if (r[1]) e.setAttribute('class', r[1]); else e.removeAttribute('class');
+        if (r[2]) e.setAttribute('style', r[2]); else e.removeAttribute('style');
+        if (r[3]) e.setAttribute('hidden', ''); else e.removeAttribute('hidden');
+      });
+      (E.f || []).forEach(function(r){
+        var e = ach(r[0]); if (!e) return;
+        if (r[2] === 'd'){ e.open = !!r[1]; return; }
+        if (r[2] === 'ck'){ if (e.checked !== !!r[1]){ e.checked = !!r[1]; e.dispatchEvent(new Event('change', {bubbles: true})); } return; }
+        if (e.value !== r[1]){ e.value = r[1]; e.dispatchEvent(new Event('input', {bubbles: true})); e.dispatchEvent(new Event('change', {bubbles: true})); }
+      });
+      (E.s || []).forEach(function(r){ var e = ach(r[0]); if (e) e.scrollTop = r[1]; });
+      if (E.y) scrollTo(0, E.y);
+    }
+    function reaplicaRolagem(){
+      if (!E || tocou) return;
+      (E.s || []).forEach(function(r){ var e = ach(r[0]); if (e && Math.abs(e.scrollTop - r[1]) > 2) e.scrollTop = r[1]; });
+      if (E.y && Math.abs(window.scrollY - E.y) > 2) scrollTo(0, E.y);
+    }
+    addEventListener('touchstart', function(){ tocou = true; }, {passive: true});
+    addEventListener('load', function(){
+      setTimeout(function(){ tira(); poe(); }, 1200);
+      setTimeout(reaplicaRolagem, 1700); setTimeout(reaplicaRolagem, 2800);
+    });
+    window.__planoLe = le;
+    document.addEventListener('visibilitychange', function(){ if (document.hidden) parent.postMessage({planoE: le()}, '*'); });
+    addEventListener('pagehide', function(){ parent.postMessage({planoE: le()}, '*'); });
+  }
+  window.planoInjeta = function(html, abs, E){
+    var json = JSON.stringify(E || null).replace(/</g, '\\u003c');
+    var tag = '<script>(' + gestoDoisDedos.toString() + ')(function(){ parent.postMessage({planoTroca: 1, planoE: window.__planoLe ? window.__planoLe() : null}, "*"); });' +
+      '(' + estadoFrame.toString() + ')(' + json + ');' +
       'document.addEventListener("click", function(e){ var a = e.target.closest && e.target.closest("a[href]"); if (a && a.getAttribute("href").charAt(0) === "#"){ e.preventDefault(); var t = document.getElementById(a.getAttribute("href").slice(1)); if (t) t.scrollIntoView({behavior: "smooth"}); } }, true);<\/script>';
     if (abs && !/<base[\s>]/i.test(html)) html = html.replace(/<head[^>]*>/i, function(m){ return m + '<base href="' + abs + '">'; });
     return html + tag;
@@ -2711,8 +2770,8 @@ abrirProcesso();
   window.addEventListener('message', function(e){
     var fr = document.getElementById('html-view-frame');
     if (!fr || e.source !== fr.contentWindow || !e.data) return;
-    if (typeof e.data.planoY === 'number') _htmlY = e.data.planoY;
-    if (e.data.planoTroca){ if (typeof e.data.y === 'number') _htmlY = e.data.y; trocaParaEstudo(); }
+    if (e.data.planoE) _htmlE = e.data.planoE;
+    if (e.data.planoTroca) trocaParaEstudo();
   });
   try { sessionStorage.removeItem('viaPlano'); } catch(e){}
   /* volta no mesmo lugar em que o Plano ficou (pasta, processo aberto, rolagem e HTML aberto) */
@@ -2736,7 +2795,7 @@ abrirProcesso();
           setTimeout(function(){ p_canvasEl.scrollTop = s.canvasY || 0; }, 600);
         }
       }
-      if (s.html && htmlLer().some(function(x){ return x.id === s.html; })) htmlAbre(s.html, s.htmlY || 0);
+      if (s.html && htmlLer().some(function(x){ return x.id === s.html; })) htmlAbre(s.html, s.htmlE || null);
     })();
   })();
 })();

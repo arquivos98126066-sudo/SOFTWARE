@@ -140,7 +140,9 @@ window.Voltar = (function () {
     }, 120);
   }
 
+  var saindo = null;
   window.addEventListener('popstate', function (e) {
+    if (saindo) { var u = saindo; saindo = null; e.stopImmediatePropagation(); setTimeout(function () { location.replace(u); }, 30); return; }
     if (ignorar > 0) { ignorar--; e.stopImmediatePropagation(); return; }
     /* descarta as que já fecharam por conta própria */
     while (pilha.length && pilha[pilha.length - 1].els && !pilha[pilha.length - 1].els.some(visivel)) pilha.pop();
@@ -165,6 +167,25 @@ window.Voltar = (function () {
       if (emPop) return;
       for (var i = pilha.length - 1; i >= 0; i--) if (pilha[i].fn) { pilha.splice(i, 1); volta(1); return; }
     },
-    varre: varre
+    varre: varre,
+    /* troca de página sem deixar passos do histórico para trás: desfaz o que esta página empurrou e só então troca */
+    sai: function (url) {
+      var d = (history.state && history.state._d) || 0;
+      if (!d) { location.replace(url); return; }
+      saindo = url;
+      try { history.go(-d); } catch (e) { saindo = null; location.replace(url); return; }
+      setTimeout(function () { if (saindo) { var u = saindo; saindo = null; location.replace(u); } }, 700);
+    }
+  };
+})();
+
+/* cada passo que a página empurra no histórico leva a sua profundidade (_d): serve para sair da página sem deixar passos sobrando */
+(function () {
+  var push = history.pushState;
+  history.pushState = function (st, t, u) {
+    var d = (history.state && history.state._d) || 0;
+    var n = (st && typeof st === 'object') ? Object.assign({}, st) : {};
+    n._d = d + 1;
+    return push.call(history, n, t, u);
   };
 })();

@@ -6347,7 +6347,7 @@ window.saveAnswer = window.saveAnswer || function(){};
   }
   gestoDoisDedos(function(){
     try { sessionStorage.setItem('troca', 'LER'); sessionStorage.setItem('rico.y', String(window.scrollY || 0)); navigator.vibrate && navigator.vibrate(25); } catch(e){}
-    location.replace('LER.html');
+    if (window.Voltar) Voltar.sai('LER.html'); else location.replace('LER.html');
   });
 })();
 /* reaberto pelo Plano: volta na rolagem em que você deixou */
