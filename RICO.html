@@ -463,6 +463,10 @@ if ((sessionStorage.getItem('troca') === (window.RICO_INST === 'p' ? 'RICOP' : '
   .rd-ov .ln.rd-nb:has(> .bl), .rd-ov .ln.rd-nb:has(> .ds), .rd-ov .ln.rd-nb:has(> .nm){ padding-left: 77px; text-indent: -30px; }
   .rd-ov .ln.rd-nb:has(> .ck){ padding-left: 75px; text-indent: -28px; }
   .rd-ov .ln.rd-nb.gap{ --gap: 10px; }
+  .rd-ov .ln.rd-lead{ --gap: 2px; }
+  .rd-ov .ln.rd-lead::before{ display: none; }
+  .rd-ov .ln.rd-nf::before{ top: 6px; }
+  .rd-ov .ln.rd-nl::before{ bottom: 16px; }
   .rd-ov .ln.rd-nl{ border-bottom-width: 1px; border-radius: 0 0 26px 26px; padding-bottom: 16px; }
   .rd-tx[data-q]{ position: relative; margin: 14px 0 14px; padding: 18px 20px 16px 22px; background: #fbfaf7; border: 1px solid #e2ddd1; border-radius: 24px; overflow: hidden; font-family: 'DM Sans', system-ui, sans-serif; font-style: normal; font-size: 15px; line-height: 1.65; color: #444; }
   .rd-tx[data-q]::before{ content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 30px; box-sizing: border-box; border-left: 3px solid #7b2d26; border-radius: 23px 0 0 23px; pointer-events: none; }
@@ -4661,7 +4665,7 @@ window.saveAnswer = window.saveAnswer || function(){};
   function rdCartoes(bl) {
     if (!bl || bl.hasAttribute('data-q')) return;
     var ls = Array.prototype.slice.call(bl.children).filter(function(c) { return c.classList && c.classList.contains('ln'); }), i = 0, k;
-    ls.forEach(function(l) { l.classList.remove('rd-nh', 'rd-nb', 'rd-nl', 'rd-ab'); });
+    ls.forEach(function(l) { l.classList.remove('rd-nh', 'rd-nb', 'rd-nl', 'rd-ab', 'rd-nf', 'rd-lead'); });
     var num = function(l) { return !!l.querySelector(':scope > .nm'); };
     while (i < ls.length) {
       if (!num(ls[i])) { i++; continue; }
@@ -4669,7 +4673,11 @@ window.saveAnswer = window.saveAnswer || function(){};
       var j = i + 1, ult = -1;
       while (j < ls.length && !num(ls[j])) { ls[j].classList.add('rd-nb'); if (!ls[j].classList.contains('gap')) ult = j; j++; }
       for (k = ult + 1; k < j; k++) ls[k].classList.remove('rd-nb');
-      if (ult > i) { ls[i].classList.add('rd-ab'); ls[ult].classList.add('rd-nl'); }
+      if (ult > i) {
+        ls[i].classList.add('rd-ab'); ls[ult].classList.add('rd-nl');
+        var f = i + 1; while (f < ult && ls[f].classList.contains('gap')) { ls[f].classList.add('rd-lead'); f++; }
+        ls[f].classList.add('rd-nf');
+      }
       else for (k = i + 1; k < j; k++) ls[k].classList.remove('rd-nb');
       i = j;
     }
