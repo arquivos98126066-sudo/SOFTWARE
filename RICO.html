@@ -665,7 +665,8 @@
   .rcm-conf-card ol{ gap: 10px; }
   .rcm-conf-card ol::before{ display: none; }
   .rcm-conf-card ol li{ flex-wrap: nowrap; gap: 6px 10px; padding: 12px 14px; background: #fff; border: 1px solid var(--bd); border-radius: 20px; box-shadow: 0 2px 8px rgba(15,27,45,.05); align-items: flex-start; }
-  .rcm-conf-card ol li b{ box-shadow: none; }
+  .rcm-conf-card ol li b{ box-shadow: none; width: 27px; height: 27px; font-size: 13px; }
+  .rcm-conf-card ol li span{ padding-top: 3px; }
   .rcm-conf-card ol li span{ flex: 1 1 auto; }
   .rcm-conf-card ol li span em{ margin: 8px -4px 0; background: var(--chip); border: 0; border-radius: 14px; }
   .rcm-conf-card ul li{ box-shadow: 0 2px 8px rgba(15,27,45,.05); }
@@ -676,9 +677,9 @@
   /* botões do diálogo: pílula branca compacta só com ícones, igual à barra do mapa */
   /* minimalista: sem os títulos "Você escolheu" e "Mudanças e instruções" nem o aviso de lista vazia */
   .rcm-conf-card h4, .rcm-conf-card ul:has(> li.vz:only-child){ display: none; }
-  .rcm-conf-bt{ display: flex; flex-wrap: nowrap; justify-content: center; gap: 2px; width: fit-content; padding: 4px; margin: 16px auto 0; background: #fff; border: 1px solid var(--bd); border-radius: 999px; box-shadow: 0 6px 16px rgba(15,27,45,.12); }
-  .rcm-conf-bt button, .rcm-conf-bt button.sim{ flex: 0 0 36px; width: 36px; min-width: 36px; height: 36px; padding: 0; border: 0; border-radius: 50%; background: transparent; color: var(--dark); display: grid; place-items: center; font-size: 0; letter-spacing: 0; box-shadow: none; filter: none; }
-  .rcm-conf-bt button svg{ width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+  .rcm-conf-bt{ display: flex; flex-wrap: nowrap; justify-content: center; gap: 2px; width: fit-content; padding: 5px; margin: 18px auto 0; background: #fff; border: 1px solid var(--bd); border-radius: 999px; box-shadow: 0 6px 16px rgba(15,27,45,.12); }
+  .rcm-conf-bt button, .rcm-conf-bt button.sim{ flex: 0 0 40px; width: 40px; min-width: 40px; height: 40px; padding: 0; border: 0; border-radius: 50%; background: transparent; color: var(--dark); display: grid; place-items: center; font-size: 0; letter-spacing: 0; box-shadow: none; filter: none; }
+  .rcm-conf-bt button svg{ width: 19px; height: 19px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
   .rcm-conf-bt button:active{ background: var(--chip); transform: none; }
   .rcm-conf-bt button.sim{ background: var(--dark); color: var(--gold-light); }
   .rcm-conf-bt button.sim:active{ background: var(--dark2); }
