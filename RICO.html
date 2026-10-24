@@ -490,6 +490,8 @@ if ((sessionStorage.getItem('troca') === (window.RICO_INST === 'p' ? 'RICOP' : '
   .rd-grupo[hidden]{ display: none; }
   .rd-tools button{ pointer-events: auto; flex: none; width: 44px; height: 44px; border-radius: 50%; border: 0; background: transparent; color: #211e19; display: grid; place-items: center; padding: 0; font-size: 17px; }
   .rd-tools button[hidden]{ display: none; }
+  .rd-tools button{ position: relative; }
+  .rd-tools button.rst::after{ content: '1'; position: absolute; right: 6px; top: 4px; font: 700 10px/1 'DM Sans', system-ui, sans-serif; color: #b07a14; }
   .rd-tools button svg{ width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
   .rd-tools button.on{ background: transparent; color: #b07a14; }
   .rd-tools button.on svg{ stroke-width: 2.4; }
@@ -4378,11 +4380,28 @@ window.saveAnswer = window.saveAnswer || function(){};
           if (tirou) rdCopiaMarca();
         }
       }, { passive: true });
+      /* segurar o botão de número: a próxima numeração recomeça do 1 ([!]); sem segurar, a contagem continua de onde parou */
+      var lpN = null;
+      ov.addEventListener('touchstart', function(ev) {
+        clearTimeout(lpN); if (_rd) _rd.holdN = false;
+        var bN = ev.target.closest ? ev.target.closest('.rd-tools [data-t="n"]') : null;
+        if (!bN || !_rd || !_rd.edit) return;
+        lpN = setTimeout(function() {
+          if (!_rd) return; _rd.holdN = true; if (navigator.vibrate) { try { navigator.vibrate(20); } catch (_) {} }
+          if (_rd.tool !== 'n') rdArma('n');
+          ov.classList.add('rd-q'); _rd.reinicia = true;
+          var b2 = ov.querySelector('[data-t="n"]'); if (b2) { b2.classList.add('rst', 'on'); }
+        }, 450);
+      }, { passive: true });
+      var fimLpN = function() { clearTimeout(lpN); };
+      ov.addEventListener('touchmove', fimLpN, { passive: true }); ov.addEventListener('touchcancel', fimLpN, { passive: true });
       ov.addEventListener('mousedown', evita);
       ov.addEventListener('touchstart', evita, { passive: false });
       ov.addEventListener('touchend', function(ev) {
         if (!ev.target.closest || !ev.target.closest('.rd-tools')) return;
-        ev.preventDefault(); tocou = Date.now(); aciona(ev);
+        clearTimeout(lpN); ev.preventDefault(); tocou = Date.now();
+        if (_rd && _rd.holdN) { _rd.holdN = false; return; }
+        aciona(ev);
       }, { passive: false });
       ov.addEventListener('click', function(ev) { if (Date.now() - tocou > 600) aciona(ev); });
       var tx0 = null, ultToque = 0, ultX = 0, ultY = 0;
@@ -4548,7 +4567,7 @@ window.saveAnswer = window.saveAnswer || function(){};
     document.documentElement.classList.toggle('rd-editando', ed);
     var tt = String(e.t || '').trim();
     if (tt || ed) h += '<h2 class="rd-t"' + (ed ? ' contenteditable="true" data-ph="Título"' : '') + '>' + rdEsc(tt) + '</h2>';
-    var nl = 0, rows = (e.i && e.i.length ? e.i : []);
+    var nl = 0, corre = 0, rows = (e.i && e.i.length ? e.i : []);
     if (ed && !rows.length) rows = [''];
     rows.forEach(function(v, idx) {
       var m = (e.m || [])[idx] || {};
@@ -4556,7 +4575,9 @@ window.saveAnswer = window.saveAnswer || function(){};
       if (st || (ed && m.t === '')) h += '<h3 class="rd-h"' + (ed ? ' contenteditable="true" data-ph="Título" data-i="' + idx + '"' : '') + '>' + rdEsc(String(m.t || '').trim()) + '</h3>';
       if (m.c) nl++;
       if (!ed && !String(v || '').trim()) return;
-      h += rdBloco(v, idx, m.c ? nl : 0, ed, m.q, m.n || 0);
+      var offC = corre;
+      rtParse(String(v || '')).lines.forEach(function(l1) { if (l1.m === 'n') { if (l1.r) corre = 1; else corre++; } });
+      h += rdBloco(v, idx, m.c ? nl : 0, ed, m.q, offC);
     });
     if (ed) h += '<div class="rd-tools"><div class="rd-linha"><div class="rd-grupo" data-g="main"><button type="button" data-t="T" aria-label="Título"><b>T</b></button><button type="button" data-t="n" aria-label="Numeração"><svg viewBox="0 0 24 24"><path d="M11 6h9M11 12h9M11 18h9M4.5 5.5l1.5-1v5M4 14.2c.6-1 2.3-.8 2.1.4-.3 1-1.6 1.5-2.1 2.4h2.4"/></svg></button><button type="button" data-t="p" aria-label="Marcadores"><svg viewBox="0 0 24 24"><path d="M11 6h9M11 12h9M11 18h9"/><circle cx="5.5" cy="6" r=".9" fill="currentColor"/><circle cx="5.5" cy="12" r=".9" fill="currentColor"/><circle cx="5.5" cy="18" r=".9" fill="currentColor"/></svg></button><button type="button" data-t="d" aria-label="Traço"><svg viewBox="0 0 24 24"><path d="M4 6h3M11 6h9M4 12h3M11 12h9M4 18h3M11 18h9"/></svg></button><button type="button" data-t="q" aria-label="Citação"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button></div><div class="rd-grupo" data-g="estilo" hidden><button type="button" data-t="b" aria-label="Negrito"><svg viewBox="0 0 24 24"><path d="M7 5h6a3.5 3.5 0 010 7H7zM7 12h7a3.5 3.5 0 010 7H7z"/></svg></button><button type="button" data-t="i" aria-label="Itálico"><svg viewBox="0 0 24 24"><path d="M10 5h7M7 19h7M14 5l-4 14"/></svg></button><button type="button" data-t="c" aria-label="Check"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M8.2 12.4l2.6 2.6 5-5.2"/></svg></button><button type="button" data-t="lixo" hidden aria-label="Apagar o marcado"><svg viewBox="0 0 24 24"><path d="M5 7h14M10 7V5h4v2M7 7l1 12h8l1-12"/></svg></button><button type="button" data-t="cpall" aria-label="Copiar tudo"><svg viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2.5"/><path d="M5 15V7a2.5 2.5 0 012.5-2.5H15M12.5 14.5h4M14.5 12.5v4"/></svg></button><button type="button" data-t="copia" aria-label="Modo copiar"><svg viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2.5"/><path d="M5 15V7a2.5 2.5 0 012.5-2.5H15"/></svg></button></div><button type="button" data-t="estilo" aria-label="Alternar ferramentas"><svg viewBox="0 0 24 24"><rect x="4.5" y="4.5" width="6" height="6" rx="1.5"/><rect x="13.5" y="4.5" width="6" height="6" rx="1.5"/><rect x="4.5" y="13.5" width="6" height="6" rx="1.5"/><rect x="13.5" y="13.5" width="6" height="6" rx="1.5"/></svg></button></div></div>';
     h += '<button type="button" data-fechar hidden onclick="fecharLeitura()" aria-label="Fechar"></button></div>';
@@ -4865,6 +4886,7 @@ window.saveAnswer = window.saveAnswer || function(){};
     var ov = document.getElementById('rdOv');
     if (_rd.copia) rdCopiaFim();
     _rd.tool = (_rd.tool === t) ? null : t;
+    if (_rd.tool !== 'n') { _rd.reinicia = false; var bn0 = ov.querySelector('[data-t="n"]'); if (bn0) bn0.classList.remove('rst'); }
     if (_rd.tool) { _rd.digita = false; var bd = ov.querySelector('[data-t="digita"]'); if (bd) bd.classList.remove('on'); }
     ov.querySelectorAll('.rd-tools [data-t]').forEach(function(b) { var x = b.getAttribute('data-t'); b.classList.toggle('on', x === _rd.tool); });
     var geA = ov.querySelector('[data-g="estilo"]'); if (geA && !geA.hidden) ov.querySelector('[data-t="estilo"]').classList.add('on');
@@ -5036,9 +5058,8 @@ window.saveAnswer = window.saveAnswer || function(){};
   }
   function rdRenumera() {
     var ov = document.getElementById('rdOv'), c = 0;
+    /* a contagem segue de um lugar para o outro e só volta ao 1 onde você segurou o botão de número ([!]) */
     ov.querySelectorAll('.rd-col > .rd-tx').forEach(function(b) {
-      var off = +b.getAttribute('data-n') || 0;
-      if (off) c = off; else if (b.getAttribute('data-i') !== '-1') c = 0;
       Array.prototype.forEach.call(b.querySelectorAll('.ln > .nm:not([data-rc])'), function(nm) { if (nm.getAttribute('data-r') === '1') c = 1; else c++; nm.textContent = c; });
     });
     rdGaranteBloco(); rdCartoesTodos();
@@ -5070,7 +5091,9 @@ window.saveAnswer = window.saveAnswer || function(){};
     while (k0 < sel.length && !sel[k0].trim()) k0++;
     for (k = k0; k < sel.length && sel[k].trim(); k++) fp.push(k);
     var tira = fp.length && fp.every(function(q) { return /^\[(#|!)\]/.test(sel[q]); });
-    fp.forEach(function(q) { var m2 = /^\[( |x|#|-|=|!)\] ?/.exec(sel[q]), cp = m2 ? sel[q].slice(m2[0].length) : sel[q]; sel[q] = tira ? cp : '[#] ' + cp; });
+    var rst = !!_rd.reinicia;
+    fp.forEach(function(q, n) { var m2 = /^\[( |x|#|-|=|!)\] ?/.exec(sel[q]), cp = m2 ? sel[q].slice(m2[0].length) : sel[q]; sel[q] = tira ? cp : ((rst && n === 0 ? '[!] ' : '[#] ') + cp); });
+    if (rst && !tira) { _rd.reinicia = false; var bnr = ov.querySelector('[data-t="n"]'); if (bnr) bnr.classList.remove('rst'); }
     var selTxt = sel.join('\n').replace(/(\n\s*)+$/, '');
     var mk = function(txt) { var d = document.createElement('div'); d.className = 'rd-tx'; d.setAttribute('contenteditable', 'true'); d.setAttribute('data-i', '-1'); d.innerHTML = rtHtml(rtParse(txt), null); return d; };
     var pos = Bn.nextSibling;
