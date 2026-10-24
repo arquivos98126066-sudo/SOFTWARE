@@ -1,4 +1,6 @@
-const CACHE_NAME = 'meus-apps-v133';
+const CACHE_NAME = 'meus-apps-v134';
+// HTMLs enviados pelo menu (segurar o app > Enviar um novo): ficam fora da limpeza de versões antigas
+const ENVIADOS = 'apps-enviados';
 
 const URLS_TO_CACHE = [
   './',
@@ -48,7 +50,7 @@ self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys().then(keys =>
       Promise.all(
-        keys.filter(key => key !== CACHE_NAME).map(key => caches.delete(key))
+        keys.filter(key => key !== CACHE_NAME && key !== ENVIADOS).map(key => caches.delete(key))
       )
     )
   );
@@ -69,15 +71,20 @@ self.addEventListener('fetch', event => {
 
   const req = event.request;
   const isLocal = url.hostname === self.location.hostname;
-  const rede = fetch(req.url, isLocal ? {cache: 'no-store'} : undefined).then(response => {
-    if (response && (response.status === 200 || response.type === 'opaque')) {
-      const clone = response.clone();
-      caches.open(CACHE_NAME).then(cache => cache.put(req, clone));
+  event.respondWith((async () => {
+    if (isLocal) {
+      const enviado = await caches.open(ENVIADOS).then(c => c.match(req, {ignoreSearch: true})).catch(() => null);
+      if (enviado) return enviado;
     }
-    return response;
-  });
-  event.waitUntil(rede.catch(() => {}));
-  event.respondWith(
-    caches.match(req).then(cached => cached || rede)
-  );
+    const rede = fetch(req.url, isLocal ? {cache: 'no-store'} : undefined).then(response => {
+      if (response && (response.status === 200 || response.type === 'opaque')) {
+        const clone = response.clone();
+        caches.open(CACHE_NAME).then(cache => cache.put(req, clone));
+      }
+      return response;
+    });
+    event.waitUntil(rede.catch(() => {}));
+    const cached = await caches.match(req);
+    return cached || rede;
+  })());
 });

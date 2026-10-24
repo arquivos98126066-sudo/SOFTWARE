@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="#0f1b2d">
 <title>Born Rich — Caderno de Atividades</title>
-<script src="https://arquivos98126066-sudo.github.io/SOFTWARE/sync-indicator.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@500;600;700;800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -740,7 +739,11 @@
   .cycle-block .rcm-ib:active{ background: transparent; color: #c4952d; }
   .cycle-block .rcm-ib.on, .cycle-block .rcm-ib.on:active{ background: transparent; color: #c4952d; }
   .cycle-block .rcm-av{ color: var(--tx); }
-  .cycle-block .cycle-sub::before{ border-color: rgba(196,149,45,.7); }</style>
+  .cycle-block .cycle-sub::before{ border-color: rgba(196,149,45,.7); }
+  /* texto da página não seleciona sozinho (ex.: "I AM PROSPEROUS" ao marcar Fiz); só campos de digitar e o editor */
+  html, body{ -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+  input, textarea, [contenteditable="true"], .ed-view, .ed-tit, #edTa{ -webkit-user-select: text; user-select: text; -webkit-touch-callout: default; }
+</style>
 </head>
 <body>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
@@ -5609,7 +5612,8 @@ window.saveAnswer = window.saveAnswer || function(){};
       ov.hidden = false;
       if (navigator.vibrate) { try { navigator.vibrate(15); } catch (_) {} }
     }
-    function fecharPick() { aberto = false; ov.hidden = true; bAlvo = null; card.classList.remove('arrasta'); knob.style.transform = ''; }
+    function fecharPick() { aberto = false; ov.hidden = true; bAlvo = null; card.classList.remove('arrasta'); knob.style.transform = ''; semSelecao(); }
+    function semSelecao() { var f = function() { try { window.getSelection().removeAllRanges(); } catch (_) {} }; f(); setTimeout(f, 120); setTimeout(f, 450); }
     function escolher(v) {
       var b = bAlvo;
       fecharPick();
