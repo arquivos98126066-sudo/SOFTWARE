@@ -6296,6 +6296,28 @@ window.saveAnswer = window.saveAnswer || function(){};
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(alinhaLiga);
   alinhaLiga(); setTimeout(alinhaLiga, 400);
 })();
+/* Primeira tela do Rico: seta um pouco maior; a frase de baixo só aparece ao rolar */
+(function(){
+  function liga(){
+    var w=document.querySelector('.liga-ciclo'), cyc=document.querySelector('.cycle-block');
+    if(!w||!cyc||w.offsetParent===null) return;
+    var s=1.15, svg=w.querySelector('svg');
+    var h0=w.getBoundingClientRect().top, cic=cyc.offsetHeight, topo=h0+window.scrollY;
+    /* a seta cresce até o bloco do ciclo terminar perto do fim da tela */
+    var alvo=Math.max(64,Math.min(110,Math.round(window.innerHeight-24-cic-20-topo)));
+    var H=alvo/s, a=Math.max(10,(H-7-28-14)/2), b=a+14;
+    w.style.height=alvo+'px';
+    svg.setAttribute('viewBox','0 0 120 '+H); svg.setAttribute('width',120*s); svg.setAttribute('height',alvo);
+    svg.querySelector('linearGradient').setAttribute('y2',H-6);
+    var p=svg.querySelectorAll('path');
+    p[0].setAttribute('d','M0 0V'+a+'Q0 '+b+' 14 '+b+'H92Q106 '+b+' 106 '+(b+14)+'V'+(H-7));
+    p[1].setAttribute('d','M99 '+(H-14)+'l7 7.5 7-7.5');
+    /* a frase de baixo só aparece ao rolar: começa depois do fim da tela */
+    var q=document.querySelector('.quote-block'); if(q){ q.style.marginTop='0px'; var fim=cyc.getBoundingClientRect().bottom+window.scrollY; var falta=window.innerHeight+12-(q.getBoundingClientRect().top+window.scrollY); q.style.marginTop=Math.max(0,Math.round(falta))+'px'; }
+  }
+  liga(); setTimeout(liga,400); setTimeout(liga,1500); window.addEventListener('resize',liga); window.addEventListener('load',liga); window.addEventListener('pageshow',liga);
+})();
+
 </script>
 </body>
           </html>
