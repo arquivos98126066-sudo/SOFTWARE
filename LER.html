@@ -27,16 +27,10 @@ svg{fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-l
 @keyframes gira{to{transform:rotate(360deg)}}
 
 /* entrada */
-#lock{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;gap:12px}
-#lock .campo,#lock .ok{width:100%;max-width:320px}
 .campo{display:flex;align-items:center;gap:10px;height:52px;padding:0 20px;border:1px solid var(--line-in);border-radius:999px;background:var(--card);transition:border-color .15s}
 .campo:focus-within{border-color:#a8adb8}
 .campo svg{width:18px;height:18px;flex:none;color:var(--muted)}
 .campo input{flex:1;min-width:0;height:100%;border:0;outline:0;background:transparent;font:inherit;font-size:16px;font-weight:500;color:var(--text);-webkit-appearance:none;appearance:none}
-.ok{height:52px;border-radius:999px;background:var(--text);color:#fff;font-size:15px;font-weight:600;white-space:nowrap;transition:transform .1s ease,opacity .15s}
-.ok:active{transform:scale(.98)}
-.ok:disabled{opacity:.5}
-#erro{color:var(--err);font-size:13px;min-height:18px;text-align:center}
 
 /* lista */
 #app{max-width:640px;margin:0 auto;min-height:100vh}
@@ -86,11 +80,7 @@ svg{fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-l
 </head>
 <body>
 
-<div id="lock" hidden>
-  <label class="campo"><svg viewBox="0 0 24 24"><rect x="4.5" y="10.5" width="15" height="10" rx="2.5"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5"/></svg><input id="senha" type="password" placeholder="Senha" autocomplete="current-password" autocapitalize="off" autocorrect="off" spellcheck="false" aria-label="Senha"></label>
-  <div id="erro"></div>
-  <button class="ok" id="entrar">Entrar</button>
-</div>
+<div id="carga"><i></i></div>
 
 <div id="app" class="raiz" hidden>
   <div id="lista"></div>
@@ -107,65 +97,13 @@ svg{fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-l
   var IC_DOC = '<svg viewBox="0 0 24 24"><path d="M7 3.5h7l4 4V19a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 6 19V5A1.5 1.5 0 0 1 7.5 3.5z"/><path d="M13.5 3.5V8H18M9 12.5h6M9 16h6"/></svg>';
   var IC_SETA = '<svg class="seta" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg>';
 
-  var B = function(s){ return Uint8Array.from(atob(s), function(c){ return c.charCodeAt(0); }); };
-
-  /* guarda a chave já aberta no aparelho: a senha só é pedida na primeira vez */
-  function bd(){
-    return new Promise(function(ok, no){
-      var r = indexedDB.open('estudos', 1);
-      r.onupgradeneeded = function(){ r.result.createObjectStore('k'); };
-      r.onsuccess = function(){ ok(r.result); };
-      r.onerror = function(){ no(r.error); };
-    });
-  }
-  function guardar(k, v){
-    return bd().then(function(d){
-      return new Promise(function(ok, no){
-        var t = d.transaction('k', 'readwrite');
-        if (v === null) t.objectStore('k').delete(k); else t.objectStore('k').put(v, k);
-        t.oncomplete = ok; t.onerror = function(){ no(t.error); };
-      });
-    });
-  }
-  function ler(k){
-    return bd().then(function(d){
-      return new Promise(function(ok, no){
-        var q = d.transaction('k').objectStore('k').get(k);
-        q.onsuccess = function(){ ok(q.result); };
-        q.onerror = function(){ no(q.error); };
-      });
-    });
-  }
-
-  function abrirChave(senha){
-    return fetch('lib/chave.json', {cache: 'no-cache'}).then(function(r){ return r.json(); }).then(function(ch){
-      var w = ch.priv;
-      return crypto.subtle.importKey('raw', new TextEncoder().encode(senha), 'PBKDF2', false, ['deriveKey'])
-        .then(function(base){
-          return crypto.subtle.deriveKey({name: 'PBKDF2', salt: B(w.s), iterations: w.it, hash: 'SHA-256'},
-            base, {name: 'AES-GCM', length: 256}, false, ['decrypt']);
-        })
-        .then(function(k){ return crypto.subtle.decrypt({name: 'AES-GCM', iv: B(w.i)}, k, B(w.c)); })
-        .then(function(der){
-          return crypto.subtle.importKey('pkcs8', der, {name: 'RSA-OAEP', hash: 'SHA-256'}, false, ['decrypt']);
-        });
-    });
-  }
-
-  function carregar(priv){
+  /* os estudos ficam abertos em lib/: sem chave nem senha */
+  function carregar(){
     return fetch('lib/lista.json', {cache: 'no-cache'}).then(function(r){ return r.json(); }).then(function(l){
       return Promise.all(Object.keys(l.itens).map(function(id){
-        return fetch('lib/' + id + '.json').then(function(r){ return r.json(); }).then(function(r){
-          return crypto.subtle.decrypt({name: 'RSA-OAEP'}, priv, B(r.k)).then(function(raw){
-            return crypto.subtle.importKey('raw', raw, 'AES-GCM', false, ['decrypt']);
-          }).then(function(ak){
-            return crypto.subtle.decrypt({name: 'AES-GCM', iv: B(r.i)}, ak, B(r.c));
-          }).then(function(gz){
-            return new Response(new Blob([gz]).stream().pipeThrough(new DecompressionStream('gzip'))).text();
-          }).then(function(t){ return JSON.parse(t); });
-        });
+        return fetch('lib/' + id + '.json').then(function(r){ return r.json(); }).catch(function(){ return null; });
       }));
-    });
+    }).then(function(a){ return a.filter(Boolean); });
   }
 
   /* árvore de pastas */
@@ -606,39 +544,11 @@ svg{fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-l
     montar(lista);
     estado = {cam: [], doc: null};
     history.replaceState(estado, '');
-    $('lock').hidden = true; $('app').hidden = false;
+    $('carga').hidden = true; $('app').hidden = false;
     desenhar();
   }
-  function trancar(msg){
-    $('app').hidden = true; $('leitor').hidden = true;
-    $('lock').hidden = false; $('erro').textContent = msg || '';
-    $('senha').value = ''; $('entrar').disabled = false; $('entrar').textContent = 'Entrar';
-  }
-  $('entrar').onclick = function(){
-    var s = $('senha').value.trim();
-    if (!s) return;
-    $('entrar').disabled = true; $('entrar').textContent = 'Abrindo…'; $('erro').textContent = '';
-    abrirChave(s).then(function(priv){
-      guardar('chave', priv).catch(function(){});
-      return carregar(priv).then(entrar);
-    }).catch(function(){ trancar('Senha incorreta.'); });
-  };
-  $('senha').addEventListener('keydown', function(e){ if (e.key === 'Enter') $('entrar').click(); });
-
-  var m = /^#k=(.+)$/.exec(location.hash), doLink = null;
-  if (m){
-    try { doLink = decodeURIComponent(m[1]); } catch (e) { doLink = m[1]; }
-    history.replaceState(null, '', location.pathname + location.search);
-  }
-  (doLink ? abrirChave(doLink).then(function(priv){
-    guardar('chave', priv).catch(function(){});
-    return priv;
-  }).catch(function(){ return null; }) : ler('chave').catch(function(){ return null; })).then(function(priv){
-    if (!priv) return trancar(doLink ? 'Link incorreto. Peça o link de novo.' : '');
-    return carregar(priv).then(entrar).catch(function(e){
-      if (e && e.name === 'OperationError'){ guardar('chave', null).catch(function(){}); trancar(''); }
-      else trancar('Sem conexão. Abra de novo quando estiver online.');
-    });
+  carregar().then(entrar).catch(function(){
+    $('carga').innerHTML = '<div class="vazio">Sem conexão. Abra de novo quando estiver online.</div>';
   });
 
   if ('serviceWorker' in navigator) navigator.serviceWorker.register('service-worker.js').catch(function(){});
