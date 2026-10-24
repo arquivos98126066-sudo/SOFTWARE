@@ -3066,10 +3066,10 @@ window.saveAnswer = window.saveAnswer || function(){};
         for (var j = 0; j < CICLO.length; j++) if (CICLO[j] && String(CICLO[j].t || '').trim() === tx) { k = j; break; }
       }
       if (!edita && window.abrirLeitura) {
-        var dl = k >= 0 ? CICLO[k] : { t: n.text, i: n.i || [], m: n.m || [] };
+        var dl = k >= 0 ? cicloParaLeitura(CICLO[k]) : cicloParaLeitura({ t: n.text, i: n.i || [], m: n.m || [] });
         var ropt = window.__rdOpts || {}; window.__rdOpts = null; ropt.ctx = { key: KEY, id: id };
         window.abrirLeitura(dl, function(x) {
-          if (k >= 0) { var ff = acha(id); if (ff && String(x.t || '').trim()) ff.n.text = String(x.t).trim().slice(0, 60); salva(); render(); if (window.renderCiclo) window.renderCiclo(); if (window.agendarSalvamento) window.agendarSalvamento(document.body); }
+          if (k >= 0) { CICLO[k].t = x.t; CICLO[k].i = x.i; CICLO[k].m = x.m; var ff = acha(id); if (ff && String(x.t || '').trim()) ff.n.text = String(x.t).trim().slice(0, 60); salva(); render(); if (window.renderCiclo) window.renderCiclo(); if (window.agendarSalvamento) window.agendarSalvamento(document.body); }
           else { x._no = n; salvaNota(x); delete x._no; render(); }
         }, ropt);
         return;
@@ -4249,9 +4249,48 @@ window.saveAnswer = window.saveAnswer || function(){};
     }
   };
 
+  /* as células do Ciclo abrem na mesma tela nova do mapa: tudo que estava em vários blocos (1, 2, 3...) vira um bloco só, com os números dentro do texto */
+  function cicloParaLeitura(e) {
+    var rows = e.i || [], ms = e.m || [], out = { t: e.t || '', i: [], m: [] }, buf = [], bufNum = false, mt = null;
+    var MK = /^\[( |x|#|-|=|!)\]/;
+    var solta = function() { if (!buf.length) return; var o = {}; if (mt) { o.t = mt; mt = null; } out.i.push(buf.join('')); out.m.push(o); buf = []; bufNum = false; };
+    rows.forEach(function(v, idx) {
+      var m = ms[idx] || {}, tx = String(v == null ? '' : v).replace(/\s+$/, '');
+      if (m.t || m.q) solta();
+      if (m.q) { var oq = { q: 1 }; if (m.t) oq.t = m.t; out.i.push(tx); out.m.push(oq); return; }
+      if (m.t) mt = m.t;
+      if (!tx.trim()) return;
+      var num = !!m.c;
+      if (num && !MK.test(tx)) tx = '[#] ' + tx;
+      buf.push((buf.length ? (num && bufNum ? '\n' : '\n\n') : '') + tx);
+      bufNum = num;
+    });
+    solta();
+    if (!out.i.length) { out.i.push(''); out.m.push({}); }
+    return out;
+  }
+  function cicloAbreLeitura(k, editavel) {
+    var it = CICLO[k], dl = cicloParaLeitura(it);
+    window.abrirLeitura(dl, function(x) {
+      it.t = x.t; it.i = x.i; it.m = x.m;
+      var idx = CICLO.indexOf(it), n = idx > -1 ? document.querySelector('#ciclo-lista .cycle-item[data-idx="' + idx + '"]') : null;
+      if (n) { var nt = n.querySelector('.cycle-t'); (nt || n).textContent = it.t || 'Nova etapa'; }
+      if (window.agendarSalvamento) window.agendarSalvamento(n || document.body);
+    }, {
+      edit: !!editavel,
+      aoFechar: function() {
+        var idx = CICLO.indexOf(it);
+        if (idx > -1 && !it.h && !String(it.t || '').trim() && !(it.i || []).some(function(v) { return String(v || '').trim(); }) && !cicloFilhos(idx).length) {
+          CICLO.splice(idx, 1);
+          setTimeout(function() { renderCiclo(); if (window.agendarSalvamento) window.agendarSalvamento(document.body); }, 0);
+        }
+      }
+    });
+  }
   function abrirEtapa(k, editavel, ext) {
     var e = ext || CICLO[k];
     if (!e) return;
+    if (!ext && window.abrirLeitura) { cicloAbreLeitura(k, editavel); return; }
     _alvo = ext || null;
     if (document.getElementById('sheet').hidden) _scrollSheet = window.scrollY;
     document.documentElement.classList.add('sheet-open');
@@ -4558,7 +4597,7 @@ window.saveAnswer = window.saveAnswer || function(){};
         setTimeout(function() { rdRepinta(bl, true); rdAgenda(); }, 0);
       });
     }
-    _rd = { e: e, salvar: salvar || null, edit: false, tm: null, ctx: opts && opts.ctx || null };
+    _rd = { e: e, salvar: salvar || null, edit: false, tm: null, ctx: opts && opts.ctx || null, aoFechar: opts && opts.aoFechar || null };
     rdPinta();
     ov.scrollTop = 0;
     ov.hidden = false;
@@ -4687,11 +4726,11 @@ window.saveAnswer = window.saveAnswer || function(){};
       ls[i].classList.add('rd-nh');
       var j = i + 1, ult = -1;
       while (j < ls.length && !num(ls[j])) { ls[j].classList.add('rd-nb'); if (!ls[j].classList.contains('gap')) ult = j; j++; }
-      for (k = ult + 1; k < j; k++) ls[k].classList.remove('rd-nb');
+      for (k = Math.max(ult, i) + 1; k < j; k++) ls[k].classList.remove('rd-nb');
       if (ult > i && rdRecOn(ls[i])) {
         ls[i].classList.add('rd-rec');
         for (k = i + 1; k <= ult; k++) ls[k].classList.add('rd-oc');
-        for (k = ult + 1; k < j; k++) ls[k].classList.remove('rd-nb');
+        for (k = Math.max(ult, i) + 1; k < j; k++) ls[k].classList.remove('rd-nb');
       }
       else if (ult > i) {
         ls[i].classList.add('rd-ab'); ls[ult].classList.add('rd-nl');
@@ -5187,10 +5226,12 @@ window.saveAnswer = window.saveAnswer || function(){};
   function ov_limpaOn() { var ov = document.getElementById('rdOv'); if (ov) ov.querySelectorAll('.rd-tools [data-t]').forEach(function(b) { b.classList.remove('on'); }); }
   function fecharLeitura() {
     var ov = document.getElementById('rdOv');
+    var af = _rd && _rd.aoFechar;
     if (_rd && _rd.edit) { clearTimeout(_rd.tm); rdSalva(); }
     if (ov) { ov.hidden = true; ov.classList.remove('rd-edit'); ov.classList.remove('rd-hold'); }
     document.documentElement.classList.remove('rd-editando');
     _rd = null;
+    if (af) { try { af(); } catch (_) {} }
     if (window.rcMapa && window.rcMapa.fechou) window.rcMapa.fechou();
   }
   window.abrirLeitura = abrirLeitura; window.fecharLeitura = fecharLeitura;
