@@ -441,13 +441,14 @@ if ((sessionStorage.getItem('troca') === (window.RICO_INST === 'p' ? 'RICOP' : '
   .rd-tx em{ font-style: italic; }
   .rd-tx .ln{ overflow-wrap: anywhere; }
   .rd-ov .nm{ background: #e8e1d0; color: #211e19; min-width: 22px; width: 22px; height: 22px; padding: 0; margin-right: 8px; text-align: center; font: 700 11px/22px 'DM Sans', system-ui, sans-serif; vertical-align: 1px; }
-  .rd-ov .ck{ width: 22px; height: 22px; margin-right: 8px; border: 1.5px solid #b9b3a6; background: transparent; vertical-align: -4px; }
+  .rd-ov .ck{ width: 18px; height: 18px; margin-right: 10px; border: 1.5px solid #b9b3a6; background: transparent; vertical-align: -3px; }
   .rd-ov .ck[data-s="1"]{ background: #211e19; border-color: #211e19; }
-  .rd-ov .ck[data-s="1"]::after{ left: 6.5px; top: 3px; }
+  .rd-ov .ck[data-s="1"]::after{ left: 5px; top: 1.5px; width: 4px; height: 8px; border-width: 0 1.6px 1.6px 0; }
   .rd-ov .bl, .rd-ov .ds{ width: 22px; margin-right: 8px; }
   .rd-ov .ds::after{ left: 6px; background: #211e19; }
   .rd-ov .bl::after{ left: 7.5px; background: #211e19; }
-  .rd-ov .ln:has(> .ck), .rd-ov .ln:has(> .nm), .rd-ov .ln:has(> .bl), .rd-ov .ln:has(> .ds){ padding-left: 30px; text-indent: -30px; }
+  .rd-ov .ln:has(> .nm), .rd-ov .ln:has(> .bl), .rd-ov .ln:has(> .ds){ padding-left: 30px; text-indent: -30px; }
+  .rd-ov .ln:has(> .ck){ padding-left: 28px; text-indent: -28px; }
   .rd-ov .ln.done{ text-decoration: none; color: inherit; }
   .rd-tx[data-q]{ position: relative; margin: 9px 0 9px; padding: 18px 20px 16px 22px; background: #fbfaf7; border: 1px solid #e2ddd1; border-radius: 24px; overflow: hidden; font-family: 'DM Sans', system-ui, sans-serif; font-style: normal; font-size: 15px; line-height: 1.65; color: #444; }
   .rd-tx[data-q]::before{ content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 30px; box-sizing: border-box; border-left: 3px solid #7b2d26; border-radius: 23px 0 0 23px; pointer-events: none; }
@@ -473,7 +474,7 @@ if ((sessionStorage.getItem('troca') === (window.RICO_INST === 'p' ? 'RICOP' : '
   .rd-tools button{ pointer-events: auto; flex: none; width: 48px; height: 48px; border-radius: 50%; border: 1px solid var(--bd-in); background: #fff; color: #211e19; display: grid; place-items: center; padding: 0; box-shadow: 0 12px 24px -14px rgba(15,27,45,.5); font-size: 17px; }
   .rd-tools button svg{ width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
   .rd-tools button.on{ background: #211e19; border-color: #211e19; color: #fff; }
-  .rd-tools button.ok{ background: #211e19; color: #fff; }
+  .rd-tools button.ok{ background: #fff; color: #211e19; }
   .sheet{
     position: fixed; left: 12px; right: 12px; bottom: calc(12px + env(safe-area-inset-bottom)); z-index: 99971;
     max-height: calc(100svh - 48px); overflow-y: auto; background: #fff; border: 1px solid var(--bd);
