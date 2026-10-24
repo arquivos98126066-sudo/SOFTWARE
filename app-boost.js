@@ -410,3 +410,78 @@ window.Alterna = (function () {
   }
   return A;
 })();
+
+/* ===== Cópia automática dos dados que só existem no aparelho =====
+   Mapas do Rico, lista de HTMLs do Plano (inclui os enviados), versões enviadas pelo menu, ordem e nomes do Estudo e as conexões
+   do zigue-zague vão para o Firestore (só acrescenta e atualiza, nunca apaga), para entrar nos backups e voltar se o celular se perder. */
+(function () {
+  if (window.parent !== window) return;
+  var PROJ = 'https://firestore.googleapis.com/v1/projects/meus-apps-8ca76/databases/(default)/documents/';
+  var CHAVE = 'AIzaSyDPJvM-XZWfa8HQ7h8v0Usb1Hf3q8sDqpg';
+  var LIMITE = 900000, ESPERA = 10 * 60 * 1000;
+  function hash(s) { var h = 5381, i = s.length; while (i) h = (h * 33) ^ s.charCodeAt(--i); return (h >>> 0).toString(36) + ':' + s.length; }
+  function idDe(k) { return String(k).replace(/[^A-Za-z0-9_.-]/g, '_').slice(0, 140) || '_'; }
+  function ler(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+  function sigLer() { try { return JSON.parse(localStorage.getItem('backup.ap.sig') || '{}') || {}; } catch (e) { return {}; } }
+
+  async function coleta() {
+    var docs = [], avisos = [], i, k, v;
+    try {
+      for (i = 0; i < localStorage.length; i++) {
+        k = localStorage.key(i);
+        if (k && k.indexOf('rico.') === 0 && k.indexOf('rico.seed.') !== 0) docs.push(['aparelho_rico', idDe(k), k, ler(k)]);
+      }
+    } catch (e) {}
+    var lista = ler('doa_htmls_v1');
+    if (lista) {
+      try {
+        var itens = JSON.parse(lista) || [];
+        itens.forEach(function (it) { if (it && it.id) docs.push(['aparelho_plano', 'h_' + idDe(it.id), 'doa_htmls_v1/' + it.id, JSON.stringify(it)]); });
+        docs.push(['aparelho_plano', '_ordem', 'doa_htmls_v1/_ordem', JSON.stringify({ ids: itens.map(function (x) { return x && x.id; }), seeds: ler('doa_htmls_v1_seeds') })]);
+      } catch (e) {}
+    }
+    ['estudos.meta.v1', 'alterna.v1'].forEach(function (c) { v = ler(c); if (v) docs.push(['aparelho_backup', idDe(c), c, v]); });
+    try {
+      if (window.caches) {
+        var cx = await caches.open('apps-enviados'), reqs = await cx.keys();
+        for (i = 0; i < reqs.length; i++) {
+          var resp = await cx.match(reqs[i]), txt = await resp.text();
+          docs.push(['aparelho_menu', idDe(new URL(reqs[i].url).pathname.split('/').pop()), 'apps-enviados/' + reqs[i].url, txt]);
+        }
+      }
+    } catch (e) {}
+    return { docs: docs, avisos: avisos };
+  }
+
+  async function envia() {
+    if (!navigator.onLine) return;
+    try {
+      var t = +ler('backup.ap.t') || 0;
+      if (Date.now() - t < ESPERA) return;
+      var col = await coleta(), sig = sigLer(), mudou = false, falhas = 0, grandes = [];
+      for (var i = 0; i < col.docs.length; i++) {
+        var d = col.docs[i], caminho = d[0] + '/' + d[1], v = d[3];
+        if (v == null) continue;
+        if (v.length > LIMITE) { grandes.push(d[2]); continue; }
+        var h = hash(v);
+        if (sig[caminho] === h) continue;
+        var corpo = { fields: { k: { stringValue: d[2] }, v: { stringValue: v }, t: { integerValue: String(Date.now()) } } };
+        try {
+          var r = await fetch(PROJ + d[0] + '/' + encodeURIComponent(d[1]) + '?key=' + CHAVE, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(corpo) });
+          if (r.ok) { sig[caminho] = h; mudou = true; } else falhas++;
+        } catch (e) { falhas++; }
+      }
+      var hg = grandes.length ? hash(JSON.stringify(grandes)) : null;
+      if (grandes.length && sig._grandes !== hg) {
+        sig._grandes = hg; mudou = true;
+        try { await fetch(PROJ + 'aparelho_backup/_grandes?key=' + CHAVE, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ fields: { v: { stringValue: JSON.stringify(grandes) }, t: { integerValue: String(Date.now()) } } }) }); } catch (e) {}
+      }
+      if (mudou) localStorage.setItem('backup.ap.sig', JSON.stringify(sig));
+      if (!falhas) localStorage.setItem('backup.ap.t', String(Date.now()));
+    } catch (e) {}
+  }
+  /* uma vez por abertura, com a tela livre, e só se faz mais de 10 minutos desde a última */
+  function agenda() { var f = function () { envia(); }; if (window.requestIdleCallback) requestIdleCallback(f, { timeout: 15000 }); else setTimeout(f, 8000); }
+  if (document.readyState === 'complete') setTimeout(agenda, 8000); else window.addEventListener('load', function () { setTimeout(agenda, 8000); });
+  window.AparelhoBackup = { envia: function () { try { localStorage.removeItem('backup.ap.t'); } catch (e) {} return envia(); } };
+})();
