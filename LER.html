@@ -557,6 +557,7 @@ svg{fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-l
     n.id = 'quadro'; n.setAttribute('sandbox', q.getAttribute('sandbox'));
     n.srcdoc = h;
     q.parentNode.replaceChild(n, q);
+    if (window.CorBarra) { if (h) CorBarra.de(h); else CorBarra.volta(); }
   }
   function abrir(d, empurrar){
     estado = {cam: estado.cam, doc: docs.indexOf(d)};

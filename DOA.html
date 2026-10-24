@@ -1886,6 +1886,7 @@ function htmlAbre(id){
   box.appendChild(fr);
   if(h.src) fr.src = h.src; else fr.srcdoc = h.html;
   _htmlAberto = h.id;
+  if(window.CorBarra) htmlCodigo(h, function(t){ if(_htmlAberto === h.id) CorBarra.de(t); });
   box.classList.add('open');
   try { history.pushState({htmlView: 1}, ''); } catch(e){}
 }
@@ -1893,6 +1894,7 @@ function htmlFecha(){
   var box = document.getElementById('html-view');
   if(!box.classList.contains('open')) return;
   box.classList.remove('open'); box.innerHTML = ''; _htmlAberto = null;
+  if(window.CorBarra) CorBarra.volta();
 }
 
 // ── Hub: o Plano é o carteiro entre os HTMLs e os apps ──
