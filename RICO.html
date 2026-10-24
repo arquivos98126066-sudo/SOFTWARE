@@ -4337,7 +4337,8 @@ window.saveAnswer = window.saveAnswer || function(){};
       };
       ov.addEventListener('touchstart', function(ev) { if (_rd && _rd.cpAll && !(ev.target.closest && ev.target.closest('.rd-tools'))) _rd.cpAll = false; var bq = ov.querySelector('[data-t="cpall"]'); if (bq) bq.classList.remove('on'); }, { passive: true });
       var cpT = null;
-      ov.addEventListener('touchstart', function(ev) { var t0 = ev.touches[0]; cpT = { t: Date.now(), x: t0.clientX, y: t0.clientY }; }, { passive: true });
+      ov.addEventListener('touchstart', function(ev) { var t0 = ev.touches[0]; cpT = { t: Date.now(), x: t0.clientX, y: t0.clientY, rolando: _rd && Date.now() - (_rd.ultRol || 0) < 160 }; }, { passive: true });
+      ov.addEventListener('scroll', function() { if (_rd) _rd.ultRol = Date.now(); }, { passive: true });
       ov.addEventListener('touchend', function(ev) {
         if (!_rd || !_rd.copia || !cpT || (ev.target.closest && ev.target.closest('.rd-tools'))) return;
         var c0 = ev.changedTouches && ev.changedTouches[0]; if (!c0) return;
@@ -4347,6 +4348,11 @@ window.saveAnswer = window.saveAnswer || function(){};
           var tirou = false;
           _rd.cpR = (_rd.cpR || []).filter(function(r) { if (!tirou && dentro(r)) { tirou = true; return false; } return true; });
           if (!tirou && _rd.cpCur && dentro(_rd.cpCur)) { _rd.cpCur = null; _rd.cpAll = false; tirou = true; try { window.getSelection().removeAllRanges(); } catch (_) {} var bq2 = ov.querySelector('[data-t="cpall"]'); if (bq2) bq2.classList.remove('on'); }
+          if (!tirou && !cpT.rolando && !(ev.target.closest && ev.target.closest('.ck'))) {
+            /* toque rápido numa linha parada marca a linha inteira (azul); rolar e marcar mais embaixo não depende das alças do celular */
+            var el0 = document.elementFromPoint(c0.clientX, c0.clientY), ln1 = el0 && el0.closest ? el0.closest('#rdOv .rd-tx > .ln, #rdOv .rd-t, #rdOv .rd-h') : null;
+            if (ln1) { var rl = document.createRange(); rl.selectNodeContents(ln1); rl._ln = ln1; (_rd.cpR = _rd.cpR || []).push(rl); tirou = true; try { window.getSelection().removeAllRanges(); } catch (_) {} }
+          }
           if (tirou) rdCopiaMarca();
         }
       }, { passive: true });
@@ -4604,7 +4610,15 @@ window.saveAnswer = window.saveAnswer || function(){};
       var rs = _rd.cpR.slice(); if (_rd.cpCur) rs.push(_rd.cpCur);
       var cur = window.getSelection(); if (cur && cur.rangeCount && !cur.isCollapsed && !_rd.cpCur) rs.push(cur.getRangeAt(0));
       rs.sort(function(x, y) { return x.compareBoundaryPoints(Range.START_TO_START, y); });
-      var tx = rs.map(function(r) { return r.toString().trim(); }).filter(Boolean).join('\n\n');
+      var tx = '', antes = null;
+      rs.forEach(function(r) {
+        var t1 = r.toString().trim();
+        if (r._ln && r._ln.classList.contains('ln')) { var c = r._ln.cloneNode(true), nm = c.querySelector('.nm'), pf = nm ? nm.textContent + '. ' : ''; c.querySelectorAll('.nm,.ck,.bl,.ds').forEach(function(x) { x.remove(); }); t1 = (pf + c.textContent).trim(); }
+        if (!t1) return;
+        var mesmo = antes && r._ln && antes.parentNode === r._ln.parentNode;
+        tx += (tx ? (mesmo ? '\n' : '\n\n') : '') + t1;
+        antes = r._ln || null;
+      });
       return tx;
     }
     var ps = [];
