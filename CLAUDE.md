@@ -46,6 +46,9 @@ Vale para os 6 apps do menu (Tapete CRM, Meu CRM, Plano/DOA, ADM, Rico, Estudo/L
 - Todo dado novo que ficar só no aparelho (localStorage, cache) tem que entrar na cópia automática do app-boost (`AparelhoBackup`: coleções aparelho_rico, aparelho_plano, aparelho_menu, aparelho_backup no Firestore, só acrescenta e atualiza, limite de 900 mil caracteres por documento). App novo com dado local: acrescentar a chave na função `coleta()`.
 - Backup de verdade: branch backup-codigo-AAAA-MM-DD (SOFTWARE) e backup-firebase-AAAA-MM-DD (Claude), nunca apagar; ver MDS/SYSTEM/Backup.md.
 
+## 7. Velocidade máxima (permanente, 24/10/2026, pedido dele)
+- Em todo HTML ou app, novo ou editado, qualquer edição: fazer sempre com a velocidade máxima possível, sem perguntar. Abertura e volta no menor tempo que mantém a tela firme: esperas mínimas (DOM quieto 60 ms; reposicionar em 80 ms), nada de espera por nuvem antes de montar a primeira tela, dados do aparelho primeiro, escondido só até estar pronto, sem reposicionar depois de aparecer, imagens leves, cache do service worker. Medir o tempo até aparecer e dizer o resultado.
+
 ---
 
 # Erros que já aconteceram (leia antes de mexer)
