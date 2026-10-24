@@ -458,6 +458,7 @@ if ((sessionStorage.getItem('troca') === (window.RICO_INST === 'p' ? 'RICOP' : '
   .rd-ln-pre, .rd-pre{ background: rgba(33,30,25,.10); border-radius: 6px; }
   html.rd-editando .rd-col{ padding-bottom: 55vh; }
   html.rd-editando #alterna-base{ display: none !important; }
+  .rd-ov.rd-kbd .rd-tools{ display: none; }
   ::highlight(rdsel){ background-color: rgba(176,122,20,.28); color: inherit; }
   .rd-ov.rd-hold, .rd-ov.rd-hold *{ -webkit-user-select: none !important; user-select: none !important; -webkit-touch-callout: none !important; }
   .rd-bar{ display: flex; justify-content: center; margin-top: 16px; }
@@ -4474,6 +4475,7 @@ window.saveAnswer = window.saveAnswer || function(){};
     var ov = document.getElementById('rdOv'); if (!ov || ov.hidden) return;
     var vv = window.visualViewport, kb = vv ? Math.max(0, window.innerHeight - vv.height - vv.offsetTop) : 0;
     ov.style.setProperty('--rd-kb', kb + 'px');
+    ov.classList.toggle('rd-kbd', kb > 100);
   }
   function rdCentra() {
     var ov = document.getElementById('rdOv'); if (!ov || ov.hidden || !_rd || !_rd.edit) return;
