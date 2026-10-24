@@ -474,6 +474,7 @@ if ((sessionStorage.getItem('troca') === (window.RICO_INST === 'p' ? 'RICOP' : '
   /* só dois detalhes pedidos: título do item com mais peso e a barra do texto cortada em cada parágrafo */
   .rd-ov .ln.rd-nh{ font-weight: 500; }
   .rd-ov .ln.rd-nb.gap::before{ display: none; }
+  .rd-ov .ln.gap.rd-junto{ --gap: 1px; }
   .rd-tx[data-q]{ position: relative; margin: 14px 0 14px; padding: 18px 20px 16px 22px; background: #fbfaf7; border: 1px solid #e2ddd1; border-radius: 24px; overflow: hidden; font-family: 'DM Sans', system-ui, sans-serif; font-style: normal; font-size: 15px; line-height: 1.65; color: #444; }
   .rd-tx[data-q]::before{ content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 30px; box-sizing: border-box; border-left: 3px solid #7b2d26; border-radius: 23px 0 0 23px; pointer-events: none; }
   .rd-tx[data-q]:has(+ .rd-tx[data-q]){ margin-bottom: 10px; }
@@ -4722,7 +4723,7 @@ window.saveAnswer = window.saveAnswer || function(){};
   function rdCartoes(bl) {
     if (!bl || bl.hasAttribute('data-q')) return;
     var ls = Array.prototype.slice.call(bl.children).filter(function(c) { return c.classList && c.classList.contains('ln'); }), i = 0, k;
-    ls.forEach(function(l) { l.classList.remove('rd-nh', 'rd-nb', 'rd-nl', 'rd-ab', 'rd-nf', 'rd-lead', 'rd-rec', 'rd-oc'); });
+    ls.forEach(function(l) { l.classList.remove('rd-nh', 'rd-nb', 'rd-nl', 'rd-ab', 'rd-nf', 'rd-lead', 'rd-rec', 'rd-oc', 'rd-junto'); });
     var num = function(l) { return !!l.querySelector(':scope > .nm'); };
     while (i < ls.length) {
       if (!num(ls[i])) { i++; continue; }
@@ -4742,6 +4743,12 @@ window.saveAnswer = window.saveAnswer || function(){};
       }
       else for (k = i + 1; k < j; k++) ls[k].classList.remove('rd-nb');
       i = j;
+    }
+    /* uma linha em branco entre dois cartões numerados deixa eles juntinhos, como no estudo (só 1 linha em branco; mais Enter = mais espaço) */
+    for (i = 1; i < ls.length - 1; i++) {
+      var g = ls[i], an = ls[i - 1], pr = ls[i + 1];
+      if (!g.classList.contains('gap') || g.classList.contains('rd-nb') || an.classList.contains('gap')) continue;
+      if ((an.classList.contains('rd-nh') || an.classList.contains('rd-nb')) && num(pr)) g.classList.add('rd-junto');
     }
   }
   /* itens numerados recolhidos: guardados no aparelho por célula e pelo texto do título */
