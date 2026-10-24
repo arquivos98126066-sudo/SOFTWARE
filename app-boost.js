@@ -360,13 +360,12 @@ window.Alterna = (function () {
   };
   if (eu) {
     window.AlternaGestos.vaiVolta(A.zig);
-    window.AlternaGestos.v(A.menu);
     window.AlternaGestos.doisDedos(A.quebra);
     /* faixa transparente por cima de tudo, na base da tela: o toque nao passa para o que esta embaixo */
     var faixa = function () {
       if (document.getElementById('alterna-base')) return;
       var d = document.createElement('div'); d.id = 'alterna-base';
-      d.style.cssText = 'position:fixed;left:0;right:0;bottom:0;height:calc(24px + env(safe-area-inset-bottom,0px));z-index:2147483647;background:transparent;touch-action:none;-webkit-tap-highlight-color:transparent;';
+      d.style.cssText = 'position:fixed;left:0;right:0;bottom:0;height:calc(44px + env(safe-area-inset-bottom,0px));z-index:2147483647;background:transparent;touch-action:none;-webkit-tap-highlight-color:transparent;';
       var tocou = false;
       d.addEventListener('touchstart', function (e) { e.stopPropagation(); tocou = true; }, { passive: true });
       d.addEventListener('touchend', function (e) { e.stopPropagation(); if (e.cancelable) e.preventDefault(); if (tocou) { tocou = false; A.botao(); } });
