@@ -4342,9 +4342,12 @@ window.saveAnswer = window.saveAnswer || function(){};
         if (!_rd || !_rd.copia || !cpT || (ev.target.closest && ev.target.closest('.rd-tools'))) return;
         var c0 = ev.changedTouches && ev.changedTouches[0]; if (!c0) return;
         if (Date.now() - cpT.t < 300 && Math.abs(c0.clientX - cpT.x) < 10 && Math.abs(c0.clientY - cpT.y) < 10) {
-          _rd.cpR = []; _rd.cpCur = null; _rd.cpAll = false;
-          var bq2 = ov.querySelector('[data-t="cpall"]'); if (bq2) bq2.classList.remove('on');
-          try { if (window.CSS && CSS.highlights) CSS.highlights.delete('rdsel'); window.getSelection().removeAllRanges(); } catch (_) {}
+          /* toque rápido em cima de um trecho marcado desmarca só aquele trecho; em outro lugar não apaga nada */
+          var dentro = function(r) { var rc = r.getClientRects(), k; for (k = 0; k < rc.length; k++) if (c0.clientX >= rc[k].left - 2 && c0.clientX <= rc[k].right + 2 && c0.clientY >= rc[k].top - 2 && c0.clientY <= rc[k].bottom + 2) return true; return false; };
+          var tirou = false;
+          _rd.cpR = (_rd.cpR || []).filter(function(r) { if (!tirou && dentro(r)) { tirou = true; return false; } return true; });
+          if (!tirou && _rd.cpCur && dentro(_rd.cpCur)) { _rd.cpCur = null; _rd.cpAll = false; tirou = true; try { window.getSelection().removeAllRanges(); } catch (_) {} var bq2 = ov.querySelector('[data-t="cpall"]'); if (bq2) bq2.classList.remove('on'); }
+          if (tirou) rdCopiaMarca();
         }
       }, { passive: true });
       ov.addEventListener('mousedown', evita);
@@ -4617,7 +4620,7 @@ window.saveAnswer = window.saveAnswer || function(){};
     if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(tx).then(fim, velho); else velho();
   }
   function rdCopiaMarca() {
-    try { if (window.CSS && CSS.highlights && window.Highlight) { var rs = (_rd.cpR || []).slice(); if (rs.length) CSS.highlights.set('rdsel', new Highlight(...rs)); else CSS.highlights.delete('rdsel'); } } catch (_) {}
+    try { if (window.CSS && CSS.highlights && window.Highlight) { var rs = (_rd.cpR || []).slice(), sn0 = window.getSelection(); if (_rd.cpCur && (!sn0 || !sn0.rangeCount || sn0.isCollapsed)) rs.push(_rd.cpCur); if (rs.length) CSS.highlights.set('rdsel', new Highlight(...rs)); else CSS.highlights.delete('rdsel'); } } catch (_) {}
   }
   function rdCopiaIni() {
     var ov = document.getElementById('rdOv');
@@ -4638,7 +4641,7 @@ window.saveAnswer = window.saveAnswer || function(){};
     clearTimeout(_rd.tcp);
     _rd.tcp = setTimeout(function() {
       if (!_rd || !_rd.copia) return;
-      var s7 = window.getSelection(); if (!s7 || !s7.rangeCount || s7.isCollapsed) return;
+      var s7 = window.getSelection(); if (!s7 || !s7.rangeCount || s7.isCollapsed) { rdCopiaMarca(); return; }
       var r7 = s7.getRangeAt(0).cloneRange(), an = _rd.cpCur;
       if (an) {
         var toca = r7.compareBoundaryPoints(Range.END_TO_START, an) <= 0 && r7.compareBoundaryPoints(Range.START_TO_END, an) >= 0;
