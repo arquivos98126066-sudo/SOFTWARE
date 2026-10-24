@@ -239,6 +239,18 @@ document.addEventListener('click',function(e){
   #pl-html .pl-h-add .row-main { color: var(--tx2); border-style: dashed; }
   #pl-html .row.sel { border-color: var(--brand); box-shadow: 0 0 0 2px rgba(80,72,180,.25); }
   #pl-html .row-main { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+  #pl-html .pl-h-title.up { display: flex; align-items: center; gap: 8px; width: 100%; background: none; border: 0; text-align: left; cursor: pointer; font-family: inherit; }
+  #pl-html .pl-h-title .ic { width: 16px; height: 16px; flex: none; }
+  #pl-html .row.arr { opacity: .3; }
+  #pl-html .row.pegado { transform: scale(1.015); }
+  #pl-html .row.alvo-dentro { border-color: var(--brand); background: rgba(80,72,180,.08); box-shadow: 0 0 0 2px rgba(80,72,180,.25); }
+  #pl-html .row.alvo-antes { box-shadow: 0 -4px 0 -1px var(--brand); }
+  #pl-html .row.alvo-depois { box-shadow: 0 4px 0 -1px var(--brand); }
+  .pl-h-fant { position: fixed; z-index: 900; margin: 0; pointer-events: none; opacity: .95; box-shadow: 0 12px 30px rgba(15,27,45,.25); }
+  #pl-h-tirar { position: fixed; left: 12px; right: 12px; top: calc(env(safe-area-inset-top) + 10px); height: 52px; z-index: 890; border-radius: 999px; display: none; align-items: center; justify-content: center; gap: 10px; background: var(--dark, #131c2e); color: #fff; font-size: 14px; font-weight: 600; opacity: .93; }
+  #pl-h-tirar.on { display: flex; }
+  #pl-h-tirar.alvo { background: var(--brand); }
+  #pl-h-tirar .ic { width: 20px; height: 20px; stroke: currentColor; fill: none; }
   .pl-h-bar { display: flex; justify-content: center; margin: -2px 0 2px; }
   .pl-h-pill { display: flex; gap: 2px; padding: 5px; background: var(--dark, #131c2e); border-radius: 999px; box-shadow: 0 6px 14px rgba(15,27,45,.25); }
   .pl-h-pill button { width: 42px; height: 42px; border: 0; border-radius: 50%; background: transparent; display: grid; place-items: center; color: #fff; padding: 0; }
@@ -1674,49 +1686,176 @@ function htmlLer(){
   return a;
 }
 function htmlSalva(a){ try { localStorage.setItem(HTML_KEY, JSON.stringify(a)); } catch(e){ alert('Não coube no aparelho: ' + e.message); } }
-var _htmlSel = null, _htmlApos = null;
+var _htmlSel = null, _htmlPasta = null;
+/* pastas dentro dos HTMLs: cada item guarda "pai" (id da pasta onde está; vazio = fora de todas) */
+function htmlTodos(){
+  var a = htmlLer(), ids = {};
+  a.forEach(function(x){ ids[x.id] = 1; });
+  a.forEach(function(x){ if(x.pai && !ids[x.pai]) x.pai = null; });
+  return a;
+}
+function htmlFilhos(a, pai){ return a.filter(function(x){ return (x.pai || null) === pai; }); }
+function htmlCaminho(a, id){
+  var n = [];
+  while(id){ var x = a.find(function(y){ return y.id === id; }); if(!x) break; n.unshift(x.nome); id = x.pai || null; }
+  return n;
+}
+function htmlSobe(){
+  var a = htmlTodos(), x = a.find(function(y){ return y.id === _htmlPasta; });
+  _htmlPasta = x ? (x.pai || null) : null; _htmlSel = null; htmlRender();
+}
 function htmlRender(){
   var box = document.getElementById('pl-html'); if(!box) return;
   if(_pl_currentFolderId !== null){ box.innerHTML = ''; return; }
-  var lista = htmlLer();
+  var todos = htmlTodos();
+  if(_htmlPasta && !todos.some(function(x){ return x.id === _htmlPasta && x.pasta; })) _htmlPasta = null;
+  var lista = htmlFilhos(todos, _htmlPasta);
   if(_htmlSel && !lista.some(function(x){ return x.id === _htmlSel; })) _htmlSel = null;
-  box.innerHTML = '<div class="pl-h-title">HTMLs</div><div class="rows"></div>';
+  box.innerHTML = '<div class="rows"></div>';
+  var tit;
+  if(_htmlPasta){
+    tit = document.createElement('button'); tit.type = 'button'; tit.className = 'pl-h-title up';
+    tit.innerHTML = ic('arrow-left') + '<span>' + p_esc(['HTMLs'].concat(htmlCaminho(todos, _htmlPasta)).join(' › ')) + '</span>';
+    tit.onclick = htmlSobe;
+  } else { tit = document.createElement('div'); tit.className = 'pl-h-title'; tit.textContent = 'HTMLs'; }
+  box.insertBefore(tit, box.firstChild);
   var rows = box.querySelector('.rows');
   lista.forEach(function(h){
-    var row = document.createElement('div'); row.className = 'row has-edit' + (h.id === _htmlSel ? ' sel' : '');
-    row.innerHTML = '<button type="button" class="row-main">' + ic('code', 'row-ico') + '<span class="row-name">' + p_esc(h.nome) + '</span>' + ic('chevron-right', 'row-chev') + '</button><button type="button" class="row-edit" aria-label="Opções" data-tip="Opções">' + ic('dots-v') + '</button>';
+    var pasta = !!h.pasta;
+    var row = document.createElement('div'); row.className = 'row has-edit' + (h.id === _htmlSel ? ' sel' : ''); row.dataset.hid = h.id;
+    var n = pasta ? htmlFilhos(todos, h.id).length : 0;
+    row.innerHTML = '<button type="button" class="row-main">' + ic(pasta ? 'folder' : 'code', 'row-ico') + '<span class="row-name">' + p_esc(h.nome) + '</span>' + (pasta ? '<span class="chip">' + n + (n === 1 ? ' item' : ' itens') + '</span>' : '') + ic('chevron-right', 'row-chev') + '</button><button type="button" class="row-edit" aria-label="Opções" data-tip="Opções">' + ic('dots-v') + '</button>';
     row.querySelector('.row-edit').onclick = function(){ _htmlSel = (_htmlSel === h.id ? null : h.id); htmlRender(); };
-    var btn = row.querySelector('.row-main'), t = null, seg = false, x0 = 0, y0 = 0;
-    btn.addEventListener('pointerdown', function(e){ seg = false; x0 = e.clientX; y0 = e.clientY; clearTimeout(t); t = setTimeout(function(){ seg = true; _htmlSel = (_htmlSel === h.id ? null : h.id); htmlRender(); }, 450); });
-    btn.addEventListener('pointermove', function(e){ if(Math.abs(e.clientX - x0) > 10 || Math.abs(e.clientY - y0) > 10) clearTimeout(t); });
-    ['pointerup', 'pointercancel', 'pointerleave'].forEach(function(n){ btn.addEventListener(n, function(){ clearTimeout(t); }); });
-    btn.addEventListener('contextmenu', function(e){ e.preventDefault(); });
-    btn.onclick = function(){ if(seg){ seg = false; return; } if(_htmlSel){ _htmlSel = null; htmlRender(); return; } htmlAbre(h.id); };
+    htmlLigaLinha(row, h);
     rows.appendChild(row);
     if(h.id === _htmlSel){
       var bar = document.createElement('div'); bar.className = 'pl-h-bar';
-      bar.innerHTML = '<div class="pl-h-pill"><button type="button" data-a="add" aria-label="Adicionar HTML abaixo">' + ic('plus') + '</button><button type="button" data-a="up" aria-label="Subir">' + ic('arrow-up') + '</button><button type="button" data-a="dn" aria-label="Descer">' + ic('arrow-down') + '</button><button type="button" data-a="ren" aria-label="Renomear">' + ic('pencil') + '</button><button type="button" data-a="dl" aria-label="Baixar HTML">' + ic('download') + '</button><button type="button" data-a="cp" aria-label="Copiar código">' + ic('copy') + '</button><button type="button" data-a="del" aria-label="Remover">' + ic('trash') + '</button></div>';
-      bar.querySelector('[data-a=add]').onclick = function(){ _htmlApos = h.id; document.getElementById('html-file').click(); };
-      bar.querySelector('[data-a=up]').onclick = function(){ htmlMove(h.id, -1); };
-      bar.querySelector('[data-a=dn]').onclick = function(){ htmlMove(h.id, 1); };
-      bar.querySelector('[data-a=dl]').onclick = function(){ htmlCodigo(h, function(c){ var u = URL.createObjectURL(new Blob([c], {type: 'text/html'})), l = document.createElement('a'); l.href = u; l.download = h.nome + '.html'; document.body.appendChild(l); l.click(); l.remove(); setTimeout(function(){ URL.revokeObjectURL(u); }, 4000); }); };
-      bar.querySelector('[data-a=cp]').onclick = function(){ htmlCodigo(h, function(c){ var ok = function(){ toast('Código copiado'); }; if(navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(c).then(ok); else { var t = document.createElement('textarea'); t.value = c; document.body.appendChild(t); t.select(); document.execCommand('copy'); t.remove(); ok(); } }); };
-      bar.querySelector('[data-a=ren]').onclick = function(){ htmlEdita(h.id); };
-      bar.querySelector('[data-a=del]').onclick = function(){ htmlEdita(h.id, true); };
+      bar.innerHTML = '<div class="pl-h-pill"><button type="button" data-a="ren" aria-label="Renomear">' + ic('pencil') + '</button>' + (pasta ? '' : '<button type="button" data-a="dl" aria-label="Baixar HTML">' + ic('download') + '</button><button type="button" data-a="cp" aria-label="Copiar código">' + ic('copy') + '</button>') + '<button type="button" data-a="del" aria-label="Remover">' + ic('trash') + '</button></div>';
+      var q = function(s){ return bar.querySelector('[data-a=' + s + ']'); };
+      q('ren').onclick = function(){ htmlEdita(h.id); };
+      q('del').onclick = function(){ htmlEdita(h.id, true); };
+      if(!pasta){
+        q('dl').onclick = function(){ htmlCodigo(h, function(c){ var u = URL.createObjectURL(new Blob([c], {type: 'text/html'})), l = document.createElement('a'); l.href = u; l.download = h.nome + '.html'; document.body.appendChild(l); l.click(); l.remove(); setTimeout(function(){ URL.revokeObjectURL(u); }, 4000); }); };
+        q('cp').onclick = function(){ htmlCodigo(h, function(c){ var ok = function(){ toast('Código copiado'); }; if(navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(c).then(ok); else { var t = document.createElement('textarea'); t.value = c; document.body.appendChild(t); t.select(); document.execCommand('copy'); t.remove(); ok(); } }); };
+      }
       rows.appendChild(bar);
     }
   });
-  if(!lista.length){
-    var add = document.createElement('div'); add.className = 'row pl-h-add';
-    add.innerHTML = '<button type="button" class="row-main">' + ic('plus', 'row-ico') + '<span class="row-name">Adicionar HTML</span></button>';
-    add.querySelector('button').onclick = function(){ _htmlApos = null; document.getElementById('html-file').click(); };
-    rows.appendChild(add);
-  }
+  var add = document.createElement('div'); add.className = 'row pl-h-add';
+  add.innerHTML = '<button type="button" class="row-main">' + ic('plus', 'row-ico') + '<span class="row-name">Adicionar HTML</span></button>';
+  add.querySelector('button').onclick = function(){ document.getElementById('html-file').click(); };
+  rows.appendChild(add);
 }
-function htmlMove(id, d){
-  var a = htmlLer(), i = a.findIndex(function(x){ return x.id === id; }), j = i + d;
-  if(i < 0 || j < 0 || j >= a.length) return;
-  var t = a[i]; a[i] = a[j]; a[j] = t; htmlSalva(a); htmlRender();
+
+/* segurar e arrastar: em cima do meio de outro vira pasta (ou entra na pasta); nas bordas reordena; faixa do topo tira da pasta */
+function htmlLigaLinha(row, h){
+  var btn = row.querySelector('.row-main'), t = null, seg = false, arr = false, x0 = 0, y0 = 0, lx = 0, ly = 0, gx = 0, gy = 0;
+  var fant = null, alvo = null, zona = '', tirar = null, rolar = null, corpo = document.querySelector('.pl-body');
+  function acha(x, y){
+    var e = document.elementFromPoint(x, y), r = e && e.closest ? e.closest('#pl-html .row[data-hid]') : null;
+    return r && r !== row ? r : null;
+  }
+  function zonaDe(r, y){
+    var b = r.getBoundingClientRect(), f = (y - b.top) / b.height;
+    if(f < .25) return 'antes';
+    if(f > .75) return 'depois';
+    return 'dentro';
+  }
+  function marca(r, z){
+    if(alvo) alvo.classList.remove('alvo-dentro', 'alvo-antes', 'alvo-depois');
+    alvo = r; zona = z;
+    if(alvo) alvo.classList.add('alvo-' + z);
+  }
+  function emTirar(y){ return tirar && y < tirar.getBoundingClientRect().bottom + 6; }
+  function atualiza(){
+    if(emTirar(ly)){ marca(null, ''); tirar.classList.add('alvo'); return; }
+    if(tirar) tirar.classList.remove('alvo');
+    var r = acha(lx, ly); marca(r, r ? zonaDe(r, ly) : '');
+  }
+  function comeca(e){
+    var r = row.getBoundingClientRect();
+    fant = row.cloneNode(true); fant.className = 'row pl-h-fant'; fant.style.cssText = 'left:' + r.left + 'px;top:' + r.top + 'px;width:' + r.width + 'px';
+    document.body.appendChild(fant);
+    row.classList.remove('pegado'); row.classList.add('arr');
+    if(_htmlPasta){
+      tirar = document.getElementById('pl-h-tirar');
+      if(!tirar){ tirar = document.createElement('div'); tirar.id = 'pl-h-tirar'; tirar.innerHTML = ic('folder-in') + '<span>Soltar aqui para tirar da pasta</span>'; document.body.appendChild(tirar); }
+      tirar.classList.add('on');
+    }
+    arr = true; gx = e.clientX; gy = e.clientY; lx = gx; ly = gy;
+    rolar = setInterval(function(){
+      if(!corpo) return;
+      if(ly > window.innerHeight - 100) corpo.scrollTop += 14;
+      else if(ly < 110 && !tirar) corpo.scrollTop -= 14;
+      atualiza();
+    }, 30);
+  }
+  function fim(solta){
+    clearInterval(rolar); rolar = null;
+    if(fant && fant.parentNode) fant.parentNode.removeChild(fant);
+    fant = null; arr = false; row.classList.remove('arr', 'pegado');
+    var r = alvo, z = zona, noTirar = tirar && tirar.classList.contains('alvo');
+    marca(null, '');
+    if(tirar){ tirar.classList.remove('on', 'alvo'); tirar = null; }
+    if(!solta) return;
+    if(noTirar) htmlSolta(h.id, null, 'tirar');
+    else if(r) htmlSolta(h.id, r.dataset.hid, z);
+  }
+  btn.addEventListener('touchmove', function(ev){ if(arr || seg) ev.preventDefault(); }, {passive: false});
+  btn.addEventListener('pointerdown', function(e){
+    seg = false; x0 = e.clientX; y0 = e.clientY; clearTimeout(t);
+    try { btn.setPointerCapture(e.pointerId); } catch(_){}
+    t = setTimeout(function(){ seg = true; row.classList.add('pegado'); if(navigator.vibrate){ try { navigator.vibrate(12); } catch(_){} } }, 450);
+  });
+  btn.addEventListener('pointermove', function(e){
+    if(arr){ lx = e.clientX; ly = e.clientY; fant.style.transform = 'translate(' + (lx - gx) + 'px,' + (ly - gy) + 'px)'; atualiza(); return; }
+    var moveu = Math.abs(e.clientX - x0) > 10 || Math.abs(e.clientY - y0) > 10;
+    if(seg && moveu){ comeca(e); return; }
+    if(moveu) clearTimeout(t);
+  });
+  btn.addEventListener('pointerup', function(){
+    clearTimeout(t);
+    if(arr){ fim(true); return; }
+    if(seg){ row.classList.remove('pegado'); _htmlSel = (_htmlSel === h.id ? null : h.id); htmlRender(); }
+  });
+  btn.addEventListener('pointercancel', function(){ clearTimeout(t); if(arr) fim(false); else row.classList.remove('pegado'); seg = false; });
+  btn.addEventListener('contextmenu', function(e){ e.preventDefault(); });
+  btn.onclick = function(){
+    if(seg){ seg = false; return; }
+    if(_htmlSel){ _htmlSel = null; htmlRender(); return; }
+    if(h.pasta){ _htmlPasta = h.id; htmlRender(); return; }
+    htmlAbre(h.id);
+  };
+}
+function htmlSolta(id, alvoId, zona){
+  var a = htmlTodos(), x = a.find(function(y){ return y.id === id; });
+  if(!x) return;
+  var sai = function(){ a.splice(a.indexOf(x), 1); };
+  if(zona === 'tirar'){
+    var pa = a.find(function(y){ return y.id === _htmlPasta; });
+    sai(); x.pai = pa ? (pa.pai || null) : null;
+    a.splice(pa ? a.indexOf(pa) + 1 : a.length, 0, x);
+    toast('Saiu da pasta');
+  } else {
+    var al = a.find(function(y){ return y.id === alvoId; });
+    if(!al) return;
+    if(zona === 'dentro' && al.pasta){
+      sai(); x.pai = al.id; a.push(x);
+      toast('Movido para ' + al.nome);
+    } else if(zona === 'dentro'){
+      var irmaos = htmlFilhos(a, al.pai || null), nome = 'Nova pasta', c = 2;
+      while(irmaos.some(function(y){ return y.pasta && y.nome === nome; })) nome = 'Nova pasta ' + c++;
+      var pasta = {id: 'p' + Date.now(), nome: nome, pasta: true, pai: al.pai || null};
+      sai(); a.splice(a.indexOf(al), 0, pasta);
+      al.pai = pasta.id; x.pai = pasta.id;
+      a.splice(a.indexOf(al) + 1, 0, x);
+      sai = null;
+      toast('Pasta criada');
+    } else {
+      sai(); a.splice(a.indexOf(al) + (zona === 'depois' ? 1 : 0), 0, x);
+    }
+  }
+  _htmlSel = null; htmlSalva(a); htmlRender();
 }
 function htmlCodigo(h, fn){
   if(h.html != null) return fn(h.html);
@@ -1767,11 +1906,17 @@ if(Hub._bc && Hub._bc()) Hub._bc().addEventListener('message', function(e){
 });
 
 function htmlEdita(id, apagar){
-  var a = htmlLer(), h = a.find(function(x){ return x.id === id; }); if(!h) return;
-  var n = apagar ? '' : prompt('Novo nome', h.nome);
+  var a = htmlTodos(), h = a.find(function(x){ return x.id === id; }); if(!h) return;
+  if(apagar){
+    if(h.pasta){
+      if(!confirm('Desfazer a pasta "' + h.nome + '"? Os HTMLs dentro dela voltam para fora.')) return;
+      htmlFilhos(a, h.id).forEach(function(x){ x.pai = h.pai || null; });
+    } else if(!confirm('Remover "' + h.nome + '" da lista?')) return;
+    a = a.filter(function(x){ return x.id !== id; }); _htmlSel = null; htmlSalva(a); htmlRender(); return;
+  }
+  var n = prompt('Novo nome', h.nome);
   if(n === null) return;
-  n = n.trim();
-  if(!n){ if(confirm('Remover "' + h.nome + '" da lista?')){ a = a.filter(function(x){ return x.id !== id; }); _htmlSel = null; htmlSalva(a); htmlRender(); } return; }
+  n = n.trim(); if(!n) return;
   h.nome = n; _htmlSel = null; htmlSalva(a); htmlRender();
 }
 window.addEventListener('popstate', function(){ htmlFecha(); });
@@ -1779,11 +1924,11 @@ document.getElementById('html-file').addEventListener('change', function(e){
   var f = e.target.files && e.target.files[0]; e.target.value = ''; if(!f) return;
   var r = new FileReader();
   r.onload = function(){
-    var a = htmlLer();
+    var a = htmlTodos();
     var novo = {id:'h' + Date.now(), nome: f.name.replace(/\.html?$/i, ''), html: String(r.result)};
-    var k = _htmlApos ? a.findIndex(function(x){ return x.id === _htmlApos; }) : -1;
-    if(k >= 0) a.splice(k + 1, 0, novo); else a.push(novo);
-    _htmlApos = null; _htmlSel = null; htmlSalva(a); htmlRender();
+    if(_htmlPasta) novo.pai = _htmlPasta;
+    a.push(novo);
+    _htmlSel = null; htmlSalva(a); htmlRender();
   };
   r.readAsText(f);
 });
