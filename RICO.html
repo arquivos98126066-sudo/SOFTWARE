@@ -4359,6 +4359,7 @@ window.saveAnswer = window.saveAnswer || function(){};
           _rd.tool = null; ov.classList.remove('rd-q'); ov_limpaOn();
           return;
         }
+        if (_rd.edit && _rd.tool === 'q' && !(ev.target.closest && ev.target.closest('.rd-tools'))) { if (ev.cancelable) ev.preventDefault(); return; }
         /* duas batidas rápidas no texto: sai da edição e volta para a leitura */
         if (_rd.edit && !_rd.tool && !(ev.target.closest && ev.target.closest('.rd-tools'))) {
           var c = ev.changedTouches && ev.changedTouches[0]; if (!c) return;
@@ -4388,6 +4389,8 @@ window.saveAnswer = window.saveAnswer || function(){};
         if (ln && bl && ln.parentNode === bl) { ev.preventDefault(); rdAplica(ln, bl); }
       });
       ov.addEventListener('input', function() { rdAgenda(); });
+      /* com ferramenta selecionada nunca há cursor nem teclado */
+      ov.addEventListener('focusin', function(ev) { if (_rd && _rd.edit && _rd.tool && !(ev.target.closest && ev.target.closest('.rd-tools'))) { try { ev.target.blur(); window.getSelection().removeAllRanges(); } catch (_) {} } });
       ov.addEventListener('focusout', function(ev) {
         var bl = ev.target && ev.target.closest ? ev.target.closest('.rd-tx') : null;
         if (bl && _rd && _rd.edit) setTimeout(function() { if (bl.isConnected && !bl.contains(document.activeElement)) rdRepinta(bl); }, 0);
