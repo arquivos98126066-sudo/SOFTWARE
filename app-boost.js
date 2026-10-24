@@ -1,7 +1,7 @@
 /* Regras de velocidade e firmeza para todos os apps: sem zoom, sem tela deslocada para o lado */
 (function () {
   var st = document.createElement('style');
-  st.textContent = 'html{touch-action:pan-x pan-y;overscroll-behavior-x:none}';
+  st.textContent = 'html,body{overscroll-behavior-y:contain}html{touch-action:pan-x pan-y;overscroll-behavior-x:none}'; /* sem puxar para atualizar: a página não recarrega sem querer */
   (document.head || document.documentElement).appendChild(st);
   /* pinça: bloqueada pelo touch-action acima; um ouvinte não passivo aqui faria toda rolagem esperar o app */
   ['gesturestart', 'gesturechange', 'gestureend'].forEach(function (n) { document.addEventListener(n, function (e) { e.preventDefault(); }); });
