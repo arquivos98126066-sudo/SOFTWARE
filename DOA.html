@@ -1889,7 +1889,13 @@ function htmlAbre(id, y){
   var h = htmlLer().find(function(x){ return x.id === id; }); if(!h) return;
   _htmlY = y || 0;
   /* app de verdade (Rico): abre a própria página, com os mesmos dados; o voltar do celular traz o Plano de volta no mesmo lugar */
-  if(h.app){ if(window.salvaEstadoPlano) window.salvaEstadoPlano(); try { sessionStorage.setItem('troca', 'DOA'); sessionStorage.setItem('viaPlano', '1'); } catch(e){} location.href = h.src; return; }
+  if(h.app){
+    if(window.salvaEstadoPlano) window.salvaEstadoPlano();
+    /* o Plano fica registrado como "dentro do Rico": ao voltar pela troca, reabre o Rico direto */
+    try { var st = JSON.parse(localStorage.getItem('troca.estado.DOA') || '{}'); st.html = h.id; st.htmlY = 0; localStorage.setItem('troca.estado.DOA', JSON.stringify(st)); } catch(e){}
+    try { sessionStorage.setItem('troca', 'DOA'); sessionStorage.setItem('viaPlano', '1'); } catch(e){}
+    location.href = h.src; return;
+  }
   /* iframe novo a cada abertura: assim ele não acumula histórico e o botão voltar do celular só fecha o HTML */
   var box = document.getElementById('html-view');
   box.innerHTML = '';

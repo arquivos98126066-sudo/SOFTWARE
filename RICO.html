@@ -6319,7 +6319,7 @@ window.saveAnswer = window.saveAnswer || function(){};
 })();
 
 
-/* aberto pelo Plano: tocar com dois dedos ao mesmo tempo volta ao Plano, no mesmo lugar em que ele ficou */
+/* aberto pelo Plano: tocar com dois dedos ao mesmo tempo troca para o Estudo (e de lá, volta direto para o Rico) */
 (function(){
   try { if (sessionStorage.getItem('viaPlano') !== '1') return; } catch(e){ return; }
   function gestoDoisDedos(aoFazer){
@@ -6346,8 +6346,8 @@ window.saveAnswer = window.saveAnswer || function(){};
     document.addEventListener('touchcancel', function(){ ini = null; }, {passive: true});
   }
   gestoDoisDedos(function(){
-    try { sessionStorage.setItem('troca', 'DOA'); sessionStorage.setItem('rico.y', String(window.scrollY || 0)); navigator.vibrate && navigator.vibrate(25); } catch(e){}
-    location.replace('DOA.html');
+    try { sessionStorage.setItem('troca', 'LER'); sessionStorage.setItem('rico.y', String(window.scrollY || 0)); navigator.vibrate && navigator.vibrate(25); } catch(e){}
+    location.replace('LER.html');
   });
 })();
 /* reaberto pelo Plano: volta na rolagem em que você deixou */
