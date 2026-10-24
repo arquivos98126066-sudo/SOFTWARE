@@ -6432,7 +6432,7 @@ window.saveAnswer = window.saveAnswer || function(){};
     ir(); requestAnimationFrame(function(){ ir(); if (window.__ricoRevela) window.__ricoRevela(); });
   }
   var carregou = false;
-  function espera(){ clearTimeout(tq); if (carregou) tq = setTimeout(pronto, 160); }
+  function espera(){ clearTimeout(tq); if (carregou) tq = setTimeout(pronto, 60); }
   try { mo = new MutationObserver(function(){ ir(); espera(); }); mo.observe(document.documentElement, {childList: true, subtree: true, characterData: true, attributes: true, attributeFilter: ['style', 'class', 'rows']}); } catch(e){}
   window.addEventListener('load', function(){ carregou = true; espera(); });
   if (document.readyState === 'complete') { carregou = true; espera(); }

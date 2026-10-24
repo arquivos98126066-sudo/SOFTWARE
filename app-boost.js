@@ -396,7 +396,7 @@ window.Alterna = (function () {
       (document.head || document.documentElement).appendChild(est);
       var solta = function () { clearTimeout(tq); clearTimeout(tmax); if (mo) mo.disconnect(); var x = document.getElementById('alterna-quieto'); if (x) x.remove(); };
       var tq, tmax = setTimeout(solta, 1200), mo = null, carregou = false;
-      var espera = function () { clearTimeout(tq); if (carregou) tq = setTimeout(solta, 160); };
+      var espera = function () { clearTimeout(tq); if (carregou) tq = setTimeout(solta, 60); };
       mo = new MutationObserver(espera); mo.observe(document.documentElement, { childList: true, subtree: true, characterData: true });
       window.addEventListener('load', function () { carregou = true; espera(); });
       if (document.readyState === 'complete') { carregou = true; espera(); }
@@ -454,7 +454,7 @@ window.Alterna = (function () {
         requestAnimationFrame(function () { rola(); requestAnimationFrame(function () { rola(); revela(); setTimeout(rola, 300); setTimeout(rola, 900); }); });
       };
       /* espera o app montar a primeira tela com os dados do aparelho */
-      var inicia = function () { setTimeout(aplica, 350); };
+      var inicia = function () { setTimeout(aplica, 80); };
       if (document.readyState === 'complete') inicia(); else window.addEventListener('load', inicia);
     }
   }

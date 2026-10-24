@@ -2759,7 +2759,7 @@ abrirProcesso();
         else { poe(); requestAnimationFrame(laco); }
       })();
     }
-    function agenda(){ clearTimeout(calmo); calmo = setTimeout(estavel, 140); }
+    function agenda(){ clearTimeout(calmo); calmo = setTimeout(estavel, 60); }
     try { obs = new MutationObserver(agenda); obs.observe(document.documentElement, {childList: true, subtree: true}); } catch (x) {}
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', agenda); else agenda();
     setTimeout(estavel, 1500);
