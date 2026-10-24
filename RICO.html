@@ -5,6 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="#fbf8f1">
 <script src="app-boost.js"></script>
+<script>
+/* reaberto por troca de app com rolagem guardada: esconde até a página estar na posição, para não aparecer no topo e pular */
+try { if (sessionStorage.getItem('viaPlano') === '1' && parseFloat(sessionStorage.getItem('rico.y')) > 0) {
+  var _e = document.createElement('style'); _e.id = 'rico-esconde'; _e.textContent = 'html{visibility:hidden}'; document.head.appendChild(_e);
+  setTimeout(function(){ var x = document.getElementById('rico-esconde'); if (x) x.remove(); }, 1500);
+} } catch (e) {}
+</script>
 <title>Born Rich — Caderno de Atividades</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -794,11 +801,11 @@
     <tr><td>Físico</td><td>Resultado</td></tr>
   </table>
 
-  <div class="liga-ciclo" aria-hidden="true" style="position:relative;height:64px;margin-top:4px">
-    <svg viewBox="0 0 120 64" width="120" height="64" style="position:absolute;left:42%;top:0;margin-left:-.75px;overflow:visible" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-      <defs><linearGradient id="ligaGr" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="58"><stop offset="0" stop-color="#e0b54a" stop-opacity="0"/><stop offset="1" stop-color="#e0b54a"/></linearGradient></defs>
-      <path d="M0 0V16Q0 30 14 30H92Q106 30 106 44V57" stroke="url(#ligaGr)"/>
-      <path d="M99 50l7 7.5 7-7.5" stroke="#e0b54a" stroke-width="1.8"/>
+  <div class="liga-ciclo" aria-hidden="true" style="position:relative;height:110px;margin-top:4px">
+    <svg viewBox="0 0 120 95.652" width="138" height="110" style="position:absolute;left:42%;top:0;margin-left:-.75px;overflow:visible" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <defs><linearGradient id="ligaGr" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="89.652"><stop offset="0" stop-color="#e0b54a" stop-opacity="0"/><stop offset="1" stop-color="#e0b54a"/></linearGradient></defs>
+      <path d="M0 0V23.326Q0 37.326 14 37.326H92Q106 37.326 106 51.326V88.652" stroke="url(#ligaGr)"/>
+      <path d="M99 81.652l7 7.5 7-7.5" stroke="#e0b54a" stroke-width="1.8"/>
     </svg>
   </div>
 
@@ -6081,20 +6088,24 @@ window.saveAnswer = window.saveAnswer || function(){};
   function desenhaSetas(anima) {
     anima = anima === true;
     document.querySelectorAll('.question-card').forEach(function(c) {
-      var old = c.querySelector(':scope > .q-seta'); if (old) old.remove();
-      if (c.classList.contains('q-aberto') || c.hasAttribute('data-sem-num')) return;
+      var old = c.querySelector(':scope > .q-seta');
+      if (c.classList.contains('q-aberto') || c.hasAttribute('data-sem-num')) { if (old) old.remove(); return; }
       var n = c.querySelector('.q-number');
       var alvo = Array.prototype.find.call(c.children, function(x) { return !x.matches('.question-header, .hint-panel, .q-tit, .q-seta'); });
       if (alvo && !alvo.querySelector('.choice-label')) alvo = alvo.querySelector('.money-field, textarea, input, .list-field-row') || alvo;
-      if (!n || !alvo || !c.offsetWidth) return;
+      if (!n || !alvo || !c.offsetWidth) { if (old) old.remove(); return; }
       var cr = c.getBoundingClientRect(), nr = n.getBoundingClientRect(), ar = alvo.getBoundingClientRect();
       var x0 = nr.right - cr.left + 4, y0 = nr.top - cr.top + nr.height / 2;
       var xt = ar.left - cr.left + ar.width / 2, yt = ar.top - cr.top - 2;
-      if (yt - y0 < 18 || xt - x0 < 30) return;
+      if (yt - y0 < 18 || xt - x0 < 30) { if (old) old.remove(); return; }
       var tp = yt - 6, rr = Math.max(0, Math.min(14, tp - y0 - 8, xt - x0));
       var d = 'M' + x0 + ' ' + y0 + ' H' + (xt - rr) + ' Q' + xt + ' ' + y0 + ' ' + xt + ' ' + (y0 + rr) + ' V' + tp;
+      /* mesma seta no mesmo lugar: não mexe (evita piscar); a animação só roda quando é pedida */
+      if (old && !anima && old.getAttribute('data-d') === d) return;
+      if (old) old.remove();
       var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
       svg.setAttribute('class', 'q-seta' + (anima && _tipoSeta === 1 ? ' anima' : '')); svg.setAttribute('aria-hidden', 'true');
+      svg.setAttribute('data-d', d);
       svg.innerHTML = setaHTML(d, xt, tp);
       c.insertBefore(svg, c.firstChild);
     });
@@ -6306,16 +6317,19 @@ window.saveAnswer = window.saveAnswer || function(){};
     /* a seta cresce até o bloco do ciclo terminar perto do fim da tela */
     var alvo=Math.max(64,Math.min(110,Math.round(window.innerHeight-24-cic-20-topo)));
     var H=alvo/s, a=Math.max(10,(H-7-28-14)/2), b=a+14;
-    w.style.height=alvo+'px';
-    svg.setAttribute('viewBox','0 0 120 '+H); svg.setAttribute('width',120*s); svg.setAttribute('height',alvo);
-    svg.querySelector('linearGradient').setAttribute('y2',H-6);
-    var p=svg.querySelectorAll('path');
-    p[0].setAttribute('d','M0 0V'+a+'Q0 '+b+' 14 '+b+'H92Q106 '+b+' 106 '+(b+14)+'V'+(H-7));
-    p[1].setAttribute('d','M99 '+(H-14)+'l7 7.5 7-7.5');
+    /* o desenho já nasce no tamanho típico (110): só redesenha se a diferença for visível, para não dar salto */
+    if(Math.abs(alvo-(parseFloat(w.style.height)||0))>3){
+      w.style.height=alvo+'px';
+      svg.setAttribute('viewBox','0 0 120 '+H); svg.setAttribute('width',120*s); svg.setAttribute('height',alvo);
+      svg.querySelector('linearGradient').setAttribute('y2',H-6);
+      var p=svg.querySelectorAll('path');
+      p[0].setAttribute('d','M0 0V'+a+'Q0 '+b+' 14 '+b+'H92Q106 '+b+' 106 '+(b+14)+'V'+(H-7));
+      p[1].setAttribute('d','M99 '+(H-14)+'l7 7.5 7-7.5');
+    }
     /* a frase de baixo só aparece ao rolar: começa depois do fim da tela */
     var q=document.querySelector('.quote-block'); if(q){ q.style.marginTop='0px'; var fim=cyc.getBoundingClientRect().bottom+window.scrollY; var falta=window.innerHeight+12-(q.getBoundingClientRect().top+window.scrollY); q.style.marginTop=Math.max(0,Math.round(falta))+'px'; }
   }
-  liga(); setTimeout(liga,400); setTimeout(liga,1500); window.addEventListener('resize',liga); window.addEventListener('load',liga); window.addEventListener('pageshow',liga);
+  liga(); window.addEventListener('resize',liga); window.addEventListener('load',liga); if(document.fonts&&document.fonts.ready) document.fonts.ready.then(liga);
 })();
 
 
@@ -6356,8 +6370,9 @@ window.saveAnswer = window.saveAnswer || function(){};
   try { if (sessionStorage.getItem('viaPlano') !== '1') return; y = parseFloat(sessionStorage.getItem('rico.y')) || 0; sessionStorage.removeItem('rico.y'); } catch(e){ return; }
   if (!y) return;
   document.addEventListener('touchstart', function(){ tocou = true; }, {passive: true});
-  function ir(){ if (!tocou && Math.abs(window.scrollY - y) > 2) window.scrollTo(0, y); }
-  window.addEventListener('load', function(){ [0, 300, 900, 1800].forEach(function(t){ setTimeout(ir, t); }); });
+  function ir(){ if (!tocou && Math.abs(window.scrollY - y) > 2) window.scrollTo({top: y, behavior: 'instant'}); }
+  ir(); var _x = document.getElementById('rico-esconde'); if (_x) _x.remove();
+  window.addEventListener('load', function(){ [0, 400, 1200].forEach(function(t){ setTimeout(ir, t); }); });
 })();
 </script>
 </body>

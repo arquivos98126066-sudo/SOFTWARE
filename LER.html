@@ -644,7 +644,7 @@ svg{fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-l
   /* dentro do estudo: reconhece o V, avisa a rolagem e volta para onde estava */
   function gestoNoEstudo(y){
     return '<style>html{overscroll-behavior-y:contain}</style><script>(' + gestoDoisDedos.toString() + ')(function(){ parent.postMessage({estudoSair: 1}, "*"); });' +
-      '(function(){ var y0 = ' + (+y || 0) + ', t = 0; addEventListener("load", function(){ if (y0) scrollTo(0, y0); });' +
+      '(function(){ var y0 = ' + (+y || 0) + ', t = 0; addEventListener("load", function(){ if (y0) scrollTo({top: y0, behavior: "instant"}); });' +
       'addEventListener("scroll", function(){ if (t) return; t = setTimeout(function(){ t = 0; parent.postMessage({estudoY: window.scrollY}, "*"); }, 250); }, {passive: true}); })();<\/script>';
   }
   window.addEventListener('message', function(e){

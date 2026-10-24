@@ -2742,13 +2742,13 @@ abrirProcesso();
         if (r[2] === 'ck'){ if (e.checked !== !!r[1]){ e.checked = !!r[1]; e.dispatchEvent(new Event('change', {bubbles: true})); } return; }
         if (e.value !== r[1]){ e.value = r[1]; e.dispatchEvent(new Event('input', {bubbles: true})); e.dispatchEvent(new Event('change', {bubbles: true})); }
       });
-      (E.s || []).forEach(function(r){ var e = ach(r[0]); if (e) e.scrollTop = r[1]; });
-      if (E.y) scrollTo(0, E.y);
+      (E.s || []).forEach(function(r){ var e = ach(r[0]); if (e) e.scrollTo({top: r[1], behavior: 'instant'}); });
+      if (E.y) scrollTo({top: E.y, behavior: 'instant'});
     }
     function reaplicaRolagem(){
       if (!E || tocou) return;
-      (E.s || []).forEach(function(r){ var e = ach(r[0]); if (e && Math.abs(e.scrollTop - r[1]) > 2) e.scrollTop = r[1]; });
-      if (E.y && Math.abs(window.scrollY - E.y) > 2) scrollTo(0, E.y);
+      (E.s || []).forEach(function(r){ var e = ach(r[0]); if (e && Math.abs(e.scrollTop - r[1]) > 2) e.scrollTo({top: r[1], behavior: 'instant'}); });
+      if (E.y && Math.abs(window.scrollY - E.y) > 2) scrollTo({top: E.y, behavior: 'instant'});
     }
     addEventListener('touchstart', function(){ tocou = true; }, {passive: true});
     addEventListener('load', function(){
