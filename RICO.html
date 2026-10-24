@@ -6346,9 +6346,18 @@ window.saveAnswer = window.saveAnswer || function(){};
     document.addEventListener('touchcancel', function(){ ini = null; }, {passive: true});
   }
   gestoDoisDedos(function(){
-    try { sessionStorage.setItem('troca', 'DOA'); navigator.vibrate && navigator.vibrate(25); } catch(e){}
+    try { sessionStorage.setItem('troca', 'DOA'); sessionStorage.setItem('rico.y', String(window.scrollY || 0)); navigator.vibrate && navigator.vibrate(25); } catch(e){}
     location.replace('DOA.html');
   });
+})();
+/* reaberto pelo Plano: volta na rolagem em que você deixou */
+(function(){
+  var y = 0, tocou = false;
+  try { if (sessionStorage.getItem('viaPlano') !== '1') return; y = parseFloat(sessionStorage.getItem('rico.y')) || 0; sessionStorage.removeItem('rico.y'); } catch(e){ return; }
+  if (!y) return;
+  document.addEventListener('touchstart', function(){ tocou = true; }, {passive: true});
+  function ir(){ if (!tocou && Math.abs(window.scrollY - y) > 2) window.scrollTo(0, y); }
+  window.addEventListener('load', function(){ [0, 300, 900, 1800].forEach(function(t){ setTimeout(ir, t); }); });
 })();
 </script>
 </body>

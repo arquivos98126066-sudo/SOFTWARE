@@ -1884,8 +1884,10 @@ function htmlCodigo(h, fn){
   fetch(h.src).then(function(r){ return r.text(); }).then(fn).catch(function(){ toast('Não consegui ler o HTML'); });
 }
 var _htmlAberto = null;
-function htmlAbre(id){
+var _htmlY = 0;
+function htmlAbre(id, y){
   var h = htmlLer().find(function(x){ return x.id === id; }); if(!h) return;
+  _htmlY = y || 0;
   /* app de verdade (Rico): abre a própria página, com os mesmos dados; o voltar do celular traz o Plano de volta no mesmo lugar */
   if(h.app){ if(window.salvaEstadoPlano) window.salvaEstadoPlano(); try { sessionStorage.setItem('troca', 'DOA'); sessionStorage.setItem('viaPlano', '1'); } catch(e){} location.href = h.src; return; }
   /* iframe novo a cada abertura: assim ele não acumula histórico e o botão voltar do celular só fecha o HTML */
@@ -1897,9 +1899,9 @@ function htmlAbre(id){
   if(h.src){
     /* carrega o código e abre com o gesto de troca dentro; se falhar, abre direto */
     fetch(h.src).then(function(r){ return r.text(); }).then(function(t){
-      if(_htmlAberto === h.id && window.planoInjeta) fr.srcdoc = window.planoInjeta(t, new URL(h.src, location.href).href); else if(_htmlAberto === h.id) fr.src = h.src;
+      if(_htmlAberto === h.id && window.planoInjeta) fr.srcdoc = window.planoInjeta(t, new URL(h.src, location.href).href, y); else if(_htmlAberto === h.id) fr.src = h.src;
     }).catch(function(){ fr.src = h.src; });
-  } else fr.srcdoc = window.planoInjeta ? window.planoInjeta(h.html) : h.html;
+  } else fr.srcdoc = window.planoInjeta ? window.planoInjeta(h.html, null, y) : h.html;
   _htmlAberto = h.id;
   if(window.CorBarra) htmlCodigo(h, function(t){ if(_htmlAberto === h.id) CorBarra.de(t); });
   box.classList.add('open');
@@ -2679,7 +2681,7 @@ abrirProcesso();
         ts: Date.now(),
         pasta: _pl_currentFolderId, htmlPasta: _htmlPasta, listY: pb ? pb.scrollTop : 0,
         proc: ov && ov.classList.contains('popen') ? localStorage.getItem('doa_active_proc_id') : null,
-        canvasY: p_canvasEl.scrollTop, html: _htmlAberto
+        canvasY: p_canvasEl.scrollTop, html: _htmlAberto, htmlY: _htmlY
       }));
     } catch(e){}
   }
@@ -2691,15 +2693,20 @@ abrirProcesso();
   }
   gestoDoisDedos(trocaParaEstudo);
   /* dentro dos HTMLs abertos em tela cheia o toque não chega ao Plano: o gesto vai junto dentro de cada um e avisa por mensagem */
-  window.planoInjeta = function(html, abs){
-    var tag = '<script>(' + gestoDoisDedos.toString() + ')(function(){ parent.postMessage({planoTroca: 1}, "*"); });' +
+  window.planoInjeta = function(html, abs, y){
+    var tag = '<script>(' + gestoDoisDedos.toString() + ')(function(){ parent.postMessage({planoTroca: 1, y: window.scrollY}, "*"); });' +
+      '(function(){ var y0 = ' + (+y || 0) + ', t = 0, tocou = false; function ir(){ if (y0 && !tocou && Math.abs(window.scrollY - y0) > 2) scrollTo(0, y0); }' +
+      'addEventListener("touchstart", function(){ tocou = true; }, {passive: true}); addEventListener("load", function(){ ir(); setTimeout(ir, 300); setTimeout(ir, 1000); setTimeout(ir, 2200); });' +
+      'addEventListener("scroll", function(){ if (t) return; t = setTimeout(function(){ t = 0; parent.postMessage({planoY: window.scrollY}, "*"); }, 250); }, {passive: true}); })();' +
       'document.addEventListener("click", function(e){ var a = e.target.closest && e.target.closest("a[href]"); if (a && a.getAttribute("href").charAt(0) === "#"){ e.preventDefault(); var t = document.getElementById(a.getAttribute("href").slice(1)); if (t) t.scrollIntoView({behavior: "smooth"}); } }, true);<\/script>';
     if (abs && !/<base[\s>]/i.test(html)) html = html.replace(/<head[^>]*>/i, function(m){ return m + '<base href="' + abs + '">'; });
     return html + tag;
   };
   window.addEventListener('message', function(e){
     var fr = document.getElementById('html-view-frame');
-    if (fr && e.source === fr.contentWindow && e.data && e.data.planoTroca) trocaParaEstudo();
+    if (!fr || e.source !== fr.contentWindow || !e.data) return;
+    if (typeof e.data.planoY === 'number') _htmlY = e.data.planoY;
+    if (e.data.planoTroca){ if (typeof e.data.y === 'number') _htmlY = e.data.y; trocaParaEstudo(); }
   });
   try { sessionStorage.removeItem('viaPlano'); } catch(e){}
   /* volta no mesmo lugar em que o Plano ficou (pasta, processo aberto, rolagem e HTML aberto) */
@@ -2723,7 +2730,7 @@ abrirProcesso();
           setTimeout(function(){ p_canvasEl.scrollTop = s.canvasY || 0; }, 600);
         }
       }
-      if (s.html && htmlLer().some(function(x){ return x.id === s.html; })) htmlAbre(s.html);
+      if (s.html && htmlLer().some(function(x){ return x.id === s.html; })) htmlAbre(s.html, s.htmlY || 0);
     })();
   })();
 })();
