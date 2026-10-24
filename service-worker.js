@@ -1,4 +1,4 @@
-const CACHE_NAME = 'meus-apps-v211';
+const CACHE_NAME = 'meus-apps-v213';
 // HTMLs enviados pelo menu (segurar o app > Enviar um novo): ficam fora da limpeza de versões antigas
 const ENVIADOS = 'apps-enviados';
 

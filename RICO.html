@@ -434,10 +434,10 @@ if ((sessionStorage.getItem('troca') === (window.RICO_INST === 'p' ? 'RICOP' : '
   .rd-ov[hidden]{ display: none; }
   .rd-col{ max-width: 560px; margin: 0 auto; padding: calc(28px + env(safe-area-inset-top)) 22px calc(120px + env(safe-area-inset-bottom)); color: var(--tx); }
   .rd-t, .rd-h{ display: table; margin-left: auto; margin-right: auto; text-align: center; font-family: 'DM Sans', system-ui, sans-serif; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: #211e19; line-height: 1.2; padding-bottom: 12px; border-bottom: 1px solid #c9c2b0; overflow-wrap: anywhere; }
-  .rd-t{ font-size: 15px; margin-top: 26px; margin-bottom: 0; }
+  .rd-t{ font-size: 15.5px; margin-top: 26px; margin-bottom: 0; }
   .rd-h{ font-size: 14px; margin-top: 30px; margin-bottom: 0; }
-  .rd-tx{ margin-top: 18px; font-family: Georgia, serif; font-size: 18px; line-height: 1.8; color: #4a443a; text-wrap: pretty; }
-  .rd-tx strong{ color: #211e19; }
+  .rd-tx{ margin-top: 1.1rem; font-family: Georgia, serif; font-size: 1.05rem; line-height: 1.85; color: #211e19; text-wrap: pretty; }
+  .rd-tx strong{ font-weight: 400; -webkit-text-stroke: .45px currentColor; color: #211e19; }
   .rd-tx .ln{ overflow-wrap: anywhere; }
   .rd-ov .nm{ background: #e8e1d0; color: #211e19; min-width: 22px; width: 22px; height: 22px; padding: 0; margin-right: 8px; text-align: center; font: 700 11px/22px 'DM Sans', system-ui, sans-serif; vertical-align: 1px; }
   .rd-ov .ck{ width: 22px; height: 22px; margin-right: 8px; border: 1.5px solid #b9b3a6; background: transparent; vertical-align: -4px; }
@@ -4251,23 +4251,37 @@ window.saveAnswer = window.saveAnswer || function(){};
       ov = document.createElement('div'); ov.className = 'rd-ov'; ov.id = 'rdOv'; ov.hidden = true;
       document.body.appendChild(ov);
       var ult = 0, tm = null, xy = null, segurou = false;
+      var seg = function(x, y) {
+        if (!_rd) return;
+        if (_rd.edit) { clearTimeout(_rd.tm); rdSalva(); _rd.edit = false; rdPinta(); try { window.getSelection().removeAllRanges(); } catch (_) {} return; }
+        var el = document.elementFromPoint(x, y), tit = el && el.closest ? el.closest('.rd-t, .rd-h') : null, bl = el && el.closest ? el.closest('.rd-tx') : null;
+        var idx = bl ? bl.getAttribute('data-i') : null, ti = tit ? (tit.classList.contains('rd-t') ? -1 : tit.getAttribute('data-i')) : null;
+        var tp = ov.scrollTop;
+        _rd.edit = true; rdPinta(); ov.scrollTop = tp;
+        var alvo = null;
+        if (tit && tit.classList.contains('rd-t')) alvo = ov.querySelector('.rd-t');
+        else if (bl) alvo = ov.querySelector('.rd-tx[data-i="' + idx + '"]');
+        if (!alvo) alvo = ov.querySelector('.rd-tx');
+        var r = null;
+        try { if (alvo && document.caretRangeFromPoint) { r = document.caretRangeFromPoint(x, y); if (r && !alvo.contains(r.startContainer)) r = null; } } catch (_) {}
+        if (alvo) { try { alvo.focus(); } catch (_) {} if (r) { var s2 = window.getSelection(); s2.removeAllRanges(); s2.addRange(r); } else rdFoco(alvo, true); }
+      };
       ov.addEventListener('touchstart', function(ev) {
-        if (!_rd || _rd.edit) return;
+        if (!_rd || (ev.target.closest && ev.target.closest('.rd-tools'))) return;
         segurou = false; var t = ev.touches[0]; xy = { x: t.clientX, y: t.clientY };
-        clearTimeout(tm); tm = setTimeout(function() { tm = null; segurou = true; var b = ov.querySelector('.rd-bar'); if (b) b.hidden = false; }, 450);
+        clearTimeout(tm); tm = setTimeout(function() { tm = null; segurou = true; if (navigator.vibrate) { try { navigator.vibrate(20); } catch (_) {} } seg(xy.x, xy.y); }, 450);
       }, { passive: true });
       ov.addEventListener('touchmove', function(ev) {
         var t = ev.touches[0]; if (xy && (Math.abs(t.clientX - xy.x) > 8 || Math.abs(t.clientY - xy.y) > 8)) { clearTimeout(tm); tm = null; }
       }, { passive: true });
       ['touchend', 'touchcancel'].forEach(function(n) { ov.addEventListener(n, function() { clearTimeout(tm); tm = null; }, { passive: true }); });
-      ov.addEventListener('contextmenu', function(ev) { if (!_rd || !_rd.edit) ev.preventDefault(); });
+      ov.addEventListener('contextmenu', function(ev) { ev.preventDefault(); });
       ov.addEventListener('click', function(ev) {
-        if (!_rd || _rd.edit) return;
-        if (segurou) { segurou = false; ult = 0; return; }
+        if (!_rd) return;
+        if (segurou) { segurou = false; ult = 0; ev.preventDefault(); return; }
+        if (_rd.edit) return;
         var b = ev.target.closest ? ev.target.closest('button') : null;
         if (b) { ult = 0; return; }
-        var bar = ov.querySelector('.rd-bar');
-        if (bar && !bar.hidden) { bar.hidden = true; ult = 0; return; }
         var agora = Date.now();
         if (agora - ult < 380) { ult = 0; fecharLeitura(); return; }
         ult = agora;
@@ -4314,14 +4328,13 @@ window.saveAnswer = window.saveAnswer || function(){};
   function rdBloco(v, idx, c, ed) {
     var corpo = rtHtml(rtParse(String(v || '')), null);
     if (c && !ed) { corpo = corpo.replace(/^(<div class="ln[^"]*" data-l="\d+">)/, '$1<span class="nm" contenteditable="false">' + c + '</span>'); }
-    return '<div class="rd-tx"' + (ed ? ' contenteditable="true" data-i="' + idx + '"' : '') + '>' + corpo + '</div>';
+    return '<div class="rd-tx" data-i="' + idx + '"' + (ed ? ' contenteditable="true"' : '') + '>' + corpo + '</div>';
   }
   function rdPinta() {
     var ov = document.getElementById('rdOv'), e = _rd.e, ed = _rd.edit, h = '<div class="rd-col">';
     ov.classList.toggle('rd-edit', ed);
     var tt = String(e.t || '').trim();
     if (tt || ed) h += '<h2 class="rd-t"' + (ed ? ' contenteditable="true" data-ph="Título"' : '') + '>' + rdEsc(tt) + '</h2>';
-    if (!ed) h += '<div class="rd-bar" hidden><div class="rcm-pill"><button type="button" class="rcm-ib" data-a="edita" aria-label="Editar"><svg viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg></button><button type="button" class="rcm-ib" data-a="fecha" aria-label="Fechar"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div></div>';
     var nl = 0, rows = (e.i && e.i.length ? e.i : []);
     if (ed && !rows.length) rows = [''];
     rows.forEach(function(v, idx) {
@@ -4335,12 +4348,6 @@ window.saveAnswer = window.saveAnswer || function(){};
     if (ed) h += '<div class="rd-tools"><button type="button" data-t="b" aria-label="Negrito"><svg viewBox="0 0 24 24"><path d="M7 5h6a3.5 3.5 0 010 7H7zM7 12h7a3.5 3.5 0 010 7H7z"/></svg></button><button type="button" data-t="i" aria-label="Itálico"><svg viewBox="0 0 24 24"><path d="M10 5h7M7 19h7M14 5l-4 14"/></svg></button><button type="button" data-t="T" aria-label="Título"><b>T</b></button><button type="button" data-t="c" aria-label="Check"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M8.2 12.4l2.6 2.6 5-5.2"/></svg></button><button type="button" data-t="n" aria-label="Numeração"><svg viewBox="0 0 24 24"><path d="M11 6h9M11 12h9M11 18h9M4.5 5.5l1.5-1v5M4 14.2c.6-1 2.3-.8 2.1.4-.3 1-1.6 1.5-2.1 2.4h2.4"/></svg></button><button type="button" data-t="p" aria-label="Marcadores"><svg viewBox="0 0 24 24"><path d="M11 6h9M11 12h9M11 18h9"/><circle cx="5.5" cy="6" r=".9" fill="currentColor"/><circle cx="5.5" cy="12" r=".9" fill="currentColor"/><circle cx="5.5" cy="18" r=".9" fill="currentColor"/></svg></button><button type="button" data-t="d" aria-label="Traço"><svg viewBox="0 0 24 24"><path d="M4 6h3M11 6h9M4 12h3M11 12h9M4 18h3M11 18h9"/></svg></button><button type="button" data-t="+" aria-label="Novo texto"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button><button type="button" data-t="ok" class="ok" aria-label="Pronto"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7"/></svg></button></div>';
     h += '<button type="button" data-fechar hidden onclick="fecharLeitura()" aria-label="Fechar"></button></div>';
     ov.innerHTML = h;
-    var bar = ov.querySelector('.rd-bar');
-    if (bar) bar.addEventListener('click', function(ev) {
-      var b = ev.target.closest ? ev.target.closest('button') : null; if (!b) return;
-      if (b.getAttribute('data-a') === 'edita') { _rd.edit = true; rdPinta(); var bl = ov.querySelector('.rd-tx'); if (bl) rdFoco(bl); }
-      else fecharLeitura();
-    });
   }
   function rdFoco(el, fim) {
     try { el.focus(); var r = document.createRange(); r.selectNodeContents(el); r.collapse(!fim); var s = window.getSelection(); s.removeAllRanges(); s.addRange(r); } catch (_) {}
