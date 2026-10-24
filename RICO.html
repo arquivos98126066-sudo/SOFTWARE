@@ -433,12 +433,12 @@ if ((sessionStorage.getItem('troca') === (window.RICO_INST === 'p' ? 'RICOP' : '
   .rd-ov{ position: fixed; inset: 0; z-index: 99975; background: var(--chip); overflow-y: auto; overscroll-behavior: contain; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; touch-action: pan-y; }
   .rd-ov[hidden]{ display: none; }
   .rd-col{ max-width: 560px; margin: 0 auto; padding: calc(28px + env(safe-area-inset-top)) 22px calc(120px + env(safe-area-inset-bottom)); color: var(--tx); }
-  .rd-t, .rd-h{ display: table; margin-left: auto; margin-right: auto; text-align: center; font-family: 'DM Sans', system-ui, sans-serif; font-style: italic; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: #211e19; line-height: 1.2; padding-bottom: 12px; border-bottom: 1px solid #c9c2b0; overflow-wrap: anywhere; }
+  .rd-t, .rd-h{ display: table; margin-left: auto; margin-right: auto; text-align: center; font-family: 'Inter', system-ui, sans-serif; font-style: normal; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: #211e19; line-height: 1.2; padding-bottom: 12px; border-bottom: 1px solid #c9c2b0; overflow-wrap: anywhere; }
   .rd-t{ font-size: 15.5px; margin-top: 26px; margin-bottom: 0; }
   .rd-h{ font-size: 14px; margin-top: 30px; margin-bottom: 0; }
-  .rd-tx{ margin-top: .55rem; font-family: 'Inter', system-ui, sans-serif; font-style: italic; font-size: 16px; line-height: 1.75; color: #211e19; text-wrap: pretty; }
+  .rd-tx{ margin-top: .55rem; font-family: 'Inter', system-ui, sans-serif; font-style: normal; font-size: 16px; line-height: 1.75; color: #211e19; text-wrap: pretty; }
   .rd-tx strong{ font-weight: 700; color: #211e19; }
-  .rd-tx em{ font-style: normal; }
+  .rd-tx em{ font-style: italic; }
   .rd-tx .ln{ overflow-wrap: anywhere; }
   .rd-ov .nm{ background: #e8e1d0; color: #211e19; min-width: 22px; width: 22px; height: 22px; padding: 0; margin-right: 8px; text-align: center; font: 700 11px/22px 'DM Sans', system-ui, sans-serif; vertical-align: 1px; }
   .rd-ov .ck{ width: 22px; height: 22px; margin-right: 8px; border: 1.5px solid #b9b3a6; background: transparent; vertical-align: -4px; }
@@ -452,6 +452,8 @@ if ((sessionStorage.getItem('troca') === (window.RICO_INST === 'p' ? 'RICOP' : '
   .rd-tx[data-q]{ position: relative; margin: 28px 0 32px; padding: 18px 20px 16px 22px; background: #fbfaf7; border: 1px solid #e2ddd1; border-radius: 24px; overflow: hidden; font-family: 'DM Sans', system-ui, sans-serif; font-style: normal; font-size: 15px; line-height: 1.65; color: #444; }
   .rd-tx[data-q]::before{ content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 30px; box-sizing: border-box; border-left: 3px solid #7b2d26; border-radius: 23px 0 0 23px; pointer-events: none; }
   .rd-tx[data-q] + .rd-tx[data-q]{ margin-top: -8px; }
+  html.rd-editando #alterna-base{ display: none !important; }
+  .rd-ov.rd-hold, .rd-ov.rd-hold *{ -webkit-user-select: none !important; user-select: none !important; -webkit-touch-callout: none !important; }
   .rd-bar{ display: flex; justify-content: center; margin-top: 16px; }
   .rd-bar[hidden]{ display: none; }
   .rd-ov.rd-edit{ -webkit-user-select: text; user-select: text; -webkit-touch-callout: default; }
@@ -460,11 +462,11 @@ if ((sessionStorage.getItem('troca') === (window.RICO_INST === 'p' ? 'RICOP' : '
   .rd-tx .ln.gap{ --gap: 6px; }
   .rd-edit .rd-t, .rd-edit .rd-h{ display: block; width: fit-content; min-width: 90px; max-width: 100%; }
   .rd-edit .rd-t:empty::before, .rd-edit .rd-h:empty::before{ content: attr(data-ph); color: #9a948a; }
-  .rd-tools{ position: fixed; left: 0; right: 0; bottom: calc(14px + env(safe-area-inset-bottom)); z-index: 3; padding: 0 calc(54px + env(safe-area-inset-right)) 0 12px; pointer-events: none; }
+  .rd-tools{ position: fixed; left: 0; right: 0; bottom: calc(14px + env(safe-area-inset-bottom)); z-index: 3; padding: 0 12px; pointer-events: none; }
   .rd-linha{ display: flex; align-items: center; justify-content: space-between; gap: 6px; }
   .rd-grupo{ flex: 1; display: flex; justify-content: space-evenly; gap: 4px; }
   .rd-grupo[hidden]{ display: none; }
-  .rd-tools button{ pointer-events: auto; flex: none; width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--bd-in); background: #fff; color: #211e19; display: grid; place-items: center; padding: 0; box-shadow: 0 12px 24px -14px rgba(15,27,45,.5); font-size: 17px; }
+  .rd-tools button{ pointer-events: auto; flex: none; width: 48px; height: 48px; border-radius: 50%; border: 1px solid var(--bd-in); background: #fff; color: #211e19; display: grid; place-items: center; padding: 0; box-shadow: 0 12px 24px -14px rgba(15,27,45,.5); font-size: 17px; }
   .rd-tools button svg{ width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
   .rd-tools button.on{ background: #211e19; border-color: #211e19; color: #fff; }
   .rd-tools button.ok{ background: #211e19; color: #fff; }
@@ -4265,7 +4267,10 @@ window.saveAnswer = window.saveAnswer || function(){};
       var seg = function(x, y) {
         if (!_rd) return;
         /* a tela é refeita com o dedo ainda embaixo: o fim do toque (que abriria cursor e teclado) é cancelado no elemento antigo */
-        if (alvoT) { try { alvoT.addEventListener('touchend', function(e) { if (e.cancelable) e.preventDefault(); }, { once: true, passive: false }); } catch (_) {} }
+        ov.classList.add('rd-hold');
+        var solta = function() { setTimeout(function() { ov.classList.remove('rd-hold'); }, 350); };
+        setTimeout(function() { ov.classList.remove('rd-hold'); }, 2500);
+        if (alvoT) { try { alvoT.addEventListener('touchend', function(e) { if (e.cancelable) e.preventDefault(); solta(); }, { once: true, passive: false }); alvoT.addEventListener('touchcancel', solta, { once: true }); } catch (_) {} }
         if (_rd.edit) { clearTimeout(_rd.tm); rdSalva(); _rd.edit = false; rdPinta(); try { window.getSelection().removeAllRanges(); } catch (_) {} return; }
         var tp = ov.scrollTop;
         _rd.edit = true; _rd.tool = null; rdPinta(); ov.scrollTop = tp;
@@ -4361,6 +4366,7 @@ window.saveAnswer = window.saveAnswer || function(){};
   function rdPinta() {
     var ov = document.getElementById('rdOv'), e = _rd.e, ed = _rd.edit, h = '<div class="rd-col">';
     ov.classList.toggle('rd-edit', ed);
+    document.documentElement.classList.toggle('rd-editando', ed);
     var tt = String(e.t || '').trim();
     if (tt || ed) h += '<h2 class="rd-t"' + (ed ? ' contenteditable="true" data-ph="Título"' : '') + '>' + rdEsc(tt) + '</h2>';
     var nl = 0, rows = (e.i && e.i.length ? e.i : []);
@@ -4499,7 +4505,8 @@ window.saveAnswer = window.saveAnswer || function(){};
   function fecharLeitura() {
     var ov = document.getElementById('rdOv');
     if (_rd && _rd.edit) { clearTimeout(_rd.tm); rdSalva(); }
-    if (ov) { ov.hidden = true; ov.classList.remove('rd-edit'); }
+    if (ov) { ov.hidden = true; ov.classList.remove('rd-edit'); ov.classList.remove('rd-hold'); }
+    document.documentElement.classList.remove('rd-editando');
     _rd = null;
     if (window.rcMapa && window.rcMapa.fechou) window.rcMapa.fechou();
   }
