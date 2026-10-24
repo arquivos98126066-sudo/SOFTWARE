@@ -4791,7 +4791,8 @@ window.saveAnswer = window.saveAnswer || function(){};
       var abre = ge.hidden; ge.hidden = !abre; gm.hidden = abre;
       ov.querySelector('[data-t="estilo"]').classList.toggle('on', abre);
       rdModoTeclado();
-      if (abre && !_rd.digita) { try { var a2 = document.activeElement; if (a2 && a2.blur && ov.contains(a2)) a2.blur(); } catch (_) {} }
+      if (_rd.digita) rdDigita(false);
+      if (abre) { try { var a2 = document.activeElement; if (a2 && a2.blur && ov.contains(a2)) a2.blur(); } catch (_) {} }
       return;
     }
     if (t === 'digita') { rdDigita(!_rd.digita); return; }
