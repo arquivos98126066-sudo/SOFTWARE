@@ -2609,16 +2609,8 @@ document.querySelector('.ps-prev').onclick=function(){go(Math.max(0,cur()-1))};
 document.querySelector('.ps-next').onclick=function(){go(Math.min(n-1,cur()+1))};
 })();
 
-(function(){var all=[];
-function reset(m){var v=m.querySelector('video');if(v){v.pause();v.style.display='none'}m.classList.remove('has-video');m.querySelector('.ps-play').style.display=''}
-document.querySelectorAll('.ps-play').forEach(function(b){
-var m=b.parentNode,f=document.createElement('input');f.type='file';f.accept='video/*';f.style.display='none';m.appendChild(f);all.push(m);
-function show(){var v=m.querySelector('video');v.style.display='block';m.classList.add('has-video');b.style.display='none';v.currentTime=0;var r=v.play();if(r&&r.catch)r.catch(function(){})}
-b.addEventListener('click',function(e){e.stopPropagation();if(m.querySelector('video'))show();else f.click()});
-f.addEventListener('change',function(){var a=f.files&&f.files[0];if(!a)return;var o=m.querySelector('video');if(o)o.remove();var v=document.createElement('video');v.src=URL.createObjectURL(a);v.controls=true;v.playsInline=true;v.preload='auto';v.className='ps-video';v.style.display='none';v.addEventListener('ended',function(){reset(m)});m.appendChild(v);show()});
-});
-document.addEventListener('click',function(e){all.forEach(function(m){if(!m.contains(e.target))reset(m)})});
-})();
+/* Play dos depoimentos é só demonstrativo: não faz nada ao tocar */
+document.querySelectorAll('.ps-play').forEach(function(b){b.style.cursor='default';b.setAttribute('aria-disabled','true');b.addEventListener('click',function(e){e.stopPropagation();e.preventDefault()})});
 </script>
 
 </body>
