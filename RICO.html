@@ -437,7 +437,7 @@ if ((sessionStorage.getItem('troca') === (window.RICO_INST === 'p' ? 'RICOP' : '
   .rd-t{ font-size: 15.5px; margin-top: 18px; margin-bottom: 0; }
   .rd-t + .rd-tx, .rd-h + .rd-tx{ margin-top: 13px; }
   .rd-h{ font-size: 14px; margin-top: 30px; margin-bottom: 0; }
-  .rd-tx{ margin-top: .55rem; font-family: 'Inter', system-ui, sans-serif; font-style: normal; font-size: 16px; line-height: 1.75; color: #211e19; text-wrap: pretty; }
+  .rd-tx{ margin-top: .55rem; font-family: Georgia, 'Times New Roman', serif; font-style: normal; font-size: 15.5px; line-height: 1.85; color: #211e19; text-wrap: pretty; }
   .rd-tx strong{ font-weight: 700; color: #211e19; }
   .rd-tx em{ font-style: italic; }
   .rd-tx .ln{ overflow-wrap: anywhere; }
@@ -467,8 +467,8 @@ if ((sessionStorage.getItem('troca') === (window.RICO_INST === 'p' ? 'RICOP' : '
   .rd-bar[hidden]{ display: none; }
   .rd-ov.rd-edit{ -webkit-user-select: text; user-select: text; -webkit-touch-callout: default; }
   .rd-edit .rd-tx, .rd-edit .rd-t, .rd-edit .rd-h{ outline: none; caret-color: #211e19; }
-    .rd-edit .rd-tx > div:has(> br:only-child){ height: 7px; line-height: 7px; }
-  .rd-tx .ln.gap{ --gap: 7px; }
+    .rd-edit .rd-tx > div:has(> br:only-child){ height: 18px; line-height: 18px; }
+  .rd-tx .ln.gap{ --gap: 18px; }
   .rd-edit .rd-t, .rd-edit .rd-h{ display: block; width: fit-content; min-width: 90px; max-width: 100%; }
   .rd-edit .rd-t:empty::before, .rd-edit .rd-h:empty::before{ content: attr(data-ph); color: #9a948a; }
   .rd-tools{ position: fixed; left: 0; right: 0; bottom: calc(14px + env(safe-area-inset-bottom) + var(--rd-kb, 0px)); z-index: 3; padding: 0 12px; pointer-events: none; }
@@ -4617,6 +4617,9 @@ window.saveAnswer = window.saveAnswer || function(){};
   /* deixa as linhas do bloco sempre no formato da leitura: cada linha é uma div .ln; linha vazia é .ln.gap com <br>; sem divs dentro de divs */
   function rdNormaliza(bl) {
     if (!bl) return;
+    /* o teclado do celular pode colar estilos próprios (altura de linha, fonte) nas linhas novas: tiro tudo, o desenho é só o da leitura */
+    Array.prototype.slice.call(bl.querySelectorAll('[style]')).forEach(function(x) { x.removeAttribute('style'); });
+    Array.prototype.slice.call(bl.querySelectorAll('font')).forEach(function(f) { while (f.firstChild) f.parentNode.insertBefore(f.firstChild, f); f.remove(); });
     var ant = window.getSelection(), salvo = null;
     Array.prototype.slice.call(bl.childNodes).forEach(function(c) {
       if (c.nodeType === 3) { if (!c.nodeValue.trim()) { c.remove(); return; } var w = document.createElement('div'); w.className = 'ln'; bl.insertBefore(w, c); w.appendChild(c); c = w; }
