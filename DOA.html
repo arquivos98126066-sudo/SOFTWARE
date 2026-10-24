@@ -2765,19 +2765,34 @@ abrirProcesso();
       (E.s || []).forEach(function(r){ var e = ach(r[0]); if (e && Math.abs(e.scrollTop - r[1]) > 2) e.scrollTo({top: r[1], behavior: 'instant'}); });
       if (E.y && Math.abs(window.scrollY - E.y) > 2) scrollTo({top: E.y, behavior: 'instant'});
     }
-    addEventListener('touchstart', function(){ tocou = true; }, {passive: true});
-    var iniciou = false;
-    function inicia(){
-      if (iniciou) return; iniciou = true;
-      tira(); poe();
-      parent.postMessage({planoPronto: 1}, '*');
+    var semAncora = null;
+    if (E){ semAncora = document.createElement('style'); semAncora.textContent = 'html,body{overflow-anchor:none!important}'; (document.head || document.documentElement).appendChild(semAncora); }
+    addEventListener('touchstart', function(){ tocou = true; if (semAncora){ semAncora.remove(); semAncora = null; } }, {passive: true});
+    var iniciou = false, calmo = null, obs = null;
+    function alvoOk(){
+      if (!E) return true;
+      if (E.y && document.documentElement.scrollHeight - window.innerHeight < E.y - 2) return false;
+      var ok = true;
+      (E.s || []).forEach(function(r){ var e = ach(r[0]); if (!e || e.scrollHeight - e.clientHeight < r[1] - 2) ok = false; });
+      return ok;
     }
-    /* o estado volta assim que a página montou (sem esperar imagens e fontes) e a rolagem é refeita quando tudo carregou */
-    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function(){ setTimeout(inicia, 120); });
-    else setTimeout(inicia, 120);
+    function avisa(){ parent.postMessage({planoPronto: 1}, '*'); }
+    /* espera a página parar de se montar (conteúdo que chega depois), volta o estado e só então mostra, já na posição certa */
+    function estavel(){
+      if (iniciou) return; iniciou = true;
+      if (obs) obs.disconnect();
+      tira(); poe();
+      var t0 = Date.now();
+      (function laco(){
+        if (alvoOk() || Date.now() - t0 > 900){ reaplicaRolagem(); avisa(); }
+        else { poe(); requestAnimationFrame(laco); }
+      })();
+    }
+    function agenda(){ clearTimeout(calmo); calmo = setTimeout(estavel, 140); }
+    try { obs = new MutationObserver(agenda); obs.observe(document.documentElement, {childList: true, subtree: true}); } catch (x) {}
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', agenda); else agenda();
+    setTimeout(estavel, 1500);
     addEventListener('load', function(){
-      inicia();
-      setTimeout(function(){ poe(); }, 500);
       setTimeout(reaplicaRolagem, 300); setTimeout(reaplicaRolagem, 1000);
     });
     window.__planoLe = le;
