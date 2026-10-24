@@ -92,7 +92,7 @@
 
   .overlay {
     position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 200;
-    opacity: 0; pointer-events: none; transition: opacity 0.3s;
+    opacity: 0; pointer-events: none; transition: none;
   }
   .overlay.active { opacity: 1; pointer-events: all; }
 
@@ -138,7 +138,7 @@
   .main { padding-top: 68px; min-height: 100dvh; }
   .page { display: none; padding: 16px; animation: fadeIn 0.2s ease; }
   .page.active { display: block; }
-  @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes fadeIn{from{}to{}}
 
   .page-header { display: flex; align-items: center; justify-content: flex-end; margin-bottom: 16px; gap: 8px; }
   .page-title { font-family: 'Barlow', sans-serif; font-size: 20px; font-weight: 600; color: #111111; }
@@ -275,12 +275,12 @@
 
   .modal-backdrop {
     position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 500;
-    display: flex; align-items: flex-end; opacity: 0; pointer-events: none; transition: opacity 0.3s;
+    display: flex; align-items: flex-end; opacity: 0; pointer-events: none; transition: none;
   }
   .modal-backdrop.active { opacity: 1; pointer-events: all; }
   .modal {
     background: var(--white); border-radius: 24px 24px 0 0; padding: 24px 20px 36px;
-    width: 100%; transform: translateY(100%); transition: transform 0.35s cubic-bezier(0.4,0,0.2,1);
+    width: 100%; transform: translateY(100%); transition: none;
     max-height: 90dvh; overflow-y: auto;
   }
   .modal-backdrop.active .modal { transform: translateY(0); }
@@ -389,7 +389,7 @@
     position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(100px);
     background: var(--gray-900); color: var(--white); padding: 12px 20px;
     border-radius: 30px; font-size: 14px; font-weight: 500; z-index: 999;
-    transition: transform 0.3s ease; white-space: nowrap; pointer-events: none;
+    transition: none; white-space: nowrap; pointer-events: none;
   }
   .toast.show { transform: translateX(-50%) translateY(0); }
 
@@ -596,7 +596,7 @@
   .menu-opcoes { position: fixed; z-index: 300; width: min(300px, calc(100vw - 24px)); background: #fff; border-radius: 18px; padding: 8px;
                  border: 1px solid #e8ecf1; box-shadow: 0 18px 40px -12px rgba(15,23,42,.28), 0 4px 10px rgba(15,23,42,.08);
                  animation: menuIn .14s ease; transform-origin: top right; }
-  @keyframes menuIn { from { opacity: 0; transform: scale(.96) translateY(-4px); } to { opacity: 1; transform: none; } }
+  @keyframes menuIn{from{}to{}}
   .mo-item { display: flex; align-items: center; gap: 12px; padding: 11px 12px; border-radius: 12px; text-decoration: none; color: #111827; cursor: pointer; }
   .mo-item:active { background: #f1f5f9; }
   .mo-item + .mo-item { margin-top: 2px; }
@@ -658,7 +658,7 @@
   .dica-balao {
     position: fixed; z-index: 700; transform: translate(-50%, -100%); background: #0f172a; color: #fff;
     font: 600 12px/1 'DM Sans', sans-serif; padding: 9px 13px; border-radius: 999px; white-space: nowrap;
-    pointer-events: none; opacity: 0; transition: opacity .15s; max-width: calc(100vw - 24px);
+    pointer-events: none; opacity: 0; transition: none; max-width: calc(100vw - 24px);
   }
   .dica-balao.on { opacity: 1; }
 
@@ -1401,7 +1401,7 @@ function showToastCRM(msg) {
   if (!t) {
     t = document.createElement('div');
     t.id = 'crm-toast';
-    t.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#111827;color:#fff;padding:10px 20px;border-radius:20px;font-size:13px;font-weight:600;z-index:9999;opacity:0;transition:opacity .2s;pointer-events:none;font-family:"Outfit",sans-serif;';
+    t.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#111827;color:#fff;padding:10px 20px;border-radius:20px;font-size:13px;font-weight:600;z-index:9999;opacity:0;transition:none;pointer-events:none;font-family:"Outfit",sans-serif;';
     document.body.appendChild(t);
   }
   t.textContent = msg; t.style.opacity = '1';

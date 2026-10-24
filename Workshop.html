@@ -85,7 +85,7 @@ body::before{
   animation:popIn 0.3s cubic-bezier(.34,1.56,.64,1) both;
   -webkit-user-select:none;user-select:none;
 }
-@keyframes popIn{from{opacity:0;transform:scale(0.7);}to{opacity:1;transform:scale(1);}}
+@keyframes popIn{from{}to{}}
 
 .app-icon{
   width:58px;height:58px;border-radius:18px;
@@ -175,7 +175,7 @@ body.editing .app:active .app-icon{animation:none;transform:scale(0.88);}
   width:100%;max-width:380px;
   animation:slideUp 0.3s cubic-bezier(.34,1.56,.64,1);
 }
-@keyframes slideUp{from{transform:translateY(50px);opacity:0;}to{transform:translateY(0);opacity:1;}}
+@keyframes slideUp{from{}to{}}
 .modal h2{font-size:1.1rem;font-weight:700;margin-bottom:1.4rem;}
 
 .field{margin-bottom:1rem;}

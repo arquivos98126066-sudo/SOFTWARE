@@ -37,7 +37,7 @@
 
     .screen{display:none;padding:14px 14px 100px;width:100%;overflow-x:hidden;animation:fadeIn .18s}
     .screen.active{display:block}
-    @keyframes fadeIn{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+    @keyframes fadeIn{from{}to{}}
 
     .metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
     .metric-card{background:var(--card);border-radius:var(--r);padding:12px 6px;text-align:center;box-shadow:var(--shadow)}
@@ -156,7 +156,7 @@
 
     /* ── REGISTRA STEPS ── */
     .reg-step{animation:stepIn .28s cubic-bezier(.4,0,.2,1);padding:20px 16px 12px}
-    @keyframes stepIn{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:translateY(0)}}
+    @keyframes stepIn{from{}to{}}
     .reg-step-label{font-size:11px;font-weight:700;letter-spacing:.08em;color:var(--muted);text-transform:uppercase;margin-bottom:6px}
     .reg-step-input{width:100%;font-size:22px;font-weight:600;border:none;border-bottom:2.5px solid var(--primary);background:transparent;outline:none;padding:6px 0 8px;color:var(--text);caret-color:var(--primary)}
     .reg-step-hint{display:none}
@@ -202,7 +202,7 @@
     .overlay.open{display:flex}
     .modal{background:var(--card);border-radius:26px 26px 0 0;padding:20px;
       width:100%;max-height:88vh;overflow-y:auto;overflow-x:hidden;animation:up .22s}
-    @keyframes up{from{transform:translateY(100%)}to{transform:none}}
+    @keyframes up{from{}to{}}
     .modal-title{font-size:16px;font-weight:700;margin-bottom:14px}
     .modal-item{display:flex;align-items:center;gap:12px;padding:13px;
       border:1px solid var(--border);border-radius:11px;cursor:pointer;font-size:14px;font-weight:500;margin-bottom:8px}
@@ -503,7 +503,7 @@
     .reg-hold{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;cursor:pointer}
     .reg-tools{display:none;align-items:center;justify-content:center;gap:8px;margin-top:16px}
     .reg-tools.show{display:flex;animation:regIn .22s ease both}
-    @keyframes regIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+    @keyframes regIn{from{}to{}}
     .reg-size{display:inline-flex;align-items:center;gap:7px;background:#f1f4f8;color:#334155;border-radius:999px;padding:8px 14px;font-size:13px;font-weight:700}
     .reg-size .ic{width:16px;height:16px;color:#64748b;vertical-align:0}
     .reg-del{display:inline-flex;align-items:center;gap:6px;background:#fff;color:#dc2626;border:1px solid #fecaca;border-radius:999px;padding:8px 14px;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer}
@@ -538,8 +538,8 @@
     .ex-data .ic{width:16px;height:16px;color:#64748b;vertical-align:0}
 
     /* Parcelamento no cartão */
-    @keyframes parcFade{from{opacity:0}to{opacity:1}}
-    @keyframes parcUp{from{transform:translateY(40px);opacity:.4}to{transform:none;opacity:1}}
+    @keyframes parcFade{from{}to{}}
+    @keyframes parcUp{from{}to{}}
     #parcelas-overlay{background:rgba(15,23,42,.5)!important;-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px);animation:parcFade .18s ease}
     .parc-sheet{background:#fff;border-radius:28px 28px 0 0;padding:10px 18px calc(24px + env(safe-area-inset-bottom,0px));width:100%;max-width:520px;max-height:92vh;overflow-y:auto;box-shadow:0 -18px 50px -12px rgba(15,23,42,.35);animation:parcUp .26s cubic-bezier(.2,.8,.2,1)}
     .parc-grip{width:42px;height:5px;border-radius:99px;background:#dfe3ea;margin:0 auto 18px}
@@ -871,7 +871,7 @@
 
 <div id="toast" style="position:fixed;top:68px;right:14px;left:auto;transform:none;
   background:#1A1A1A;color:#fff;padding:9px 16px;border-radius:22px;font-size:13px;font-weight:600;
-  z-index:9999;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap;max-width:60vw;text-align:center"></div>
+  z-index:9999;opacity:0;transition:none;pointer-events:none;white-space:nowrap;max-width:60vw;text-align:center"></div>
 
 <div class="nav" id="nav-bar">
   <button class="nav-back" id="navBack" style="display:none" onclick="goBack()"><svg class="ic" aria-hidden="true"><use href="#i-arrow-left"/></svg></button>
@@ -928,7 +928,7 @@
 .cad-moverlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:10010;align-items:flex-end;justify-content:center;}
 .cad-moverlay.open{display:flex;}
 .cad-mbox{background:#fff;border-radius:24px 24px 0 0;padding:20px 16px 34px;width:100%;max-width:520px;max-height:92vh;overflow-y:auto;animation:cad-sup .25s ease;font-family:'DM Sans',system-ui,sans-serif;}
-@keyframes cad-sup{from{transform:translateY(100%)}to{transform:translateY(0)}}
+@keyframes cad-sup{from{}to{}}
 .cad-mtitle{font-size:1rem;font-weight:900;margin-bottom:14px;padding-bottom:10px;border-bottom:2px solid #d1d5db;font-family:'DM Sans',sans-serif;}
 .cad-mclose{float:right;background:#f3f4f6;border:none;border-radius:50%;width:28px;height:28px;font-size:1rem;cursor:pointer;line-height:28px;text-align:center;}
 .cad-input{width:100%;padding:16px 14px;border:2px solid #d1d5db;border-radius:12px;font-size:.88rem;font-family:'DM Sans',sans-serif;font-weight:600;background:#f9fafb;color:#111;transition:border-color .2s;-webkit-appearance:none;margin-bottom:13px;box-sizing:border-box;}

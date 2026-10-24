@@ -394,10 +394,7 @@ body::after {
   font-size: 18px; cursor: pointer; padding: 0 2px; line-height: 1;
 }
 
-@keyframes fadeUp {
-  from { opacity: 0; transform: translateY(16px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
+@keyframes fadeUp{from{}to{}}
 #app-content.show .card { animation: fadeUp .36s cubic-bezier(.22,.68,0,1.1) both; }
 #app-content.show .card:nth-child(1) { animation-delay: .04s; }
 #app-content.show .card:nth-child(2) { animation-delay: .08s; }
@@ -448,14 +445,14 @@ input { -webkit-user-select: text; user-select: text; }
 #apps-ov { position: fixed; inset: 0; z-index: 9000; background: rgba(2,7,25,.45); display: none; }
 #apps-ov.on { display: block; }
 #apps-sheet { --tint: #ffffff; position: absolute; left: 50%; bottom: calc(env(safe-area-inset-bottom, 0px) + 38px); display: flex; align-items: center; gap: 8px; padding: 8px; border-radius: 30px; background: linear-gradient(180deg, rgba(255,255,255,.12), rgba(255,255,255,.02)), rgba(10,15,38,.86); border: 1px solid rgba(255,255,255,.28); border: 1px solid color-mix(in srgb, var(--tint) 60%, transparent); box-shadow: 0 22px 54px rgba(0,0,0,.65), 0 0 36px color-mix(in srgb, var(--tint) 38%, transparent), inset 0 1px 0 rgba(255,255,255,.22); animation: appsSobe .2s ease both; }
-@keyframes appsSobe { from { transform: translate(-50%, 10px) scale(.94); opacity: 0; } to { transform: translate(-50%, 0) scale(1); opacity: 1; } }
+@keyframes appsSobe{from{}to{}}
 #apps-sheet button { position: relative; display: grid; place-items: center; width: 58px; height: 58px; padding: 0; border-radius: 21px; background: rgba(255,255,255,.075); border: 1px solid rgba(255,255,255,.11); color: #fff; cursor: pointer; transition: background .15s, transform .12s; }
 #apps-sheet button:first-child { background: linear-gradient(145deg, color-mix(in srgb, var(--tint) 55%, #0a0f26), color-mix(in srgb, var(--tint) 25%, #0a0f26)); border-color: color-mix(in srgb, var(--tint) 70%, transparent); }
 #apps-sheet button:active { transform: scale(.94); filter: brightness(1.25); }
 #apps-sheet button:disabled { opacity: .3; pointer-events: none; }
 #apps-sheet button svg { width: 25px; height: 25px; fill: none; stroke: currentColor; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; }
 #apps-sheet button.tem::after { content: ''; position: absolute; top: 11px; right: 11px; width: 7px; height: 7px; border-radius: 50%; background: #ffc83d; box-shadow: 0 0 8px #ffc83d; }
-#apps-aviso { position: fixed; left: 50%; bottom: calc(env(safe-area-inset-bottom, 0px) + 28px); z-index: 9100; transform: translate(-50%, 8px); max-width: 90vw; padding: 11px 20px; border-radius: 999px; background: rgba(18,26,58,.92); border: 1px solid rgba(255,255,255,.18); color: #fff; font-family: var(--fh); font-size: 13.5px; font-weight: 600; text-align: center; opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s; }
+#apps-aviso { position: fixed; left: 50%; bottom: calc(env(safe-area-inset-bottom, 0px) + 28px); z-index: 9100; transform: translate(-50%, 8px); max-width: 90vw; padding: 11px 20px; border-radius: 999px; background: rgba(18,26,58,.92); border: 1px solid rgba(255,255,255,.18); color: #fff; font-family: var(--fh); font-size: 13.5px; font-weight: 600; text-align: center; opacity: 0; pointer-events: none; transition: none; }
 #apps-aviso.on { opacity: 1; transform: translate(-50%, 0); }
 </style>
 </head>

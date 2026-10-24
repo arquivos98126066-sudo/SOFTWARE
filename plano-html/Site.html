@@ -1536,7 +1536,7 @@ html { scroll-behavior: smooth; }
 .faq-icon::after { transform: rotate(90deg); }
 .faq-item[open] .faq-icon::after { transform: rotate(0deg); }
 .faq-item p { padding: 0 22px 22px; font-size: 15px; line-height: 1.7; color: var(--text-secondary); animation: faqOpen 0.3s ease; }
-@keyframes faqOpen { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+@keyframes faqOpen{from{}to{}}
 
 @media (max-width: 900px) {
   #funcionalidades .func-grid { grid-template-columns: 1fr 1fr; }
@@ -1916,10 +1916,7 @@ window.salvarLeadFirebase = async function(nome, numero, email, segmento) {
   z-index: 4000;
 }
 .fc-window.open { display: flex; animation: fc-in 0.3s ease; }
-@keyframes fc-in {
-  from { opacity: 0; transform: translateY(16px) scale(0.96); }
-  to { opacity: 1; transform: translateY(0) scale(1); }
-}
+@keyframes fc-in{from{}to{}}
 .fc-header {
   background: #0f1b2d;
   padding: 12px 16px;
@@ -1960,10 +1957,7 @@ window.salvarLeadFirebase = async function(nome, numero, email, segmento) {
   gap: 6px;
   animation: fc-msg-in 0.25s ease;
 }
-@keyframes fc-msg-in {
-  from { opacity: 0; transform: translateY(6px); }
-  to { opacity: 1; transform: translateY(0); }
-}
+@keyframes fc-msg-in{from{}to{}}
 .fc-msg-avatar {
   width: 26px; height: 26px;
   border-radius: 50%;
