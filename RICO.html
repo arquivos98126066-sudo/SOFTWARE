@@ -12,7 +12,7 @@ window.RICO_PIN = window.RICO_INST === 'p' ? 'fixarTelaRico.p' : 'fixarTelaRico'
 </script>
 <script>
 /* reaberto por troca de app com rolagem guardada: esconde até a página estar na posição, para não aparecer no topo e pular */
-try { var _pinY = 0; try { var _pj = JSON.parse(localStorage.getItem(window.RICO_PIN) || 'null'); _pinY = _pj && _pj.y > 0 ? _pj.y : 0; } catch (e) {}
+try { var _pinY = 0; try { var _pj = JSON.parse(localStorage.getItem(window.RICO_PIN) || 'null'); _pinY = _pj && (_pj.y > 0 || _pj.v) ? 1 : 0; } catch (e) {}
 if ((window.RICO_INST === 'p' && parseFloat(sessionStorage.getItem('rico.y')) > 0) || _pinY > 0) {
   var _e = document.createElement('style'); _e.id = 'rico-esconde'; _e.textContent = 'html{visibility:hidden}'; document.head.appendChild(_e);
   /* durante a volta, a animação de entrada das células já nasce terminada: não pisca ao desenhar de novo */
