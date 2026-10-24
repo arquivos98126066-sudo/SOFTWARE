@@ -813,6 +813,7 @@ if ((sessionStorage.getItem('troca') === (window.RICO_INST === 'p' ? 'RICOP' : '
   .rcm-field{ display: flex; align-items: center; gap: 10px; height: 52px; padding: 0 18px; border: 1px solid var(--bd-in); border-radius: 999px; background: #fff; transition: border-color .15s; }
   .rcm-field:focus-within{ border-color: #a8adb8; }
   .rcm-field svg{ width: 18px; height: 18px; stroke: var(--tx3); stroke-width: 1.7; fill: none; stroke-linecap: round; flex: none; }
+  .rcm-field textarea{ flex: 1; min-width: 0; height: 100%; border: 0; outline: 0; background: transparent; font: inherit; font-size: 16px; font-weight: 600; line-height: 22px; padding: 15px 0; resize: none; overflow: hidden; white-space: nowrap; color: var(--tx); -webkit-user-select: text; user-select: text; -webkit-appearance: none; appearance: none; }
   .rcm-field input{ flex: 1; min-width: 0; height: 100%; border: 0; outline: 0; background: transparent; font: inherit; font-size: 16px; font-weight: 600; color: var(--tx); -webkit-user-select: text; user-select: text; -webkit-appearance: none; appearance: none; }
   .rcm-row{ display: flex; gap: 10px; }
   .rcm-row .act-btn{ flex: 1; }
@@ -2992,10 +2993,10 @@ window.saveAnswer = window.saveAnswer || function(){};
       scrim = document.createElement('div'); scrim.className = 'rcm-scrim';
       sheet = document.createElement('div'); sheet.className = 'rcm-sheet rcm-direto';
       sheet.setAttribute('role', 'dialog'); sheet.setAttribute('aria-modal', 'true');
-      sheet.innerHTML = '<div class="rcm-field"><svg viewBox="0 0 24 24"><path d="M5 8h14M5 12h14M5 16h9"/></svg><input type="text" maxlength="60" autocomplete="off" autocorrect="off" spellcheck="false" aria-label="Texto"></div>' +
+      sheet.innerHTML = '<div class="rcm-field"><svg viewBox="0 0 24 24"><path d="M5 8h14M5 12h14M5 16h9"/></svg><textarea rows="1" maxlength="60" autocomplete="off" autocorrect="off" spellcheck="false" enterkeyhint="done" aria-label="Texto"></textarea></div>' +
         '<div class="rcm-row"><button type="button" class="act-btn" data-a="del">Excluir</button><button type="button" class="act-btn pri" data-a="ok">Salvar</button></div>';
       document.body.appendChild(scrim); document.body.appendChild(sheet);
-      txt = sheet.querySelector('input'); delB = sheet.querySelector('[data-a="del"]');
+      txt = sheet.querySelector('textarea'); txt.addEventListener('input', function() { if (/\n/.test(txt.value)) txt.value = txt.value.replace(/\n+/g, ' '); }); delB = sheet.querySelector('[data-a="del"]');
       sheet.querySelector('[data-a="ok"]').addEventListener('click', confirma);
       delB.addEventListener('click', exclui);
       scrim.addEventListener('click', fecha);
@@ -4274,10 +4275,10 @@ window.saveAnswer = window.saveAnswer || function(){};
   function rcPedeNome(atual, aoSalvar) {
     var scrim = document.createElement('div'); scrim.className = 'rcm-scrim on';
     var sh = document.createElement('div'); sh.className = 'rcm-sheet rcm-direto on'; sh.style.bottom = rcKbGet() + 'px'; sh.setAttribute('role', 'dialog'); sh.setAttribute('aria-modal', 'true');
-    sh.innerHTML = '<div class="rcm-field"><svg viewBox="0 0 24 24"><path d="M5 8h14M5 12h14M5 16h9"/></svg><input type="text" maxlength="60" autocomplete="off" autocorrect="off" spellcheck="false" aria-label="Nome"></div>' +
+    sh.innerHTML = '<div class="rcm-field"><svg viewBox="0 0 24 24"><path d="M5 8h14M5 12h14M5 16h9"/></svg><textarea rows="1" maxlength="60" autocomplete="off" autocorrect="off" spellcheck="false" enterkeyhint="done" aria-label="Nome"></textarea></div>' +
       '<div class="rcm-row"><button type="button" class="act-btn" data-a="no">Cancelar</button><button type="button" class="act-btn pri" data-a="ok">Salvar</button></div>';
     document.body.appendChild(scrim); document.body.appendChild(sh);
-    var inp = sh.querySelector('input'); inp.value = atual || '';
+    var inp = sh.querySelector('textarea'); inp.value = atual || ''; inp.addEventListener('input', function() { if (/\n/.test(inp.value)) inp.value = inp.value.replace(/\n+/g, ' '); });
     var vv = window.visualViewport, aj = function() { rcKbAjusta(sh); };
     if (vv) { vv.addEventListener('resize', aj); vv.addEventListener('scroll', aj); }
     var fecha = function() { if (vv) { vv.removeEventListener('resize', aj); vv.removeEventListener('scroll', aj); } try { inp.blur(); } catch (_) {} scrim.remove(); sh.remove(); };
