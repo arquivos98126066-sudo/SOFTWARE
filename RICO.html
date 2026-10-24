@@ -3032,7 +3032,16 @@ window.saveAnswer = window.saveAnswer || function(){};
     }
     function confirma() {
       var f = editId ? acha(editId) : null;
-      if (f) { var v = txt.value.trim(); if (v) f.n.text = v; salva(); }
+      if (f) {
+        var v = txt.value.trim();
+        if (v && v !== f.n.text && !Array.isArray(f.n.i) && (KEY === 'rico.mapa.v1' || KEY === 'rico.proc.v1')) {
+          /* a célula é ligada a um item da lista do Ciclo pelo nome: troca o nome nos dois */
+          var tx0 = String(f.n.text || '').trim();
+          for (var j = 0; j < CICLO.length; j++) if (CICLO[j] && String(CICLO[j].t || '').trim() === tx0) { CICLO[j].t = v.slice(0, 60); if (window.renderCiclo) window.renderCiclo(); if (window.agendarSalvamento) window.agendarSalvamento(document.body); break; }
+        }
+        if (v) f.n.text = v;
+        salva();
+      }
       fecha(); render();
     }
     /* apagou o último filho do nível em que você está: sobe um nível de cada vez, em vez de voltar ao começo */
@@ -3702,7 +3711,7 @@ window.saveAnswer = window.saveAnswer || function(){};
         else if (a === 'sobe') moveNo(id, -1);
         else if (a === 'desce') moveNo(id, 1);
         else if (a === 'pronto') { movBar = false; movKeep = null; barId = null; montaBar(); render(); }
-        else if (a === 'edita') { barId = null; render(); abreEditor(id, true); }
+        else if (a === 'edita') { barId = null; render(); abre(id); }
         else if (a === 'pergunta') { var fq = acha(id); if (fq && fq.p) { if (fq.n.q) delete fq.n.q; else fq.n.q = true; salva(); montaBar(); render(); } }
         else if (a === 'exclui') excluiNo(id);
         else if (a === 'dup') duplicaNo(id);
@@ -4253,6 +4262,24 @@ window.saveAnswer = window.saveAnswer || function(){};
     }
   };
 
+  /* trocar o nome de uma célula do Ciclo (lápis): janelinha com o campo do nome, igual à do mapa */
+  function rcPedeNome(atual, aoSalvar) {
+    var scrim = document.createElement('div'); scrim.className = 'rcm-scrim on';
+    var sh = document.createElement('div'); sh.className = 'rcm-sheet on'; sh.setAttribute('role', 'dialog'); sh.setAttribute('aria-modal', 'true');
+    sh.innerHTML = '<div class="rcm-field"><svg viewBox="0 0 24 24"><path d="M5 8h14M5 12h14M5 16h9"/></svg><input type="text" maxlength="60" autocomplete="off" autocorrect="off" spellcheck="false" aria-label="Nome"></div>' +
+      '<div class="rcm-row"><button type="button" class="act-btn" data-a="no">Cancelar</button><button type="button" class="act-btn pri" data-a="ok">Salvar</button></div>';
+    document.body.appendChild(scrim); document.body.appendChild(sh);
+    var inp = sh.querySelector('input'); inp.value = atual || '';
+    var vv = window.visualViewport, aj = function() { if (vv) sh.style.bottom = Math.max(0, window.innerHeight - vv.height - vv.offsetTop) + 'px'; };
+    if (vv) { vv.addEventListener('resize', aj); vv.addEventListener('scroll', aj); }
+    var fecha = function() { if (vv) { vv.removeEventListener('resize', aj); vv.removeEventListener('scroll', aj); } try { inp.blur(); } catch (_) {} scrim.remove(); sh.remove(); };
+    var ok = function() { var v = inp.value.trim(); fecha(); if (v) aoSalvar(v.slice(0, 60)); };
+    sh.querySelector('[data-a="ok"]').addEventListener('click', ok);
+    sh.querySelector('[data-a="no"]').addEventListener('click', fecha);
+    scrim.addEventListener('click', fecha);
+    inp.addEventListener('keydown', function(e) { if (e.key === 'Enter') { e.preventDefault(); ok(); } else if (e.key === 'Escape') fecha(); });
+    setTimeout(function() { try { inp.focus(); inp.select(); } catch (_) {} }, 120);
+  }
   /* as células do Ciclo abrem na mesma tela nova do mapa: tudo que estava em vários blocos (1, 2, 3...) vira um bloco só, com os números dentro do texto */
   function cicloParaLeitura(e) {
     var rows = e.i || [], ms = e.m || [], out = { t: e.t || '', i: [], m: [] }, buf = [], bufNum = false, mt = null;
@@ -5999,7 +6026,7 @@ window.saveAnswer = window.saveAnswer || function(){};
           }
           renderCiclo(); salvarAlt();
         },
-        editar: function() { var k = _acao.idx; fecharAcoes(); abrirEtapa(k, true); },
+        editar: function() { var k = _acao.idx; fecharAcoes(); if (CICLO[k]) rcPedeNome(CICLO[k].t, function(v) { CICLO[k].t = v; renderCiclo(); salvarAlt(); }); },
         excluir: function() {
           var k = _acao.idx, it = CICLO[k];
           if (it && it.g) CICLO.splice(k, cicloFimNo(k) - k + 1);
