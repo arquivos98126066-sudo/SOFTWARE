@@ -1202,6 +1202,8 @@ var _editou = false;
 
 // ─── Camada 1: IndexedDB com fallback localStorage ────────────────────────────
 function saveLocal(key, data) {
+  /* copia sincrona: a gravacao do IndexedDB e assincrona e pode se perder se o app fechar na hora (sair pela faixa de baixo) */
+  try { localStorage.setItem('ricoc_' + key, JSON.stringify(data)); } catch(_) {}
   try {
     var req = indexedDB.open('meus_apps_backup', 1);
     req.onupgradeneeded = function(e) { e.target.result.createObjectStore('data'); };
@@ -1395,6 +1397,10 @@ window.saveAnswer = function(btn) {
 // ─── Carregar dados com guard de timestamp ────────────────────────────────────
 async function carregarDados() {
   var local = await loadLocal('born_rich_' + CADERNO_ID);
+  try {
+    var _ls = JSON.parse(localStorage.getItem('ricoc_born_rich_' + CADERNO_ID) || 'null');
+    if (_ls && _ls.dados && (!local || (_ls.updatedAt || 0) >= (local.updatedAt || 0))) local = _ls;
+  } catch(_) {}
   var localTime = local ? (local.updatedAt || 0) : 0;
 
   /* mostra na hora o que está guardado neste aparelho, sem esperar a nuvem (evita nomes sumindo e voltando) */
