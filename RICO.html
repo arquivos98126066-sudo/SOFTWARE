@@ -4487,7 +4487,7 @@ window.saveAnswer = window.saveAnswer || function(){};
   function rdModoTeclado() {
     var ov = document.getElementById('rdOv'); if (!ov || !_rd) return;
     var m = rdModoAtual();
-    ov.querySelectorAll('.rd-tx[contenteditable], .rd-t[contenteditable], .rd-h[contenteditable]').forEach(function(e) { e.setAttribute('inputmode', m); });
+    ov.querySelectorAll('.rd-tx[contenteditable], .rd-t[contenteditable], .rd-h[contenteditable]').forEach(function(e) { e.setAttribute('inputmode', m); e.setAttribute('contenteditable', _rd.digita ? 'true' : 'false'); });
   }
   function rdPosDe(no, off) {
     var el = no.nodeType === 1 ? no : no.parentNode, ln = el && el.closest ? el.closest('.ln') : null, bl = ln && ln.closest('.rd-tx');
