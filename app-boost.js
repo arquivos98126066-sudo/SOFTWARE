@@ -237,20 +237,20 @@ window.AlternaGestos = {
     var pts = null, t0 = 0;
     function reto(a, b){ return Math.hypot(b.x - a.x, b.y - a.y); }
     function ehV(p){
-      if (p.length < 6) return false;
+      if (p.length < 4) return false;
       var n = p.length, v = 0, minx = p[0].x, maxx = p[0].x;
       for (var i = 1; i < n; i++){ if (p[i].y > p[v].y) v = i; if (p[i].x < minx) minx = p[i].x; if (p[i].x > maxx) maxx = p[i].x; }
-      if (v < n * 0.1 || v > n * 0.9) return false;
+      if (v < 1 || v > n - 2) return false;
       var a = p[0], b = p[v], c = p[n - 1];
       var desce = b.y - a.y, sobe = b.y - c.y;
-      if (desce < 80 || sobe < 50 || sobe < desce * 0.3 || sobe > desce * 3) return false;
-      if (maxx - minx < 35) return false;
+      if (desce < 45 || sobe < 28 || sobe < desce * 0.2 || sobe > desce * 4) return false;
+      if (maxx - minx < 22 || maxx - minx < desce * 0.18) return false;
       var cam = 0; for (var k = 1; k < n; k++) cam += reto(p[k - 1], p[k]);
-      return cam <= (reto(a, b) + reto(b, c)) * 2.2;
+      return cam <= (reto(a, b) + reto(b, c)) * 3;
     }
     function fimToque(){
       var p = pts; pts = null;
-      if (p && Date.now() - t0 <= 1500 && ehV(p)) aoFazer();
+      if (p && Date.now() - t0 <= 2500 && ehV(p)) aoFazer();
     }
     document.addEventListener('touchstart', function(e){
       if (e.touches.length !== 1 || (e.target === document.activeElement && /^(INPUT|TEXTAREA|SELECT)$/.test((e.target.tagName || '')))) { pts = null; return; }
@@ -260,7 +260,7 @@ window.AlternaGestos = {
       if (!pts) return;
       if (e.touches.length !== 1) { pts = null; return; }
       var t = e.touches[0], u = pts[pts.length - 1];
-      if (Math.hypot(t.clientX - u.x, t.clientY - u.y) >= 6) pts.push({x: t.clientX, y: t.clientY});
+      if (Math.hypot(t.clientX - u.x, t.clientY - u.y) >= 4) pts.push({x: t.clientX, y: t.clientY});
     }, {passive: true});
     document.addEventListener('touchend', fimToque, {passive: true});
     document.addEventListener('touchcancel', fimToque, {passive: true});
