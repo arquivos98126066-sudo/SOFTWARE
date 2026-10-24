@@ -472,6 +472,8 @@ if ((sessionStorage.getItem('troca') === (window.RICO_INST === 'p' ? 'RICOP' : '
   .rd-tx[data-q]{ position: relative; margin: 14px 0 14px; padding: 18px 20px 16px 22px; background: #fbfaf7; border: 1px solid #e2ddd1; border-radius: 24px; overflow: hidden; font-family: 'DM Sans', system-ui, sans-serif; font-style: normal; font-size: 15px; line-height: 1.65; color: #444; }
   .rd-tx[data-q]::before{ content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 30px; box-sizing: border-box; border-left: 3px solid #7b2d26; border-radius: 23px 0 0 23px; pointer-events: none; }
   .rd-tx[data-q]:has(+ .rd-tx[data-q]){ margin-bottom: 10px; }
+  /* texto dividido ao numerar: a linha em branco que ficou na ponta já é o respiro, então o bloco não soma mais espaço */
+  .rd-tx:not([data-q]):has(> .ln.gap:first-child), .rd-tx:not([data-q]):has(> .ln.gap:last-child) + .rd-tx:not([data-q]){ margin-top: 0; }
   .rd-tx[data-q] + .rd-tx[data-q]{ margin-top: 0; }
   .rd-ov.rd-q{ touch-action: none; }
   .rd-ln-pre, .rd-pre{ background: rgba(33,30,25,.10); border-radius: 6px; }
@@ -5091,9 +5093,11 @@ window.saveAnswer = window.saveAnswer || function(){};
       var kids = Array.prototype.slice.call(bl.children), lines = rtDeDom(bl, false).split('\n');
       var a0 = n === 0 ? kids.indexOf(usa[0]) : 0, z0 = n === blocos.length - 1 ? kids.indexOf(usa[usa.length - 1]) : kids.length - 1;
       if (a0 < 0) a0 = 0; if (z0 < a0) z0 = a0;
-      if (n === 0) antes = lines.slice(0, a0).join('\n').replace(/(\n\s*)+$/, '');
-      if (n === blocos.length - 1) depois = lines.slice(z0 + 1).join('\n').replace(/^(\s*\n)+/, '');
-      if (n > 0) sel.push('');
+      /* as linhas em branco ficam onde estavam (nada é cortado), assim o respiro é o mesmo ao numerar e ao tirar a numeração */
+      if (n === 0) antes = lines.slice(0, a0).join('\n');
+      if (n === blocos.length - 1) depois = lines.slice(z0 + 1).join('\n');
+      var pf = n > 0 ? lines[a0] : null, ul = sel.length ? sel[sel.length - 1] : null;
+      if (n > 0 && ul !== null && ul.trim() && pf !== null && pf.trim()) sel.push('');
       sel = sel.concat(lines.slice(a0, z0 + 1));
     });
     /* o primeiro parágrafo (até a primeira linha em branco): cada linha vira um número; o que vem depois fica como texto do último número */
@@ -5104,7 +5108,11 @@ window.saveAnswer = window.saveAnswer || function(){};
     var rst = !!_rd.reinicia;
     fp.forEach(function(q, n) { var m2 = /^\[( |x|#|-|=|!)\] ?/.exec(sel[q]), cp = m2 ? sel[q].slice(m2[0].length) : sel[q]; sel[q] = tira ? cp : ((rst && n === 0 ? '[!] ' : '[#] ') + cp); });
     if (rst && !tira) { _rd.reinicia = false; var bnr = ov.querySelector('[data-t="n"]'); if (bnr) bnr.classList.remove('rst'); }
-    var selTxt = sel.join('\n').replace(/(\n\s*)+$/, '');
+    var fimSel = sel.length;
+    while (fimSel > 0 && !sel[fimSel - 1].trim()) fimSel--;
+    var sobra = sel.length - fimSel;
+    if (sobra && depois.trim()) depois = new Array(sobra + 1).join('\n') + depois;
+    var selTxt = sel.slice(0, fimSel).join('\n');
     var mk = function(txt) { var d = document.createElement('div'); d.className = 'rd-tx'; d.setAttribute('contenteditable', 'true'); d.setAttribute('data-i', '-1'); d.innerHTML = rtHtml(rtParse(txt), null); return d; };
     var pos = Bn.nextSibling;
     blocos.slice(1).forEach(function(bl) { bl.parentNode.removeChild(bl); });
