@@ -7049,9 +7049,13 @@ window.saveAnswer = window.saveAnswer || function(){};
   }
 
   function autoGrow(el) {
+    /* mesma caixa, mesmo texto, mesma largura e mesma fonte: o tamanho já está certo, não mede de novo */
+    var ch = el.value + '|' + el.clientWidth + '|' + (document.fonts ? document.fonts.status : '');
+    if (el._ag === ch && el.style.height) return;
     el.style.height = 'auto';
     var borda = el.offsetHeight - el.clientHeight;
     el.style.height = (el.scrollHeight + borda) + 'px';
+    el._ag = el.value + '|' + el.clientWidth + '|' + (document.fonts ? document.fonts.status : '');
   }
 
   window.addEventListener('load', function() {
@@ -7286,8 +7290,13 @@ window.saveAnswer = window.saveAnswer || function(){};
   /* texto que quebra em 2+ linhas: encolhe a celulazinha até o menor tamanho que mantém as mesmas linhas (sobra igual nos dois lados) */
   function apertaLinhas() {
     document.querySelectorAll(':is(.question-card, .meta-block) .list-fields > .list-field-row textarea.list-ta').forEach(function(t) {
-      t.style.width = ''; t.style.height = 'auto';
+      /* mesma caixa, mesmo texto, mesma largura disponível e mesma fonte: o aperto já está certo */
+      var pw = t.parentNode ? t.parentNode.clientWidth : 0;
+      var ck = t.value + '|' + pw + '|' + (document.fonts ? document.fonts.status : '');
+      if (t._ap === ck && t.style.height && t.offsetWidth) return;
+      t.style.width = ''; t.style.height = 'auto'; t._ag = null;
       if (!t.offsetWidth) return;
+      t._ap = ck;
       ajustaQuebra(t);
       if (t.scrollHeight <= 60) { autoGrow(t); return; }
       var H = t.scrollHeight, lo = 60, hi = t.offsetWidth;
@@ -7305,11 +7314,15 @@ window.saveAnswer = window.saveAnswer || function(){};
     document.querySelectorAll(':is(.question-card, .meta-block) .list-fields').forEach(function(lf) {
       var rows = [].filter.call(lf.querySelectorAll(':scope > .list-field-row'), function(r) { return r.offsetWidth; });
       if (!rows.length) return;
+      /* mesmas linhas, mesmas larguras e mesma fonte: o alinhamento já está certo, não mede de novo */
+      var ck = lf.clientWidth + ':' + rows.map(function(r) { return r.offsetWidth; }).join(',') + ':' + (document.fonts ? document.fonts.status : '');
+      if (lf._al === ck) return;
       rows.forEach(function(r) { r.style.alignSelf = ''; r.style.marginLeft = ''; });
       var min = Math.min.apply(null, rows.map(function(r) { return r.getBoundingClientRect().left; }));
       var cs = getComputedStyle(lf);
       var base = lf.getBoundingClientRect().left + parseFloat(cs.borderLeftWidth || 0) + parseFloat(cs.paddingLeft || 0);
       rows.forEach(function(r) { r.style.alignSelf = 'flex-start'; r.style.marginLeft = Math.max(0, min - base) + 'px'; });
+      lf._al = lf.clientWidth + ':' + rows.map(function(r) { return r.offsetWidth; }).join(',') + ':' + (document.fonts ? document.fonts.status : '');
     });
   }
   document.addEventListener('input', function() { requestAnimationFrame(alinhaNums); });
