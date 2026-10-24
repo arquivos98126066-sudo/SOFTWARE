@@ -78,3 +78,93 @@ var CorBarra = window.CorBarra = (function () {
   window.addEventListener('load', aplica);
   document.addEventListener('visibilitychange', function () { if (!document.hidden) aplica(); });
 })();
+
+/* Botão voltar do celular: fecha a janela aberta ou volta uma tela, como no Estudo; sem nada aberto, volta ao menu */
+window.Voltar = (function () {
+  var pilha = [], ignorar = 0, emPop = false, base = typeof WeakSet === 'function' ? new WeakSet() : null, pronto = false, tm1, tm2;
+  var SEL = '[class~="sidebar"],[class*="modal"],[class*="overlay"],[class*="sheet"],[class*="drawer"],[class*="-ov"],[class*="popup"],[class*="dialog"],[class*="scrim"],[class*="rcm-conf"],[id*="modal"],[id*="overlay"],[id*="sheet"],[id*="drawer"]';
+  var FECHA = /\b(fechar|close)(Modal|Sheet|Menu|Cloud|Escolha|Celula|Editor|Hab|Pick|Sidebar|Painel|Overlay|Drawer|Popup|Opcoes|Mais)[A-Za-z0-9_]*\s*\(/;
+
+  function visivel(el) {
+    if (!el.isConnected) return false;
+    var cs = getComputedStyle(el);
+    if (cs.display === 'none' || cs.visibility === 'hidden' || parseFloat(cs.opacity) < 0.05) return false;
+    if (cs.position !== 'fixed' && cs.position !== 'absolute') return false;
+    var r = el.getBoundingClientRect();
+    /* fora da tela (painel escondido para o lado) não conta */
+    var dentro = Math.min(r.right, innerWidth) - Math.max(r.left, 0);
+    if (dentro < r.width * 0.6 || r.bottom < innerHeight * 0.3 || r.top > innerHeight * 0.7) return false;
+    return (r.width >= innerWidth * 0.9 && r.height >= innerHeight * 0.5) || (r.height >= innerHeight * 0.9 && r.width >= 240);
+  }
+  function abertas() {
+    var v = [];
+    document.querySelectorAll(SEL).forEach(function (el) { if (visivel(el)) v.push(el); });
+    return v.filter(function (el) { return !v.some(function (o) { return o !== el && o.contains(el); }); });
+  }
+  function empurra() { try { history.pushState({ _voltar: 1 }, ''); } catch (e) {} }
+  function volta(n) { if (n > 0) { ignorar++; try { history.go(-n); } catch (e) { ignorar--; } } }
+
+  function varre() {
+    if (!pronto) return;
+    var v = abertas();
+    /* as que estavam abertas desde o início só passam a contar depois de fechar uma vez */
+    document.querySelectorAll(SEL).forEach(function (el) { if (base && base.has(el) && v.indexOf(el) === -1) base.delete(el); });
+    var aberta = v.filter(function (el) { return !(base && base.has(el)); });
+    /* as que fecharam sozinhas */
+    var fechadas = 0;
+    pilha = pilha.filter(function (p) {
+      if (!p.els) return true;
+      if (p.els.some(function (e) { return v.indexOf(e) !== -1; })) return true;
+      fechadas++; return false;
+    });
+    /* as novas (várias abertas juntas valem por uma só volta) */
+    var novas = aberta.filter(function (el) { return !pilha.some(function (p) { return p.els && p.els.indexOf(el) !== -1; }); });
+    if (novas.length) { pilha.push({ els: novas }); empurra(); }
+    volta(fechadas);
+  }
+  function agenda() { clearTimeout(tm1); clearTimeout(tm2); tm1 = setTimeout(varre, 90); tm2 = setTimeout(varre, 450); }
+
+  function fecha(el) {
+    var alvo = null;
+    el.querySelectorAll('[onclick]').forEach(function (b) { if (!alvo && FECHA.test(b.getAttribute('onclick') || '')) alvo = b; });
+    if (!alvo) alvo = el.querySelector('.close,.fechar,[data-fechar],[aria-label="Fechar"],[aria-label="fechar"]');
+    if (alvo) alvo.click(); else el.click();
+    setTimeout(function () {
+      if (!visivel(el)) return;
+      el.click();
+      setTimeout(function () {
+        if (!visivel(el)) return;
+        ['open', 'on', 'show', 'active', 'aberto'].forEach(function (c) { el.classList.remove(c); });
+        if (visivel(el)) el.style.display = 'none';
+      }, 120);
+    }, 120);
+  }
+
+  window.addEventListener('popstate', function (e) {
+    if (ignorar > 0) { ignorar--; e.stopImmediatePropagation(); return; }
+    /* descarta as que já fecharam por conta própria */
+    while (pilha.length && pilha[pilha.length - 1].els && !pilha[pilha.length - 1].els.some(visivel)) pilha.pop();
+    if (!pilha.length) return;
+    var p = pilha.pop();
+    e.stopImmediatePropagation();
+    if (p.fn) { emPop = true; try { p.fn(); } finally { emPop = false; } }
+    else p.els.forEach(function (el) { if (visivel(el)) fecha(el); });
+  }, true);
+
+  ['click', 'touchend', 'keyup', 'change'].forEach(function (n) { document.addEventListener(n, agenda, true); });
+  setTimeout(function () {
+    if (base) abertas().forEach(function (el) { base.add(el); });
+    pronto = true;
+  }, 1800);
+
+  return {
+    /* tela interna aberta pelo app: fn volta uma tela */
+    empurra: function (fn) { pilha.push({ fn: fn }); empurra(); },
+    /* o app voltou uma tela por conta própria (botão do próprio app) */
+    desempilha: function () {
+      if (emPop) return;
+      for (var i = pilha.length - 1; i >= 0; i--) if (pilha[i].fn) { pilha.splice(i, 1); volta(1); return; }
+    },
+    varre: varre
+  };
+})();

@@ -2152,7 +2152,7 @@ async function syncPending() {
 const ROOT_SCREENS = ['registrar','home'];
 
 function showScreen(name, push=true){
-  if(push && curScreen!==name) stack.push(curScreen);
+  if(push && curScreen!==name){ stack.push(curScreen); if(window.Voltar && !ROOT_SCREENS.includes(name)) Voltar.empurra(function(){ _goBackInterno(); }); }
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById('screen-'+name)?.classList.add('active');
   curScreen=name;
@@ -2189,6 +2189,7 @@ window.showScreen = showScreen;
 
 // goBack interno: navega pela stack sem empurrar history
 function _goBackInterno(){
+  if(window.Voltar) Voltar.desempilha();
   const p=stack.pop()||'home';
   showScreen(p, false);
   if(ROOT_SCREENS.includes(p)) setNav(ROOT_SCREENS.indexOf(p));
@@ -3924,9 +3925,15 @@ function regAdvance(){
     regCurStep++;
     const newSteps=regActiveSteps();
     if(regCurStep>newSteps.length) regCurStep=newSteps.length;
+    if(window.Voltar) Voltar.empurra(_regVoltaFisico);
   }
   salvarEstadoRegistrar();
   renderRegStep();
+}
+/* botão voltar do celular dentro do Registra: volta uma etapa (ou fecha a categoria aberta) */
+function _regVoltaFisico(){
+  const a=regCurStep; regVoltar();
+  if(regCurStep===a && a>0 && window.Voltar) Voltar.empurra(_regVoltaFisico);
 }
 window.regAdvance = regAdvance;
 
@@ -3947,6 +3954,7 @@ function regVoltar(){
     }
   }
   if(regCurStep <= 0) return;
+  if(window.Voltar) Voltar.desempilha();
   regCurStep--;
   // Pula steps que não devem aparecer (onlyIf false)
   while(regCurStep > 0 && !steps[regCurStep]) regCurStep--;
