@@ -471,15 +471,9 @@ if ((sessionStorage.getItem('troca') === (window.RICO_INST === 'p' ? 'RICOP' : '
   .rd-ov .ln.rd-nf::before{ top: 6px; }
   .rd-ov .ln.rd-nl::before{ bottom: 16px; }
   .rd-ov .ln.rd-nl{ border-bottom-width: 1px; border-radius: 0 0 26px 26px; padding-bottom: 16px; }
-  /* cartão escuro (vinho): número em selo dourado, título com mais peso e barra do texto cortada em cada parágrafo (aprovado em imagem, 24/10/2026) */
-  .rd-ov .ln.rd-nh, .rd-ov .ln.rd-nb{ background: #301412; border-color: #301412; color: #f6e9dc; caret-color: #e8c36a; }
-  .rd-ov .ln.rd-nh{ padding-left: 62px; font-weight: 600; }
-  .rd-ov .ln.rd-nh > .nm{ top: 10px; width: 32px; min-width: 32px; height: 32px; background: linear-gradient(#e8c36a, #c0922c); color: #2a1210; font: 700 14px/32px 'DM Sans', system-ui, sans-serif; }
-  .rd-ov .ln.rd-nb{ padding-left: 74px; color: #e2cfc0; }
-  .rd-ov .ln.rd-nb::before{ left: 62px; background: rgba(232, 195, 106, .4); }
+  /* só dois detalhes pedidos: título do item com mais peso e a barra do texto cortada em cada parágrafo */
+  .rd-ov .ln.rd-nh{ font-weight: 600; }
   .rd-ov .ln.rd-nb.gap::before{ display: none; }
-  .rd-ov .ln.rd-nb:has(> .bl), .rd-ov .ln.rd-nb:has(> .ds), .rd-ov .ln.rd-nb:has(> .nm){ padding-left: 104px; }
-  .rd-ov .ln.rd-nb:has(> .ck){ padding-left: 102px; }
   .rd-tx[data-q]{ position: relative; margin: 14px 0 14px; padding: 18px 20px 16px 22px; background: #fbfaf7; border: 1px solid #e2ddd1; border-radius: 24px; overflow: hidden; font-family: 'DM Sans', system-ui, sans-serif; font-style: normal; font-size: 15px; line-height: 1.65; color: #444; }
   .rd-tx[data-q]::before{ content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 30px; box-sizing: border-box; border-left: 3px solid #7b2d26; border-radius: 23px 0 0 23px; pointer-events: none; }
   .rd-tx[data-q]:has(+ .rd-tx[data-q]){ margin-bottom: 10px; }
