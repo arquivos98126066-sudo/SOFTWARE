@@ -367,24 +367,27 @@ window.Alterna = (function () {
       var d = document.createElement('div'); d.id = 'alterna-base';
       d.style.cssText = 'position:fixed;left:0;right:0;bottom:0;height:calc(44px + env(safe-area-inset-bottom,0px));z-index:2147483647;background:transparent;touch-action:none;-webkit-tap-highlight-color:transparent;';
       var tocou = false, ultimo = 0;
-      /* botoes que ficam por baixo da faixa (menu inferior do app) continuam funcionando: o toque e repassado a eles */
-      var passa = function (x, y) {
+      /* botao que fica por baixo da faixa (menu inferior do app): so ele recebe o toque, na hora; fora dele, dois toques levam ao menu */
+      var botaoAbaixo = function (x, y) {
         try {
           var l = document.elementsFromPoint(x, y), el = null, i;
           for (i = 0; i < l.length; i++) if (l[i] !== d && l[i].id !== 'alterna-base') { el = l[i]; break; }
           for (i = 0; el && el !== document.body && i < 6; i++, el = el.parentElement) {
-            if (el.matches && el.matches('button,a[href],input,select,textarea,label,summary,[onclick],[role=button],[role=tab]') || getComputedStyle(el).cursor === 'pointer') { el.click(); return; }
+            var r = el.getBoundingClientRect();
+            if (r.height > 130 || r.width > innerWidth * 0.8) continue;
+            if ((el.matches && el.matches('button,a[href],input,select,textarea,label,summary,[onclick],[role=button],[role=tab]')) || getComputedStyle(el).cursor === 'pointer') return el;
           }
         } catch (e) {}
+        return null;
       };
-      /* dois toques seguidos (ate 0,5 s): um toque so nao faz nada, para nao sair sem querer */
-      var espera = null;
+      var ultimo = 0, tocou = false;
       var toque = function (x, y) {
+        /* faixa do meio da tela: sempre e so para sair (dois toques); nas laterais, botao de baixo funciona na hora */
+        var meio = Math.abs(x - innerWidth / 2) < 70;
+        var b = meio ? null : botaoAbaixo(x, y);
+        if (b) { ultimo = 0; b.click(); return; }
         var t = Date.now();
-        if (t - ultimo < 380) { clearTimeout(espera); ultimo = 0; A.botao(); return; }
-        /* primeiro toque: espera o segundo; se nao vier, repassa o toque ao botao que esta por baixo */
-        ultimo = t; clearTimeout(espera);
-        espera = setTimeout(function () { ultimo = 0; if (x || y) passa(x, y); }, 380);
+        if (t - ultimo < 500) { ultimo = 0; A.botao(); } else ultimo = t;
       };
       d.addEventListener('touchstart', function (e) { e.stopPropagation(); tocou = true; }, { passive: true });
       d.addEventListener('touchend', function (e) { e.stopPropagation(); if (e.cancelable) e.preventDefault(); if (tocou) { tocou = false; var c = e.changedTouches && e.changedTouches[0]; toque(c ? c.clientX : 0, c ? c.clientY : 0); } });
