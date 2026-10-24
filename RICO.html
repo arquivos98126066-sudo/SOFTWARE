@@ -436,7 +436,7 @@ if ((sessionStorage.getItem('troca') === (window.RICO_INST === 'p' ? 'RICOP' : '
   .rd-t, .rd-h{ display: table; margin-left: auto; margin-right: auto; text-align: center; font-family: 'DM Sans', system-ui, sans-serif; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: #211e19; line-height: 1.2; padding-bottom: 12px; border-bottom: 1px solid #c9c2b0; overflow-wrap: anywhere; }
   .rd-t{ font-size: 15.5px; margin-top: 26px; margin-bottom: 0; }
   .rd-h{ font-size: 14px; margin-top: 30px; margin-bottom: 0; }
-  .rd-tx{ margin-top: 1.1rem; font-family: 'DM Sans', system-ui, sans-serif; font-size: 16px; line-height: 1.75; color: #211e19; text-wrap: pretty; }
+  .rd-tx{ margin-top: .55rem; font-family: 'DM Sans', system-ui, sans-serif; font-size: 16px; line-height: 1.75; color: #211e19; text-wrap: pretty; }
   .rd-tx strong{ font-weight: 700; color: #211e19; }
   .rd-tx .ln{ overflow-wrap: anywhere; }
   .rd-ov .nm{ background: #e8e1d0; color: #211e19; min-width: 22px; width: 22px; height: 22px; padding: 0; margin-right: 8px; text-align: center; font: 700 11px/22px 'DM Sans', system-ui, sans-serif; vertical-align: 1px; }
@@ -452,12 +452,18 @@ if ((sessionStorage.getItem('troca') === (window.RICO_INST === 'p' ? 'RICOP' : '
   .rd-bar[hidden]{ display: none; }
   .rd-ov.rd-edit{ -webkit-user-select: text; user-select: text; -webkit-touch-callout: default; }
   .rd-edit .rd-tx, .rd-edit .rd-t, .rd-edit .rd-h{ outline: none; caret-color: #211e19; }
-  .rd-edit .rd-tx{ min-height: 30px; }
+  .rd-edit .rd-tx:has(> .ln.gap:only-child){ min-height: 30px; }
+  .rd-tx .ln.gap{ --gap: 6px; }
   .rd-edit .rd-t, .rd-edit .rd-h{ display: block; width: fit-content; min-width: 90px; max-width: 100%; }
   .rd-edit .rd-t:empty::before, .rd-edit .rd-h:empty::before{ content: attr(data-ph); color: #9a948a; }
-  .rd-tools{ position: fixed; left: 0; right: 0; bottom: calc(14px + env(safe-area-inset-bottom)); z-index: 3; display: flex; justify-content: center; gap: 6px; padding: 0 10px; pointer-events: none; }
-  .rd-tools button{ pointer-events: auto; flex: none; width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--bd-in); background: #fff; color: #211e19; display: grid; place-items: center; padding: 0; box-shadow: 0 10px 20px -12px rgba(15,27,45,.5); font-size: 15px; }
-  .rd-tools button svg{ width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .rd-tools{ position: fixed; left: 0; right: 0; bottom: calc(14px + env(safe-area-inset-bottom)); z-index: 3; display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 0 10px; pointer-events: none; }
+  .rd-linha, .rd-leque{ display: flex; justify-content: center; gap: 6px; }
+  .rd-leque[hidden]{ display: none; }
+  .rd-leque{ background: #fff; border: 1px solid var(--bd-in); border-radius: 999px; padding: 5px; box-shadow: 0 10px 20px -12px rgba(15,27,45,.5); pointer-events: auto; }
+  .rd-tools button{ pointer-events: auto; flex: none; width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--bd-in); background: #fff; color: #211e19; display: grid; place-items: center; padding: 0; box-shadow: 0 12px 24px -14px rgba(15,27,45,.5); font-size: 16px; }
+  .rd-leque button{ box-shadow: none; border-color: transparent; }
+  .rd-tools button svg{ width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .rd-tools button.on{ background: #211e19; border-color: #211e19; color: #fff; }
   .rd-tools button.ok{ background: #211e19; color: #fff; }
   .sheet{
     position: fixed; left: 12px; right: 12px; bottom: calc(12px + env(safe-area-inset-bottom)); z-index: 99971;
@@ -4257,7 +4263,7 @@ window.saveAnswer = window.saveAnswer || function(){};
         var el = document.elementFromPoint(x, y), tit = el && el.closest ? el.closest('.rd-t, .rd-h') : null, bl = el && el.closest ? el.closest('.rd-tx') : null;
         var idx = bl ? bl.getAttribute('data-i') : null, ti = tit ? (tit.classList.contains('rd-t') ? -1 : tit.getAttribute('data-i')) : null;
         var tp = ov.scrollTop;
-        _rd.edit = true; rdPinta(); ov.scrollTop = tp;
+        _rd.edit = true; _rd.tool = null; rdPinta(); ov.scrollTop = tp;
         var alvo = null;
         if (tit && tit.classList.contains('rd-t')) alvo = ov.querySelector('.rd-t');
         else if (bl) alvo = ov.querySelector('.rd-tx[data-i="' + idx + '"]');
@@ -4265,7 +4271,14 @@ window.saveAnswer = window.saveAnswer || function(){};
         var r = null;
         try { if (alvo && document.caretRangeFromPoint) { r = document.caretRangeFromPoint(x, y); if (r && !alvo.contains(r.startContainer)) r = null; } } catch (_) {}
         if (alvo) { try { alvo.focus(); } catch (_) {} if (r) { var s2 = window.getSelection(); s2.removeAllRanges(); s2.addRange(r); } else rdFoco(alvo, true); }
+        try { var sv = window.getSelection(); if (sv.rangeCount) _rd.cur = sv.getRangeAt(0).cloneRange(); } catch (_) {}
+        _rd.guarda = Date.now() + 1200;
       };
+      document.addEventListener('selectionchange', function() {
+        if (!_rd || !_rd.guarda || Date.now() > _rd.guarda) return;
+        var s3 = window.getSelection();
+        if (s3 && s3.rangeCount && !s3.isCollapsed && _rd.cur) { try { s3.removeAllRanges(); s3.addRange(_rd.cur); } catch (_) {} }
+      });
       ov.addEventListener('touchstart', function(ev) {
         if (!_rd || (ev.target.closest && ev.target.closest('.rd-tools'))) return;
         segurou = false; var t = ev.touches[0]; xy = { x: t.clientX, y: t.clientY };
@@ -4300,6 +4313,11 @@ window.saveAnswer = window.saveAnswer || function(){};
         ev.preventDefault(); tocou = Date.now(); aciona(ev);
       }, { passive: false });
       ov.addEventListener('click', function(ev) { if (Date.now() - tocou > 600) aciona(ev); });
+      ov.addEventListener('click', function(ev) {
+        if (!_rd || !_rd.edit || !_rd.tool || (ev.target.closest && ev.target.closest('.rd-tools'))) return;
+        var ln = ev.target.closest ? ev.target.closest('.ln') : null, bl = ln ? ln.closest('.rd-tx') : null;
+        if (ln && bl && ln.parentNode === bl) { ev.preventDefault(); rdAplica(ln, bl); }
+      });
       ov.addEventListener('input', function() { rdAgenda(); });
       ov.addEventListener('focusout', function(ev) {
         var bl = ev.target && ev.target.closest ? ev.target.closest('.rd-tx') : null;
@@ -4345,7 +4363,7 @@ window.saveAnswer = window.saveAnswer || function(){};
       if (!ed && !String(v || '').trim()) return;
       h += rdBloco(v, idx, m.c ? nl : 0, ed);
     });
-    if (ed) h += '<div class="rd-tools"><button type="button" data-t="b" aria-label="Negrito"><svg viewBox="0 0 24 24"><path d="M7 5h6a3.5 3.5 0 010 7H7zM7 12h7a3.5 3.5 0 010 7H7z"/></svg></button><button type="button" data-t="i" aria-label="Itálico"><svg viewBox="0 0 24 24"><path d="M10 5h7M7 19h7M14 5l-4 14"/></svg></button><button type="button" data-t="T" aria-label="Título"><b>T</b></button><button type="button" data-t="c" aria-label="Check"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M8.2 12.4l2.6 2.6 5-5.2"/></svg></button><button type="button" data-t="n" aria-label="Numeração"><svg viewBox="0 0 24 24"><path d="M11 6h9M11 12h9M11 18h9M4.5 5.5l1.5-1v5M4 14.2c.6-1 2.3-.8 2.1.4-.3 1-1.6 1.5-2.1 2.4h2.4"/></svg></button><button type="button" data-t="p" aria-label="Marcadores"><svg viewBox="0 0 24 24"><path d="M11 6h9M11 12h9M11 18h9"/><circle cx="5.5" cy="6" r=".9" fill="currentColor"/><circle cx="5.5" cy="12" r=".9" fill="currentColor"/><circle cx="5.5" cy="18" r=".9" fill="currentColor"/></svg></button><button type="button" data-t="d" aria-label="Traço"><svg viewBox="0 0 24 24"><path d="M4 6h3M11 6h9M4 12h3M11 12h9M4 18h3M11 18h9"/></svg></button><button type="button" data-t="+" aria-label="Novo texto"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button><button type="button" data-t="ok" class="ok" aria-label="Pronto"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7"/></svg></button></div>';
+    if (ed) h += '<div class="rd-tools"><div class="rd-leque" hidden><button type="button" data-t="b" aria-label="Negrito"><svg viewBox="0 0 24 24"><path d="M7 5h6a3.5 3.5 0 010 7H7zM7 12h7a3.5 3.5 0 010 7H7z"/></svg></button><button type="button" data-t="i" aria-label="Itálico"><svg viewBox="0 0 24 24"><path d="M10 5h7M7 19h7M14 5l-4 14"/></svg></button><button type="button" data-t="c" aria-label="Check"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M8.2 12.4l2.6 2.6 5-5.2"/></svg></button></div><div class="rd-linha"><button type="button" data-t="estilo" aria-label="Negrito, itálico e check"><b>Aa</b></button><button type="button" data-t="T" aria-label="Título"><b>T</b></button><button type="button" data-t="n" aria-label="Numeração"><svg viewBox="0 0 24 24"><path d="M11 6h9M11 12h9M11 18h9M4.5 5.5l1.5-1v5M4 14.2c.6-1 2.3-.8 2.1.4-.3 1-1.6 1.5-2.1 2.4h2.4"/></svg></button><button type="button" data-t="p" aria-label="Marcadores"><svg viewBox="0 0 24 24"><path d="M11 6h9M11 12h9M11 18h9"/><circle cx="5.5" cy="6" r=".9" fill="currentColor"/><circle cx="5.5" cy="12" r=".9" fill="currentColor"/><circle cx="5.5" cy="18" r=".9" fill="currentColor"/></svg></button><button type="button" data-t="d" aria-label="Traço"><svg viewBox="0 0 24 24"><path d="M4 6h3M11 6h9M4 12h3M11 12h9M4 18h3M11 18h9"/></svg></button><button type="button" data-t="+" aria-label="Novo texto"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button><button type="button" data-t="ok" class="ok" aria-label="Pronto"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7"/></svg></button></div></div>';
     h += '<button type="button" data-fechar hidden onclick="fecharLeitura()" aria-label="Fechar"></button></div>';
     ov.innerHTML = h;
   }
@@ -4379,40 +4397,58 @@ window.saveAnswer = window.saveAnswer || function(){};
     bl.innerHTML = rtHtml(rtParse(tx), null);
     if (fim && at === bl) rdFoco(bl, true);
   }
+  /* ferramenta armada (check, número, bolinha, traço, título): toca na linha e aplica ali; tocar de novo na ferramenta desarma */
+  function rdArma(t) {
+    var ov = document.getElementById('rdOv');
+    _rd.tool = (_rd.tool === t) ? null : t;
+    ov.querySelectorAll('.rd-tools [data-t]').forEach(function(b) { var x = b.getAttribute('data-t'); b.classList.toggle('on', x === _rd.tool || (x === 'estilo' && _rd.tool === 'c')); });
+  }
   function rdFerr(t) {
     var ov = document.getElementById('rdOv'), sel = window.getSelection();
-    if (t === 'ok') { clearTimeout(_rd.tm); rdSalva(); _rd.edit = false; rdPinta(); return; }
+    var leque = ov.querySelector('.rd-leque');
+    if (t === 'ok') { clearTimeout(_rd.tm); rdSalva(); _rd.edit = false; _rd.tool = null; rdPinta(); return; }
+    if (t === 'estilo') { leque.hidden = !leque.hidden; ov.querySelector('[data-t="estilo"]').classList.toggle('on', !leque.hidden || _rd.tool === 'c'); return; }
     if (t === 'b' || t === 'i') { try { document.execCommand(t === 'b' ? 'bold' : 'italic'); } catch (_) {} rdAgenda(); return; }
-    var no = sel && sel.anchorNode ? (sel.anchorNode.nodeType === 1 ? sel.anchorNode : sel.anchorNode.parentNode) : null;
-    var bl = no && no.closest ? no.closest('.rd-tx') : null;
     if (t === '+') {
+      var no0 = sel && sel.anchorNode ? (sel.anchorNode.nodeType === 1 ? sel.anchorNode : sel.anchorNode.parentNode) : null;
+      var bl0 = no0 && no0.closest ? no0.closest('.rd-tx') : null;
       var novo = document.createElement('div'); novo.className = 'rd-tx'; novo.setAttribute('contenteditable', 'true');
       novo.setAttribute('data-i', '-1'); novo.innerHTML = '<div class="ln gap"><br></div>';
-      var ref = bl || ov.querySelector('.rd-col > .rd-tx:last-of-type');
+      var ref = bl0 || ov.querySelector('.rd-col > .rd-tx:last-of-type');
       if (ref && ref.parentNode) ref.parentNode.insertBefore(novo, ref.nextSibling); else ov.querySelector('.rd-col').insertBefore(novo, ov.querySelector('.rd-tools'));
       rdFoco(novo); rdAgenda(); return;
     }
-    if (t === 'T') {
-      if (!bl) bl = ov.querySelector('.rd-col > .rd-tx');
-      if (!bl) return;
-      var ant = bl.previousElementSibling;
-      if (ant && ant.classList.contains('rd-h')) { rdFoco(ant, true); return; }
-      var h3 = document.createElement('h3'); h3.className = 'rd-h'; h3.setAttribute('contenteditable', 'true'); h3.setAttribute('data-ph', 'Título');
-      bl.parentNode.insertBefore(h3, bl); rdFoco(h3); rdAgenda(); return;
-    }
-    if (!bl) return;
-    var ln = no.closest('.ln');
-    if (!ln || ln.parentNode !== bl) return;
-    var pos = Array.prototype.indexOf.call(bl.children, ln);
+    rdArma(t);
+    if (t !== 'c') leque.hidden = true;
+  }
+  /* aplica a ferramenta armada na linha tocada */
+  function rdAplica(ln, bl) {
+    var t = _rd.tool, pos = Array.prototype.indexOf.call(bl.children, ln);
+    if (pos < 0) return;
     var lines = rtDeDom(bl, false).split('\n');
+    if (t === 'T') {
+      var h3 = document.createElement('h3'); h3.className = 'rd-h'; h3.setAttribute('contenteditable', 'true'); h3.setAttribute('data-ph', 'Título');
+      if (pos === 0) { bl.parentNode.insertBefore(h3, bl); }
+      else {
+        var resto = document.createElement('div'); resto.className = 'rd-tx'; resto.setAttribute('contenteditable', 'true'); resto.setAttribute('data-i', '-1');
+        resto.innerHTML = rtHtml(rtParse(lines.slice(pos).join('\n')), null);
+        bl.innerHTML = rtHtml(rtParse(lines.slice(0, pos).join('\n')), null);
+        bl.parentNode.insertBefore(h3, bl.nextSibling);
+        bl.parentNode.insertBefore(resto, h3.nextSibling);
+      }
+      _rd.tool = null; ov_limpaOn();
+      rdFoco(h3); rdAgenda(); return;
+    }
     var pre = { c: '[ ] ', n: '[#] ', p: '[-] ', d: '[=] ' }[t];
+    if (!pre) return;
     var atual = lines[pos] || '', mm = /^\[( |x|#|-|=|!)\] ?/.exec(atual), corpo = mm ? atual.slice(mm[0].length) : atual;
-    var igual = mm && (pre === '[ ] ' ? (mm[1] === ' ' || mm[1] === 'x') : pre === mm[0].trim() + ' ' || mm[0] === pre);
+    var igual = mm && (t === 'c' ? (mm[1] === ' ' || mm[1] === 'x') : mm[0].trim() === pre.trim());
     lines[pos] = igual ? corpo : pre + corpo;
     bl.innerHTML = rtHtml(rtParse(lines.join('\n')), null);
-    var alvo = bl.children[pos]; if (alvo) rdFoco(alvo, true);
+    try { var a = document.activeElement; if (a && a.blur) a.blur(); } catch (_) {}
     rdAgenda();
   }
+  function ov_limpaOn() { var ov = document.getElementById('rdOv'); if (ov) ov.querySelectorAll('.rd-tools [data-t]').forEach(function(b) { b.classList.remove('on'); }); }
   function fecharLeitura() {
     var ov = document.getElementById('rdOv');
     if (_rd && _rd.edit) { clearTimeout(_rd.tm); rdSalva(); }
