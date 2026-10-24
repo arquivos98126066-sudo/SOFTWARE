@@ -458,6 +458,11 @@ if ((sessionStorage.getItem('troca') === (window.RICO_INST === 'p' ? 'RICOP' : '
   .rd-ov .ln.rd-nh:first-child{ margin-top: 0; }
   .rd-ov .ln.rd-nh > .nm{ position: absolute; left: 16px; top: 12px; margin: 0; width: 26px; min-width: 26px; height: 26px; font: 700 12px/26px 'DM Sans', system-ui, sans-serif; }
   .rd-ov .ln.rd-nh.rd-ab{ border-bottom-width: 0; border-radius: 26px 26px 0 0; padding-bottom: 8px; }
+  /* recolher e abrir o item numerado, como no estudo: toque no título (setinha à direita); o que você deixar fica guardado */
+  .rd-ov .ln.rd-nh.rd-ab, .rd-ov .ln.rd-nh.rd-rec{ padding-right: 48px; }
+  .rd-ov .ln.rd-nh.rd-ab::after, .rd-ov .ln.rd-nh.rd-rec::after{ content: ''; position: absolute; right: 16px; top: 16px; width: 20px; height: 20px; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%237a7468' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") center/20px 20px no-repeat; transition: transform .25s; pointer-events: none; }
+  .rd-ov .ln.rd-nh.rd-ab::after{ transform: rotate(180deg); }
+  .rd-ov .ln.rd-oc{ display: none; }
   .rd-ov .ln.rd-nb{ position: relative; box-sizing: border-box; background: #fbfaf7; border: solid #e2ddd1; border-width: 0 1px; padding: 0 16px 0 47px; text-indent: 0; font-family: 'DM Sans', system-ui, sans-serif; font-size: 14.5px; line-height: 1.55; }
   .rd-ov .ln.rd-nb b, .rd-ov .ln.rd-nb strong, .rd-ov .ln.rd-nh b, .rd-ov .ln.rd-nh strong{ font-weight: 500; -webkit-text-stroke: 0; }
   .rd-ov .ln.rd-nb::before{ content: ''; position: absolute; left: 29px; top: 0; bottom: 0; width: 2px; border-radius: 2px; background: #e2ddd1; }
@@ -4334,6 +4339,15 @@ window.saveAnswer = window.saveAnswer || function(){};
       ov.addEventListener('touchend', function(ev) { clearTimeout(tm); tm = null; if (segurou && ev.cancelable) ev.preventDefault(); }, { passive: false });
       ov.addEventListener('touchcancel', function() { clearTimeout(tm); tm = null; }, { passive: true });
       ov.addEventListener('contextmenu', function(ev) { ev.preventDefault(); });
+      /* tocar no título do item numerado recolhe e abre o que vem embaixo (na edição só pela setinha, e sem ferramenta nem teclado) */
+      ov.addEventListener('click', function(ev) {
+        if (!_rd || _rd.copia) return;
+        var h = ev.target.closest ? ev.target.closest('.ln.rd-nh.rd-ab, .ln.rd-nh.rd-rec') : null;
+        if (!h || !ov.contains(h)) return;
+        if (_rd.edit) { if (_rd.tool || _rd.digita) return; if (ev.clientX < h.getBoundingClientRect().right - 60) return; }
+        ev.preventDefault(); ev.stopPropagation(); ult = 0;
+        rdRecTroca(h); rdCartoes(h.closest('.rd-tx'));
+      }, true);
       /* tocar na bolinha do check marca e desmarca (na leitura e na edição) */
       ov.addEventListener('click', function(ev) {
         var ck = ev.target.closest ? ev.target.closest('.ck') : null;
@@ -4669,7 +4683,7 @@ window.saveAnswer = window.saveAnswer || function(){};
   function rdCartoes(bl) {
     if (!bl || bl.hasAttribute('data-q')) return;
     var ls = Array.prototype.slice.call(bl.children).filter(function(c) { return c.classList && c.classList.contains('ln'); }), i = 0, k;
-    ls.forEach(function(l) { l.classList.remove('rd-nh', 'rd-nb', 'rd-nl', 'rd-ab', 'rd-nf', 'rd-lead'); });
+    ls.forEach(function(l) { l.classList.remove('rd-nh', 'rd-nb', 'rd-nl', 'rd-ab', 'rd-nf', 'rd-lead', 'rd-rec', 'rd-oc'); });
     var num = function(l) { return !!l.querySelector(':scope > .nm'); };
     while (i < ls.length) {
       if (!num(ls[i])) { i++; continue; }
@@ -4677,7 +4691,12 @@ window.saveAnswer = window.saveAnswer || function(){};
       var j = i + 1, ult = -1;
       while (j < ls.length && !num(ls[j])) { ls[j].classList.add('rd-nb'); if (!ls[j].classList.contains('gap')) ult = j; j++; }
       for (k = ult + 1; k < j; k++) ls[k].classList.remove('rd-nb');
-      if (ult > i) {
+      if (ult > i && rdRecOn(ls[i])) {
+        ls[i].classList.add('rd-rec');
+        for (k = i + 1; k <= ult; k++) ls[k].classList.add('rd-oc');
+        for (k = ult + 1; k < j; k++) ls[k].classList.remove('rd-nb');
+      }
+      else if (ult > i) {
         ls[i].classList.add('rd-ab'); ls[ult].classList.add('rd-nl');
         var f = i + 1; while (f < ult && ls[f].classList.contains('gap')) { ls[f].classList.add('rd-lead'); f++; }
         ls[f].classList.add('rd-nf');
@@ -4685,6 +4704,16 @@ window.saveAnswer = window.saveAnswer || function(){};
       else for (k = i + 1; k < j; k++) ls[k].classList.remove('rd-nb');
       i = j;
     }
+  }
+  /* itens numerados recolhidos: guardados no aparelho por célula e pelo texto do título */
+  function rdRecKey(l) { var c = l.cloneNode(true); c.querySelectorAll('.nm,.ck,.bl,.ds').forEach(function(x) { x.remove(); }); return c.textContent.replace(/\s+/g, ' ').trim(); }
+  function rdRecCel() { return 'c:' + ((_rd && _rd.e && (_rd.e.id || _rd.e.t)) || ''); }
+  function rdRecTudo() { try { return JSON.parse(localStorage.getItem('ui.rdc') || '{}') || {}; } catch (_) { return {}; } }
+  function rdRecOn(l) { var o = rdRecTudo()[rdRecCel()]; return !!(o && o[rdRecKey(l)]); }
+  function rdRecTroca(l) {
+    var a = rdRecTudo(), c = rdRecCel(), k = rdRecKey(l); a[c] = a[c] || {};
+    if (a[c][k]) delete a[c][k]; else a[c][k] = 1;
+    try { localStorage.setItem('ui.rdc', JSON.stringify(a)); } catch (_) {}
   }
   function rdCartoesTodos() { var ov = document.getElementById('rdOv'); if (ov) ov.querySelectorAll('.rd-tx').forEach(rdCartoes); }
   function rdNormaliza(bl) {
