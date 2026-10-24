@@ -476,6 +476,7 @@ if ((sessionStorage.getItem('troca') === (window.RICO_INST === 'p' ? 'RICOP' : '
   .rd-grupo{ display: contents; }
   .rd-grupo[hidden]{ display: none; }
   .rd-tools button{ pointer-events: auto; flex: none; width: 44px; height: 44px; border-radius: 50%; border: 0; background: transparent; color: #211e19; display: grid; place-items: center; padding: 0; font-size: 17px; }
+  .rd-tools button[hidden]{ display: none; }
   .rd-tools button svg{ width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
   .rd-tools button.on{ background: transparent; color: #b07a14; }
   .rd-tools button.on svg{ stroke-width: 2.4; }
@@ -4499,7 +4500,7 @@ window.saveAnswer = window.saveAnswer || function(){};
       if (!ed && !String(v || '').trim()) return;
       h += rdBloco(v, idx, m.c ? nl : 0, ed, m.q, m.n || 0);
     });
-    if (ed) h += '<div class="rd-tools"><div class="rd-linha"><button type="button" data-t="estilo" aria-label="Alternar ferramentas"><svg viewBox="0 0 24 24"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/></svg></button><div class="rd-grupo" data-g="main"><button type="button" data-t="T" aria-label="Título"><b>T</b></button><button type="button" data-t="n" aria-label="Numeração"><svg viewBox="0 0 24 24"><path d="M11 6h9M11 12h9M11 18h9M4.5 5.5l1.5-1v5M4 14.2c.6-1 2.3-.8 2.1.4-.3 1-1.6 1.5-2.1 2.4h2.4"/></svg></button><button type="button" data-t="p" aria-label="Marcadores"><svg viewBox="0 0 24 24"><path d="M11 6h9M11 12h9M11 18h9"/><circle cx="5.5" cy="6" r=".9" fill="currentColor"/><circle cx="5.5" cy="12" r=".9" fill="currentColor"/><circle cx="5.5" cy="18" r=".9" fill="currentColor"/></svg></button><button type="button" data-t="d" aria-label="Traço"><svg viewBox="0 0 24 24"><path d="M4 6h3M11 6h9M4 12h3M11 12h9M4 18h3M11 18h9"/></svg></button><button type="button" data-t="q" aria-label="Citação"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button></div><div class="rd-grupo" data-g="estilo" hidden><button type="button" data-t="b" aria-label="Negrito"><svg viewBox="0 0 24 24"><path d="M7 5h6a3.5 3.5 0 010 7H7zM7 12h7a3.5 3.5 0 010 7H7z"/></svg></button><button type="button" data-t="i" aria-label="Itálico"><svg viewBox="0 0 24 24"><path d="M10 5h7M7 19h7M14 5l-4 14"/></svg></button><button type="button" data-t="c" aria-label="Check"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M8.2 12.4l2.6 2.6 5-5.2"/></svg></button><button type="button" data-t="cpall" aria-label="Copiar tudo"><svg viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2.5"/><path d="M5 15V7a2.5 2.5 0 012.5-2.5H15M12.5 14.5h4M14.5 12.5v4"/></svg></button><button type="button" data-t="copia" aria-label="Modo copiar"><svg viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2.5"/><path d="M5 15V7a2.5 2.5 0 012.5-2.5H15"/></svg></button></div></div></div>';
+    if (ed) h += '<div class="rd-tools"><div class="rd-linha"><button type="button" data-t="estilo" aria-label="Alternar ferramentas"><svg viewBox="0 0 24 24"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/></svg></button><div class="rd-grupo" data-g="main"><button type="button" data-t="T" aria-label="Título"><b>T</b></button><button type="button" data-t="n" aria-label="Numeração"><svg viewBox="0 0 24 24"><path d="M11 6h9M11 12h9M11 18h9M4.5 5.5l1.5-1v5M4 14.2c.6-1 2.3-.8 2.1.4-.3 1-1.6 1.5-2.1 2.4h2.4"/></svg></button><button type="button" data-t="p" aria-label="Marcadores"><svg viewBox="0 0 24 24"><path d="M11 6h9M11 12h9M11 18h9"/><circle cx="5.5" cy="6" r=".9" fill="currentColor"/><circle cx="5.5" cy="12" r=".9" fill="currentColor"/><circle cx="5.5" cy="18" r=".9" fill="currentColor"/></svg></button><button type="button" data-t="d" aria-label="Traço"><svg viewBox="0 0 24 24"><path d="M4 6h3M11 6h9M4 12h3M11 12h9M4 18h3M11 18h9"/></svg></button><button type="button" data-t="q" aria-label="Citação"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button></div><div class="rd-grupo" data-g="estilo" hidden><button type="button" data-t="b" aria-label="Negrito"><svg viewBox="0 0 24 24"><path d="M7 5h6a3.5 3.5 0 010 7H7zM7 12h7a3.5 3.5 0 010 7H7z"/></svg></button><button type="button" data-t="i" aria-label="Itálico"><svg viewBox="0 0 24 24"><path d="M10 5h7M7 19h7M14 5l-4 14"/></svg></button><button type="button" data-t="c" aria-label="Check"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M8.2 12.4l2.6 2.6 5-5.2"/></svg></button><button type="button" data-t="lixo" hidden aria-label="Apagar o marcado"><svg viewBox="0 0 24 24"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 002 2h6a2 2 0 002-2l1-12M9 7V5a1 1 0 011-1h4a1 1 0 011 1v2"/></svg></button><button type="button" data-t="cpall" aria-label="Copiar tudo"><svg viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2.5"/><path d="M5 15V7a2.5 2.5 0 012.5-2.5H15M12.5 14.5h4M14.5 12.5v4"/></svg></button><button type="button" data-t="copia" aria-label="Modo copiar"><svg viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2.5"/><path d="M5 15V7a2.5 2.5 0 012.5-2.5H15"/></svg></button></div></div></div>';
     h += '<button type="button" data-fechar hidden onclick="fecharLeitura()" aria-label="Fechar"></button></div>';
     ov.innerHTML = h;
     if (ed) { _rd.mudoAte = Date.now() + 1100; rdModoTeclado(); setTimeout(rdModoTeclado, 1150); }
@@ -4651,7 +4652,14 @@ window.saveAnswer = window.saveAnswer || function(){};
     var velho = function() { try { var ta = document.createElement('textarea'); ta.value = tx; ta.style.cssText = 'position:fixed;opacity:0;left:-999px'; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove(); fim(); } catch (_) {} };
     if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(tx).then(fim, velho); else velho();
   }
+  function rdLixoVis() {
+    var ov = document.getElementById('rdOv'); if (!ov) return;
+    var tem = !!(_rd && _rd.copia && ((_rd.cpR && _rd.cpR.length) || _rd.cpCur || (_rd.cpPrev && _rd.cpPrev.length)));
+    var bl = ov.querySelector('[data-t="lixo"]'), bc = ov.querySelector('[data-t="c"]');
+    if (bl) bl.hidden = !tem; if (bc) bc.hidden = tem;
+  }
   function rdCopiaMarca() {
+    rdLixoVis();
     try { if (window.CSS && CSS.highlights && window.Highlight) { var rs = (_rd.cpR || []).concat(_rd.cpPrev || []), sn0 = window.getSelection(); if (_rd.cpCur && (!sn0 || !sn0.rangeCount || sn0.isCollapsed)) rs.push(_rd.cpCur); if (rs.length) CSS.highlights.set('rdsel', new Highlight(...rs)); else CSS.highlights.delete('rdsel'); } } catch (_) {}
   }
 
@@ -4730,7 +4738,7 @@ window.saveAnswer = window.saveAnswer || function(){};
   }
   function rdCopiaFim() {
     var ov = document.getElementById('rdOv'); if (!_rd) return;
-    rdCopiaDragOff(); _rd.copia = false; _rd.cpR = null; _rd.cpCur = null; _rd.cpAll = false;
+    rdCopiaDragOff(); _rd.copia = false; _rd.cpR = null; _rd.cpCur = null; _rd.cpAll = false; rdLixoVis();
     var ba = ov && ov.querySelector('[data-t="cpall"]'); if (ba) ba.classList.remove('on');
     try { if (window.CSS && CSS.highlights) CSS.highlights.delete('rdsel'); window.getSelection().removeAllRanges(); } catch (_) {}
     var bc = ov && ov.querySelector('[data-t="copia"]'); if (bc) bc.classList.remove('on');
@@ -4767,6 +4775,34 @@ window.saveAnswer = window.saveAnswer || function(){};
     if (t === 'copia') {
       if (!_rd.copia) { rdCopiaIni(); return; }
       var txc = rdCopiaTxt(!!_rd.cpAll); if (txc) rdCopiaGrava(txc, null); rdCopiaFim(); return;
+    }
+    if (t === 'lixo') {
+      var rs = (_rd.cpR || []).slice(); if (_rd.cpCur) rs.push(_rd.cpCur);
+      var cur0 = window.getSelection(); if (cur0 && cur0.rangeCount && !cur0.isCollapsed && !_rd.cpCur) rs.push(cur0.getRangeAt(0));
+      var linhas = rdCopiaLinhas(), tira = [], parte = [];
+      rs.forEach(function(r0) {
+        if (r0._ln) { if (tira.indexOf(r0._ln) < 0) tira.push(r0._ln); return; }
+        linhas.forEach(function(el) {
+          if (!r0.intersectsNode(el)) return;
+          var q = document.createRange(); q.selectNodeContents(el);
+          if (r0.compareBoundaryPoints(Range.START_TO_START, q) > 0) q.setStart(r0.startContainer, r0.startOffset);
+          if (r0.compareBoundaryPoints(Range.END_TO_END, q) < 0) q.setEnd(r0.endContainer, r0.endOffset);
+          var lim = function(x) { var dv = document.createElement('div'); dv.appendChild(x); dv.querySelectorAll('.nm,.ck,.bl,.ds').forEach(function(y) { y.remove(); }); return dv.textContent.trim(); };
+          var tq = lim(q.cloneContents()), full = document.createRange(); full.selectNodeContents(el);
+          if (!tq) return;
+          if (tq === lim(full.cloneContents())) { if (tira.indexOf(el) < 0) tira.push(el); } else parte.push(q);
+        });
+      });
+      parte.forEach(function(q) { try { q.deleteContents(); } catch (_) {} });
+      tira.forEach(function(el) {
+        if (el.classList.contains('rd-t')) return;
+        var pai = el.parentNode; pai.removeChild(el);
+        if (pai.classList.contains('rd-tx') && !pai.children.length) pai.parentNode.removeChild(pai);
+      });
+      _rd.cpR = []; _rd.cpCur = null; _rd.cpPrev = []; _rd.cpAll = false;
+      var bq4 = ov.querySelector('[data-t="cpall"]'); if (bq4) bq4.classList.remove('on');
+      try { if (window.CSS && CSS.highlights) CSS.highlights.delete('rdsel'); window.getSelection().removeAllRanges(); } catch (_) {}
+      rdLixoVis(); rdRenumera(); rdAgenda(); return;
     }
     if (t === 'cpall') {
       var bt = ov.querySelector('[data-t="cpall"]');
