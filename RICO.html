@@ -6318,6 +6318,38 @@ window.saveAnswer = window.saveAnswer || function(){};
   liga(); setTimeout(liga,400); setTimeout(liga,1500); window.addEventListener('resize',liga); window.addEventListener('load',liga); window.addEventListener('pageshow',liga);
 })();
 
+
+/* aberto pelo Plano: tocar com dois dedos ao mesmo tempo volta ao Plano, no mesmo lugar em que ele ficou */
+(function(){
+  try { if (sessionStorage.getItem('viaPlano') !== '1') return; } catch(e){ return; }
+  function gestoDoisDedos(aoFazer){
+    var t1 = 0, ini = null;
+    function longe(e){
+      for (var i = 0; i < e.touches.length; i++){
+        var t = e.touches[i], o = ini.p[t.identifier];
+        if (o && Math.hypot(t.clientX - o.x, t.clientY - o.y) > 24) return true;
+      }
+      return false;
+    }
+    document.addEventListener('touchstart', function(e){
+      if (e.touches.length === 1){ t1 = Date.now(); ini = null; return; }
+      if (e.touches.length === 2 && (e.changedTouches.length === 2 || Date.now() - t1 <= 300)){
+        ini = {t: Date.now(), p: {}};
+        for (var i = 0; i < 2; i++) ini.p[e.touches[i].identifier] = {x: e.touches[i].clientX, y: e.touches[i].clientY};
+      } else ini = null;
+    }, {passive: true});
+    document.addEventListener('touchmove', function(e){ if (ini && longe(e)) ini = null; }, {passive: true});
+    document.addEventListener('touchend', function(e){
+      var g = ini; ini = null;
+      if (g && Date.now() - g.t <= 500) aoFazer();
+    }, {passive: true});
+    document.addEventListener('touchcancel', function(){ ini = null; }, {passive: true});
+  }
+  gestoDoisDedos(function(){
+    try { sessionStorage.setItem('troca', 'DOA'); navigator.vibrate && navigator.vibrate(25); } catch(e){}
+    location.replace('DOA.html');
+  });
+})();
 </script>
 </body>
           </html>

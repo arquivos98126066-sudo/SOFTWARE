@@ -1887,14 +1887,19 @@ var _htmlAberto = null;
 function htmlAbre(id){
   var h = htmlLer().find(function(x){ return x.id === id; }); if(!h) return;
   /* app de verdade (Rico): abre a própria página, com os mesmos dados; o voltar do celular traz o Plano de volta no mesmo lugar */
-  if(h.app){ if(window.salvaEstadoPlano) window.salvaEstadoPlano(); try { sessionStorage.setItem('troca', 'DOA'); } catch(e){} location.href = h.src; return; }
+  if(h.app){ if(window.salvaEstadoPlano) window.salvaEstadoPlano(); try { sessionStorage.setItem('troca', 'DOA'); sessionStorage.setItem('viaPlano', '1'); } catch(e){} location.href = h.src; return; }
   /* iframe novo a cada abertura: assim ele não acumula histórico e o botão voltar do celular só fecha o HTML */
   var box = document.getElementById('html-view');
   box.innerHTML = '';
   var fr = document.createElement('iframe'); fr.id = 'html-view-frame';
   fr.setAttribute('sandbox', 'allow-scripts allow-forms allow-popups allow-downloads');
   box.appendChild(fr);
-  if(h.src) fr.src = h.src; else fr.srcdoc = h.html;
+  if(h.src){
+    /* carrega o código e abre com o gesto de troca dentro; se falhar, abre direto */
+    fetch(h.src).then(function(r){ return r.text(); }).then(function(t){
+      if(_htmlAberto === h.id && window.planoInjeta) fr.srcdoc = window.planoInjeta(t, new URL(h.src, location.href).href); else if(_htmlAberto === h.id) fr.src = h.src;
+    }).catch(function(){ fr.src = h.src; });
+  } else fr.srcdoc = window.planoInjeta ? window.planoInjeta(h.html) : h.html;
   _htmlAberto = h.id;
   if(window.CorBarra) htmlCodigo(h, function(t){ if(_htmlAberto === h.id) CorBarra.de(t); });
   box.classList.add('open');
@@ -2679,11 +2684,24 @@ abrirProcesso();
     } catch(e){}
   }
   window.salvaEstadoPlano = salvaEstadoPlano;
-  gestoDoisDedos(function(){
+  function trocaParaEstudo(){
     salvaEstadoPlano();
     try { sessionStorage.setItem('troca', 'LER'); navigator.vibrate && navigator.vibrate(25); } catch(e){}
     location.replace('LER.html');
+  }
+  gestoDoisDedos(trocaParaEstudo);
+  /* dentro dos HTMLs abertos em tela cheia o toque não chega ao Plano: o gesto vai junto dentro de cada um e avisa por mensagem */
+  window.planoInjeta = function(html, abs){
+    var tag = '<script>(' + gestoDoisDedos.toString() + ')(function(){ parent.postMessage({planoTroca: 1}, "*"); });' +
+      'document.addEventListener("click", function(e){ var a = e.target.closest && e.target.closest("a[href]"); if (a && a.getAttribute("href").charAt(0) === "#"){ e.preventDefault(); var t = document.getElementById(a.getAttribute("href").slice(1)); if (t) t.scrollIntoView({behavior: "smooth"}); } }, true);<\/script>';
+    if (abs && !/<base[\s>]/i.test(html)) html = html.replace(/<head[^>]*>/i, function(m){ return m + '<base href="' + abs + '">'; });
+    return html + tag;
+  };
+  window.addEventListener('message', function(e){
+    var fr = document.getElementById('html-view-frame');
+    if (fr && e.source === fr.contentWindow && e.data && e.data.planoTroca) trocaParaEstudo();
   });
+  try { sessionStorage.removeItem('viaPlano'); } catch(e){}
   /* volta no mesmo lugar em que o Plano ficou (pasta, processo aberto, rolagem e HTML aberto) */
   (function(){
     var s = null;
