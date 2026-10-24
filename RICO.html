@@ -7485,10 +7485,9 @@ window.saveAnswer = window.saveAnswer || function(){};
   }
   var feitos = 0;
   window.__ricoRevela = function(){ revela(); };
-  function revela(){ liga(); if (++feitos < 3 + (window.__ricoExtra || 0)) return; requestAnimationFrame(function(){ requestAnimationFrame(function(){ var x = document.getElementById('rico-esconde'); if (x) x.remove(); }); }); }
+  function revela(){ liga(); if (++feitos < 2 + (window.__ricoExtra || 0)) return; requestAnimationFrame(function(){ requestAnimationFrame(function(){ var x = document.getElementById('rico-esconde'); if (x) x.remove(); }); }); }
   liga(); window.addEventListener('resize',liga);
   /* só mostra a página (quando ela estava escondida para voltar ao lugar) depois que fontes e arquivos terminaram e tudo está no tamanho final */
-  if (document.readyState === 'complete') revela(); else window.addEventListener('load', revela);
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(revela); else revela();
   if (window.__ricoDados) revela();
 })();
@@ -7528,11 +7527,11 @@ window.saveAnswer = window.saveAnswer || function(){};
     ir(); requestAnimationFrame(function(){ ir(); if (window.__ricoRevela) window.__ricoRevela(); });
   }
   var carregou = false;
-  function espera(){ clearTimeout(tq); if (carregou) tq = setTimeout(pronto, 60); }
+  function espera(){ clearTimeout(tq); if (carregou) tq = setTimeout(pronto, 40); }
   try { mo = new MutationObserver(function(){ ir(); espera(); }); mo.observe(document.documentElement, {childList: true, subtree: true, characterData: true, attributes: true, attributeFilter: ['style', 'class', 'rows']}); } catch(e){}
-  window.addEventListener('load', function(){ carregou = true; espera(); });
-  if (document.readyState === 'complete') { carregou = true; espera(); }
-  tmax = setTimeout(pronto, 1200);
+  var dclr = function(){ carregou = true; espera(); };
+  if (document.readyState !== 'loading') dclr(); else document.addEventListener('DOMContentLoaded', dclr);
+  tmax = setTimeout(pronto, 800);
 })();
 </script>
 </body>

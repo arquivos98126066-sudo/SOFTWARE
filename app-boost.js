@@ -143,7 +143,7 @@ window.Voltar = (function () {
 
   var saindo = null;
   window.addEventListener('popstate', function (e) {
-    if (saindo) { var u = saindo; saindo = null; e.stopImmediatePropagation(); setTimeout(function () { location.replace(u); }, 30); return; }
+    if (saindo) { var u = saindo; saindo = null; e.stopImmediatePropagation(); location.replace(u); return; }
     if (ignorar > 0) { ignorar--; e.stopImmediatePropagation(); return; }
     /* descarta as que já fecharam por conta própria */
     while (pilha.length && pilha[pilha.length - 1].els && !pilha[pilha.length - 1].els.some(visivel)) pilha.pop();
@@ -404,10 +404,10 @@ window.Alterna = (function () {
       (document.head || document.documentElement).appendChild(est);
       var solta = function () { clearTimeout(tq); clearTimeout(tmax); if (mo) mo.disconnect(); var x = document.getElementById('alterna-quieto'); if (x) x.remove(); };
       var tq, tmax = setTimeout(solta, 1200), mo = null, carregou = false;
-      var espera = function () { clearTimeout(tq); if (carregou) tq = setTimeout(solta, 60); };
+      var espera = function () { clearTimeout(tq); if (carregou) tq = setTimeout(solta, 40); };
       mo = new MutationObserver(espera); mo.observe(document.documentElement, { childList: true, subtree: true, characterData: true });
-      window.addEventListener('load', function () { carregou = true; espera(); });
-      if (document.readyState === 'complete') { carregou = true; espera(); }
+      var dcl = function () { carregou = true; espera(); };
+      if (document.readyState !== 'loading') dcl(); else document.addEventListener('DOMContentLoaded', dcl);
     } catch (e) {}
   }
 
@@ -462,8 +462,8 @@ window.Alterna = (function () {
         requestAnimationFrame(function () { rola(); requestAnimationFrame(function () { rola(); revela(); setTimeout(rola, 300); setTimeout(rola, 900); }); });
       };
       /* espera o app montar a primeira tela com os dados do aparelho */
-      var inicia = function () { setTimeout(aplica, 80); };
-      if (document.readyState === 'complete') inicia(); else window.addEventListener('load', inicia);
+      var inicia = function () { setTimeout(aplica, 30); };
+      if (document.readyState !== 'loading') inicia(); else document.addEventListener('DOMContentLoaded', inicia);
     }
   }
   return A;
