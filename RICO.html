@@ -465,7 +465,8 @@ if ((sessionStorage.getItem('troca') === (window.RICO_INST === 'p' ? 'RICOP' : '
   .rd-bar[hidden]{ display: none; }
   .rd-ov.rd-edit{ -webkit-user-select: text; user-select: text; -webkit-touch-callout: default; }
   .rd-edit .rd-tx, .rd-edit .rd-t, .rd-edit .rd-h{ outline: none; caret-color: #211e19; }
-  .rd-edit .rd-tx:has(> .ln.gap:only-child){ min-height: 30px; }
+  .rd-edit .rd-tx:has(> .ln.gap:only-child){ min-height: 18px; }
+  .rd-edit .rd-tx .ln:has(> br:only-child){ height: 16px; line-height: 16px; }
   .rd-tx .ln.gap{ --gap: 6px; }
   .rd-edit .rd-t, .rd-edit .rd-h{ display: block; width: fit-content; min-width: 90px; max-width: 100%; }
   .rd-edit .rd-t:empty::before, .rd-edit .rd-h:empty::before{ content: attr(data-ph); color: #9a948a; }
@@ -4418,6 +4419,28 @@ window.saveAnswer = window.saveAnswer || function(){};
         if (ln && bl && ln.parentNode === bl) { ev.preventDefault(); rdAplica(ln, bl); }
       });
       ov.addEventListener('input', function() { rdAgenda(); });
+      /* apagar no começo de um bloco junta com o de cima (cada bloco é um campo separado, o navegador não junta sozinho) */
+      ov.addEventListener('beforeinput', function(ev) {
+        if (!_rd || !_rd.edit || ev.inputType !== 'deleteContentBackward') return;
+        var sl = window.getSelection(); if (!sl || !sl.rangeCount || !sl.isCollapsed) return;
+        var pp = rdPosDe(sl.anchorNode, sl.anchorOffset); if (!pp || pp.li !== 0 || pp.off !== 0) return;
+        var bls = document.querySelectorAll('#rdOv .rd-tx'), cur = bls[pp.bi], prev = cur && cur.previousElementSibling;
+        if (!cur || !prev) return;
+        ev.preventDefault();
+        if (prev.classList.contains('rd-t')) return;
+        var tc = rtDeDom(cur, false);
+        if (prev.classList.contains('rd-h')) {
+          if (!prev.textContent.trim()) { prev.parentNode.removeChild(prev); rdAgenda(); return; }
+          tc = prev.textContent.trim() + (tc.trim() ? '\n' + tc : ''); cur.innerHTML = rtHtml(rtParse(tc), null); prev.parentNode.removeChild(prev);
+          rdRenumera(); rdAgenda(); return;
+        }
+        var tp = rtDeDom(prev, false), nlp = tp.split('\n').length;
+        var junto = tc.trim() ? tp + '\n' + tc : tp;
+        prev.innerHTML = rtHtml(rtParse(junto), null); cur.parentNode.removeChild(cur);
+        rdRenumera(); rdAgenda();
+        var pi = Array.prototype.indexOf.call(document.querySelectorAll('#rdOv .rd-tx'), prev), nd = rdNoDe({ bi: pi, li: tc.trim() ? nlp : nlp - 1, off: 0 });
+        try { prev.focus(); if (nd) { var rr = document.createRange(); rr.setStart(nd.n, nd.o); rr.collapse(true); var s9 = window.getSelection(); s9.removeAllRanges(); s9.addRange(rr); } } catch (_) {}
+      }, true);
       /* com ferramenta selecionada nunca há cursor nem teclado */
       ov.addEventListener('focusin', function(ev) { if (_rd && _rd.edit && (_rd.tool || !_rd.digita) && !_rd.fmt && !(ev.target.closest && ev.target.closest('.rd-tools'))) { try { ev.target.blur(); window.getSelection().removeAllRanges(); } catch (_) {} } });
       ov.addEventListener('focusout', function(ev) {
