@@ -3018,7 +3018,7 @@ window.saveAnswer = window.saveAnswer || function(){};
       delB.textContent = id === 'root' ? 'Limpar' : 'Excluir';
       scrim.classList.add('on'); sheet.classList.add('on');
       setTimeout(function() {
-        try { txt.focus(); txt.select(); } catch (e) {}
+        try { txt.focus(); var fimN = txt.value.length; txt.setSelectionRange(fimN, fimN); } catch (e) {}
         var mm = L[id]; if (!mm || !sheet.classList.contains('on')) return;
         var rc = mm.el.getBoundingClientRect(), livre = window.innerHeight - sheet.offsetHeight - 24;
         if (rc.bottom > livre) window.scrollBy({ top: rc.bottom - livre + 12, behavior: 'smooth' });
@@ -4278,7 +4278,7 @@ window.saveAnswer = window.saveAnswer || function(){};
     sh.querySelector('[data-a="no"]').addEventListener('click', fecha);
     scrim.addEventListener('click', fecha);
     inp.addEventListener('keydown', function(e) { if (e.key === 'Enter') { e.preventDefault(); ok(); } else if (e.key === 'Escape') fecha(); });
-    setTimeout(function() { try { inp.focus(); inp.select(); } catch (_) {} }, 120);
+    setTimeout(function() { try { inp.focus(); var fimN = inp.value.length; inp.setSelectionRange(fimN, fimN); } catch (_) {} }, 120);
   }
   /* as células do Ciclo abrem na mesma tela nova do mapa: tudo que estava em vários blocos (1, 2, 3...) vira um bloco só, com os números dentro do texto */
   function cicloParaLeitura(e) {
