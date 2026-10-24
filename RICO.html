@@ -3043,10 +3043,11 @@ window.saveAnswer = window.saveAnswer || function(){};
       }
       if (!edita && window.abrirLeitura) {
         var dl = k >= 0 ? CICLO[k] : { t: n.text, i: n.i || [], m: n.m || [] };
+        var ropt = window.__rdOpts || {}; window.__rdOpts = null; ropt.ctx = { key: KEY, id: id };
         window.abrirLeitura(dl, function(x) {
           if (k >= 0) { var ff = acha(id); if (ff && String(x.t || '').trim()) ff.n.text = String(x.t).trim().slice(0, 60); salva(); render(); if (window.renderCiclo) window.renderCiclo(); if (window.agendarSalvamento) window.agendarSalvamento(document.body); }
           else { x._no = n; salvaNota(x); delete x._no; render(); }
-        });
+        }, ropt);
         return;
       }
       if (k >= 0) {
@@ -3705,7 +3706,7 @@ window.saveAnswer = window.saveAnswer || function(){};
 
     window.addEventListener('resize', render);
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(render);
-    var api = { key: KEY, existe: function(id) { if (!root) root = carrega(); return !!acha(id); }, clonaNo: function(id) { var f = acha(id); return f ? clona(f.n) : null; }, linhas: function() { if (!root) root = carrega(); var o = []; linhasNo(root, 0, o); return o; }, soltaMov: function() { movKeep = null; movBar = false; destId = null; }, destino: function() { movKeep = null; movBar = false; barId = null; destId = 'root'; }, tira: tiraNo, poe: poeNo, visivel: function() { return !!(wrap && wrap.isConnected && PEND && wrap.querySelector('.rcm-node[data-id="' + PEND.id + '"]')); }, serializa: function() { if (!root) root = carrega(); return JSON.stringify(root); }, montar: montar, salvaNota: salvaNota, fechou: fechou, limpar: limpar, info: function() { return zig ? zInfo : tInfo; } };
+    var api = { key: KEY, abreLeitura: function(id) { abreEditor(id); }, existe: function(id) { if (!root) root = carrega(); return !!acha(id); }, clonaNo: function(id) { var f = acha(id); return f ? clona(f.n) : null; }, linhas: function() { if (!root) root = carrega(); var o = []; linhasNo(root, 0, o); return o; }, soltaMov: function() { movKeep = null; movBar = false; destId = null; }, destino: function() { movKeep = null; movBar = false; barId = null; destId = 'root'; }, tira: tiraNo, poe: poeNo, visivel: function() { return !!(wrap && wrap.isConnected && PEND && wrap.querySelector('.rcm-node[data-id="' + PEND.id + '"]')); }, serializa: function() { if (!root) root = carrega(); return JSON.stringify(root); }, montar: montar, salvaNota: salvaNota, fechou: fechou, limpar: limpar, info: function() { return zig ? zInfo : tInfo; } };
     if (vazio) { root = nd('Novo'); root.id = 'root'; salva(); }
     return api;
   }
@@ -4031,6 +4032,11 @@ window.saveAnswer = window.saveAnswer || function(){};
     })(g, sem);
   }
   window.rcMapa = {
+    abre: function(key, id, opts) {
+      var ss = [SETS.m, SETS.p], i, j;
+      for (i = 0; i < ss.length; i++) { try { mapasGarante(ss[i]); } catch (e) {} for (j = 0; j < ss[i].arr.length; j++) { var mm = ss[i].arr[j]; if (mm.key === key && mm.existe && mm.existe(id)) { window.__rdOpts = opts || null; mm.abreLeitura(id); return true; } } }
+      return false;
+    },
     tela: function() { return CUR === SETS.p ? 'Processo' : 'Mapa mental'; },
     todasLinhas: function() { var mt = metaGet(CUR); return [].concat.apply([], CUR.arr.filter(function(m) { return !mt.f[m.key]; }).map(function(m) { return m.linhas(); })); },
     raizes: function() { var mt = metaGet(CUR); return CUR.arr.filter(function(m) { return !mt.f[m.key]; }).map(function(m) { try { return JSON.parse(m.serializa()); } catch (e) { return null; } }).filter(Boolean); },
@@ -4268,7 +4274,7 @@ window.saveAnswer = window.saveAnswer || function(){};
 
   /* leitura limpa do círculo do mapa: título da célula, subtítulos e texto com os marcadores do editor; o lápis edita ali mesmo */
   var _rd = null;
-  function abrirLeitura(e, salvar) {
+  function abrirLeitura(e, salvar, opts) {
     var ov = document.getElementById('rdOv');
     if (!ov) {
       ov = document.createElement('div'); ov.className = 'rd-ov'; ov.id = 'rdOv'; ov.hidden = true;
@@ -4473,11 +4479,22 @@ window.saveAnswer = window.saveAnswer || function(){};
         setTimeout(function() { rdRepinta(bl, true); rdAgenda(); }, 0);
       });
     }
-    _rd = { e: e, salvar: salvar || null, edit: false, tm: null };
+    _rd = { e: e, salvar: salvar || null, edit: false, tm: null, ctx: opts && opts.ctx || null };
     rdPinta();
     ov.scrollTop = 0;
     ov.hidden = false;
+    /* volta de outro app: reabre a mesma célula, na mesma rolagem e no mesmo modo */
+    if (opts && (opts.edit || opts.sc)) {
+      if (opts.edit) { _rd.edit = true; _rd.tool = null; _rd.digita = false; _rd.copia = false; rdPinta(); }
+      var yy = +opts.sc || 0; ov.scrollTop = yy; requestAnimationFrame(function() { ov.scrollTop = yy; });
+    }
   }
+  window.rdGuarda = function() {
+    var ov = document.getElementById('rdOv');
+    if (!_rd || !ov || ov.hidden || !_rd.ctx) return null;
+    if (_rd.edit) { try { clearTimeout(_rd.tm); rdSalva(); } catch (_) {} }
+    return { ctx: _rd.ctx, edit: !!_rd.edit, sc: ov.scrollTop };
+  };
   function rdEsc(x) { return String(x == null ? '' : x).replace(/[&<>]/g, function(c) { return c === '&' ? '&amp;' : (c === '<' ? '&lt;' : '&gt;'); }); }
   function rdBloco(v, idx, c, ed, q, off) {
     var corpo = rtHtml(rtParse(String(v || '')), null, off);
@@ -7178,13 +7195,24 @@ window.saveAnswer = window.saveAnswer || function(){};
 /* alternar entre apps: o gesto vive no app-boost; aqui o Rico guarda a rolagem (e a do pino) antes de trocar e volta nela */
 (function(){
   var INST = window.RICO_INST, CHAVE = 'rico.y.' + INST, COD = INST === 'p' ? 'RICOP' : 'RICO';
+  var CHAVE_RD = 'rico.rd.' + INST;
   if (window.Alterna) Alterna.aoSair = function(){
+    try { var rdE = window.rdGuarda && window.rdGuarda(); if (rdE) { rdE.t = Date.now(); sessionStorage.setItem(CHAVE_RD, JSON.stringify(rdE)); } else sessionStorage.removeItem(CHAVE_RD); } catch(e){}
     try {
       sessionStorage.setItem(CHAVE, String(window.scrollY || 0));
       var pj = JSON.parse(localStorage.getItem(window.RICO_PIN) || 'null'); if (pj && pj.v) { pj.y = window.scrollY || 0; localStorage.setItem(window.RICO_PIN, JSON.stringify(pj)); }
     } catch(e){}
   };
   var y = 0, tocou = false;
+  var rdVolta = null;
+  try { if (sessionStorage.getItem('troca') === COD) { rdVolta = JSON.parse(sessionStorage.getItem(CHAVE_RD) || 'null'); } sessionStorage.removeItem(CHAVE_RD); } catch(e){}
+  if (rdVolta && Date.now() - (rdVolta.t || 0) < 3600000 && rdVolta.ctx) {
+    var tent = 0, tr = setInterval(function() {
+      tent++;
+      try { if (window.rcMapa && window.rcMapa.abre && window.abrirLeitura && window.rcMapa.abre(rdVolta.ctx.key, rdVolta.ctx.id, { edit: rdVolta.edit, sc: rdVolta.sc })) { clearInterval(tr); return; } } catch(e){}
+      if (tent > 50) clearInterval(tr);
+    }, 100);
+  }
   try { if (sessionStorage.getItem('troca') !== COD) return; sessionStorage.removeItem('troca'); y = parseFloat(sessionStorage.getItem(CHAVE)) || 0; sessionStorage.removeItem(CHAVE); } catch(e){ return; }
   if (!y) return;
   document.addEventListener('touchstart', function(){ tocou = true; }, {passive: true});
