@@ -453,6 +453,7 @@ if ((sessionStorage.getItem('troca') === (window.RICO_INST === 'p' ? 'RICOP' : '
   .rd-ov .ln:has(> .ck){ padding-left: 28px; text-indent: -28px; }
   .rd-ov .ln.done{ text-decoration: line-through; text-decoration-thickness: 1.5px; color: #9a948a; }
   /* item numerado vira cartão como no estudo: número e título no alto, e o texto que vem embaixo dentro do cartão, com a barra do lado */
+  .rd-edit .rd-tx.rd-solo{ min-height: 64px; }
   .rd-ov .ln.rd-nh{ position: relative; margin-top: 8px; padding: 15px 16px 15px 54px; text-indent: 0; min-height: 52px; box-sizing: border-box; background: #fbfaf7; border: 1px solid #e2ddd1; border-radius: 26px; font-family: 'DM Sans', system-ui, sans-serif; font-size: 16px; line-height: 1.35; }
   .rd-ov .ln.rd-nh:first-child{ margin-top: 0; }
   .rd-ov .ln.rd-nh > .nm{ position: absolute; left: 16px; top: 12px; margin: 0; width: 26px; min-width: 26px; height: 26px; font: 700 12px/26px 'DM Sans', system-ui, sans-serif; }
@@ -4916,7 +4917,13 @@ window.saveAnswer = window.saveAnswer || function(){};
     }
     if (t === 'T') {
       /* alterna: 1º toque liga o modo texto (cursor e teclado); com o cursor no texto cria o título ali; com o cursor num título desfaz o título; sem cursor desliga o modo texto */
-      if (!_rd.digita) { rdDigita(true); var bT = ov.querySelector('[data-t="T"]'); if (bT) bT.classList.add('on'); return; }
+      if (!_rd.digita) {
+        rdDigita(true); var bT = ov.querySelector('[data-t="T"]'); if (bT) bT.classList.add('on');
+        var b1 = rdGaranteBloco(); rdModoTeclado();
+        var f1 = document.activeElement;
+        if (b1 && !(f1 && ov.contains(f1) && f1.isContentEditable)) { var alvo = ov.querySelectorAll('.rd-tx').length === 1 ? b1 : null; if (alvo) rdFoco(alvo); }
+        return;
+      }
       var at = document.activeElement, sn = sel && sel.rangeCount ? sel.anchorNode : null; sn = sn && (sn.nodeType === 1 ? sn : sn.parentNode);
       var th = (at && at.classList && at.classList.contains('rd-h')) ? at : (sn && sn.closest ? sn.closest('#rdOv .rd-h') : null);
       if (th) {
@@ -5016,6 +5023,17 @@ window.saveAnswer = window.saveAnswer || function(){};
     rdAgenda();
   }
   /* numeração contínua entre os pedaços de um mesmo texto (depois de dividir por título ou citação) */
+  /* na edição sempre existe pelo menos um campo de texto, mesmo depois de apagar tudo */
+  function rdGaranteBloco() {
+    var ov = document.getElementById('rdOv'); if (!ov || !_rd || !_rd.edit) return null;
+    var col = ov.querySelector('.rd-col'); if (!col) return null;
+    var b = col.querySelector('.rd-tx'); if (b) return b;
+    b = document.createElement('div'); b.className = 'rd-tx rd-solo'; b.setAttribute('contenteditable', _rd.digita ? 'true' : 'false'); b.setAttribute('data-i', '-1');
+    b.innerHTML = '<div class="ln gap"><br></div>';
+    var ult = null; col.querySelectorAll('.rd-t, .rd-h').forEach(function(x) { ult = x; });
+    if (ult) col.insertBefore(b, ult.nextSibling); else col.insertBefore(b, col.firstChild);
+    return b;
+  }
   function rdRenumera() {
     var ov = document.getElementById('rdOv'), c = 0;
     ov.querySelectorAll('.rd-col > .rd-tx').forEach(function(b) {
@@ -5023,7 +5041,7 @@ window.saveAnswer = window.saveAnswer || function(){};
       if (off) c = off; else if (b.getAttribute('data-i') !== '-1') c = 0;
       Array.prototype.forEach.call(b.querySelectorAll('.ln > .nm:not([data-rc])'), function(nm) { if (nm.getAttribute('data-r') === '1') c = 1; else c++; nm.textContent = c; });
     });
-    rdCartoesTodos();
+    rdGaranteBloco(); rdCartoesTodos();
   }
   /* numeração por arrasto: a primeira linha marcada vira o título numerado e as outras ficam como o texto de baixo, dentro do mesmo cartão; o que vem antes e depois fica em blocos separados */
   function rdNumera(l1, l2) {
