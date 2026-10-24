@@ -4666,10 +4666,12 @@ window.saveAnswer = window.saveAnswer || function(){};
       if (pos === 0) { bl.parentNode.insertBefore(h3, bl); }
       else {
         var resto = document.createElement('div'); resto.className = 'rd-tx'; resto.setAttribute('contenteditable', 'true'); resto.setAttribute('data-i', '-1'); if (bl.hasAttribute('data-q')) resto.setAttribute('data-q', '');
-        resto.innerHTML = rtHtml(rtParse(lines.slice(pos).join('\n')), null);
-        bl.innerHTML = rtHtml(rtParse(lines.slice(0, pos).join('\n')), null);
+        var tail = lines.slice(pos).join('\n').replace(/^\s*\n/, '').replace(/^(\s*\n)+/, ''), head = lines.slice(0, pos).join('\n').replace(/(\n\s*)+$/, '');
+        resto.innerHTML = rtHtml(rtParse(tail), null);
+        bl.innerHTML = rtHtml(rtParse(head), null);
         bl.parentNode.insertBefore(h3, bl.nextSibling);
-        bl.parentNode.insertBefore(resto, h3.nextSibling);
+        if (tail.trim()) bl.parentNode.insertBefore(resto, h3.nextSibling);
+        if (!head.trim()) bl.parentNode.removeChild(bl);
       }
       _rd.tool = null; ov_limpaOn(); rdRenumera();
       rdDigita(true); rdFoco(h3); rdAgenda(); return;
