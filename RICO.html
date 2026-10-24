@@ -4654,7 +4654,8 @@ window.saveAnswer = window.saveAnswer || function(){};
   }
   function rdLixoVis() {
     var ov = document.getElementById('rdOv'); if (!ov) return;
-    var tem = !!(_rd && _rd.copia && ((_rd.cpR && _rd.cpR.length) || _rd.cpCur || (_rd.cpPrev && _rd.cpPrev.length)));
+    var sn1 = window.getSelection(), nat = !!(sn1 && sn1.rangeCount && !sn1.isCollapsed && ov.contains(sn1.anchorNode));
+    var tem = !!(_rd && _rd.copia && (nat || (_rd.cpR && _rd.cpR.length) || _rd.cpCur || (_rd.cpPrev && _rd.cpPrev.length)));
     var bl = ov.querySelector('[data-t="lixo"]'), bc = ov.querySelector('[data-t="c"]');
     if (bl) bl.hidden = !tem; if (bc) bc.hidden = tem;
   }
@@ -4714,12 +4715,12 @@ window.saveAnswer = window.saveAnswer || function(){};
         else if (tm && (Math.abs(fx - h.x0) > 10 || Math.abs(fy - h.y0) > 10)) { clearTimeout(tm); tm = null; }
       },
       te: function() {
-        clearTimeout(tm); tm = null; clearInterval(iv); iv = null;
+        clearTimeout(tm); tm = null; clearInterval(iv); iv = null; setTimeout(rdLixoVis, 0);
         if (d && _rd) { (_rd.cpPrev || []).forEach(function(rl) { if (!rl.collapsed) (_rd.cpR = _rd.cpR || []).push(rl); }); _rd.cpPrev = []; rdCopiaMarca(); }
         d = null;
       }
     };
-    _rd.cpH = h;
+    _rd.cpH = h; _rd.cpIv = setInterval(rdLixoVis, 200);
     ov.addEventListener('touchstart', h.ts, { passive: true }); ov.addEventListener('touchmove', h.tm, { passive: false });
     ov.addEventListener('touchend', h.te, { passive: true }); ov.addEventListener('touchcancel', h.te, { passive: true });
     ov.classList.add('rd-cp');
@@ -4727,7 +4728,7 @@ window.saveAnswer = window.saveAnswer || function(){};
   function rdCopiaDragOff() {
     var ov = document.getElementById('rdOv'); if (!ov || !_rd || !_rd.cpH) return;
     var h = _rd.cpH; ov.removeEventListener('touchstart', h.ts); ov.removeEventListener('touchmove', h.tm); ov.removeEventListener('touchend', h.te); ov.removeEventListener('touchcancel', h.te);
-    _rd.cpH = null; _rd.cpPrev = []; ov.classList.remove('rd-cp');
+    clearInterval(_rd.cpIv); _rd.cpH = null; _rd.cpPrev = []; ov.classList.remove('rd-cp');
   }
   function rdCopiaIni() {
     var ov = document.getElementById('rdOv');
