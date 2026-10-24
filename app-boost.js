@@ -366,11 +366,13 @@ window.Alterna = (function () {
       if (document.getElementById('alterna-base')) return;
       var d = document.createElement('div'); d.id = 'alterna-base';
       d.style.cssText = 'position:fixed;left:0;right:0;bottom:0;height:calc(44px + env(safe-area-inset-bottom,0px));z-index:2147483647;background:transparent;touch-action:none;-webkit-tap-highlight-color:transparent;';
-      var tocou = false;
+      var tocou = false, ultimo = 0;
+      /* dois toques seguidos (ate 0,5 s): um toque so nao faz nada, para nao sair sem querer */
+      var toque = function () { var t = Date.now(); if (t - ultimo < 500) { ultimo = 0; A.botao(); } else ultimo = t; };
       d.addEventListener('touchstart', function (e) { e.stopPropagation(); tocou = true; }, { passive: true });
-      d.addEventListener('touchend', function (e) { e.stopPropagation(); if (e.cancelable) e.preventDefault(); if (tocou) { tocou = false; A.botao(); } });
+      d.addEventListener('touchend', function (e) { e.stopPropagation(); if (e.cancelable) e.preventDefault(); if (tocou) { tocou = false; toque(); } });
       d.addEventListener('touchcancel', function () { tocou = false; }, { passive: true });
-      d.addEventListener('click', function (e) { e.stopPropagation(); e.preventDefault(); if (!('ontouchstart' in window)) A.botao(); });
+      d.addEventListener('click', function (e) { e.stopPropagation(); e.preventDefault(); if (!('ontouchstart' in window)) toque(); });
       d.addEventListener('mousedown', function (e) { e.stopPropagation(); });
       document.documentElement.appendChild(d);
     };
