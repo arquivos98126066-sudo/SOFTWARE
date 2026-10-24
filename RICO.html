@@ -6403,7 +6403,7 @@ window.saveAnswer = window.saveAnswer || function(){};
     var pts = null, t0 = 0;
     /* ir para um lado e voltar: um traço horizontal grande, de ida e volta, mais ou menos reto */
     function ehVaiVolta(p){
-      if (p.length < 5) return false;
+      if (p.length < 4) return false;
       var x0 = p[0].x, m = 0, minY = p[0].y, maxY = p[0].y, i;
       for (i = 1; i < p.length; i++){
         if (Math.abs(p[i].x - x0) > Math.abs(p[m].x - x0)) m = i;
@@ -6411,16 +6411,16 @@ window.saveAnswer = window.saveAnswer || function(){};
         if (p[i].y > maxY) maxY = p[i].y;
       }
       var ida = p[m].x - x0, aida = Math.abs(ida), fim = p[p.length - 1];
-      if (aida < 100) return false;
-      if (m < 2 || m > p.length - 3) return false;
+      if (aida < 40) return false;
+      if (m < 1 || m > p.length - 2) return false;
       if ((fim.x - p[m].x) * ida > 0) return false;
-      if (Math.abs(p[m].x - fim.x) < aida * 0.7) return false;
-      if (maxY - minY > Math.max(70, aida * 0.55)) return false;
+      if (Math.abs(p[m].x - fim.x) < aida * 0.6) return false;
+      if (maxY - minY > Math.max(45, aida * 0.8)) return false;
       return true;
     }
     function fim(){
       var p = pts; pts = null;
-      if (p && Date.now() - t0 <= 1600 && ehVaiVolta(p)) aoFazer();
+      if (p && Date.now() - t0 <= 2200 && ehVaiVolta(p)) aoFazer();
     }
     document.addEventListener('touchstart', function(e){
       if (e.touches.length !== 1 || /^(INPUT|TEXTAREA|SELECT)$/.test((e.target.tagName || ''))) { pts = null; return; }
