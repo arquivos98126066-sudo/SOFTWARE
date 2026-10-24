@@ -384,11 +384,11 @@ window.Alterna = (function () {
       var toque = function (x, y) {
         /* faixa do meio da tela: sempre e so para sair (dois toques); nas laterais, botao de baixo funciona na hora */
         /* a faixa fica no lado direito, no meio da altura: a base da tela fica 100% livre para os botoes do app */
-        var t = Date.now();
-        if (t - ultimo < 500) { ultimo = 0; A.botao(); } else ultimo = t;
+        A.botao();
       };
-      d.addEventListener('touchstart', function (e) { e.stopPropagation(); tocou = true; }, { passive: true });
-      d.addEventListener('touchend', function (e) { e.stopPropagation(); if (e.cancelable) e.preventDefault(); if (tocou) { tocou = false; var c = e.changedTouches && e.changedTouches[0]; toque(c ? c.clientX : 0, c ? c.clientY : 0); } });
+      var x0 = 0, y0 = 0;
+      d.addEventListener('touchstart', function (e) { e.stopPropagation(); tocou = true; var c0 = e.touches && e.touches[0]; x0 = c0 ? c0.clientX : 0; y0 = c0 ? c0.clientY : 0; }, { passive: true });
+      d.addEventListener('touchend', function (e) { e.stopPropagation(); if (e.cancelable) e.preventDefault(); if (tocou) { tocou = false; var c = e.changedTouches && e.changedTouches[0]; if (c && (Math.abs(c.clientX - x0) > 12 || Math.abs(c.clientY - y0) > 12)) return; toque(c ? c.clientX : 0, c ? c.clientY : 0); } });
       d.addEventListener('touchcancel', function () { tocou = false; }, { passive: true });
       d.addEventListener('click', function (e) { e.stopPropagation(); e.preventDefault(); if (!('ontouchstart' in window)) toque(e.clientX, e.clientY); });
       d.addEventListener('mousedown', function (e) { e.stopPropagation(); });
