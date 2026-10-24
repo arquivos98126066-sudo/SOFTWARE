@@ -45,6 +45,10 @@ Vale para os 6 apps do menu (Tapete CRM, Meu CRM, Plano/DOA, ADM, Rico, Estudo/L
 - Voltar do celular = abrir do começo; só a faixa de baixo guarda a posição (regra dele, 24/10/2026).
 - Abrir o app instalado sem logo do Chrome nem barra: manifest com id, scope, display standalone e background_color igual à cor do menu (#020719). Se ainda aparecer, o atalho foi criado fora do app instalado: remover e instalar de novo pelo Chrome (Instalar app).
 
+## 4A. APARECER DE UMA VEZ, "TELETRANSPORTE" (permanente, 24/10/2026, gosto dele)
+- Janelas, folhas de baixo, balões, avisos, menus e pílulas aparecem e somem de uma vez (plim), sem subir de baixo, sem descer, sem deslizar e sem esmaecer. Nada de `transform: translate` nem `opacity` com transição para surgir. Se um teclado vai abrir, a janela já nasce na altura final dele (altura do teclado guardada em `ui.kbh`), sem pulo.
+- Vale em todo app e HTML novo ou editado. Rico já foi todo ajustado (keyframes cicloEntra, habPickSobe, rcmConfIn, rcmCardIn viraram sem movimento; toast, #tip, .rcm-scrim e .rcm-sheet sem transição).
+
 ## 4B. PUBLICAR DE VERDADE (permanente, 24/10/2026, erro repetido várias vezes)
 - O app mostra a branch main do SOFTWARE (GitHub Pages). Commit ou push na branch de trabalho NÃO publica: já deixei mudanças de fora por isso.
 - Para publicar: subir o número do cache em service-worker.js, fazer commit e rodar `bash publicar.sh`. Ele envia para a main e confere no GitHub.
