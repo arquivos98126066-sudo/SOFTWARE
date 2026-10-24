@@ -6400,7 +6400,7 @@ window.saveAnswer = window.saveAnswer || function(){};
   }
   var feitos = 0;
   window.__ricoRevela = function(){ revela(); };
-  function revela(){ liga(); if (++feitos < 3) return; requestAnimationFrame(function(){ requestAnimationFrame(function(){ var x = document.getElementById('rico-esconde'); if (x) x.remove(); }); }); }
+  function revela(){ liga(); if (++feitos < 3 + (window.__ricoExtra || 0)) return; requestAnimationFrame(function(){ requestAnimationFrame(function(){ var x = document.getElementById('rico-esconde'); if (x) x.remove(); }); }); }
   liga(); window.addEventListener('resize',liga);
   /* só mostra a página (quando ela estava escondida para voltar ao lugar) depois que fontes e arquivos terminaram e tudo está no tamanho final */
   if (document.readyState === 'complete') revela(); else window.addEventListener('load', revela);
@@ -6423,8 +6423,20 @@ window.saveAnswer = window.saveAnswer || function(){};
   if (!y) return;
   document.addEventListener('touchstart', function(){ tocou = true; }, {passive: true});
   function ir(){ if (!tocou && Math.abs(window.scrollY - y) > 2) window.scrollTo({top: y, behavior: 'instant'}); }
-  ir();
-  window.addEventListener('load', function(){ [0, 400, 1200].forEach(function(t){ setTimeout(ir, t); }); });
+  /* so mostra a pagina depois de posicionar com o conteudo ja no tamanho final (senao sobe e desce na frente dele) */
+  window.__ricoExtra = 1;
+  var feito = false, tq = null, tmax = null, mo = null;
+  function pronto(){
+    if (feito) return; feito = true; clearTimeout(tq); clearTimeout(tmax); if (mo) mo.disconnect();
+    document.documentElement.style.overflowAnchor = 'none';
+    ir(); requestAnimationFrame(function(){ ir(); if (window.__ricoRevela) window.__ricoRevela(); });
+  }
+  var carregou = false;
+  function espera(){ clearTimeout(tq); if (carregou) tq = setTimeout(pronto, 160); }
+  try { mo = new MutationObserver(function(){ ir(); espera(); }); mo.observe(document.documentElement, {childList: true, subtree: true, characterData: true, attributes: true, attributeFilter: ['style', 'class', 'rows']}); } catch(e){}
+  window.addEventListener('load', function(){ carregou = true; espera(); });
+  if (document.readyState === 'complete') { carregou = true; espera(); }
+  tmax = setTimeout(pronto, 1200);
 })();
 </script>
 </body>
