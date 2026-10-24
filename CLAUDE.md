@@ -37,6 +37,7 @@ Vale para os 6 apps do menu (Tapete CRM, Meu CRM, Plano/DOA, ADM, Rico, Estudo/L
 - Rico ao voltar: a página só aparece depois do DOM ficar quieto 160 ms e da rolagem estar no lugar (`__ricoExtra`); nada de reposicionar depois de aparecer (era a "mexidinha" para cima e para baixo).
 - Tapete, Registra: tocar na área vazia abaixo da pergunta não reabre o teclado; só tocar dentro da pergunta reabre (o teclado continua abrindo sozinho a cada passo).
 - Tapete, Registra: qualquer toque fora da pergunta (vazio, menu de baixo) tira o foco do campo, para o teclado não subir; só dentro da pergunta ele reabre.
+- Rico, mapa mental: dois toques no círculo abrem a leitura limpa (`#rdOv`, função `abrirLeitura`): título = nome da célula (cápsula sem fundo, linha fina), subtítulos centralizados, texto com marcadores do editor (número em círculo bege, traço, bolinha, check). Segurar mostra o lápis (abre o editor de sempre, onde título e `#` já existem) e o X; dois toques no vazio fecham. Sem dourado e sem azul nos títulos (preto do texto).
 - Voltar do celular = abrir do começo; só a faixa de baixo guarda a posição (regra dele, 24/10/2026).
 - Abrir o app instalado sem logo do Chrome nem barra: manifest com id, scope, display standalone e background_color igual à cor do menu (#020719). Se ainda aparecer, o atalho foi criado fora do app instalado: remover e instalar de novo pelo Chrome (Instalar app).
 
