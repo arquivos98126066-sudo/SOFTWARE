@@ -3,7 +3,7 @@
   var st = document.createElement('style');
   st.textContent = 'html{touch-action:pan-x pan-y;overscroll-behavior-x:none}';
   (document.head || document.documentElement).appendChild(st);
-  document.addEventListener('touchstart', function (e) { if (e.touches && e.touches.length > 1) e.preventDefault(); }, { passive: false });
+  /* pinça: bloqueada pelo touch-action acima; um ouvinte não passivo aqui faria toda rolagem esperar o app */
   ['gesturestart', 'gesturechange', 'gestureend'].forEach(function (n) { document.addEventListener(n, function (e) { e.preventDefault(); }); });
   function zera() {
     if (window.scrollX) window.scrollTo(0, window.scrollY);

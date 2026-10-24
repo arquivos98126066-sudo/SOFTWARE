@@ -5699,13 +5699,13 @@ window.saveAnswer = window.saveAnswer || function(){};
       card.classList.toggle('n', v === 'n');
     }
     function abrirPick(b) {
-      bAlvo = b; aberto = true; moveu = false; arrasto = false; abriuEm = Date.now();
+      bAlvo = b; aberto = true; trava(true); moveu = false; arrasto = false; abriuEm = Date.now();
       card.classList.remove('arrasta'); knob.style.transform = '';
       estado(b._alvo);
       ov.hidden = false;
       if (navigator.vibrate) { try { navigator.vibrate(15); } catch (_) {} }
     }
-    function fecharPick() { aberto = false; ov.hidden = true; bAlvo = null; card.classList.remove('arrasta'); knob.style.transform = ''; semSelecao(); }
+    function fecharPick() { aberto = false; trava(false); ov.hidden = true; bAlvo = null; card.classList.remove('arrasta'); knob.style.transform = ''; semSelecao(); }
     function semSelecao() { var f = function() { try { window.getSelection().removeAllRanges(); } catch (_) {} }; f(); setTimeout(f, 120); setTimeout(f, 450); }
     function escolher(v) {
       var b = bAlvo;
@@ -5756,7 +5756,12 @@ window.saveAnswer = window.saveAnswer || function(){};
       else if (moveu) fecharPick();
     }, true);
     document.addEventListener('pointercancel', function() { clearTimeout(tm); tm = null; if (aberto && moveu) fecharPick(); }, true);
-    document.addEventListener('touchmove', function(e) { if (aberto) e.preventDefault(); }, { passive: false });
+    /* ouvinte que bloqueia a rolagem só existe enquanto o seletor está aberto: sempre ligado, ele faz toda rolagem esperar o app (travadas) */
+    var travaTm = null;
+    function trava(on) {
+      if (on && !travaTm) { travaTm = function(e) { e.preventDefault(); }; document.addEventListener('touchmove', travaTm, { passive: false }); }
+      else if (!on && travaTm) { document.removeEventListener('touchmove', travaTm); travaTm = null; }
+    }
     ov.addEventListener('click', function(e) {
       if (!aberto || Date.now() - abriuEm < 500) return;
       var pl = e.target.closest('.pl');
@@ -6008,7 +6013,6 @@ window.saveAnswer = window.saveAnswer || function(){};
 <script>
 /* trava zoom e rolagem lateral: o app nunca fica maior que a tela nem deslocado */
 (function() {
-  document.addEventListener('touchstart', function(e) { if (e.touches && e.touches.length > 1) e.preventDefault(); }, { passive: false });
   ['gesturestart', 'gesturechange', 'gestureend'].forEach(function(n) { document.addEventListener(n, function(e) { e.preventDefault(); }); });
   function zera() {
     if (window.scrollX) window.scrollTo(0, window.scrollY);
