@@ -442,15 +442,15 @@ html, body { height: 100%; overflow: hidden; }
 
 /* ===== Segurar um app: baixar, enviar, voltar ao original ===== */
 .menu-link { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; -webkit-user-drag: none; }
-#apps-ov { position: fixed; inset: 0; z-index: 9000; background: rgba(2,7,25,.34); display: none; }
+#apps-ov { position: fixed; inset: 0; z-index: 9000; background: rgba(2,7,25,.45); display: none; }
 #apps-ov.on { display: block; }
-#apps-sheet { position: absolute; display: flex; align-items: center; gap: 6px; padding: 7px; border-radius: 999px; background: rgba(18,26,58,.78); -webkit-backdrop-filter: blur(22px) saturate(1.4); backdrop-filter: blur(22px) saturate(1.4); border: 1px solid rgba(255,255,255,.18); box-shadow: 0 18px 44px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.14); animation: appsSobe .2s ease both; }
-@keyframes appsSobe { from { transform: translate(-50%, 8px) scale(.94); opacity: 0; } to { transform: translate(-50%, 0) scale(1); opacity: 1; } }
-#apps-sheet button { position: relative; display: grid; place-items: center; width: 54px; height: 54px; padding: 0; border: 0; border-radius: 50%; background: transparent; color: #fff; cursor: pointer; transition: background .15s, transform .12s; }
-#apps-sheet button:active { background: rgba(255,255,255,.18); transform: scale(.94); }
+#apps-sheet { --tint: #ffffff; position: absolute; left: 50%; bottom: calc(env(safe-area-inset-bottom, 0px) + 38px); display: flex; align-items: center; gap: 8px; padding: 8px; border-radius: 30px; background: linear-gradient(180deg, rgba(255,255,255,.12), rgba(255,255,255,.02)), rgba(10,15,38,.86); border: 1px solid rgba(255,255,255,.28); border: 1px solid color-mix(in srgb, var(--tint) 60%, transparent); box-shadow: 0 22px 54px rgba(0,0,0,.65), 0 0 36px color-mix(in srgb, var(--tint) 38%, transparent), inset 0 1px 0 rgba(255,255,255,.22); animation: appsSobe .2s ease both; }
+@keyframes appsSobe { from { transform: translate(-50%, 10px) scale(.94); opacity: 0; } to { transform: translate(-50%, 0) scale(1); opacity: 1; } }
+#apps-sheet button { position: relative; display: grid; place-items: center; width: 58px; height: 58px; padding: 0; border-radius: 21px; background: rgba(255,255,255,.075); border: 1px solid rgba(255,255,255,.11); color: #fff; cursor: pointer; transition: background .15s, transform .12s; }
+#apps-sheet button:first-child { background: linear-gradient(145deg, color-mix(in srgb, var(--tint) 55%, #0a0f26), color-mix(in srgb, var(--tint) 25%, #0a0f26)); border-color: color-mix(in srgb, var(--tint) 70%, transparent); }
+#apps-sheet button:active { transform: scale(.94); filter: brightness(1.25); }
 #apps-sheet button:disabled { opacity: .3; pointer-events: none; }
-#apps-sheet button + button::before { content: ''; position: absolute; left: -4px; top: 14px; bottom: 14px; width: 1px; background: rgba(255,255,255,.14); }
-#apps-sheet button svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; }
+#apps-sheet button svg { width: 25px; height: 25px; fill: none; stroke: currentColor; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; }
 #apps-sheet button.tem::after { content: ''; position: absolute; top: 11px; right: 11px; width: 7px; height: 7px; border-radius: 50%; background: #ffc83d; box-shadow: 0 0 8px #ffc83d; }
 #apps-aviso { position: fixed; left: 50%; bottom: calc(env(safe-area-inset-bottom, 0px) + 28px); z-index: 9100; transform: translate(-50%, 8px); max-width: 90vw; padding: 11px 20px; border-radius: 999px; background: rgba(18,26,58,.92); border: 1px solid rgba(255,255,255,.18); color: #fff; font-family: var(--fh); font-size: 13.5px; font-weight: 600; text-align: center; opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s; }
 #apps-aviso.on { opacity: 1; transform: translate(-50%, 0); }
@@ -620,6 +620,7 @@ html, body { height: 100%; overflow: hidden; }
     'RICO.html': ['Rico', 'RICO.html'], 'LER.html': ['Estudo', 'ESTUDO.html']
   };
   var ENVIADOS = 'apps-enviados';
+  var CORES = { 'TAPETE-CRM.html': '#ff2d55', 'MEU-CRM.html': '#19d38a', 'DOA.html': '#9fb0d6', 'ADM.html': '#2f7bff', 'RICO.html': '#ffb020', 'LER.html': '#a45cff' };
   var ov = document.getElementById('apps-ov'), fileIn = document.getElementById('apps-file');
   var avisoEl = document.getElementById('apps-aviso'), avisoTm = null;
   var alvo = null, tm = null, x0 = 0, y0 = 0, longo = false, confirmaTm = null, abriuEm = 0;
@@ -639,9 +640,7 @@ html, body { height: 100%; overflow: hidden; }
       o.disabled = !sim; o.classList.toggle('tem', sim);
     });
     ov.className = 'on'; abriuEm = Date.now();
-    var r = a.getBoundingClientRect(), w = 3 * 54 + 2 * 6 + 14;
-    var x = Math.max(w / 2 + 12, Math.min(window.innerWidth - w / 2 - 12, r.left + r.width / 2));
-    sh.style.left = x + 'px'; sh.style.top = Math.max(12, Math.min(window.innerHeight - 90, r.top + r.height * 0.62)) + 'px';
+    sh.style.setProperty('--tint', CORES[arq(a)] || '#ffffff');
     if (navigator.vibrate) { try { navigator.vibrate(15); } catch (e) {} }
   }
   function fecha() { ov.className = ''; alvo = null; clearTimeout(confirmaTm); }
