@@ -673,6 +673,15 @@
   .rcm-conf-bt button{ border: 0; background: transparent; font-weight: 600; color: var(--tx2); height: 44px; }
   .rcm-conf-bt button.sim{ height: 54px; background: var(--dark); color: var(--gold-light); box-shadow: 0 10px 22px rgba(15,27,45,.3); }
   .rcm-conf-bt button.sim:active{ background: var(--dark2); filter: none; }
+  /* botões do diálogo: pílula branca compacta só com ícones, igual à barra do mapa */
+  /* minimalista: sem os títulos "Você escolheu" e "Mudanças e instruções" nem o aviso de lista vazia */
+  .rcm-conf-card h4, .rcm-conf-card ul:has(> li.vz:only-child){ display: none; }
+  .rcm-conf-bt{ display: flex; flex-wrap: nowrap; justify-content: center; gap: 2px; width: fit-content; padding: 4px; margin: 16px auto 0; background: #fff; border: 1px solid var(--bd); border-radius: 999px; box-shadow: 0 6px 16px rgba(15,27,45,.12); }
+  .rcm-conf-bt button, .rcm-conf-bt button.sim{ flex: 0 0 36px; width: 36px; min-width: 36px; height: 36px; padding: 0; border: 0; border-radius: 50%; background: transparent; color: var(--dark); display: grid; place-items: center; font-size: 0; letter-spacing: 0; box-shadow: none; filter: none; }
+  .rcm-conf-bt button svg{ width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+  .rcm-conf-bt button:active{ background: var(--chip); transform: none; }
+  .rcm-conf-bt button.sim{ background: var(--dark); color: var(--gold-light); }
+  .rcm-conf-bt button.sim:active{ background: var(--dark2); }
   .rcm-bar{ position: absolute; z-index: 5; display: flex; justify-content: center; margin: 0; left: 0; top: 0; filter: drop-shadow(0 6px 14px rgba(0,0,0,.4)); }
   .rcm-bar[hidden]{ display: none; }
   .rcm-pill{ display: flex; gap: 2px; padding: 5px; background: var(--dark2); border: 1px solid var(--gold); border-radius: 999px; }
@@ -2579,10 +2588,38 @@ window.saveAnswer = window.saveAnswer || function(){};
       return r;
     }
     function carrega() {
-      try { var s = localStorage.getItem(KEY); if (s) { var r = limpa(JSON.parse(s), true); if (r) return r; } } catch (e) {}
+      try { var s = localStorage.getItem(KEY); if (s) { var raw = JSON.parse(s), r = limpa(raw, true); if (r) { retomaFluxo(r, raw); return r; } } } catch (e) {}
       return semente();
     }
-    function salva() { try { localStorage.setItem(KEY, JSON.stringify(root)); } catch (e) {} }
+    /* onde está a lista que aparece agora (dono + camada): fica salvo para voltar ao mesmo ponto depois de sair do app */
+    function vistaDe() {
+      var L = root.children, r = null;
+      (function anda(n) {
+        if (r) return;
+        if (n.et) { var i = n.et.s.indexOf(L); if (i >= 0) { r = { o: n.id, l: i }; return; } }
+        else if (n.children === L) { r = { o: n.id, l: -1 }; return; }
+        (n.et ? [].concat.apply([], n.et.s) : n.children).forEach(anda);
+      })(root);
+      return r;
+    }
+    function salva() { try { if (root && root.et) root.et.vista = vistaDe(); localStorage.setItem(KEY, JSON.stringify(root)); } catch (e) {} }
+    function retomaFluxo(r, raw) {
+      if (!r.et || !raw.et) return;
+      var por = {};
+      (function m(n) { por[n.id] = n; (n.et ? [].concat.apply([], n.et.s) : n.children).forEach(m); })(r);
+      var idsOk = function(a) { return Array.isArray(a) && a.every(function(id) { return typeof id === 'string' && por[id]; }); };
+      var listaEm = function(v) {
+        if (!v || typeof v.o !== 'string' || !por[v.o]) return null;
+        var n = por[v.o];
+        return n.et ? (n.et.s[v.l] || null) : (v.l === -1 ? n.children : null);
+      };
+      var d = raw.et.desc, lst = listaEm(raw.et.vista);
+      if (!idsOk(d) || !d.length || !lst) return;
+      r.et.desc = d.slice(); r.children = lst; r.et.run = true;
+      if (Array.isArray(raw.et.pilha)) r.et.pilha = raw.et.pilha.filter(function(s) {
+        return s && typeof s.cur === 'number' && idsOk(s.desc) && Array.isArray(s.esc) && listaEm(s.v);
+      }).map(function(s) { return { cur: s.cur, desc: s.desc.slice(), esc: s.esc.map(String), v: { o: s.v.o, l: s.v.l } }; });
+    }
     function acha(id, n, p) {
       n = n || root; p = p || null;
       if (n.id === id) return { n: n, p: p };
@@ -3018,12 +3055,12 @@ window.saveAnswer = window.saveAnswer || function(){};
       et.cur = Math.max(0, Math.min(et.cur - 1, et.s.length - 1));
       p.children = et.s[et.cur];
     }
-    function reiniciaFluxo(n) { focoId = null; n.et.cur = 0; n.et.desc = []; n.et.esc = []; n.et.fim = false; n.et.ver = null; n.children = n.et.s[0]; n.et.run = true; }
+    function reiniciaFluxo(n) { focoId = null; n.et.pilha = []; n.et.cur = 0; n.et.desc = []; n.et.esc = []; n.et.fim = false; n.et.ver = null; n.children = n.et.s[0]; n.et.run = true; }
     function etapasMostra(id) { selId = id; barId = id; salva(); montaBar(); render(); }
     function etapasNo(id) { /* segurar: cria a próxima etapa (se a última já estiver vazia, só vai até ela) */
       var f = acha(id); if (!f) return;
       var n = f.n;
-      if (n.et && ((n.et.desc && n.et.desc.length) || n.et.ver != null)) { n.children = n.et.s[n.et.cur]; n.et.desc = []; n.et.esc = []; }
+      if (n.et && ((n.et.desc && n.et.desc.length) || n.et.ver != null)) { n.children = n.et.s[n.et.cur]; n.et.desc = []; n.et.esc = []; n.et.pilha = []; }
       if (n.et) { n.et.fim = false; n.et.ver = null; }
       if (!n.et) { if (!n.children.length && !f.p) return; n.et = { s: [n.children], cur: 0, run: false, esc: [] }; }
       n.et.s[n.et.cur] = n.children;
@@ -3047,6 +3084,7 @@ window.saveAnswer = window.saveAnswer || function(){};
       }
       if (n.et.s.length < 2) { if (!f.p) { reiniciaFluxo(n); n.collapsed = false; etapasMostra(id); } return; }
       if (n.et.desc && n.et.desc.length) { n.children = n.et.s[n.et.cur]; n.et.desc = []; }
+      n.et.pilha = [];
       n.et.fim = false;
       n.et.s[n.et.cur] = n.children;
       n.et.cur = (n.et.cur + 1) % n.et.s.length; n.children = n.et.s[n.et.cur];
@@ -3061,7 +3099,18 @@ window.saveAnswer = window.saveAnswer || function(){};
       for (var i = 0; i < lst.length; i++) { var r = achaTudo(id, lst[i]); if (r) return r; }
       return null;
     }
+    function pilhaVolta() { /* volta exatamente para a tela anterior (lista e caminho de antes da última escolha) */
+      var et = root.et; if (!et || !et.pilha || !et.pilha.length) return false;
+      var s = et.pilha.pop(), n = s.v && (s.v.o === 'root' ? root : achaTudo(s.v.o));
+      var lst = n ? (n.et ? n.et.s[s.v.l] : (s.v.l === -1 ? n.children : null)) : null;
+      if (!lst || !s.desc.every(function(id) { return achaTudo(id); })) { et.pilha = []; return false; }
+      et.cur = s.cur; et.desc = s.desc.slice(); et.esc = s.esc.slice(); et.fim = false; et.ver = null;
+      root.children = lst; root.collapsed = false;
+      focoId = null; focoFix = false; abreId = null; selId = 'root'; barId = null; salva(); render();
+      return true;
+    }
     function camadaVolta() { /* volta para a camada anterior (camada 2 -> 1) */
+      if (pilhaVolta()) return;
       var et = root.et; if (!et || et.cur <= 0) return;
       et.s[et.cur] = root.children;
       et.cur--; et.ver = null; et.desc = []; et.esc = []; et.fim = false;
@@ -3070,10 +3119,14 @@ window.saveAnswer = window.saveAnswer || function(){};
       selId = 'root'; barId = null; salva(); render();
     }
     function fluxoVolta() { /* sobe um nível da descida do fluxo: tira a última escolha e mostra a lista de cima */
+      if (pilhaVolta()) return;
       var et = root.et; if (!et || !et.desc || !et.desc.length) return;
-      et.desc.pop(); et.esc.pop(); et.fim = false; et.ver = null;
+      var saiu = et.desc.pop(); et.esc.pop(); et.fim = false; et.ver = null;
       var topo = et.desc.length ? achaTudo(et.desc[et.desc.length - 1]) : null;
-      root.children = topo ? (topo.et ? topo.et.s[0] : topo.children) : et.s[et.cur];
+      /* volta para a lista onde a célula que saiu estava; se a célula de cima tem camadas, é a camada dela (e não sempre a primeira, que mandava para o começo) */
+      var lista = null;
+      if (topo && topo.et) topo.et.s.some(function(l) { if (l.some(function(c) { return c.id === saiu; })) { lista = l; return true; } return false; });
+      root.children = topo ? (lista || (topo.et ? topo.et.s[0] : topo.children)) : et.s[et.cur];
       selId = 'root'; barId = null; salva(); render();
     }
     function focoEntra(id) { focoId = id; }
@@ -3278,7 +3331,7 @@ window.saveAnswer = window.saveAnswer || function(){};
       var ov = document.createElement('div'); ov.className = 'rcm-conf';
       var caminho = corpo.map(function(x, q) { var ls = String(x).split('\n'), rp = /^Resposta: /.test(ls[1] || '') ? ls.slice(1).join('\n').slice(10) : ''; return '<li><b>' + (q + 1) + '</b><span>' + escH(ls[0].replace(/^\(|\)$/g, '')) + (rp ? '<em>' + escH(rp) + '</em>' : '') + '</span></li>'; }).join('');
       var mud = muda.length ? muda.map(function(m) { return '<li><i>' + escH(m.k) + '</i><span>' + escH(m.d) + '</span></li>'; }).join('') : '<li class="vz">Nenhuma mudança desde a última cópia.</li>';
-      ov.innerHTML = '<div class="rcm-conf-card">' + '<h4>Você escolheu</h4><ol>' + caminho + '</ol><h4>Mudanças e instruções</h4><ul>' + mud + '</ul><div class="rcm-conf-bt"><button type="button" class="sim">Copiado</button><button type="button" class="nao">Cancela</button><button type="button" class="volta">Volta</button></div></div>';
+      ov.innerHTML = '<div class="rcm-conf-card">' + '<h4>Você escolheu</h4><ol>' + caminho + '</ol><h4>Mudanças e instruções</h4><ul>' + mud + '</ul><div class="rcm-conf-bt"><button type="button" class="sim" aria-label="Copiado" title="Copiado"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2.5"/><path d="M5 15V7a2 2 0 0 1 2-2h8"/></svg></button><button type="button" class="nao" aria-label="Cancela" title="Cancela"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button><button type="button" class="volta" aria-label="Volta" title="Volta"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5M5 12l6-6M5 12l6 6"/></svg></button></div></div>';
       document.body.appendChild(ov);
       ov.querySelector('.nao').onclick = function() { ov.remove(); };
       ov.querySelector('.volta').onclick = function() { ov.remove(); ac.voltar(); };
@@ -3316,7 +3369,7 @@ window.saveAnswer = window.saveAnswer || function(){};
     function pedeResposta(f, cb) {
       var velho = document.querySelector('.rcm-conf'); if (velho) velho.remove();
       var ov = document.createElement('div'); ov.className = 'rcm-conf'; ov.style.paddingBottom = '40px';
-      ov.innerHTML = '<div class="rcm-conf-card"><h3>' + escH(f.n.text) + '</h3><textarea rows="1"></textarea><div class="rcm-conf-bt"><button type="button" class="sim">OK</button><button type="button" class="nao">Cancela</button><button type="button" class="volta">Pula</button></div></div>';
+      ov.innerHTML = '<div class="rcm-conf-card"><h3>' + escH(f.n.text) + '</h3><textarea rows="1"></textarea><div class="rcm-conf-bt"><button type="button" class="sim" aria-label="OK" title="OK"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7"/></svg></button><button type="button" class="nao" aria-label="Cancela" title="Cancela"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button><button type="button" class="volta" aria-label="Pula" title="Pula"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></div></div>';
       document.body.appendChild(ov);
       var ta = ov.querySelector('textarea'); ta.addEventListener('input', function() { if (!(window.CSS && CSS.supports && CSS.supports('field-sizing', 'content'))) (window.autoGrow || function() {})(ta); ta.classList.toggle('quebrou', ta.scrollHeight > 56); }); setTimeout(function() { try { ta.focus(); } catch (e) {} }, 60);
       ov.querySelector('.nao').onclick = function() { ov.remove(); };
@@ -3329,10 +3382,11 @@ window.saveAnswer = window.saveAnswer || function(){};
       var tx = textoDe(f.n);
       var pos = p.children.indexOf(f.n) + 1;
       var dN = et.desc ? et.desc.length : 0, lvN = et.ver == null ? dN : et.ver;
-      if (lvN < dN) { et.esc = et.esc.slice(0, lvN); et.desc = et.desc.slice(0, lvN); et.fim = false; }
+      if (lvN < dN) { et.esc = et.esc.slice(0, lvN); et.desc = et.desc.slice(0, lvN); et.fim = false; et.pilha = []; }
       et.ver = null;
       var linha = '(' + (f.n.text || '') + ')' + (resp !== undefined ? '\nResposta: ' + (resp || 'sem resposta') : (pos > 0 ? '\nOpção ' + pos : '') + (tx ? '\n' + tx : ''));
       if (et.fim) { et.esc[et.esc.length - 1] = linha; selId = p.id; barId = null; render(); abreConfirma(p, false); return; }
+      (et.pilha = et.pilha || []).push({ cur: et.cur, desc: (et.desc || []).slice(), esc: et.esc.slice(), v: vistaDe() });
       et.esc.push(linha);
       var sub = f.n.et ? (f.n.et.s.filter(function(x) { return x.length; })[0] || []) : f.n.children;
       var fim = false;
