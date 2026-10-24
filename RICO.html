@@ -4756,6 +4756,7 @@ window.saveAnswer = window.saveAnswer || function(){};
     _rd.tool = (_rd.tool === t) ? null : t;
     if (_rd.tool) { _rd.digita = false; var bd = ov.querySelector('[data-t="digita"]'); if (bd) bd.classList.remove('on'); }
     ov.querySelectorAll('.rd-tools [data-t]').forEach(function(b) { var x = b.getAttribute('data-t'); b.classList.toggle('on', x === _rd.tool); });
+    var geA = ov.querySelector('[data-g="estilo"]'); if (geA && !geA.hidden) ov.querySelector('[data-t="estilo"]').classList.add('on');
     /* ferramenta armada: sem teclado até desarmar */
     rdModoTeclado();
     if (_rd.tool) { try { var a = document.activeElement; if (a && a.blur && ov.contains(a)) a.blur(); } catch (_) {} }
@@ -4793,12 +4794,16 @@ window.saveAnswer = window.saveAnswer || function(){};
       rdDigita(false); return;
     }
     if (t === 'estilo') {
+      /* trocar de grupo desliga tudo do grupo anterior: modo texto, ferramenta armada, modo copiar e seleção */
       var gm = ov.querySelector('[data-g="main"]'), ge = ov.querySelector('[data-g="estilo"]');
-      var abre = ge.hidden; ge.hidden = !abre; gm.hidden = abre;
+      var abre = ge.hidden;
+      if (_rd.copia) rdCopiaFim();
+      _rd.tool = null; ov.classList.remove('rd-q'); ov_limpaOn();
+      if (_rd.digita) rdDigita(false);
+      ge.hidden = !abre; gm.hidden = abre;
       ov.querySelector('[data-t="estilo"]').classList.toggle('on', abre);
       rdModoTeclado();
-      if (_rd.digita) rdDigita(false);
-      if (abre) { try { var a2 = document.activeElement; if (a2 && a2.blur && ov.contains(a2)) a2.blur(); } catch (_) {} }
+      try { var a2 = document.activeElement; if (a2 && a2.blur && ov.contains(a2)) a2.blur(); window.getSelection().removeAllRanges(); } catch (_) {}
       return;
     }
     if (t === 'digita') { rdDigita(!_rd.digita); return; }
