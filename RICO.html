@@ -4568,7 +4568,8 @@ window.saveAnswer = window.saveAnswer || function(){};
     function pinGet() { try { var r = localStorage.getItem(PIN); if (!r) return null; try { var o = JSON.parse(r); if (o && o.v) return o; } catch (x) {} return { v: r }; } catch (e) { return null; } }
     function pinSalva(v) { if (pend) return; try { localStorage.setItem(PIN, JSON.stringify({ v: v || viewAtual(), e: window.rcMapa ? window.rcMapa.estado() : null, y: lastY, f: _foco })); } catch (e) {} }
     var lastY = 0, pronto = false, scT = null;
-    function irY() { window.scrollTo({ top: lastY, behavior: 'instant' }); }
+    /* só reposiciona enquanto você ainda não tocou na tela: depois disso, qualquer volta ao lugar puxaria a tela para cima e para baixo (a tremida) */
+    function irY() { if (!pend) return; window.scrollTo({ top: lastY, behavior: 'instant' }); }
     function pinMarca() { if (pb) pb.classList.toggle('on', !!pinGet()); }
     var _vai = cicloVai;
     cicloVai = function(v) {
