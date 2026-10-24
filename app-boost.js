@@ -361,11 +361,11 @@ window.Alterna = (function () {
   if (eu) {
     window.AlternaGestos.vaiVolta(A.zig);
     window.AlternaGestos.doisDedos(A.quebra);
-    /* faixa transparente por cima de tudo, na base da tela: o toque nao passa para o que esta embaixo */
+    /* faixa transparente no lado direito, no meio da altura (nada na base da tela: la ficam os botoes do app); o toque nao passa para o que esta embaixo */
     var faixa = function () {
       if (document.getElementById('alterna-base')) return;
       var d = document.createElement('div'); d.id = 'alterna-base';
-      d.style.cssText = 'position:fixed;left:calc(50% - 70px);width:140px;bottom:0;height:calc(44px + env(safe-area-inset-bottom,0px));z-index:2147483647;background:transparent;touch-action:none;-webkit-tap-highlight-color:transparent;';
+      d.style.cssText = 'position:fixed;right:0;top:calc(50% - 90px);width:calc(26px + env(safe-area-inset-right,0px));height:180px;z-index:2147483647;background:transparent;touch-action:pan-y;-webkit-tap-highlight-color:transparent;';
       var tocou = false, ultimo = 0;
       /* botao que fica por baixo da faixa (menu inferior do app): so ele recebe o toque, na hora; fora dele, dois toques levam ao menu */
       var botaoAbaixo = function (x, y) {
@@ -383,7 +383,7 @@ window.Alterna = (function () {
       var ultimo = 0, tocou = false;
       var toque = function (x, y) {
         /* faixa do meio da tela: sempre e so para sair (dois toques); nas laterais, botao de baixo funciona na hora */
-        /* a faixa so existe no meio (140 px): as laterais ficam livres e os botoes de baixo recebem o toque direto, bem sensiveis */
+        /* a faixa fica no lado direito, no meio da altura: a base da tela fica 100% livre para os botoes do app */
         var t = Date.now();
         if (t - ultimo < 500) { ultimo = 0; A.botao(); } else ultimo = t;
       };
