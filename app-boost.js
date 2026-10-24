@@ -378,11 +378,18 @@ window.Alterna = (function () {
         } catch (e) {}
       };
       /* dois toques seguidos (ate 0,5 s): um toque so nao faz nada, para nao sair sem querer */
-      var toque = function () { var t = Date.now(); if (t - ultimo < 500) { ultimo = 0; A.botao(); } else ultimo = t; };
+      var espera = null;
+      var toque = function (x, y) {
+        var t = Date.now();
+        if (t - ultimo < 380) { clearTimeout(espera); ultimo = 0; A.botao(); return; }
+        /* primeiro toque: espera o segundo; se nao vier, repassa o toque ao botao que esta por baixo */
+        ultimo = t; clearTimeout(espera);
+        espera = setTimeout(function () { ultimo = 0; if (x || y) passa(x, y); }, 380);
+      };
       d.addEventListener('touchstart', function (e) { e.stopPropagation(); tocou = true; }, { passive: true });
-      d.addEventListener('touchend', function (e) { e.stopPropagation(); if (e.cancelable) e.preventDefault(); if (tocou) { tocou = false; var c = e.changedTouches && e.changedTouches[0]; if (c) passa(c.clientX, c.clientY); toque(); } });
+      d.addEventListener('touchend', function (e) { e.stopPropagation(); if (e.cancelable) e.preventDefault(); if (tocou) { tocou = false; var c = e.changedTouches && e.changedTouches[0]; toque(c ? c.clientX : 0, c ? c.clientY : 0); } });
       d.addEventListener('touchcancel', function () { tocou = false; }, { passive: true });
-      d.addEventListener('click', function (e) { e.stopPropagation(); e.preventDefault(); if (!('ontouchstart' in window)) toque(); });
+      d.addEventListener('click', function (e) { e.stopPropagation(); e.preventDefault(); if (!('ontouchstart' in window)) toque(e.clientX, e.clientY); });
       d.addEventListener('mousedown', function (e) { e.stopPropagation(); });
       document.documentElement.appendChild(d);
     };
