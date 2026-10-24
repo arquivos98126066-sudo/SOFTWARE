@@ -430,7 +430,7 @@ if ((sessionStorage.getItem('troca') === (window.RICO_INST === 'p' ? 'RICOP' : '
   /* ── Janela de etapa do Ciclo (sobe de baixo) ── */
   .sheet-ov{ position: fixed; inset: 0; z-index: 99970; background: var(--chip); }
   /* leitura: dois toques no círculo do mapa abrem o texto limpo, como o estudo; segurar mostra o lápis */
-  .rd-ov{ position: fixed; inset: 0; z-index: 99975; background: var(--chip); overflow-y: auto; overscroll-behavior: contain; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; touch-action: pan-y; }
+  .rd-ov{ position: fixed; inset: 0; z-index: 99975; background: var(--chip); overflow-y: auto; overscroll-behavior: contain; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; touch-action: pan-y; overflow-anchor: none; scroll-behavior: auto; }
   .rd-ov[hidden]{ display: none; }
   .rd-col{ max-width: 560px; margin: 0 auto; padding: calc(14px + env(safe-area-inset-top)) 22px calc(120px + env(safe-area-inset-bottom)); color: var(--tx); }
   .rd-t, .rd-h{ display: table; margin-left: auto; margin-right: auto; text-align: center; font-family: 'Inter', system-ui, sans-serif; font-style: normal; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: #211e19; line-height: 1.2; padding-bottom: 12px; border-bottom: 1px solid #c9c2b0; overflow-wrap: anywhere; }
@@ -457,7 +457,7 @@ if ((sessionStorage.getItem('troca') === (window.RICO_INST === 'p' ? 'RICOP' : '
   .rd-tx[data-q] + .rd-tx[data-q]{ margin-top: 0; }
   .rd-ov.rd-q{ touch-action: none; }
   .rd-ln-pre, .rd-pre{ background: rgba(33,30,25,.10); border-radius: 6px; }
-  html.rd-editando .rd-col{ padding-bottom: 55vh; }
+  html.rd-editando .rd-col{ padding-bottom: calc(var(--rd-kb, 0px) + 45vh); }
   html.rd-editando #alterna-base{ display: none !important; }
   .rd-ov.rd-kbd .rd-tools{ display: none; }
   .rd-ov.rd-cp, .rd-ov.rd-cp *{ -webkit-user-select: none !important; user-select: none !important; -webkit-touch-callout: none !important; }
@@ -4529,22 +4529,24 @@ window.saveAnswer = window.saveAnswer || function(){};
     ov.style.setProperty('--rd-kb', kb + 'px');
     ov.classList.toggle('rd-kbd', kb > 100);
   }
+  /* teclado: só rola quando a linha do cursor fica escondida atrás dele (ou colada no topo), e só o mínimo; nunca recentraliza (era isso que fazia o texto subir e descer) */
   function rdCentra() {
     var ov = document.getElementById('rdOv'); if (!ov || ov.hidden || !_rd || !_rd.edit) return;
-    if ((parseFloat(ov.style.getPropertyValue('--rd-kb')) || 0) < 100) return;
-    var sel = window.getSelection(); if (!sel || !sel.rangeCount) return;
+    var kb = parseFloat(ov.style.getPropertyValue('--rd-kb')) || 0; if (kb < 100) return;
+    var sel = window.getSelection(); if (!sel || !sel.rangeCount || !sel.isCollapsed) return;
+    var an = sel.anchorNode; an = an && (an.nodeType === 1 ? an : an.parentNode); if (!an || !ov.contains(an) || !an.closest || !an.closest('[contenteditable="true"]')) return;
     var r = sel.getRangeAt(0), rc = null;
     try { var l = r.getClientRects(); rc = l.length ? l[l.length - 1] : null; } catch (_) {}
-    if (!rc || (!rc.height && !rc.top)) { var n = r.startContainer; n = n && (n.nodeType === 1 ? n : n.parentNode); rc = n && n.getBoundingClientRect ? n.getBoundingClientRect() : null; }
-    if (!rc) return;
-    var vv = window.visualViewport, alt = vv ? vv.height : window.innerHeight;
-    var barra = 48 + 14 + 16;
-    if (rc.bottom > alt * 0.55 - barra * 0 || rc.top < 60) {
-      ov.scrollTop += rc.top - alt * 0.30;
-    }
+    if (!rc || (!rc.height && !rc.top)) { var ln = an.closest('.ln') || an; rc = ln.getBoundingClientRect(); }
+    var vv = window.visualViewport, base = (vv ? vv.height + vv.offsetTop : window.innerHeight) - 24, topo = 70, dy = 0;
+    if (rc.bottom > base) dy = rc.bottom - base; else if (rc.top < topo) dy = rc.top - topo;
+    if (Math.abs(dy) > 1) ov.scrollTo({ top: ov.scrollTop + dy, behavior: 'instant' });
   }
-  if (window.visualViewport) { window.visualViewport.addEventListener('resize', function() { rdTeclado(); setTimeout(rdCentra, 60); }); window.visualViewport.addEventListener('scroll', rdTeclado); }
-  document.addEventListener('selectionchange', function() { if (_rd && _rd.edit) { clearTimeout(_rd.tc); _rd.tc = setTimeout(rdCentra, 120); } });
+  var _rdFr = 0;
+  function rdCentraLogo() { if (_rdFr) return; _rdFr = requestAnimationFrame(function() { _rdFr = 0; rdCentra(); }); }
+  document.addEventListener('input', function(ev) { if (_rd && _rd.edit && ev.target && ev.target.closest && ev.target.closest('#rdOv')) rdCentraLogo(); }, true);
+  if (window.visualViewport) { window.visualViewport.addEventListener('resize', function() { rdTeclado(); setTimeout(rdCentra, 60); setTimeout(rdCentra, 260); }); window.visualViewport.addEventListener('scroll', rdTeclado); }
+  document.addEventListener('selectionchange', function() { if (_rd && _rd.edit) { clearTimeout(_rd.tc); _rd.tc = setTimeout(rdCentra, 90); } });
   /* teclado só quando tocar no texto sem ferramenta: com ferramenta ou leque Aa aberto, os campos ficam com inputmode none (aceitam foco e seleção, mas não abrem o teclado) */
   function rdModoAtual() {
     var ov = document.getElementById('rdOv'), ge = ov && ov.querySelector('[data-g="estilo"]');
