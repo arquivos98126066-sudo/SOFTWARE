@@ -377,6 +377,20 @@ window.Alterna = (function () {
     if (document.documentElement) faixa(); else document.addEventListener('DOMContentLoaded', faixa);
   }
 
+  /* Tapete, Meu CRM e ADM: nao mostra a pagina enquanto os dados do aparelho ainda estao entrando (senao os nomes aparecem carregando) */
+  if (eu === 'tapete' || eu === 'crm' || eu === 'adm') {
+    try {
+      var est = document.createElement('style'); est.id = 'alterna-quieto'; est.textContent = 'html{visibility:hidden}';
+      (document.head || document.documentElement).appendChild(est);
+      var solta = function () { clearTimeout(tq); clearTimeout(tmax); if (mo) mo.disconnect(); var x = document.getElementById('alterna-quieto'); if (x) x.remove(); };
+      var tq, tmax = setTimeout(solta, 1200), mo = null, carregou = false;
+      var espera = function () { clearTimeout(tq); if (carregou) tq = setTimeout(solta, 160); };
+      mo = new MutationObserver(espera); mo.observe(document.documentElement, { childList: true, subtree: true, characterData: true });
+      window.addEventListener('load', function () { carregou = true; espera(); });
+      if (document.readyState === 'complete') { carregou = true; espera(); }
+    } catch (e) {}
+  }
+
   /* ----- Tapete CRM, Meu CRM e ADM: voltam na tela e na rolagem em que estavam ----- */
   var GEN = { tapete: 'TAPETE', crm: 'CRM', adm: 'ADM' };
   if (eu && GEN[eu]) {

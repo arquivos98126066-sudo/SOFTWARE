@@ -13,8 +13,11 @@ window.RICO_PIN = window.RICO_INST === 'p' ? 'fixarTelaRico.p' : 'fixarTelaRico'
 <script>
 /* reaberto por troca de app com rolagem guardada: esconde até a página estar na posição, para não aparecer no topo e pular */
 try { var _pinY = 0; try { var _pj = JSON.parse(localStorage.getItem(window.RICO_PIN) || 'null'); _pinY = _pj && (_pj.y > 0 || _pj.v) ? 1 : 0; } catch (e) {}
-if ((sessionStorage.getItem('troca') === (window.RICO_INST === 'p' ? 'RICOP' : 'RICO') && parseFloat(sessionStorage.getItem('rico.y.' + window.RICO_INST)) > 0) || _pinY > 0) {
+/* sempre esconde ate os textos guardados no aparelho entrarem nos campos (senao os nomes aparecem carregando) */
+{
   var _e = document.createElement('style'); _e.id = 'rico-esconde'; _e.textContent = 'html{visibility:hidden}'; document.head.appendChild(_e);
+}
+if ((sessionStorage.getItem('troca') === (window.RICO_INST === 'p' ? 'RICOP' : 'RICO') && parseFloat(sessionStorage.getItem('rico.y.' + window.RICO_INST)) > 0) || _pinY > 0) {
   /* durante a volta, a animação de entrada das células já nasce terminada: não pisca ao desenhar de novo */
   document.documentElement.classList.add('rico-restaura');
   setTimeout(function(){ document.documentElement.classList.remove('rico-restaura'); }, 2200);
@@ -1399,6 +1402,8 @@ async function carregarDados() {
     respostasCache = local.dados;
     preencherDados(respostasCache);
   }
+  /* textos do aparelho ja estao nos campos: a pagina pode aparecer */
+  window.__ricoDados = true; if (window.__ricoRevela) window.__ricoRevela();
 
   try {
     var snap = await getDoc(doc(db, 'born_rich', CADERNO_ID));
@@ -6388,11 +6393,13 @@ window.saveAnswer = window.saveAnswer || function(){};
     var q=document.querySelector('.quote-block'); if(q){ q.style.marginTop='0px'; var fim=cyc.getBoundingClientRect().bottom+window.scrollY; var falta=window.innerHeight+12-(q.getBoundingClientRect().top+window.scrollY); q.style.marginTop=Math.max(0,Math.round(falta))+'px'; }
   }
   var feitos = 0;
-  function revela(){ liga(); if (++feitos < 2) return; requestAnimationFrame(function(){ requestAnimationFrame(function(){ var x = document.getElementById('rico-esconde'); if (x) x.remove(); }); }); }
+  window.__ricoRevela = function(){ revela(); };
+  function revela(){ liga(); if (++feitos < 3) return; requestAnimationFrame(function(){ requestAnimationFrame(function(){ var x = document.getElementById('rico-esconde'); if (x) x.remove(); }); }); }
   liga(); window.addEventListener('resize',liga);
   /* só mostra a página (quando ela estava escondida para voltar ao lugar) depois que fontes e arquivos terminaram e tudo está no tamanho final */
   if (document.readyState === 'complete') revela(); else window.addEventListener('load', revela);
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(revela); else revela();
+  if (window.__ricoDados) revela();
 })();
 
 

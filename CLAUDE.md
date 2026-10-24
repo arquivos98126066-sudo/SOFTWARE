@@ -30,6 +30,8 @@ Vale para os 6 apps do menu (Tapete CRM, Meu CRM, Plano/DOA, ADM, Rico, Estudo/L
 - Nunca deixar ouvinte de `touchstart`/`touchmove` não passivo ligado no documento (trava toda rolagem). Só enquanto uma ação precisa dele.
 - Layout que depende de medida (seta, margens) já nasce no tamanho típico e só muda se a diferença for visível.
 - Sem puxar para atualizar (`overscroll-behavior-y:contain`).
+- Nomes e textos não podem aparecer "carregando": Rico esconde a página até os textos do aparelho entrarem nos campos (`rico-esconde` solto por `__ricoRevela`); Tapete, Meu CRM e ADM escondem (`alterna-quieto`) até o DOM ficar quieto 160 ms depois do load (limite 1,2 s). App novo com dados em IndexedDB: mesmo cuidado.
+- Abrir o app instalado sem logo do Chrome nem barra: manifest com id, scope, display standalone e background_color igual à cor do menu (#020719). Se ainda aparecer, o atalho foi criado fora do app instalado: remover e instalar de novo pelo Chrome (Instalar app).
 
 ## 5. Como trabalhar
 - Mudança de design: mostrar imagem antes e esperar o "pode fazer". Função e correção: fazer.
