@@ -524,16 +524,23 @@ svg{fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-l
     });
     if (!box.children.length) box.innerHTML = '<div class="vazio">Pasta vazia</div>';
   }
+  /* troca o quadro por um novo: mudar o srcdoc de um quadro já carregado cria passos extras no histórico e o voltar "pula devagar" */
+  function quadro(h){
+    var q = $('quadro'), n = document.createElement('iframe');
+    n.id = 'quadro'; n.setAttribute('sandbox', q.getAttribute('sandbox'));
+    n.srcdoc = h;
+    q.parentNode.replaceChild(n, q);
+  }
   function abrir(d, empurrar){
     estado = {cam: estado.cam, doc: docs.indexOf(d)};
     if (empurrar) history.pushState(estado, '');
-    $('quadro').srcdoc = d.h;
+    quadro(d.h);
     $('leitor').hidden = false;
   }
   function mostrar(){
     var d = estado.doc !== null && docs[estado.doc];
-    if (d){ $('quadro').srcdoc = d.h; $('leitor').hidden = false; }
-    else { $('leitor').hidden = true; $('quadro').srcdoc = ''; desenhar(); }
+    if (d){ quadro(d.h); $('leitor').hidden = false; }
+    else { $('leitor').hidden = true; quadro(''); desenhar(); }
   }
   window.addEventListener('popstate', function(e){
     estado = e.state || {cam: [], doc: null};

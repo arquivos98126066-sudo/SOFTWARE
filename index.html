@@ -442,6 +442,8 @@ html, body { height: 100%; overflow: hidden; }
 
 /* ===== Segurar um app: baixar, enviar, voltar ao original ===== */
 .menu-link { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; -webkit-user-drag: none; }
+html, body { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+input { -webkit-user-select: text; user-select: text; }
 #apps-ov { position: fixed; inset: 0; z-index: 9000; background: rgba(2,7,25,.45); display: none; }
 #apps-ov.on { display: block; }
 #apps-sheet { --tint: #ffffff; position: absolute; left: 50%; bottom: calc(env(safe-area-inset-bottom, 0px) + 38px); display: flex; align-items: center; gap: 8px; padding: 8px; border-radius: 30px; background: linear-gradient(180deg, rgba(255,255,255,.12), rgba(255,255,255,.02)), rgba(10,15,38,.86); border: 1px solid rgba(255,255,255,.28); border: 1px solid color-mix(in srgb, var(--tint) 60%, transparent); box-shadow: 0 22px 54px rgba(0,0,0,.65), 0 0 36px color-mix(in srgb, var(--tint) 38%, transparent), inset 0 1px 0 rgba(255,255,255,.22); animation: appsSobe .2s ease both; }
@@ -640,6 +642,8 @@ html, body { height: 100%; overflow: hidden; }
       o.disabled = !sim; o.classList.toggle('tem', sim);
     });
     ov.className = 'on'; abriuEm = Date.now();
+    try { window.getSelection().removeAllRanges(); } catch (e) {}
+    setTimeout(function () { try { window.getSelection().removeAllRanges(); } catch (e) {} }, 150);
     sh.style.setProperty('--tint', CORES[arq(a)] || '#ffffff');
     if (navigator.vibrate) { try { navigator.vibrate(15); } catch (e) {} }
   }
@@ -689,6 +693,7 @@ html, body { height: 100%; overflow: hidden; }
   ov.addEventListener('click', function (e) { if (e.target === ov && Date.now() - abriuEm > 450) fecha(); });
   fileIn.addEventListener('change', function () { var a = fileIn._app; if (a && fileIn.files && fileIn.files[0]) enviar(a, fileIn.files[0]); });
 
+  document.addEventListener('selectstart', function (e) { var t = e.target && e.target.nodeType === 1 ? e.target : (e.target && e.target.parentElement); if (!t || !t.closest || !t.closest('input, textarea')) e.preventDefault(); });
   var links = document.querySelectorAll('.menu-link');
   Array.prototype.forEach.call(links, function (a) {
     a.setAttribute('draggable', 'false');
@@ -701,6 +706,7 @@ html, body { height: 100%; overflow: hidden; }
     });
     ['pointerup', 'pointercancel', 'pointerleave'].forEach(function (n) { a.addEventListener(n, function () { clearTimeout(tm); tm = null; }); });
     a.addEventListener('contextmenu', function (e) { e.preventDefault(); });
+    a.addEventListener('selectstart', function (e) { e.preventDefault(); });
     a.addEventListener('click', function (e) { if (longo) { e.preventDefault(); setTimeout(function () { longo = false; }, 0); } });
   });
 })();
