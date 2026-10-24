@@ -443,7 +443,7 @@ if ((sessionStorage.getItem('troca') === (window.RICO_INST === 'p' ? 'RICOP' : '
   .rd-ov .nm{ background: #e8e1d0; color: #211e19; min-width: 22px; width: 22px; height: 22px; padding: 0; margin-right: 8px; text-align: center; font: 700 11px/22px 'DM Sans', system-ui, sans-serif; vertical-align: 1px; }
   .rd-ov .ck{ width: 18px; height: 18px; margin-right: 10px; border: 1.5px solid #b9b3a6; background: transparent; vertical-align: -3px; }
   .rd-ov .ck[data-s="1"]{ background: #211e19; border-color: #211e19; }
-  .rd-ov .ck[data-s="1"]::after{ left: 5px; top: 1.5px; width: 4px; height: 8px; border-width: 0 1.6px 1.6px 0; }
+  .rd-ov .ck[data-s="1"]::after{ left: 6px; top: 2.5px; width: 4px; height: 8px; border-width: 0 1.6px 1.6px 0; }
   .rd-ov .bl, .rd-ov .ds{ width: 22px; margin-right: 8px; }
   .rd-ov .ds::after{ left: 6px; background: #211e19; }
   .rd-ov .bl::after{ left: 7.5px; background: #211e19; }
@@ -458,6 +458,7 @@ if ((sessionStorage.getItem('troca') === (window.RICO_INST === 'p' ? 'RICOP' : '
   .rd-ln-pre, .rd-pre{ background: rgba(33,30,25,.10); border-radius: 6px; }
   html.rd-editando .rd-col{ padding-bottom: 55vh; }
   html.rd-editando #alterna-base{ display: none !important; }
+  ::highlight(rdsel){ background-color: #a8d4e0; color: inherit; }
   .rd-ov.rd-hold, .rd-ov.rd-hold *{ -webkit-user-select: none !important; user-select: none !important; -webkit-touch-callout: none !important; }
   .rd-bar{ display: flex; justify-content: center; margin-top: 16px; }
   .rd-bar[hidden]{ display: none; }
@@ -4452,7 +4453,7 @@ window.saveAnswer = window.saveAnswer || function(){};
       if (!ed && !String(v || '').trim()) return;
       h += rdBloco(v, idx, m.c ? nl : 0, ed, m.q, m.n || 0);
     });
-    if (ed) h += '<div class="rd-tools"><div class="rd-linha"><button type="button" data-t="estilo" aria-label="Negrito, itálico e check"><b>Aa</b></button><div class="rd-grupo" data-g="main"><button type="button" data-t="T" aria-label="Título"><b>T</b></button><button type="button" data-t="n" aria-label="Numeração"><svg viewBox="0 0 24 24"><path d="M11 6h9M11 12h9M11 18h9M4.5 5.5l1.5-1v5M4 14.2c.6-1 2.3-.8 2.1.4-.3 1-1.6 1.5-2.1 2.4h2.4"/></svg></button><button type="button" data-t="p" aria-label="Marcadores"><svg viewBox="0 0 24 24"><path d="M11 6h9M11 12h9M11 18h9"/><circle cx="5.5" cy="6" r=".9" fill="currentColor"/><circle cx="5.5" cy="12" r=".9" fill="currentColor"/><circle cx="5.5" cy="18" r=".9" fill="currentColor"/></svg></button><button type="button" data-t="d" aria-label="Traço"><svg viewBox="0 0 24 24"><path d="M4 6h3M11 6h9M4 12h3M11 12h9M4 18h3M11 18h9"/></svg></button><button type="button" data-t="q" aria-label="Citação"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button></div><div class="rd-grupo" data-g="estilo" hidden><button type="button" data-t="b" aria-label="Negrito"><svg viewBox="0 0 24 24"><path d="M7 5h6a3.5 3.5 0 010 7H7zM7 12h7a3.5 3.5 0 010 7H7z"/></svg></button><button type="button" data-t="i" aria-label="Itálico"><svg viewBox="0 0 24 24"><path d="M10 5h7M7 19h7M14 5l-4 14"/></svg></button><button type="button" data-t="c" aria-label="Check"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M8.2 12.4l2.6 2.6 5-5.2"/></svg></button><button type="button" data-t="digita" aria-label="Digitar"><svg viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg></button><button type="button" data-t="copia" aria-label="Modo copiar"><svg viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2.5"/><path d="M5 15V7a2.5 2.5 0 012.5-2.5H15"/></svg></button></div><div class="rd-grupo" data-g="copia" hidden><button type="button" data-t="cpall" aria-label="Selecionar tudo"><svg viewBox="0 0 24 24"><path d="M4 8V6a2 2 0 012-2h2M16 4h2a2 2 0 012 2v2M20 16v2a2 2 0 01-2 2h-2M8 20H6a2 2 0 01-2-2v-2M8 12h8"/></svg></button><button type="button" data-t="cpdo" aria-label="Copiar"><svg viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2.5"/><path d="M5 15V7a2.5 2.5 0 012.5-2.5H15"/></svg></button><button type="button" data-t="cpfim" aria-label="Sair do modo copiar"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div></div></div>';
+    if (ed) h += '<div class="rd-tools"><div class="rd-linha"><button type="button" data-t="estilo" aria-label="Negrito, itálico e check"><b>Aa</b></button><div class="rd-grupo" data-g="main"><button type="button" data-t="digita" aria-label="Digitar"><svg viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg></button><button type="button" data-t="T" aria-label="Título"><b>T</b></button><button type="button" data-t="n" aria-label="Numeração"><svg viewBox="0 0 24 24"><path d="M11 6h9M11 12h9M11 18h9M4.5 5.5l1.5-1v5M4 14.2c.6-1 2.3-.8 2.1.4-.3 1-1.6 1.5-2.1 2.4h2.4"/></svg></button><button type="button" data-t="p" aria-label="Marcadores"><svg viewBox="0 0 24 24"><path d="M11 6h9M11 12h9M11 18h9"/><circle cx="5.5" cy="6" r=".9" fill="currentColor"/><circle cx="5.5" cy="12" r=".9" fill="currentColor"/><circle cx="5.5" cy="18" r=".9" fill="currentColor"/></svg></button><button type="button" data-t="d" aria-label="Traço"><svg viewBox="0 0 24 24"><path d="M4 6h3M11 6h9M4 12h3M11 12h9M4 18h3M11 18h9"/></svg></button><button type="button" data-t="q" aria-label="Citação"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button></div><div class="rd-grupo" data-g="estilo" hidden><button type="button" data-t="b" aria-label="Negrito"><svg viewBox="0 0 24 24"><path d="M7 5h6a3.5 3.5 0 010 7H7zM7 12h7a3.5 3.5 0 010 7H7z"/></svg></button><button type="button" data-t="i" aria-label="Itálico"><svg viewBox="0 0 24 24"><path d="M10 5h7M7 19h7M14 5l-4 14"/></svg></button><button type="button" data-t="c" aria-label="Check"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M8.2 12.4l2.6 2.6 5-5.2"/></svg></button><button type="button" data-t="cpall" aria-label="Copiar tudo"><svg viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2.5"/><path d="M5 15V7a2.5 2.5 0 012.5-2.5H15M12.5 14.5h4M14.5 12.5v4"/></svg></button><button type="button" data-t="copia" aria-label="Modo copiar"><svg viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2.5"/><path d="M5 15V7a2.5 2.5 0 012.5-2.5H15"/></svg></button></div></div></div>';
     h += '<button type="button" data-fechar hidden onclick="fecharLeitura()" aria-label="Fechar"></button></div>';
     ov.innerHTML = h;
     if (ed) { _rd.mudoAte = Date.now() + 1100; rdModoTeclado(); setTimeout(rdModoTeclado, 1150); }
@@ -4519,6 +4520,7 @@ window.saveAnswer = window.saveAnswer || function(){};
   function rdDigita(on) {
     var ov = document.getElementById('rdOv'); if (!_rd || !ov) return;
     _rd.digita = !!on;
+    if (on && _rd.copia) rdCopiaFim();
     if (on) { _rd.tool = null; ov.classList.remove('rd-q'); ov_limpaOn(); }
     var b = ov.querySelector('[data-t="digita"]'); if (b) b.classList.toggle('on', !!on);
     else { try { var a = document.activeElement; if (a && a.blur && ov.contains(a)) a.blur(); } catch (_) {} }
@@ -4556,9 +4558,62 @@ window.saveAnswer = window.saveAnswer || function(){};
     bl.innerHTML = rtHtml(rtParse(tx), null);
     if (fim && at === bl) rdFoco(bl, true);
   }
+  /* modo copiar: seleção nativa sem teclado; trechos selecionados em momentos diferentes se acumulam e ficam marcados */
+  function rdCopiaTxt(tudo) {
+    var ov = document.getElementById('rdOv');
+    if (!tudo && _rd.cpR) {
+      var rs = _rd.cpR.slice(); if (_rd.cpCur) rs.push(_rd.cpCur);
+      var cur = window.getSelection(); if (cur && cur.rangeCount && !cur.isCollapsed && !_rd.cpCur) rs.push(cur.getRangeAt(0));
+      rs.sort(function(x, y) { return x.compareBoundaryPoints(Range.START_TO_START, y); });
+      var tx = rs.map(function(r) { return r.toString().trim(); }).filter(Boolean).join('\n\n');
+      if (tx) return tx;
+    }
+    var ps = [];
+    ov.querySelectorAll('.rd-col > *').forEach(function(el) {
+      if (el.classList.contains('rd-t') || el.classList.contains('rd-h')) ps.push(el.textContent.trim());
+      else if (el.classList.contains('rd-tx')) ps.push(Array.prototype.map.call(el.children, function(l) { var c = l.cloneNode(true), nm = c.querySelector('.nm'), pf = nm ? nm.textContent + '. ' : ''; c.querySelectorAll('.nm,.ck,.bl,.ds').forEach(function(x) { x.remove(); }); return pf + c.textContent; }).join('\n'));
+    });
+    return ps.join('\n\n');
+  }
+  function rdCopiaGrava(tx, bb) {
+    var fim = function() { if (bb) { bb.classList.add('on'); setTimeout(function() { if (!(_rd && _rd.copia && bb.getAttribute('data-t') === 'copia')) bb.classList.remove('on'); }, 900); } };
+    var velho = function() { try { var ta = document.createElement('textarea'); ta.value = tx; ta.style.cssText = 'position:fixed;opacity:0;left:-999px'; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove(); fim(); } catch (_) {} };
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(tx).then(fim, velho); else velho();
+  }
+  function rdCopiaMarca() {
+    try { if (window.CSS && CSS.highlights && window.Highlight) { var rs = (_rd.cpR || []).slice(); if (_rd.cpCur) rs.push(_rd.cpCur); if (rs.length) CSS.highlights.set('rdsel', new Highlight(...rs)); else CSS.highlights.delete('rdsel'); } } catch (_) {}
+  }
+  function rdCopiaIni() {
+    var ov = document.getElementById('rdOv');
+    _rd.copia = true; _rd.cpR = []; _rd.cpCur = null; _rd.tool = null; ov.classList.remove('rd-q'); ov_limpaOn(); rdDigita(false); _rd.copia = true;
+    var bc = ov.querySelector('[data-t="copia"]'); if (bc) bc.classList.add('on');
+    try { var a3 = document.activeElement; if (a3 && a3.blur) a3.blur(); window.getSelection().removeAllRanges(); } catch (_) {}
+    rdModoTeclado();
+  }
+  function rdCopiaFim() {
+    var ov = document.getElementById('rdOv'); if (!_rd) return;
+    _rd.copia = false; _rd.cpR = null; _rd.cpCur = null;
+    try { if (window.CSS && CSS.highlights) CSS.highlights.delete('rdsel'); window.getSelection().removeAllRanges(); } catch (_) {}
+    var bc = ov && ov.querySelector('[data-t="copia"]'); if (bc) setTimeout(function() { if (!_rd || !_rd.copia) bc.classList.remove('on'); }, 900);
+  }
+  document.addEventListener('selectionchange', function() {
+    if (!_rd || !_rd.copia) return;
+    clearTimeout(_rd.tcp);
+    _rd.tcp = setTimeout(function() {
+      if (!_rd || !_rd.copia) return;
+      var s7 = window.getSelection(); if (!s7 || !s7.rangeCount || s7.isCollapsed) return;
+      var r7 = s7.getRangeAt(0).cloneRange(), an = _rd.cpCur;
+      if (an) {
+        var toca = r7.compareBoundaryPoints(Range.END_TO_START, an) <= 0 && r7.compareBoundaryPoints(Range.START_TO_END, an) >= 0;
+        if (!toca) _rd.cpR.push(an);
+      }
+      _rd.cpCur = r7; rdCopiaMarca();
+    }, 250);
+  });
   /* ferramenta armada (check, número, bolinha, traço, título): toca na linha e aplica ali; tocar de novo na ferramenta desarma */
   function rdArma(t) {
     var ov = document.getElementById('rdOv');
+    if (_rd.copia) rdCopiaFim();
     _rd.tool = (_rd.tool === t) ? null : t;
     if (_rd.tool) { _rd.digita = false; var bd = ov.querySelector('[data-t="digita"]'); if (bd) bd.classList.remove('on'); }
     ov.querySelectorAll('.rd-tools [data-t]').forEach(function(b) { var x = b.getAttribute('data-t'); b.classList.toggle('on', x === _rd.tool); });
@@ -4569,35 +4624,33 @@ window.saveAnswer = window.saveAnswer || function(){};
   function rdFerr(t) {
     var ov = document.getElementById('rdOv'), sel = window.getSelection();
     if (t === 'ok') { clearTimeout(_rd.tm); rdSalva(); _rd.edit = false; _rd.tool = null; _rd.digita = false; ov.classList.remove('rd-q'); rdPinta(); return; }
-    if (t === 'copia' || t === 'cpfim') {
-      _rd.cpAll = false;
-      var gm0 = ov.querySelector('[data-g="main"]'), ge0 = ov.querySelector('[data-g="estilo"]'), gc0 = ov.querySelector('[data-g="copia"]'), liga = t === 'copia';
-      _rd.copia = liga; _rd.tool = null; ov.classList.remove('rd-q'); ov_limpaOn(); rdDigita(false);
-      gc0.hidden = !liga; ge0.hidden = true; gm0.hidden = liga;
-      try { var a3 = document.activeElement; if (a3 && a3.blur) a3.blur(); } catch (_) {}
-      rdModoTeclado(); return;
+    if (t === 'copia') {
+      if (!_rd.copia) { rdCopiaIni(); return; }
+      rdCopiaGrava(rdCopiaTxt(false), ov.querySelector('[data-t="copia"]')); rdCopiaFim(); return;
     }
     if (t === 'cpall') {
-      var col = ov.querySelector('.rd-col'), rg = document.createRange(), ult = col.querySelectorAll('.rd-t, .rd-h, .rd-tx'); rg.setStartBefore(ult[0]); rg.setEndAfter(ult[ult.length - 1]); _rd.cpAll = true;
-      var sl = window.getSelection(); sl.removeAllRanges(); sl.addRange(rg); return;
-    }
-    if (t === 'cpdo') {
-      var s6 = window.getSelection(), tx = s6 && s6.rangeCount && !s6.isCollapsed && !_rd.cpAll ? s6.toString() : '';
-      if (!tx) {
-        var ps = [];
-        ov.querySelectorAll('.rd-col > *').forEach(function(el) {
-          if (el.classList.contains('rd-t') || el.classList.contains('rd-h')) ps.push(el.textContent.trim());
-          else if (el.classList.contains('rd-tx')) ps.push(Array.prototype.map.call(el.children, function(l) { var c = l.cloneNode(true), nm = c.querySelector('.nm'), pf = nm ? nm.textContent + '. ' : ''; c.querySelectorAll('.nm,.ck,.bl,.ds').forEach(function(x) { x.remove(); }); return pf + c.textContent; }).join('\n'));
-        });
-        tx = ps.join('\n\n');
-      }
-      var fim = function() { var bb = ov.querySelector('[data-t="cpdo"]'); if (bb) { bb.classList.add('on'); setTimeout(function() { bb.classList.remove('on'); }, 900); } };
-      var velho = function() { try { var ta = document.createElement('textarea'); ta.value = tx; ta.style.cssText = 'position:fixed;opacity:0;left:-999px'; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove(); fim(); } catch (_) {} };
-      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(tx).then(fim, velho); else velho();
+      var col = ov.querySelector('.rd-col'), rg = document.createRange(), ult = col.querySelectorAll('.rd-t, .rd-h, .rd-tx'); rg.setStartBefore(ult[0]); rg.setEndAfter(ult[ult.length - 1]);
+      var sl = window.getSelection(); sl.removeAllRanges(); sl.addRange(rg);
+      rdCopiaGrava(rdCopiaTxt(true), ov.querySelector('[data-t="cpall"]'));
+      setTimeout(function() { try { window.getSelection().removeAllRanges(); } catch (_) {} }, 900);
       return;
     }
+    if (t === 'T') {
+      /* com o cursor no texto: cria o título ali; com o cursor num título: desfaz o título */
+      var at = document.activeElement, sn = sel && sel.rangeCount ? sel.anchorNode : null; sn = sn && (sn.nodeType === 1 ? sn : sn.parentNode);
+      var th = (at && at.classList && at.classList.contains('rd-h')) ? at : (sn && sn.closest ? sn.closest('#rdOv .rd-h') : null);
+      if (th) {
+        var tt = th.textContent.trim();
+        if (tt) {
+          var nb = document.createElement('div'); nb.className = 'rd-tx'; nb.setAttribute('contenteditable', 'true'); nb.setAttribute('data-i', '-1');
+          nb.innerHTML = rtHtml(rtParse(tt), null); th.parentNode.insertBefore(nb, th); th.parentNode.removeChild(th); rdFoco(nb, true);
+        } else th.parentNode.removeChild(th);
+        rdRenumera(); rdAgenda(); return;
+      }
+      var ln0 = sn && sn.closest ? sn.closest('#rdOv .rd-tx > .ln') : null;
+      if (ln0 && _rd.digita) { _rd.tool = 'T'; rdAplica(ln0, ln0.parentNode); return; }
+    }
     if (t === 'estilo') {
-      if (_rd.copia) { rdFerr('cpfim'); return; }
       var gm = ov.querySelector('[data-g="main"]'), ge = ov.querySelector('[data-g="estilo"]');
       var abre = ge.hidden; ge.hidden = !abre; gm.hidden = abre;
       ov.querySelector('[data-t="estilo"]').classList.toggle('on', abre);
