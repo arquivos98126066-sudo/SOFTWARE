@@ -45,6 +45,12 @@ Vale para os 6 apps do menu (Tapete CRM, Meu CRM, Plano/DOA, ADM, Rico, Estudo/L
 - Voltar do celular = abrir do começo; só a faixa de baixo guarda a posição (regra dele, 24/10/2026).
 - Abrir o app instalado sem logo do Chrome nem barra: manifest com id, scope, display standalone e background_color igual à cor do menu (#020719). Se ainda aparecer, o atalho foi criado fora do app instalado: remover e instalar de novo pelo Chrome (Instalar app).
 
+## 4B. PUBLICAR DE VERDADE (permanente, 24/10/2026, erro repetido várias vezes)
+- O app mostra a branch main do SOFTWARE (GitHub Pages). Commit ou push na branch de trabalho NÃO publica: já deixei mudanças de fora por isso.
+- Para publicar: subir o número do cache em service-worker.js, fazer commit e rodar `bash publicar.sh`. Ele envia para a main e confere no GitHub.
+- Nunca dizer "publicado" antes de o script mostrar "PUBLICADO E CONFERIDO". Se falhar, dizer que falhou e o motivo. Se o Pages não puder ser aberto daqui, dizer "não confirmei no ar".
+- Toda mudança pedida pelo Klebson neste repositório termina com esse script, na mesma resposta, sem esperar ele cobrar.
+
 ## 5. Como trabalhar
 - Mudança de design: mostrar imagem antes e esperar o "pode fazer". Função e correção: fazer.
 - Antes de publicar: rodar a checagem de sintaxe dos scripts, abrir o app no teste sem erros novos, testar o fluxo mexido e subir a versão do cache. Publicar na main do SOFTWARE e conferir que o GitHub tem o mesmo commit.
