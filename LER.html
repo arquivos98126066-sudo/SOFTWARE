@@ -555,7 +555,7 @@ svg{fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-l
   function quadro(h){
     var q = $('quadro'), n = document.createElement('iframe');
     n.id = 'quadro'; n.setAttribute('sandbox', q.getAttribute('sandbox'));
-    n.srcdoc = h;
+    n.srcdoc = h ? h + GESTO_NO_ESTUDO : h;
     q.parentNode.replaceChild(n, q);
     if (window.CorBarra) { if (h) CorBarra.de(h); else CorBarra.volta(); }
   }
@@ -584,6 +584,49 @@ svg{fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-l
   }
   carregar().then(entrar).catch(function(){
     $('carga').innerHTML = '<div class="vazio">Sem conexão. Abra de novo quando estiver online.</div>';
+  });
+
+
+  /* gesto de sair: desenhar um V grande com o dedo, em qualquer parte da tela (inclusive dentro do estudo), volta ao menu */
+  function gestoV(aoFazer){
+    var pts = null, t0 = 0;
+    function reto(a, b){ return Math.hypot(b.x - a.x, b.y - a.y); }
+    function ehV(p){
+      if (p.length < 8) return false;
+      var n = p.length, v = 0;
+      for (var i = 1; i < n; i++) if (p[i].y > p[v].y) v = i;
+      if (v < n * 0.2 || v > n * 0.8) return false;
+      var a = p[0], b = p[v], c = p[n - 1];
+      var desce = b.y - a.y, sobe = b.y - c.y;
+      if (desce < 110 || sobe < 80 || sobe < desce * 0.6 || sobe > desce * 1.6) return false;
+      var d1 = b.x - a.x, d2 = c.x - b.x;
+      if (Math.abs(d1) < 35 || Math.abs(d2) < 35 || (d1 > 0) !== (d2 > 0)) return false;
+      if (Math.abs(d1) < desce * 0.2 || Math.abs(d2) < sobe * 0.2) return false;
+      var cam = 0; for (var k = 1; k < n; k++) cam += reto(p[k - 1], p[k]);
+      return cam <= (reto(a, b) + reto(b, c)) * 1.35;
+    }
+    document.addEventListener('touchstart', function(e){
+      if (e.touches.length !== 1 || /^(INPUT|TEXTAREA)$/.test((e.target.tagName || ''))) { pts = null; return; }
+      var t = e.touches[0]; pts = [{x: t.clientX, y: t.clientY}]; t0 = Date.now();
+    }, {passive: true});
+    document.addEventListener('touchmove', function(e){
+      if (!pts) return;
+      if (e.touches.length !== 1) { pts = null; return; }
+      var t = e.touches[0], u = pts[pts.length - 1];
+      if (Math.hypot(t.clientX - u.x, t.clientY - u.y) >= 6) pts.push({x: t.clientX, y: t.clientY});
+    }, {passive: true});
+    document.addEventListener('touchend', function(){
+      var p = pts; pts = null;
+      if (p && Date.now() - t0 < 1500 && ehV(p)) aoFazer();
+    }, {passive: true});
+    document.addEventListener('touchcancel', function(){ pts = null; }, {passive: true});
+  }
+  function sairParaMenu(){ try { navigator.vibrate && navigator.vibrate(25); } catch(e){} location.replace('index.html'); }
+  gestoV(sairParaMenu);
+  var GESTO_NO_ESTUDO = '<script>(' + gestoV.toString() + ')(function(){ parent.postMessage({estudoSair: 1}, "*"); });<\/script>';
+  window.addEventListener('message', function(e){
+    var q = $('quadro');
+    if (e.data && e.data.estudoSair && q && e.source === q.contentWindow) sairParaMenu();
   });
 
   if ('serviceWorker' in navigator) navigator.serviceWorker.register('service-worker.js').catch(function(){});
