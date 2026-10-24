@@ -4263,7 +4263,7 @@ window.saveAnswer = window.saveAnswer || function(){};
   };
 
   /* altura do teclado guardada no aparelho: a janelinha do nome já abre no lugar final, sem pulo */
-  function rcKbGet() { var v = 0; try { v = +localStorage.getItem('ui.kbh') || 0; } catch (_) {} return v > 150 ? v : Math.round(window.innerHeight * 0.4); }
+  function rcKbGet() { var v = 0; try { v = +localStorage.getItem('ui.kbh') || 0; } catch (_) {} return v > 150 ? v : Math.round(window.innerHeight * 0.49); }
   function rcKbAjusta(sh) {
     var vv = window.visualViewport; if (!vv) return;
     var kb = Math.max(0, window.innerHeight - vv.height - vv.offsetTop);
