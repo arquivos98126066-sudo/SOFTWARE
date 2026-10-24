@@ -190,3 +190,129 @@ window.Voltar = (function () {
     return push.call(history, n, t, u);
   };
 })();
+
+
+/* ===== Alternar entre apps ===== 
+   Ir e voltar com o dedo na horizontal (zigue-zague):
+     - app sem par: vai para o menu e guarda de onde saiu; no próximo app, outro zigue-zague conecta os dois e já alterna;
+     - app com par: vai direto para o par (e de lá, volta);
+   Dois dedos tocando juntos: desfaz a conexão do app em que você está (o próximo zigue-zague volta ao menu). */
+window.AlternaGestos = {
+  vaiVolta: function gestoVaiVolta(aoFazer){
+    var pts = null, t0 = 0;
+    function ehVaiVolta(p){
+      if (p.length < 4) return false;
+      var x0 = p[0].x, m = 0, minY = p[0].y, maxY = p[0].y, i;
+      for (i = 1; i < p.length; i++){
+        if (Math.abs(p[i].x - x0) > Math.abs(p[m].x - x0)) m = i;
+        if (p[i].y < minY) minY = p[i].y;
+        if (p[i].y > maxY) maxY = p[i].y;
+      }
+      var ida = p[m].x - x0, aida = Math.abs(ida), fim = p[p.length - 1];
+      if (aida < 40) return false;
+      if (m < 1 || m > p.length - 2) return false;
+      if ((fim.x - p[m].x) * ida > 0) return false;
+      if (Math.abs(p[m].x - fim.x) < aida * 0.6) return false;
+      if (maxY - minY > Math.max(45, aida * 0.8)) return false;
+      return true;
+    }
+    function fimToque(){
+      var p = pts; pts = null;
+      if (p && Date.now() - t0 <= 2200 && ehVaiVolta(p)) aoFazer();
+    }
+    document.addEventListener('touchstart', function(e){
+      if (e.touches.length !== 1 || /^(INPUT|TEXTAREA|SELECT)$/.test((e.target.tagName || ''))) { pts = null; return; }
+      var t = e.touches[0]; pts = [{x: t.clientX, y: t.clientY}]; t0 = Date.now();
+    }, {passive: true});
+    document.addEventListener('touchmove', function(e){
+      if (!pts) return;
+      if (e.touches.length !== 1) { pts = null; return; }
+      var t = e.touches[0], u = pts[pts.length - 1];
+      if (Math.hypot(t.clientX - u.x, t.clientY - u.y) >= 5) pts.push({x: t.clientX, y: t.clientY});
+    }, {passive: true});
+    document.addEventListener('touchend', fimToque, {passive: true});
+    document.addEventListener('touchcancel', fimToque, {passive: true});
+  },
+  doisDedos: function gestoDoisDedos(aoFazer){
+    var t1 = 0, ini = null;
+    function longe(e){
+      for (var i = 0; i < e.touches.length; i++){
+        var t = e.touches[i], o = ini.p[t.identifier];
+        if (o && Math.hypot(t.clientX - o.x, t.clientY - o.y) > 24) return true;
+      }
+      return false;
+    }
+    document.addEventListener('touchstart', function(e){
+      if (e.touches.length === 1){ t1 = Date.now(); ini = null; return; }
+      if (e.touches.length === 2 && (e.changedTouches.length === 2 || Date.now() - t1 <= 300)){
+        ini = {t: Date.now(), p: {}};
+        for (var i = 0; i < 2; i++) ini.p[e.touches[i].identifier] = {x: e.touches[i].clientX, y: e.touches[i].clientY};
+      } else ini = null;
+    }, {passive: true});
+    document.addEventListener('touchmove', function(e){ if (ini && longe(e)) ini = null; }, {passive: true});
+    document.addEventListener('touchend', function(){
+      var g = ini; ini = null;
+      if (g && Date.now() - g.t <= 500) aoFazer();
+    }, {passive: true});
+    document.addEventListener('touchcancel', function(){ ini = null; }, {passive: true});
+  }
+};
+
+window.Alterna = (function () {
+  var K = 'alterna.v1', VALE = 30 * 60 * 1000;
+  var URLS = { tapete: 'TAPETE-CRM.html', crm: 'MEU-CRM.html', plano: 'DOA.html', adm: 'ADM.html', rico: 'RICO.html', ricop: 'RICO.html?i=plano', estudo: 'LER.html', menu: 'index.html' };
+  var CODIGO = { plano: 'DOA', estudo: 'LER', rico: 'RICO', ricop: 'RICOP' };
+  function quem() {
+    var f = (location.pathname.split('/').pop() || '').toLowerCase();
+    if (f === 'tapete-crm.html') return 'tapete';
+    if (f === 'meu-crm.html') return 'crm';
+    if (f === 'doa.html') return 'plano';
+    if (f === 'adm.html') return 'adm';
+    if (f === 'rico.html') return /[?&]i=plano\b/.test(location.search) ? 'ricop' : 'rico';
+    if (f === 'ler.html') return 'estudo';
+    return null;
+  }
+  var eu = quem();
+  function ler() {
+    try { var s = JSON.parse(localStorage.getItem(K) || 'null'); if (s && typeof s === 'object' && s.p) return s; } catch (e) {}
+    return { p: {}, o: null, t: 0 };
+  }
+  function grava(s) { try { localStorage.setItem(K, JSON.stringify(s)); } catch (e) {} }
+  function vibra(p) { try { navigator.vibrate && navigator.vibrate(p); } catch (e) {} }
+  function desliga(s, id) { var q = s.p[id]; if (q) delete s.p[q]; delete s.p[id]; }
+  var A = {
+    eu: eu,
+    /* o app define aoSair(destino) para guardar onde você estava (pasta, rolagem...) antes de trocar */
+    aoSair: null,
+    ir: function (id) {
+      try { if (A.aoSair) A.aoSair(id); } catch (e) {}
+      try { var c = CODIGO[id]; if (c) sessionStorage.setItem('troca', c); else sessionStorage.removeItem('troca'); } catch (e) {}
+      var url = URLS[id]; if (!url) return;
+      if (window.Voltar) Voltar.sai(url); else location.replace(url);
+    },
+    zig: function () {
+      if (!eu) return;
+      var s = ler(), par = s.p[eu];
+      if (par && URLS[par]) { vibra(25); A.ir(par); return; }
+      if (s.o && s.o !== eu && URLS[s.o] && Date.now() - s.t < VALE) {
+        var alvo = s.o;
+        desliga(s, eu); desliga(s, alvo);
+        s.p[eu] = alvo; s.p[alvo] = eu; s.o = null; grava(s);
+        vibra([30, 60, 30]); A.ir(alvo); return;
+      }
+      s.o = eu; s.t = Date.now(); grava(s);
+      vibra(25); A.ir('menu');
+    },
+    quebra: function () {
+      if (!eu) return;
+      var s = ler();
+      if (s.p[eu]) { desliga(s, eu); vibra([60, 40, 60]); }
+      s.o = null; grava(s);
+    }
+  };
+  if (eu) {
+    window.AlternaGestos.vaiVolta(A.zig);
+    window.AlternaGestos.doisDedos(A.quebra);
+  }
+  return A;
+})();

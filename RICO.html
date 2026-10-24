@@ -13,7 +13,7 @@ window.RICO_PIN = window.RICO_INST === 'p' ? 'fixarTelaRico.p' : 'fixarTelaRico'
 <script>
 /* reaberto por troca de app com rolagem guardada: esconde até a página estar na posição, para não aparecer no topo e pular */
 try { var _pinY = 0; try { var _pj = JSON.parse(localStorage.getItem(window.RICO_PIN) || 'null'); _pinY = _pj && (_pj.y > 0 || _pj.v) ? 1 : 0; } catch (e) {}
-if ((window.RICO_INST === 'p' && parseFloat(sessionStorage.getItem('rico.y')) > 0) || _pinY > 0) {
+if ((sessionStorage.getItem('troca') === (window.RICO_INST === 'p' ? 'RICOP' : 'RICO') && parseFloat(sessionStorage.getItem('rico.y.' + window.RICO_INST)) > 0) || _pinY > 0) {
   var _e = document.createElement('style'); _e.id = 'rico-esconde'; _e.textContent = 'html{visibility:hidden}'; document.head.appendChild(_e);
   /* durante a volta, a animação de entrada das células já nasce terminada: não pisca ao desenhar de novo */
   document.documentElement.classList.add('rico-restaura');
@@ -6396,57 +6396,17 @@ window.saveAnswer = window.saveAnswer || function(){};
 })();
 
 
-/* aberto pelo Plano: ir e voltar com o dedo na horizontal troca para o Estudo (e de lá, volta direto para o Rico) */
+/* alternar entre apps: o gesto vive no app-boost; aqui o Rico guarda a rolagem (e a do pino) antes de trocar e volta nela */
 (function(){
-  if (window.RICO_INST !== 'p') return;
-  function gestoVaiVolta(aoFazer){
-    var pts = null, t0 = 0;
-    /* ir para um lado e voltar: um traço horizontal grande, de ida e volta, mais ou menos reto */
-    function ehVaiVolta(p){
-      if (p.length < 4) return false;
-      var x0 = p[0].x, m = 0, minY = p[0].y, maxY = p[0].y, i;
-      for (i = 1; i < p.length; i++){
-        if (Math.abs(p[i].x - x0) > Math.abs(p[m].x - x0)) m = i;
-        if (p[i].y < minY) minY = p[i].y;
-        if (p[i].y > maxY) maxY = p[i].y;
-      }
-      var ida = p[m].x - x0, aida = Math.abs(ida), fim = p[p.length - 1];
-      if (aida < 40) return false;
-      if (m < 1 || m > p.length - 2) return false;
-      if ((fim.x - p[m].x) * ida > 0) return false;
-      if (Math.abs(p[m].x - fim.x) < aida * 0.6) return false;
-      if (maxY - minY > Math.max(45, aida * 0.8)) return false;
-      return true;
-    }
-    function fim(){
-      var p = pts; pts = null;
-      if (p && Date.now() - t0 <= 2200 && ehVaiVolta(p)) aoFazer();
-    }
-    document.addEventListener('touchstart', function(e){
-      if (e.touches.length !== 1 || /^(INPUT|TEXTAREA|SELECT)$/.test((e.target.tagName || ''))) { pts = null; return; }
-      var t = e.touches[0]; pts = [{x: t.clientX, y: t.clientY}]; t0 = Date.now();
-    }, {passive: true});
-    document.addEventListener('touchmove', function(e){
-      if (!pts) return;
-      if (e.touches.length !== 1) { pts = null; return; }
-      var t = e.touches[0], u = pts[pts.length - 1];
-      if (Math.hypot(t.clientX - u.x, t.clientY - u.y) >= 5) pts.push({x: t.clientX, y: t.clientY});
-    }, {passive: true});
-    document.addEventListener('touchend', fim, {passive: true});
-    document.addEventListener('touchcancel', fim, {passive: true});
-  }
-  gestoVaiVolta(function(){
+  var INST = window.RICO_INST, CHAVE = 'rico.y.' + INST, COD = INST === 'p' ? 'RICOP' : 'RICO';
+  if (window.Alterna) Alterna.aoSair = function(){
     try {
-      sessionStorage.setItem('troca', 'LER'); sessionStorage.setItem('rico.y', String(window.scrollY || 0)); navigator.vibrate && navigator.vibrate(25);
+      sessionStorage.setItem(CHAVE, String(window.scrollY || 0));
       var pj = JSON.parse(localStorage.getItem(window.RICO_PIN) || 'null'); if (pj && pj.v) { pj.y = window.scrollY || 0; localStorage.setItem(window.RICO_PIN, JSON.stringify(pj)); }
     } catch(e){}
-    if (window.Voltar) Voltar.sai('LER.html'); else location.replace('LER.html');
-  });
-})();
-/* reaberto pelo Plano: volta na rolagem em que você deixou */
-(function(){
+  };
   var y = 0, tocou = false;
-  try { if (window.RICO_INST !== 'p') return; y = parseFloat(sessionStorage.getItem('rico.y')) || 0; sessionStorage.removeItem('rico.y'); } catch(e){ return; }
+  try { if (sessionStorage.getItem('troca') !== COD) return; sessionStorage.removeItem('troca'); y = parseFloat(sessionStorage.getItem(CHAVE)) || 0; sessionStorage.removeItem(CHAVE); } catch(e){ return; }
   if (!y) return;
   document.addEventListener('touchstart', function(){ tocou = true; }, {passive: true});
   function ir(){ if (!tocou && Math.abs(window.scrollY - y) > 2) window.scrollTo({top: y, behavior: 'instant'}); }
