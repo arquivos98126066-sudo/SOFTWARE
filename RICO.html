@@ -2033,13 +2033,14 @@ window.saveAnswer = window.saveAnswer || function(){};
       '<div class="hab-donut-c"><b>' + pct + '<em>%</em></b></div></div>';
     b._pop = false;
     atualizarDur(b);
+    b._zerado = st.run.length === 0;
     habCor(b); habAgenda();
   }
 
   /* cor do número do hábito conforme o dia de hoje: sem marca e no horário = verde; sem marca e fora do horário = vermelho; marcado = normal */
   function habMin(v) { var m = /^(\d{1,2}):(\d{2})/.exec(v || ''); return m ? (+m[1]) * 60 + (+m[2]) : -1; }
   function habEstado(b) {
-    if ((b._reg || {})[diaAlvo()]) return '';
+    if ((b._reg || {})[diaAlvo()] || b._zerado) return ''; /* 0%: ainda não começou, fica preto */
     var fim = habMin(b.querySelector('.hab-ate').value);
     if (fim < 0) fim = habMin(b.querySelector('.hab-de').value);
     if (fim < 0) return 'hab-pend';
