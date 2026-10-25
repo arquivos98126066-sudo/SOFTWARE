@@ -365,7 +365,7 @@ window.Alterna = (function () {
     var faixa = function () {
       if (document.getElementById('alterna-base')) return;
       var d = document.createElement('div'); d.id = 'alterna-base';
-      d.style.cssText = 'position:fixed;right:0;top:0;bottom:0;width:calc(48px + env(safe-area-inset-right,0px));z-index:2147483647;background:transparent;touch-action:pan-y;-webkit-tap-highlight-color:transparent;';
+      d.style.cssText = 'position:fixed;right:0;top:25%;height:50%;width:calc(48px + env(safe-area-inset-right,0px));z-index:2147483647;background:transparent;touch-action:pan-y;-webkit-tap-highlight-color:transparent;';
       var tocou = false, ultimo = 0;
       /* botao que fica por baixo da faixa (menu inferior do app): so ele recebe o toque, na hora; fora dele, dois toques levam ao menu */
       var botaoAbaixo = function (x, y) {

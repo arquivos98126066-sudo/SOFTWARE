@@ -833,6 +833,9 @@ if ((sessionStorage.getItem('troca') === (window.RICO_INST === 'p' ? 'RICOP' : '
   .rcm-bar, .modo-bar{ filter: none; }
   /* números das perguntas e dos blocos: mesmo dourado escuro, texto branco */
   .q-number, .meta-badge{ background: #b07a14; color: #fff; }
+  /* número do hábito: verde = falta marcar hoje e ainda está no horário; vermelho = passou do horário sem marcar; marcado = cor normal */
+  .habito-block .meta-badge.hab-pend{ background: #2f8f4e; color: #fff; }
+  .habito-block .meta-badge.hab-atraso{ background: #c0392b; color: #fff; }
   .meta-block .meta-field:has(.list-fields) > .chip{ background: #b07a14; color: #fff; }
   .meta-field.lim-oculto{ display: none; }
   .area-block .meta-field > .chip{ cursor: pointer; }
@@ -2030,7 +2033,39 @@ window.saveAnswer = window.saveAnswer || function(){};
       '<div class="hab-donut-c"><b>' + pct + '<em>%</em></b></div></div>';
     b._pop = false;
     atualizarDur(b);
+    habCor(b); habAgenda();
   }
+
+  /* cor do número do hábito conforme o dia de hoje: sem marca e no horário = verde; sem marca e fora do horário = vermelho; marcado = normal */
+  function habMin(v) { var m = /^(\d{1,2}):(\d{2})/.exec(v || ''); return m ? (+m[1]) * 60 + (+m[2]) : -1; }
+  function habEstado(b) {
+    if ((b._reg || {})[diaAlvo()]) return '';
+    var fim = habMin(b.querySelector('.hab-ate').value);
+    if (fim < 0) fim = habMin(b.querySelector('.hab-de').value);
+    if (fim < 0) return 'hab-pend';
+    var ag = new Date();
+    return (ag.getHours() * 60 + ag.getMinutes()) >= fim ? 'hab-atraso' : 'hab-pend';
+  }
+  function habCor(b) {
+    var bd = b.querySelector('.meta-badge'); if (!bd) return;
+    var e = habEstado(b);
+    bd.classList.toggle('hab-pend', e === 'hab-pend');
+    bd.classList.toggle('hab-atraso', e === 'hab-atraso');
+  }
+  var _habCorT = null;
+  /* sem relógio rodando: um só aviso para o próximo horário em que algum número passa de verde para vermelho */
+  function habAgenda() {
+    clearTimeout(_habCorT);
+    var ag = new Date(), agora = ag.getHours() * 60 + ag.getMinutes(), prox = -1;
+    document.querySelectorAll('#habito-lista .habito-block').forEach(function(b) {
+      if (habEstado(b) !== 'hab-pend') return;
+      var fim = habMin(b.querySelector('.hab-ate').value); if (fim < 0) fim = habMin(b.querySelector('.hab-de').value);
+      if (fim > agora && (prox < 0 || fim < prox)) prox = fim;
+    });
+    if (prox < 0) return;
+    _habCorT = setTimeout(function() { document.querySelectorAll('#habito-lista .habito-block').forEach(habCor); habAgenda(); }, Math.max(1000, ((prox - agora) * 60 - ag.getSeconds()) * 1000));
+  }
+  document.addEventListener('change', function(e) { var b = e.target && e.target.closest && e.target.closest('.hab-time') && e.target.closest('.habito-block'); if (b) { habCor(b); habAgenda(); } });
 
   // botão único: cada toque troca entre Fiz e Não
   
