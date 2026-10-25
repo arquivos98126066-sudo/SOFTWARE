@@ -833,9 +833,9 @@ if ((sessionStorage.getItem('troca') === (window.RICO_INST === 'p' ? 'RICOP' : '
   .rcm-bar, .modo-bar{ filter: none; }
   /* números das perguntas e dos blocos: mesmo dourado escuro, texto branco */
   .q-number, .meta-badge{ background: #b07a14; color: #fff; }
-  /* número do hábito: verde = falta marcar hoje e ainda está no horário; vermelho = passou do horário sem marcar; marcado = cor normal */
-  .habito-block .meta-badge.hab-pend{ background: #2f8f4e; color: #fff; }
-  .habito-block .meta-badge.hab-atraso{ background: #c0392b; color: #fff; }
+  /* número grande do hábito (a porcentagem no gráfico): verde = falta marcar hoje e ainda está no horário; vermelho = passou do horário sem marcar; marcado = cor normal */
+  .habito-block.hab-pend .hab-donut-c b{ color: #2f8f4e; }
+  .habito-block.hab-atraso .hab-donut-c b{ color: #c0392b; }
   .meta-block .meta-field:has(.list-fields) > .chip{ background: #b07a14; color: #fff; }
   .meta-field.lim-oculto{ display: none; }
   .area-block .meta-field > .chip{ cursor: pointer; }
@@ -2047,10 +2047,9 @@ window.saveAnswer = window.saveAnswer || function(){};
     return (ag.getHours() * 60 + ag.getMinutes()) >= fim ? 'hab-atraso' : 'hab-pend';
   }
   function habCor(b) {
-    var bd = b.querySelector('.meta-badge'); if (!bd) return;
     var e = habEstado(b);
-    bd.classList.toggle('hab-pend', e === 'hab-pend');
-    bd.classList.toggle('hab-atraso', e === 'hab-atraso');
+    b.classList.toggle('hab-pend', e === 'hab-pend');
+    b.classList.toggle('hab-atraso', e === 'hab-atraso');
   }
   var _habCorT = null;
   /* sem relógio rodando: um só aviso para o próximo horário em que algum número passa de verde para vermelho */
