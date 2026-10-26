@@ -9,8 +9,8 @@
   try{
     if(window.caches){var ks=await caches.keys();for(var i=0;i<ks.length;i++){if(ks[i].indexOf('meus-apps-v')===0)await caches.delete(ks[i]);}}
     if(navigator.serviceWorker){var rs=await navigator.serviceWorker.getRegistrations();for(var j=0;j<rs.length;j++)await rs[j].unregister();}
-    t.textContent='Pronto. Abrindo a cópia...';
+    t.textContent='Pronto. Abrindo o menu...';
   }catch(e){t.textContent='Erro: '+e;}
-  setTimeout(function(){location.replace('copia.html?'+Date.now());},700);
+  setTimeout(function(){location.replace('index.html?'+Date.now());},700);
 })();
 </script></body></html>
