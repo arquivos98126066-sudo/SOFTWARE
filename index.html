@@ -529,7 +529,7 @@ input { -webkit-user-select: text; user-select: text; }
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
 
-  onAuthStateChanged(auth, u => u ? mostrarApp() : mostrarLogin());
+  onAuthStateChanged(auth, u => (u && !u.isAnonymous) ? mostrarApp() : mostrarLogin());
 
   window.fazerLogin = async function () {
     const email   = document.getElementById('email-input').value;
