@@ -498,11 +498,8 @@ window.Alterna = (function () {
   async function restaura() {
     try {
       if (!navigator.onLine || ler('backup.ap.rest')) return false;
-      var i, k;
-      for (i = 0; i < localStorage.length; i++) {
-        k = localStorage.key(i);
-        if ((k && k.indexOf('rico.') === 0 && k.indexOf('rico.seed.') !== 0) || k === 'doa_htmls_v1') { localStorage.setItem('backup.ap.rest', 'nao'); return false; }
-      }
+      /* aparelho novo = nunca enviou cópia (sem marca de envio). Os apps já gravaram valores de fábrica aqui, por isso não dá para olhar se está vazio */
+      if (ler('backup.ap.sig') || ler('backup.ap.t')) { localStorage.setItem('backup.ap.rest', 'nao'); return false; }
       var tk = await token(); if (!tk) return false;
       async function lista(col) {
         var out = [], pg = '';
@@ -515,24 +512,37 @@ window.Alterna = (function () {
         return out;
       }
       function campo(d, c) { return d.fields && d.fields[c] ? d.fields[c].stringValue : null; }
-      var mudou = false;
-      (await lista('aparelho_rico')).forEach(function (d) { var kk = campo(d, 'k'), v = campo(d, 'v'); if (kk && v != null && localStorage.getItem(kk) == null) { localStorage.setItem(kk, v); mudou = true; } });
+      var mudou = false, orig = Storage.prototype.setItem, dest = {};
+      function idDoc(d) { try { return decodeURIComponent(d.name.split('/').pop()); } catch (e) { return ''; } }
+      var bk = await lista('aparelho_backup'), man = null;
+      bk.forEach(function (d) { if (idDoc(d) === '_chaves') { try { man = JSON.parse(campo(d, 'v')); } catch (e) {} } });
+      /* sem a lista de chaves (o aparelho antigo ainda não enviou a nova versão) não traz nada: traria também o que você já apagou */
+      if (!man) return false;
+      var ok = {}; man.forEach(function (c) { ok[c] = 1; });
+      var rico = await lista('aparelho_rico');
+      rico.forEach(function (d) { var kk = campo(d, 'k'), v = campo(d, 'v'); if (kk && v != null && kk.indexOf('rico.seed.') !== 0 && ok['aparelho_rico/' + idDoc(d)]) dest[kk] = v; });
       var pl = await lista('aparelho_plano'), itens = {}, ordem = null, seeds = null;
       pl.forEach(function (d) {
-        var kk = campo(d, 'k'), v = campo(d, 'v'); if (!kk || v == null) return;
+        var kk = campo(d, 'k'), v = campo(d, 'v'); if (!kk || v == null || !ok['aparelho_plano/' + idDoc(d)]) return;
         try {
           if (kk === 'doa_htmls_v1/_ordem') { var o = JSON.parse(v); ordem = o.ids || []; seeds = o.seeds; }
           else { var it = JSON.parse(v); if (it && it.id) itens[it.id] = it; }
         } catch (e) {}
       });
-      if (Object.keys(itens).length && localStorage.getItem('doa_htmls_v1') == null) {
+      if (Object.keys(itens).length) {
         var arr = [], usados = {};
         (ordem || []).forEach(function (id) { if (itens[id]) { arr.push(itens[id]); usados[id] = 1; } });
         Object.keys(itens).forEach(function (id) { if (!usados[id]) arr.push(itens[id]); });
-        localStorage.setItem('doa_htmls_v1', JSON.stringify(arr)); mudou = true;
-        if (seeds != null && localStorage.getItem('doa_htmls_v1_seeds') == null) localStorage.setItem('doa_htmls_v1_seeds', seeds);
+        dest['doa_htmls_v1'] = JSON.stringify(arr);
+        if (seeds != null) dest['doa_htmls_v1_seeds'] = seeds;
       }
-      (await lista('aparelho_backup')).forEach(function (d) { var kk = campo(d, 'k'), v = campo(d, 'v'); if (kk === 'estudos.meta.v1' && v != null && localStorage.getItem(kk) == null) { localStorage.setItem(kk, v); mudou = true; } });
+      bk.forEach(function (d) { var kk = campo(d, 'k'), v = campo(d, 'v'); if (kk === 'estudos.meta.v1' && v != null && ok['aparelho_backup/' + idDoc(d)]) dest[kk] = v; });
+      mudou = Object.keys(dest).length > 0;
+      if (mudou) {
+        /* até recarregar, o app não pode regravar os valores de fábrica por cima do que veio da cópia */
+        Storage.prototype.setItem = function (k) { if (dest[k] !== undefined) return; return orig.apply(this, arguments); };
+        Object.keys(dest).forEach(function (kk) { orig.call(localStorage, kk, dest[kk]); });
+      }
       localStorage.setItem('backup.ap.rest', mudou ? 'sim' : 'vazio');
       if (mudou) { location.reload(); return true; }
     } catch (e) {}
@@ -592,6 +602,14 @@ window.Alterna = (function () {
       if (grandes.length && sig._grandes !== hg) {
         sig._grandes = hg; mudou = true;
         try { await fetch(PROJ + 'aparelho_backup/_grandes?key=' + CHAVE, { method: 'PATCH', headers: cab(tk), body: JSON.stringify({ fields: { v: { stringValue: JSON.stringify(grandes) }, t: { integerValue: String(Date.now()) } } }) }); } catch (e) {}
+      }
+      /* lista do que existe agora no aparelho: a restauração só traz o que está nela (o que você apagou não volta) */
+      var lc = JSON.stringify(col.docs.map(function (d) { return d[0] + '/' + d[1]; })), hc = hash(lc);
+      if (sig._chaves !== hc) {
+        try {
+          var rc = await fetch(PROJ + 'aparelho_backup/_chaves?key=' + CHAVE, { method: 'PATCH', headers: cab(tk), body: JSON.stringify({ fields: { v: { stringValue: lc }, t: { integerValue: String(Date.now()) } } }) });
+          if (rc.ok) { sig._chaves = hc; mudou = true; } else falhas++;
+        } catch (e) { falhas++; }
       }
       if (mudou) localStorage.setItem('backup.ap.sig', JSON.stringify(sig));
       if (!falhas) localStorage.setItem('backup.ap.t', String(Date.now()));
