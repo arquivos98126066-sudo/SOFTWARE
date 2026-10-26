@@ -649,3 +649,12 @@ window.Alterna = (function () {
   setTimeout(function () { restaura(); }, 600);
   window.AparelhoBackup = { envia: function (forca) { try { localStorage.removeItem('backup.ap.t'); } catch (e) {} return envia(forca); } };
 })();
+
+/* Rico ao vivo em qualquer app aberto: os dados do Rico chegam da nuvem mesmo fora dele, e ao entrar no Rico já estão em dia (aqui só recebe; quem envia é o Rico) */
+(function () {
+  try {
+    if (window.top !== window || /RICO\.html$/i.test(location.pathname) || /(entrar|copia|reparar|atualiza)\.html$/i.test(location.pathname)) return;
+    window.NV_SORECEBE = true;
+    import('./nuvem-rico.js?v=' + Date.now()).catch(function () {});
+  } catch (e) {}
+})();

@@ -2,9 +2,9 @@
    Quem muda grava na nuvem; os outros aparelhos recebem em poucos segundos. O aparelho continua guardando uma cópia para abrir rápido.
    Recebe na hora pelo canal ao vivo do Firestore (app próprio "nv", sem esperar o login do SDK, que travava em alguns celulares).
    Grava por REST (fetch simples). Se o canal ao vivo cair, a leitura por REST a cada 3 s assume sozinha. */
-var VER = 'r4', CH = 'AIzaSyDPJvM-XZWfa8HQ7h8v0Usb1Hf3q8sDqpg', PROJ = 'projects/meus-apps-8ca76/databases/(default)/documents';
+var VER = 'r5', CH = 'AIzaSyDPJvM-XZWfa8HQ7h8v0Usb1Hf3q8sDqpg', PROJ = 'projects/meus-apps-8ca76/databases/(default)/documents';
 var URL0 = 'https://firestore.googleapis.com/v1/' + PROJ, COL = self.NV_COL || 'rico_vivo';
-var LIMITE = 900000, TK = 'nv.t.v1', PEND = 'nv.pend.v1', ST = 'nv.st.v1', RT = 'nv.rt', CADA = 3000;
+var SO = !!self.NV_SORECEBE, LIMITE = 900000, TK = 'nv.t.v1', PEND = 'nv.pend.v1', ST = 'nv.st.v1', RT = 'nv.rt', CADA = 3000;
 var orig = { set: Storage.prototype.setItem, rem: Storage.prototype.removeItem };
 var pronto = false, aplicando = false, timer = null, ultimoToque = Date.now(), recarregar = false, enviando = false, lendo = false;
 var vivo = 0, vF = null, vDb = null, semLogin = 0, nuvem = {}, tok = null, tokAte = 0, est = 'carregou', erro = '', ultEnvio = 0, ultLeitura = 0;
@@ -19,12 +19,12 @@ function lim(pr, ms) { return Promise.race([pr, new Promise(function (_, rj) { s
 
 Storage.prototype.setItem = function (k, v) {
   var r = orig.set.apply(this, arguments);
-  if (this === localStorage && pronto && !aplicando && sincroniza(k)) { marca(k, false); agenda(); }
+  if (this === localStorage && pronto && !aplicando && !SO && sincroniza(k)) { marca(k, false); agenda(); }
   return r;
 };
 Storage.prototype.removeItem = function (k) {
   var r = orig.rem.apply(this, arguments);
-  if (this === localStorage && pronto && !aplicando && sincroniza(k)) { marca(k, true); agenda(); }
+  if (this === localStorage && pronto && !aplicando && !SO && sincroniza(k)) { marca(k, true); agenda(); }
   return r;
 };
 
@@ -116,7 +116,7 @@ function aplica(d) {
   /* mudança local ainda não enviada e mais nova: ela vale e sobe */
   if (p[k] && (t[k] || 0) > d.t) return false;
   /* aparelho antigo, sem marca de tempo da chave: o que já está nele vale e sobe (o aparelho novo recebe a nuvem) */
-  if (!t[k] && local != null && ler('backup.ap.sig')) { marca(k, false); agenda(); return false; }
+  if (!t[k] && local != null && ler('backup.ap.sig')) { if (SO) return false; marca(k, false); agenda(); return false; }
   /* idade do que está no aparelho é desconhecida: antes de trocar pela nuvem, guarda o que ele tinha na nuvem (_conf_), para nada se perder */
   if (!t[k] && local != null) pede('/' + COL + '/_conf_' + devId + '_' + idDe(k).slice(0, 100), 'PATCH', { fields: { ck: { stringValue: k }, v: { stringValue: local.slice(0, LIMITE) }, t: { integerValue: String(Date.now()) } } }).catch(function () {});
   aplicando = true;
@@ -134,8 +134,7 @@ function atualizaTela() {
   if (ocupado()) { telaT = setTimeout(atualizaTela, 500); return; }
   var ks = Object.keys(mudadas); mudadas = {};
   if (!ks.length) return;
-  if (window.rcMapa && window.rcMapa.nuvem) { try { window.rcMapa.nuvem(ks); } catch (e) { erro = 'tela: ' + e.message; } return; }
-  location.reload();
+  if (window.rcMapa && window.rcMapa.nuvem) { try { window.rcMapa.nuvem(ks); } catch (e) { erro = 'tela: ' + e.message; } }
 }
 function recebe(docs) {
   var mudou = false, maior = ler(ST) || '';
@@ -147,7 +146,7 @@ function recebe(docs) {
     if (aplica(d)) { mudou = true; mudadas[d.k] = 1; }
   });
   if (maior) grava(ST, maior);
-  if (mudou && pronto && !telaT) atualizaTela();
+  if (mudou && !telaT) atualizaTela();
 }
 
 /* Primeira carga: a coleção inteira. Depois, a cada 3 s com a tela aberta, só o que mudou desde a última hora do servidor. */
@@ -198,25 +197,25 @@ var devId = ler('nv.dev') || ('d' + Math.random().toString(36).slice(2, 8)); gra
 function diag(e) {
   if (e) est = e;
   var s = function (x) { return { stringValue: String(x) }; };
-  pede('/' + COL + '/_dev_' + devId, 'PATCH', { fields: { est: s(est), ver: s(VER), t: { integerValue: String(Date.now()) }, ua: s(navigator.userAgent.slice(0, 120)), pend: { integerValue: String(Object.keys(mapa(PEND)).length) }, login: s(tok ? 'sim' : 'nao'), aovivo: s(vivo ? 'sim' : 'nao'), erro: s(erro), envio: { integerValue: String(ultEnvio) }, leitura: { integerValue: String(ultLeitura) } } }).catch(function () {});
+  pede('/' + COL + '/_dev_' + devId, 'PATCH', { fields: { est: s(est), ver: s(VER), pag: s(location.pathname.split('/').pop() || 'menu'), t: { integerValue: String(Date.now()) }, ua: s(navigator.userAgent.slice(0, 120)), pend: { integerValue: String(Object.keys(mapa(PEND)).length) }, login: s(tok ? 'sim' : 'nao'), aovivo: s(vivo ? 'sim' : 'nao'), erro: s(erro), envio: { integerValue: String(ultEnvio) }, leitura: { integerValue: String(ultLeitura) } } }).catch(function () {});
 }
 
 setTimeout(function () { pronto = true; }, 6000);
 (async function () {
   diag('carregou');
+  aoVivo();
   try { navigator.serviceWorker && navigator.serviceWorker.getRegistration().then(function (r) { r && r.update(); }).catch(function () {}); } catch (e) {}
   for (var i = 0; ; i++) {
     try { await carga(); break; }
     catch (e) { erro = 'carga: ' + e.message; diag('sem nuvem'); await new Promise(function (r) { setTimeout(r, Math.min(30000, 3000 * (i + 1))); }); }
   }
   /* chaves do aparelho que a nuvem ainda não tem: só sobem se este é um aparelho antigo (já enviava cópia) */
-  if (ler('backup.ap.sig')) {
+  if (!SO && ler('backup.ap.sig')) {
     var t = mapa(TK), p = mapa(PEND);
     for (var j = 0; j < localStorage.length; j++) { var k = localStorage.key(j); if (sincroniza(k) && !nuvem[k]) { t[k] = t[k] || Date.now(); p[k] = 1; } }
     grava(TK, t); grava(PEND, p);
   }
   pronto = true; erro = ''; agenda(); diag('ouvindo nuvem');
-  aoVivo();
   setInterval(function () { if (!vivo || Date.now() - ultLeitura > 60000) busca(); }, CADA);
   setInterval(function () { if (document.visibilityState !== 'hidden') diag(); }, 120000);
 })();
