@@ -1,4 +1,4 @@
-const CACHE_NAME = 'meus-apps-v330';
+const CACHE_NAME = 'meus-apps-v331';
 // HTMLs enviados pelo menu (segurar o app > Enviar um novo): ficam fora da limpeza de versões antigas
 const ENVIADOS = 'apps-enviados';
 
@@ -39,7 +39,7 @@ const URLS_TO_CACHE = [
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME).then(cache => {
-      return cache.addAll(URLS_TO_CACHE).catch(err => {
+      return Promise.all(URLS_TO_CACHE.map(u => fetch(new Request(u, {cache: 'reload'})).then(r => r.ok ? cache.put(u, r) : null))).catch(err => {
         console.warn('Alguns arquivos nao cacheados:', err);
       });
     })
@@ -70,6 +70,7 @@ self.addEventListener('fetch', event => {
     return;
   }
 
+  if (/\/(reparar|atualiza|entrar|copia)\.html$/.test(url.pathname)) return;
   const req = event.request;
   const isLocal = url.hostname === self.location.hostname;
   event.respondWith((async () => {

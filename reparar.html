@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8"><title>Reparar</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no">
+<style>body{font:17px system-ui;background:#faf6ee;color:#14213d;padding:24px 16px}.r{background:#fff;border:1px solid #e6dcc6;border-radius:12px;padding:14px;margin-top:12px;white-space:pre-wrap;word-break:break-word}a{display:inline-block;margin-top:14px;padding:12px 18px;border-radius:10px;background:#b07a1a;color:#fff;text-decoration:none}</style></head><body>
+<h1 style="font-size:20px">Reparar este aparelho</h1>
+<p>Apaga a versão antiga guardada, baixa tudo de novo e confere. Não mexe nos seus dados.</p>
+<div class="r" id="r">Começando...</div><a id="l" href="index.html" style="display:none">Abrir o menu</a>
+<script>
+var R=document.getElementById('r'),L=[];function say(t){L.push(t);R.textContent=L.join('\n')}
+(async function(){
+ try{
+  var ks=await caches.keys();
+  for(var i=0;i<ks.length;i++){if(ks[i].indexOf('meus-apps-v')===0){await caches.delete(ks[i])}}
+  say('1) versões antigas apagadas: '+ks.filter(function(k){return k.indexOf('meus-apps-v')===0}).length);
+  var rs=await navigator.serviceWorker.getRegistrations();for(var j=0;j<rs.length;j++)await rs[j].unregister();
+  say('2) programas antigos desligados: '+rs.length);
+  var base=location.href.replace(/[^\/]*$/,'');
+  var arq=['index.html','RICO.html','DOA.html','LER.html','ADM.html','TAPETE-CRM.html','app-boost.js','nuvem-rico.js','firebase-sync.js','service-worker.js'],bons=0,ruins=[];
+  for(var a=0;a<arq.length;a++){try{var x=await fetch(base+arq[a]+'?r='+Date.now(),{cache:'reload'});if(x.ok)bons++;else ruins.push(arq[a]+' '+x.status)}catch(e){ruins.push(arq[a]+' falhou')}}
+  say('3) arquivos baixados novos: '+bons+' de '+arq.length+(ruins.length?' (problema: '+ruins.join(', ')+')':''));
+  var sw=await (await fetch(base+'service-worker.js?r='+Date.now(),{cache:'reload'})).text();
+  var v=(sw.match(/meus-apps-v\d+/)||['?'])[0];
+  var rg=await navigator.serviceWorker.register('service-worker.js?v='+Date.now());
+  await navigator.serviceWorker.ready;await new Promise(function(r){setTimeout(r,2500)});
+  var k2=await caches.keys();var tem=false;try{tem=!!(await caches.match(base+'nuvem-rico.js',{ignoreSearch:true}))}catch(e){}
+  say('4) versão no ar: '+v+' | guardada agora: '+k2.filter(function(k){return k.indexOf('meus-apps-v')===0}).join(',')+' | Rico ao vivo guardado: '+(tem?'sim':'não'));
+  say('Pronto. Toque em Abrir o menu e depois abra o Rico.');
+ }catch(e){say('Erro: '+e)}
+ document.getElementById('l').style.display='inline-block';
+})();
+</script></body></html>
