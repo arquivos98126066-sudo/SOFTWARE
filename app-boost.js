@@ -584,6 +584,8 @@ window.Alterna = (function () {
     try {
       var t = +ler('backup.ap.t') || 0;
       if (Date.now() - t < ESPERA) return;
+      /* aparelho novo só envia depois de restaurar: senão os valores de fábrica dele cobriam a cópia boa */
+      if (!ler('backup.ap.sig') && !ler('backup.ap.t') && ler('backup.ap.rest') !== 'sim') return;
       var tk = await token(); if (!tk) return;
       var col = await coleta(), sig = sigLer(), mudou = false, falhas = 0, grandes = [];
       for (var i = 0; i < col.docs.length; i++) {
@@ -605,7 +607,7 @@ window.Alterna = (function () {
       }
       /* lista do que existe agora no aparelho: a restauração só traz o que está nela (o que você apagou não volta) */
       var lc = JSON.stringify(col.docs.map(function (d) { return d[0] + '/' + d[1]; })), hc = hash(lc);
-      if (sig._chaves !== hc) {
+      if (col.docs.length && sig._chaves !== hc) {
         try {
           var rc = await fetch(PROJ + 'aparelho_backup/_chaves?key=' + CHAVE, { method: 'PATCH', headers: cab(tk), body: JSON.stringify({ fields: { v: { stringValue: lc }, t: { integerValue: String(Date.now()) } } }) });
           if (rc.ok) { sig._chaves = hc; mudou = true; } else falhas++;
