@@ -480,6 +480,64 @@ window.Alterna = (function () {
   function hash(s) { var h = 5381, i = s.length; while (i) h = (h * 33) ^ s.charCodeAt(--i); return (h >>> 0).toString(36) + ':' + s.length; }
   function idDe(k) { return String(k).replace(/[^A-Za-z0-9_.-]/g, '_').slice(0, 140) || '_'; }
   function ler(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+  var CFG = { apiKey: CHAVE, authDomain: 'meus-apps-8ca76.firebaseapp.com', projectId: 'meus-apps-8ca76', storageBucket: 'meus-apps-8ca76.firebasestorage.app', messagingSenderId: '768854372271', appId: '1:768854372271:web:467b541baf3c513f03095a' };
+  /* chave de acesso do usuário logado (não anônimo); sem ela o banco, trancado, recusa a cópia */
+  async function token() {
+    try {
+      var FA = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js');
+      var AU = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js');
+      var ap = FA.getApps().length ? FA.getApps()[0] : FA.initializeApp(CFG);
+      var au = AU.getAuth(ap);
+      await au.authStateReady();
+      var u = au.currentUser;
+      return u && !u.isAnonymous ? await u.getIdToken() : null;
+    } catch (e) { return null; }
+  }
+  function cab(tk) { return { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + tk }; }
+  /* aparelho vazio + login: traz a cópia do Firebase (só preenche o que não existe, nunca apaga) */
+  async function restaura() {
+    try {
+      if (!navigator.onLine || ler('backup.ap.rest')) return false;
+      var i, k;
+      for (i = 0; i < localStorage.length; i++) {
+        k = localStorage.key(i);
+        if ((k && k.indexOf('rico.') === 0 && k.indexOf('rico.seed.') !== 0) || k === 'doa_htmls_v1') { localStorage.setItem('backup.ap.rest', 'nao'); return false; }
+      }
+      var tk = await token(); if (!tk) return false;
+      async function lista(col) {
+        var out = [], pg = '';
+        for (var n = 0; n < 8; n++) {
+          var r = await fetch(PROJ + col + '?pageSize=300' + pg, { headers: cab(tk) });
+          if (!r.ok) throw new Error('lista ' + col);
+          var j = await r.json(); out = out.concat(j.documents || []);
+          if (!j.nextPageToken) break; pg = '&pageToken=' + encodeURIComponent(j.nextPageToken);
+        }
+        return out;
+      }
+      function campo(d, c) { return d.fields && d.fields[c] ? d.fields[c].stringValue : null; }
+      var mudou = false;
+      (await lista('aparelho_rico')).forEach(function (d) { var kk = campo(d, 'k'), v = campo(d, 'v'); if (kk && v != null && localStorage.getItem(kk) == null) { localStorage.setItem(kk, v); mudou = true; } });
+      var pl = await lista('aparelho_plano'), itens = {}, ordem = null, seeds = null;
+      pl.forEach(function (d) {
+        var kk = campo(d, 'k'), v = campo(d, 'v'); if (!kk || v == null) return;
+        try {
+          if (kk === 'doa_htmls_v1/_ordem') { var o = JSON.parse(v); ordem = o.ids || []; seeds = o.seeds; }
+          else { var it = JSON.parse(v); if (it && it.id) itens[it.id] = it; }
+        } catch (e) {}
+      });
+      if (Object.keys(itens).length && localStorage.getItem('doa_htmls_v1') == null) {
+        var arr = [], usados = {};
+        (ordem || []).forEach(function (id) { if (itens[id]) { arr.push(itens[id]); usados[id] = 1; } });
+        Object.keys(itens).forEach(function (id) { if (!usados[id]) arr.push(itens[id]); });
+        localStorage.setItem('doa_htmls_v1', JSON.stringify(arr)); mudou = true;
+        if (seeds != null && localStorage.getItem('doa_htmls_v1_seeds') == null) localStorage.setItem('doa_htmls_v1_seeds', seeds);
+      }
+      (await lista('aparelho_backup')).forEach(function (d) { var kk = campo(d, 'k'), v = campo(d, 'v'); if (kk === 'estudos.meta.v1' && v != null && localStorage.getItem(kk) == null) { localStorage.setItem(kk, v); mudou = true; } });
+      localStorage.setItem('backup.ap.rest', mudou ? 'sim' : 'vazio');
+      if (mudou) { location.reload(); return true; }
+    } catch (e) {}
+    return false;
+  }
   function sigLer() { try { return JSON.parse(localStorage.getItem('backup.ap.sig') || '{}') || {}; } catch (e) { return {}; } }
 
   async function coleta() {
@@ -516,6 +574,7 @@ window.Alterna = (function () {
     try {
       var t = +ler('backup.ap.t') || 0;
       if (Date.now() - t < ESPERA) return;
+      var tk = await token(); if (!tk) return;
       var col = await coleta(), sig = sigLer(), mudou = false, falhas = 0, grandes = [];
       for (var i = 0; i < col.docs.length; i++) {
         var d = col.docs[i], caminho = d[0] + '/' + d[1], v = d[3];
@@ -525,14 +584,14 @@ window.Alterna = (function () {
         if (sig[caminho] === h) continue;
         var corpo = { fields: { k: { stringValue: d[2] }, v: { stringValue: v }, t: { integerValue: String(Date.now()) } } };
         try {
-          var r = await fetch(PROJ + d[0] + '/' + encodeURIComponent(d[1]) + '?key=' + CHAVE, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(corpo) });
+          var r = await fetch(PROJ + d[0] + '/' + encodeURIComponent(d[1]) + '?key=' + CHAVE, { method: 'PATCH', headers: cab(tk), body: JSON.stringify(corpo) });
           if (r.ok) { sig[caminho] = h; mudou = true; } else falhas++;
         } catch (e) { falhas++; }
       }
       var hg = grandes.length ? hash(JSON.stringify(grandes)) : null;
       if (grandes.length && sig._grandes !== hg) {
         sig._grandes = hg; mudou = true;
-        try { await fetch(PROJ + 'aparelho_backup/_grandes?key=' + CHAVE, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ fields: { v: { stringValue: JSON.stringify(grandes) }, t: { integerValue: String(Date.now()) } } }) }); } catch (e) {}
+        try { await fetch(PROJ + 'aparelho_backup/_grandes?key=' + CHAVE, { method: 'PATCH', headers: cab(tk), body: JSON.stringify({ fields: { v: { stringValue: JSON.stringify(grandes) }, t: { integerValue: String(Date.now()) } } }) }); } catch (e) {}
       }
       if (mudou) localStorage.setItem('backup.ap.sig', JSON.stringify(sig));
       if (!falhas) localStorage.setItem('backup.ap.t', String(Date.now()));
@@ -541,5 +600,7 @@ window.Alterna = (function () {
   /* uma vez por abertura, com a tela livre, e só se faz mais de 10 minutos desde a última */
   function agenda() { var f = function () { envia(); }; if (window.requestIdleCallback) requestIdleCallback(f, { timeout: 15000 }); else setTimeout(f, 8000); }
   if (document.readyState === 'complete') setTimeout(agenda, 8000); else window.addEventListener('load', function () { setTimeout(agenda, 8000); });
+  /* aparelho vazio: traz a cópia logo no começo (antes da cópia de ida) */
+  setTimeout(function () { restaura(); }, 600);
   window.AparelhoBackup = { envia: function () { try { localStorage.removeItem('backup.ap.t'); } catch (e) {} return envia(); } };
 })();
