@@ -6,6 +6,8 @@
 <h1>Cópia dos dados deste aparelho</h1>
 <p>Envia agora para o Firebase o que só existe neste aparelho.</p>
 <button id="b">Enviar agora</button> <button id="t2" style="background:#14213d">Reenviar tudo</button>
+<p style="margin-top:22px"><b>Celular novo ou de outra pessoa:</b> toque abaixo para trazer a sua cópia do Firebase para cá. Isso troca o que este aparelho tem.</p>
+<button id="t3" style="background:#2f6b3a">Trazer meus dados para cá</button>
 <div class="r" id="r">Nada enviado ainda. Só toque nos botões neste aparelho, se for o seu celular de sempre.</div><div class="r" id="t"></div>
 <script>
 async function vai(){var r=document.getElementById('r');r.textContent='Enviando...';
@@ -16,5 +18,5 @@ async function vai(){var r=document.getElementById('r');r.textContent='Enviando.
  var tk=await window.__tokenBk();
  if(tk)await fetch('https://firestore.googleapis.com/v1/projects/meus-apps-8ca76/databases/(default)/documents/aparelho_backup/_diag?key=AIzaSyDPJvM-XZWfa8HQ7h8v0Usb1Hf3q8sDqpg',{method:'PATCH',headers:{'Content-Type':'application/json','Authorization':'Bearer '+tk},body:JSON.stringify({fields:{v:{stringValue:JSON.stringify(d)},t:{integerValue:String(Date.now())}}})});}catch(e){x+=' (diag falhou: '+e+')'}
  r.textContent=x+' | itens rico.* no aparelho: '+n+' | versão '+(window.__v||'');}
-setInterval(function(){var t=document.getElementById('t');if(t)t.textContent=(window.__bk||[]).join(' > ')},500);document.getElementById('t2').onclick=function(){window.__forca=true;try{localStorage.setItem('backup.ap.rest','sim')}catch(e){};try{localStorage.removeItem('backup.ap.sig');localStorage.removeItem('backup.ap.t')}catch(e){};vai()};document.getElementById('b').onclick=vai;
+setInterval(function(){var t=document.getElementById('t');if(t)t.textContent=(window.__bk||[]).join(' > ')},500);document.getElementById('t2').onclick=function(){window.__forca=true;try{localStorage.setItem('backup.ap.rest','sim')}catch(e){};try{localStorage.removeItem('backup.ap.sig');localStorage.removeItem('backup.ap.t')}catch(e){};vai()};document.getElementById('t3').onclick=function(){try{['backup.ap.sig','backup.ap.t','backup.ap.rest'].forEach(function(k){localStorage.removeItem(k)})}catch(e){};document.getElementById('r').textContent='Trazendo seus dados... a página recarrega sozinha.';setTimeout(function(){location.reload()},400)};document.getElementById('b').onclick=vai;
 </script></body></html>
