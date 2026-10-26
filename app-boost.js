@@ -485,7 +485,14 @@ window.Alterna = (function () {
   var passos = window.__bk = [];
   function p(x) { passos.push(x); }
   function limite(pr, ms, nome) { return Promise.race([pr, new Promise(function (_, rj) { setTimeout(function () { rj(new Error(nome + ' demorou mais de ' + ms / 1000 + 's')); }, ms); })]); }
-  async function token() {
+  var _tkp = null, _tkt = 0;
+  function token() {
+    if (_tkp && Date.now() - _tkt < 30 * 60 * 1000) return _tkp;
+    _tkt = Date.now();
+    _tkp = token0().then(function (t) { if (!t) _tkp = null; return t; });
+    return _tkp;
+  }
+  async function token0() {
     try {
       p('carregando firebase');
       var FA = await limite(import('https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js'), 8000, 'carregar firebase-app');
@@ -493,7 +500,7 @@ window.Alterna = (function () {
       p('firebase carregado');
       var ap = FA.getApps().length ? FA.getApps()[0] : FA.initializeApp(CFG);
       var au = AU.getAuth(ap);
-      await limite(au.authStateReady(), 8000, 'ler login');
+      await limite(au.authStateReady(), 25000, 'ler login');
       var u = au.currentUser;
       p(u ? (u.isAnonymous ? 'login anônimo' : 'login ok') : 'sem login');
       return u && !u.isAnonymous ? await limite(u.getIdToken(), 8000, 'pegar chave') : null;
