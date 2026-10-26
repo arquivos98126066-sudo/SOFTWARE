@@ -579,15 +579,21 @@ window.Alterna = (function () {
     return { docs: docs, avisos: avisos };
   }
 
+  async function diario(tk, o) {
+    try { o.t = Date.now(); o.p = location.pathname.split('/').pop(); await fetch(PROJ + 'aparelho_backup/_log?key=' + CHAVE, { method: 'PATCH', headers: cab(tk), body: JSON.stringify({ fields: { v: { stringValue: JSON.stringify(o) }, t: { integerValue: String(Date.now()) } } }) }); } catch (e) {}
+  }
+  var rodando = false;
   async function envia() {
-    if (!navigator.onLine) return;
+    if (!navigator.onLine || rodando) return;
+    rodando = true;
     try {
       var t = +ler('backup.ap.t') || 0;
       if (Date.now() - t < ESPERA) return;
+      var tk = await token();
+      if (!tk) return;
       /* aparelho novo só envia depois de restaurar: senão os valores de fábrica dele cobriam a cópia boa */
-      if (!ler('backup.ap.sig') && !ler('backup.ap.t') && ler('backup.ap.rest') !== 'sim') return;
-      var tk = await token(); if (!tk) return;
-      var col = await coleta(), sig = sigLer(), mudou = false, falhas = 0, grandes = [];
+      if (!ler('backup.ap.sig') && !ler('backup.ap.t') && ler('backup.ap.rest') !== 'sim') { await diario(tk, { r: 'novo-sem-restaurar' }); return; }
+      var col = await coleta(), sig = sigLer(), mudou = false, falhas = 0, grandes = [], enviados = 0;
       for (var i = 0; i < col.docs.length; i++) {
         var d = col.docs[i], caminho = d[0] + '/' + d[1], v = d[3];
         if (v == null) continue;
@@ -597,7 +603,7 @@ window.Alterna = (function () {
         var corpo = { fields: { k: { stringValue: d[2] }, v: { stringValue: v }, t: { integerValue: String(Date.now()) } } };
         try {
           var r = await fetch(PROJ + d[0] + '/' + encodeURIComponent(d[1]) + '?key=' + CHAVE, { method: 'PATCH', headers: cab(tk), body: JSON.stringify(corpo) });
-          if (r.ok) { sig[caminho] = h; mudou = true; } else falhas++;
+          if (r.ok) { sig[caminho] = h; mudou = true; enviados++; } else falhas++;
         } catch (e) { falhas++; }
       }
       var hg = grandes.length ? hash(JSON.stringify(grandes)) : null;
@@ -615,11 +621,14 @@ window.Alterna = (function () {
       }
       if (mudou) localStorage.setItem('backup.ap.sig', JSON.stringify(sig));
       if (!falhas) localStorage.setItem('backup.ap.t', String(Date.now()));
-    } catch (e) {}
+      await diario(tk, { r: 'ok', docs: col.docs.length, env: enviados, falhas: falhas, grandes: grandes.length });
+    } catch (e) {} finally { rodando = false; }
   }
   /* uma vez por abertura, com a tela livre, e só se faz mais de 10 minutos desde a última */
-  function agenda() { var f = function () { envia(); }; if (window.requestIdleCallback) requestIdleCallback(f, { timeout: 15000 }); else setTimeout(f, 8000); }
-  if (document.readyState === 'complete') setTimeout(agenda, 8000); else window.addEventListener('load', function () { setTimeout(agenda, 8000); });
+  function agenda() { var f = function () { envia(); }; if (window.requestIdleCallback) requestIdleCallback(f, { timeout: 3000 }); else setTimeout(f, 2500); }
+  if (document.readyState === 'complete') setTimeout(agenda, 1500); else window.addEventListener('load', function () { setTimeout(agenda, 1500); });
+  /* saiu do app (troca rápida entre apps): tenta enviar na hora, o app nem sempre fica aberto 8 segundos */
+  document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'hidden') envia(); });
   /* aparelho vazio: traz a cópia logo no começo (antes da cópia de ida) */
   setTimeout(function () { restaura(); }, 600);
   window.AparelhoBackup = { envia: function () { try { localStorage.removeItem('backup.ap.t'); } catch (e) {} return envia(); } };
