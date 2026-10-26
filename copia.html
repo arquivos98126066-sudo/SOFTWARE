@@ -11,6 +11,10 @@
 async function vai(){var r=document.getElementById('r');r.textContent='Enviando...';
  var x=await window.AparelhoBackup.envia();
  var n=0;try{for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k&&k.indexOf('rico.')===0&&k.indexOf('rico.seed.')!==0)n++}}catch(e){}
+ try{var d={ordem:localStorage.getItem('rico.proc.ordem'),pastasP:localStorage.getItem('rico.pastas.p'),keys:[],sig:localStorage.getItem('backup.ap.sig')?Object.keys(JSON.parse(localStorage.getItem('backup.ap.sig'))).length:0};
+ for(var j=0;j<localStorage.length;j++){var kk=localStorage.key(j);if(kk&&kk.indexOf('rico.')===0)d.keys.push([kk,(localStorage.getItem(kk)||'').length])}
+ var tk=await window.__tokenBk();
+ if(tk)await fetch('https://firestore.googleapis.com/v1/projects/meus-apps-8ca76/databases/(default)/documents/aparelho_backup/_diag?key=AIzaSyDPJvM-XZWfa8HQ7h8v0Usb1Hf3q8sDqpg',{method:'PATCH',headers:{'Content-Type':'application/json','Authorization':'Bearer '+tk},body:JSON.stringify({fields:{v:{stringValue:JSON.stringify(d)},t:{integerValue:String(Date.now())}}})});}catch(e){x+=' (diag falhou: '+e+')'}
  r.textContent=x+' | itens rico.* no aparelho: '+n+' | versão '+(window.__v||'');}
 setInterval(function(){var t=document.getElementById('t');if(t)t.textContent=(window.__bk||[]).join(' > ')},500);document.getElementById('b').onclick=vai;window.addEventListener('load',function(){setTimeout(vai,800)});
 </script></body></html>

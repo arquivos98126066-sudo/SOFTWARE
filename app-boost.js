@@ -499,6 +499,7 @@ window.Alterna = (function () {
       return u && !u.isAnonymous ? await limite(u.getIdToken(), 8000, 'pegar chave') : null;
     } catch (e) { p('erro: ' + e); return null; }
   }
+  window.__tokenBk = token;
   function cab(tk) { return { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + tk }; }
   /* aparelho vazio + login: traz a cópia do Firebase (só preenche o que não existe, nunca apaga) */
   async function restaura() {
