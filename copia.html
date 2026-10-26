@@ -1,0 +1,16 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8"><title>Copia</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no">
+<style>body{font:16px system-ui;background:#faf6ee;color:#14213d;margin:0;padding:24px 16px}h1{font-size:20px}p{line-height:1.5}.r{background:#fff;border:1px solid #e6dcc6;border-radius:12px;padding:14px;margin-top:12px;word-break:break-word}button{font:inherit;padding:12px 18px;border-radius:10px;border:0;background:#b07a1a;color:#fff}</style>
+<script src="app-boost.js"></script></head><body>
+<h1>Cópia dos dados deste aparelho</h1>
+<p>Envia agora para o Firebase o que só existe neste aparelho.</p>
+<button id="b">Enviar agora</button>
+<div class="r" id="r">Enviando...</div>
+<script>
+async function vai(){var r=document.getElementById('r');r.textContent='Enviando...';
+ var x=await window.AparelhoBackup.envia();
+ var n=0;try{for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k&&k.indexOf('rico.')===0&&k.indexOf('rico.seed.')!==0)n++}}catch(e){}
+ r.textContent=x+' | itens rico.* no aparelho: '+n+' | versão '+(window.__v||'');}
+document.getElementById('b').onclick=vai;window.addEventListener('load',function(){setTimeout(vai,800)});
+</script></body></html>

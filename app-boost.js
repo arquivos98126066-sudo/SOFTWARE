@@ -584,15 +584,16 @@ window.Alterna = (function () {
   }
   var rodando = false;
   async function envia() {
-    if (!navigator.onLine || rodando) return;
+    if (!navigator.onLine) return 'sem internet';
+    if (rodando) return 'já está enviando';
     rodando = true;
     try {
       var t = +ler('backup.ap.t') || 0;
-      if (Date.now() - t < ESPERA) return;
+      if (Date.now() - t < ESPERA) return 'enviou há menos de 10 minutos';
       var tk = await token();
-      if (!tk) return;
+      if (!tk) return 'sem login de usuário (entre pelo menu com e-mail e senha)';
       /* aparelho novo só envia depois de restaurar: senão os valores de fábrica dele cobriam a cópia boa */
-      if (!ler('backup.ap.sig') && !ler('backup.ap.t') && ler('backup.ap.rest') !== 'sim') { await diario(tk, { r: 'novo-sem-restaurar' }); return; }
+      if (!ler('backup.ap.sig') && !ler('backup.ap.t') && ler('backup.ap.rest') !== 'sim') { await diario(tk, { r: 'novo-sem-restaurar' }); return 'aparelho novo: ainda não restaurou'; }
       var col = await coleta(), sig = sigLer(), mudou = false, falhas = 0, grandes = [], enviados = 0;
       for (var i = 0; i < col.docs.length; i++) {
         var d = col.docs[i], caminho = d[0] + '/' + d[1], v = d[3];
@@ -622,7 +623,8 @@ window.Alterna = (function () {
       if (mudou) localStorage.setItem('backup.ap.sig', JSON.stringify(sig));
       if (!falhas) localStorage.setItem('backup.ap.t', String(Date.now()));
       await diario(tk, { r: 'ok', docs: col.docs.length, env: enviados, falhas: falhas, grandes: grandes.length });
-    } catch (e) {} finally { rodando = false; }
+      return 'ok: ' + col.docs.length + ' itens no aparelho, ' + enviados + ' enviados agora, ' + falhas + ' falhas, ' + grandes.length + ' grandes demais';
+    } catch (e) { return 'erro: ' + e; } finally { rodando = false; }
   }
   /* uma vez por abertura, com a tela livre, e só se faz mais de 10 minutos desde a última */
   function agenda() { var f = function () { envia(); }; if (window.requestIdleCallback) requestIdleCallback(f, { timeout: 3000 }); else setTimeout(f, 2500); }
