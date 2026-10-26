@@ -597,7 +597,7 @@ window.Alterna = (function () {
     try { o.t = Date.now(); o.p = location.pathname.split('/').pop(); await fetch(PROJ + 'aparelho_backup/_log?key=' + CHAVE, { method: 'PATCH', headers: cab(tk), body: JSON.stringify({ fields: { v: { stringValue: JSON.stringify(o) }, t: { integerValue: String(Date.now()) } } }) }); } catch (e) {}
   }
   var rodando = false;
-  async function envia() {
+  async function envia(forca) {
     if (!navigator.onLine) return 'sem internet';
     if (rodando) return 'já está enviando';
     rodando = true;
@@ -607,7 +607,7 @@ window.Alterna = (function () {
       var tk = await token();
       if (!tk) return 'sem login de usuário (entre pelo menu com e-mail e senha)';
       /* aparelho novo só envia depois de restaurar: senão os valores de fábrica dele cobriam a cópia boa */
-      if (!ler('backup.ap.sig') && !ler('backup.ap.t') && ler('backup.ap.rest') !== 'sim') { await diario(tk, { r: 'novo-sem-restaurar' }); return 'aparelho novo: ainda não restaurou'; }
+      if (!forca && !ler('backup.ap.sig') && !ler('backup.ap.t') && ler('backup.ap.rest') !== 'sim') { await diario(tk, { r: 'novo-sem-restaurar' }); return 'aparelho novo: ainda não restaurou'; }
       var col = await coleta(), sig = sigLer(), mudou = false, falhas = 0, grandes = [], enviados = 0;
       for (var i = 0; i < col.docs.length; i++) {
         var d = col.docs[i], caminho = d[0] + '/' + d[1], v = d[3];
@@ -647,5 +647,5 @@ window.Alterna = (function () {
   document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'hidden') envia(); });
   /* aparelho vazio: traz a cópia logo no começo (antes da cópia de ida) */
   setTimeout(function () { restaura(); }, 600);
-  window.AparelhoBackup = { envia: function () { try { localStorage.removeItem('backup.ap.t'); } catch (e) {} return envia(); } };
+  window.AparelhoBackup = { envia: function (forca) { try { localStorage.removeItem('backup.ap.t'); } catch (e) {} return envia(forca); } };
 })();
