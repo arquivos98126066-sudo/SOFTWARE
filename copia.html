@@ -5,7 +5,7 @@
 <script src="app-boost.js"></script></head><body>
 <h1>Cópia dos dados deste aparelho</h1>
 <p>Envia agora para o Firebase o que só existe neste aparelho.</p>
-<button id="b">Enviar agora</button>
+<button id="b">Enviar agora</button> <button id="t2" style="background:#14213d">Reenviar tudo</button>
 <div class="r" id="r">Enviando...</div><div class="r" id="t"></div>
 <script>
 async function vai(){var r=document.getElementById('r');r.textContent='Enviando...';
@@ -16,5 +16,5 @@ async function vai(){var r=document.getElementById('r');r.textContent='Enviando.
  var tk=await window.__tokenBk();
  if(tk)await fetch('https://firestore.googleapis.com/v1/projects/meus-apps-8ca76/databases/(default)/documents/aparelho_backup/_diag?key=AIzaSyDPJvM-XZWfa8HQ7h8v0Usb1Hf3q8sDqpg',{method:'PATCH',headers:{'Content-Type':'application/json','Authorization':'Bearer '+tk},body:JSON.stringify({fields:{v:{stringValue:JSON.stringify(d)},t:{integerValue:String(Date.now())}}})});}catch(e){x+=' (diag falhou: '+e+')'}
  r.textContent=x+' | itens rico.* no aparelho: '+n+' | versão '+(window.__v||'');}
-setInterval(function(){var t=document.getElementById('t');if(t)t.textContent=(window.__bk||[]).join(' > ')},500);document.getElementById('b').onclick=vai;window.addEventListener('load',function(){setTimeout(vai,800)});
+setInterval(function(){var t=document.getElementById('t');if(t)t.textContent=(window.__bk||[]).join(' > ')},500);document.getElementById('t2').onclick=function(){try{localStorage.removeItem('backup.ap.sig');localStorage.removeItem('backup.ap.t')}catch(e){};vai()};document.getElementById('b').onclick=vai;window.addEventListener('load',function(){setTimeout(vai,800)});
 </script></body></html>
