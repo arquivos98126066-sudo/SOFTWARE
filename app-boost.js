@@ -482,16 +482,22 @@ window.Alterna = (function () {
   function ler(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
   var CFG = { apiKey: CHAVE, authDomain: 'meus-apps-8ca76.firebaseapp.com', projectId: 'meus-apps-8ca76', storageBucket: 'meus-apps-8ca76.firebasestorage.app', messagingSenderId: '768854372271', appId: '1:768854372271:web:467b541baf3c513f03095a' };
   /* chave de acesso do usuário logado (não anônimo); sem ela o banco, trancado, recusa a cópia */
+  var passos = window.__bk = [];
+  function p(x) { passos.push(x); }
+  function limite(pr, ms, nome) { return Promise.race([pr, new Promise(function (_, rj) { setTimeout(function () { rj(new Error(nome + ' demorou mais de ' + ms / 1000 + 's')); }, ms); })]); }
   async function token() {
     try {
-      var FA = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js');
-      var AU = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js');
+      p('carregando firebase');
+      var FA = await limite(import('https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js'), 8000, 'carregar firebase-app');
+      var AU = await limite(import('https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js'), 8000, 'carregar firebase-auth');
+      p('firebase carregado');
       var ap = FA.getApps().length ? FA.getApps()[0] : FA.initializeApp(CFG);
       var au = AU.getAuth(ap);
-      await au.authStateReady();
+      await limite(au.authStateReady(), 8000, 'ler login');
       var u = au.currentUser;
-      return u && !u.isAnonymous ? await u.getIdToken() : null;
-    } catch (e) { return null; }
+      p(u ? (u.isAnonymous ? 'login anônimo' : 'login ok') : 'sem login');
+      return u && !u.isAnonymous ? await limite(u.getIdToken(), 8000, 'pegar chave') : null;
+    } catch (e) { p('erro: ' + e); return null; }
   }
   function cab(tk) { return { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + tk }; }
   /* aparelho vazio + login: traz a cópia do Firebase (só preenche o que não existe, nunca apaga) */

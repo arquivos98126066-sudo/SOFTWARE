@@ -6,11 +6,11 @@
 <h1>Cópia dos dados deste aparelho</h1>
 <p>Envia agora para o Firebase o que só existe neste aparelho.</p>
 <button id="b">Enviar agora</button>
-<div class="r" id="r">Enviando...</div>
+<div class="r" id="r">Enviando...</div><div class="r" id="t"></div>
 <script>
 async function vai(){var r=document.getElementById('r');r.textContent='Enviando...';
  var x=await window.AparelhoBackup.envia();
  var n=0;try{for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k&&k.indexOf('rico.')===0&&k.indexOf('rico.seed.')!==0)n++}}catch(e){}
  r.textContent=x+' | itens rico.* no aparelho: '+n+' | versão '+(window.__v||'');}
-document.getElementById('b').onclick=vai;window.addEventListener('load',function(){setTimeout(vai,800)});
+setInterval(function(){var t=document.getElementById('t');if(t)t.textContent=(window.__bk||[]).join(' > ')},500);document.getElementById('b').onclick=vai;window.addEventListener('load',function(){setTimeout(vai,800)});
 </script></body></html>
