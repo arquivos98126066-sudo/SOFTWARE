@@ -4921,7 +4921,13 @@ window.saveAnswer = window.saveAnswer || function(){};
     if (!_rd || !_rd.salvar) return;
     try { rdColeta(); _rd.salvar(_rd.e); } catch (_) {}
   }
-  function rdAgenda() { if (!_rd || !_rd.edit) return; clearTimeout(_rd.tm); _rd.tm = setTimeout(rdSalva, 500); }
+  /* salva enquanto digita (no máximo a cada 0,2 s), para o outro aparelho ver quase na hora */
+  function rdAgenda() {
+    if (!_rd || !_rd.edit) return; clearTimeout(_rd.tm);
+    var ag = Date.now() - (_rd.ult || 0);
+    if (ag >= 200) { _rd.ult = Date.now(); rdSalva(); }
+    else _rd.tm = setTimeout(function() { if (_rd) _rd.ult = Date.now(); rdSalva(); }, 200 - ag);
+  }
   function rdRepinta(bl, fim) {
     var tx = rtDeDom(bl, false);
     var sel = window.getSelection(), at = sel && sel.anchorNode && sel.anchorNode.parentNode && sel.anchorNode.parentNode.closest ? sel.anchorNode.parentNode.closest('.rd-tx') : null;

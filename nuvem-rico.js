@@ -2,7 +2,7 @@
    Quem muda grava na nuvem; os outros aparelhos recebem em poucos segundos. O aparelho continua guardando uma cópia para abrir rápido.
    Recebe na hora pelo canal ao vivo do Firestore (app próprio "nv", sem esperar o login do SDK, que travava em alguns celulares).
    Grava por REST (fetch simples). Se o canal ao vivo cair, a leitura por REST a cada 3 s assume sozinha. */
-var VER = 'r5', CH = 'AIzaSyDPJvM-XZWfa8HQ7h8v0Usb1Hf3q8sDqpg', PROJ = 'projects/meus-apps-8ca76/databases/(default)/documents';
+var VER = 'r6', CH = 'AIzaSyDPJvM-XZWfa8HQ7h8v0Usb1Hf3q8sDqpg', PROJ = 'projects/meus-apps-8ca76/databases/(default)/documents';
 var URL0 = 'https://firestore.googleapis.com/v1/' + PROJ, COL = self.NV_COL || 'rico_vivo';
 var SO = !!self.NV_SORECEBE, LIMITE = 900000, TK = 'nv.t.v1', PEND = 'nv.pend.v1', ST = 'nv.st.v1', RT = 'nv.rt', CADA = 3000;
 var orig = { set: Storage.prototype.setItem, rem: Storage.prototype.removeItem };
@@ -67,10 +67,12 @@ async function pede(caminho, metodo, corpo) {
 }
 function campos(d) { var f = d.fields || {}; return { k: f.k && f.k.stringValue, v: f.v ? (f.v.stringValue != null ? f.v.stringValue : '') : '', ap: !!(f.ap && f.ap.booleanValue), t: f.t ? +(f.t.integerValue || f.t.doubleValue || 0) : 0, st: f.st && f.st.timestampValue }; }
 
-function agenda() { clearTimeout(timer); timer = setTimeout(envia, 150); }
+/* envia na hora; se acabou de enviar, espera só o resto de 0,25 s (junta as letras digitadas nesse meio tempo) */
+var iniEnvio = 0;
+function agenda() { clearTimeout(timer); timer = setTimeout(envia, Math.max(0, 250 - (Date.now() - iniEnvio))); }
 async function envia() {
   if (enviando) { agenda(); return; }
-  enviando = true;
+  enviando = true; iniEnvio = Date.now();
   /* tudo o que está pendente sobe junto, num envio só (lotes de até 3 MB) */
   var p = mapa(PEND), t = mapa(TK), ks = Object.keys(p), falhou = false, lote = [], tam = 0;
   async function sobe() {
@@ -99,6 +101,7 @@ async function envia() {
   await sobe();
   enviando = false;
   if (falhou) { diag(); setTimeout(agenda, 15000); }
+  else if (Object.keys(mapa(PEND)).length) agenda();
 }
 ['touchstart', 'keydown', 'pointerdown'].forEach(function (e) { addEventListener(e, function () { ultimoToque = Date.now(); }, { capture: true, passive: true }); });
 document.addEventListener('visibilitychange', function () {

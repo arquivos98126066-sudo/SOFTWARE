@@ -22,7 +22,7 @@ var R=document.getElementById('r'),L=[];function say(t){L.push(t);R.textContent=
   var v=(sw.match(/meus-apps-v\d+/)||['?'])[0];
   var rg=await navigator.serviceWorker.register('service-worker.js?v='+Date.now());
   await navigator.serviceWorker.ready;await new Promise(function(r){setTimeout(r,2500)});
-  var k2=await caches.keys();var tem=false;try{tem=/VER = 'r5'/.test(await (await fetch(base+'nuvem-rico.js?r='+Date.now(),{cache:'reload'})).text())}catch(e){}
+  var k2=await caches.keys();var tem=false;try{tem=/VER = 'r6'/.test(await (await fetch(base+'nuvem-rico.js?r='+Date.now(),{cache:'reload'})).text())}catch(e){}
   say('4) versão no ar: '+v+' | guardada agora: '+k2.filter(function(k){return k.indexOf('meus-apps-v')===0}).join(',')+' | Rico ao vivo guardado: '+(tem?'sim':'não'));
   say('Pronto. Toque em Abrir o menu e depois abra o Rico.');
  }catch(e){say('Erro: '+e)}
