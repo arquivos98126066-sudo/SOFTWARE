@@ -3787,7 +3787,7 @@ window.saveAnswer = window.saveAnswer || function(){};
 
     window.addEventListener('resize', render);
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(render);
-    var api = { key: KEY, abreLeitura: function(id) { abreEditor(id); }, existe: function(id) { if (!root) root = carrega(); return !!acha(id); }, clonaNo: function(id) { var f = acha(id); return f ? clona(f.n) : null; }, linhas: function() { if (!root) root = carrega(); var o = []; linhasNo(root, 0, o); return o; }, soltaMov: function() { movKeep = null; movBar = false; destId = null; }, destino: function() { movKeep = null; movBar = false; barId = null; destId = 'root'; }, tira: tiraNo, poe: poeNo, visivel: function() { return !!(wrap && wrap.isConnected && PEND && wrap.querySelector('.rcm-node[data-id="' + PEND.id + '"]')); }, serializa: function() { if (!root) root = carrega(); return JSON.stringify(root); }, montar: montar, salvaNota: salvaNota, fechou: fechou, limpar: limpar, info: function() { return zig ? zInfo : tInfo; } };
+    var api = { key: KEY, rele: function() { if (!root) return; root = carrega(); if (focoId && !acha(focoId)) { focoId = null; focoFix = false; } if (abreId && !acha(abreId)) abreId = null; }, abreLeitura: function(id) { abreEditor(id); }, existe: function(id) { if (!root) root = carrega(); return !!acha(id); }, clonaNo: function(id) { var f = acha(id); return f ? clona(f.n) : null; }, linhas: function() { if (!root) root = carrega(); var o = []; linhasNo(root, 0, o); return o; }, soltaMov: function() { movKeep = null; movBar = false; destId = null; }, destino: function() { movKeep = null; movBar = false; barId = null; destId = 'root'; }, tira: tiraNo, poe: poeNo, visivel: function() { return !!(wrap && wrap.isConnected && PEND && wrap.querySelector('.rcm-node[data-id="' + PEND.id + '"]')); }, serializa: function() { if (!root) root = carrega(); return JSON.stringify(root); }, montar: montar, salvaNota: salvaNota, fechou: fechou, limpar: limpar, info: function() { return zig ? zInfo : tInfo; } };
     if (vazio) { root = nd('Novo'); root.id = 'root'; salva(); }
     return api;
   }
@@ -4113,6 +4113,30 @@ window.saveAnswer = window.saveAnswer || function(){};
     })(g, sem);
   }
   window.rcMapa = {
+    /* chegou mudança de outro aparelho: relê só os mapas que mudaram e redesenha no mesmo lugar, sem recarregar a página */
+    ocupado: function() { var ov = document.getElementById('rdOv'); return !!(PEND || window._rcSrc || (window._rcMS && window._rcMS.ativo) || document.querySelector('.rcm-sheet.on') || (ov && !ov.hidden && window._rd && window._rd.edit)); },
+    nuvem: function(ks) {
+      var tocou = false, estrut = false;
+      ks.forEach(function(k) {
+        if (/^rico\.(mapas\.ordem|proc\.ordem|pastas\.[pm])$/.test(k)) { estrut = true; return; }
+        if (k.indexOf('rico.mapa.') !== 0 && k.indexOf('rico.proc.') !== 0) return;
+        var ach = false;
+        [SETS.m, SETS.p].forEach(function(S) { S.arr.forEach(function(m) { if (m.key === k) { ach = true; m.rele(); } }); });
+        if (ach) tocou = true; else if (/^rico\.(mapa|proc)\./.test(k)) estrut = true;
+      });
+      if (estrut) [SETS.m, SETS.p].forEach(function(S) {
+        if (!S.arr.length) return;
+        var vel = {}, ab = S.aberto >= 0 && S.arr[S.aberto] ? S.arr[S.aberto].key : null;
+        S.arr.forEach(function(m) { vel[m.key] = m; m.rele(); });
+        S.arr = mapasChaves(S).map(function(k) { return vel[k] || criaMapa(k, false); });
+        S.aberto = ab ? S.arr.map(function(m) { return m.key; }).indexOf(ab) : -1;
+      });
+      if (!tocou && !estrut) return;
+      var y = window.scrollY;
+      renderCiclo();
+      if (Math.abs(window.scrollY - y) > 1) window.scrollTo({ top: y, behavior: 'instant' });
+      requestAnimationFrame(function() { if (Math.abs(window.scrollY - y) > 1) window.scrollTo({ top: y, behavior: 'instant' }); });
+    },
     abre: function(key, id, opts) {
       var ss = [SETS.m, SETS.p], i, j;
       for (i = 0; i < ss.length; i++) { try { mapasGarante(ss[i]); } catch (e) {} for (j = 0; j < ss[i].arr.length; j++) { var mm = ss[i].arr[j]; if (mm.key === key && mm.existe && mm.existe(id)) { window.__rdOpts = opts || null; mm.abreLeitura(id); return true; } } }

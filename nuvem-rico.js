@@ -2,12 +2,12 @@
    Quem muda grava na nuvem; os outros aparelhos recebem em poucos segundos. O aparelho continua guardando uma cópia para abrir rápido.
    Recebe na hora pelo canal ao vivo do Firestore (app próprio "nv", sem esperar o login do SDK, que travava em alguns celulares).
    Grava por REST (fetch simples). Se o canal ao vivo cair, a leitura por REST a cada 3 s assume sozinha. */
-var VER = 'r3', CH = 'AIzaSyDPJvM-XZWfa8HQ7h8v0Usb1Hf3q8sDqpg', PROJ = 'projects/meus-apps-8ca76/databases/(default)/documents';
+var VER = 'r4', CH = 'AIzaSyDPJvM-XZWfa8HQ7h8v0Usb1Hf3q8sDqpg', PROJ = 'projects/meus-apps-8ca76/databases/(default)/documents';
 var URL0 = 'https://firestore.googleapis.com/v1/' + PROJ, COL = self.NV_COL || 'rico_vivo';
 var LIMITE = 900000, TK = 'nv.t.v1', PEND = 'nv.pend.v1', ST = 'nv.st.v1', RT = 'nv.rt', CADA = 3000;
 var orig = { set: Storage.prototype.setItem, rem: Storage.prototype.removeItem };
 var pronto = false, aplicando = false, timer = null, ultimoToque = Date.now(), recarregar = false, enviando = false, lendo = false;
-var vivo = 0, nuvem = {}, tok = null, tokAte = 0, est = 'carregou', erro = '', ultEnvio = 0, ultLeitura = 0;
+var vivo = 0, vF = null, vDb = null, semLogin = 0, nuvem = {}, tok = null, tokAte = 0, est = 'carregou', erro = '', ultEnvio = 0, ultLeitura = 0;
 
 function sincroniza(k) { return typeof k === 'string' && k.indexOf('rico.') === 0 && k.indexOf('rico.seed.') !== 0 && !/\.foto$/.test(k) && k.indexOf('rico.y.') !== 0 && k.indexOf('rico.rd.') !== 0 && k.indexOf('rico.fixarTela') !== 0; }
 function ler(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
@@ -46,7 +46,8 @@ function rtDoSdk() {
 }
 async function token() {
   if (tok && tokAte > Date.now() + 60000) return tok;
-  var rt = ler(RT) || await rtDoSdk();
+  var rt = ler(RT);
+  if (!rt && Date.now() - semLogin > 300000) { rt = await rtDoSdk(); if (!rt) semLogin = Date.now(); }
   if (!rt) return null;
   try {
     var r = await lim(fetch('https://securetoken.googleapis.com/v1/token?key=' + CH, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: 'grant_type=refresh_token&refresh_token=' + encodeURIComponent(rt) }), 15000);
@@ -66,25 +67,36 @@ async function pede(caminho, metodo, corpo) {
 }
 function campos(d) { var f = d.fields || {}; return { k: f.k && f.k.stringValue, v: f.v ? (f.v.stringValue != null ? f.v.stringValue : '') : '', ap: !!(f.ap && f.ap.booleanValue), t: f.t ? +(f.t.integerValue || f.t.doubleValue || 0) : 0, st: f.st && f.st.timestampValue }; }
 
-function agenda() { clearTimeout(timer); timer = setTimeout(envia, 300); }
+function agenda() { clearTimeout(timer); timer = setTimeout(envia, 150); }
 async function envia() {
   if (enviando) { agenda(); return; }
   enviando = true;
-  var p = mapa(PEND), t = mapa(TK), ks = Object.keys(p), falhou = false;
+  /* tudo o que está pendente sobe junto, num envio só (lotes de até 3 MB) */
+  var p = mapa(PEND), t = mapa(TK), ks = Object.keys(p), falhou = false, lote = [], tam = 0;
+  async function sobe() {
+    if (!lote.length) return;
+    var l = lote; lote = []; tam = 0;
+    try {
+      /* com o canal ao vivo aberto, grava por ele (mais rápido); se falhar, grava por REST */
+      var foi = false;
+      if (vivo && vF) { try { var bt = vF.writeBatch(vDb); l.forEach(function (x) { bt.set(vF.doc(vDb, COL, idDe(x.k)), { k: x.k, v: x.v, ap: x.ap, t: x.t, st: vF.serverTimestamp() }); }); await lim(bt.commit(), 8000); foi = true; } catch (e) {} }
+      if (!foi) await pede(':commit', 'POST', { writes: l.map(function (x) { return {
+        update: { name: PROJ + '/' + COL + '/' + idDe(x.k), fields: { k: { stringValue: x.k }, v: { stringValue: x.v }, ap: { booleanValue: x.ap }, t: { integerValue: String(x.t) } } },
+        updateTransforms: [{ fieldPath: 'st', setToServerValue: 'REQUEST_TIME' }]
+      }; }) });
+      var p2 = mapa(PEND), t2 = mapa(TK);
+      l.forEach(function (x) { nuvem[x.k] = { v: x.v, ap: x.ap, t: x.t }; if (p2[x.k] === x.marca && t2[x.k] === x.t0) delete p2[x.k]; });
+      grava(PEND, p2); ultEnvio = Date.now();
+    } catch (e) { falhou = true; erro = 'envio: ' + e.message; }
+  }
   for (var i = 0; i < ks.length; i++) {
     var k = ks[i], apagado = p[k] === 2, v = apagado ? '' : ler(k);
     if (!apagado && v == null) { apagado = true; v = ''; }
-    if (!apagado && v.length > LIMITE) { delete p[k]; continue; }
-    try {
-      await pede(':commit', 'POST', { writes: [{
-        update: { name: PROJ + '/' + COL + '/' + idDe(k), fields: { k: { stringValue: k }, v: { stringValue: v }, ap: { booleanValue: apagado }, t: { integerValue: String(t[k] || Date.now()) } } },
-        updateTransforms: [{ fieldPath: 'st', setToServerValue: 'REQUEST_TIME' }]
-      }] });
-      nuvem[k] = { v: v, ap: apagado, t: t[k] || 0 };
-      var p2 = mapa(PEND); if (p2[k] === p[k] && mapa(TK)[k] === t[k]) { delete p2[k]; grava(PEND, p2); }
-      ultEnvio = Date.now();
-    } catch (e) { falhou = true; erro = 'envio: ' + e.message; }
+    if (!apagado && v.length > LIMITE) { var p3 = mapa(PEND); delete p3[k]; grava(PEND, p3); continue; }
+    if (tam + v.length > 3000000) await sobe();
+    lote.push({ k: k, v: v, ap: apagado, t: t[k] || Date.now(), t0: t[k], marca: p[k] }); tam += v.length;
   }
+  await sobe();
   enviando = false;
   if (falhou) { diag(); setTimeout(agenda, 15000); }
 }
@@ -114,9 +126,16 @@ function aplica(d) {
   if (p[k]) { delete p[k]; grava(PEND, p); }
   return true;
 }
-function recarrega() {
-  if (Date.now() - ultimoToque > 2500 && !document.querySelector('textarea:focus,input:focus,[contenteditable="true"]:focus')) location.reload();
-  else setTimeout(recarrega, 1500);
+/* mostra na tela o que chegou: o Rico relê só os mapas que mudaram e redesenha no lugar, sem piscar nem sair da posição */
+var mudadas = {}, telaT = null;
+function ocupado() { return Date.now() - ultimoToque < 400 || !!document.querySelector('textarea:focus,input:focus,[contenteditable="true"]:focus') || !!(window.rcMapa && window.rcMapa.ocupado && window.rcMapa.ocupado()); }
+function atualizaTela() {
+  telaT = null;
+  if (ocupado()) { telaT = setTimeout(atualizaTela, 500); return; }
+  var ks = Object.keys(mudadas); mudadas = {};
+  if (!ks.length) return;
+  if (window.rcMapa && window.rcMapa.nuvem) { try { window.rcMapa.nuvem(ks); } catch (e) { erro = 'tela: ' + e.message; } return; }
+  location.reload();
 }
 function recebe(docs) {
   var mudou = false, maior = ler(ST) || '';
@@ -125,10 +144,10 @@ function recebe(docs) {
     if (!d.k) return;
     if (d.st && nuvem[d.k] && nuvem[d.k].st && Date.parse(d.st) < Date.parse(nuvem[d.k].st)) return;
     nuvem[d.k] = { v: d.v, ap: d.ap, t: d.t, st: d.st };
-    if (aplica(d)) mudou = true;
+    if (aplica(d)) { mudou = true; mudadas[d.k] = 1; }
   });
   if (maior) grava(ST, maior);
-  if (mudou && pronto && !recarregar) { recarregar = true; recarrega(); }
+  if (mudou && pronto && !telaT) atualizaTela();
 }
 
 /* Primeira carga: a coleção inteira. Depois, a cada 3 s com a tela aberta, só o que mudou desde a última hora do servidor. */
@@ -162,7 +181,7 @@ async function aoVivo() {
     var db; try { db = F.initializeFirestore(app, { experimentalAutoDetectLongPolling: true }); } catch (e) { db = F.getFirestore(app); }
     F.onSnapshot(F.collection(db, COL), function (snap) {
       if (snap.metadata.fromCache) return;
-      if (!vivo) { vivo = Date.now(); diag(); }
+      if (!vivo) { vivo = Date.now(); vF = F; vDb = db; diag(); }
       var docs = [];
       snap.docChanges().forEach(function (c) {
         if (c.type === 'removed') return;
