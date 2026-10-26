@@ -1,4 +1,4 @@
-const CACHE_NAME = 'meus-apps-v328';
+const CACHE_NAME = 'meus-apps-v329';
 // HTMLs enviados pelo menu (segurar o app > Enviar um novo): ficam fora da limpeza de versões antigas
 const ENVIADOS = 'apps-enviados';
 
@@ -32,7 +32,8 @@ const URLS_TO_CACHE = [
   './auth-check.js',
   './firebase-sync.js',
   './sync-indicator.js',
-  './app-boost.js'
+  './app-boost.js',
+  './nuvem-rico.js'
 ];
 
 self.addEventListener('install', event => {
