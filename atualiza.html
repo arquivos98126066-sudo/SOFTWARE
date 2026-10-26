@@ -1,0 +1,16 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8"><title>Atualizar</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>body{font:18px system-ui;background:#faf6ee;color:#14213d;padding:28px 16px}</style></head><body>
+<p id="t">Atualizando os apps...</p>
+<script>
+(async function(){
+  var t=document.getElementById('t');
+  try{
+    if(window.caches){var ks=await caches.keys();for(var i=0;i<ks.length;i++){if(ks[i].indexOf('meus-apps-v')===0)await caches.delete(ks[i]);}}
+    if(navigator.serviceWorker){var rs=await navigator.serviceWorker.getRegistrations();for(var j=0;j<rs.length;j++)await rs[j].unregister();}
+    t.textContent='Pronto. Abrindo a cópia...';
+  }catch(e){t.textContent='Erro: '+e;}
+  setTimeout(function(){location.replace('copia.html?'+Date.now());},700);
+})();
+</script></body></html>
