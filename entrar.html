@@ -20,6 +20,7 @@ async function vai(){
   var rl=await lim(fetch('https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key='+CH,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:document.getElementById('e').value.trim(),password:document.getElementById('s').value,returnSecureToken:true})}),20000,'login');
   var j=await rl.json();
   if(!rl.ok){throw new Error('login recusado: '+((j.error&&j.error.message)||rl.status))}
+  try{if(j.refreshToken)localStorage.setItem('nv.rt',j.refreshToken)}catch(e){}
   var tk=j.idToken,H={'Authorization':'Bearer '+tk};
   async function lista(col){var out=[],pg='';for(var n=0;n<8;n++){var r=await lim(fetch(PROJ+col+'?pageSize=300'+pg,{headers:H}),20000,'ler '+col);if(!r.ok)throw new Error('ler '+col+': '+r.status);var d=await r.json();out=out.concat(d.documents||[]);if(!d.nextPageToken)break;pg='&pageToken='+encodeURIComponent(d.nextPageToken)}return out}
   function campo(d,c){return d.fields&&d.fields[c]?d.fields[c].stringValue:null}

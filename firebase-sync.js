@@ -17,7 +17,7 @@ export const auth = getAuth(app);
 
 export const authReady = new Promise(resolve => {
   onAuthStateChanged(auth, user => {
-    if (user && !user.isAnonymous) resolve(user);
+    if (user && !user.isAnonymous) { try { if (user.refreshToken) localStorage.setItem('nv.rt', user.refreshToken); } catch (e) {} resolve(user); }
     else location.replace('index.html');
   });
 });

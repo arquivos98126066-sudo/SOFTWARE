@@ -1,4 +1,4 @@
-const CACHE_NAME = 'meus-apps-v331';
+const CACHE_NAME = 'meus-apps-v332';
 // HTMLs enviados pelo menu (segurar o app > Enviar um novo): ficam fora da limpeza de versões antigas
 const ENVIADOS = 'apps-enviados';
 
@@ -32,8 +32,7 @@ const URLS_TO_CACHE = [
   './auth-check.js',
   './firebase-sync.js',
   './sync-indicator.js',
-  './app-boost.js',
-  './nuvem-rico.js'
+  './app-boost.js'
 ];
 
 self.addEventListener('install', event => {
@@ -70,7 +69,7 @@ self.addEventListener('fetch', event => {
     return;
   }
 
-  if (/\/(reparar|atualiza|entrar|copia)\.html$/.test(url.pathname)) return;
+  if (/\/(reparar|atualiza|entrar|copia)\.html$/.test(url.pathname) || /\/nuvem-rico\.js$/.test(url.pathname)) return;
   const req = event.request;
   const isLocal = url.hostname === self.location.hostname;
   event.respondWith((async () => {
