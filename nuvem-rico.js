@@ -66,7 +66,15 @@ function recarrega() {
   else setTimeout(recarrega, 1500);
 }
 
+function diag(est) {
+  try {
+    var id = ler('nv.dev') || ('d' + Math.random().toString(36).slice(2, 8)); orig.set.call(localStorage, 'nv.dev', id);
+    setDoc(doc(db, COL, '_dev_' + id), { est: est, t: Date.now(), ua: navigator.userAgent.slice(0, 80), pend: Object.keys(mapa(PEND)).length }).catch(function () {});
+  } catch (e) {}
+}
+diag('carregou');
 authReady.then(function () {
+  diag('login ok');
   var primeira = true;
   onSnapshot(collection(db, COL), function (s) {
     var mudou = false;
@@ -84,7 +92,7 @@ authReady.then(function () {
         for (var i = 0; i < localStorage.length; i++) { var k = localStorage.key(i); if (sincroniza(k) && !nuvem[k]) { t[k] = t[k] || Date.now(); var p = mapa(PEND); p[k] = 1; grava(PEND, p); alvo = true; } }
         grava(TK, t); if (alvo) agenda();
       }
-      pronto = true; agenda();
+      pronto = true; agenda(); diag('ouvindo nuvem');
     }
     if (mudou && !recarregar) { recarregar = true; recarrega(); }
   }, function () { pronto = true; });
