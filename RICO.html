@@ -4778,6 +4778,24 @@ window.saveAnswer = window.saveAnswer || function(){};
     if (_rd.edit) { try { clearTimeout(_rd.tm); rdSalva(); } catch (_) {} }
     return { ctx: _rd.ctx, edit: !!_rd.edit, sc: ov.scrollTop };
   };
+  /* assistente: lê e troca o texto da leitura aberta (subtítulos e blocos viram um texto só; desfazer volta tudo como era) */
+  window.rdIa = {
+    aberto: function() { var ov = document.getElementById('rdOv'); return !!(_rd && ov && !ov.hidden); },
+    titulo: function() { return String(_rd.e.t || '').trim(); },
+    texto: function() {
+      if (_rd.edit) { try { rdColeta(); } catch (_) {} }
+      var e = _rd.e, out = [];
+      (e.i || []).forEach(function(v, k) { var m = (e.m || [])[k] || {}; if (m.t && String(m.t).trim()) out.push('**' + String(m.t).trim() + '**'); if (String(v || '').trim()) out.push(String(v)); });
+      return out.join('\n\n').trim();
+    },
+    guarda: function() { return JSON.stringify({ i: _rd.e.i || [], m: _rd.e.m || [] }); },
+    poe: function(v, volta) {
+      var ov = document.getElementById('rdOv'), sc = ov.scrollTop;
+      if (volta) { var o = JSON.parse(volta); _rd.e.i = o.i; _rd.e.m = o.m; } else { _rd.e.i = [v]; _rd.e.m = [{}]; }
+      rdPinta(); ov.scrollTop = sc;
+      if (_rd.salvar) { try { _rd.salvar(_rd.e); } catch (_) {} }
+    }
+  };
   function rdEsc(x) { return String(x == null ? '' : x).replace(/[&<>]/g, function(c) { return c === '&' ? '&amp;' : (c === '<' ? '&lt;' : '&gt;'); }); }
   function rdBloco(v, idx, c, ed, q, off) {
     var corpo = rtHtml(rtParse(String(v || '')), null, off);
@@ -6613,14 +6631,16 @@ window.saveAnswer = window.saveAnswer || function(){};
     var ultimoTa = null, alvo = null, novo = '', antes = null, ocupado = false;
     document.addEventListener('focusin', function(e) { var t = e.target; if (t && t.tagName === 'TEXTAREA' && !pan.contains(t) && t.id !== 'edTa') ultimoTa = t; }, true);
     function editorAberto() { var ov = document.getElementById('edOv'); return !!(ov && !ov.hidden && _edAlvo); }
+    function visivel(t) { if (!t || !document.body.contains(t) || t.offsetParent === null) return false; var r = t.getBoundingClientRect(); return r.bottom > 0 && r.top < innerHeight; }
     function textoAlvo() {
+      if (alvo === 'rd') return window.rdIa.texto();
       if (alvo === 'ed') { var ed = document.getElementById('edTa'); try { if (_edModo === 'editar') ed.value = rtDeDom(document.getElementById('edView'), false); } catch (_) {} return ed.value; }
       return alvo && alvo.value != null ? alvo.value : '';
     }
     function abre() {
-      alvo = editorAberto() ? 'ed' : (ultimoTa && document.body.contains(ultimoTa) ? ultimoTa : null);
+      alvo = editorAberto() ? 'ed' : (window.rdIa && window.rdIa.aberto() ? 'rd' : (visivel(ultimoTa) ? ultimoTa : null));
       var t = textoAlvo(), n = t ? t.split('\n').length : 0;
-      alvoTx.textContent = alvo ? (alvo === 'ed' ? 'Texto do editor aberto' : 'Texto do último campo tocado') + ' (' + n + (n === 1 ? ' linha)' : ' linhas)') : 'Sem texto aberto: a resposta aparece aqui.';
+      alvoTx.textContent = alvo ? (alvo === 'ed' ? 'Texto do editor aberto' : (alvo === 'rd' ? 'Texto da tela aberta' + (window.rdIa.titulo() ? ': ' + window.rdIa.titulo() : '') : 'Texto do campo tocado')) + ' (' + n + (n === 1 ? ' linha)' : ' linhas)') : 'Sem texto aberto: a resposta aparece aqui.';
       res.hidden = true; fim.hidden = true; st.textContent = ''; novo = ''; antes = null; troca.textContent = 'Trocar o texto'; troca.hidden = !alvo;
       pan.hidden = false; btn.hidden = true;
     }
@@ -6634,7 +6654,7 @@ window.saveAnswer = window.saveAnswer || function(){};
       if (!window.NvCanal) { st.textContent = 'Sem conexão com o servidor.'; return; }
       ocupado = true; go.disabled = true; st.textContent = 'Pensando...'; res.hidden = true; fim.hidden = true;
       var t0 = Date.now();
-      NvCanal.http('/ia', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ordem: o, texto: textoAlvo() }) })
+      NvCanal.http('/ia', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ordem: o, texto: textoAlvo(), titulo: alvo === 'rd' ? window.rdIa.titulo() : '' }) })
         .then(function(r) { return r.json().catch(function() { return { erro: 'Resposta inválida (' + r.status + ').' }; }); })
         .then(function(j) {
           if (j.erro) { st.textContent = j.erro; return; }
@@ -6645,7 +6665,8 @@ window.saveAnswer = window.saveAnswer || function(){};
         .catch(function() { st.textContent = 'Sem internet ou servidor fora.'; })
         .then(function() { ocupado = false; go.disabled = false; });
     }
-    function poe(v) {
+    function poe(v, volta) {
+      if (alvo === 'rd') { window.rdIa.poe(v, volta); return; }
       if (alvo === 'ed') {
         var ed = document.getElementById('edTa'), view = document.getElementById('edView');
         _edModo = 'ler'; view.setAttribute('contenteditable', 'false'); ed.value = v; _pm = rtParse(v); view.innerHTML = rtHtml(_pm, _tool); edSalvaJa();
@@ -6653,8 +6674,8 @@ window.saveAnswer = window.saveAnswer || function(){};
     }
     troca.addEventListener('click', function() {
       if (!alvo || !novo) return;
-      if (antes === null) { antes = textoAlvo(); poe(novo); troca.textContent = 'Desfazer'; st.textContent = 'Texto trocado e salvo.'; }
-      else { poe(antes); antes = null; troca.textContent = 'Trocar o texto'; st.textContent = 'Voltou como era.'; }
+      if (antes === null) { antes = alvo === 'rd' ? window.rdIa.guarda() : textoAlvo(); poe(novo); troca.textContent = 'Desfazer'; st.textContent = 'Texto trocado e salvo.'; }
+      else { if (alvo === 'rd') poe(null, antes); else poe(antes); antes = null; troca.textContent = 'Trocar o texto'; st.textContent = 'Voltou como era.'; }
     });
     pan.querySelector('.ia-copia').addEventListener('click', function() {
       try { navigator.clipboard.writeText(novo).then(function() { st.textContent = 'Copiado.'; }); } catch (_) { st.textContent = 'Não deu para copiar.'; }
