@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8"><title>Guardar cópia</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#faf6ee">
+<style>
+:root{--fundo:#faf6ee;--texto:#14213d;--caixa:#fff;--borda:#e6dcc6;--ouro:#b07a1a;--ok:#2f6b3a;--erro:#a3341f}
+body{font:17px system-ui;background:var(--fundo);color:var(--texto);margin:0;padding:24px 16px}
+h1{font-size:20px;margin:0 0 8px}p{line-height:1.5;margin:8px 0}
+.r{background:var(--caixa);border:1px solid var(--borda);border-radius:12px;padding:14px;margin-top:14px;white-space:pre-wrap;word-break:break-word;font-size:15px}
+.f{font-size:19px;font-weight:600;margin-top:14px}.ok{color:var(--ok)}.er{color:var(--erro)}
+button,a.b{display:inline-block;font:inherit;padding:12px 18px;border-radius:10px;border:0;background:var(--ouro);color:#fff;margin-top:14px;text-decoration:none}
+</style></head><body>
+<h1>Guardar cópia deste aparelho</h1>
+<p>Copia tudo o que os apps guardam neste celular para a nuvem, cifrado. Não muda nem apaga nada dos apps.</p>
+<div class="f" id="f">Começando...</div>
+<div class="r" id="r"></div>
+<button id="b" style="display:none">Guardar de novo</button>
+<a class="b" id="baixa" href="#" style="display:none;background:#14213d">Baixar arquivo extra</a>
+<a class="b" href="index.html" style="background:#2f6b3a">Abrir o menu</a>
+<script>
+var R=document.getElementById('r'),F=document.getElementById('f'),L=[];
+window.PV_MANUAL=true;
+window.PV_MOSTRA=function(t){L.push(t);R.textContent=L.join('\n')};
+</script>
+<script>
+(function(){var s=document.createElement('script');s.src='preserva.js?v='+Date.now();s.onload=vai;s.onerror=function(){F.textContent='Não abriu. Confira a internet e abra de novo.';F.className='f er'};document.head.appendChild(s)})();
+async function vai(){
+  F.textContent='Guardando...';F.className='f';
+  var x=await window.Preserva.roda(true);
+  if(x.ok){F.textContent='Cópia guardada e conferida.';F.className='f ok'}
+  else{F.textContent='Não guardou: '+x.motivo;F.className='f er'}
+  document.getElementById('b').style.display='inline-block';
+  document.getElementById('baixa').style.display='inline-block';
+}
+document.getElementById('b').onclick=function(){L=[];vai()};
+document.getElementById('baixa').onclick=async function(e){e.preventDefault();var b=await window.Preserva.arquivo();var a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='copia-'+(localStorage.getItem('pv.dev')||'aparelho')+'-'+new Date().toISOString().slice(0,10)+'.json';document.body.appendChild(a);a.click()};
+</script>
+</body></html>

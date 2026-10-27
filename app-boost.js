@@ -1,3 +1,15 @@
+/* Preservação (fase 0): copia o localStorage na hora em que a página abre, antes de os apps juntarem com a nuvem,
+   e carrega o preserva.js, que guarda uma cópia cifrada deste aparelho (não muda nada dos apps) */
+(function () {
+  try {
+    if (window.top !== window || window.__PV_LS) return;
+    var r = {}; for (var i = 0; i < localStorage.length; i++) { var k = localStorage.key(i); r[k] = localStorage.getItem(k); }
+    window.__PV_LS = r; window.__PV_T = Date.now();
+    if (/(reparar|exportar)\.html$/i.test(location.pathname)) return;
+    var s = document.createElement('script'); s.src = 'preserva.js?v=' + Date.now(); s.async = true; (document.head || document.documentElement).appendChild(s);
+  } catch (e) {}
+})();
+
 /* Regras de velocidade e firmeza para todos os apps: sem zoom, sem tela deslocada para o lado */
 (function () {
   var st = document.createElement('style');
@@ -512,6 +524,8 @@ window.Alterna = (function () {
   async function restaura() {
     try {
       if (!navigator.onLine || ler('backup.ap.rest')) return false;
+      /* fase 0: só traz a cópia da nuvem depois de este aparelho ter guardado a cópia dele (preserva.js); senão o que ele tinha se perdia */
+      if (!ler('pv.ok')) return false;
       /* aparelho novo = nunca enviou cópia (sem marca de envio). Os apps já gravaram valores de fábrica aqui, por isso não dá para olhar se está vazio */
       if (ler('backup.ap.sig') || ler('backup.ap.t')) { localStorage.setItem('backup.ap.rest', 'nao'); return false; }
       var tk = await token(); if (!tk) return false;

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'meus-apps-v341';
+const CACHE_NAME = 'meus-apps-v342';
 // HTMLs enviados pelo menu (segurar o app > Enviar um novo): ficam fora da limpeza de versões antigas
 const ENVIADOS = 'apps-enviados';
 
@@ -69,7 +69,7 @@ self.addEventListener('fetch', event => {
     return;
   }
 
-  if (/\/(reparar|atualiza|entrar|copia)\.html$/.test(url.pathname) || /\/nuvem-rico\.js$/.test(url.pathname)) return;
+  if (/\/(reparar|atualiza|entrar|copia|exportar)\.html$/.test(url.pathname) || /\/(nuvem-rico|preserva)\.js$/.test(url.pathname)) return;
   const req = event.request;
   const isLocal = url.hostname === self.location.hostname;
   event.respondWith((async () => {
