@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <script src="app-boost.js"></script>
+<script src="dados.js"></script>
 <meta name="theme-color" content="#f3f5f8">
 <title>Administração</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -553,6 +554,8 @@ async function salvar() {
   // Salva local imediatamente — independente da internet
   idbSet('lanc', { itens: _cache.lancamentos });
   idbSet('config', _cache.adm);
+  /* camada única: cada lançamento é um item na nuvem e a configuração é outro; só sobe o que mudou */
+  if (window.Dados) { Dados.mudou('adm_lanc'); Dados.mudou('adm_config'); return; }
   if (window.syncShow) window.syncShow.syncing();
   try {
     await setDoc(docLanc, { itens: _cache.lancamentos, _t: Date.now() });
@@ -565,6 +568,7 @@ async function salvar() {
 }
 
 function gd() { return _cache; }
+window._adm = { dados: function() { return _cache; }, salvar: function() { return salvar(); } };
 
 // ===== GARANTIR ESTRUTURA =====
 function garantirEstrutura() {
@@ -594,6 +598,16 @@ async function iniciarListeners() {
     renderADM();
   }
 
+  if (window.Dados) {
+    var pinta = window.AoVivo ? AoVivo.pinta : function(n, f){ f(); };
+    Dados.liga({ nome: 'adm_lanc', area: 'adm', rotulo: 'ADM',
+      ler: function() { return _cache.lancamentos || []; },
+      escrever: function(lista) { lista.sort(function(a, b) { return (a.id || 0) - (b.id || 0); }); _cache.lancamentos = lista; idbSet('lanc', { itens: lista }); garantirEstrutura(); pinta('lanc', function() { renderHistorico(); renderRelatorio(); atualizarHeader(); }); } });
+    Dados.liga({ nome: 'adm_config', area: 'adm', rotulo: 'ADM',
+      ler: function() { return [Object.assign({}, _cache.adm, { id: 'config' })]; },
+      escrever: function(lista) { var c = lista[0]; if (!c) return; var o = Object.assign({}, c); delete o.id; _cache.adm = o; idbSet('config', o); garantirEstrutura(); pinta('cfg', function() { renderADM(); }); } });
+    return;
+  }
   // 2. Escuta a nuvem — quando chegar, faz merge com o local
   onSnapshot(docLanc, async function(snap) {
     if (snap.metadata.hasPendingWrites) return;
@@ -1194,6 +1208,7 @@ document.getElementById('btnImportarDados').onclick = async function() {
     if (!d.lancamentos) throw new Error('inválido');
     if (!(await confirmar('Substituir todos os dados pelo backup?', '', 'Substitui'))) return;
     _cache = d;
+    if (window.Dados) Dados.mudou('adm_lanc', true);
     await salvar();
     renderADM(); renderHistorico(); renderRelatorio(); atualizarHeader();
     document.getElementById('importArea').style.display = 'none';
@@ -1203,6 +1218,7 @@ document.getElementById('btnImportarDados').onclick = async function() {
 document.getElementById('btnReset').onclick = async function() {
   if (!(await confirmar('Apagar todos os dados?', 'Isso não pode ser desfeito.', 'Apaga', true))) return;
   _cache = { lancamentos: [], adm: { retiradas: { despesas: 0, negocio: 0, invest: 0, diversao: 0 }, tapeteRetirada: 0, outrasRetirada: 0, outrasNome: 'Outras' } };
+  if (window.Dados) Dados.mudou('adm_lanc', true);
   await salvar();
   renderADM(); renderHistorico(); renderRelatorio(); atualizarHeader();
   toast('Dados apagados');

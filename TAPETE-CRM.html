@@ -4,6 +4,7 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <script src="app-boost.js"></script>
+<script src="dados.js"></script>
   <meta name="mobile-web-app-capable" content="yes"/>
   <meta name="apple-mobile-web-app-capable" content="yes"/>
   <meta name="apple-mobile-web-app-status-bar-style" content="default"/>
@@ -1499,13 +1500,17 @@
 
 <script type="module">
 import { db } from "https://arquivos98126066-sudo.github.io/SOFTWARE/firebase-sync.js";
-import {
-  collection, doc, addDoc, setDoc, getDoc, getDocs,
-  updateDoc, deleteDoc, onSnapshot, query, orderBy
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import * as _fs from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+/* com a camada única (dados.js) ligada, as gravações antigas na nuvem não acontecem mais: quem sobe é a camada */
+const _nv = !!window.Dados, _ok = () => Promise.resolve({ id: null, exists: () => false, data: () => ({}), forEach() {}, docs: [] });
+const collection = _nv ? () => null : _fs.collection, doc = _nv ? () => null : _fs.doc, query = _nv ? () => null : _fs.query, orderBy = _nv ? () => null : _fs.orderBy;
+const addDoc = _nv ? _ok : _fs.addDoc, setDoc = _nv ? _ok : _fs.setDoc, getDoc = _nv ? _ok : _fs.getDoc, getDocs = _nv ? _ok : _fs.getDocs;
+const updateDoc = _nv ? _ok : _fs.updateDoc, deleteDoc = _nv ? _ok : _fs.deleteDoc, onSnapshot = _nv ? () => () => {} : _fs.onSnapshot;
 
 // ── CAMADA 1: LOCAL — IndexedDB com fallback localStorage ──────────────
+const TAP_MAPA = { tapete_crm_clients_cache: 'tap_clientes', tapetes_cache: 'tap_pedidos', tapetes_ruas_cache: 'tap_ruas' };
 function saveLocal(key, data) {
+  if (window.Dados && TAP_MAPA[key]) Dados.mudou(TAP_MAPA[key]);
   try {
     const req = indexedDB.open('meus_apps_backup', 1);
     req.onupgradeneeded = e => e.target.result.createObjectStore('data');
@@ -1955,7 +1960,7 @@ async function fsAddClient(c) {
   try {
     // Envia sem base64 para o Firebase (fotos ficam só no cache local)
     await setDoc(doc(db, COL_CLIENTS, payload.id), _stripImgsForFirebase(payload));
-    window.syncShow?.synced('Tapetes CRM');
+    if(!_nv) window.syncShow?.synced('Tapetes CRM');
   } catch(e) {
     const pending = JSON.parse(localStorage.getItem(LS_PENDING)||'[]');
     // Guarda versão sem base64 na fila de pendentes também
@@ -1977,7 +1982,7 @@ async function fsUpdateClient(id, fields) {
   try {
     // Envia sem base64 para o Firebase (fotos ficam só no cache local)
     await updateDoc(doc(db, COL_CLIENTS, id), _stripImgsForFirebase(withTs));
-    window.syncShow?.synced('Tapetes CRM');
+    if(!_nv) window.syncShow?.synced('Tapetes CRM');
   } catch(e) {
     const pending = JSON.parse(localStorage.getItem(LS_PENDING)||'[]');
     pending.push({op:'update', id, fields:_stripImgsForFirebase(withTs)});
@@ -2038,6 +2043,7 @@ function renderLixeiraTapeteCRM() {
 }
 window.renderLixeiraTapeteCRM = renderLixeiraTapeteCRM;
 
+window._tapClientes = { lista: () => clients, add: c => fsAddClient(c), muda: (id, f) => fsUpdateClient(id, f), apaga: id => fsDeleteClient(id) };
 async function fsDeleteClient(id) {
   enviarClienteParaLixeira(id);
   clients = clients.filter(c => c.id !== id);
@@ -2046,7 +2052,7 @@ async function fsDeleteClient(id) {
   window.syncShow?.syncing();
   try {
     await deleteDoc(doc(db, COL_CLIENTS, id));
-    window.syncShow?.synced('Tapetes CRM');
+    if(!_nv) window.syncShow?.synced('Tapetes CRM');
   } catch(e) {
     console.error(e);
     const pending = JSON.parse(localStorage.getItem(LS_PENDING)||'[]');
@@ -2073,13 +2079,14 @@ async function loadConfig() {
   try { onSnapshot(doc(db, COL_CONFIG, 'main'), s2 => { if(!s2.exists() || s2.metadata.hasPendingWrites) return; const d = s2.data(); messages = d.messages || messages; links = d.links || []; textoFixo = d.textoFixo || ''; }); } catch(_) {}
 }
 /* textos guardados só no aparelho (mensagem rápida): também ao vivo */
-try { import('./nuvem-rico.js?col=tapete&k=tap_msg_rapida&v=' + Date.now()).catch(()=>{}); } catch(_) {}
+try { import('./nuvem-rico.js?col=tapete&k=tap_msg_rapida,tapete_crm_lixeira&v=' + Date.now()).catch(()=>{}); } catch(_) {}
 
 async function saveConfig() {
+  if (window.Dados) { try { localStorage.setItem('tapete_crm_config_local', JSON.stringify({ messages, links, textoFixo })); } catch (_) {} Dados.mudou('tap_config'); return; }
   window.syncShow?.syncing();
   try {
     await setDoc(doc(db, COL_CONFIG, 'main'), { messages, links, textoFixo });
-    window.syncShow?.synced('Tapetes CRM');
+    if(!_nv) window.syncShow?.synced('Tapetes CRM');
   } catch(e) {
     console.error(e);
     localStorage.setItem('tapete_crm_config_local', JSON.stringify({ messages, links, textoFixo }));
@@ -2102,52 +2109,22 @@ async function crmTapCarregarLocal() {
 
 // ── LISTENER TEMPO REAL ───────────────────────────────────────────────────────
 function startRealtimeSync() {
-  crmTapCarregarLocal(); // carrega local imediatamente
-
-  const q = query(collection(db, COL_CLIENTS));
-  onSnapshot(q, snapshot => {
-    if(snapshot.metadata.hasPendingWrites) return;
-    /* junta cliente por cliente: vale a versão mais nova de cada um; apagado em outro aparelho sai daqui também
-       (só fica o que é deste aparelho e ainda não subiu: na fila ou mexido há menos de 15 s) */
-    const pend = {};
-    try { JSON.parse(localStorage.getItem(LS_PENDING)||'[]').forEach(x => { const id = x.id || (x.data && x.data.id); if(id) pend[id] = 1; }); } catch(_) {}
-    /* primeira vez neste canal: os clientes que só existem neste aparelho sobem para a nuvem (nada se perde) */
-    if(!localStorage.getItem('nv.uniao.tapete')){
-      try { localStorage.setItem('nv.uniao.tapete', '1'); } catch(_) {}
-      const naNuvem = {}; snapshot.forEach(d => { naNuvem[d.id] = 1; });
-      clients.forEach(l => { if(l && l.id && !naNuvem[l.id] && !_crmTapDeletedIds[l.id]){ pend[l.id] = 1; setDoc(doc(db, COL_CLIENTS, l.id), _stripImgsForFirebase({ ...l, updatedAt: l.updatedAt || Date.now() })).catch(()=>{}); } });
-    }
-    const mapa = {};
-    snapshot.forEach(docSnap => { if(!_crmTapDeletedIds[docSnap.id]) mapa[docSnap.id] = { ...docSnap.data(), id: docSnap.id }; });
-    const novos = [], junto = [];
-    clients.forEach(l => {
-      const c = mapa[l.id];
-      if(c){ const v = (l.updatedAt||0) > (c.updatedAt||0) ? l : c; if(v === c && l.fotos && !c.fotos) v.fotos = l.fotos; junto.push(v); delete mapa[l.id]; }
-      else if(pend[l.id] || Date.now() - (l.updatedAt||0) < 15000) junto.push(l);
-    });
-    Object.keys(mapa).forEach(id => novos.push(mapa[id]));
-    clients = novos.concat(junto);
-    setTimeout(atualizarBadges, 300);
-    saveLocal('tapete_crm_clients_cache', clients);
-    /* nada mudou desde o último desenho: não redesenha (evita piscar e pulo da tela) */
-    const _sig = clients.map(c => c.id + ':' + (c.updatedAt||0)).join('|');
-    if(_sig === window._tapSig) return;
-    window._tapSig = _sig;
-    (window.AoVivo ? AoVivo.pinta : function(n, f){ f(); })('cli', () => {
-      if(curScreen==='home') renderHome();
-      if(curScreen==='clientes') renderAllClients();
-      if(curScreen==='fila') renderFila();
-      atualizarBadges();
-    });
-  }, async err => {
-    console.warn('TAPETE-CRM onSnapshot offline:', err);
-    await crmTapCarregarLocal();
+  crmTapCarregarLocal().then(() => {
+    if (!window.Dados) return;
+    Dados.liga({ nome: 'tap_clientes', area: 'tapete', rotulo: 'Tapetes CRM', semMidia: true, novoNoInicio: true,
+      ler: () => clients,
+      escrever: (lista) => {
+        clients = lista; saveLocal('tapete_crm_clients_cache', clients); setTimeout(atualizarBadges, 300);
+        (window.AoVivo ? AoVivo.pinta : function (n, f) { f(); })('cli', () => {
+          if (curScreen === 'home') renderHome(); if (curScreen === 'clientes') renderAllClients(); if (curScreen === 'fila') renderFila(); atualizarBadges();
+        });
+      } });
+    /* mensagens, links e texto fixo: um item só */
+    try { const l = JSON.parse(localStorage.getItem('tapete_crm_config_local') || 'null'); if (l) { messages = l.messages || messages; links = l.links || links; textoFixo = l.textoFixo || textoFixo; } } catch (_) {}
+    Dados.liga({ nome: 'tap_config', area: 'tapete', rotulo: 'Tapetes CRM',
+      ler: () => [{ id: 'main', messages, links, textoFixo }],
+      escrever: (lista) => { const c = lista[0]; if (!c) return; messages = c.messages || messages; links = c.links || []; textoFixo = c.textoFixo || ''; try { localStorage.setItem('tapete_crm_config_local', JSON.stringify({ messages, links, textoFixo })); } catch (_) {} } });
   });
-
-  window.addEventListener('online', () => {
-  _crmTapBlockUntil = Date.now() + 10000;
-  setTimeout(() => syncPending(), 800);
-});
 }
 
 // ── TENTAR SINCRONIZAR PENDENTES ──────────────────────────────────────────────
@@ -5894,6 +5871,7 @@ function cadPreencherMeses(){
 // Cache local — chave diferente do CRM para não conflitar
 function cadSalvarLocal(){
   try{ localStorage.setItem('cad_tapetes_cache', JSON.stringify(cad_pedidosCache)); }catch(_){}
+  if(window.Dados) Dados.mudou('tap_cadastro');
 }
 function cadCarregarLocal(){
   return new Promise(function(resolve){
@@ -6083,7 +6061,7 @@ window.cadDelP = async function(id){
 
 window.cadApagarTodosP = async function(){
   if(!confirm('Apaga TODOS os pedidos cadastrados aqui?')) return;
-  cad_pedidosCache = []; cadSalvarLocal(); cadRenderP(); cadToast('Apagados');
+  cad_pedidosCache = []; if(window.Dados) Dados.mudou('tap_cadastro', true); cadSalvarLocal(); cadRenderP(); cadToast('Apagados');
 };
 
 // ── Transferir para Gestão ────────────────────────────────────────────────────
@@ -6481,7 +6459,7 @@ var _firebaseOk = false;
 try {
   const fbSync = await import("https://arquivos98126066-sudo.github.io/SOFTWARE/firebase-sync.js").catch(()=>null);
   const fbStore = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js").catch(()=>null);
-  if(fbSync && fbStore && fbSync.db) {
+  if(!window.Dados && fbSync && fbStore && fbSync.db) {
     db = fbSync.db;
     ({ collection, addDoc, getDocs, updateDoc, deleteDoc, doc, onSnapshot, query, orderBy, writeBatch, getDoc } = fbStore);
     _firebaseOk = true;
@@ -6498,15 +6476,17 @@ try {
 // Stubs para evitar travamento quando Firebase nao carregou
 if(!_firebaseOk) {
   db = window._cadDB || null;
-  var _offlinePromise = function(){ return Promise.reject('offline'); };
+  /* camada nova ligada: as chamadas antigas não fazem nada (sem erro); sem ela, ficam offline */
+  var _offlinePromise = window.Dados ? function(){ return Promise.resolve({ id: null, forEach: function(){}, docs: [] }); } : function(){ return Promise.reject('offline'); };
   collection = window._cadCollection || _offlinePromise;
   addDoc = window._cadAddDoc || _offlinePromise;
   updateDoc = window._cadUpdateDoc || _offlinePromise;
   deleteDoc = window._cadDeleteDoc || _offlinePromise;
   doc = window._cadDoc || _offlinePromise;
-  getDocs = getDoc = writeBatch = _offlinePromise;
+  getDocs = getDoc = _offlinePromise;
+  writeBatch = window.Dados ? function(){ return { set: function(){}, update: function(){}, delete: function(){}, commit: function(){ return Promise.resolve(); } }; } : _offlinePromise;
   query = orderBy = function(){ return null; };
-  onSnapshot = function(q, okCb, errCb){ try{ if(errCb) errCb(new Error('offline')); }catch(_){} return function(){}; };
+  onSnapshot = function(q, okCb, errCb){ try{ if(errCb && !window.Dados) errCb(new Error('offline')); }catch(_){} return function(){}; };
 }
 
 // ─── Cache local (fonte de verdade em memória) ───────────────────────────────
@@ -6516,7 +6496,9 @@ window._gestAddPedido = function(p){ pedidosCache.unshift(p); };
 window._gestGetCache  = function(){ return pedidosCache; };
 
 // ─── IndexedDB com fallback localStorage ────────────────────────────────────
+var TAP_MAPA2 = { tapete_crm_clients_cache: 'tap_clientes', tapetes_cache: 'tap_pedidos', tapetes_ruas_cache: 'tap_ruas' };
 function saveLocal(key, data) {
+  if (window.Dados && TAP_MAPA2[key]) Dados.mudou(TAP_MAPA2[key]);
   try {
     var req = indexedDB.open('meus_apps_backup', 1);
     req.onupgradeneeded = function(e) { e.target.result.createObjectStore('data'); };
@@ -6831,6 +6813,7 @@ window.apagarTodasV = async function(){
   if(!confirm('Apaga TODAS?'))return;
   var ids=pedidosCache.map(function(p){return p.id;});
   pedidosCache=[];_saveTimestampsPedidos={};
+  if(window.Dados) Dados.mudou('tap_pedidos', true);
   salvarCacheLocal();renderG();toast('Apagadas');
   try{var batch=writeBatch(db);ids.forEach(function(id){batch.delete(doc(db,'tapetes',id));});await batch.commit();}catch(e){}
 };
@@ -7115,7 +7098,7 @@ window.delR = async function(id){
 window.apagarTodasR = async function(){
   if(!confirm('Apaga TODAS as ruas?'))return;
   var ids=ruasCache.map(function(r){return r.id;});
-  ruasCache=[];_saveTimestampsRuas={};salvarCacheLocal();renderR();renderRC();toast('Removidas');
+  ruasCache=[];_saveTimestampsRuas={};if(window.Dados) Dados.mudou('tap_ruas', true);salvarCacheLocal();renderR();renderRC();toast('Removidas');
   try{var batch=writeBatch(db);ids.forEach(function(id){batch.delete(doc(db,'tapetes_ruas',id));});await batch.commit();}catch(e){}
 };
 
@@ -7416,6 +7399,19 @@ async function iniciarListeners(){
   renderG();renderC();renderR();renderRC();renderAgenda();
   iniciarRel();
 
+  if(window.Dados){
+    var pinta = window.AoVivo ? AoVivo.pinta : function(n, f){ f(); };
+    Dados.liga({ nome: 'tap_pedidos', area: 'tapete', rotulo: 'Tapetes', semMidia: true, novoNoInicio: true, ignora: ['pendingSync', '_localId'],
+      ler: function(){ return pedidosCache; },
+      escrever: function(lista){ pedidosCache = lista; salvarCacheLocal(); pinta('ped', function(){ renderG(); renderC(); renderAgenda(); }); } });
+    Dados.liga({ nome: 'tap_ruas', area: 'tapete', rotulo: 'Tapetes', ignora: ['pendingSync', '_localId'],
+      ler: function(){ return ruasCache; },
+      escrever: function(lista){ ruasCache = lista; salvarCacheLocal(); pinta('ruas', function(){ renderR(); renderRC(); }); } });
+    Dados.liga({ nome: 'tap_cadastro', area: 'tapete', rotulo: 'Tapetes', semMidia: true,
+      ler: function(){ return typeof cad_pedidosCache !== 'undefined' ? cad_pedidosCache : []; },
+      escrever: function(lista){ cad_pedidosCache = lista; try{ localStorage.setItem('cad_tapetes_cache', JSON.stringify(cad_pedidosCache)); }catch(_){} if (typeof cadRenderP === 'function') pinta('cad', cadRenderP); } });
+    return;
+  }
   if(!_firebaseOk&&!window._cadDB) return;
 
   try{

@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <script src="app-boost.js"></script>
+<script src="dados.js"></script>
 <meta name="theme-color" content="#ffffff">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -1167,7 +1168,7 @@ function loadLocal(key) {
 
 
 /* textos padrão (proposta, reunião) guardados no aparelho: também ao vivo entre aparelhos */
-try { import('./nuvem-rico.js?col=crm&k=meucrmTextoEnvioProposta,meucrmPropostaPadrao,meucrmMsgReuniao&v=' + Date.now()).catch(()=>{}); } catch(_) {}
+try { import('./nuvem-rico.js?col=crm&k=meucrmTextoEnvioProposta,meucrmPropostaPadrao,meucrmMsgReuniao,meucrm_lixeira&v=' + Date.now()).catch(()=>{}); } catch(_) {}
 
 // ══════════════════════════════════════════════
 // ESTADO LOCAL (cache reativo)
@@ -1252,48 +1253,22 @@ async function crmSyncPending() {
   try { for (const it of crmFila()) { if (COLS[it.col] && it.id) await crmEnvia(it); } } finally { _crmEnviando = false; }
 }
 
+/* ao vivo pela camada única de dados (dados.js): cada contato, agenda, reunião, ativo e arquivo é um item na nuvem;
+   a camada compara campo a campo, guarda a fila no aparelho e junta sem perder nada */
+function crmAvisa(colKey) { if (window.Dados) Dados.mudou('crm_' + colKey); }
 function initListeners() {
-  crmCarregarLocal(); // carrega local imediatamente
-
-  Object.entries(COLS).forEach(([key, colName]) => {
-    onSnapshot(collection(firestoreDb, colName), snap => {
-      if (snap.metadata.hasPendingWrites) return;
-      /* junta item por item: vale a versão mais nova de cada contato; o que foi apagado em outro aparelho sai daqui também */
-      const del = _crmDeletedIds[key] || {}, pend = {};
-      crmFila().filter(x => x.col === key).forEach(x => { pend[x.id] = x; });
-      /* primeira vez neste canal: o que só existe neste aparelho sobe para a nuvem (nada se perde) */
-      if (!localStorage.getItem('nv.uniao.crm.' + key)) {
-        try { localStorage.setItem('nv.uniao.crm.' + key, '1'); } catch(_) {}
-        const naNuvem = {}; snap.docs.forEach(d => { naNuvem[d.id] = 1; });
-        (state[key] || []).forEach(l => { if (l && l.id && !naNuvem[l.id] && !del[l.id] && !pend[l.id]) { const it = { op: 'add', col: key, id: l.id, data: { ...l } }; crmFilaPoe(it); pend[l.id] = it; crmEnvia(it); } });
-      }
-      const mapa = {};
-      snap.docs.forEach(d => { if (del[d.id] || (pend[d.id] && pend[d.id].op === 'delete')) return; mapa[d.id] = { ...d.data(), id: d.id }; });
-      const novo = [];
-      (state[key] || []).forEach(l => {
-        const c = mapa[l.id];
-        if (c) { novo.push((l.updatedAt || 0) > (c.updatedAt || 0) ? l : c); delete mapa[l.id]; }
-        else if (pend[l.id] && pend[l.id].op !== 'delete') novo.push(l);
-      });
-      Object.keys(mapa).forEach(id => novo.push(mapa[id]));
-      state[key] = novo;
-      saveLocal('meucrm_state_' + colName, state[key]);
-      /* nada mudou desde o último desenho: não redesenha (evita piscar e pulo da tela) */
-      const _sig = JSON.stringify(state[key]);
-      window._crmSig = window._crmSig || {};
-      if (window._crmSig[key] === _sig) return;
-      window._crmSig[key] = _sig;
-      (window.AoVivo ? AoVivo.pinta : function(n, f){ f(); })('crm', () => { renderPage(currentPage); updateBadges(); });
-    }, async err => {
-      console.warn('CRM listener offline:', err);
-      await crmCarregarLocal();
+  crmCarregarLocal().then(() => {
+    if (!window.Dados) return;
+    Object.entries(COLS).forEach(([key, colName]) => {
+      Dados.liga({ nome: 'crm_' + key, area: 'crm',
+        ler: () => state[key] || [],
+        escrever: (lista) => {
+          state[key] = lista;
+          saveLocal('meucrm_state_' + colName, lista);
+          (window.AoVivo ? AoVivo.pinta : function (n, f) { f(); })('crm', () => { renderPage(currentPage); updateBadges(); });
+        } });
     });
   });
-
-  window.addEventListener('online', () => {
-  Object.keys(_crmBlockUntil).forEach(k => { _crmBlockUntil[k] = Date.now() + 10000; });
-  setTimeout(() => crmSyncPending(), 800);
-});
 }
 
 // ══════════════════════════════════════════════
@@ -1310,7 +1285,7 @@ async function fsAdd(colKey, data) {
   renderPage(currentPage); updateBadges();
   if (window.syncShow) window.syncShow.syncing();
   const it = { op: 'add', col: colKey, id, data: payload };
-  crmFilaPoe(it); crmEnvia(it);
+  crmAvisa(colKey);
   return id;
 }
 
@@ -1324,7 +1299,7 @@ async function fsUpdate(colKey, id, data) {
   renderPage(currentPage); updateBadges();
   if (window.syncShow) window.syncShow.syncing();
   const it = { op: 'update', col: colKey, id, data: idx >= 0 ? { ...state[colKey][idx] } : { ...withTs, id } };
-  crmFilaPoe(it); crmEnvia(it);
+  crmAvisa(colKey);
 }
 
 // ── LIXEIRA DO MEU CRM ───────────────────────────────────
@@ -1403,7 +1378,7 @@ async function fsDelete(colKey, id) {
   saveLocal('meucrm_state_' + COLS[colKey], state[colKey] || []);
   renderPage(currentPage); updateBadges();
   const it = { op: 'delete', col: colKey, id };
-  crmFilaPoe(it); crmEnvia(it);
+  crmAvisa(colKey);
 }
 
 // ══════════════════════════════════════════════
@@ -2533,7 +2508,6 @@ if ('serviceWorker' in navigator) {
 // ══════════════════════════════════════════════
 requestNotifPermission();
 carregarLixeiraCRM();
-crmSyncPending();
 initListeners();
 
 </script>

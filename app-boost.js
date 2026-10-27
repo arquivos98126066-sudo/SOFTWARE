@@ -5,6 +5,8 @@
     if (window.top !== window || window.__PV_LS) return;
     var r = {}; for (var i = 0; i < localStorage.length; i++) { var k = localStorage.key(i); r[k] = localStorage.getItem(k); }
     window.__PV_LS = r; window.__PV_T = Date.now();
+    /* versão guardada no aparelho, para o diagnóstico mostrar o que este celular está rodando */
+    try { caches.keys().then(function (k) { window.NV_CACHE = k.filter(function (x) { return x.indexOf('meus-apps') === 0; }).join(','); }); } catch (e) {}
     if (/(reparar|exportar)\.html$/i.test(location.pathname)) return;
     var s = document.createElement('script'); s.src = 'preserva.js?v=' + Date.now(); s.async = true; (document.head || document.documentElement).appendChild(s);
   } catch (e) {}
@@ -678,16 +680,28 @@ window.Alterna = (function () {
 /* Ao vivo sem piscar: AoVivo.pinta(nome, desenhar) redesenha o que chegou da nuvem na mesma rolagem;
    se você está digitando num campo, espera sair dele (o desenho não apaga o que está sendo escrito) */
 window.AoVivo = window.AoVivo || (function () {
-  var fila = {}, presa = null;
-  function digitando() { var a = document.activeElement; return a && a !== document.body && (/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName) || a.isContentEditable) ? a : null; }
+  /* espera só enquanto a pessoa digita de verdade (campo visível e tecla há menos de 3 s);
+     campo esquecido com foco (janela fechada) não segura mais as atualizações. Depois do desenho, o campo
+     em edição volta com o mesmo texto, o foco e o cursor no lugar */
+  var fila = {}, presa = null, ultTecla = 0, espera = null;
+  document.addEventListener('input', function () { ultTecla = Date.now(); }, true);
+  function visivel(a) { return !!(a.offsetParent || (a.getClientRects && a.getClientRects().length)); }
+  function digitando() { var a = document.activeElement; return a && a !== document.body && (/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName) || a.isContentEditable) && visivel(a) ? a : null; }
   function roda() {
     var ks = Object.keys(fila); if (!ks.length) return;
     var a = digitando();
-    if (a) { if (presa !== a) { presa = a; a.addEventListener('blur', function () { presa = null; setTimeout(roda, 0); }, { once: true }); } return; }
+    if (a && Date.now() - ultTecla < 3000) {
+      if (presa !== a) { presa = a; a.addEventListener('blur', function () { presa = null; setTimeout(roda, 0); }, { once: true }); }
+      clearTimeout(espera); espera = setTimeout(roda, 3100 - (Date.now() - ultTecla));
+      return;
+    }
     var fs = ks.map(function (k) { return fila[k]; }); fila = {};
-    var y = window.scrollY;
+    var y = window.scrollY, foco = a && a.id ? { id: a.id, v: a.value, i: a.selectionStart, f: a.selectionEnd } : null;
+    var rol = []; document.querySelectorAll('[id]').forEach(function (e) { if (e.scrollTop > 0 && e !== document.documentElement) rol.push([e.id, e.scrollTop]); });
     fs.forEach(function (f) { try { f(); } catch (e) {} });
     if (Math.abs(window.scrollY - y) > 1) window.scrollTo({ top: y, behavior: 'instant' });
+    rol.forEach(function (r) { var e = document.getElementById(r[0]); if (e && Math.abs(e.scrollTop - r[1]) > 1) e.scrollTop = r[1]; });
+    if (foco) { var n = document.getElementById(foco.id); if (n && n !== document.activeElement) { try { if (n.value !== foco.v) n.value = foco.v; n.focus({ preventScroll: true }); n.setSelectionRange && n.setSelectionRange(foco.i, foco.f); } catch (e) {} } }
   }
   return { pinta: function (nome, f) { fila[nome] = f; roda(); } };
 })();

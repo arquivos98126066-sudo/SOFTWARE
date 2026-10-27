@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <script src="app-boost.js"></script>
+<script src="dados.js"></script>
 <script>document.documentElement.classList.add('plano-carregando'); setTimeout(function(){ document.documentElement.classList.remove('plano-carregando'); }, 1500);</script>
 <script>
 /* chegou por troca de app: não mostra a lista por um instante, para não aparecer e pular para o lugar guardado */
@@ -851,11 +852,12 @@ async function p_initFirebase(){
     // Ativa cache persistente no IndexedDB do browser
     // Na segunda visita em diante, onSnapshot entrega dados do cache LOCAL instantaneamente
     // sem esperar a rede — elimina a tela em branco
-    try {
-      _p_db = initializeFirestore(app, { experimentalAutoDetectLongPolling: true });
-    } catch(e2){
-      // Se já foi inicializado (ex: hot reload), usa o existente
-      _p_db = getFirestore(app);
+    _p_db = window.__nvDb;
+    if(!_p_db){
+      try { _p_db = initializeFirestore(app, { experimentalAutoDetectLongPolling: true }); }
+      catch(e2){ _p_db = getFirestore(app); }
+      if(window.NV_EMU){ try { (await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js')).connectFirestoreEmulator(_p_db, '127.0.0.1', window.NV_EMU); } catch(e3){} }
+      window.__nvDb = _p_db;
     }
 
     const auth = getAuth(appLogin);
@@ -863,6 +865,22 @@ async function p_initFirebase(){
     /* o login confere por trás e não segura os dados; só volta ao menu se nunca entrou */
     onAuthStateChanged(auth, function(user){ if(!(user && !user.isAnonymous)){ var ok = false; try { ok = localStorage.getItem('menu_logado') === '1' || !!localStorage.getItem('nv.rt'); } catch(e){} if(!ok) location.replace('index.html'); } });
 
+    /* camada única (dados.js): cada processo e pasta é um item na nuvem; dois aparelhos mexendo em processos diferentes não se apagam */
+    if(window.Dados){
+      _p_fbReady = false;
+      Dados.liga({ nome: 'plano_procs', area: 'plano', rotulo: 'Processo',
+        ler: function(){ return p_procs; },
+        padrao: function(it){ return it.name === 'Meu Processo' && it.type === 'process' && !it.parentId && JSON.stringify(it.steps) === JSON.stringify(p_stepsDefault()); },
+        escrever: function(lista){
+          var ativo = p_procs[p_procIdx] && p_procs[p_procIdx].id;
+          if(!lista.length) lista = [{id:Date.now(), type:'process', name:'Meu Processo', parentId:null, order:0, steps:p_stepsDefault()}];
+          p_procs = lista;
+          var i = ativo == null ? -1 : p_procs.findIndex(function(x){ return String(x.id) === String(ativo); });
+          if(i >= 0) p_procIdx = i;
+          p_syncAlias(); p_idbSet('doa_procs', p_procs); pl_refreshIfOpen(); p_vivoPinta();
+        } });
+      return;
+    }
     _p_docRef = doc(_p_db, 'doa', 'processos');
     _p_fbReady = true;
 
@@ -934,6 +952,7 @@ async function p_salvarTudo(){
     localStorage.setItem('doa_active_proc_id', String(activeItem.id));
   }
   if(window.syncShow) window.syncShow.syncing();
+  if(window.Dados){ Dados.mudou('plano_procs'); return; }
   // 2. Tenta Firebase
   if(_p_fbReady && _p_docRef){
     try {

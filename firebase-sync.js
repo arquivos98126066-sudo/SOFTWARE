@@ -1,5 +1,5 @@
 import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getFirestore, initializeFirestore } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { getFirestore, initializeFirestore, connectFirestoreEmulator } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
 const firebaseConfig = {
@@ -15,7 +15,8 @@ export const app = initializeApp(firebaseConfig);
 /* dados por um canal próprio ("nv"), que não espera o login do celular: o mesmo canal dos mapas do Rico.
    O canal antigo esperava o login, travava em alguns celulares e nada chegava à nuvem. */
 const nvApp = getApps().filter(a => a.name === 'nv')[0] || initializeApp({ apiKey: firebaseConfig.apiKey, projectId: firebaseConfig.projectId, appId: firebaseConfig.appId }, 'nv');
-let _db; try { _db = initializeFirestore(nvApp, { experimentalAutoDetectLongPolling: true }); } catch (e) { _db = getFirestore(nvApp); }
+let _db = self.__nvDb;
+if (!_db) { try { _db = initializeFirestore(nvApp, { experimentalAutoDetectLongPolling: true }); } catch (e) { _db = getFirestore(nvApp); } if (self.NV_EMU) { try { connectFirestoreEmulator(_db, '127.0.0.1', self.NV_EMU); } catch (e) {} } self.__nvDb = _db; }
 export const db = _db;
 export const auth = getAuth(app);
 

@@ -119,9 +119,10 @@ Lista do que deu errado ao deixar os apps rápidos, firmes e sem piscar, e a sol
 ## AO VIVO PONTA A PONTA (regra do Klebson, 2026-10-27, vale em todo app e HTML, atual e futuro)
 - 100% do que o app guarda sincroniza entre aparelhos em menos de 1 s, sem recarregar, sem piscar e sem sair do lugar. Nunca ligar só uma parte.
 - Antes de mexer: listar TODO dado que o app grava (localStorage, IndexedDB, Firestore, campos, escolhas, listas, textos, configurações) e ligar cada um.
-- Dados no aparelho (localStorage): `import('./nuvem-rico.js?col=NOME&k=chave1,prefixo*')` e `window.nvTela.NOME = function(chaves){ redesenhar no lugar }`. Outros apps só recebem com `&so=1` (app-boost).
-- Dados no Firestore: gravar com id próprio (`setDoc`, nunca `addDoc` com tempo limite), fila de envio que só sai quando a nuvem confirma, junção item por item pela versão mais nova, ignorar `hasPendingWrites`, nunca bloquear a escuta por tempo, apagado em outro aparelho sai daqui.
-- Redesenho sempre por `AoVivo.pinta(nome, fn)` (mantém rolagem e espera o campo em digitação).
-- Texto sobe enquanto digita: no máximo a cada 0,2 s (nunca esperar parar de digitar).
+- Listas de itens (contatos, clientes, pedidos, lançamentos, processos): camada única `dados.js` (`<script src="dados.js">` depois do app-boost). `Dados.liga({ nome, area, ler: () => lista, escrever: (lista) => { trocar a lista, salvar local, AoVivo.pinta(...) } })` e, depois de cada salvamento local, `Dados.mudou(nome)` (`Dados.mudou(nome, true)` só em "apagar tudo" de propósito). Coleção na nuvem: `v2_<nome>`, um documento por item, campo a campo. Opções: `semMidia` (fotos data: ficam no aparelho), `ignora`, `novoNoInicio`, `padrao(item)` (item de fábrica não sobe). O app não grava mais direto no Firestore.
+- Chaves do aparelho (localStorage): motor `nuvem-rico.js?col=NOME&k=chave1,prefixo*` (r9) e `window.nvTela.NOME = function(chaves){ redesenhar no lugar }`. Outros apps só recebem com `&so=1` (app-boost). O motor junta por partes (célula com célula) e guarda conflitos em `v2_conflitos`.
+- Economia da cota grátis (50 mil leituras e 20 mil gravações por dia): envio 0,4 s depois da última letra e no máximo 1 por segundo digitando; ao abrir, só desce o que mudou (consulta por `st`); diagnóstico em `diag`, só quando muda. Nunca ouvir coleção inteira a cada abertura nem gravar a cada letra.
+- Redesenho sempre por `AoVivo.pinta(nome, fn)` (mantém rolagem da página e dos painéis; espera só enquanto a pessoa digita de verdade; o campo em edição volta com texto, foco e cursor).
 - HTML aberto dentro do Plano: guarda em `ph:*` pelo Plano e se atualiza montando a versão nova por trás.
-- Testar com dois navegadores, campo por campo, e medir o tempo antes de dizer que terminou.
+- Service worker: código (html, js, json) vem da rede primeiro (até 1,5 s), cache só sem rede; imagens do cache. Subir o número do cache a cada publicação.
+- Testes: emulador do Firestore e dois navegadores (scripts de teste na sessão), campo por campo, com tempo medido; depois conferir na nuvem real (coleção `diag`) que cada celular gravou.

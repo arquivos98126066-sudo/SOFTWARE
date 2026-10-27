@@ -1,4 +1,4 @@
-const CACHE_NAME = 'meus-apps-v342';
+const CACHE_NAME = 'meus-apps-v343';
 // HTMLs enviados pelo menu (segurar o app > Enviar um novo): ficam fora da limpeza de versões antigas
 const ENVIADOS = 'apps-enviados';
 
@@ -21,7 +21,6 @@ const URLS_TO_CACHE = [
   './plano-html/Leads.html',
   './plano-html/Cidades.html',
   './plano-html/Site.html',
-  './ESTUDO.html',
   './LER.html',
   './Code.html',
   './manifest.json',
@@ -32,7 +31,8 @@ const URLS_TO_CACHE = [
   './auth-check.js',
   './firebase-sync.js',
   './sync-indicator.js',
-  './app-boost.js'
+  './app-boost.js',
+  './dados.js'
 ];
 
 self.addEventListener('install', event => {
@@ -94,6 +94,14 @@ self.addEventListener('fetch', event => {
     });
     event.waitUntil(rede.catch(() => {}));
     const cached = await caches.match(req, {ignoreSearch: true});
+    /* páginas e programas deste site: a versão nova da rede vem primeiro (até 1,5 s); sem rede, a guardada.
+       Assim um HTML novo nunca roda com um programa velho. Imagens e fontes: a guardada primeiro. */
+    const codigo = isLocal && (req.mode === 'navigate' || /\.(html|js|json)$/i.test(url.pathname) || url.pathname.endsWith('/'));
+    if (codigo && cached) {
+      const tempo = new Promise(ok => setTimeout(() => ok(null), 1500));
+      const r = await Promise.race([rede.catch(() => null), tempo]);
+      return (r && r.ok) ? r : cached;
+    }
     return cached || rede;
   })());
 });
