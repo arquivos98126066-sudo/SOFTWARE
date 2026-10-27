@@ -1,5 +1,6 @@
 /* Camada única de dados dos apps (CRM, Tapete, ADM, Plano...). Cada item de uma lista vira um documento na nuvem:
-   v2_<nome>/<id> = { ij (id original), d: { campo: valor em JSON }, del (apagado), st (hora do servidor), por (aparelho), area }.
+   v2_<nome>/<id> = { ij (id original), d: { campo: valor em JSON }, del (apagado), st (número de ordem do servidor), por (aparelho), area }.
+   d3: o servidor é o da Cloudflare (nv-canal.js). Ele numera cada mudança e todos os aparelhos recebem na mesma ordem.
    - O app continua com a lista dele; depois de salvar, chama Dados.mudou(nome). A camada compara campo a campo e envia só o que mudou.
    - Fila no aparelho (IndexedDB): o que não foi confirmado pela nuvem sobrevive a fechar o app e volta a subir sozinho.
    - Ao abrir, desce só o que mudou desde a última vez. Dois aparelhos mudando campos diferentes: os dois valem.
@@ -9,9 +10,9 @@
    Uso: Dados.liga({ nome, ler: () => lista, escrever: (lista, ids) => {...}, novoNoInicio, area }) */
 (function () {
   if (window.Dados) return;
-  var VER = 'd2', CH = 'AIzaSyDPJvM-XZWfa8HQ7h8v0Usb1Hf3q8sDqpg', PRE = window.NV_COL ? window.NV_COL + '_' : '';
+  var VER = 'd3', PRE = window.NV_COL ? window.NV_COL + '_' : '';
   var LIMITE_CAMPO = 700000, LIMITE_DOC = 950000;
-  var F = null, db = null, cols = {}, dev = null, carregando = null;
+  var db = null, cols = {}, dev = null, carregando = null, AQUI = (document.currentScript && document.currentScript.src) || location.href;
   function lerLs(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
   dev = lerLs('nv.dev') || ('d' + Math.random().toString(36).slice(2, 8));
   try { localStorage.setItem('nv.dev', dev); } catch (e) {}
@@ -44,23 +45,19 @@
   }
   function poe(loja, k, v) { return idb().then(function (b) { if (!b) return; return new Promise(function (ok) { try { var t = b.transaction(loja, 'readwrite'); if (v === undefined) t.objectStore(loja).delete(k); else t.objectStore(loja).put(v, k); t.oncomplete = ok; t.onerror = ok; t.onabort = ok; } catch (e) { ok(); } }); }); }
 
-  /* ---------- Firestore (app "nv", o mesmo canal dos outros) ---------- */
+  /* ---------- servidor (canal único, nv-canal.js) ---------- */
   function banco() {
     if (carregando) return carregando;
     carregando = (async function () {
-      var A = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js');
-      F = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js');
-      var app = A.getApps().filter(function (a) { return a.name === 'nv'; })[0] || A.initializeApp({ apiKey: CH, projectId: 'meus-apps-8ca76', appId: '1:768854372271:web:467b541baf3c513f03095a' }, 'nv');
-      db = window.__nvDb;
-      if (!db) {
-        try { db = F.initializeFirestore(app, { experimentalAutoDetectLongPolling: true }); } catch (e) { db = F.getFirestore(app); }
-        if (window.NV_EMU) { try { F.connectFirestoreEmulator(db, '127.0.0.1', window.NV_EMU); } catch (e) {} }
-        window.__nvDb = db;
-      }
+      if (!window.NvCanal) await import(new URL('nv-canal.js', AQUI).href);
+      db = window.NvCanal;
+      db.estado(function (v) { Object.keys(cols).forEach(function (n) { cols[n].vivo = v; }); });
       return db;
     })();
     return carregando;
   }
+  /* objeto -> lista de [caminho, valor] para o servidor */
+  function pares(o) { return Object.keys(o).map(function (c) { return [[c], o[c]]; }); }
   function idDoc(id) { var s = String(id).replace(/\//g, '%2F'); if (s === '.' || s === '..' || !s) s = '_' + s; return s.slice(0, 700); }
 
   /* fotos guardadas no próprio item (data:...) ficam só no aparelho até irem para o armazenamento de arquivos */
@@ -166,25 +163,23 @@
     if (!navigator.onLine) return;
     var ks = Object.keys(C.fila); if (!ks.length) return;
     C.enviando = true;
-    var lote = F.writeBatch(db), itens = [], n = 0;
+    var ops = [], itens = [], n = 0;
     ks.slice(0, 300).forEach(function (k) {
-      var f = C.fila[k], ref = F.doc(db, C.col, k), cab = { ij: JSON.stringify(C.ids[k] != null ? C.ids[k] : k), st: F.serverTimestamp(), por: dev, area: C.cfg.area || 'geral' };
-      if (f.del) { cab.del = true; lote.set(ref, cab, { merge: true }); itens.push({ k: k, v: f.v, del: true }); n++; return; }
-      var cs = C.atual[k] || {}, caminhos = ['ij', 'st', 'por', 'area', 'del'], dados = Object.assign({ del: false }, cab), d = {}, tam = 0, grandes = [];
+      var f = C.fila[k], cab = { ij: JSON.stringify(C.ids[k] != null ? C.ids[k] : k), por: dev, area: C.cfg.area || 'geral' };
+      if (f.del) { cab.del = true; ops.push({ col: C.col, id: k, set: pares(cab) }); itens.push({ k: k, v: f.v, del: true }); n++; return; }
+      var cs = C.atual[k] || {}, set = pares(Object.assign({ del: false }, cab)), apaga = [], d = {}, tam = 0, grandes = [];
       Object.keys(f.campos).forEach(function (c) {
         if (c in cs) {
           if (cs[c].length > LIMITE_CAMPO || tam + cs[c].length > LIMITE_DOC) { grandes.push(c); return; }
-          d[c] = cs[c]; tam += cs[c].length;
-        } else d[c] = F.deleteField();
-        caminhos.push(new F.FieldPath('d', c));
+          d[c] = cs[c]; tam += cs[c].length; set.push([['d', c], cs[c]]);
+        } else { d[c] = null; apaga.push(['d', c]); }
       });
       if (grandes.length) C.erro = 'grande demais (fica só no aparelho): ' + C.cfg.nome + ' ' + k + ' ' + grandes.join(',');
-      dados.d = d;
-      lote.set(ref, dados, { mergeFields: caminhos });
+      ops.push({ col: C.col, id: k, set: set, apaga: apaga });
       itens.push({ k: k, v: f.v, d: d, grandes: grandes }); n++;
     });
     try {
-      await Promise.race([lote.commit(), new Promise(function (_, rj) { setTimeout(function () { rj(new Error('demorou')); }, 15000); })]);
+      await Promise.race([db.grava(ops), new Promise(function (_, rj) { setTimeout(function () { rj(new Error('demorou')); }, 15000); })]);
       itens.forEach(function (x) {
         var f = C.fila[x.k]; if (!f || f.v !== x.v) return;
         var b = C.base[x.k] || { d: {} };
@@ -205,24 +200,21 @@
   /* ---------- receber ---------- */
   function guardaConflito(C, k, campo, valor, motivo) {
     if (!db) return;
-    F.addDoc(F.collection(db, PRE + 'v2_conflitos'), { col: C.col, id: k, campo: campo, v: String(valor == null ? '(apagado)' : valor).slice(0, 900000), motivo: motivo, dev: dev, t: Date.now() }).catch(function () {});
+    db.grava([{ col: PRE + 'v2_conflitos', id: dev + '_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6), troca: true, set: pares({ col: C.col, id: k, campo: campo, v: String(valor == null ? '(apagado)' : valor).slice(0, 900000), motivo: motivo, dev: dev, t: Date.now() }) }]);
   }
   async function ouve(C) {
-    try { await banco(); } catch (e) { C.erro = 'sem firebase: ' + e.message; return; }
-    var desde = C.meta.junto && C.meta.st;
-    var q = desde ? F.query(F.collection(db, C.col), F.where('st', '>', F.Timestamp.fromDate(new Date(desde)))) : F.collection(db, C.col);
-    F.onSnapshot(q, function (snap) {
+    try { await banco(); } catch (e) { C.erro = 'sem servidor: ' + e.message; diag(C); setTimeout(function () { carregando = null; ouve(C); }, 15000); return; }
+    var desde = (C.meta.junto && C.meta.seq) || 0;
+    db.ouve(C.col, desde, function (docs, fim) {
       C.vivo = true;
-      var docs = [];
-      snap.docChanges().forEach(function (ch) { if (ch.type !== 'removed' && !ch.doc.metadata.hasPendingWrites) docs.push({ k: ch.doc.id, x: ch.doc.data() }); });
-      recebe(C, docs, !C.iniciado);
-      if (!C.iniciado) comeca(C);
-    }, function (e) { C.vivo = false; C.erro = 'ao vivo: ' + (e.code || e.message); diag(C); setTimeout(function () { ouve(C); }, 15000); });
+      recebe(C, docs.map(function (d) { return { k: d.id, x: d.x }; }), !C.iniciado);
+      if (!C.iniciado && fim) comeca(C);
+    });
   }
   function recebe(C, docs, primeira) {
-    var mudados = [], maior = C.meta.st || '';
+    var mudados = [], maior = C.meta.seq || 0;
     docs.forEach(function (doc) {
-      var k = doc.k, x = doc.x || {}, st = x.st && x.st.toDate ? x.st.toDate().toISOString() : '';
+      var k = doc.k, x = doc.x || {}, st = +x.st || 0;
       if (st > maior) maior = st;
       C.recebidos++;
       var R = {}; Object.keys(x.d || {}).forEach(function (c) { if (typeof x.d[c] === 'string') R[c] = canon(x.d[c]); });
@@ -262,7 +254,7 @@
       if (Object.keys(reenvia).length) { var f = C.fila[k] || { campos: {}, del: false, v: 0 }; Object.keys(reenvia).forEach(function (c) { f.campos[c] = 1; }); f.v = (f.v || 0) + 1; C.fila[k] = f; poe('fila', C.cfg.nome + '|' + k, f); agenda(C); }
       else if (P && !Object.keys(P.campos).length && !P.del) { delete C.fila[k]; poe('fila', C.cfg.nome + '|' + k, undefined); }
     });
-    if (maior && C.iniciado) { C.meta.st = maior; poe('meta', C.cfg.nome + '|', C.meta); }
+    if (maior && C.iniciado) { C.meta.seq = maior; poe('meta', C.cfg.nome + '|', C.meta); }
     else if (maior) C.stPendente = maior;
     if (mudados.length) { escreve(C, mudados); if (C.iniciado) diag(C); }
   }
@@ -299,7 +291,7 @@
       if (tirar.length) escreve(C, tirar);
       C.meta.junto = Date.now();
     }
-    if (C.stPendente) { C.meta.st = C.stPendente; C.stPendente = null; }
+    if (C.stPendente) { C.meta.seq = C.stPendente; C.stPendente = null; }
     poe('meta', C.cfg.nome + '|', C.meta);
     agenda(C); diag(C);
   }
@@ -315,7 +307,7 @@
     if (falta > 0) { clearTimeout(C.diagT); C.diagT = setTimeout(function () { diag(C); }, falta); return; }
     C.ultDiag = s; C.ultDiagT = Date.now();
     o.envios = C.envios; o.recebidos = C.recebidos; o.t = Date.now();
-    F.setDoc(F.doc(db, PRE + 'diag', dev + '_' + C.col), o).catch(function () {});
+    db.grava([{ col: PRE + 'diag', id: dev + '_' + C.col, troca: true, set: pares(o) }]);
   }
   document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'hidden') Object.keys(cols).forEach(function (n) { var C = cols[n]; clearTimeout(C.diffT); compara(C); clearTimeout(C.timer); envia(C); diag(C); }); });
   addEventListener('online', function () { Object.keys(cols).forEach(function (n) { agenda(cols[n]); }); });

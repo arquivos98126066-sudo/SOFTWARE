@@ -1275,10 +1275,17 @@ if ((sessionStorage.getItem('troca') === (window.RICO_INST === 'p' ? 'RICOP' : '
 <!-- ══════════════════════════════════════════ -->
 <script type="module">import('./nuvem-rico.js?v=' + Date.now()).catch(function () {});</script>
 <script type="module">
-import { db } from "https://arquivos98126066-sudo.github.io/SOFTWARE/firebase-sync.js";
-import {
-  collection, doc, getDoc, setDoc, onSnapshot, FieldPath
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+/* caderno pelo servidor único (Cloudflare, nv-canal.js): cada pergunta é um campo, gravado na ordem do servidor */
+if (!window.NvCanal) await import('./nv-canal.js');
+var canal = window.NvCanal;
+function cadGrava(o, soDados) {
+  var set = [];
+  Object.keys(o).forEach(function(c) {
+    if (c === 'dados') Object.keys(o.dados || {}).forEach(function(q) { set.push([['dados', q], o.dados[q]]); });
+    else if (c !== 'st') set.push([[c], o[c]]);
+  });
+  return Promise.race([canal.grava([{ col: 'born_rich', id: CADERNO_ID, set: set }]), new Promise(function(_, rj) { setTimeout(function() { rj(new Error('demorou')); }, 15000); })]);
+}
 
 // ─── ID único do caderno (fixo — um documento por caderno) ───────────────────
 var CADERNO_ID = 'born_rich_caderno_principal';
@@ -1456,8 +1463,7 @@ async function salvarNoFirebase() {
 
   if (window.syncShow) window.syncShow.syncing();
   try {
-    if (_cadEnviado) await setDoc(doc(db, 'born_rich', CADERNO_ID), Object.assign({}, payload, { dados: parte }), { mergeFields: muda.map(function(q) { return new FieldPath('dados', q); }).concat(['_w', 'updatedAt', 'atualizadoEm']) });
-    else await setDoc(doc(db, 'born_rich', CADERNO_ID), payload, { merge: true });
+    await cadGrava(_cadEnviado ? Object.assign({}, payload, { dados: parte }) : payload);
     _cadEnviado = dados;
     respostasCache = dados;
     if (window.syncShow) window.syncShow.synced('Born Rich');
@@ -1479,13 +1485,13 @@ window.agendarSalvamento = function(el) {
 };
 /* caderno ao vivo: o que outro aparelho escreve aparece aqui na hora, sem recarregar; o campo em que você está digitando espera você sair dele */
 function cadernoAoVivo() {
-  onSnapshot(doc(db, 'born_rich', CADERNO_ID), function(snap) {
-    if (!snap.exists() || snap.metadata.hasPendingWrites) return;
-    var c = snap.data(); if (!c || !c.dados || (c._w && _meusW[c._w])) return;
+  canal.ouve('born_rich', 0, function(docs) {
+    var d = docs.filter(function(x) { return x.id === CADERNO_ID; }).pop(); if (!d) return;
+    var c = d.x; if (!c || !c.dados || (c._w && _meusW[c._w])) return;
     try { if (JSON.stringify(c.dados) === JSON.stringify(coletarDados())) return; } catch (_) {}
     respostasCache = c.dados; _cadEnviado = Object.assign({}, _cadEnviado || {}, c.dados); saveLocal('born_rich_' + CADERNO_ID, c);
     (window.AoVivo ? AoVivo.pinta : function(n, f) { f(); })('caderno', function() { _remoto = true; try { preencherDados(c.dados, true, true); } finally { _remoto = false; } });
-  }, function() {});
+  });
 }
 window.salvarAgora = function() {
   if (!_editou) return;
@@ -1522,9 +1528,8 @@ async function carregarDados() {
   window.__ricoDados = true; if (window.__ricoRevela) window.__ricoRevela();
 
   try {
-    var snap = await getDoc(doc(db, 'born_rich', CADERNO_ID));
-    if (snap.exists()) {
-      var cloud = snap.data();
+    var cloud = await Promise.race([canal.pega('born_rich', CADERNO_ID), new Promise(function(_, rj) { setTimeout(function() { rj(new Error('demorou')); }, 15000); })]);
+    if (cloud) {
       var cloudTime = cloud.updatedAt || 0;
       _cadEnviado = Object.assign({}, cloud.dados || {});
       if (localTime > cloudTime) {
@@ -1539,7 +1544,7 @@ async function carregarDados() {
         saveLocal('born_rich_' + CADERNO_ID, cloud);
       }
     } else if (local) {
-      try { await setDoc(doc(db, 'born_rich', CADERNO_ID), local, { merge: true }); } catch(_) {}
+      try { await cadGrava(local); } catch(_) {}
     }
   } catch(e) {
     if (local) showToast('Dados carregados localmente', '#b45309');

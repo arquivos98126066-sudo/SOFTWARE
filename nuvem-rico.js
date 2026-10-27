@@ -7,16 +7,17 @@
    - a ordem é a do servidor, não o relógio do celular;
    - envia 0,4 s depois da última letra (no máximo 1 envio por segundo enquanto digita);
    - diagnóstico em coleção própria (diag), sem acordar os outros celulares.
+   r11: o servidor é o da Cloudflare (nv-canal.js), que numera cada mudança; todos recebem na mesma ordem.
    Uso: nuvem-rico.js (Rico) ou nuvem-rico.js?col=plano&k=chave1,prefixo* (&so=1 só recebe). */
-var VER = 'r10', CH = 'AIzaSyDPJvM-XZWfa8HQ7h8v0Usb1Hf3q8sDqpg', PROJ = 'projects/meus-apps-8ca76/databases/(default)/documents';
+var VER = 'r11', CH = 'AIzaSyDPJvM-XZWfa8HQ7h8v0Usb1Hf3q8sDqpg', PROJ = 'projects/meus-apps-8ca76/databases/(default)/documents';
 var QS = new URL(import.meta.url).searchParams, OUTRO = QS.get('col');
 var URL0 = 'https://firestore.googleapis.com/v1/' + PROJ, PRE = self.NV_COL ? self.NV_COL + '_' : '';
 var COL = OUTRO ? PRE + OUTRO : (self.NV_COL || 'rico_vivo'), CONF = PRE + 'v2_conflitos', DIAG = PRE + 'diag';
 var CHAVES = (QS.get('k') || '').split(',').filter(Boolean), SO = OUTRO ? QS.get('so') === '1' : !!self.NV_SORECEBE;
-var NS = OUTRO ? 'nv.' + OUTRO + '.' : 'nv.', LIMITE = 900000, PEND = NS + 'pend.v1', ST = NS + 'st.v1', JUNTO = NS + 'junto.v2', RT = 'nv.rt';
+var NS = OUTRO ? 'nv.' + OUTRO + '.' : 'nv.', LIMITE = 900000, PEND = NS + 'pend.v1', ST = NS + 'seq.cf1', JUNTO = NS + 'junto.v2', RT = 'nv.rt';
 var orig = { set: Storage.prototype.setItem, rem: Storage.prototype.removeItem, get: Storage.prototype.getItem };
 var timer = null, primeiraMudanca = 0, enviando = false, lendo = false, aplicando = false, ultimoToque = Date.now(), iniciado = false;
-var vivo = 0, vF = null, vDb = null, base = {}, baseOk = false, tok = null, tokAte = 0, est = 'carregou', erro = '', envios = 0, recebidos = 0;
+var vivo = 0, canal = null, base = {}, baseOk = false, tok = null, tokAte = 0, est = 'carregou', erro = '', envios = 0, recebidos = 0;
 self.NV_VER = VER;
 
 function sincroniza(k) { if (OUTRO) return typeof k === 'string' && CHAVES.some(function (c) { return c.slice(-1) === '*' ? k.indexOf(c.slice(0, -1)) === 0 : k === c; }); return typeof k === 'string' && k.indexOf('rico.') === 0 && k.indexOf('rico.seed.') !== 0 && !/\.foto$/.test(k) && k.indexOf('rico.y.') !== 0 && k.indexOf('rico.rd.') !== 0 && k.indexOf('rico.fixarTela') !== 0; }
@@ -24,6 +25,7 @@ function ler(k) { try { return orig.get.call(localStorage, k); } catch (e) { ret
 function mapa(k) { try { return JSON.parse(ler(k) || '{}') || {}; } catch (e) { return {}; } }
 function grava(k, o) { try { orig.set.call(localStorage, k, typeof o === 'string' ? o : JSON.stringify(o)); } catch (e) { erro = 'aparelho cheio: ' + e.name; } }
 function idDe(k) { return String(k).replace(/[^A-Za-z0-9_.-]/g, '_').slice(0, 140) || '_'; }
+function pares(o) { return Object.keys(o).map(function (c) { return [[c], o[c]]; }); }
 function lim(pr, ms) { return Promise.race([pr, new Promise(function (_, rj) { setTimeout(function () { rj(new Error('demorou')); }, ms); })]); }
 var devId = ler('nv.dev') || ('d' + Math.random().toString(36).slice(2, 8)); grava('nv.dev', devId);
 /* o que já estava pendente de sessões anteriores é mudança de verdade deste aparelho (não valor de fábrica) */
@@ -154,7 +156,7 @@ function parse(v) { if (v == null) return undefined; try { return JSON.parse(v);
 function guardaConflito(k, valor, motivo) {
   var id = (idDe(COL + '_' + k).slice(0, 90) + '_' + devId + '_' + Date.now()).replace(/\./g, '_');
   var corpo = { k: k, v: String(valor == null ? '(apagado)' : valor).slice(0, LIMITE), dev: devId, col: COL, motivo: String(motivo).slice(0, 300), t: Date.now() };
-  if (vF) vF.setDoc(vF.doc(vDb, CONF, id), corpo).catch(function () {});
+  if (canal) canal.grava([{ col: CONF, id: id, troca: true, set: pares(corpo) }]);
 }
 
 /* chegou da nuvem: d = {k, v, ap, st} */
@@ -214,14 +216,14 @@ function atualizaTela() {
 var espera = [];
 function recebe(docs) {
   if (!baseOk) { espera = espera.concat(docs); return; }
-  var mudou = false, maior = ler(ST) || '';
+  var mudou = false, maior = +ler(ST) || 0;
   docs.forEach(function (d) {
     if (d.st && d.st > maior) maior = d.st;
     if (!d.k) return;
     recebidos++;
     if (aplica(d)) { mudou = true; mudadas[d.k] = 1; }
   });
-  if (maior) grava(ST, maior);
+  if (maior) grava(ST, String(maior));
   if (mudou && !telaT) atualizaTela();
 }
 
@@ -247,13 +249,8 @@ async function envia() {
   for (var i = 0; i < lote.length; i += 300) {
     var l = lote.slice(i, i + 300);
     try {
-      if (vF) {
-        var bt = vF.writeBatch(vDb);
-        l.forEach(function (x) { bt.set(vF.doc(vDb, COL, idDe(x.k)), { k: x.k, v: x.v, ap: x.ap, t: Date.now(), pai: x.pai, por: devId, st: vF.serverTimestamp() }); });
-        await lim(bt.commit(), 15000);
-      } else {
-        await pede(':commit', 'POST', { writes: l.map(function (x) { return { update: { name: PROJ + '/' + COL + '/' + idDe(x.k), fields: { k: { stringValue: x.k }, v: { stringValue: x.v }, ap: { booleanValue: x.ap }, t: { integerValue: String(Date.now()) }, pai: { stringValue: x.pai }, por: { stringValue: devId } } }, updateTransforms: [{ fieldPath: 'st', setToServerValue: 'REQUEST_TIME' }] }; }) });
-      }
+      if (!canal) throw new Error('sem servidor');
+      await lim(canal.grava(l.map(function (x) { return { col: COL, id: idDe(x.k), troca: true, set: pares({ k: x.k, v: x.v, ap: x.ap, t: Date.now(), pai: x.pai, por: devId }) }; })), 15000);
       var p2 = mapa(PEND);
       l.forEach(function (x) {
         /* só sai da fila se não mudou de novo enquanto enviava */
@@ -272,44 +269,34 @@ document.addEventListener('visibilitychange', function () { if (document.visibil
 addEventListener('pagehide', function () { clearTimeout(timer); envia(); });
 addEventListener('online', function () { agenda(); if (!vivo) busca(); });
 
-/* reserva por REST, só quando o canal ao vivo não abre */
-function campos(doc) { var f = doc.fields || {}; return { k: f.k && f.k.stringValue, v: f.v ? (f.v.stringValue != null ? f.v.stringValue : '') : '', ap: !!(f.ap && f.ap.booleanValue), pai: f.pai ? f.pai.stringValue : '', por: f.por ? f.por.stringValue : '', st: f.st && f.st.timestampValue }; }
+/* reserva por leitura simples (sem conexão ao vivo), só quando o canal não abre */
+function campos(x) { x = x || {}; return { k: x.k, v: x.v == null ? '' : String(x.v), ap: !!x.ap, pai: x.pai || '', por: x.por || '', st: +x.st || 0 }; }
 async function busca() {
-  if (lendo || vivo || document.visibilityState === 'hidden') return;
+  if (lendo || vivo || document.visibilityState === 'hidden' || self.NV_EMU) return;
   lendo = true;
   try {
-    var desde = (ler(JUNTO) && ler(ST)) || '1970-01-01T00:00:00Z';
-    var r = await pede(':runQuery', 'POST', { structuredQuery: { from: [{ collectionId: COL }], where: { fieldFilter: { field: { fieldPath: 'st' }, op: 'GREATER_THAN', value: { timestampValue: desde } } }, orderBy: [{ field: { fieldPath: 'st' } }], limit: 300 } });
-    recebe((r || []).map(function (x) { return x.document; }).filter(Boolean).map(campos));
+    var desde = (ler(JUNTO) && +ler(ST)) || 0, srv = (self.NV_SERVIDOR || 'wss://nv-dados.meusapps.workers.dev').replace(/^ws/, 'http');
+    var r = await lim(fetch(srv + '/le?k=nv1-meus-apps&col=' + encodeURIComponent(COL) + '&desde=' + desde, { cache: 'no-store' }), 20000);
+    if (!r.ok) throw new Error('leitura ' + r.status);
+    var j = await r.json();
+    recebe((j.docs || []).map(function (d) { return campos(d.x); }));
   } catch (e) { erro = 'leitura: ' + e.message; }
   lendo = false;
 }
 
-/* canal ao vivo: só o que mudou desde a última vez. Na primeira vez com este motor, lê tudo uma vez. */
+/* canal ao vivo: só o que mudou desde a última vez. Na primeira vez com este servidor, lê tudo uma vez. */
 async function aoVivo() {
   try {
-    var A = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js');
-    var F = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js');
-    var app = A.getApps().filter(function (a) { return a.name === 'nv'; })[0] || A.initializeApp({ apiKey: CH, projectId: 'meus-apps-8ca76', appId: '1:768854372271:web:467b541baf3c513f03095a' }, 'nv');
-    var db = self.__nvDb;
-    if (!db) {
-      try { db = F.initializeFirestore(app, { experimentalAutoDetectLongPolling: true }); } catch (e) { db = F.getFirestore(app); }
-      if (self.NV_EMU) { try { F.connectFirestoreEmulator(db, '127.0.0.1', self.NV_EMU); } catch (e) {} }
-      self.__nvDb = db;
-    }
-    vF = F; vDb = db;
-    var desde = ler(JUNTO) && ler(ST), q = desde ? F.query(F.collection(db, COL), F.where('st', '>', F.Timestamp.fromDate(new Date(desde)))) : F.collection(db, COL);
-    F.onSnapshot(q, function (snap) {
+    if (!self.NvCanal) await import(new URL('nv-canal.js', import.meta.url).href);
+    canal = self.NvCanal;
+    canal.estado(function (v) { vivo = v ? (vivo || Date.now()) : 0; if (v) agenda(); });
+    var desde = (ler(JUNTO) && +ler(ST)) || 0;
+    canal.ouve(COL, desde, function (lista, fim) {
       if (!vivo) vivo = Date.now();
-      var docs = [];
-      snap.docChanges().forEach(function (c) {
-        if (c.type === 'removed' || c.doc.metadata.hasPendingWrites) return;
-        var x = c.doc.data(); if (!x || !x.k) return;
-        docs.push({ k: x.k, v: x.v == null ? '' : String(x.v), ap: !!x.ap, pai: x.pai || '', por: x.por || '', st: x.st && x.st.toDate ? x.st.toDate().toISOString() : null });
-      });
+      var docs = lista.map(function (d) { return campos(d.x); }).filter(function (x) { return x.k; });
       if (docs.length) recebe(docs);
-      if (!iniciado) comeca();
-    }, function (e) { vivo = 0; erro = 'ao vivo: ' + (e && e.code || e); diag(); setTimeout(aoVivo, 15000); busca(); });
+      if (!iniciado && fim) comeca();
+    });
   } catch (e) { vivo = 0; erro = 'ao vivo: ' + e.message; busca(); }
 }
 
@@ -331,11 +318,11 @@ function comeca() {
 var ultDiag = '';
 function diag(e) {
   if (e) est = e;
-  if (!vF) return;
+  if (!canal) return;
   var o = { dev: devId, col: COL, ver: VER, pag: location.pathname.split('/').pop() || 'menu', ua: navigator.userAgent.slice(0, 160), pend: Object.keys(mapa(PEND)).length, aovivo: vivo ? 'sim' : 'nao', login: tok ? 'sim' : 'nao', est: est, erro: erro, cache: self.NV_CACHE || '' };
   var s = JSON.stringify(o); if (s === ultDiag) return; ultDiag = s;
   o.envios = envios; o.recebidos = recebidos; o.t = Date.now();
-  vF.setDoc(vF.doc(vDb, DIAG, devId + '_' + idDe(COL)), o).catch(function () {});
+  canal.grava([{ col: DIAG, id: devId + '_' + idDe(COL), troca: true, set: pares(o) }]);
 }
 
 (async function () {
