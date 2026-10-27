@@ -144,6 +144,10 @@ svg{fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-l
   if (!meta.m || typeof meta.m !== 'object') meta.m = {};
   if (!meta.x || typeof meta.x !== 'object') meta.x = {};
   function salvaMeta(){ try { localStorage.setItem(KM, JSON.stringify(meta)); } catch (e) {} }
+  /* Estudo ao vivo: a ordem e os nomes chegam dos outros aparelhos e a tela se redesenha no lugar */
+  window.nvTela = window.nvTela || {};
+  window.nvTela.estudo = function(){ try { var _n = JSON.parse(localStorage.getItem(KM) || 'null'); if (_n && _n.o && _n.n) { meta = _n; var y = window.scrollY; desenhar(); if (Math.abs(window.scrollY - y) > 1) window.scrollTo({ top: y, behavior: 'instant' }); } } catch (e) {} };
+  try { import('./nuvem-rico.js?col=estudo&k=estudos.meta.v1&v=' + Date.now()).catch(function(){}); } catch (e) {}
   function idDe(cam, t, n){ return t + ':' + cam.concat(n).join('/'); }
   function rotulo(cam, t, n){ return meta.n[idDe(cam, t, n)] || n; }
   function itensDe(cam){

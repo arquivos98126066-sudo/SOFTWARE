@@ -2,7 +2,7 @@
    Quem muda grava na nuvem; os outros aparelhos recebem em poucos segundos. O aparelho continua guardando uma cópia para abrir rápido.
    Recebe na hora pelo canal ao vivo do Firestore (app próprio "nv", sem esperar o login do SDK, que travava em alguns celulares).
    Grava por REST (fetch simples). Se o canal ao vivo cair, a leitura por REST a cada 3 s assume sozinha. */
-var VER = 'r7', CH = 'AIzaSyDPJvM-XZWfa8HQ7h8v0Usb1Hf3q8sDqpg', PROJ = 'projects/meus-apps-8ca76/databases/(default)/documents';
+var VER = 'r8', CH = 'AIzaSyDPJvM-XZWfa8HQ7h8v0Usb1Hf3q8sDqpg', PROJ = 'projects/meus-apps-8ca76/databases/(default)/documents';
 /* o mesmo motor serve outros apps: nuvem-rico.js?col=plano_vivo&k=chave1,chave2 (chaves exatas ou prefixos terminados em *) e &so=1 para só receber */
 var QS = new URL(import.meta.url).searchParams, OUTRO = QS.get('col');
 var URL0 = 'https://firestore.googleapis.com/v1/' + PROJ, COL = OUTRO ? (self.NV_COL ? self.NV_COL + '_' + OUTRO : OUTRO) : (self.NV_COL || 'rico_vivo');
