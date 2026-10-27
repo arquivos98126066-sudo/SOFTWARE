@@ -115,3 +115,13 @@ Lista do que deu errado ao deixar os apps rápidos, firmes e sem piscar, e a sol
 - Ao refatorar cortando blocos por posição apaguei uma função usada por outra parte (salvaEstadoPlano). Depois de refatorar: procurar as funções usadas e rodar o fluxo.
 - Não confirmar no celular dele: dizer "não medi no celular", pedir para fechar e abrir o app duas ou três vezes por causa do cache.
 - Mudança de design só com imagem antes e o "pode fazer".
+
+## AO VIVO PONTA A PONTA (regra do Klebson, 2026-10-27, vale em todo app e HTML, atual e futuro)
+- 100% do que o app guarda sincroniza entre aparelhos em menos de 1 s, sem recarregar, sem piscar e sem sair do lugar. Nunca ligar só uma parte.
+- Antes de mexer: listar TODO dado que o app grava (localStorage, IndexedDB, Firestore, campos, escolhas, listas, textos, configurações) e ligar cada um.
+- Dados no aparelho (localStorage): `import('./nuvem-rico.js?col=NOME&k=chave1,prefixo*')` e `window.nvTela.NOME = function(chaves){ redesenhar no lugar }`. Outros apps só recebem com `&so=1` (app-boost).
+- Dados no Firestore: gravar com id próprio (`setDoc`, nunca `addDoc` com tempo limite), fila de envio que só sai quando a nuvem confirma, junção item por item pela versão mais nova, ignorar `hasPendingWrites`, nunca bloquear a escuta por tempo, apagado em outro aparelho sai daqui.
+- Redesenho sempre por `AoVivo.pinta(nome, fn)` (mantém rolagem e espera o campo em digitação).
+- Texto sobe enquanto digita: no máximo a cada 0,2 s (nunca esperar parar de digitar).
+- HTML aberto dentro do Plano: guarda em `ph:*` pelo Plano e se atualiza montando a versão nova por trás.
+- Testar com dois navegadores, campo por campo, e medir o tempo antes de dizer que terminou.

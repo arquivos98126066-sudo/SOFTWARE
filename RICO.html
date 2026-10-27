@@ -1372,11 +1372,11 @@ function coletarDados() {
 
 // ─── Preencher formulário a partir dos dados do Firebase ─────────────────────
 // Só preenche o que está vazio e fora de foco: nunca apaga o que a pessoa já digitou
-function preencherDados(dados, forcar) {
+function preencherDados(dados, forcar, remoto) {
   if (!dados) return;
-  forcar = !!forcar && !_editou;
+  forcar = !!remoto || (!!forcar && !_editou);
 
-  if (!_editou) {
+  if (!_editou || remoto) {
     if (dados.q_habitos && dados.q_habitos.habitos && window.restoreHabitos) {
       try { window.restoreHabitos(JSON.parse(dados.q_habitos.habitos)); } catch (_) {}
     }
@@ -1390,7 +1390,7 @@ function preencherDados(dados, forcar) {
     }
   }
 
-  if (!_editou && dados.q_ciclo && dados.q_ciclo.ciclo && window.restoreCiclo) {
+  if ((!_editou || remoto) && dados.q_ciclo && dados.q_ciclo.ciclo && window.restoreCiclo) {
     try { window.restoreCiclo(JSON.parse(dados.q_ciclo.ciclo)); } catch (_) {}
   }
 
@@ -1427,6 +1427,7 @@ function preencherDados(dados, forcar) {
       }
     });
 
+    if (remoto && entradas['choice'] !== undefined) card.querySelectorAll('.choice-label.selected').forEach(function(l) { if (l.textContent.trim() !== entradas['choice']) l.classList.remove('selected'); });
     if (entradas['choice'] && !card.querySelector('.choice-label.selected')) {
       card.querySelectorAll('.choice-label').forEach(function(lbl) {
         if (lbl.textContent.trim() === entradas['choice']) {
@@ -1440,8 +1441,9 @@ function preencherDados(dados, forcar) {
 // ─── Salvar no Firebase ───────────────────────────────────────────────────────
 async function salvarNoFirebase() {
   var dados = coletarDados();
+  var _w = 'w' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6); _meusW[_w] = 1;
   var payload = {
-    dados: dados,
+    dados: dados, _w: _w,
     updatedAt: Date.now(),
     atualizadoEm: new Date().toISOString()
   };
@@ -1458,12 +1460,27 @@ async function salvarNoFirebase() {
   }
 }
 
-// ─── Agendador de salvamento (debounce — salva 1.5s após parar de digitar) ───
+// ─── Agendador de salvamento: sobe enquanto digita (no máximo a cada 0,2 s), para o outro aparelho ver quase na hora ───
+var _saveUlt = 0, _meusW = {};
+var _remoto = false;
 window.agendarSalvamento = function(el) {
+  if (_remoto) return;
   _editou = true;
   clearTimeout(_saveTimer);
-  _saveTimer = setTimeout(function() { salvarNoFirebase(); }, 400);
+  var ag = Date.now() - _saveUlt;
+  if (ag >= 200) { _saveUlt = Date.now(); salvarNoFirebase(); }
+  else _saveTimer = setTimeout(function() { _saveUlt = Date.now(); salvarNoFirebase(); }, 200 - ag);
 };
+/* caderno ao vivo: o que outro aparelho escreve aparece aqui na hora, sem recarregar; o campo em que você está digitando espera você sair dele */
+function cadernoAoVivo() {
+  onSnapshot(doc(db, 'born_rich', CADERNO_ID), function(snap) {
+    if (!snap.exists() || snap.metadata.hasPendingWrites) return;
+    var c = snap.data(); if (!c || !c.dados || (c._w && _meusW[c._w])) return;
+    try { if (JSON.stringify(c.dados) === JSON.stringify(coletarDados())) return; } catch (_) {}
+    respostasCache = c.dados; saveLocal('born_rich_' + CADERNO_ID, c);
+    (window.AoVivo ? AoVivo.pinta : function(n, f) { f(); })('caderno', function() { _remoto = true; try { preencherDados(c.dados, true, true); } finally { _remoto = false; } });
+  }, function() {});
+}
 window.salvarAgora = function() {
   if (!_editou) return;
   clearTimeout(_saveTimer);
@@ -1583,7 +1600,7 @@ function hInicia() { if (_hOk) return; _hOk = true; try { _hAtual = hFoto(); } c
 })();
 
 // ─── INIT ─────────────────────────────────────────────────────────────────────
-carregarDados().then(hInicia, hInicia);
+carregarDados().then(hInicia, hInicia).then(cadernoAoVivo, cadernoAoVivo);
 setTimeout(hInicia, 12000);
 // Sincroniza automaticamente ao voltar online
 window.addEventListener('online', function() {

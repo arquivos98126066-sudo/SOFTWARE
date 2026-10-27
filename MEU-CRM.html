@@ -1166,6 +1166,9 @@ function loadLocal(key) {
 }
 
 
+/* textos padrão (proposta, reunião) guardados no aparelho: também ao vivo entre aparelhos */
+try { import('./nuvem-rico.js?col=crm&k=meucrmTextoEnvioProposta,meucrmPropostaPadrao,meucrmMsgReuniao&v=' + Date.now()).catch(()=>{}); } catch(_) {}
+
 // ══════════════════════════════════════════════
 // ESTADO LOCAL (cache reativo)
 // ══════════════════════════════════════════════
@@ -1225,31 +1228,28 @@ async function crmCarregarLocal() {
   if (window.syncShow) window.syncShow.offline();
 }
 
-async function crmSyncPending() {
+/* fila de envio: cada mudança fica anotada até a nuvem confirmar; se fechar o app antes, sobe ao abrir de novo.
+   Cada contato tem o id certo desde o começo (setDoc), então reenviar nunca duplica. */
+function crmFila() { try { return JSON.parse(localStorage.getItem('meucrm_pending') || '[]'); } catch(_) { return []; } }
+function crmFilaGrava(p) { try { localStorage.setItem('meucrm_pending', JSON.stringify(p)); } catch(_) {} }
+function crmFilaPoe(it) { const p = crmFila().filter(x => !(x.col === it.col && x.id === it.id)); p.push(it); crmFilaGrava(p); }
+function crmFilaTira(it) { crmFilaGrava(crmFila().filter(x => !(x.col === it.col && x.id === it.id && x.op === it.op && ((x.data || {}).updatedAt || 0) === ((it.data || {}).updatedAt || 0)))); }
+let _crmRetry = null;
+async function crmEnvia(it) {
   try {
-    const pending = JSON.parse(localStorage.getItem('meucrm_pending') || '[]');
-    if (!pending.length) return;
-    // Bloqueia snapshot durante todo o sync para evitar race condition
-    Object.keys(_crmBlockUntil).forEach(k => { _crmBlockUntil[k] = Date.now() + 30000; });
-    const remaining = [];
-    for (const item of pending) {
-      try {
-        if (item.op === 'add') {
-          const ref = await addDoc(collection(firestoreDb, COLS[item.col]), item.data);
-          // Atualiza ID local → real no state
-          if (state[item.col]) {
-            const i = state[item.col].findIndex(x => x.id === (item.data._localId || item.data.id));
-            if (i >= 0) { state[item.col][i] = { ...item.data, id: ref.id }; saveLocal('meucrm_state_' + COLS[item.col], state[item.col]); }
-          }
-        }
-        else if (item.op === 'update') await updateDoc(doc(firestoreDb, COLS[item.col], item.id), item.data);
-        else if (item.op === 'delete') await deleteDoc(doc(firestoreDb, COLS[item.col], item.id));
-      } catch(_) { remaining.push(item); }
-    }
-    localStorage.setItem('meucrm_pending', JSON.stringify(remaining));
-    // Libera o block após sync completo
-    Object.keys(_crmBlockUntil).forEach(k => { _crmBlockUntil[k] = Date.now() + 3000; });
-  } catch(_) {}
+    if (it.op === 'delete') await deleteDoc(doc(firestoreDb, COLS[it.col], it.id));
+    else await setDoc(doc(firestoreDb, COLS[it.col], it.id), it.data, { merge: true });
+    crmFilaTira(it);
+    if (window.syncShow) window.syncShow.synced('MEU CRM');
+  } catch(_) {
+    if (window.syncShow) window.syncShow.offline();
+    clearTimeout(_crmRetry); _crmRetry = setTimeout(crmSyncPending, 5000);
+  }
+}
+let _crmEnviando = false;
+async function crmSyncPending() {
+  if (_crmEnviando) return; _crmEnviando = true;
+  try { for (const it of crmFila()) { if (COLS[it.col] && it.id) await crmEnvia(it); } } finally { _crmEnviando = false; }
 }
 
 function initListeners() {
@@ -1257,17 +1257,23 @@ function initListeners() {
 
   Object.entries(COLS).forEach(([key, colName]) => {
     onSnapshot(collection(firestoreDb, colName), snap => {
-      if (Date.now() < (_crmBlockUntil[key] || 0)) return; // guard
-      const cloudList = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-      const localMaxTime = (state[key] || []).reduce((mx, c) => Math.max(mx, c.updatedAt || c.createdAt || 0), 0);
-      const filtered = cloudList.filter(c => !(_crmDeletedIds[key] && _crmDeletedIds[key][c.id]));
-      const cloudMaxTime = filtered.reduce((mx, c) => Math.max(mx, c.updatedAt || c.createdAt || 0), 0);
-      if (cloudMaxTime >= localMaxTime) {
-        state[key] = filtered;
-        saveLocal('meucrm_state_' + colName, state[key]);
-      }
+      if (snap.metadata.hasPendingWrites) return;
+      /* junta item por item: vale a versão mais nova de cada contato; o que foi apagado em outro aparelho sai daqui também */
+      const del = _crmDeletedIds[key] || {}, pend = {};
+      crmFila().filter(x => x.col === key).forEach(x => { pend[x.id] = x; });
+      const mapa = {};
+      snap.docs.forEach(d => { if (del[d.id] || (pend[d.id] && pend[d.id].op === 'delete')) return; mapa[d.id] = { ...d.data(), id: d.id }; });
+      const novo = [];
+      (state[key] || []).forEach(l => {
+        const c = mapa[l.id];
+        if (c) { novo.push((l.updatedAt || 0) > (c.updatedAt || 0) ? l : c); delete mapa[l.id]; }
+        else if (pend[l.id] && pend[l.id].op !== 'delete') novo.push(l);
+      });
+      Object.keys(mapa).forEach(id => novo.push(mapa[id]));
+      state[key] = novo;
+      saveLocal('meucrm_state_' + colName, state[key]);
       /* nada mudou desde o último desenho: não redesenha (evita piscar e pulo da tela) */
-      const _sig = (state[key] || []).map(c => c.id + ':' + (c.updatedAt || c.createdAt || 0)).join('|');
+      const _sig = JSON.stringify(state[key]);
       window._crmSig = window._crmSig || {};
       if (window._crmSig[key] === _sig) return;
       window._crmSig[key] = _sig;
@@ -1289,31 +1295,17 @@ function initListeners() {
 // ══════════════════════════════════════════════
 async function fsAdd(colKey, data) {
   const now = Date.now();
-  const tempId = data.id || uid();
-  const payload = { ...data, id: tempId, createdAt: now, updatedAt: now };
+  const id = data.id || uid();
+  const payload = { ...data, id, createdAt: now, updatedAt: now };
   // Atualiza state e local imediatamente — nunca bloqueia a UI
   if (!state[colKey]) state[colKey] = [];
   state[colKey].push(payload);
   saveLocal('meucrm_state_' + COLS[colKey], state[colKey]);
-  _crmBlockUntil[colKey] = now + 5000;
   renderPage(currentPage); updateBadges();
   if (window.syncShow) window.syncShow.syncing();
-  // Firebase em background com timeout de 4s
-  const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 1000));
-  try {
-    const ref = await Promise.race([addDoc(collection(firestoreDb, COLS[colKey]), payload), timeout]);
-    const idx = state[colKey].findIndex(x => x.id === tempId);
-    if (idx >= 0) state[colKey][idx].id = ref.id;
-    saveLocal('meucrm_state_' + COLS[colKey], state[colKey]);
-    if (window.syncShow) window.syncShow.synced('MEU CRM');
-    return ref.id;
-  } catch(e) {
-    const pending = JSON.parse(localStorage.getItem('meucrm_pending') || '[]');
-    pending.push({ op: 'add', col: colKey, id: tempId, data: payload, pendingSync: true });
-    localStorage.setItem('meucrm_pending', JSON.stringify(pending));
-    if (window.syncShow) window.syncShow.offline();
-    return tempId;
-  }
+  const it = { op: 'add', col: colKey, id, data: payload };
+  crmFilaPoe(it); crmEnvia(it);
+  return id;
 }
 
 async function fsUpdate(colKey, id, data) {
@@ -1323,20 +1315,10 @@ async function fsUpdate(colKey, id, data) {
   const idx = (state[colKey] || []).findIndex(x => x.id === id);
   if (idx >= 0) Object.assign(state[colKey][idx], withTs);
   saveLocal('meucrm_state_' + COLS[colKey], state[colKey]);
-  _crmBlockUntil[colKey] = now + 5000;
   renderPage(currentPage); updateBadges();
   if (window.syncShow) window.syncShow.syncing();
-  // Firebase em background com timeout de 4s
-  const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 1000));
-  try {
-    await Promise.race([updateDoc(doc(firestoreDb, COLS[colKey], id), withTs), timeout]);
-    if (window.syncShow) window.syncShow.synced('MEU CRM');
-  } catch(e) {
-    const pending = JSON.parse(localStorage.getItem('meucrm_pending') || '[]');
-    pending.push({ op: 'update', col: colKey, id, data: withTs, pendingSync: true });
-    localStorage.setItem('meucrm_pending', JSON.stringify(pending));
-    if (window.syncShow) window.syncShow.offline();
-  }
+  const it = { op: 'update', col: colKey, id, data: idx >= 0 ? { ...state[colKey][idx] } : { ...withTs, id } };
+  crmFilaPoe(it); crmEnvia(it);
 }
 
 // ── LIXEIRA DO MEU CRM ───────────────────────────────────
@@ -1414,19 +1396,8 @@ async function fsDelete(colKey, id) {
   marcarDeletadoCRM(colKey, id);
   saveLocal('meucrm_state_' + COLS[colKey], state[colKey] || []);
   renderPage(currentPage); updateBadges();
-  // IDs locais nunca existiram no Firebase
-  if (id.startsWith('local_') || id.startsWith('tmp_')) return;
-  // Firebase em background com timeout de 4s
-  const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 1000));
-  try {
-    await Promise.race([deleteDoc(doc(firestoreDb, COLS[colKey], id)), timeout]);
-  } catch(e) {
-    const pending = JSON.parse(localStorage.getItem('meucrm_pending') || '[]');
-    if (!pending.find(p => p.op === 'delete' && p.col === colKey && p.id === id)) {
-      pending.push({ op: 'delete', col: colKey, id });
-      localStorage.setItem('meucrm_pending', JSON.stringify(pending));
-    }
-  }
+  const it = { op: 'delete', col: colKey, id };
+  crmFilaPoe(it); crmEnvia(it);
 }
 
 // ══════════════════════════════════════════════

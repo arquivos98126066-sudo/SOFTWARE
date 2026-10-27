@@ -2069,7 +2069,11 @@ async function loadConfig() {
   } catch(e) {
     console.error('Erro ao carregar config:', e);
   }
+  /* configurações ao vivo: mudou em outro aparelho, vale aqui na hora */
+  try { onSnapshot(doc(db, COL_CONFIG, 'main'), s2 => { if(!s2.exists() || s2.metadata.hasPendingWrites) return; const d = s2.data(); messages = d.messages || messages; links = d.links || []; textoFixo = d.textoFixo || ''; }); } catch(_) {}
 }
+/* textos guardados só no aparelho (mensagem rápida): também ao vivo */
+try { import('./nuvem-rico.js?col=tapete&k=tap_msg_rapida&v=' + Date.now()).catch(()=>{}); } catch(_) {}
 
 async function saveConfig() {
   window.syncShow?.syncing();
@@ -2102,20 +2106,23 @@ function startRealtimeSync() {
 
   const q = query(collection(db, COL_CLIENTS));
   onSnapshot(q, snapshot => {
-    if(Date.now() < _crmTapBlockUntil) return; // guard
-    const cloudList = [];
-    snapshot.forEach(docSnap => { cloudList.push({ ...docSnap.data(), id: docSnap.id }); });
-    const localMaxTime = clients.reduce((mx, c) => Math.max(mx, c.updatedAt||0), 0);
-    const cloudMaxTime = cloudList.reduce((mx, c) => Math.max(mx, c.updatedAt||0), 0);
-    const filteredCloud = cloudList.filter(c => !_crmTapDeletedIds[c.id]);
-    const filteredMax = filteredCloud.reduce((mx, c) => Math.max(mx, c.updatedAt||0), 0);
-    // Preserva itens locais que ainda não foram sincronizados
-    const localOnly = clients.filter(c => !filteredCloud.find(x => x.id === c.id) && !_crmTapDeletedIds[c.id]);
-    if(filteredMax >= localMaxTime || localOnly.length === 0) {
-      clients = [...filteredCloud, ...localOnly];
-      setTimeout(atualizarBadges, 300);
-      saveLocal('tapete_crm_clients_cache', clients);
-    }
+    if(snapshot.metadata.hasPendingWrites) return;
+    /* junta cliente por cliente: vale a versão mais nova de cada um; apagado em outro aparelho sai daqui também
+       (só fica o que é deste aparelho e ainda não subiu: na fila ou mexido há menos de 15 s) */
+    const pend = {};
+    try { JSON.parse(localStorage.getItem(LS_PENDING)||'[]').forEach(x => { const id = x.id || (x.data && x.data.id); if(id) pend[id] = 1; }); } catch(_) {}
+    const mapa = {};
+    snapshot.forEach(docSnap => { if(!_crmTapDeletedIds[docSnap.id]) mapa[docSnap.id] = { ...docSnap.data(), id: docSnap.id }; });
+    const novos = [], junto = [];
+    clients.forEach(l => {
+      const c = mapa[l.id];
+      if(c){ const v = (l.updatedAt||0) > (c.updatedAt||0) ? l : c; if(v === c && l.fotos && !c.fotos) v.fotos = l.fotos; junto.push(v); delete mapa[l.id]; }
+      else if(pend[l.id] || Date.now() - (l.updatedAt||0) < 15000) junto.push(l);
+    });
+    Object.keys(mapa).forEach(id => novos.push(mapa[id]));
+    clients = novos.concat(junto);
+    setTimeout(atualizarBadges, 300);
+    saveLocal('tapete_crm_clients_cache', clients);
     /* nada mudou desde o último desenho: não redesenha (evita piscar e pulo da tela) */
     const _sig = clients.map(c => c.id + ':' + (c.updatedAt||0)).join('|');
     if(_sig === window._tapSig) return;
@@ -7407,8 +7414,7 @@ async function iniciarListeners(){
 
   try{
     onSnapshot(query(collection(db,'tapetes'),orderBy('criadoEm','desc')),function(snap){
-      var now=Date.now();
-      if(now<_blockSnapshotUntil) return;
+      if(snap.metadata.hasPendingWrites) return;
       var dadosFirebase=[];
       snap.forEach(function(d){dadosFirebase.push(Object.assign({id:d.id},d.data()));});
       var merged=[];
@@ -7419,7 +7425,8 @@ async function iniciarListeners(){
         if(localTs>cloudTs){var local=pedidosCache.find(function(p){return p.id===cloud.id;});if(local)merged.push(local);}
         else{merged.push(cloud);}
       });
-      pedidosCache.forEach(function(local){if(!merged.find(function(p){return p.id===local.id;})&&!_deletedPedidosIds[local.id])merged.push(local);});
+      /* só fica o que ainda não subiu (pendente ou mexido há menos de 15 s): o que foi apagado em outro aparelho sai daqui */
+      pedidosCache.forEach(function(local){if(!merged.find(function(p){return p.id===local.id;})&&!_deletedPedidosIds[local.id]&&(local.pendingSync||Date.now()-(local.updatedAt||_saveTimestampsPedidos[local.id]||0)<15000))merged.push(local);});
       pedidosCache=merged;salvarCacheLocal();
       var _sp=JSON.stringify(merged);if(_sp===window._tapSigP)return;window._tapSigP=_sp;
       (window.AoVivo ? AoVivo.pinta : function(n, f){ f(); })('ped',function(){renderG();renderC();renderAgenda();});
@@ -7428,8 +7435,7 @@ async function iniciarListeners(){
 
   try{
     onSnapshot(collection(db,'tapetes_ruas'),function(snap){
-      var now=Date.now();
-      if(now<_blockSnapshotUntil) return;
+      if(snap.metadata.hasPendingWrites) return;
       var dadosFirebase=[];
       snap.forEach(function(d){dadosFirebase.push(Object.assign({id:d.id},d.data()));});
       var merged=[];
@@ -7440,7 +7446,7 @@ async function iniciarListeners(){
         if(localTs>cloudTs){var local=ruasCache.find(function(r){return r.id===cloud.id;});if(local)merged.push(local);}
         else{merged.push(cloud);}
       });
-      ruasCache.forEach(function(local){if(!merged.find(function(r){return r.id===local.id;})&&!_deletedRuasIds[local.id])merged.push(local);});
+      ruasCache.forEach(function(local){if(!merged.find(function(r){return r.id===local.id;})&&!_deletedRuasIds[local.id]&&(local.pendingSync||Date.now()-(local.updatedAt||_saveTimestampsRuas[local.id]||0)<15000))merged.push(local);});
       ruasCache=merged;salvarCacheLocal();
       var _sr=JSON.stringify(merged);if(_sr===window._tapSigR)return;window._tapSigR=_sr;
       (window.AoVivo ? AoVivo.pinta : function(n, f){ f(); })('ruas',function(){renderR();renderRC();});

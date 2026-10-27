@@ -1733,7 +1733,43 @@ function htmlLer(){
   return a;
 }
 window.nvTela = window.nvTela || {};
-window.nvTela.plano = function(){ var box = document.getElementById('pl-html'); if(box && box.isConnected && box.offsetParent !== null) htmlRender(); };
+window.nvTela.plano = function(ks){
+  var box = document.getElementById('pl-html'); if(box && box.isConnected && box.offsetParent !== null) htmlRender();
+  if(_htmlAberto && (ks || []).some(function(k){ return k.indexOf('ph:') === 0; })) htmlAoVivo();
+};
+/* HTML aberto e chegou marcação de outro aparelho: monta a versão nova por trás, na mesma rolagem, e troca de uma vez (sem piscar) */
+var _hvT = null, _hvNovo = null;
+function htmlAoVivo(){
+  var fr = document.getElementById('html-view-frame'); if(!fr || !_htmlAberto) return;
+  if(_hvNovo){ clearTimeout(_hvT); _hvT = setTimeout(htmlAoVivo, 300); return; }
+  var id = _htmlAberto, respondeu = false;
+  function ouve(e){
+    if(e.source !== fr.contentWindow || !e.data || !e.data.nvEstado) return;
+    respondeu = true; removeEventListener('message', ouve);
+    if(e.data.nvFoco){ clearTimeout(_hvT); _hvT = setTimeout(htmlAoVivo, 700); return; }
+    var h = htmlLer().find(function(x){ return x.id === id; }); if(!h) return;
+    htmlCodigo(h, function(t){
+      if(_htmlAberto !== id || !fr.isConnected) return;
+      var box = document.getElementById('html-view'); if(getComputedStyle(box).position === 'static') box.style.position = 'relative';
+      var nf = document.createElement('iframe'); _hvNovo = nf;
+      nf.setAttribute('sandbox', fr.getAttribute('sandbox'));
+      nf.style.cssText = 'position:absolute;left:0;top:0;width:100%;height:100%;border:0;visibility:hidden';
+      function pronto(ev){
+        if(ev.source !== nf.contentWindow || !ev.data || !ev.data.planoPronto) return;
+        removeEventListener('message', pronto); _hvNovo = null;
+        if(_htmlAberto !== id || !fr.isConnected){ nf.remove(); return; }
+        fr.remove(); nf.id = 'html-view-frame'; nf.style.cssText = '';
+      }
+      addEventListener('message', pronto);
+      setTimeout(function(){ if(_hvNovo === nf){ removeEventListener('message', pronto); _hvNovo = null; nf.remove(); } }, 4000);
+      box.appendChild(nf);
+      nf.srcdoc = window.planoInjeta(t, h.src ? new URL(h.src, location.href).href : null, e.data.nvEstado);
+    });
+  }
+  addEventListener('message', ouve);
+  fr.contentWindow.postMessage({nvPede: 1}, '*');
+  setTimeout(function(){ if(!respondeu) removeEventListener('message', ouve); }, 1500);
+}
 try { import('./nuvem-rico.js?col=plano&k=doa_htmls_v1,doa_htmls_v1_seeds,ph:*&v=' + Date.now()).catch(function(){}); } catch(e){}
 function htmlSalva(a){ try { localStorage.setItem(HTML_KEY, JSON.stringify(a)); } catch(e){ alert('Não coube no aparelho: ' + e.message); } }
 var _htmlSel = null, _htmlPasta = null, _htmlApos = null;
@@ -2808,7 +2844,8 @@ abrirProcesso();
     var dd = {}; try { for (var i = 0; i < localStorage.length; i++){ var k = localStorage.key(i); if (k && k.indexOf('ph:') === 0) dd[k.slice(3)] = localStorage.getItem(k); } } catch(e){}
     var ls = '<script>(function(){var d=' + JSON.stringify(dd).replace(/</g, '\\u003c') + ';function m(k,v){parent.postMessage({nvLs:1,k:String(k),v:v},"*")}' +
       'var s={getItem:function(k){k=String(k);return Object.prototype.hasOwnProperty.call(d,k)?d[k]:null},setItem:function(k,v){k=String(k);d[k]=String(v);m(k,d[k])},removeItem:function(k){k=String(k);delete d[k];m(k,null)},key:function(i){return Object.keys(d)[i]||null},clear:function(){Object.keys(d).forEach(function(k){m(k,null)});d={}}};' +
-      'Object.defineProperty(s,"length",{get:function(){return Object.keys(d).length}});try{Object.defineProperty(window,"localStorage",{value:s,configurable:true})}catch(e){}})();<\/script>';
+      'Object.defineProperty(s,"length",{get:function(){return Object.keys(d).length}});try{Object.defineProperty(window,"localStorage",{value:s,configurable:true})}catch(e){}' +
+      'addEventListener("message",function(e){if(!e.data||!e.data.nvPede)return;var a=document.activeElement,st=window.__planoLe?window.__planoLe():{y:scrollY};parent.postMessage({nvEstado:{y:st.y||0,s:st.s||[],c:[],f:[]},nvFoco:!!(a&&a!==document.body&&(/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName)||a.isContentEditable))},"*")});})();<\/script>';
     html = /<head[^>]*>/i.test(html) ? html.replace(/<head[^>]*>/i, function(m){ return m + ls; }) : ls + html;
     return html + tag;
   };
