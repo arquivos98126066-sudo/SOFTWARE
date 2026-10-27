@@ -624,6 +624,8 @@ async function iniciarListeners() {
 
   onSnapshot(docConfig, function(snap) {
     if (snap.metadata.hasPendingWrites) return;
+    /* primeira vez neste canal: a configuração deste aparelho sobe uma vez (a nuvem estava parada desde o dia 4) */
+    if (!localStorage.getItem('nv.uniao.adm')) { try { localStorage.setItem('nv.uniao.adm', '1'); } catch(_) {} if (localConfig) { salvar(); return; } }
     if (snap.exists()) {
       var _sigC = JSON.stringify(snap.data());
       if (_sigC === window._admSigC) return;

@@ -2111,6 +2111,12 @@ function startRealtimeSync() {
        (só fica o que é deste aparelho e ainda não subiu: na fila ou mexido há menos de 15 s) */
     const pend = {};
     try { JSON.parse(localStorage.getItem(LS_PENDING)||'[]').forEach(x => { const id = x.id || (x.data && x.data.id); if(id) pend[id] = 1; }); } catch(_) {}
+    /* primeira vez neste canal: os clientes que só existem neste aparelho sobem para a nuvem (nada se perde) */
+    if(!localStorage.getItem('nv.uniao.tapete')){
+      try { localStorage.setItem('nv.uniao.tapete', '1'); } catch(_) {}
+      const naNuvem = {}; snapshot.forEach(d => { naNuvem[d.id] = 1; });
+      clients.forEach(l => { if(l && l.id && !naNuvem[l.id] && !_crmTapDeletedIds[l.id]){ pend[l.id] = 1; setDoc(doc(db, COL_CLIENTS, l.id), _stripImgsForFirebase({ ...l, updatedAt: l.updatedAt || Date.now() })).catch(()=>{}); } });
+    }
     const mapa = {};
     snapshot.forEach(docSnap => { if(!_crmTapDeletedIds[docSnap.id]) mapa[docSnap.id] = { ...docSnap.data(), id: docSnap.id }; });
     const novos = [], junto = [];
@@ -7417,6 +7423,8 @@ async function iniciarListeners(){
       if(snap.metadata.hasPendingWrites) return;
       var dadosFirebase=[];
       snap.forEach(function(d){dadosFirebase.push(Object.assign({id:d.id},d.data()));});
+      /* primeira vez neste canal: pedidos que só existem neste aparelho entram na fila de envio (nada se perde) */
+      if(!localStorage.getItem('nv.uniao.pedidos')){try{localStorage.setItem('nv.uniao.pedidos','1')}catch(e){}var ids0={};dadosFirebase.forEach(function(x){ids0[x.id]=1});var tem0=false;pedidosCache.forEach(function(p){if(!ids0[p.id]&&!_deletedPedidosIds[p.id]){p.pendingSync=true;tem0=true}});if(tem0)setTimeout(sincronizarPendentes,500);}
       var merged=[];
       dadosFirebase.forEach(function(cloud){
         if(_deletedPedidosIds[cloud.id]) return;
@@ -7438,6 +7446,7 @@ async function iniciarListeners(){
       if(snap.metadata.hasPendingWrites) return;
       var dadosFirebase=[];
       snap.forEach(function(d){dadosFirebase.push(Object.assign({id:d.id},d.data()));});
+      if(!localStorage.getItem('nv.uniao.ruas')){try{localStorage.setItem('nv.uniao.ruas','1')}catch(e){}var ids1={};dadosFirebase.forEach(function(x){ids1[x.id]=1});var tem1=false;ruasCache.forEach(function(r){if(!ids1[r.id]&&!_deletedRuasIds[r.id]){r.pendingSync=true;tem1=true}});if(tem1)setTimeout(sincronizarPendentes,500);}
       var merged=[];
       dadosFirebase.forEach(function(cloud){
         if(_deletedRuasIds[cloud.id]) return;

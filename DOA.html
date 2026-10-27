@@ -844,26 +844,24 @@ async function p_initFirebase(){
       appId: "1:768854372271:web:467b541baf3c513f03095a"
     };
 
-    const apps = getApps();
-    const app = apps.length ? apps[0] : initializeApp(cfg);
+    /* dados pelo canal "nv" (não espera o login do celular; o canal antigo travava e nada subia) */
+    const app = getApps().filter(function(a){ return a.name === 'nv'; })[0] || initializeApp({ apiKey: cfg.apiKey, projectId: cfg.projectId, appId: cfg.appId }, 'nv');
+    const appLogin = getApps().filter(function(a){ return a.name === '[DEFAULT]'; })[0] || initializeApp(cfg);
 
     // Ativa cache persistente no IndexedDB do browser
     // Na segunda visita em diante, onSnapshot entrega dados do cache LOCAL instantaneamente
     // sem esperar a rede — elimina a tela em branco
     try {
-      _p_db = initializeFirestore(app, {
-        localCache: persistentLocalCache({ tabManager: persistentSingleTabManager() })
-      });
+      _p_db = initializeFirestore(app, { experimentalAutoDetectLongPolling: true });
     } catch(e2){
       // Se já foi inicializado (ex: hot reload), usa o existente
       _p_db = getFirestore(app);
     }
 
-    const auth = getAuth(app);
+    const auth = getAuth(appLogin);
 
-    await new Promise(function(resolve){
-      onAuthStateChanged(auth, function(user){ if(user && !user.isAnonymous) resolve(user); else location.replace('index.html'); });
-    });
+    /* o login confere por trás e não segura os dados; só volta ao menu se nunca entrou */
+    onAuthStateChanged(auth, function(user){ if(!(user && !user.isAnonymous)){ var ok = false; try { ok = localStorage.getItem('menu_logado') === '1' || !!localStorage.getItem('nv.rt'); } catch(e){} if(!ok) location.replace('index.html'); } });
 
     _p_docRef = doc(_p_db, 'doa', 'processos');
     _p_fbReady = true;
@@ -872,6 +870,14 @@ async function p_initFirebase(){
     onSnapshot(_p_docRef, async function(snap){
       if(!snap.exists() || snap.metadata.hasPendingWrites) return;
       var nuvem = snap.data().procs || [];
+      /* primeira vez neste canal: junta o que o aparelho tem e a nuvem não (nada se perde); no mesmo processo, vale o do aparelho */
+      if(!localStorage.getItem('nv.uniao.plano') && nuvem.length && window._p_tinhaLocal){
+        try { localStorage.setItem('nv.uniao.plano', '1'); } catch(x){}
+        var ids = {}; nuvem.forEach(function(x){ ids[String(x.id)] = 1; });
+        var loc = {}; (p_procs || []).forEach(function(x){ loc[String(x.id)] = x; });
+        var junto = nuvem.map(function(x){ return loc[String(x.id)] || x; }).concat((p_procs || []).filter(function(x){ return !ids[String(x.id)]; }));
+        if(JSON.stringify(junto) !== JSON.stringify(nuvem)){ p_procs = junto; p_syncAlias(); p_salvarTudo(); p_vivoPinta(); return; }
+      }
       if(!nuvem.length) return;
       /* igual ao que já está na tela: não refaz nada (evita piscar e a lista pular) */
       try { if(JSON.stringify(nuvem) === JSON.stringify(p_procs)) { plRevela(); return; } } catch(x){}
@@ -1001,6 +1007,7 @@ async function p_carregarSteps(){
       if(leg && leg.length){ p_procs = leg; p_procIdx = 0; p_idbSet('doa_procs', leg); }
     } catch(e){}
   }
+  window._p_tinhaLocal = p_procs.length > 0;
   if(!p_procs.length){
     p_procs = [{id:Date.now(), type:'process', name:'Meu Processo', parentId:null, order:0, steps:p_stepsDefault()}];
     p_procIdx = 0;

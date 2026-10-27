@@ -1261,6 +1261,12 @@ function initListeners() {
       /* junta item por item: vale a versão mais nova de cada contato; o que foi apagado em outro aparelho sai daqui também */
       const del = _crmDeletedIds[key] || {}, pend = {};
       crmFila().filter(x => x.col === key).forEach(x => { pend[x.id] = x; });
+      /* primeira vez neste canal: o que só existe neste aparelho sobe para a nuvem (nada se perde) */
+      if (!localStorage.getItem('nv.uniao.crm.' + key)) {
+        try { localStorage.setItem('nv.uniao.crm.' + key, '1'); } catch(_) {}
+        const naNuvem = {}; snap.docs.forEach(d => { naNuvem[d.id] = 1; });
+        (state[key] || []).forEach(l => { if (l && l.id && !naNuvem[l.id] && !del[l.id] && !pend[l.id]) { const it = { op: 'add', col: key, id: l.id, data: { ...l } }; crmFilaPoe(it); pend[l.id] = it; crmEnvia(it); } });
+      }
       const mapa = {};
       snap.docs.forEach(d => { if (del[d.id] || (pend[d.id] && pend[d.id].op === 'delete')) return; mapa[d.id] = { ...d.data(), id: d.id }; });
       const novo = [];
