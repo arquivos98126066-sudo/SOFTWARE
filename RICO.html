@@ -6660,7 +6660,10 @@ window.saveAnswer = window.saveAnswer || function(){};
           if (j.erro) { st.textContent = j.erro; return; }
           novo = j.texto || ''; antes = null; troca.textContent = 'Trocar o texto';
           res.innerHTML = rtHtml(rtParse(novo), null); res.hidden = false; fim.hidden = false;
-          st.textContent = 'Pronto em ' + ((Date.now() - t0) / 1000).toFixed(1).replace('.', ',') + ' s.';
+          var seg = ((Date.now() - t0) / 1000).toFixed(1).replace('.', ',');
+          /* com texto aberto, já troca e salva na hora; "Desfazer" volta como era */
+          if (alvo && novo.trim()) { antes = alvo === 'rd' ? window.rdIa.guarda() : textoAlvo(); poe(novo); troca.textContent = 'Desfazer'; st.textContent = 'Pronto em ' + seg + ' s. Texto trocado e salvo.'; }
+          else st.textContent = 'Pronto em ' + seg + ' s.';
         })
         .catch(function() { st.textContent = 'Sem internet ou servidor fora.'; })
         .then(function() { ocupado = false; go.disabled = false; });
