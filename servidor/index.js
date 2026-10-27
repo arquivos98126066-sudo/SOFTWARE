@@ -123,6 +123,13 @@ export default {
       if (!p) return cors(new Response('sem acesso', { status: 403 }));
       return cors(await conta.fetch(comQuem(req, p)));
     }
+    /* assistente (DeepSeek): só com login de verdade; a chave fica guardada no servidor (segredo DEEPSEEK_KEY) */
+    if (u.pathname === '/ia') {
+      if (req.method !== 'POST') return cors(new Response('só POST', { status: 405 }));
+      const p = await quem(req, u, env);
+      if (!p || (p.chave && env.IA_ABERTA !== '1')) return cors(json({ erro: 'Entre com o login do menu.' }, 403));
+      return cors(await conta.fetch(comQuem(req, p)));
+    }
     return new Response('não encontrado', { status: 404 });
   },
   /* tarefa agendada: cópia inicial do Firebase (uma vez) e um retrato do estado no Firebase, para conferência */
@@ -180,6 +187,7 @@ export class Conta extends DurableObject {
     }
     if (this.foi) return new Response('mudou de lugar', { status: 503 });
     if (this.vazio) { await this.ctx.blockConcurrencyWhile(async () => { if (this.vazio) { await this.trazer(); this.vazio = false; } }); }
+    if (u.pathname === '/ia') return this.ia(req);
     if (u.pathname === '/ws') {
       const par = new WebSocketPair();
       this.ctx.acceptWebSocket(par[1]);
@@ -266,6 +274,34 @@ export class Conta extends DurableObject {
   }
 
   /* quem é a pessoa: o dono vê tudo; sem login (fase de troca) também; os outros, só as áreas liberadas */
+  /* assistente: manda o pedido e o texto ao DeepSeek (rápido, sem modo pensar) e devolve o texto pronto, no formato do editor */
+  async ia(req) {
+    const p = this.perfil(JSON.parse(req.headers.get('x-nv-quem') || '{}'));
+    if (!p.admin && p.areas.indexOf('rico') < 0) return json({ erro: 'Sem acesso ao assistente.' }, 403);
+    if (!this.env.DEEPSEEK_KEY) return json({ erro: 'Assistente desligado.' }, 503);
+    let c; try { c = await req.json(); } catch (e) { return json({ erro: 'Pedido inválido.' }, 400); }
+    const ordem = String(c.ordem || '').slice(0, 2000).trim(), texto = String(c.texto || '').slice(0, 60000);
+    if (!ordem) return json({ erro: 'Escreva o pedido.' }, 400);
+    /* limite por pessoa e por dia, para a chave não ser gasta à toa */
+    const k = 'ia:' + new Date().toISOString().slice(0, 10) + ':' + (p.email || p.uid || '?');
+    const r = this.sql.exec('SELECT v FROM meta WHERE k = ?', k).toArray(), n = r.length ? +r[0].v : 0;
+    if (n >= 300) return json({ erro: 'Limite de hoje atingido.' }, 429);
+    this.sql.exec('INSERT OR REPLACE INTO meta (k, v) VALUES (?, ?)', k, n + 1);
+    const sis = 'Você é o assistente do app Rico (metas, hábitos e anotações), em português do Brasil. Faça exatamente o pedido sobre o texto. ' +
+      'Responda SÓ com o texto final, sem comentários antes ou depois e sem bloco de código. Não invente fatos e não tire informação, a não ser que o pedido mande. ' +
+      'Formato do editor: uma ideia por linha; linha vazia separa blocos; "[-] " marcador; "[#] " item numerado; "[ ] " tarefa a fazer; "[x] " tarefa feita; "[=] " traço; **negrito**; __itálico__. Não use #, títulos markdown nem tabelas.';
+    const msgs = [{ role: 'system', content: sis }, { role: 'user', content: 'PEDIDO: ' + ordem + (texto.trim() ? '\n\nTEXTO:\n' + texto : '') }];
+    let j;
+    try {
+      const resp = await fetch(this.env.DEEPSEEK_URL || 'https://api.deepseek.com/chat/completions', { method: 'POST', headers: { 'Authorization': 'Bearer ' + this.env.DEEPSEEK_KEY, 'Content-Type': 'application/json' }, body: JSON.stringify({ model: 'deepseek-flash', messages: msgs, thinking: { type: 'disabled' }, max_tokens: 8000 }) });
+      j = await resp.json();
+      if (!resp.ok) return json({ erro: 'O assistente não respondeu (' + resp.status + ').' }, 502);
+    } catch (e) { return json({ erro: 'Sem resposta do assistente.' }, 502); }
+    let out = String((j.choices && j.choices[0] && j.choices[0].message && j.choices[0].message.content) || '').trim();
+    out = out.replace(/^```[a-z]*\n?/i, '').replace(/\n?```$/, '').trim();
+    return json({ texto: out, uso: j.usage || null });
+  }
+
   perfil(q) {
     if (q.chave) return { chave: true, admin: true, areas: ['*'], email: '' };
     if (q.uid === DONO_UID) return { uid: q.uid, email: q.email, admin: true, areas: ['*'] };

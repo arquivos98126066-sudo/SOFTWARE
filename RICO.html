@@ -674,6 +674,26 @@ if ((sessionStorage.getItem('troca') === (window.RICO_INST === 'p' ? 'RICOP' : '
   .ed-view strong{ font-weight: 700; }
   .ed-view em{ font-style: italic; }
   .ed-view.pen{ touch-action: none; -webkit-user-select: none; user-select: none; cursor: pointer; }
+  /* assistente (DeepSeek): bolinha flutuante e painel no topo (o teclado não cobre) */
+  #iaBtn{ position: fixed; left: 14px; bottom: calc(88px + env(safe-area-inset-bottom)); z-index: 100020; width: 46px; height: 46px; border-radius: 50%; border: 0; background: var(--grad); color: #fff; display: flex; align-items: center; justify-content: center; box-shadow: 0 12px 24px -12px rgba(138,98,18,.7); }
+  #iaBtn svg{ width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+  #iaPan{ position: fixed; left: 10px; right: 10px; top: calc(10px + env(safe-area-inset-top)); z-index: 100030; max-height: calc(100dvh - 20px - env(safe-area-inset-top)); display: flex; flex-direction: column; gap: 10px; background: #fff; border: 1px solid var(--bd); border-radius: 20px; padding: 14px; box-shadow: 0 24px 48px -20px rgba(15,27,45,.45); }
+  #iaPan .ia-top{ display: flex; align-items: center; gap: 8px; }
+  #iaPan .ia-tit{ flex: 1; font: 700 16px var(--f-title); color: var(--tx); }
+  #iaPan .ia-x{ width: 36px; height: 36px; border-radius: 50%; border: 0; background: var(--chip); color: var(--tx); display: flex; align-items: center; justify-content: center; }
+  #iaPan .ia-x svg{ width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
+  #iaPan .ia-alvo{ font-size: 12.5px; color: var(--tx2); }
+  #iaPan textarea{ width: 100%; min-height: 64px; max-height: 120px; resize: none; border: 1px solid var(--bd-in); border-radius: 14px; padding: 10px 12px; font: 15px var(--f-body); color: var(--tx); background: var(--bg); outline: none; }
+  #iaPan .ia-chips{ display: flex; flex-wrap: wrap; gap: 6px; }
+  #iaPan .ia-chip{ border: 1px solid var(--bd); background: var(--chip); color: var(--tx); border-radius: 999px; padding: 6px 12px; font: 600 13px var(--f-body); }
+  #iaPan .ia-acts{ display: flex; gap: 8px; }
+  #iaPan .ia-b{ flex: 1; height: 42px; border-radius: 999px; border: 1px solid var(--bd-in); background: #fff; color: var(--tx); font: 700 14px var(--f-body); }
+  #iaPan .ia-b.pri{ background: var(--dark); border-color: var(--dark); color: #fff; }
+  #iaPan .ia-b[disabled]{ opacity: .5; }
+  #iaPan .ia-st{ font-size: 12.5px; color: var(--tx2); min-height: 16px; }
+  #iaPan .ia-res{ overflow: auto; -webkit-overflow-scrolling: touch; border-top: 1px solid var(--bd); padding-top: 10px; white-space: pre-wrap; overflow-wrap: anywhere; font-size: 15px; line-height: 1.5; color: var(--tx); }
+  #iaPan .ia-res .ln{ min-height: 1.5em; }
+  #iaPan .ia-res strong{ font-weight: 700; } #iaPan .ia-res em{ font-style: italic; }
   .ed-tools{ position: absolute; right: 82px; bottom: calc(20px + env(safe-area-inset-bottom)); max-width: calc(100% - 82px - 16px); display: flex; flex-direction: row; flex-wrap: nowrap; justify-content: flex-end; gap: 8px; }
   .ed-tool{
     flex: none; width: min(44px, calc((100vw - 138px) / 6)); height: min(44px, calc((100vw - 138px) / 6)); border-radius: 50%; background: #fff; border: 1px solid var(--bd-in); color: var(--dark);
@@ -6576,6 +6596,70 @@ window.saveAnswer = window.saveAnswer || function(){};
     ta.dispatchEvent(new Event('input', { bubbles: true }));
   }
   window.edSalvaJa = edSalvaJa;
+
+  /* ── assistente (DeepSeek pelo servidor da Cloudflare): bolinha em qualquer tela; trabalha no texto aberto ── */
+  (function() {
+    var IC = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l1.8 4.7L18.5 9.5l-4.7 1.8L12 16l-1.8-4.7L5.5 9.5l4.7-1.8z"/><path d="M18.5 15.5l.8 2.1 2.1.8-2.1.8-.8 2.1-.8-2.1-2.1-.8 2.1-.8z"/></svg>';
+    var X = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>';
+    var btn = document.createElement('button'); btn.type = 'button'; btn.id = 'iaBtn'; btn.setAttribute('aria-label', 'Assistente'); btn.innerHTML = IC;
+    var pan = document.createElement('div'); pan.id = 'iaPan'; pan.hidden = true; pan.setAttribute('role', 'dialog'); pan.setAttribute('aria-label', 'Assistente');
+    pan.innerHTML = '<div class="ia-top"><span class="ia-tit">Assistente</span><button type="button" class="ia-x" aria-label="Fechar">' + X + '</button></div>' +
+      '<div class="ia-alvo"></div><textarea rows="2" placeholder="O que fazer? Ex.: organize em tópicos"></textarea>' +
+      '<div class="ia-chips"><button type="button" class="ia-chip">Organize em tópicos</button><button type="button" class="ia-chip">Resuma</button><button type="button" class="ia-chip">Corrija o português</button><button type="button" class="ia-chip">Vire uma lista de tarefas</button></div>' +
+      '<div class="ia-acts"><button type="button" class="ia-b pri ia-go">Enviar</button></div><div class="ia-st"></div>' +
+      '<div class="ia-res" hidden></div><div class="ia-acts ia-fim" hidden><button type="button" class="ia-b ia-copia">Copiar</button><button type="button" class="ia-b pri ia-troca">Trocar o texto</button></div>';
+    document.body.appendChild(btn); document.body.appendChild(pan);
+    var ord = pan.querySelector('textarea'), st = pan.querySelector('.ia-st'), res = pan.querySelector('.ia-res'), fim = pan.querySelector('.ia-fim'), go = pan.querySelector('.ia-go'), troca = pan.querySelector('.ia-troca'), alvoTx = pan.querySelector('.ia-alvo');
+    var ultimoTa = null, alvo = null, novo = '', antes = null, ocupado = false;
+    document.addEventListener('focusin', function(e) { var t = e.target; if (t && t.tagName === 'TEXTAREA' && !pan.contains(t) && t.id !== 'edTa') ultimoTa = t; }, true);
+    function editorAberto() { var ov = document.getElementById('edOv'); return !!(ov && !ov.hidden && _edAlvo); }
+    function textoAlvo() {
+      if (alvo === 'ed') { var ed = document.getElementById('edTa'); try { if (_edModo === 'editar') ed.value = rtDeDom(document.getElementById('edView'), false); } catch (_) {} return ed.value; }
+      return alvo && alvo.value != null ? alvo.value : '';
+    }
+    function abre() {
+      alvo = editorAberto() ? 'ed' : (ultimoTa && document.body.contains(ultimoTa) ? ultimoTa : null);
+      var t = textoAlvo(), n = t ? t.split('\n').length : 0;
+      alvoTx.textContent = alvo ? (alvo === 'ed' ? 'Texto do editor aberto' : 'Texto do último campo tocado') + ' (' + n + (n === 1 ? ' linha)' : ' linhas)') : 'Sem texto aberto: a resposta aparece aqui.';
+      res.hidden = true; fim.hidden = true; st.textContent = ''; novo = ''; antes = null; troca.textContent = 'Trocar o texto'; troca.hidden = !alvo;
+      pan.hidden = false; btn.hidden = true;
+    }
+    function fecha() { pan.hidden = true; btn.hidden = false; try { ord.blur(); } catch (_) {} }
+    btn.addEventListener('click', abre);
+    pan.querySelector('.ia-x').addEventListener('click', fecha);
+    Array.prototype.forEach.call(pan.querySelectorAll('.ia-chip'), function(c) { c.addEventListener('click', function() { ord.value = c.textContent; envia(); }); });
+    go.addEventListener('click', envia);
+    function envia() {
+      var o = ord.value.trim(); if (!o || ocupado) { if (!o) ord.focus(); return; }
+      if (!window.NvCanal) { st.textContent = 'Sem conexão com o servidor.'; return; }
+      ocupado = true; go.disabled = true; st.textContent = 'Pensando...'; res.hidden = true; fim.hidden = true;
+      var t0 = Date.now();
+      NvCanal.http('/ia', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ordem: o, texto: textoAlvo() }) })
+        .then(function(r) { return r.json().catch(function() { return { erro: 'Resposta inválida (' + r.status + ').' }; }); })
+        .then(function(j) {
+          if (j.erro) { st.textContent = j.erro; return; }
+          novo = j.texto || ''; antes = null; troca.textContent = 'Trocar o texto';
+          res.innerHTML = rtHtml(rtParse(novo), null); res.hidden = false; fim.hidden = false;
+          st.textContent = 'Pronto em ' + ((Date.now() - t0) / 1000).toFixed(1).replace('.', ',') + ' s.';
+        })
+        .catch(function() { st.textContent = 'Sem internet ou servidor fora.'; })
+        .then(function() { ocupado = false; go.disabled = false; });
+    }
+    function poe(v) {
+      if (alvo === 'ed') {
+        var ed = document.getElementById('edTa'), view = document.getElementById('edView');
+        _edModo = 'ler'; view.setAttribute('contenteditable', 'false'); ed.value = v; _pm = rtParse(v); view.innerHTML = rtHtml(_pm, _tool); edSalvaJa();
+      } else if (alvo) { alvo.value = v; try { autoGrow(alvo); } catch (_) {} alvo.dispatchEvent(new Event('input', { bubbles: true })); }
+    }
+    troca.addEventListener('click', function() {
+      if (!alvo || !novo) return;
+      if (antes === null) { antes = textoAlvo(); poe(novo); troca.textContent = 'Desfazer'; st.textContent = 'Texto trocado e salvo.'; }
+      else { poe(antes); antes = null; troca.textContent = 'Trocar o texto'; st.textContent = 'Voltou como era.'; }
+    });
+    pan.querySelector('.ia-copia').addEventListener('click', function() {
+      try { navigator.clipboard.writeText(novo).then(function() { st.textContent = 'Copiado.'; }); } catch (_) { st.textContent = 'Não deu para copiar.'; }
+    });
+  })();
   function edClasses() {
     var v = document.getElementById('edView');
     Array.prototype.forEach.call(v.children, function(n) {
