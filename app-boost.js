@@ -656,5 +656,6 @@ window.Alterna = (function () {
     if (window.top !== window || /RICO\.html$/i.test(location.pathname) || /(entrar|copia|reparar|atualiza)\.html$/i.test(location.pathname)) return;
     window.NV_SORECEBE = true;
     import('./nuvem-rico.js?v=' + Date.now()).catch(function () {});
+    if (!/DOA\.html$/i.test(location.pathname)) import('./nuvem-rico.js?col=plano&so=1&k=doa_htmls_v1,doa_htmls_v1_seeds&v=' + Date.now()).catch(function () {});
   } catch (e) {}
 })();

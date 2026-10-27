@@ -2,14 +2,17 @@
    Quem muda grava na nuvem; os outros aparelhos recebem em poucos segundos. O aparelho continua guardando uma cópia para abrir rápido.
    Recebe na hora pelo canal ao vivo do Firestore (app próprio "nv", sem esperar o login do SDK, que travava em alguns celulares).
    Grava por REST (fetch simples). Se o canal ao vivo cair, a leitura por REST a cada 3 s assume sozinha. */
-var VER = 'r6', CH = 'AIzaSyDPJvM-XZWfa8HQ7h8v0Usb1Hf3q8sDqpg', PROJ = 'projects/meus-apps-8ca76/databases/(default)/documents';
-var URL0 = 'https://firestore.googleapis.com/v1/' + PROJ, COL = self.NV_COL || 'rico_vivo';
-var SO = !!self.NV_SORECEBE, LIMITE = 900000, TK = 'nv.t.v1', PEND = 'nv.pend.v1', ST = 'nv.st.v1', RT = 'nv.rt', CADA = 3000;
+var VER = 'r7', CH = 'AIzaSyDPJvM-XZWfa8HQ7h8v0Usb1Hf3q8sDqpg', PROJ = 'projects/meus-apps-8ca76/databases/(default)/documents';
+/* o mesmo motor serve outros apps: nuvem-rico.js?col=plano_vivo&k=chave1,chave2 (chaves exatas ou prefixos terminados em *) e &so=1 para só receber */
+var QS = new URL(import.meta.url).searchParams, OUTRO = QS.get('col');
+var URL0 = 'https://firestore.googleapis.com/v1/' + PROJ, COL = OUTRO ? (self.NV_COL ? self.NV_COL + '_' + OUTRO : OUTRO) : (self.NV_COL || 'rico_vivo');
+var CHAVES = (QS.get('k') || '').split(',').filter(Boolean), SO = OUTRO ? QS.get('so') === '1' : !!self.NV_SORECEBE;
+var NS = OUTRO ? 'nv.' + OUTRO + '.' : 'nv.', LIMITE = 900000, TK = NS + 't.v1', PEND = NS + 'pend.v1', ST = NS + 'st.v1', RT = 'nv.rt', CADA = 3000;
 var orig = { set: Storage.prototype.setItem, rem: Storage.prototype.removeItem };
 var pronto = false, aplicando = false, timer = null, ultimoToque = Date.now(), recarregar = false, enviando = false, lendo = false;
 var vivo = 0, vF = null, vDb = null, semLogin = 0, nuvem = {}, tok = null, tokAte = 0, est = 'carregou', erro = '', ultEnvio = 0, ultLeitura = 0;
 
-function sincroniza(k) { return typeof k === 'string' && k.indexOf('rico.') === 0 && k.indexOf('rico.seed.') !== 0 && !/\.foto$/.test(k) && k.indexOf('rico.y.') !== 0 && k.indexOf('rico.rd.') !== 0 && k.indexOf('rico.fixarTela') !== 0; }
+function sincroniza(k) { if (OUTRO) return typeof k === 'string' && CHAVES.some(function (c) { return c.slice(-1) === '*' ? k.indexOf(c.slice(0, -1)) === 0 : k === c; }); return typeof k === 'string' && k.indexOf('rico.') === 0 && k.indexOf('rico.seed.') !== 0 && !/\.foto$/.test(k) && k.indexOf('rico.y.') !== 0 && k.indexOf('rico.rd.') !== 0 && k.indexOf('rico.fixarTela') !== 0; }
 function ler(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
 function mapa(k) { try { return JSON.parse(ler(k) || '{}') || {}; } catch (e) { return {}; } }
 function grava(k, o) { try { orig.set.call(localStorage, k, typeof o === 'string' ? o : JSON.stringify(o)); } catch (e) {} }
@@ -137,7 +140,8 @@ function atualizaTela() {
   if (ocupado()) { telaT = setTimeout(atualizaTela, 500); return; }
   var ks = Object.keys(mudadas); mudadas = {};
   if (!ks.length) return;
-  if (window.rcMapa && window.rcMapa.nuvem) { try { window.rcMapa.nuvem(ks); } catch (e) { erro = 'tela: ' + e.message; } }
+  var f = OUTRO ? (window.nvTela && window.nvTela[OUTRO]) : (window.rcMapa && window.rcMapa.nuvem && window.rcMapa.nuvem.bind(window.rcMapa));
+  if (f) { try { f(ks); } catch (e) { erro = 'tela: ' + e.message; } }
 }
 function recebe(docs) {
   var mudou = false, maior = ler(ST) || '';

@@ -870,7 +870,7 @@ async function p_initFirebase(){
 
     // Escuta mudanças — na 1ª visita vem da rede, nas seguintes vem do cache local imediatamente
     onSnapshot(_p_docRef, async function(snap){
-      if(!snap.exists()) return;
+      if(!snap.exists() || snap.metadata.hasPendingWrites) return;
       var nuvem = snap.data().procs || [];
       if(!nuvem.length) return;
       /* igual ao que já está na tela: não refaz nada (evita piscar e a lista pular) */
@@ -882,11 +882,7 @@ async function p_initFirebase(){
       p_syncAlias();
       pl_refreshIfOpen();
       // Renderiza se a tela de processo estiver aberta
-      var overlay = document.getElementById('processo-overlay');
-      if(overlay && overlay.classList.contains('popen')){
-        p_render();
-        requestAnimationFrame(p_drawLines);
-      }
+      p_vivoPinta();
     }, function(e){ console.warn('Snapshot erro:', e); });
 
   } catch(e){
@@ -894,6 +890,34 @@ async function p_initFirebase(){
     _p_fbReady = false;
   }
 }
+
+/* ao vivo: o que chega de outro aparelho aparece na hora; se você está digitando num campo do processo, espera sair dele */
+function p_vivoPinta(){
+  var overlay = document.getElementById('processo-overlay');
+  if(!overlay || !overlay.classList.contains('popen')) return;
+  var a = document.activeElement;
+  if(a && overlay.contains(a) && /^(INPUT|TEXTAREA)$/.test(a.tagName)){ a.addEventListener('blur', function(){ setTimeout(p_vivoPinta, 0); }, { once: true }); return; }
+  var y = window.scrollY; p_render(); requestAnimationFrame(function(){ p_drawLines(); if(Math.abs(window.scrollY - y) > 1) window.scrollTo({ top: y, behavior: 'instant' }); });
+}
+/* digitando num passo: sobe enquanto digita (no máximo a cada 0,3 s) */
+var _p_vivoT = null, _p_vivoU = 0;
+function p_vivoSalva(){
+  clearTimeout(_p_vivoT);
+  var ag = Date.now() - _p_vivoU;
+  if(ag >= 300){ _p_vivoU = Date.now(); p_salvarTudo(); }
+  else _p_vivoT = setTimeout(function(){ _p_vivoU = Date.now(); p_salvarTudo(); }, 300 - ag);
+}
+document.addEventListener('input', function(e){
+  var el = e.target, id = el && el.id || '';
+  if((id === 'p-edit-word' || id === 'p-edit-detail') && p_editIdx !== null && p_steps[p_editIdx]){
+    var w = document.getElementById('p-edit-word').value.trim(); if(!w) return;
+    p_steps[p_editIdx] = { word: w, detail: document.getElementById('p-edit-detail').value.trim() };
+    p_vivoSalva();
+  } else if(id.indexOf('p-inline-detail-') === 0){
+    var i = +id.slice(16);
+    if(p_inlineEditIdx === i && p_steps[i]){ p_steps[i] = { word: p_steps[i].word, detail: el.value.trim() }; p_vivoSalva(); }
+  }
+}, true);
 
 // ── Salvar: IndexedDB primeiro, Firebase depois ──
 async function p_salvarTudo(){
@@ -1708,6 +1732,9 @@ function htmlLer(){
   if(a.some(function(x){ return x.id === 'h-website'; })){ a = a.filter(function(x){ return x.id !== 'h-website'; }); htmlSalva(a); }
   return a;
 }
+window.nvTela = window.nvTela || {};
+window.nvTela.plano = function(){ var box = document.getElementById('pl-html'); if(box && box.isConnected && box.offsetParent !== null) htmlRender(); };
+try { import('./nuvem-rico.js?col=plano&k=doa_htmls_v1,doa_htmls_v1_seeds&v=' + Date.now()).catch(function(){}); } catch(e){}
 function htmlSalva(a){ try { localStorage.setItem(HTML_KEY, JSON.stringify(a)); } catch(e){ alert('Não coube no aparelho: ' + e.message); } }
 var _htmlSel = null, _htmlPasta = null, _htmlApos = null;
 /* pastas dentro dos HTMLs: cada item guarda "pai" (id da pasta onde está; vazio = fora de todas) */
