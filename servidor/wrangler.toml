@@ -12,7 +12,7 @@ tag = "v1"
 new_sqlite_classes = ["Conta"]
 
 [triggers]
-crons = ["* * * * *"]
+crons = ["*/30 * * * *"]
 
 [observability]
 enabled = true
