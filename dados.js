@@ -9,7 +9,7 @@
    Uso: Dados.liga({ nome, ler: () => lista, escrever: (lista, ids) => {...}, novoNoInicio, area }) */
 (function () {
   if (window.Dados) return;
-  var VER = 'd1', CH = 'AIzaSyDPJvM-XZWfa8HQ7h8v0Usb1Hf3q8sDqpg', PRE = window.NV_COL ? window.NV_COL + '_' : '';
+  var VER = 'd2', CH = 'AIzaSyDPJvM-XZWfa8HQ7h8v0Usb1Hf3q8sDqpg', PRE = window.NV_COL ? window.NV_COL + '_' : '';
   var LIMITE_CAMPO = 700000, LIMITE_DOC = 950000;
   var F = null, db = null, cols = {}, dev = null, carregando = null;
   function lerLs(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
@@ -80,6 +80,13 @@
     if (velho && typeof velho === 'object' && novo && typeof novo === 'object' && !Array.isArray(novo)) { var o = Object.assign({}, novo); Object.keys(velho).forEach(function (k) { var x = reinsere(novo[k], velho[k]); if (x !== undefined) o[k] = x; }); return o; }
     return novo;
   }
+  /* JSON com as chaves sempre na mesma ordem: o mesmo conteúdo dá sempre o mesmo texto (senão a ordem diferente parecia mudança) */
+  function estavel(v) {
+    if (Array.isArray(v)) return '[' + v.map(function (x) { return x === undefined || typeof x === 'function' ? 'null' : estavel(x); }).join(',') + ']';
+    if (v && typeof v === 'object') return '{' + Object.keys(v).sort().filter(function (k) { return v[k] !== undefined && typeof v[k] !== 'function'; }).map(function (k) { return JSON.stringify(k) + ':' + estavel(v[k]); }).join(',') + '}';
+    return JSON.stringify(v === undefined ? null : v);
+  }
+  function canon(t) { try { return estavel(JSON.parse(t)); } catch (e) { return t; } }
   /* campos de um item: { campo: JSON }, sem o id */
   function campos(item, cfg) {
     var o = {}, ign = (cfg && cfg.ignora) || [];
@@ -88,7 +95,7 @@
       if (c === 'id' || ign.indexOf(c) >= 0) return;
       var v = item[c]; if (v === undefined || typeof v === 'function') return;
       if (cfg && cfg.semMidia) { v = semMidia(v); if (v === undefined) return; }
-      try { o[c] = JSON.stringify(v); } catch (e) {}
+      try { o[c] = estavel(v); } catch (e) {}
     });
     return o;
   }
@@ -103,6 +110,7 @@
     cols[nome] = C;
     var p = Promise.all([todos('base', nome + '|'), todos('fila', nome + '|'), todos('meta', nome + '|')]).then(function (r) {
       C.base = r[0]; C.fila = r[1]; C.meta = r[2][''] || {};
+      Object.keys(C.base).forEach(function (k) { var b = C.base[k]; if (b && b.d) Object.keys(b.d).forEach(function (c) { b.d[c] = canon(b.d[c]); }); });
       /* o que o app tem agora; o que difere da base e não está na fila é mudança que ainda não subiu */
       var lista = lista0(C);
       lista.forEach(function (it) { var k = idDoc(it.id); C.ids[k] = it.id; C.atual[k] = campos(it, cfg); });
@@ -186,7 +194,7 @@
         if (x.grandes && x.grandes.length) { f.campos = {}; x.grandes.forEach(function (c) { f.campos[c] = 1; }); f.grande = true; poe('fila', C.cfg.nome + '|' + x.k, f); }
         else { delete C.fila[x.k]; poe('fila', C.cfg.nome + '|' + x.k, undefined); }
       });
-      C.envios += n; if (/^envio/.test(C.erro)) C.erro = '';
+      C.envios += n; if (/^envio/.test(C.erro)) C.erro = ''; diag(C);
       if (window.syncShow && !Object.keys(cols).some(function (q) { return Object.keys(cols[q].fila).some(function (k) { return !cols[q].fila[k].grande; }); })) try { syncShow.synced(C.cfg.rotulo || ''); } catch (e) {}
     } catch (e) { C.erro = 'envio: ' + (e.code || e.message); diag(C); if (window.syncShow) try { syncShow.offline(); } catch (x) {} C.enviando = false; clearTimeout(C.timer); C.timer = setTimeout(function () { envia(C); }, 15000); return; }
     C.enviando = false;
@@ -217,7 +225,7 @@
       var k = doc.k, x = doc.x || {}, st = x.st && x.st.toDate ? x.st.toDate().toISOString() : '';
       if (st > maior) maior = st;
       C.recebidos++;
-      var R = {}; Object.keys(x.d || {}).forEach(function (c) { if (typeof x.d[c] === 'string') R[c] = x.d[c]; });
+      var R = {}; Object.keys(x.d || {}).forEach(function (c) { if (typeof x.d[c] === 'string') R[c] = canon(x.d[c]); });
       var id; try { id = x.ij != null ? JSON.parse(x.ij) : k; } catch (e) { id = k; }
       C.ids[k] = id;
       var L = C.atual[k], B = C.base[k], P = C.fila[k];
@@ -256,7 +264,7 @@
     });
     if (maior && C.iniciado) { C.meta.st = maior; poe('meta', C.cfg.nome + '|', C.meta); }
     else if (maior) C.stPendente = maior;
-    if (mudados.length) escreve(C, mudados);
+    if (mudados.length) { escreve(C, mudados); if (C.iniciado) diag(C); }
   }
   function escreve(C, mudados) {
     var lista = lista0(C), porK = {}, ordem = [];
@@ -299,8 +307,13 @@
   /* ---------- diagnóstico (só quando muda) ---------- */
   function diag(C) {
     if (!db) return;
-    var o = { dev: dev, col: C.col, ver: VER, pag: location.pathname.split('/').pop() || 'menu', fila: Object.keys(C.fila).length, aovivo: C.vivo ? 'sim' : 'nao', erro: C.erro, cache: window.NV_CACHE || '', ua: navigator.userAgent.slice(0, 160) };
-    var s = JSON.stringify(o); if (s === C.ultDiag) return; C.ultDiag = s;
+    var vivos = Object.keys(C.atual), soma = 0; vivos.sort().forEach(function (k) { for (var i = 0; i < k.length; i++) soma = (soma * 31 + k.charCodeAt(i)) | 0; });
+    var o = { dev: dev, col: C.col, ver: VER, itens: vivos.length, ids: (soma >>> 0).toString(36), pag: location.pathname.split('/').pop() || 'menu', fila: Object.keys(C.fila).length, aovivo: C.vivo ? 'sim' : 'nao', erro: C.erro, cache: window.NV_CACHE || '', ua: navigator.userAgent.slice(0, 160) };
+    var s = JSON.stringify(o); if (s === C.ultDiag) return;
+    /* no máximo 1 diagnóstico a cada 30 s por coleção */
+    var falta = 30000 - (Date.now() - (C.ultDiagT || 0));
+    if (falta > 0) { clearTimeout(C.diagT); C.diagT = setTimeout(function () { diag(C); }, falta); return; }
+    C.ultDiag = s; C.ultDiagT = Date.now();
     o.envios = C.envios; o.recebidos = C.recebidos; o.t = Date.now();
     F.setDoc(F.doc(db, PRE + 'diag', dev + '_' + C.col), o).catch(function () {});
   }

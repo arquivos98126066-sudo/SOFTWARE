@@ -5,6 +5,8 @@ cd "$(dirname "$0")" || exit 1
 RAMO=$(git branch --show-current)
 if [ -n "$(git status --porcelain)" ]; then echo "FALHOU: tem mudança sem commit. Faça o commit antes."; exit 1; fi
 V_LOCAL=$(grep -m1 -o "meus-apps-v[0-9]*" service-worker.js)
+V_APP=$(grep -m1 -o "NV_APP = .meus-apps-v[0-9]*" app-boost.js | grep -o "meus-apps-v[0-9]*")
+if [ "$V_APP" != "$V_LOCAL" ]; then echo "FALHOU: a versão no app-boost.js ($V_APP) tem que ser igual à do service-worker.js ($V_LOCAL)."; exit 1; fi
 git fetch -q origin main || { echo "FALHOU: não consegui falar com o GitHub."; exit 1; }
 V_MAIN_ANTES=$(git show origin/main:service-worker.js | grep -m1 -o "meus-apps-v[0-9]*")
 if [ "$V_LOCAL" = "$V_MAIN_ANTES" ] && [ -n "$(git diff origin/main HEAD --stat)" ]; then
@@ -19,4 +21,4 @@ V_MAIN=$(git show origin/main:service-worker.js | grep -m1 -o "meus-apps-v[0-9]*
 if [ "$L" != "$R" ]; then echo "FALHOU: a main do GitHub ($R) não é igual à minha ($L)."; exit 1; fi
 echo "main do GitHub = minha versão ($L)"
 echo "cache no ar: $V_MAIN"
-echo "PUBLICADO E CONFERIDO (o celular só pega depois de 1 a 2 min e de fechar e abrir o app 2 a 3 vezes)"
+echo "PUBLICADO E CONFERIDO (o app aberto se atualiza sozinho ao voltar para a tela)"

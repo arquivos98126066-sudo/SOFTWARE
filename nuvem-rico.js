@@ -8,7 +8,7 @@
    - envia 0,4 s depois da última letra (no máximo 1 envio por segundo enquanto digita);
    - diagnóstico em coleção própria (diag), sem acordar os outros celulares.
    Uso: nuvem-rico.js (Rico) ou nuvem-rico.js?col=plano&k=chave1,prefixo* (&so=1 só recebe). */
-var VER = 'r9', CH = 'AIzaSyDPJvM-XZWfa8HQ7h8v0Usb1Hf3q8sDqpg', PROJ = 'projects/meus-apps-8ca76/databases/(default)/documents';
+var VER = 'r10', CH = 'AIzaSyDPJvM-XZWfa8HQ7h8v0Usb1Hf3q8sDqpg', PROJ = 'projects/meus-apps-8ca76/databases/(default)/documents';
 var QS = new URL(import.meta.url).searchParams, OUTRO = QS.get('col');
 var URL0 = 'https://firestore.googleapis.com/v1/' + PROJ, PRE = self.NV_COL ? self.NV_COL + '_' : '';
 var COL = OUTRO ? PRE + OUTRO : (self.NV_COL || 'rico_vivo'), CONF = PRE + 'v2_conflitos', DIAG = PRE + 'diag';
@@ -128,8 +128,21 @@ function junta(b, l, r, pref, perdas, cam) {
     });
     return out;
   }
+  /* listas de listas do mesmo tamanho (as etapas do Rico guardam as células assim): junta posição por posição */
+  if (Array.isArray(l) && Array.isArray(r) && l.length === r.length && l.length && l.every(function (x) { return Array.isArray(x) || obj(x); }) && r.every(function (x) { return Array.isArray(x) || obj(x); })) {
+    var bl = Array.isArray(b) && b.length === l.length ? b : [];
+    return l.map(function (x, i) { return junta(bl[i], x, r[i], pref, perdas, cam + '[' + i + ']'); });
+  }
   perdas.push({ cam: cam, v: pref === 'l' ? r : l });
   return pref === 'l' ? l : r;
+}
+/* depois de juntar um mapa do Rico: as células da etapa atual e as "children" são a mesma lista; ficam iguais */
+function arruma(n) {
+  if (!obj(n)) return n;
+  if (obj(n.et) && Array.isArray(n.et.s) && Array.isArray(n.children) && n.et.s[n.et.cur] !== undefined) n.et.s[n.et.cur] = n.children;
+  if (Array.isArray(n.children)) n.children.forEach(arruma);
+  if (obj(n.et) && Array.isArray(n.et.s)) n.et.s.forEach(function (st) { if (Array.isArray(st)) st.forEach(arruma); });
+  return n;
 }
 /* cada gravação leva "pai" = resumo do valor em que ela se baseou; quem recebe uma gravação feita sem ver a sua
    junta as duas a partir desse pai (guardado no histórico curto de cada chave) */
@@ -156,7 +169,7 @@ function aplica(d) {
     if (lj !== undefined && rj !== undefined && (obj(lj) || Array.isArray(lj)) && (obj(rj) || Array.isArray(rj))) {
       var perd = [];
       var j = junta(semBase ? undefined : (bj === undefined ? null : bj), lj, rj, pref, perd, '');
-      novo = JSON.stringify(j);
+      novo = JSON.stringify(arruma(j));
       if (perd.length) guardaConflito(k, pref === 'l' ? rv : local, (semBase ? 'primeira junção' : 'os dois mudaram') + ': ' + perd.map(function (x) { return x.cam || '(tudo)'; }).slice(0, 8).join(', '));
       reenvia = novo !== rv;
     } else if (pref === 'l') {
@@ -169,7 +182,7 @@ function aplica(d) {
     var anc = parse(hist[k][d.pai]), lj3 = parse(local), rj3 = parse(rv);
     if (lj3 !== undefined && rj3 !== undefined && (obj(lj3) || Array.isArray(lj3))) {
       var perd3 = [], j3 = junta(anc === undefined ? null : anc, lj3, rj3, 'r', perd3, '');
-      novo = JSON.stringify(j3); reenvia = novo !== rv;
+      novo = JSON.stringify(arruma(j3)); reenvia = novo !== rv;
       if (perd3.length) guardaConflito(k, local, 'gravado em cima: ' + perd3.map(function (x) { return x.cam || '(tudo)'; }).slice(0, 8).join(', '));
     } else if (local !== rv) guardaConflito(k, local, 'gravado em cima');
   } else if (b === undefined && local != null && !SO) {

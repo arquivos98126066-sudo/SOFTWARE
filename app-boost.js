@@ -1,3 +1,33 @@
+/* Versão deste programa (igual ao número do cache do service-worker.js; sobe junto a cada publicação).
+   App aberto há tempo: quando volta para a tela (ou a cada 5 min), confere se saiu versão nova; se saiu, troca
+   sozinho assim que a pessoa não estiver digitando, uma vez por versão (nunca fica preso recarregando). */
+window.NV_APP = 'meus-apps-v344';
+(function () {
+  try {
+    if (window.top !== window || /(reparar|exportar|entrar|copia|atualiza)\.html$/i.test(location.pathname)) return;
+    var tecla = 0;
+    document.addEventListener('input', function () { tecla = Date.now(); }, true);
+    function noAr() { return fetch('service-worker.js?v=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.text() : ''; }).then(function (t) { return (t.match(/meus-apps-v\d+/) || [])[0] || null; }).catch(function () { return null; }); }
+    function digitando() { var a = document.activeElement; return (a && a !== document.body && (/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName) || a.isContentEditable)) || Date.now() - tecla < 4000; }
+    function troca(v) {
+      if (document.visibilityState !== 'visible') return;
+      if (digitando()) { setTimeout(function () { troca(v); }, 3000); return; }
+      try { if (localStorage.getItem('nv.atualizou') === v) return; localStorage.setItem('nv.atualizou', v); } catch (e) { return; }
+      try { navigator.serviceWorker && navigator.serviceWorker.getRegistration().then(function (r) { r && r.update(); }); } catch (e) {}
+      setTimeout(function () { location.reload(); }, 300);
+    }
+    var ult = 0;
+    function confere() {
+      if (document.visibilityState !== 'visible' || !navigator.onLine || Date.now() - ult < 5000) return;
+      ult = Date.now();
+      noAr().then(function (v) { if (v && v !== window.NV_APP && +v.slice(11) > +window.NV_APP.slice(11)) troca(v); });
+    }
+    document.addEventListener('visibilitychange', confere);
+    setInterval(confere, 300000);
+    setTimeout(confere, 8000);
+  } catch (e) {}
+})();
+
 /* Preservação (fase 0): copia o localStorage na hora em que a página abre, antes de os apps juntarem com a nuvem,
    e carrega o preserva.js, que guarda uma cópia cifrada deste aparelho (não muda nada dos apps) */
 (function () {

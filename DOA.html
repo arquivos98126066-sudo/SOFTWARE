@@ -870,7 +870,7 @@ async function p_initFirebase(){
       _p_fbReady = false;
       Dados.liga({ nome: 'plano_procs', area: 'plano', rotulo: 'Processo',
         ler: function(){ return p_procs; },
-        padrao: function(it){ return it.name === 'Meu Processo' && it.type === 'process' && !it.parentId && JSON.stringify(it.steps) === JSON.stringify(p_stepsDefault()); },
+        padrao: function(it){ return it.name === 'Meu Processo' && it.type === 'process' && !it.parentId && (function(){ var f = function(l){ return (l || []).map(function(x){ return x.word + '|' + x.detail; }).join('\n'); }; return f(it.steps) === f(p_stepsDefault()); })(); },
         escrever: function(lista){
           var ativo = p_procs[p_procIdx] && p_procs[p_procIdx].id;
           if(!lista.length) lista = [{id:Date.now(), type:'process', name:'Meu Processo', parentId:null, order:0, steps:p_stepsDefault()}];
