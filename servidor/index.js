@@ -87,7 +87,7 @@ export default {
   async fetch(req, env) {
     const u = new URL(req.url);
     if (req.method === 'OPTIONS') return cors(new Response(null, { status: 204 }));
-    const conta = env.CONTA.get(env.CONTA.idFromName('principal'));
+    const conta = contaDe(env);
     if (u.pathname === '/' || u.pathname === '') return env.ASSETS.fetch(new Request(new URL('/index.html', u), req));
     if (u.pathname === '/ws') {
       if (req.headers.get('Upgrade') !== 'websocket') return new Response('so websocket', { status: 426 });
@@ -127,10 +127,13 @@ export default {
   },
   /* tarefa agendada: cópia inicial do Firebase (uma vez) e um retrato do estado no Firebase, para conferência */
   async scheduled(ev, env, ctx) {
-    const conta = env.CONTA.get(env.CONTA.idFromName('principal'));
+    const conta = contaDe(env);
     ctx.waitUntil(conta.fetch('https://interno/interno/cron'));
   }
 };
+/* servidor perto do Brasil (Miami): o antigo ('principal') ficou longe; o novo traz tudo dele na primeira vez */
+const NOVO = 'sul', ANTIGO = 'principal';
+function contaDe(env) { return env.CONTA.get(env.CONTA.idFromName(NOVO), { locationHint: 'sam' }); }
 function cors(r) { const h = new Headers(r.headers); h.set('Access-Control-Allow-Origin', '*'); h.set('Access-Control-Allow-Headers', '*'); return new Response(r.body, { status: r.status, headers: h }); }
 function json(o, s) { return new Response(JSON.stringify(o), { status: s || 200, headers: { 'Content-Type': 'application/json' } }); }
 
@@ -146,10 +149,37 @@ export class Conta extends DurableObject {
     this.sql.exec('CREATE TABLE IF NOT EXISTS entradas (quem TEXT PRIMARY KEY, chave INTEGER NOT NULL, ua TEXT, t INTEGER NOT NULL)');
     const r = this.sql.exec("SELECT v FROM meta WHERE k = 'seq'").toArray();
     this.seq = r.length ? r[0].v : 0;
+    this.foi = this.sql.exec("SELECT v FROM meta WHERE k = 'foi'").toArray().length > 0;
+    this.vazio = !r.length && !this.foi && !this.sql.exec("SELECT v FROM meta WHERE k = 'veio'").toArray().length;
+  }
+
+  /* mudança de lugar: o servidor novo (vazio) copia tudo do antigo, com a mesma numeração */
+  async trazer() {
+    const antigo = this.env.CONTA.get(this.env.CONTA.idFromName(ANTIGO));
+    const d = await (await antigo.fetch('https://interno/interno/despejo')).json();
+    const t = { docs: ['col', 'id', 'x', 'seq'], meta: ['k', 'v'], usuarios: ['email', 'areas', 'ativo', 't'], mudancas: ['c', 'i', 'n', 'dado', 't'], entradas: ['quem', 'chave', 'ua', 't'] };
+    this.ctx.storage.transactionSync(() => {
+      for (const tab of Object.keys(t)) for (const row of d[tab] || []) this.sql.exec('INSERT OR REPLACE INTO ' + tab + ' (' + t[tab].join(', ') + ') VALUES (' + t[tab].map(() => '?').join(', ') + ')', ...t[tab].map(c => row[c]));
+      this.sql.exec("DELETE FROM meta WHERE k = 'foi'");
+      this.sql.exec("INSERT OR REPLACE INTO meta (k, v) VALUES ('veio', ?)", Date.now());
+    });
+    const r = this.sql.exec("SELECT v FROM meta WHERE k = 'seq'").toArray();
+    this.seq = r.length ? r[0].v : 0;
   }
 
   async fetch(req) {
     const u = new URL(req.url);
+    if (u.pathname === '/interno/despejo') {
+      /* tudo de uma vez, sem pausa: depois daqui este servidor não aceita mais nada (os aparelhos reconectam no novo) */
+      this.foi = true;
+      this.sql.exec("INSERT OR REPLACE INTO meta (k, v) VALUES ('foi', ?)", Date.now());
+      for (const ws of this.ctx.getWebSockets()) try { ws.close(1012, 'mudou'); } catch (e) {}
+      const d = {};
+      for (const tab of ['docs', 'meta', 'usuarios', 'mudancas', 'entradas']) d[tab] = this.sql.exec('SELECT * FROM ' + tab).toArray();
+      return json(d);
+    }
+    if (this.foi) return new Response('mudou de lugar', { status: 503 });
+    if (this.vazio) { await this.ctx.blockConcurrencyWhile(async () => { if (this.vazio) { await this.trazer(); this.vazio = false; } }); }
     if (u.pathname === '/ws') {
       const par = new WebSocketPair();
       this.ctx.acceptWebSocket(par[1]);
@@ -176,7 +206,7 @@ export class Conta extends DurableObject {
       if (!pode(p, col, false)) return json({ col, negado: true, docs: [] }, 403);
       return json(this.le(col, +u.searchParams.get('desde') || 0));
     }
-    if (u.pathname === '/admin/zera' && this.env.TESTE === '1') { this.sql.exec('DELETE FROM docs'); this.sql.exec('DELETE FROM meta'); this.seq = 0; return json({ ok: 1 }); }
+    if (u.pathname === '/admin/zera' && this.env.TESTE === '1') { this.sql.exec('DELETE FROM docs'); this.sql.exec("DELETE FROM meta WHERE k != 'veio'"); this.seq = 0; return json({ ok: 1 }); }
     if (u.pathname === '/admin/cols') return json(this.sql.exec('SELECT col, COUNT(*) AS n, MAX(seq) AS seq FROM docs GROUP BY col').toArray());
     if (u.pathname === '/admin/exporta') {
       const col = u.searchParams.get('col');
@@ -263,6 +293,7 @@ export class Conta extends DurableObject {
   }
 
   async webSocketMessage(ws, msg) {
+    if (this.foi) { try { ws.close(1012, 'mudou'); } catch (e) {} return; }
     let m; try { m = JSON.parse(msg); } catch (e) { return; }
     const quem = this.usuarioDe(ws);
     if (m.t === 'eu') { ws.send(JSON.stringify({ t: 'eu', q: m.q, email: quem.email, admin: !!quem.admin, areas: quem.areas, chave: !!quem.chave })); return; }

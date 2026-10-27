@@ -164,11 +164,11 @@
     f.del = false; f.v = (f.v || 0) + 1; C.fila[k] = f; poe('fila', C.cfg.nome + '|' + k, f);
   }
 
-  /* o app salvou: compara (no máximo a cada 0,25 s) */
+  /* o app salvou: compara logo (40 ms juntam as gravações de um mesmo toque) */
   function mudou(nome, forca) {
     var C = cols[nome]; if (!C || C.aplicando) return;
     if (forca) C.forca = true;
-    clearTimeout(C.diffT); C.diffT = setTimeout(function () { compara(C); }, 250);
+    clearTimeout(C.diffT); C.diffT = setTimeout(function () { compara(C); }, 40);
   }
   function compara(C) {
     if (!C.pronto) { C.diffT = setTimeout(function () { compara(C); }, 300); return; }
@@ -189,7 +189,7 @@
   function agenda(C) {
     clearTimeout(C.timer);
     if (!C.primeira) C.primeira = Date.now();
-    C.timer = setTimeout(function () { envia(C); }, Math.min(400, Math.max(0, 1000 - (Date.now() - C.primeira))));
+    C.timer = setTimeout(function () { envia(C); }, Math.min(60, Math.max(0, 250 - (Date.now() - C.primeira))));
   }
   async function envia(C) {
     C.primeira = 0;

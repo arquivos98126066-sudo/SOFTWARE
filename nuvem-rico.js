@@ -227,12 +227,12 @@ function recebe(docs) {
   if (mudou && !telaT) atualizaTela();
 }
 
-/* envio: 0,4 s depois da última mudança e no máximo 1 s de espera enquanto digita; tudo num lote só */
+/* envio: 60 ms depois da última mudança e no máximo 0,25 s de espera enquanto digita; tudo num lote só */
 function agenda() {
   if (SO) return;
   clearTimeout(timer);
   if (!primeiraMudanca) primeiraMudanca = Date.now();
-  timer = setTimeout(envia, Math.min(400, Math.max(0, 1000 - (Date.now() - primeiraMudanca))));
+  timer = setTimeout(envia, Math.min(60, Math.max(0, 250 - (Date.now() - primeiraMudanca))));
 }
 async function envia() {
   primeiraMudanca = 0;

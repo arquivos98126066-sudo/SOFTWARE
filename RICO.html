@@ -1481,7 +1481,7 @@ window.agendarSalvamento = function(el) {
   /* sobe 0,4 s depois da última letra; digitando sem parar, no máximo 1 vez por segundo (economiza a cota da nuvem) */
   clearTimeout(_saveTimer);
   if (!_savePrim) _savePrim = Date.now();
-  _saveTimer = setTimeout(function() { _savePrim = 0; _saveUlt = Date.now(); salvarNoFirebase(); }, Math.min(400, Math.max(0, 1000 - (Date.now() - _savePrim))));
+  _saveTimer = setTimeout(function() { _savePrim = 0; _saveUlt = Date.now(); salvarNoFirebase(); }, Math.min(60, Math.max(0, 250 - (Date.now() - _savePrim))));
 };
 /* caderno ao vivo: o que outro aparelho escreve aparece aqui na hora, sem recarregar; o campo em que você está digitando espera você sair dele */
 function cadernoAoVivo() {

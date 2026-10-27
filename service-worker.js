@@ -1,4 +1,4 @@
-const CACHE_NAME = 'meus-apps-v350';
+const CACHE_NAME = 'meus-apps-v351';
 // HTMLs enviados pelo menu (segurar o app > Enviar um novo): ficam fora da limpeza de versões antigas
 const ENVIADOS = 'apps-enviados';
 
@@ -37,6 +37,9 @@ const URLS_TO_CACHE = [
   './nv-fs.js',
   './acessos.html'
 ];
+
+const BASE = new URL('./', self.location).pathname;
+const PRE = new Set(URLS_TO_CACHE);
 
 self.addEventListener('install', event => {
   event.waitUntil(
@@ -88,6 +91,10 @@ self.addEventListener('fetch', event => {
         return new Response(novo, {status: 200, headers: {'content-type': 'text/html; charset=utf-8'}});
       }
     }
+    /* abrir na hora: o que já está guardado nesta versão abre direto da memória, sem esperar a internet.
+       Versão nova chega pelo número do cache (publicar sobe o número), toda de uma vez, na abertura seguinte. */
+    const cached0 = await caches.match(req, {ignoreSearch: true});
+    if (cached0 && (!isLocal || PRE.has(url.pathname.replace(BASE, './')))) return cached0;
     const rede = fetch(req.url, isLocal ? {cache: 'no-store'} : undefined).then(response => {
       if (response && (response.status === 200 || response.type === 'opaque')) {
         const clone = response.clone();
@@ -97,8 +104,7 @@ self.addEventListener('fetch', event => {
     });
     event.waitUntil(rede.catch(() => {}));
     const cached = await caches.match(req, {ignoreSearch: true});
-    /* páginas e programas deste site: a versão nova da rede vem primeiro (até 1,5 s); sem rede, a guardada.
-       Assim um HTML novo nunca roda com um programa velho. Imagens e fontes: a guardada primeiro. */
+    /* o resto deste site (fora da lista, como a conferência de versão): a rede primeiro (até 1,5 s); sem rede, o guardado */
     const codigo = isLocal && (req.mode === 'navigate' || /\.(html|js|json)$/i.test(url.pathname) || url.pathname.endsWith('/'));
     if (codigo && cached) {
       const tempo = new Promise(ok => setTimeout(() => ok(null), 1500));
