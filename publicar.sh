@@ -21,4 +21,8 @@ V_MAIN=$(git show origin/main:service-worker.js | grep -m1 -o "meus-apps-v[0-9]*
 if [ "$L" != "$R" ]; then echo "FALHOU: a main do GitHub ($R) não é igual à minha ($L)."; exit 1; fi
 echo "main do GitHub = minha versão ($L)"
 echo "cache no ar: $V_MAIN"
+# endereço novo (apps.v4cless.com): o mesmo código vai para a Cloudflare; a chave vem de NV_CF_TOKEN (nunca gravada aqui)
+if [ -z "$NV_CF_TOKEN" ]; then echo "ATENÇÃO: sem NV_CF_TOKEN, o endereço novo (apps.v4cless.com) NÃO foi atualizado."; exit 1; fi
+(cd servidor && CLOUDFLARE_API_TOKEN="$NV_CF_TOKEN" npx -y wrangler@4.40.0 deploy 2>&1 | grep -q "Current Version ID") || { echo "FALHOU: a Cloudflare recusou o envio (endereço novo não atualizado)."; exit 1; }
+echo "endereço novo atualizado: apps.v4cless.com"
 echo "PUBLICADO E CONFERIDO (o app aberto se atualiza sozinho ao voltar para a tela)"
