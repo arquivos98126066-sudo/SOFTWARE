@@ -660,3 +660,20 @@ window.Alterna = (function () {
     if (!/DOA\.html$/i.test(location.pathname)) import('./nuvem-rico.js?col=plano&so=1&k=doa_htmls_v1,doa_htmls_v1_seeds,ph:*&v=' + Date.now()).catch(function () {});
   } catch (e) {}
 })();
+
+/* Ao vivo sem piscar: AoVivo.pinta(nome, desenhar) redesenha o que chegou da nuvem na mesma rolagem;
+   se você está digitando num campo, espera sair dele (o desenho não apaga o que está sendo escrito) */
+window.AoVivo = window.AoVivo || (function () {
+  var fila = {}, presa = null;
+  function digitando() { var a = document.activeElement; return a && a !== document.body && (/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName) || a.isContentEditable) ? a : null; }
+  function roda() {
+    var ks = Object.keys(fila); if (!ks.length) return;
+    var a = digitando();
+    if (a) { if (presa !== a) { presa = a; a.addEventListener('blur', function () { presa = null; setTimeout(roda, 0); }, { once: true }); } return; }
+    var fs = ks.map(function (k) { return fila[k]; }); fila = {};
+    var y = window.scrollY;
+    fs.forEach(function (f) { try { f(); } catch (e) {} });
+    if (Math.abs(window.scrollY - y) > 1) window.scrollTo({ top: y, behavior: 'instant' });
+  }
+  return { pinta: function (nome, f) { fila[nome] = f; roda(); } };
+})();

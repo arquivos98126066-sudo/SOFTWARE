@@ -618,7 +618,7 @@ async function iniciarListeners() {
     var _sigL = JSON.stringify(merged);
     if (_sigL === window._admSigL) return;
     window._admSigL = _sigL;
-    renderHistorico(); renderRelatorio(); atualizarHeader();
+    (window.AoVivo ? AoVivo.pinta : function(n, f){ f(); })('lanc', function() { renderHistorico(); renderRelatorio(); atualizarHeader(); });
   }, function(e) { console.error('Listener lancamentos:', e); });
 
   onSnapshot(docConfig, function(snap) {
@@ -629,7 +629,7 @@ async function iniciarListeners() {
       _cache.adm = snap.data();
       idbSet('config', _cache.adm);
       garantirEstrutura();
-      renderADM();
+      (window.AoVivo ? AoVivo.pinta : function(n, f){ f(); })('cfg', function() { renderADM(); });
     }
   }, function(e) { console.error('Listener config:', e); });
 }

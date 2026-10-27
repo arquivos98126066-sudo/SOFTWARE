@@ -1271,8 +1271,7 @@ function initListeners() {
       window._crmSig = window._crmSig || {};
       if (window._crmSig[key] === _sig) return;
       window._crmSig[key] = _sig;
-      renderPage(currentPage);
-      updateBadges();
+      (window.AoVivo ? AoVivo.pinta : function(n, f){ f(); })('crm', () => { renderPage(currentPage); updateBadges(); });
     }, async err => {
       console.warn('CRM listener offline:', err);
       await crmCarregarLocal();

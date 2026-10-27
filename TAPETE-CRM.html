@@ -2120,10 +2120,12 @@ function startRealtimeSync() {
     const _sig = clients.map(c => c.id + ':' + (c.updatedAt||0)).join('|');
     if(_sig === window._tapSig) return;
     window._tapSig = _sig;
-    if(curScreen==='home') renderHome();
-    if(curScreen==='clientes') renderAllClients();
-    if(curScreen==='fila') renderFila();
-    atualizarBadges();
+    (window.AoVivo ? AoVivo.pinta : function(n, f){ f(); })('cli', () => {
+      if(curScreen==='home') renderHome();
+      if(curScreen==='clientes') renderAllClients();
+      if(curScreen==='fila') renderFila();
+      atualizarBadges();
+    });
   }, async err => {
     console.warn('TAPETE-CRM onSnapshot offline:', err);
     await crmTapCarregarLocal();
@@ -7419,7 +7421,8 @@ async function iniciarListeners(){
       });
       pedidosCache.forEach(function(local){if(!merged.find(function(p){return p.id===local.id;})&&!_deletedPedidosIds[local.id])merged.push(local);});
       pedidosCache=merged;salvarCacheLocal();
-      renderG();renderC();renderAgenda();
+      var _sp=JSON.stringify(merged);if(_sp===window._tapSigP)return;window._tapSigP=_sp;
+      (window.AoVivo ? AoVivo.pinta : function(n, f){ f(); })('ped',function(){renderG();renderC();renderAgenda();});
     },function(e){console.warn('Listener pedidos erro:',e);});
   }catch(e){console.warn('Listener pedidos erro:',e);}
 
@@ -7438,7 +7441,9 @@ async function iniciarListeners(){
         else{merged.push(cloud);}
       });
       ruasCache.forEach(function(local){if(!merged.find(function(r){return r.id===local.id;})&&!_deletedRuasIds[local.id])merged.push(local);});
-      ruasCache=merged;salvarCacheLocal();renderR();renderRC();
+      ruasCache=merged;salvarCacheLocal();
+      var _sr=JSON.stringify(merged);if(_sr===window._tapSigR)return;window._tapSigR=_sr;
+      (window.AoVivo ? AoVivo.pinta : function(n, f){ f(); })('ruas',function(){renderR();renderRC();});
     },function(e){console.warn('Listener ruas erro:',e);});
   }catch(e){console.warn('Listener ruas erro:',e);}
 }
