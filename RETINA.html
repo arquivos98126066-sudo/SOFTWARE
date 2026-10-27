@@ -517,11 +517,12 @@
 </div>
 
 <script type="module">
-  import { db } from "https://arquivos98126066-sudo.github.io/SOFTWARE/firebase-sync.js";
-  import {
+    /* login confere como antes; os dados vão pelo servidor único (nv-fs.js) */
+    import "https://arquivos98126066-sudo.github.io/SOFTWARE/firebase-sync.js";
+    import { db,
     collection, addDoc, onSnapshot,
     query, orderBy, limit, serverTimestamp
-  } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+  } from "./nv-fs.js";
 
   // ══════════════════════════════════════════════════════
   // CAMADA LOCAL — IndexedDB + localStorage

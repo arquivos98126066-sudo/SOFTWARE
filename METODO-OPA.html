@@ -10,8 +10,9 @@
 <!-- Firebase carregado como módulo separado, expõe funções via window -->
 <script src="https://arquivos98126066-sudo.github.io/SOFTWARE/sync-indicator.js"></script>
 <script type="module">
-import { db } from "https://arquivos98126066-sudo.github.io/SOFTWARE/firebase-sync.js";
-import { doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+/* login confere como antes; os dados vão pelo servidor único (nv-fs.js) */
+import "https://arquivos98126066-sudo.github.io/SOFTWARE/firebase-sync.js";
+import { db, doc, setDoc, onSnapshot } from "./nv-fs.js";
 
 const COL = 'metodo_opa';
 const DOC_ID = 'dados_principais';
@@ -86,9 +87,9 @@ function opaLigarListener() {
   if(_syncAtivo) return;
   _syncAtivo = true;
   try {
-    _unsubscribe = onSnapshot(doc(db, COL, DOC_ID), async (snap) => {
-      // Se acabamos de salvar, ignora snapshot para não sobrescrever
-      if(Date.now() < _blockSnapshotUntil) return;
+    _unsubscribe = onSnapshot(doc(db, COL, DOC_ID), async function opaSnap(snap) {
+      // Se acabamos de salvar, espera o bloqueio acabar e olha de novo (a mudança do outro aparelho não se perde)
+      if(Date.now() < _blockSnapshotUntil) { clearTimeout(window._opaAdiado); window._opaAdiado = setTimeout(function(){ opaSnap(snap); }, _blockSnapshotUntil - Date.now() + 50); return; }
       const local = await loadLocal(COL + '_' + DOC_ID);
       const localTime = local ? (local.updatedAt || 0) : 0;
       if(snap.exists()) {

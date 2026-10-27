@@ -12,6 +12,8 @@ const CHAVE_APP = 'nv1-meus-apps';
 /* Firebase antigo: só para a cópia inicial e para o retrato de conferência */
 const FB = 'https://firestore.googleapis.com/v1/projects/meus-apps-8ca76/databases/(default)/documents', FB_CH = 'AIzaSyDPJvM-XZWfa8HQ7h8v0Usb1Hf3q8sDqpg';
 const FB_COLS = ['rico_vivo', 'plano', 'estudo', 'crm', 'tapete', 'born_rich', 'v2_conflitos', 'v2_adm_config', 'v2_adm_lanc', 'v2_crm_agenda', 'v2_crm_arquivo', 'v2_crm_ativos', 'v2_crm_contatos', 'v2_crm_reunioes', 'v2_plano_procs', 'v2_tap_cadastro', 'v2_tap_clientes', 'v2_tap_config', 'v2_tap_pedidos', 'v2_tap_ruas'];
+/* páginas que usavam o Firestore direto (Pré-venda, Retina, Método OPA, Workshop) */
+const FB_COLS2 = ['pre_venda', 'prevenda_lixeira', 'painel_ia', 'metodo_opa', 'launcher_apps', 'launcher_ck', 'launcher_fm', 'launcher_fm_prefs', 'launcher_trash', 'launcher_ad'];
 function fbVal(f) {
   if (!f) return null;
   if ('stringValue' in f) return f.stringValue;
@@ -99,11 +101,10 @@ export class Conta extends DurableObject {
   }
 
   async cron() {
-    const feito = this.sql.exec("SELECT v FROM meta WHERE k = 'migrou'").toArray();
-    let copia = null;
-    if (!feito.length) {
-      copia = {};
-      for (const col of FB_COLS) {
+    const copia = {};
+    for (const [flag, lista] of [['migrou', FB_COLS], ['migrou2', FB_COLS2]]) {
+      if (this.sql.exec('SELECT v FROM meta WHERE k = ?', flag).toArray().length) continue;
+      for (const col of lista) {
         let pg = '', n = 0;
         for (let i = 0; i < 50; i++) {
           const r = await fetch(FB + '/' + col + '?pageSize=300&key=' + FB_CH + pg);
@@ -123,7 +124,7 @@ export class Conta extends DurableObject {
         if (copia[col] === undefined) copia[col] = n;
       }
       this.sql.exec("INSERT OR REPLACE INTO meta (k, v) VALUES ('seq', ?)", this.seq);
-      this.sql.exec("INSERT OR REPLACE INTO meta (k, v) VALUES ('migrou', ?)", this.seq);
+      this.sql.exec('INSERT OR REPLACE INTO meta (k, v) VALUES (?, ?)', flag, this.seq);
     }
     const cols = this.sql.exec('SELECT col, COUNT(*) AS n, MAX(seq) AS seq FROM docs GROUP BY col').toArray();
     const diag = this.sql.exec("SELECT x FROM docs WHERE col = 'diag'").toArray().map(r => JSON.parse(r.x));

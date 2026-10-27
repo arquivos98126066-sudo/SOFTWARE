@@ -330,10 +330,11 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 </div>
 
 <script type="module">
-import { db } from "https://arquivos98126066-sudo.github.io/SOFTWARE/firebase-sync.js";
-import {
+/* login confere como antes; os dados vão pelo servidor único (nv-fs.js) */
+import "https://arquivos98126066-sudo.github.io/SOFTWARE/firebase-sync.js";
+import { db,
   collection, doc, setDoc, deleteDoc, onSnapshot, getDoc
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+} from "./nv-fs.js";
 
 // ── CAMADA 1: LOCAL — IndexedDB com fallback localStorage ──────────────
 function saveLocal(key, data) {
@@ -481,11 +482,11 @@ function initRealtimeSync() {
   // Carrega local imediatamente enquanto espera o Firebase
   carregarDoLocal();
 
-  onSnapshot(collection(db, COLL), (snapshot) => {
+  onSnapshot(collection(db, COLL), function pvSnap(snapshot) {
     const now = Date.now();
 
-    // Se acabamos de salvar, aguarda o guard expirar antes de aceitar snapshot
-    if (now < _blockSnapshotUntil) return;
+    // Se acabamos de salvar, espera o bloqueio acabar e olha de novo (a mudança do outro aparelho não se perde)
+    if (now < _blockSnapshotUntil) { clearTimeout(window._pvAdiado); window._pvAdiado = setTimeout(function() { pvSnap(snapshot); }, _blockSnapshotUntil - now + 50); return; }
 
     // Monta lista da nuvem
     const cloudList = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
@@ -1477,7 +1478,7 @@ function enviarParaLixeira(item) {
 function salvarLixeira() {
   saveLocal(LIXEIRA_KEY, { list: lixeira });
   if (window.syncShow) window.syncShow.syncing();
-  import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js').then(({ doc: fsDoc, setDoc: fsSetDoc }) => {
+  import('./nv-fs.js').then(({ doc: fsDoc, setDoc: fsSetDoc }) => {
     fsSetDoc(fsDoc(db, 'prevenda_lixeira', 'lista'), { list: lixeira, updatedAt: Date.now() })
       .then(() => { if (window.syncShow) window.syncShow.synced('Lixeira'); })
       .catch(() => { if (window.syncShow) window.syncShow.offline(); });
