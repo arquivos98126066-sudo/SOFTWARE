@@ -1,4 +1,4 @@
-const CACHE_NAME = 'meus-apps-v346';
+const CACHE_NAME = 'meus-apps-v347';
 // HTMLs enviados pelo menu (segurar o app > Enviar um novo): ficam fora da limpeza de versões antigas
 const ENVIADOS = 'apps-enviados';
 
@@ -34,7 +34,8 @@ const URLS_TO_CACHE = [
   './app-boost.js',
   './dados.js',
   './nv-canal.js',
-  './nv-fs.js'
+  './nv-fs.js',
+  './acessos.html'
 ];
 
 self.addEventListener('install', event => {
@@ -71,7 +72,7 @@ self.addEventListener('fetch', event => {
     return;
   }
 
-  if (/\/(reparar|atualiza|entrar|copia|exportar)\.html$/.test(url.pathname) || /\/(nuvem-rico|preserva)\.js$/.test(url.pathname)) return;
+  if (/\/(reparar|atualiza|entrar|copia|exportar|mudar)\.html$/.test(url.pathname) || /\/(nuvem-rico|preserva)\.js$/.test(url.pathname)) return;
   const req = event.request;
   const isLocal = url.hostname === self.location.hostname;
   event.respondWith((async () => {

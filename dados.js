@@ -10,7 +10,7 @@
    Uso: Dados.liga({ nome, ler: () => lista, escrever: (lista, ids) => {...}, novoNoInicio, area }) */
 (function () {
   if (window.Dados) return;
-  var VER = 'd3', PRE = window.NV_COL ? window.NV_COL + '_' : '';
+  var VER = 'd4', PRE = window.NV_COL ? window.NV_COL + '_' : '';
   var LIMITE_CAMPO = 700000, LIMITE_DOC = 950000;
   var db = null, cols = {}, dev = null, carregando = null, AQUI = (document.currentScript && document.currentScript.src) || location.href;
   function lerLs(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
@@ -60,20 +60,55 @@
   function pares(o) { return Object.keys(o).map(function (c) { return [[c], o[c]]; }); }
   function idDoc(id) { var s = String(id).replace(/\//g, '%2F'); if (s === '.' || s === '..' || !s) s = '_' + s; return s.slice(0, 700); }
 
-  /* fotos guardadas no próprio item (data:...) ficam só no aparelho até irem para o armazenamento de arquivos */
+  /* fotos (data:... no próprio item): sobem para o R2 pelo servidor e o item leva só a referência "nvmidia:<chave>".
+     Os outros aparelhos recebem o endereço da foto; o aparelho que tirou a foto continua com ela guardada. */
   function ehMidia(v) { return typeof v === 'string' && v.length > 2000 && v.slice(0, 5) === 'data:'; }
+  var SRV_HTTP = (window.NV_SERVIDOR || (location.protocol === 'https:' && !/github\.io$/.test(location.hostname) ? 'wss://' + location.host : 'wss://nv-dados.meusapps.workers.dev')).replace(/^ws/, 'http');
+  var URL_MIDIA = SRV_HTTP + '/midia/', subindo = {}, chaves = {};
+  function chave(v) {
+    if (chaves[v.length + v.slice(-64)]) return chaves[v.length + v.slice(-64)];
+    var h1 = 0x811c9dc5, h2 = 0x01000193 ^ 0x5bd1e995;
+    for (var i = 0; i < v.length; i++) { var c = v.charCodeAt(i); h1 = Math.imul(h1 ^ c, 16777619); h2 = Math.imul(h2 ^ c, 2246822519); }
+    var ext = (v.slice(5, v.indexOf(';')).split('/')[1] || 'bin').replace(/[^a-z0-9]/g, '').slice(0, 5);
+    var k = (h1 >>> 0).toString(16) + (h2 >>> 0).toString(16) + v.length.toString(36) + '.' + ext;
+    chaves[v.length + v.slice(-64)] = k; return k;
+  }
+  function sobe(k, v) {
+    if (subindo[k]) return subindo[k];
+    subindo[k] = (async function () {
+      for (var t = 0; t < 4; t++) {
+        try {
+          if (!window.NvCanal) await banco();
+          var i = v.indexOf(','), bin = atob(v.slice(i + 1)), u8 = new Uint8Array(bin.length);
+          for (var j = 0; j < bin.length; j++) u8[j] = bin.charCodeAt(j);
+          var r = await NvCanal.http('/midia/' + k, { method: 'POST', body: new Blob([u8], { type: v.slice(5, v.indexOf(';')) }) });
+          if (r.ok) return true;
+        } catch (e) {}
+        await new Promise(function (ok) { setTimeout(ok, 2000 * (t + 1)); });
+      }
+      delete subindo[k]; return false;
+    })();
+    return subindo[k];
+  }
   function semMidia(v) {
-    if (ehMidia(v)) return undefined;
-    if (Array.isArray(v)) return v.map(semMidia).filter(function (x) { return x !== undefined; });
-    if (v && typeof v === 'object') { var o = {}; Object.keys(v).forEach(function (k) { var x = semMidia(v[k]); if (x !== undefined) o[k] = x; }); return o; }
+    if (ehMidia(v)) { var k = chave(v); sobe(k, v); return 'nvmidia:' + k; }
+    if (typeof v === 'string' && v.indexOf(URL_MIDIA) === 0) return 'nvmidia:' + v.slice(URL_MIDIA.length);
+    if (Array.isArray(v)) return v.map(semMidia);
+    if (v && typeof v === 'object') { var o = {}; Object.keys(v).forEach(function (k) { o[k] = semMidia(v[k]); }); return o; }
+    return v;
+  }
+  function comMidia(v) {
+    if (typeof v === 'string' && v.indexOf('nvmidia:') === 0) return URL_MIDIA + v.slice(8);
+    if (Array.isArray(v)) return v.map(comMidia);
+    if (v && typeof v === 'object') { var o = {}; Object.keys(v).forEach(function (k) { o[k] = comMidia(v[k]); }); return o; }
     return v;
   }
   function temMidia(v) { return ehMidia(v) || (Array.isArray(v) ? v.some(temMidia) : !!v && typeof v === 'object' && Object.keys(v).some(function (k) { return temMidia(v[k]); })); }
-  /* junta o que chegou da nuvem com as fotos que só este aparelho tem */
+  /* o que chegou da nuvem: onde o aparelho já tem a mesma foto guardada, fica a dele (não baixa de novo) */
   function reinsere(novo, velho) {
     if (velho === undefined || !temMidia(velho)) return novo;
-    if (ehMidia(velho) && novo === undefined) return velho;
-    if (Array.isArray(velho) && (Array.isArray(novo) || novo === undefined)) return (novo || []).concat(velho.filter(ehMidia));
+    if (ehMidia(velho)) return (novo === undefined || (typeof novo === 'string' && novo === URL_MIDIA + chave(velho))) ? velho : novo;
+    if (Array.isArray(velho) && Array.isArray(novo)) return novo.map(function (x, i) { return reinsere(x, velho[i]); });
     if (velho && typeof velho === 'object' && novo && typeof novo === 'object' && !Array.isArray(novo)) { var o = Object.assign({}, novo); Object.keys(velho).forEach(function (k) { var x = reinsere(novo[k], velho[k]); if (x !== undefined) o[k] = x; }); return o; }
     return novo;
   }
@@ -91,12 +126,12 @@
     Object.keys(item).forEach(function (c) {
       if (c === 'id' || ign.indexOf(c) >= 0) return;
       var v = item[c]; if (v === undefined || typeof v === 'function') return;
-      if (cfg && cfg.semMidia) { v = semMidia(v); if (v === undefined) return; }
+      if (cfg && cfg.semMidia) v = semMidia(v);
       try { o[c] = estavel(v); } catch (e) {}
     });
     return o;
   }
-  function monta(id, cs) { var o = { id: id }; Object.keys(cs).forEach(function (c) { try { o[c] = JSON.parse(cs[c]); } catch (e) {} }); return o; }
+  function monta(id, cs) { var o = { id: id }; Object.keys(cs).forEach(function (c) { try { o[c] = comMidia(JSON.parse(cs[c])); } catch (e) {} }); return o; }
   function mesmo(a, b) { var ka = Object.keys(a || {}), kb = Object.keys(b || {}); if (ka.length !== kb.length) return false; for (var i = 0; i < ka.length; i++) if (a[ka[i]] !== b[ka[i]]) return false; return true; }
 
   function liga(cfg) {
@@ -163,6 +198,9 @@
     if (!navigator.onLine) return;
     var ks = Object.keys(C.fila); if (!ks.length) return;
     C.enviando = true;
+    /* fotos novas sobem antes do item, para o outro aparelho já achar a foto */
+    var sub = Object.keys(subindo).map(function (k) { return subindo[k]; });
+    if (sub.length) await Promise.race([Promise.all(sub), new Promise(function (ok) { setTimeout(ok, 20000); })]);
     var ops = [], itens = [], n = 0;
     ks.slice(0, 300).forEach(function (k) {
       var f = C.fila[k], cab = { ij: JSON.stringify(C.ids[k] != null ? C.ids[k] : k), por: dev, area: C.cfg.area || 'geral' };
@@ -268,7 +306,7 @@
       if (porK[k]) {
         /* troca os campos dentro do mesmo objeto (o app pode ter referências a ele) */
         var o = porK[k], ign = C.cfg.ignora || [];
-        Object.keys(o).forEach(function (c) { if (c !== 'id' && !(c in it) && ign.indexOf(c) < 0 && !(C.cfg.semMidia && temMidia(o[c]))) delete o[c]; });
+        Object.keys(o).forEach(function (c) { if (c !== 'id' && !(c in it) && ign.indexOf(c) < 0) delete o[c]; });
         Object.keys(it).forEach(function (c) { if (c !== 'id') o[c] = C.cfg.semMidia ? reinsere(it[c], o[c]) : it[c]; });
       } else { porK[k] = it; novos.push(k); }
     });

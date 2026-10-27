@@ -19,7 +19,7 @@ try { if (sessionStorage.getItem('troca') === 'DOA') {
 // Carrega sync-indicator de forma não-bloqueante — se falhar, não quebra nada
 (function(){
   var s=document.createElement('script');
-  s.src='https://arquivos98126066-sudo.github.io/SOFTWARE/sync-indicator.js';
+  s.src='./sync-indicator.js';
   s.async=true;
   s.defer=true;
   s.onerror=function(){ console.warn('sync-indicator.js não carregou — modo offline ativo.'); };
@@ -558,7 +558,7 @@ html.plano-carregando #proc-list-overlay .pl-body{visibility:hidden}
 <div id="toast" role="status" aria-live="polite"></div>
 
 <script type="module">
-import { db } from "https://arquivos98126066-sudo.github.io/SOFTWARE/firebase-sync.js";
+import { db } from "./firebase-sync.js";
 
 async function salvarProcessoNuvem(steps) {
   try {

@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no">
+<title>Mudança</title>
+<style>
+  html,body{margin:0;background:#f9fafb;color:#111;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}
+  main{max-width:420px;margin:0 auto;padding:28px 18px}
+  h1{font-size:20px;margin:0 0 6px}
+  p{color:#6b7280;font-size:14px;line-height:1.45;margin:0 0 16px}
+  #passos{background:#fff;border-radius:14px;padding:14px 16px;box-shadow:0 1px 3px rgba(0,0,0,.08);font-size:14px;line-height:1.7;min-height:60px}
+  .ok{color:#15803d}.erro{color:#b91c1c}
+  a.bt{display:block;text-align:center;margin-top:16px;background:#111;color:#fff;text-decoration:none;border-radius:12px;padding:14px;font-weight:600}
+</style>
+</head>
+<body>
+<main>
+  <h1>Mudança para o endereço novo</h1>
+  <p id="sub">Leva tudo o que está guardado neste celular para o app novo. Nada é apagado daqui.</p>
+  <div id="passos"></div>
+  <div id="fim"></div>
+</main>
+<script>
+/* Mudança de endereço (GitHub -> apps.v4cless.com). O endereço antigo empacota o que só existe neste aparelho
+   (localStorage e bancos do aparelho, com as fotos) e manda para o servidor com um código secreto; o endereço novo
+   busca pelo código e coloca tudo no lugar. Os dados de sincronização não vão: o app novo junta de novo com o servidor. */
+(function () {
+  var NOVO = window.NV_NOVO || 'https://apps.v4cless.com', SRV = window.NV_SERVIDOR ? window.NV_SERVIDOR.replace(/^ws/, 'http') : location.hostname.indexOf('github.io') >= 0 ? 'https://nv-dados.meusapps.workers.dev' : location.origin;
+  var PULA_BANCO = /^(nv_dados|nv_motor|firebase|firestore)/, PULA_CHAVE = /^(nv\.|pv\.|firebase:|menu_logado$)/, PARTE = 1500000;
+  var el = document.getElementById('passos');
+  function diz(t, c) { var d = document.createElement('div'); d.textContent = t; if (c) d.className = c; el.appendChild(d); }
+  function b64(u8) { var s = '', i; for (i = 0; i < u8.length; i += 32768) s += String.fromCharCode.apply(null, u8.subarray(i, i + 32768)); return btoa(s); }
+  function deB64(s) { var b = atob(s), u = new Uint8Array(b.length); for (var i = 0; i < b.length; i++) u[i] = b.charCodeAt(i); return u; }
+  async function ser(v) {
+    if (v == null || typeof v !== 'object') return v;
+    if (v instanceof Date) return { __m: 'data', v: v.toISOString() };
+    if (v instanceof Blob) return { __m: 'blob', tipo: v.type, v: b64(new Uint8Array(await v.arrayBuffer())) };
+    if (v instanceof ArrayBuffer) return { __m: 'bytes', v: b64(new Uint8Array(v)) };
+    if (ArrayBuffer.isView(v)) return { __m: 'bytes', v: b64(new Uint8Array(v.buffer, v.byteOffset, v.byteLength)) };
+    if (Array.isArray(v)) { var a = []; for (var i = 0; i < v.length; i++) a.push(await ser(v[i])); return a; }
+    var r = {}; for (var k in v) if (Object.prototype.hasOwnProperty.call(v, k)) r[k] = await ser(v[k]); return r;
+  }
+  function des(v) {
+    if (v == null || typeof v !== 'object') return v;
+    if (Array.isArray(v)) return v.map(des);
+    if (v.__m === 'data') return new Date(v.v);
+    if (v.__m === 'blob') return new Blob([deB64(v.v)], { type: v.tipo });
+    if (v.__m === 'bytes') return deB64(v.v).buffer;
+    var r = {}; for (var k in v) r[k] = des(v[k]); return r;
+  }
+  function req(r) { return new Promise(function (ok, rj) { r.onsuccess = function () { ok(r.result); }; r.onerror = function () { rj(r.error); }; }); }
+  async function gz(txt, volta) {
+    var s = new Blob([txt]).stream().pipeThrough(volta ? new DecompressionStream('gzip') : new CompressionStream('gzip'));
+    return volta ? await new Response(s).text() : new Uint8Array(await new Response(s).arrayBuffer());
+  }
+  function passe() {
+    var rt = null; try { rt = localStorage.getItem('nv.rt'); } catch (e) {}
+    if (!rt) return Promise.resolve('');
+    return fetch('https://securetoken.googleapis.com/v1/token?key=AIzaSyDPJvM-XZWfa8HQ7h8v0Usb1Hf3q8sDqpg', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: 'grant_type=refresh_token&refresh_token=' + encodeURIComponent(rt) })
+      .then(function (r) { return r.ok ? r.json() : {}; }).then(function (j) { return j.id_token ? '&t=' + encodeURIComponent(j.id_token) : ''; }).catch(function () { return ''; });
+  }
+
+  async function empacota() {
+    var pacote = { ls: {}, idb: {}, de: location.href, t: Date.now() }, n = 0;
+    for (var i = 0; i < localStorage.length; i++) { var k = localStorage.key(i); if (!PULA_CHAVE.test(k)) { pacote.ls[k] = localStorage.getItem(k); n++; } }
+    diz('Guardado no celular: ' + n + ' itens', 'ok');
+    var nomes = []; try { nomes = (await indexedDB.databases()).map(function (d) { return d.name; }); } catch (e) {}
+    for (var a = 0; a < nomes.length; a++) {
+      if (PULA_BANCO.test(nomes[a])) continue;
+      var db = await req(indexedDB.open(nomes[a])), lojas = {}, ns = [].slice.call(db.objectStoreNames), qt = 0;
+      for (var j = 0; j < ns.length; j++) {
+        var st = db.transaction(ns[j], 'readonly').objectStore(ns[j]);
+        var idx = [].slice.call(st.indexNames).map(function (x) { var ix = st.index(x); return { nome: x, kp: ix.keyPath, unico: ix.unique, multi: ix.multiEntry }; });
+        var ks = await req(st.getAllKeys()), vs = await req(st.getAll());
+        lojas[ns[j]] = { kp: st.keyPath, ai: st.autoIncrement, idx: idx, chaves: await ser(ks), valores: await ser(vs) };
+        qt += vs.length;
+      }
+      pacote.idb[nomes[a]] = { versao: db.version, lojas: lojas };
+      db.close();
+      diz('Banco ' + nomes[a] + ': ' + qt + ' itens', 'ok');
+    }
+    return pacote;
+  }
+  async function envia() {
+    try {
+      var txt = JSON.stringify(await empacota()), dados = b64(await gz(txt));
+      var cod = b64(crypto.getRandomValues(new Uint8Array(24))).replace(/[+/=]/g, function (c) { return c === '+' ? '-' : c === '/' ? '_' : ''; });
+      var partes = Math.ceil(dados.length / PARTE) || 1, t = await passe();
+      diz('Tamanho: ' + Math.round(txt.length / 1024) + ' KB (enviando ' + Math.round(dados.length / 1024) + ' KB)');
+      for (var i = 0; i < partes; i++) {
+        var r = await fetch(SRV + '/mudanca?k=nv1-meus-apps' + t + '&c=' + cod + '&i=' + i + '&n=' + partes, { method: 'POST', body: dados.slice(i * PARTE, (i + 1) * PARTE) });
+        if (!r.ok) throw new Error('o servidor recusou (' + r.status + ')');
+        diz('Parte ' + (i + 1) + ' de ' + partes + ' enviada', 'ok');
+      }
+      diz('Tudo enviado. Abrindo o endereço novo...', 'ok');
+      setTimeout(function () { location.href = NOVO + '/mudar.html#c=' + cod; }, 900);
+    } catch (e) { diz('Parou: ' + e.message, 'erro'); }
+  }
+  async function recebe(cod) {
+    document.getElementById('sub').textContent = 'Colocando neste app o que veio do celular. Não feche esta tela.';
+    try {
+      var dados = '', i = 0, n = 1;
+      for (; i < n; i++) {
+        var r = await fetch(SRV + '/mudanca?c=' + encodeURIComponent(cod) + '&i=' + i);
+        if (!r.ok) throw new Error('não achei a mudança (' + r.status + ')');
+        n = +r.headers.get('x-partes') || 1; dados += await r.text();
+      }
+      var p = JSON.parse(await gz(deB64(dados), true)), k, qt = 0;
+      for (k in p.ls) { try { localStorage.setItem(k, p.ls[k]); qt++; } catch (e) { diz('Não coube: ' + k, 'erro'); } }
+      diz('Itens do celular: ' + qt, 'ok');
+      for (var nome in p.idb) {
+        var b = p.idb[nome];
+        var db = await new Promise(function (ok, rj) {
+          var q = indexedDB.open(nome, b.versao);
+          q.onupgradeneeded = function () {
+            Object.keys(b.lojas).forEach(function (s) {
+              if (q.result.objectStoreNames.contains(s)) return;
+              var L = b.lojas[s], o = q.result.createObjectStore(s, L.kp ? { keyPath: L.kp, autoIncrement: L.ai } : { autoIncrement: L.ai });
+              (L.idx || []).forEach(function (x) { try { o.createIndex(x.nome, x.kp, { unique: x.unico, multiEntry: x.multi }); } catch (e) {} });
+            });
+          };
+          q.onsuccess = function () { ok(q.result); }; q.onerror = function () { rj(q.error); };
+        });
+        var tot = 0;
+        for (var s in b.lojas) {
+          if (!db.objectStoreNames.contains(s)) continue;
+          var L = b.lojas[s], ks = des(L.chaves), vs = des(L.valores), tx = db.transaction(s, 'readwrite'), o = tx.objectStore(s);
+          for (var j = 0; j < vs.length; j++) { if (o.keyPath) o.put(vs[j]); else o.put(vs[j], ks[j]); tot++; }
+          await new Promise(function (ok) { tx.oncomplete = ok; tx.onerror = ok; tx.onabort = ok; });
+        }
+        db.close();
+        diz('Banco ' + nome + ': ' + tot + ' itens', 'ok');
+      }
+      try { localStorage.setItem('nv.mudou', String(Date.now())); } catch (e) {}
+      diz('Pronto. Agora entre com seu e-mail e senha.', 'ok');
+      document.getElementById('fim').innerHTML = '<a class="bt" href="index.html">Abrir o app</a>';
+    } catch (e) { diz('Parou: ' + e.message, 'erro'); }
+  }
+  var m = location.hash.match(/c=([A-Za-z0-9_-]+)/);
+  if (m) recebe(m[1]); else envia();
+})();
+</script>
+</body>
+</html>

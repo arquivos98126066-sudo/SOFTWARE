@@ -5,10 +5,67 @@
      {t:'sub', col, desde}                 -> {t:'docs', col, docs:[{id,x}], fim:true, seq}
      {t:'grava', q, ops:[{col,id,troca,set:[[caminho,valor]],apaga:[caminho]}]}  -> {t:'ok', q, seq} e {t:'docs'} para quem ouve
      {t:'pega', q, col, id}                -> {t:'doc', q, x}
+     {t:'eu'}                              -> {t:'eu', email, admin, areas, chave}
+     {t:'usuarios'} / {t:'usuario', email, areas, ativo}   (só o dono)
+   Acesso: login do Firebase (o mesmo e-mail e senha do menu). O servidor confere a assinatura do Google e libera
+   só as áreas daquela pessoa. O dono vê tudo. Enquanto ACEITA_CHAVE não for "0", quem vem sem login ainda entra
+   (fase de troca dos celulares).
    Administração (cópia e exportação) só com a senha guardada no servidor. */
 import { DurableObject } from 'cloudflare:workers';
 
 const CHAVE_APP = 'nv1-meus-apps';
+const PROJETO = 'meus-apps-8ca76', DONO_UID = 'UhH3Luc0AYW9URS6OahnSqWTTgw2';
+/* cada coleção pertence a uma área; a pessoa só vê as áreas liberadas para ela */
+const AREAS = {
+  rico: ['rico_vivo', 'born_rich'], plano: ['plano', 'v2_plano_procs'], estudo: ['estudo'],
+  crm: ['crm', /^v2_crm_/], tapete: ['tapete', /^v2_tap_/], adm: [/^v2_adm_/],
+  prevenda: ['pre_venda', 'prevenda_lixeira'], retina: ['painel_ia'], opa: ['metodo_opa'], workshop: [/^launcher_/]
+};
+function areaDe(col) {
+  if (col === 'diag' || col === 'v2_conflitos') return 'sistema';
+  for (const a of Object.keys(AREAS)) if (AREAS[a].some(x => typeof x === 'string' ? x === col : x.test(col))) return a;
+  return 'outros';
+}
+/* sistema: todos gravam (diagnóstico e conflitos), só o dono lê */
+function pode(u, col, grava) {
+  if (u.admin) return true;
+  const a = areaDe(col);
+  if (a === 'sistema') return !!grava;
+  return u.areas.indexOf(a) >= 0;
+}
+
+/* confere o login do Firebase: assinatura do Google, projeto e validade */
+let chaves = null, chavesAte = 0;
+function b64url(s) { s = s.replace(/-/g, '+').replace(/_/g, '/'); while (s.length % 4) s += '='; return Uint8Array.from(atob(s), c => c.charCodeAt(0)); }
+async function confereToken(t, env) {
+  if (!t) return null;
+  if (env.TESTE === '1' && t.indexOf('teste:') === 0) { const [, uid, email] = t.split(':'); return { uid, email }; }
+  try {
+    const [h, c, a] = t.split('.');
+    const cab = JSON.parse(new TextDecoder().decode(b64url(h))), dado = JSON.parse(new TextDecoder().decode(b64url(c)));
+    const agora = Date.now() / 1000;
+    if (cab.alg !== 'RS256' || dado.aud !== PROJETO || dado.iss !== 'https://securetoken.google.com/' + PROJETO || !(dado.exp > agora) || !(dado.iat < agora + 300) || !dado.sub) return null;
+    if (!chaves || Date.now() > chavesAte) {
+      const r = await fetch('https://www.googleapis.com/service_accounts/v1/jwk/securetoken@system.gserviceaccount.com');
+      chaves = (await r.json()).keys || []; chavesAte = Date.now() + 3600000;
+    }
+    const jwk = chaves.find(k => k.kid === cab.kid); if (!jwk) return null;
+    const k = await crypto.subtle.importKey('jwk', jwk, { name: 'RSASSA-PKCS1-v1_5', hash: 'SHA-256' }, false, ['verify']);
+    const ok = await crypto.subtle.verify('RSASSA-PKCS1-v1_5', k, b64url(a), new TextEncoder().encode(h + '.' + c));
+    return ok ? { uid: dado.sub, email: String(dado.email || '').toLowerCase() } : null;
+  } catch (e) { return null; }
+}
+async function quem(req, u, env) {
+  const p = await confereToken(u.searchParams.get('t'), env);
+  if (p) return p;
+  if (u.searchParams.get('k') === CHAVE_APP && env.ACEITA_CHAVE !== '0') return { chave: true };
+  return null;
+}
+function comQuem(req, p) {
+  const h = new Headers(req.headers);
+  h.set('x-nv-quem', JSON.stringify(p));
+  return new Request(req, { headers: h });
+}
 /* Firebase antigo: só para a cópia inicial e para o retrato de conferência */
 const FB = 'https://firestore.googleapis.com/v1/projects/meus-apps-8ca76/databases/(default)/documents', FB_CH = 'AIzaSyDPJvM-XZWfa8HQ7h8v0Usb1Hf3q8sDqpg';
 const FB_COLS = ['rico_vivo', 'plano', 'estudo', 'crm', 'tapete', 'born_rich', 'v2_conflitos', 'v2_adm_config', 'v2_adm_lanc', 'v2_crm_agenda', 'v2_crm_arquivo', 'v2_crm_ativos', 'v2_crm_contatos', 'v2_crm_reunioes', 'v2_plano_procs', 'v2_tap_cadastro', 'v2_tap_clientes', 'v2_tap_config', 'v2_tap_pedidos', 'v2_tap_ruas'];
@@ -31,20 +88,42 @@ export default {
     const u = new URL(req.url);
     if (req.method === 'OPTIONS') return cors(new Response(null, { status: 204 }));
     const conta = env.CONTA.get(env.CONTA.idFromName('principal'));
+    if (u.pathname === '/' || u.pathname === '') return env.ASSETS.fetch(new Request(new URL('/index.html', u), req));
     if (u.pathname === '/ws') {
-      if (u.searchParams.get('k') !== CHAVE_APP) return new Response('sem chave', { status: 403 });
       if (req.headers.get('Upgrade') !== 'websocket') return new Response('so websocket', { status: 426 });
-      return conta.fetch(req);
+      const p = await quem(req, u, env);
+      if (!p) return new Response('sem acesso', { status: 403 });
+      return conta.fetch(comQuem(req, p));
     }
     if (u.pathname.startsWith('/admin/')) {
       if (!env.ADMIN || req.headers.get('x-admin') !== env.ADMIN) return new Response('nao', { status: 403 });
       return conta.fetch(req);
     }
-    if (u.pathname === '/le') {
-      if (u.searchParams.get('k') !== CHAVE_APP) return cors(new Response('sem chave', { status: 403 }));
+    /* fotos dos apps: guardadas no R2 (pasta imagens/apps); ver é livre (o nome é um código longo), enviar precisa de acesso */
+    if (u.pathname.startsWith('/midia/')) {
+      const k = u.pathname.slice(7);
+      if (!/^[a-z0-9]{8,40}\.[a-z0-9]{1,5}$/.test(k)) return cors(new Response('nome inválido', { status: 400 }));
+      if (req.method === 'POST') {
+        if (!(await quem(req, u, env))) return cors(new Response('sem acesso', { status: 403 }));
+        if (!(await env.MIDIA.head('imagens/apps/' + k))) await env.MIDIA.put('imagens/apps/' + k, req.body, { httpMetadata: { contentType: req.headers.get('Content-Type') || 'application/octet-stream', cacheControl: 'public, max-age=31536000, immutable' } });
+        return cors(new Response('ok'));
+      }
+      const o = await env.MIDIA.get('imagens/apps/' + k);
+      if (!o) return cors(new Response('não achei', { status: 404 }));
+      const h = new Headers(); o.writeHttpMetadata(h); h.set('Cache-Control', 'public, max-age=31536000, immutable'); h.set('Access-Control-Allow-Origin', '*');
+      return new Response(o.body, { headers: h });
+    }
+    /* mudança de endereço: o antigo envia (com login), o novo busca só com o código secreto */
+    if (u.pathname === '/mudanca') {
+      if (req.method === 'POST' && !(await quem(req, u, env))) return cors(new Response('sem acesso', { status: 403 }));
       return cors(await conta.fetch(req));
     }
-    return new Response('ok');
+    if (u.pathname === '/le') {
+      const p = await quem(req, u, env);
+      if (!p) return cors(new Response('sem acesso', { status: 403 }));
+      return cors(await conta.fetch(comQuem(req, p)));
+    }
+    return new Response('não encontrado', { status: 404 });
   },
   /* tarefa agendada: cópia inicial do Firebase (uma vez) e um retrato do estado no Firebase, para conferência */
   async scheduled(ev, env, ctx) {
@@ -62,6 +141,9 @@ export class Conta extends DurableObject {
     this.sql.exec('CREATE TABLE IF NOT EXISTS docs (col TEXT NOT NULL, id TEXT NOT NULL, x TEXT NOT NULL, seq INTEGER NOT NULL, PRIMARY KEY (col, id))');
     this.sql.exec('CREATE INDEX IF NOT EXISTS docs_seq ON docs (col, seq)');
     this.sql.exec('CREATE TABLE IF NOT EXISTS meta (k TEXT PRIMARY KEY, v INTEGER NOT NULL)');
+    this.sql.exec('CREATE TABLE IF NOT EXISTS usuarios (email TEXT PRIMARY KEY, areas TEXT NOT NULL, ativo INTEGER NOT NULL, t INTEGER NOT NULL)');
+    this.sql.exec('CREATE TABLE IF NOT EXISTS mudancas (c TEXT NOT NULL, i INTEGER NOT NULL, n INTEGER NOT NULL, dado TEXT NOT NULL, t INTEGER NOT NULL, PRIMARY KEY (c, i))');
+    this.sql.exec('CREATE TABLE IF NOT EXISTS entradas (quem TEXT PRIMARY KEY, chave INTEGER NOT NULL, ua TEXT, t INTEGER NOT NULL)');
     const r = this.sql.exec("SELECT v FROM meta WHERE k = 'seq'").toArray();
     this.seq = r.length ? r[0].v : 0;
   }
@@ -71,11 +153,29 @@ export class Conta extends DurableObject {
     if (u.pathname === '/ws') {
       const par = new WebSocketPair();
       this.ctx.acceptWebSocket(par[1]);
-      par[1].serializeAttachment({ subs: [] });
+      const p = this.perfil(JSON.parse(req.headers.get('x-nv-quem') || '{}'));
+      this.sql.exec('INSERT OR REPLACE INTO entradas (quem, chave, ua, t) VALUES (?, ?, ?, ?)', p.chave ? 'sem login ' + (req.headers.get('User-Agent') || '').slice(0, 80) : p.email + ' ' + (p.uid || '') + (p.transicao ? ' (troca)' : ''), p.chave ? 1 : 0, (req.headers.get('User-Agent') || '').slice(0, 160), Date.now());
+      par[1].serializeAttachment({ subs: [], u: p });
       return new Response(null, { status: 101, webSocket: par[0] });
     }
+    if (u.pathname === '/mudanca') {
+      const c = u.searchParams.get('c') || '', i = +u.searchParams.get('i') || 0;
+      if (c.length < 20) return new Response('código curto', { status: 400 });
+      if (req.method === 'POST') {
+        const n = +u.searchParams.get('n') || 1, dado = await req.text();
+        this.sql.exec('INSERT OR REPLACE INTO mudancas (c, i, n, dado, t) VALUES (?, ?, ?, ?, ?)', c, i, n, dado, Date.now());
+        return json({ ok: 1 });
+      }
+      const r = this.sql.exec('SELECT n, dado, t FROM mudancas WHERE c = ? AND i = ?', c, i).toArray();
+      if (!r.length || Date.now() - r[0].t > 7 * 86400000) return new Response('não achei', { status: 404 });
+      return new Response(r[0].dado, { headers: { 'x-partes': String(r[0].n), 'Access-Control-Expose-Headers': 'x-partes' } });
+    }
     if (u.pathname === '/interno/cron') return json(await this.cron());
-    if (u.pathname === '/le') return json(this.le(u.searchParams.get('col') || '', +u.searchParams.get('desde') || 0));
+    if (u.pathname === '/le') {
+      const p = this.perfil(JSON.parse(req.headers.get('x-nv-quem') || '{}')), col = u.searchParams.get('col') || '';
+      if (!pode(p, col, false)) return json({ col, negado: true, docs: [] }, 403);
+      return json(this.le(col, +u.searchParams.get('desde') || 0));
+    }
     if (u.pathname === '/admin/zera' && this.env.TESTE === '1') { this.sql.exec('DELETE FROM docs'); this.sql.exec('DELETE FROM meta'); this.seq = 0; return json({ ok: 1 }); }
     if (u.pathname === '/admin/cols') return json(this.sql.exec('SELECT col, COUNT(*) AS n, MAX(seq) AS seq FROM docs GROUP BY col').toArray());
     if (u.pathname === '/admin/exporta') {
@@ -128,11 +228,23 @@ export class Conta extends DurableObject {
     }
     const cols = this.sql.exec('SELECT col, COUNT(*) AS n, MAX(seq) AS seq FROM docs GROUP BY col').toArray();
     const diag = this.sql.exec("SELECT x FROM docs WHERE col = 'diag'").toArray().map(r => JSON.parse(r.x));
-    const estado = { t: Date.now(), seq: this.seq, copia, cols, diag };
+    const entradas = this.sql.exec('SELECT quem, chave, t FROM entradas ORDER BY t DESC LIMIT 30').toArray();
+    const estado = { t: Date.now(), seq: this.seq, copia, cols, diag, entradas };
     const w = await fetch(FB + '/cf_estado/agora?key=' + FB_CH, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ fields: { j: { stringValue: JSON.stringify(estado) } } }) });
     console.log('cron', this.seq, JSON.stringify(copia), 'retrato', w.status, w.ok ? '' : (await w.text()).slice(0, 300));
     return estado;
   }
+
+  /* quem é a pessoa: o dono vê tudo; sem login (fase de troca) também; os outros, só as áreas liberadas */
+  perfil(q) {
+    if (q.chave) return { chave: true, admin: true, areas: ['*'], email: '' };
+    if (q.uid === DONO_UID) return { uid: q.uid, email: q.email, admin: true, areas: ['*'] };
+    const r = this.sql.exec('SELECT areas, ativo FROM usuarios WHERE email = ?', q.email || '').toArray();
+    /* fase de troca: login de quem ainda não foi cadastrado entra como antes (vale até ACEITA_CHAVE = "0") */
+    if (!r.length && this.env.ACEITA_CHAVE !== '0') return { uid: q.uid, email: q.email, admin: true, areas: ['*'], transicao: true };
+    return { uid: q.uid, email: q.email, admin: false, areas: r.length && r[0].ativo ? JSON.parse(r[0].areas) : [] };
+  }
+  usuarioDe(ws) { const a = ws.deserializeAttachment() || {}; return a.u ? this.perfil(a.u.chave ? { chave: true } : a.u) : { areas: [] }; }
 
   le(col, desde) {
     const rows = this.sql.exec('SELECT id, x FROM docs WHERE col = ? AND seq > ? ORDER BY seq', col, desde).toArray();
@@ -152,6 +264,19 @@ export class Conta extends DurableObject {
 
   async webSocketMessage(ws, msg) {
     let m; try { m = JSON.parse(msg); } catch (e) { return; }
+    const quem = this.usuarioDe(ws);
+    if (m.t === 'eu') { ws.send(JSON.stringify({ t: 'eu', q: m.q, email: quem.email, admin: !!quem.admin, areas: quem.areas, chave: !!quem.chave })); return; }
+    if (m.t === 'usuarios' || m.t === 'usuario') {
+      if (!quem.admin || quem.chave || quem.transicao) { ws.send(JSON.stringify({ t: 'negado', q: m.q })); return; }
+      if (m.t === 'usuario') {
+        const email = String(m.email || '').trim().toLowerCase();
+        if (email) this.sql.exec('INSERT OR REPLACE INTO usuarios (email, areas, ativo, t) VALUES (?, ?, ?, ?)', email, JSON.stringify((m.areas || []).filter(a => AREAS[a])), m.ativo === false ? 0 : 1, Date.now());
+      }
+      const lista = this.sql.exec('SELECT email, areas, ativo, t FROM usuarios ORDER BY email').toArray().map(r => ({ email: r.email, areas: JSON.parse(r.areas), ativo: !!r.ativo, t: r.t }));
+      ws.send(JSON.stringify({ t: 'usuarios', q: m.q, lista, areas: Object.keys(AREAS) }));
+      return;
+    }
+    if ((m.t === 'sub' || m.t === 'pega') && !pode(quem, m.col, false)) { ws.send(JSON.stringify({ t: 'negado', col: m.col, q: m.q })); return; }
     if (m.t === 'sub') {
       const a = ws.deserializeAttachment() || { subs: [] };
       if (a.subs.indexOf(m.col) < 0) { a.subs.push(m.col); ws.serializeAttachment(a); }
@@ -175,6 +300,7 @@ export class Conta extends DurableObject {
       const porCol = {};
       for (const op of m.ops || []) {
         if (!op || typeof op.col !== 'string' || typeof op.id !== 'string') continue;
+        if (!pode(quem, op.col, true)) continue;
         const x = this.aplica(op);
         (porCol[op.col] = porCol[op.col] || []).push({ id: op.id, x });
       }
@@ -182,7 +308,9 @@ export class Conta extends DurableObject {
       ws.send(JSON.stringify({ t: 'ok', q: m.q, seq: this.seq }));
       for (const outro of this.ctx.getWebSockets()) {
         const a = outro.deserializeAttachment() || { subs: [] };
-        for (const col of Object.keys(porCol)) if (a.subs.indexOf(col) >= 0) { try { outro.send(JSON.stringify({ t: 'docs', col, docs: porCol[col], seq: this.seq })); } catch (e) {} }
+        if (!a.subs.some(c => porCol[c])) continue;
+        const p = this.usuarioDe(outro);
+        for (const col of Object.keys(porCol)) if (a.subs.indexOf(col) >= 0 && pode(p, col, false)) { try { outro.send(JSON.stringify({ t: 'docs', col, docs: porCol[col], seq: this.seq })); } catch (e) {} }
       }
       return;
     }

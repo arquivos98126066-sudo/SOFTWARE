@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Sistema Tapetes</title>
-<script src="https://arquivos98126066-sudo.github.io/SOFTWARE/sync-indicator.js" defer onerror="console.warn('sync-indicator falhou')"></script>
+<script src="./sync-indicator.js" defer onerror="console.warn('sync-indicator falhou')"></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap');
 :root{--laranja:#111111;--escuro:#000000;--bg:#ffffff;--card:#ffffff;--texto:#111111;--cinza:#6b7280;--borda:#d1d5db;--verde:#10b981;--vermelho:#ef4444;--azul:#374151;--amarelo:#4b5563;}
@@ -398,7 +398,7 @@ tbody tr:hover td{background:#fafafa;}
 var db, collection, addDoc, getDocs, updateDoc, deleteDoc, doc, onSnapshot, query, orderBy, writeBatch, getDoc;
 var _firebaseOk = false;
 try {
-  const fbSync = await import("https://arquivos98126066-sudo.github.io/SOFTWARE/firebase-sync.js").catch(()=>null);
+  const fbSync = await import("./firebase-sync.js").catch(()=>null);
   const fbStore = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js").catch(()=>null);
   if(fbSync && fbStore && fbSync.db) {
     db = fbSync.db;

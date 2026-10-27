@@ -8,10 +8,10 @@
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
 <!-- Firebase carregado como módulo separado, expõe funções via window -->
-<script src="https://arquivos98126066-sudo.github.io/SOFTWARE/sync-indicator.js"></script>
+<script src="./sync-indicator.js"></script>
 <script type="module">
 /* login confere como antes; os dados vão pelo servidor único (nv-fs.js) */
-import "https://arquivos98126066-sudo.github.io/SOFTWARE/firebase-sync.js";
+import "./firebase-sync.js";
 import { db, doc, setDoc, onSnapshot } from "./nv-fs.js";
 
 const COL = 'metodo_opa';

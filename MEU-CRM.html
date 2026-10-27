@@ -11,7 +11,7 @@
 <meta name="apple-mobile-web-app-title" content="MEU CRM">
 <title>MEU CRM</title>
 <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@600;700;800&family=DM+Sans:wght@400;500;600;700&family=Outfit:wght@400;500&display=swap" rel="stylesheet">
-<script src="https://arquivos98126066-sudo.github.io/SOFTWARE/sync-indicator.js"></script>
+<script src="./sync-indicator.js"></script>
 <style>
   :root {
     /* ── Variáveis padrão do sistema ── */
@@ -1129,7 +1129,7 @@
 <div class="toast" id="toast"></div>
 
 <script type="module">
-import { db as firestoreDb } from "https://arquivos98126066-sudo.github.io/SOFTWARE/firebase-sync.js";
+import { db as firestoreDb } from "./firebase-sync.js";
 import {
   collection, addDoc, getDocs, updateDoc, deleteDoc, doc, onSnapshot, setDoc, getDoc
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";

@@ -10,7 +10,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@500;600;700;800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-<script src="https://arquivos98126066-sudo.github.io/SOFTWARE/sync-indicator.js"></script>
+<script src="./sync-indicator.js"></script>
 <style>
 :root{
   --bg:#f3f5f8; --card:#fff; --tx:#0f172a; --tx2:#6b7280; --tx3:#9aa3b2; --bd:#e6e9ef; --bd-in:#e5e7eb;
@@ -485,7 +485,7 @@ input[type=date]::-webkit-calendar-picker-indicator{display:none}
 </div>
 
 <script type="module">
-import { db } from "https://arquivos98126066-sudo.github.io/SOFTWARE/firebase-sync.js";
+import { db } from "./firebase-sync.js";
 import { doc, getDoc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 // ===== INDEXEDDB — salva e carrega localmente =====

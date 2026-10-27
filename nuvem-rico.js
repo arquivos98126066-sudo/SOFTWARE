@@ -275,7 +275,7 @@ async function busca() {
   if (lendo || vivo || document.visibilityState === 'hidden' || self.NV_EMU) return;
   lendo = true;
   try {
-    var desde = (ler(JUNTO) && +ler(ST)) || 0, srv = (self.NV_SERVIDOR || 'wss://nv-dados.meusapps.workers.dev').replace(/^ws/, 'http');
+    var desde = (ler(JUNTO) && +ler(ST)) || 0, srv = (self.NV_SERVIDOR || (location.protocol === 'https:' && !/github\.io$/.test(location.hostname) ? 'wss://' + location.host : 'wss://nv-dados.meusapps.workers.dev')).replace(/^ws/, 'http');
     var r = await lim(fetch(srv + '/le?k=nv1-meus-apps&col=' + encodeURIComponent(COL) + '&desde=' + desde, { cache: 'no-store' }), 20000);
     if (!r.ok) throw new Error('leitura ' + r.status);
     var j = await r.json();

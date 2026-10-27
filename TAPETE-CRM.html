@@ -12,7 +12,7 @@
   <meta name="theme-color" content="#111111"/>
   <link rel="manifest" href="data:application/json,{&quot;name&quot;:&quot;Tapetes CRM&quot;,&quot;short_name&quot;:&quot;TapetesCRM&quot;,&quot;display&quot;:&quot;standalone&quot;,&quot;start_url&quot;:&quot;.&quot;,&quot;background_color&quot;:&quot;%23f9fafb&quot;,&quot;theme_color&quot;:&quot;%23111111&quot;,&quot;icons&quot;:[{&quot;src&quot;:&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%23111'/%3E%3Ctext y='.9em' font-size='80' x='10'%3E🏠%3C/text%3E%3C/svg%3E&quot;,&quot;sizes&quot;:&quot;any&quot;,&quot;type&quot;:&quot;image/svg+xml&quot;}]}"/>
   <title>Tapetes CRM</title>
-  <script src="https://arquivos98126066-sudo.github.io/SOFTWARE/sync-indicator.js"></script>
+  <script src="./sync-indicator.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@500;600;700;800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root{
@@ -1499,7 +1499,7 @@
 </div>
 
 <script type="module">
-import { db } from "https://arquivos98126066-sudo.github.io/SOFTWARE/firebase-sync.js";
+import { db } from "./firebase-sync.js";
 import * as _fs from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 /* com a camada única (dados.js) ligada, as gravações antigas na nuvem não acontecem mais: quem sobe é a camada */
 const _nv = !!window.Dados, _ok = () => Promise.resolve({ id: null, exists: () => false, data: () => ({}), forEach() {}, docs: [] });
@@ -6457,7 +6457,7 @@ window.fecharModalRelatorio = function(){
 var db, collection, addDoc, getDocs, updateDoc, deleteDoc, doc, onSnapshot, query, orderBy, writeBatch, getDoc;
 var _firebaseOk = false;
 try {
-  const fbSync = await import("https://arquivos98126066-sudo.github.io/SOFTWARE/firebase-sync.js").catch(()=>null);
+  const fbSync = await import("./firebase-sync.js").catch(()=>null);
   const fbStore = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js").catch(()=>null);
   if(!window.Dados && fbSync && fbStore && fbSync.db) {
     db = fbSync.db;

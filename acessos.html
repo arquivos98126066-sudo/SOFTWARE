@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no">
+<title>Acessos</title>
+<style>
+  html,body{margin:0;background:#f9fafb;color:#111;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}
+  main{max-width:460px;margin:0 auto;padding:22px 16px 40px}
+  h1{font-size:20px;margin:0 0 4px} h2{font-size:15px;margin:22px 0 8px}
+  p{color:#6b7280;font-size:13px;line-height:1.45;margin:0 0 12px}
+  .card{background:#fff;border-radius:14px;padding:14px;box-shadow:0 1px 3px rgba(0,0,0,.08);margin-bottom:10px}
+  input[type=text],input[type=password]{width:100%;box-sizing:border-box;border:1px solid #e5e7eb;border-radius:10px;padding:12px;font-size:15px;margin-bottom:8px;background:#fff}
+  .areas{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 10px}
+  .areas label{border:1px solid #e5e7eb;border-radius:999px;padding:6px 10px;font-size:13px;display:flex;gap:5px;align-items:center}
+  button{border:0;border-radius:10px;padding:12px 14px;font-size:15px;font-weight:600;background:#111;color:#fff;width:100%}
+  button.leve{background:#f3f4f6;color:#111;width:auto;padding:8px 12px;font-size:13px}
+  .linha{display:flex;justify-content:space-between;align-items:center;gap:8px}
+  .email{font-weight:600;font-size:14px;word-break:break-all}
+  .off{opacity:.5} #msg{font-size:13px;margin:8px 0;min-height:18px} .erro{color:#b91c1c} .ok{color:#15803d}
+</style>
+</head>
+<body>
+<main>
+  <h1>Acessos</h1>
+  <p>Cada pessoa entra com o próprio e-mail e senha e só vê as áreas marcadas aqui.</p>
+  <div id="msg"></div>
+  <div class="card">
+    <h2 style="margin-top:0">Nova pessoa</h2>
+    <input type="text" id="email" placeholder="E-mail" autocomplete="off" autocapitalize="none">
+    <input type="text" id="senha" placeholder="Senha inicial (mínimo 6)" autocomplete="off">
+    <div class="areas" id="novaAreas"></div>
+    <button id="criar">Criar acesso</button>
+  </div>
+  <h2>Pessoas</h2>
+  <div id="lista"><p>Carregando...</p></div>
+</main>
+<script type="module">
+/* Só o dono usa esta tela (o servidor recusa os outros). A conta de login é criada no Firebase (mesmo login do menu)
+   e as áreas ficam no servidor. */
+if (!window.NvCanal) await import('./nv-canal.js');
+const C = window.NvCanal, NOMES = { rico: 'Rico', plano: 'Plano', estudo: 'Estudo', crm: 'Meu CRM', tapete: 'Tapete CRM', adm: 'ADM', prevenda: 'Pré-venda', retina: 'Retina', opa: 'Método OPA', workshop: 'Workshop' };
+const $ = id => document.getElementById(id);
+let AREAS = Object.keys(NOMES);
+function msg(t, c) { $('msg').textContent = t; $('msg').className = c || ''; }
+function caixas(sel, marcadas) { return AREAS.map(a => `<label><input type="checkbox" value="${a}" ${marcadas.indexOf(a) >= 0 ? 'checked' : ''}> ${NOMES[a] || a}</label>`).join(''); }
+function marcadas(el) { return [...el.querySelectorAll('input:checked')].map(x => x.value); }
+function esc(s) { return String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]); }
+function mostra(r) {
+  if (!r || r.negado || r.t !== 'usuarios') { $('lista').innerHTML = '<p class="erro">Só o dono pode ver esta tela. Entre pelo menu com o seu e-mail.</p>'; return; }
+  AREAS = r.areas || AREAS;
+  $('novaAreas').innerHTML = caixas('nova', []);
+  $('lista').innerHTML = r.lista.length ? r.lista.map((u, i) => `<div class="card ${u.ativo ? '' : 'off'}" data-i="${i}">
+    <div class="linha"><span class="email">${esc(u.email)}</span><button class="leve" data-acao="ativo">${u.ativo ? 'Bloquear' : 'Liberar'}</button></div>
+    <div class="areas">${caixas('u' + i, u.areas)}</div>
+    <button class="leve" data-acao="salvar">Salvar áreas</button></div>`).join('') : '<p>Ninguém ainda.</p>';
+  $('lista').querySelectorAll('.card').forEach(card => {
+    const u = r.lista[+card.dataset.i];
+    card.querySelector('[data-acao=salvar]').onclick = async () => { mostra(await C.salvaUsuario(u.email, marcadas(card), u.ativo)); msg('Áreas salvas.', 'ok'); };
+    card.querySelector('[data-acao=ativo]').onclick = async () => { mostra(await C.salvaUsuario(u.email, u.areas, !u.ativo)); msg(u.ativo ? 'Bloqueado.' : 'Liberado.', 'ok'); };
+  });
+}
+$('criar').onclick = async () => {
+  const email = $('email').value.trim().toLowerCase(), senha = $('senha').value, areas = marcadas($('novaAreas'));
+  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return msg('E-mail inválido.', 'erro');
+  if (senha.length < 6) return msg('A senha precisa de 6 letras ou mais.', 'erro');
+  msg('Criando...');
+  /* cria a conta de login (se já existir, só libera as áreas) */
+  const r = await fetch('https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyDPJvM-XZWfa8HQ7h8v0Usb1Hf3q8sDqpg', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, password: senha, returnSecureToken: false }) }).then(x => x.json()).catch(e => ({ error: { message: e.message } }));
+  const existe = r.error && /EMAIL_EXISTS/.test(r.error.message);
+  if (r.error && !existe) return msg('Não consegui criar o login: ' + r.error.message, 'erro');
+  mostra(await C.salvaUsuario(email, areas, true));
+  $('email').value = ''; $('senha').value = '';
+  msg(existe ? 'Esse e-mail já tinha login: áreas liberadas.' : 'Acesso criado. Passe o e-mail e a senha para a pessoa.', 'ok');
+};
+mostra(await C.usuarios());
+</script>
+</body>
+</html>

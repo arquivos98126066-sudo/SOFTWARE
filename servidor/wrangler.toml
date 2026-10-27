@@ -2,6 +2,14 @@ name = "nv-dados"
 main = "index.js"
 compatibility_date = "2025-09-01"
 workers_dev = true
+routes = [{ pattern = "apps.v4cless.com/*", zone_name = "v4cless.com" }]
+
+# os apps (a mesma pasta que o GitHub mostra); /ws, /le e /admin vão para o código
+[assets]
+directory = ".."
+binding = "ASSETS"
+html_handling = "none"
+not_found_handling = "none"
 
 [[durable_objects.bindings]]
 name = "CONTA"
@@ -16,3 +24,7 @@ crons = ["*/30 * * * *"]
 
 [observability]
 enabled = true
+
+[[r2_buckets]]
+binding = "MIDIA"
+bucket_name = "arquivos"

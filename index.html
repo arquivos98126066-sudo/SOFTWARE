@@ -529,7 +529,7 @@ input { -webkit-user-select: text; user-select: text; }
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
 
-  onAuthStateChanged(auth, u => (u && !u.isAnonymous) ? mostrarApp() : mostrarLogin());
+  onAuthStateChanged(auth, u => (u && !u.isAnonymous) ? mostrarApp(u) : mostrarLogin());
 
   window.fazerLogin = async function () {
     const email   = document.getElementById('email-input').value;
@@ -553,10 +553,23 @@ input { -webkit-user-select: text; user-select: text; }
     }
   };
 
-  window.fazerLogout = async function () { await signOut(auth); };
+  window.fazerLogout = async function () { try { localStorage.removeItem('nv.rt'); } catch (e) {} if (window.NvCanal) NvCanal.sair(); await signOut(auth); };
 
-  function mostrarApp() {
-    try { localStorage.setItem('menu_logado', '1'); } catch (e) {}
+  /* cada pessoa só abre as áreas liberadas para ela (quem libera é o servidor; aqui só avisa no toque) */
+  var AREA = { 'TAPETE-CRM.html': 'tapete', 'MEU-CRM.html': 'crm', 'DOA.html': 'plano', 'ADM.html': 'adm', 'RICO.html': 'rico', 'LER.html': 'estudo' };
+  async function liberaAreas() {
+    try {
+      if (!window.NvCanal) await import('./nv-canal.js');
+      var eu = await NvCanal.eu(); if (!eu || eu.admin) return;
+      document.querySelectorAll('a.menu-link').forEach(function (a) {
+        var ar = AREA[a.getAttribute('href')]; if (!ar || eu.areas.indexOf(ar) >= 0) return;
+        a.addEventListener('click', function (e) { e.preventDefault(); e.stopImmediatePropagation(); alert('Sem acesso a esta área.'); }, true);
+      });
+    } catch (e) {}
+  }
+  function mostrarApp(u) {
+    try { localStorage.setItem('menu_logado', '1'); if (u && u.refreshToken) localStorage.setItem('nv.rt', u.refreshToken); } catch (e) {}
+    liberaAreas();
     document.getElementById('lock-screen').classList.remove('show');
     document.getElementById('app-content').classList.add('show');
   }
