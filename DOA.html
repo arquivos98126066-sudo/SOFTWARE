@@ -2872,12 +2872,21 @@ abrirProcesso();
       'var s={getItem:function(k){k=String(k);return Object.prototype.hasOwnProperty.call(d,k)?d[k]:null},setItem:function(k,v){k=String(k);d[k]=String(v);m(k,d[k])},removeItem:function(k){k=String(k);delete d[k];m(k,null)},key:function(i){return Object.keys(d)[i]||null},clear:function(){Object.keys(d).forEach(function(k){m(k,null)});d={}}};' +
       'Object.defineProperty(s,"length",{get:function(){return Object.keys(d).length}});try{Object.defineProperty(window,"localStorage",{value:s,configurable:true})}catch(e){}' +
       'addEventListener("message",function(e){if(!e.data||!e.data.nvPede)return;var a=document.activeElement,st=window.__planoLe?window.__planoLe():{y:scrollY};parent.postMessage({nvEstado:{y:st.y||0,s:st.s||[],c:[],f:[]},nvFoco:!!(a&&a!==document.body&&(/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName)||a.isContentEditable))},"*")});})();<\/script>';
-    html = /<head[^>]*>/i.test(html) ? html.replace(/<head[^>]*>/i, function(m){ return m + ls; }) : ls + html;
+    /* ponte para o robô local (porta 8787): o HTML aberto aqui roda isolado e não alcança o celular; quem pede é o Plano */
+    var br = '<script>(function(){var of=window.fetch,n=0,p={};window.fetch=function(u,o){var s=String(u&&u.url||u);if(!/^http:\\/\\/(127\\.0\\.0\\.1|localhost):8787(\\/|$)/.test(s))return of.apply(this,arguments);return new Promise(function(res,rej){var id=++n;p[id]=[res,rej];parent.postMessage({nvLocal:1,id:id,url:s,method:(o&&o.method)||"GET"},"*")})};' +
+      'addEventListener("message",function(e){var d=e.data;if(!d||!d.nvLocalR||!p[d.id])return;var q=p[d.id];delete p[d.id];if(d.erro)q[1](new TypeError("Failed to fetch"));else q[0](new Response(d.corpo,{status:d.status,headers:{"content-type":d.tipo||"text/plain"}}))})})();<\/script>';
+    html = /<head[^>]*>/i.test(html) ? html.replace(/<head[^>]*>/i, function(m){ return m + ls + br; }) : ls + br + html;
     return html + tag;
   };
   window.addEventListener('message', function(e){
     var fr = document.getElementById('html-view-frame');
     if (!fr || e.source !== fr.contentWindow || !e.data) return;
+    if (e.data.nvLocal){
+      var lu = String(e.data.url || ''), lid = e.data.id, lrep = function(o){ try { fr.contentWindow.postMessage(Object.assign({nvLocalR: 1, id: lid}, o), '*'); } catch(x){} };
+      if (!/^http:\/\/(127\.0\.0\.1|localhost):8787(\/[a-z]*)?$/.test(lu)) { lrep({erro: 1}); return; }
+      fetch(lu, {method: e.data.method === 'POST' ? 'POST' : 'GET'}).then(function(r){ return r.text().then(function(t){ lrep({status: r.status, corpo: t, tipo: r.headers.get('content-type') || ''}); }); }).catch(function(){ lrep({erro: 1}); });
+      return;
+    }
     if (e.data.nvLs){ try { var kk = 'ph:' + String(e.data.k).slice(0, 200); if (e.data.v == null) localStorage.removeItem(kk); else localStorage.setItem(kk, String(e.data.v)); } catch(x){} return; }
     if (e.data.planoPronto){ fr.style.visibility = ''; }
     if (e.data.planoE) _htmlE = e.data.planoE;

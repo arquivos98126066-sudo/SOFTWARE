@@ -127,3 +127,6 @@ Lista do que deu errado ao deixar os apps rápidos, firmes e sem piscar, e a sol
 - HTML aberto dentro do Plano: guarda em `ph:*` pelo Plano e se atualiza montando a versão nova por trás.
 - Service worker: código (html, js, json) vem da rede primeiro (até 1,5 s), cache só sem rede; imagens do cache. Subir o número do cache a cada publicação.
 - Testes: servidor local (`npx wrangler dev` na pasta `servidor/`, com `.dev.vars` só no teste) e dois navegadores (scripts de teste na sessão), campo por campo, com tempo medido; depois conferir no retrato `cf_estado/agora` que cada celular gravou.
+
+## 6. Plano e o robô local de WhatsApp (permanente, 2026-10-31)
+- HTML aberto no Plano roda isolado (iframe com sandbox) e não alcança o celular. Por isso o Plano tem uma ponte: dentro do HTML, `fetch('http://127.0.0.1:8787/...')` é repassado ao Plano (`nvLocal`), que faz o pedido e devolve a resposta. Só a porta 8787 (robô de WhatsApp do Termux), só GET e POST. O service worker não mexe em pedidos para 127.0.0.1 e localhost. O navegador pode pedir uma vez a permissão de rede local para o endereço do app. Teste local ok; no celular do Klebson: não confirmei.

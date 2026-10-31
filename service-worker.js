@@ -1,4 +1,4 @@
-const CACHE_NAME = 'meus-apps-v355';
+const CACHE_NAME = 'meus-apps-v356';
 // HTMLs enviados pelo menu (segurar o app > Enviar um novo): ficam fora da limpeza de versões antigas
 const ENVIADOS = 'apps-enviados';
 
@@ -70,6 +70,7 @@ self.addEventListener('fetch', event => {
     url.hostname === 'identitytoolkit.googleapis.com' ||
     url.hostname === 'securetoken.googleapis.com' ||
     url.hostname === 'firestore.googleapis.com' ||
+    url.hostname === '127.0.0.1' || url.hostname === 'localhost' ||
     event.request.method !== 'GET'
   ) {
     return;
