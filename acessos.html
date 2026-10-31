@@ -57,6 +57,7 @@
   #msg{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:#0f172a;color:#fff;font-size:13px;font-weight:600;padding:11px 16px;border-radius:99px;opacity:0;pointer-events:none;transition:opacity .2s;max-width:90%;text-align:center;z-index:20}
   #msg.ve{opacity:1}#msg.erro{background:#b91c1c}
   .vazio{color:#94a3b8;font-size:14px;padding:30px 0;text-align:center}
+.quem.ed .av{box-shadow:0 0 0 3px #fff,0 0 0 5px #2563eb}.quem.ed b{color:#2563eb}
 </style>
 </head>
 <body>
@@ -104,6 +105,7 @@ function msg(t, c) { const m = $('msg'); m.textContent = t; m.className = 've' +
 function esc(s) { return String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]); }
 function ini(e) { return (e || '?').charAt(0).toUpperCase(); }
 function usuario() { return R && R.lista.find(u => u.email === sel); }
+let editando = false;
 function tem(u, app, parte) { return u.areas.indexOf(app) >= 0 || u.areas.indexOf(app + ':' + parte) >= 0; }
 
 const ICONES = {
@@ -141,7 +143,7 @@ function desenha() {
   if (!sel || !usuario()) sel = R.lista.length ? R.lista[0].email : null;
   const u = usuario();
   $('topo').innerHTML =
-    (u ? '<button class="quem" id="abreLista"><div class="av ' + (u.ativo ? '' : 'off') + '">' + ini(u.email) + '</div><b>' + esc(u.email) + '</b>' + SVG.seta + '</button><button class="ic" id="abreSenha" aria-label="Senha">' + SVG.chave + '</button>' : '<span style="flex:1"></span>') +
+    (u ? '<button class="quem' + (editando ? ' ed' : '') + '" id="abreLista"><div class="av ' + (u.ativo ? '' : 'off') + '">' + ini(u.email) + '</div><b>' + esc(u.email) + '</b>' + SVG.seta + '</button><button class="ic" id="abreSenha" aria-label="Senha">' + SVG.chave + '</button>' : '<span style="flex:1"></span>') +
     '<button class="ic novo" id="abreNovo" aria-label="Nova pessoa">' + SVG.mais + '</button>';
   $('partes').innerHTML = !u ? '<div class="fant"><div class="fa"><i></i><i></i><i></i></div><div class="ln"></div><div class="ln"></div></div>' : R.apps.map(a => {
     const lig = a.partes.filter(p => tem(u, a.id, p.id)).length;
@@ -150,16 +152,16 @@ function desenha() {
   if ($('abreLista')) {
     let tm = null, longo = false, x0 = 0, y0 = 0;
     const q = $('abreLista');
-    q.onpointerdown = e => { longo = false; x0 = e.clientX; y0 = e.clientY; clearTimeout(tm); tm = setTimeout(() => { longo = true; if (navigator.vibrate) { try { navigator.vibrate(15); } catch (x) {} } copiaConvite(); }, 550); };
+    q.onpointerdown = e => { longo = false; x0 = e.clientX; y0 = e.clientY; clearTimeout(tm); tm = setTimeout(() => { longo = true; if (navigator.vibrate) { try { navigator.vibrate(15); } catch (x) {} } editando = !editando; if (editando) msg('Modo edição'); else copiaConvite(); desenha(); }, 550); };
     q.onpointermove = e => { if (Math.abs(e.clientX - x0) + Math.abs(e.clientY - y0) > 10) clearTimeout(tm); };
     ['onpointerup', 'onpointercancel', 'onpointerleave'].forEach(k => { q[k] = () => clearTimeout(tm); });
     q.oncontextmenu = e => e.preventDefault();
-    q.onclick = () => { if (longo) { longo = false; return; } abrePessoas(); };
+    q.onclick = () => { if (longo) { longo = false; return; } if (editando) { editando = false; copiaConvite(); desenha(); return; } abrePessoas(); };
   }
   if ($('abreSenha')) $('abreSenha').onclick = () => { $('bloqueia').classList.toggle('bloq', !u.ativo); $('nova').value = ''; $('fSenha').classList.add('abre'); };
   $('abreNovo').onclick = () => { $('email').value = ''; $('senha').value = ''; $('fNovo').classList.add('abre'); };
   $('partes').querySelectorAll('.ah').forEach(b => { b.onclick = () => { const k = b.dataset.abre; abertos[k] = !abertos[k]; b.parentNode.classList.toggle('abre', !!abertos[k]); }; });
-  $('partes').querySelectorAll('.cp').forEach(b => { b.onclick = () => alterna(b.dataset.a, b.dataset.p, !b.classList.contains('on')); });
+  $('partes').querySelectorAll('.cp').forEach(b => { b.onclick = () => { if (!editando) { msg('Segure o nome para editar'); return; } alterna(b.dataset.a, b.dataset.p, !b.classList.contains('on')); }; });
 }
 /* escolher a pessoa: tela toda branca, cada pessoa num cartão solto; ao escolher, volta ao normal */
 function abrePessoas() {
