@@ -58,6 +58,7 @@
   #msg.ve{opacity:1}#msg.erro{background:#b91c1c}
   .vazio{color:#94a3b8;font-size:14px;padding:30px 0;text-align:center}
 .quem.ed .av{box-shadow:0 0 0 3px #fff,0 0 0 5px #2563eb}.quem.ed b{color:#2563eb}
+body{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}input,textarea{-webkit-user-select:text;user-select:text}
 </style>
 </head>
 <body>
@@ -173,10 +174,12 @@ function abrePessoas() {
 async function copiaConvite() {
   const u = usuario(); if (!u) return;
   const ap = R.apps.map(x => { const l = x.partes.filter(p => tem(u, x.id, p.id)); return l.length ? x.nome + (l.length === x.partes.length ? '' : ' (' + l.map(p => p.nome).join(', ') + ')') : ''; }).filter(Boolean);
+  if (!ap.length) { $('msg').className = ''; return; }
   const texto = 'https://apps.v4cless.com\nE-mail: ' + u.email + (ap.length ? '\nAcesso: ' + ap.join(', ') : '');
   try { await navigator.clipboard.writeText(texto); msg('Convite copiado'); }
   catch (e) { const t = document.createElement('textarea'); t.value = texto; document.body.appendChild(t); t.select(); try { document.execCommand('copy'); msg('Convite copiado'); } catch (x) { msg('Não consegui copiar', 'erro'); } t.remove(); }
 }
+document.addEventListener('selectstart', e => { const t = e.target && e.target.nodeType === 1 ? e.target : e.target && e.target.parentElement; if (!t || !t.closest || !t.closest('input,textarea')) e.preventDefault(); });
 $('branco').onclick = () => $('branco').classList.remove('abre');
 async function alterna(app, parte, liga) {
   const u = usuario(), a = R.apps.find(x => x.id === app);
