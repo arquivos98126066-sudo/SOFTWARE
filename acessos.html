@@ -177,8 +177,8 @@ async function copiaConvite() {
   const ap = R.apps.map(x => { const l = x.partes.filter(p => tem(u, x.id, p.id)); return l.length ? x.nome + (l.length === x.partes.length ? '' : ' (' + l.map(p => p.nome).join(', ') + ')') : ''; }).filter(Boolean);
   if (!ap.length) { $('msg').className = ''; return; }
   const texto = u.email;
-  try { await navigator.clipboard.writeText(texto); msg('Convite copiado'); }
-  catch (e) { const t = document.createElement('textarea'); t.value = texto; document.body.appendChild(t); t.select(); try { document.execCommand('copy'); msg('Convite copiado'); } catch (x) { msg('Não consegui copiar', 'erro'); } t.remove(); }
+  try { await navigator.clipboard.writeText(texto); }
+  catch (e) { const t = document.createElement('textarea'); t.value = texto; document.body.appendChild(t); t.select(); try { document.execCommand('copy'); } catch (x) { msg('Não consegui copiar', 'erro'); } t.remove(); }
 }
 document.addEventListener('selectstart', e => { const t = e.target && e.target.nodeType === 1 ? e.target : e.target && e.target.parentElement; if (!t || !t.closest || !t.closest('input,textarea')) e.preventDefault(); });
 $('branco').onclick = () => $('branco').classList.remove('abre');
