@@ -863,7 +863,7 @@ async function p_initFirebase(){
     const auth = getAuth(appLogin);
 
     /* o login confere por trás e não segura os dados; só volta ao menu se nunca entrou */
-    onAuthStateChanged(auth, function(user){ if(!(user && !user.isAnonymous)){ var ok = false; try { ok = localStorage.getItem('menu_logado') === '1' || !!localStorage.getItem('nv.rt'); } catch(e){} if(!ok) location.replace('index.html'); } });
+    onAuthStateChanged(auth, function(user){ if(!(user && !user.isAnonymous)){ var ok = false; try { ok = localStorage.getItem('menu_logado') === '1' || !!localStorage.getItem('nv.rt') || !!localStorage.getItem('nv.rt2'); } catch(e){} if(!ok) location.replace('index.html'); } });
 
     /* camada única (dados.js): cada processo e pasta é um item na nuvem; dois aparelhos mexendo em processos diferentes não se apagam */
     if(window.Dados){

@@ -19,6 +19,16 @@
   function pegaPasse() {
     if (window.NV_TOKEN_TESTE) return Promise.resolve(window.NV_TOKEN_TESTE);
     if (passe && Date.now() < passeAte - 120000) return Promise.resolve(passe);
+    /* login novo (Cloudflare): passe de 1 hora trocado pela chave de renovação guardada; sem ela, o caminho antigo (Firebase) */
+    var rt2 = lerLs('nv.rt2');
+    if (rt2) {
+      return Promise.race([fetch(SRV.replace(/^ws/, 'http') + '/auth/refresh', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ refresh: rt2 }) }).then(function (r) { if (r.status === 401) { try { localStorage.removeItem('nv.rt2'); } catch (e) {} return 'caiu'; } return r.ok ? r.json() : null; }), new Promise(function (ok) { setTimeout(function () { ok(null); }, 8000); })])
+        .then(function (j) {
+          if (j && j.token) { passe = j.token; passeAte = Date.now() + (+j.expira || 3600) * 1000; try { if (j.refresh) localStorage.setItem('nv.rt2', j.refresh); } catch (e) {} return passe; }
+          return j === 'caiu' ? pegaPasse() : null;
+        })
+        .catch(function () { return null; });
+    }
     var rt = lerLs('nv.rt'); if (!rt) return Promise.resolve(null);
     return Promise.race([fetch('https://securetoken.googleapis.com/v1/token?key=' + CH, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: 'grant_type=refresh_token&refresh_token=' + encodeURIComponent(rt) }).then(function (r) { return r.ok ? r.json() : null; }), new Promise(function (ok) { setTimeout(function () { ok(null); }, 8000); })])
       .then(function (j) { if (!j || !j.id_token) return null; passe = j.id_token; passeAte = Date.now() + (+j.expires_in || 3600) * 1000; try { if (j.refresh_token) localStorage.setItem('nv.rt', j.refresh_token); } catch (e) {} return passe; })
@@ -96,6 +106,8 @@
     negada: function (col) { return !!negadas[col]; },
     /* pedido comum ao servidor (fotos), com o mesmo login */
     http: function (caminho, op) { return pegaPasse().then(function (t) { return fetch(SRV.replace(/^ws/, 'http') + caminho + (caminho.indexOf('?') < 0 ? '?' : '&') + 'k=nv1-meus-apps' + (t ? '&t=' + encodeURIComponent(t) : ''), op); }); },
+    /* passe de acesso atual (login novo ou antigo), para telas que falam direto com o servidor */
+    passe: function () { return pegaPasse(); },
     sair: function () { passe = null; passeAte = 0; try { ws && ws.close(); } catch (e) {} },
     vivo: function () { return aberto; },
     estado: function (f) { ouvintes.push(f); },

@@ -529,7 +529,10 @@ input { -webkit-user-select: text; user-select: text; }
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
 
-  onAuthStateChanged(auth, u => (u && !u.isAnonymous) ? mostrarApp(u) : mostrarLogin());
+  /* login novo (Cloudflare, 2026-10-31): vale junto com o do Firebase até todos entrarem pelo novo */
+  const BASE_AUTH = /github\.io$/.test(location.hostname) ? 'https://nv-dados.meusapps.workers.dev' : '';
+  const temNovo = () => { try { return !!localStorage.getItem('nv.rt2'); } catch (e) { return false; } };
+  onAuthStateChanged(auth, u => (u && !u.isAnonymous) ? mostrarApp(u) : temNovo() ? mostrarApp(null) : mostrarLogin());
 
   window.fazerLogin = async function () {
     const email   = document.getElementById('email-input').value;
@@ -541,6 +544,17 @@ input { -webkit-user-select: text; user-select: text; }
     loading.classList.add('show');
     btn.disabled = true;
     try {
+      /* 1º o login novo (Cloudflare); se a pessoa ainda não tem senha nova, o do Firebase */
+      let novo = null;
+      try {
+        const r = await fetch(BASE_AUTH + '/auth/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: email.trim(), senha }) });
+        if (r.ok) novo = await r.json();
+      } catch (e) {}
+      if (novo && novo.refresh) {
+        try { localStorage.setItem('nv.rt2', novo.refresh); localStorage.setItem('nv.email2', novo.email || ''); } catch (e) {}
+        mostrarApp(null);
+        return;
+      }
       await signInWithEmailAndPassword(auth, email, senha);
     } catch (e) {
       erro.classList.add('show');
@@ -553,7 +567,7 @@ input { -webkit-user-select: text; user-select: text; }
     }
   };
 
-  window.fazerLogout = async function () { try { localStorage.removeItem('nv.rt'); } catch (e) {} if (window.NvCanal) NvCanal.sair(); await signOut(auth); };
+  window.fazerLogout = async function () { try { localStorage.removeItem('nv.rt'); localStorage.removeItem('nv.rt2'); localStorage.removeItem('nv.email2'); } catch (e) {} if (window.NvCanal) NvCanal.sair(); try { await signOut(auth); } catch (e) {} mostrarLogin(); };
 
   /* cada pessoa só abre as áreas liberadas para ela (quem libera é o servidor; aqui só avisa no toque) */
   var AREA = { 'TAPETE-CRM.html': 'tapete', 'MEU-CRM.html': 'crm', 'DOA.html': 'plano', 'ADM.html': 'adm', 'RICO.html': 'rico', 'LER.html': 'estudo' };
