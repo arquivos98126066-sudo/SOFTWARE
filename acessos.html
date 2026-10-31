@@ -30,9 +30,18 @@
   .fundo.abre{display:flex}
   .folha{background:#fff;width:100%;max-width:460px;border-radius:24px 24px 0 0;padding:22px 20px 26px}
   .folha h2{font-size:17px;margin:0 0 14px;font-weight:700}
-  .folha input{width:100%;border:1px solid #e2e8f0;border-radius:14px;padding:14px;font:inherit;font-size:15px;margin-bottom:10px}
-  .bt{display:block;width:100%;text-align:center;background:#0f172a;color:#fff;border:0;border-radius:14px;padding:14px;font:inherit;font-weight:700;font-size:14px;margin-top:6px;cursor:pointer}
-  .bt.leve{background:#f1f5f9;color:#0f172a}
+  .gr{width:40px;height:4px;border-radius:9px;background:#e2e8f0;margin:-8px auto 16px}
+  .f{display:flex;align-items:center;gap:10px;border:1px solid #e2e8f0;border-radius:16px;padding:0 14px;height:52px;margin-bottom:10px;background:#f8fafc}
+  .f:focus-within{border-color:#0f172a;background:#fff}
+  .f svg{flex:none}
+  .f input{flex:1;min-width:0;border:0;outline:0;background:transparent;font:inherit;font-size:15px;color:#0f172a;padding:0;height:100%}
+  .bt{display:flex;align-items:center;justify-content:center;gap:8px;height:52px}
+  .fant{display:flex;flex-direction:column;align-items:center;padding-top:90px}
+  .fant .fa{display:flex}.fant .fa i{width:64px;height:64px;border-radius:50%;background:#f1f5f9;border:3px solid #fff;margin-left:-10px}
+  .fant .fa i:first-child{margin-left:0}
+  .fant .ln{height:6px;border-radius:9px;background:#f1f5f9;margin-top:22px;width:72px}.fant .ln+.ln{margin-top:8px;width:46px}
+  .bt{width:100%;background:#0f172a;color:#fff;border:0;border-radius:16px;font:inherit;font-weight:700;font-size:15px;margin-top:8px;cursor:pointer}
+  .bt.leve{background:#f1f5f9;color:#475569}
   .bt.perigo{background:#fff;color:#b91c1c;border:1px solid #fee2e2}
   #msg{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:#0f172a;color:#fff;font-size:13px;font-weight:600;padding:11px 16px;border-radius:99px;opacity:0;pointer-events:none;transition:opacity .2s;max-width:90%;text-align:center;z-index:20}
   #msg.ve{opacity:1}#msg.erro{background:#b91c1c}
@@ -46,19 +55,20 @@
 </main>
 
 <div class="fundo" id="fSenha"><div class="folha">
+  <div class="gr"></div>
   <h2 id="tSenha">Senha</h2>
-  <input type="text" id="nova" placeholder="Nova senha (mínimo 8)" autocomplete="off" autocapitalize="none">
-  <button class="bt" id="defSenha">Definir senha</button>
+  <div class="f"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="3"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg><input type="text" id="nova" placeholder="Nova senha (mínimo 8)" autocomplete="off" autocapitalize="none"></div>
+  <button class="bt" id="defSenha"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"/></svg>Definir senha</button>
   <button class="bt perigo" id="bloqueia">Bloquear</button>
-  <button class="bt leve" data-fecha>Fechar</button>
+  <button class="bt leve" data-fecha><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>Fechado</button>
 </div></div>
 
 <div class="fundo" id="fNovo"><div class="folha">
-  <h2>Nova pessoa</h2>
-  <input type="text" id="email" placeholder="E-mail" autocomplete="off" autocapitalize="none">
-  <input type="text" id="senha" placeholder="Senha (mínimo 8)" autocomplete="off" autocapitalize="none">
-  <button class="bt" id="criar">Criar</button>
-  <button class="bt leve" data-fecha>Fechar</button>
+  <div class="gr"></div>
+  <div class="f"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="m4 8 8 6 8-6"/></svg><input type="text" id="email" placeholder="E-mail" autocomplete="off" autocapitalize="none"></div>
+  <div class="f"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="3"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg><input type="text" id="senha" placeholder="Senha (mínimo 8)" autocomplete="off" autocapitalize="none"></div>
+  <button class="bt" id="criar"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"/></svg>Criando</button>
+  <button class="bt leve" data-fecha><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>Fechado</button>
 </div></div>
 
 <div id="msg"></div>
@@ -87,10 +97,10 @@ function desenha() {
   if (!sel || !usuario()) sel = R.lista.length ? R.lista[0].email : null;
   const u = usuario();
   $('topo').innerHTML =
-    (u ? '<button class="quem" id="abreLista"><div class="av ' + (u.ativo ? '' : 'off') + '">' + ini(u.email) + '</div><b>' + esc(u.email) + '</b>' + SVG.seta + '</button><button class="ic" id="abreSenha" aria-label="Senha">' + SVG.chave + '</button>' : '<b style="flex:1;color:#94a3b8;font-weight:500">Ninguém ainda</b>') +
+    (u ? '<button class="quem" id="abreLista"><div class="av ' + (u.ativo ? '' : 'off') + '">' + ini(u.email) + '</div><b>' + esc(u.email) + '</b>' + SVG.seta + '</button><button class="ic" id="abreSenha" aria-label="Senha">' + SVG.chave + '</button>' : '<span style="flex:1"></span>') +
     '<button class="ic novo" id="abreNovo" aria-label="Nova pessoa">' + SVG.mais + '</button>' +
     '<div class="lista" id="lista">' + R.lista.map(p => '<button data-e="' + esc(p.email) + '"><div class="av ' + (p.ativo ? '' : 'off') + '" style="width:32px;height:32px;font-size:14px">' + ini(p.email) + '</div>' + esc(p.email) + (p.ativo ? '' : '<small>bloqueado</small>') + '</button>').join('') + '</div>';
-  $('partes').innerHTML = !u ? '' : R.apps.map(a => '<div class="sec">' + esc(a.nome) + '</div>' + a.partes.map(p => '<div class="li"><b>' + esc(p.nome) + '</b><button class="sw ' + (tem(u, a.id, p.id) ? 'on' : '') + '" data-a="' + a.id + '" data-p="' + p.id + '" aria-label="' + esc(p.nome) + '"></button></div>').join('')).join('');
+  $('partes').innerHTML = !u ? '<div class="fant"><div class="fa"><i></i><i></i><i></i></div><div class="ln"></div><div class="ln"></div></div>' : R.apps.map(a => '<div class="sec">' + esc(a.nome) + '</div>' + a.partes.map(p => '<div class="li"><b>' + esc(p.nome) + '</b><button class="sw ' + (tem(u, a.id, p.id) ? 'on' : '') + '" data-a="' + a.id + '" data-p="' + p.id + '" aria-label="' + esc(p.nome) + '"></button></div>').join('')).join('');
   if ($('abreLista')) $('abreLista').onclick = () => $('lista').classList.toggle('abre');
   if ($('abreSenha')) $('abreSenha').onclick = () => { $('tSenha').textContent = u.email; $('bloqueia').textContent = u.ativo ? 'Bloquear' : 'Liberar'; $('nova').value = ''; $('fSenha').classList.add('abre'); };
   $('abreNovo').onclick = () => { $('email').value = ''; $('senha').value = ''; $('fNovo').classList.add('abre'); };
