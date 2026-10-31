@@ -14,23 +14,52 @@
 import { DurableObject } from 'cloudflare:workers';
 
 const CHAVE_APP = 'nv1-meus-apps';
-/* cada coleção pertence a uma área; a pessoa só vê as áreas liberadas para ela */
-const AREAS = {
-  rico: ['rico_vivo', 'born_rich'], plano: ['plano', 'v2_plano_procs'], estudo: ['estudo'],
-  crm: ['crm', /^v2_crm_/], tapete: ['tapete', /^v2_tap_/], adm: [/^v2_adm_/],
-  prevenda: ['pre_venda', 'prevenda_lixeira'], retina: ['painel_ia'], opa: ['metodo_opa'], workshop: [/^launcher_/]
+/* Apps novos já nascem prontos: coleção "app_<nome>" (ou "app_<nome>_<parte>") vira o app <nome> com a parte <parte> (ou "tudo"),
+   sem mexer aqui. Os nomes bonitos e as partes dos apps antigos ficam em APPS. */
+const APPS = {
+  rico: { nome: 'Rico', partes: { tudo: ['Mapas e processos', ['rico_vivo', 'born_rich']] } },
+  plano: { nome: 'Plano', partes: { tudo: ['Processos', ['plano', 'v2_plano_procs']] } },
+  estudo: { nome: 'Estudo', partes: { tudo: ['Estudos', ['estudo']] } },
+  crm: { nome: 'Meu CRM', partes: { contatos: ['Contatos', ['crm', 'v2_crm_contatos']], agenda: ['Agenda', ['v2_crm_agenda']], reunioes: ['Reuniões', ['v2_crm_reunioes']], ativos: ['Ativos', ['v2_crm_ativos']], arquivo: ['Arquivo', ['v2_crm_arquivo']] } },
+  tapete: { nome: 'Tapete CRM', partes: { clientes: ['Clientes', ['tapete', 'v2_tap_clientes']], pedidos: ['Pedidos', ['v2_tap_pedidos']], ruas: ['Ruas', ['v2_tap_ruas']], cadastro: ['Cadastro', ['v2_tap_cadastro']], config: ['Configuração', ['v2_tap_config']] } },
+  adm: { nome: 'ADM', partes: { lancamentos: ['Lançamentos', ['v2_adm_lanc']], config: ['Configuração', ['v2_adm_config']] } },
+  prevenda: { nome: 'Pré-venda', partes: { tudo: ['Tudo', ['pre_venda', 'prevenda_lixeira']] } },
+  retina: { nome: 'Retina', partes: { tudo: ['Tudo', ['painel_ia']] } },
+  opa: { nome: 'Método OPA', partes: { tudo: ['Tudo', ['metodo_opa']] } },
+  workshop: { nome: 'Workshop', partes: { tudo: ['Tudo', [/^launcher_/]] } }
 };
-function areaDe(col) {
-  if (col === 'diag' || col === 'v2_conflitos') return 'sistema';
-  for (const a of Object.keys(AREAS)) if (AREAS[a].some(x => typeof x === 'string' ? x === col : x.test(col))) return a;
-  return 'outros';
+function casa(x, col) { return typeof x === 'string' ? x === col : x.test(col); }
+/* devolve [app, parte] da coleção, ou ['outros', null] */
+function lugarDe(col) {
+  if (col === 'diag' || col === 'v2_conflitos') return ['sistema', null];
+  for (const a of Object.keys(APPS)) for (const p of Object.keys(APPS[a].partes)) if (APPS[a].partes[p][1].some(x => casa(x, col))) return [a, p];
+  /* o que sobrou do mesmo app (coleções v2_crm_*, v2_tap_*, v2_adm_* novas) vale para o app todo */
+  if (/^v2_crm_/.test(col)) return ['crm', null];
+  if (/^v2_tap_/.test(col)) return ['tapete', null];
+  if (/^v2_adm_/.test(col)) return ['adm', null];
+  const m = /^app_([a-z0-9]+)(?:_([a-z0-9_]+))?$/.exec(col);
+  if (m) return [m[1], m[2] || 'tudo'];
+  return ['outros', null];
 }
-/* sistema: todos gravam (diagnóstico e conflitos), só o dono lê */
+function areaDe(col) { return lugarDe(col)[0]; }
+/* sistema: todos gravam (diagnóstico e conflitos), só o dono lê. A pessoa entra se tem o app todo ("crm") ou aquela parte ("crm:agenda") */
 function pode(u, col, grava) {
   if (u.admin) return true;
-  const a = areaDe(col);
+  const [a, p] = lugarDe(col);
   if (a === 'sistema') return !!grava;
-  return u.areas.indexOf(a) >= 0;
+  if (u.areas.indexOf(a) >= 0) return true;
+  return !!p && u.areas.indexOf(a + ':' + p) >= 0;
+}
+function appsParaTela(colunas) {
+  const o = {};
+  for (const a of Object.keys(APPS)) o[a] = { id: a, nome: APPS[a].nome, partes: Object.keys(APPS[a].partes).map(p => ({ id: p, nome: APPS[a].partes[p][0] })) };
+  for (const col of colunas) {
+    const m = /^app_([a-z0-9]+)(?:_([a-z0-9_]+))?$/.exec(col); if (!m) continue;
+    const a = o[m[1]] || (o[m[1]] = { id: m[1], nome: m[1].charAt(0).toUpperCase() + m[1].slice(1), partes: [] });
+    const p = m[2] || 'tudo';
+    if (!a.partes.some(x => x.id === p)) a.partes.push({ id: p, nome: p === 'tudo' ? 'Tudo' : p.charAt(0).toUpperCase() + p.slice(1).replace(/_/g, ' ') });
+  }
+  return Object.keys(o).map(k => o[k]);
 }
 
 /* confere o login do Firebase: assinatura do Google, projeto e validade */
@@ -147,6 +176,8 @@ export class Conta extends DurableObject {
     this.sql.exec('CREATE TABLE IF NOT EXISTS docs (col TEXT NOT NULL, id TEXT NOT NULL, x TEXT NOT NULL, seq INTEGER NOT NULL, PRIMARY KEY (col, id))');
     this.sql.exec('CREATE INDEX IF NOT EXISTS docs_seq ON docs (col, seq)');
     this.sql.exec('CREATE TABLE IF NOT EXISTS meta (k TEXT PRIMARY KEY, v INTEGER NOT NULL)');
+    /* senha extra por parte de um app: tabela pronta, ainda sem uso (desligada) */
+    this.sql.exec('CREATE TABLE IF NOT EXISTS senhas_parte (app TEXT NOT NULL, parte TEXT NOT NULL, salt TEXT, hash TEXT, t INTEGER, PRIMARY KEY (app, parte))');
     this.sql.exec('CREATE TABLE IF NOT EXISTS usuarios (email TEXT PRIMARY KEY, areas TEXT NOT NULL, ativo INTEGER NOT NULL, t INTEGER NOT NULL)');
     this.sql.exec('CREATE TABLE IF NOT EXISTS credenciais (email TEXT PRIMARY KEY, salt TEXT NOT NULL, hash TEXT NOT NULL, dono INTEGER NOT NULL, t INTEGER NOT NULL)');
     this.sql.exec('CREATE TABLE IF NOT EXISTS falhas (email TEXT NOT NULL, t INTEGER NOT NULL)');
@@ -358,10 +389,11 @@ export class Conta extends DurableObject {
       if (!quem.admin || quem.chave || quem.transicao) { ws.send(JSON.stringify({ t: 'negado', q: m.q })); return; }
       if (m.t === 'usuario') {
         const email = String(m.email || '').trim().toLowerCase();
-        if (email) this.sql.exec('INSERT OR REPLACE INTO usuarios (email, areas, ativo, t) VALUES (?, ?, ?, ?)', email, JSON.stringify((m.areas || []).filter(a => AREAS[a])), m.ativo === false ? 0 : 1, Date.now());
+        if (email) this.sql.exec('INSERT OR REPLACE INTO usuarios (email, areas, ativo, t) VALUES (?, ?, ?, ?)', email, JSON.stringify((m.areas || []).filter(a => typeof a === 'string' && /^[a-z0-9]+(:[a-z0-9_]+)?$/.test(a))), m.ativo === false ? 0 : 1, Date.now());
       }
       const lista = this.sql.exec('SELECT email, areas, ativo, t FROM usuarios ORDER BY email').toArray().map(r => ({ email: r.email, areas: JSON.parse(r.areas), ativo: !!r.ativo, t: r.t }));
-      ws.send(JSON.stringify({ t: 'usuarios', q: m.q, lista, areas: Object.keys(AREAS) }));
+      const cols = this.sql.exec('SELECT DISTINCT col FROM docs').toArray().map(r => r.col);
+      ws.send(JSON.stringify({ t: 'usuarios', q: m.q, lista, apps: appsParaTela(cols), areas: Object.keys(APPS) }));
       return;
     }
     if ((m.t === 'sub' || m.t === 'pega') && !pode(quem, m.col, false)) { ws.send(JSON.stringify({ t: 'negado', col: m.col, q: m.q })); return; }

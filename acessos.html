@@ -5,93 +5,140 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no">
 <title>Acessos</title>
 <style>
-  html,body{margin:0;background:#f9fafb;color:#111;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}
-  main{max-width:460px;margin:0 auto;padding:22px 16px 40px}
-  h1{font-size:20px;margin:0 0 4px} h2{font-size:15px;margin:22px 0 8px}
-  p{color:#6b7280;font-size:13px;line-height:1.45;margin:0 0 12px}
-  .card{background:#fff;border-radius:14px;padding:14px;box-shadow:0 1px 3px rgba(0,0,0,.08);margin-bottom:10px}
-  input[type=text],input[type=password]{width:100%;box-sizing:border-box;border:1px solid #e5e7eb;border-radius:10px;padding:12px;font-size:15px;margin-bottom:8px;background:#fff}
-  .areas{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 10px}
-  .areas label{border:1px solid #e5e7eb;border-radius:999px;padding:6px 10px;font-size:13px;display:flex;gap:5px;align-items:center}
-  button{border:0;border-radius:10px;padding:12px 14px;font-size:15px;font-weight:600;background:#111;color:#fff;width:100%}
-  button.leve{background:#f3f4f6;color:#111;width:auto;padding:8px 12px;font-size:13px}
-  .linha{display:flex;justify-content:space-between;align-items:center;gap:8px}
-  .email{font-weight:600;font-size:14px;word-break:break-all}
-  .off{opacity:.5} #msg{font-size:13px;margin:8px 0;min-height:18px} .erro{color:#b91c1c} .ok{color:#15803d}
+  *{box-sizing:border-box}
+  html,body{margin:0;background:#fff;color:#0f172a;font-family:'DM Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;-webkit-tap-highlight-color:transparent}
+  main{max-width:460px;margin:0 auto;padding:22px 20px 80px}
+  .pe{display:flex;align-items:center;gap:12px;margin-bottom:0;padding:10px 0;position:sticky;top:0;background:#fff;z-index:4}
+  .quem{display:flex;align-items:center;gap:12px;flex:1;min-width:0;background:none;border:0;padding:0;text-align:left;color:inherit;font:inherit;cursor:pointer}
+  .quem b{font-size:15px;font-weight:600;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .av{width:40px;height:40px;border-radius:50%;background:#0f172a;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px;flex:none}
+  .av.off{background:#94a3b8}
+  .ic{width:38px;height:38px;border-radius:12px;background:#f1f5f9;display:flex;align-items:center;justify-content:center;border:0;flex:none;cursor:pointer;padding:0}
+  .ic.novo{background:#fff;border:1.5px dashed #cbd5e1}
+  .sec{font-size:11px;letter-spacing:.08em;color:#94a3b8;font-weight:700;margin:22px 0 2px;text-transform:uppercase}
+  .li{display:flex;align-items:center;padding:15px 0;border-bottom:1px solid #f1f5f9;font-size:15px}
+  .li b{flex:1;font-weight:500}
+  .sw{width:42px;height:25px;border-radius:99px;background:#e2e8f0;position:relative;flex:none;border:0;padding:0;cursor:pointer;transition:background .15s}
+  .sw:after{content:'';position:absolute;top:3px;left:3px;width:19px;height:19px;border-radius:50%;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.15);transition:left .15s}
+  .sw.on{background:#0f172a}.sw.on:after{left:20px}
+  .lista{position:absolute;left:0;right:0;top:48px;background:#fff;border:1px solid #e2e8f0;border-radius:16px;box-shadow:0 8px 24px rgba(15,23,42,.08);z-index:5;overflow:hidden;display:none}
+  .lista.abre{display:block}
+  .lista button{display:flex;align-items:center;gap:12px;width:100%;padding:12px 14px;border:0;background:#fff;font:inherit;font-size:14px;font-weight:600;text-align:left;border-bottom:1px solid #f1f5f9;cursor:pointer;color:inherit}
+  .lista button:last-child{border:0}
+  .lista small{margin-left:auto;color:#94a3b8;font-weight:500;font-size:12px}
+  .fundo{position:fixed;inset:0;background:rgba(15,23,42,.35);display:none;align-items:flex-end;justify-content:center;z-index:10}
+  .fundo.abre{display:flex}
+  .folha{background:#fff;width:100%;max-width:460px;border-radius:24px 24px 0 0;padding:22px 20px 26px}
+  .folha h2{font-size:17px;margin:0 0 14px;font-weight:700}
+  .folha input{width:100%;border:1px solid #e2e8f0;border-radius:14px;padding:14px;font:inherit;font-size:15px;margin-bottom:10px}
+  .bt{display:block;width:100%;text-align:center;background:#0f172a;color:#fff;border:0;border-radius:14px;padding:14px;font:inherit;font-weight:700;font-size:14px;margin-top:6px;cursor:pointer}
+  .bt.leve{background:#f1f5f9;color:#0f172a}
+  .bt.perigo{background:#fff;color:#b91c1c;border:1px solid #fee2e2}
+  #msg{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:#0f172a;color:#fff;font-size:13px;font-weight:600;padding:11px 16px;border-radius:99px;opacity:0;pointer-events:none;transition:opacity .2s;max-width:90%;text-align:center;z-index:20}
+  #msg.ve{opacity:1}#msg.erro{background:#b91c1c}
+  .vazio{color:#94a3b8;font-size:14px;padding:30px 0;text-align:center}
 </style>
 </head>
 <body>
 <main>
-  <h1>Acessos</h1>
-  <p>Cada pessoa entra com o próprio e-mail e senha e só vê as áreas marcadas aqui.</p>
-  <div id="msg"></div>
-  <div class="card">
-    <h2 style="margin-top:0">Nova pessoa</h2>
-    <input type="text" id="email" placeholder="E-mail" autocomplete="off" autocapitalize="none">
-    <input type="text" id="senha" placeholder="Senha inicial (mínimo 8)" autocomplete="off">
-    <div class="areas" id="novaAreas"></div>
-    <button id="criar">Criar acesso</button>
-  </div>
-  <h2>Pessoas</h2>
-  <div id="lista"><p>Carregando...</p></div>
+  <div class="pe" id="topo"></div>
+  <div id="partes"></div>
 </main>
+
+<div class="fundo" id="fSenha"><div class="folha">
+  <h2 id="tSenha">Senha</h2>
+  <input type="text" id="nova" placeholder="Nova senha (mínimo 8)" autocomplete="off" autocapitalize="none">
+  <button class="bt" id="defSenha">Definir senha</button>
+  <button class="bt perigo" id="bloqueia">Bloquear</button>
+  <button class="bt leve" data-fecha>Fechar</button>
+</div></div>
+
+<div class="fundo" id="fNovo"><div class="folha">
+  <h2>Nova pessoa</h2>
+  <input type="text" id="email" placeholder="E-mail" autocomplete="off" autocapitalize="none">
+  <input type="text" id="senha" placeholder="Senha (mínimo 8)" autocomplete="off" autocapitalize="none">
+  <button class="bt" id="criar">Criar</button>
+  <button class="bt leve" data-fecha>Fechar</button>
+</div></div>
+
+<div id="msg"></div>
+
 <script type="module">
-/* Só o dono usa esta tela (o servidor recusa os outros). A conta de login é criada no Firebase (mesmo login do menu)
-   e as áreas ficam no servidor. */
+/* Só o dono usa esta tela (o servidor recusa os outros). Cada pessoa tem e-mail e senha (Cloudflare) e, por app, o app todo
+   ou só algumas partes. App novo aparece aqui sozinho: coleção "app_<nome>" ou "app_<nome>_<parte>" no servidor. */
 if (!window.NvCanal) await import('./nv-canal.js');
-const C = window.NvCanal, NOMES = { rico: 'Rico', plano: 'Plano', estudo: 'Estudo', crm: 'Meu CRM', tapete: 'Tapete CRM', adm: 'ADM', prevenda: 'Pré-venda', retina: 'Retina', opa: 'Método OPA', workshop: 'Workshop' };
+const C = window.NvCanal;
 const $ = id => document.getElementById(id);
-let AREAS = Object.keys(NOMES);
-function msg(t, c) { $('msg').textContent = t; $('msg').className = c || ''; }
-function caixas(sel, marcadas) { return AREAS.map(a => `<label><input type="checkbox" value="${a}" ${marcadas.indexOf(a) >= 0 ? 'checked' : ''}> ${NOMES[a] || a}</label>`).join(''); }
-function marcadas(el) { return [...el.querySelectorAll('input:checked')].map(x => x.value); }
-function esc(s) { return String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]); }
-function mostra(r) {
-  if (!r || r.negado || r.t !== 'usuarios') { $('lista').innerHTML = '<p class="erro">Só o dono pode ver esta tela. Entre pelo menu com o seu e-mail.</p>'; return; }
-  AREAS = r.areas || AREAS;
-  $('novaAreas').innerHTML = caixas('nova', []);
-  $('lista').innerHTML = r.lista.length ? r.lista.map((u, i) => `<div class="card ${u.ativo ? '' : 'off'}" data-i="${i}">
-    <div class="linha"><span class="email">${esc(u.email)}</span><button class="leve" data-acao="ativo">${u.ativo ? 'Bloquear' : 'Liberar'}</button></div>
-    <div class="areas">${caixas('u' + i, u.areas)}</div>
-    <button class="leve" data-acao="salvar">Salvar áreas</button>
-    <input type="text" data-campo="nova" placeholder="Nova senha (mínimo 8)" autocomplete="off" style="margin-top:10px">
-    <button class="leve" data-acao="senha">Definir senha</button></div>`).join('') : '<p>Ninguém ainda.</p>';
-  $('lista').querySelectorAll('.card').forEach(card => {
-    const u = r.lista[+card.dataset.i];
-    card.querySelector('[data-acao=salvar]').onclick = async () => { mostra(await C.salvaUsuario(u.email, marcadas(card), u.ativo)); msg('Áreas salvas.', 'ok'); };
-    card.querySelector('[data-acao=ativo]').onclick = async () => { mostra(await C.salvaUsuario(u.email, u.areas, !u.ativo)); msg(u.ativo ? 'Bloqueado.' : 'Liberado.', 'ok'); };
-    card.querySelector('[data-acao=senha]').onclick = async () => {
-      const s = card.querySelector('[data-campo=nova]').value;
-      if (s.length < 8) return msg('A senha precisa de 8 letras ou mais.', 'erro');
-      const e = await definirSenha(u.email, s);
-      msg(e ? 'Não consegui: ' + e : 'Senha definida para ' + u.email + '. Passe para a pessoa.', e ? 'erro' : 'ok');
-      if (!e) card.querySelector('[data-campo=nova]').value = '';
-    };
-  });
-}
-/* login novo (Cloudflare): só o dono define a senha das pessoas; devolve o texto do erro, ou '' se deu certo */
+const SVG = {
+  chave: '<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#0f172a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2.586 17.414A2 2 0 0 0 2 18.828V21a1 1 0 0 0 1 1h3a1 1 0 0 0 1-1v-1a1 1 0 0 1 1-1h1a1 1 0 0 0 1-1v-1a1 1 0 0 1 1-1h.172a2 2 0 0 0 1.414-.586l.814-.814a6.5 6.5 0 1 0-4-4z"/><circle cx="16.5" cy="7.5" r=".5" fill="#0f172a"/></svg>',
+  seta: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>',
+  mais: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>'
+};
+let R = null, sel = null;
 const BASE = /github\.io$/.test(location.hostname) ? 'https://nv-dados.meusapps.workers.dev' : '';
+function msg(t, c) { const m = $('msg'); m.textContent = t; m.className = 've' + (c ? ' ' + c : ''); clearTimeout(msg.t); msg.t = setTimeout(() => { m.className = ''; }, 2600); }
+function esc(s) { return String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]); }
+function ini(e) { return (e || '?').charAt(0).toUpperCase(); }
+function usuario() { return R && R.lista.find(u => u.email === sel); }
+function tem(u, app, parte) { return u.areas.indexOf(app) >= 0 || u.areas.indexOf(app + ':' + parte) >= 0; }
+
+function desenha() {
+  if (!R || R.negado || R.t !== 'usuarios') { $('topo').innerHTML = ''; $('partes').innerHTML = '<p class="vazio">Só o dono pode ver esta tela.</p>'; return; }
+  if (!sel || !usuario()) sel = R.lista.length ? R.lista[0].email : null;
+  const u = usuario();
+  $('topo').innerHTML =
+    (u ? '<button class="quem" id="abreLista"><div class="av ' + (u.ativo ? '' : 'off') + '">' + ini(u.email) + '</div><b>' + esc(u.email) + '</b>' + SVG.seta + '</button><button class="ic" id="abreSenha" aria-label="Senha">' + SVG.chave + '</button>' : '<b style="flex:1;color:#94a3b8;font-weight:500">Ninguém ainda</b>') +
+    '<button class="ic novo" id="abreNovo" aria-label="Nova pessoa">' + SVG.mais + '</button>' +
+    '<div class="lista" id="lista">' + R.lista.map(p => '<button data-e="' + esc(p.email) + '"><div class="av ' + (p.ativo ? '' : 'off') + '" style="width:32px;height:32px;font-size:14px">' + ini(p.email) + '</div>' + esc(p.email) + (p.ativo ? '' : '<small>bloqueado</small>') + '</button>').join('') + '</div>';
+  $('partes').innerHTML = !u ? '' : R.apps.map(a => '<div class="sec">' + esc(a.nome) + '</div>' + a.partes.map(p => '<div class="li"><b>' + esc(p.nome) + '</b><button class="sw ' + (tem(u, a.id, p.id) ? 'on' : '') + '" data-a="' + a.id + '" data-p="' + p.id + '" aria-label="' + esc(p.nome) + '"></button></div>').join('')).join('');
+  if ($('abreLista')) $('abreLista').onclick = () => $('lista').classList.toggle('abre');
+  if ($('abreSenha')) $('abreSenha').onclick = () => { $('tSenha').textContent = u.email; $('bloqueia').textContent = u.ativo ? 'Bloquear' : 'Liberar'; $('nova').value = ''; $('fSenha').classList.add('abre'); };
+  $('abreNovo').onclick = () => { $('email').value = ''; $('senha').value = ''; $('fNovo').classList.add('abre'); };
+  $('lista').querySelectorAll('button').forEach(b => { b.onclick = () => { sel = b.dataset.e; desenha(); }; });
+  $('partes').querySelectorAll('.sw').forEach(b => { b.onclick = () => alterna(b.dataset.a, b.dataset.p, !b.classList.contains('on')); });
+}
+async function alterna(app, parte, liga) {
+  const u = usuario(), a = R.apps.find(x => x.id === app);
+  const ligadas = a.partes.filter(p => (p.id === parte ? liga : tem(u, app, p.id))).map(p => p.id);
+  const resto = u.areas.filter(x => x !== app && x.indexOf(app + ':') !== 0);
+  const novo = ligadas.length === a.partes.length ? resto.concat([app]) : resto.concat(ligadas.map(p => app + ':' + p));
+  u.areas = novo; desenha();
+  const r = await C.salvaUsuario(u.email, novo, u.ativo);
+  if (r && r.lista) { R = r; desenha(); } else msg('Não consegui salvar', 'erro');
+}
 async function definirSenha(email, senha) {
   try {
     const t = await C.passe();
-    if (!t) return 'entre pelo menu com a senha nova do dono antes';
+    if (!t) return 'entre pelo menu com a senha do dono antes';
     const r = await fetch(BASE + '/auth/definir', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ token: t, email, senha }) });
     const j = await r.json().catch(() => ({}));
     return r.ok ? '' : (j.erro || 'erro ' + r.status);
   } catch (e) { return e.message; }
 }
-$('criar').onclick = async () => {
-  const email = $('email').value.trim().toLowerCase(), senha = $('senha').value, areas = marcadas($('novaAreas'));
-  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return msg('E-mail inválido.', 'erro');
-  if (senha.length < 8) return msg('A senha precisa de 8 letras ou mais.', 'erro');
-  msg('Criando...');
-  const e = await definirSenha(email, senha);
-  if (e) return msg('Não consegui criar o login: ' + e, 'erro');
-  mostra(await C.salvaUsuario(email, areas, true));
-  $('email').value = ''; $('senha').value = '';
-  msg('Acesso criado. Passe o e-mail e a senha para a pessoa.', 'ok');
+document.querySelectorAll('[data-fecha]').forEach(b => { b.onclick = () => document.querySelectorAll('.fundo').forEach(f => f.classList.remove('abre')); });
+document.querySelectorAll('.fundo').forEach(f => { f.addEventListener('click', e => { if (e.target === f) f.classList.remove('abre'); }); });
+$('defSenha').onclick = async () => {
+  const s = $('nova').value, u = usuario();
+  if (s.length < 8) return msg('Mínimo 8 letras', 'erro');
+  const e = await definirSenha(u.email, s);
+  if (e) return msg(e, 'erro');
+  $('fSenha').classList.remove('abre'); msg('Senha definida');
 };
-mostra(await C.usuarios());
+$('bloqueia').onclick = async () => {
+  const u = usuario(); const r = await C.salvaUsuario(u.email, u.areas, !u.ativo);
+  if (r && r.lista) { R = r; $('fSenha').classList.remove('abre'); desenha(); msg(u.ativo ? 'Bloqueado' : 'Liberado'); }
+};
+$('criar').onclick = async () => {
+  const email = $('email').value.trim().toLowerCase(), senha = $('senha').value;
+  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return msg('E-mail inválido', 'erro');
+  if (senha.length < 8) return msg('Senha: mínimo 8', 'erro');
+  const e = await definirSenha(email, senha);
+  if (e) return msg(e, 'erro');
+  const r = await C.salvaUsuario(email, [], true);
+  if (r && r.lista) { R = r; sel = email; $('fNovo').classList.remove('abre'); desenha(); msg('Pessoa criada'); }
+};
+R = await C.usuarios();
+desenha();
 </script>
 </body>
 </html>
