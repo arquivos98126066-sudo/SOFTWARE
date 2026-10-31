@@ -8,13 +8,12 @@
      {t:'eu'}                              -> {t:'eu', email, admin, areas, chave}
      {t:'usuarios'} / {t:'usuario', email, areas, ativo}   (só o dono)
    Acesso: login do Firebase (o mesmo e-mail e senha do menu). O servidor confere a assinatura do Google e libera
-   só as áreas daquela pessoa. O dono vê tudo. Enquanto ACEITA_CHAVE não for "0", quem vem sem login ainda entra
+   só as áreas daquela pessoa. O dono vê tudo. Sem login (a chave pública foi fechada em 31/10/2026) ninguém entra
    (fase de troca dos celulares).
    Administração (cópia e exportação) só com a senha guardada no servidor. */
 import { DurableObject } from 'cloudflare:workers';
 
 const CHAVE_APP = 'nv1-meus-apps';
-const PROJETO = 'meus-apps-8ca76', DONO_UID = 'UhH3Luc0AYW9URS6OahnSqWTTgw2';
 /* cada coleção pertence a uma área; a pessoa só vê as áreas liberadas para ela */
 const AREAS = {
   rico: ['rico_vivo', 'born_rich'], plano: ['plano', 'v2_plano_procs'], estudo: ['estudo'],
@@ -35,55 +34,23 @@ function pode(u, col, grava) {
 }
 
 /* confere o login do Firebase: assinatura do Google, projeto e validade */
-let chaves = null, chavesAte = 0;
 function b64url(s) { s = s.replace(/-/g, '+').replace(/_/g, '/'); while (s.length % 4) s += '='; return Uint8Array.from(atob(s), c => c.charCodeAt(0)); }
 async function confereToken(t, env) {
   if (!t) return null;
   if (t.indexOf('nv.') === 0) { const o = await abre(env, t, 'a'); return o ? { uid: 'nv:' + o.e, email: o.e } : null; }
   if (env.TESTE === '1' && t.indexOf('teste:') === 0) { const [, uid, email] = t.split(':'); return { uid, email }; }
-  try {
-    const [h, c, a] = t.split('.');
-    const cab = JSON.parse(new TextDecoder().decode(b64url(h))), dado = JSON.parse(new TextDecoder().decode(b64url(c)));
-    const agora = Date.now() / 1000;
-    if (cab.alg !== 'RS256' || dado.aud !== PROJETO || dado.iss !== 'https://securetoken.google.com/' + PROJETO || !(dado.exp > agora) || !(dado.iat < agora + 300) || !dado.sub) return null;
-    if (!chaves || Date.now() > chavesAte) {
-      const r = await fetch('https://www.googleapis.com/service_accounts/v1/jwk/securetoken@system.gserviceaccount.com');
-      chaves = (await r.json()).keys || []; chavesAte = Date.now() + 3600000;
-    }
-    const jwk = chaves.find(k => k.kid === cab.kid); if (!jwk) return null;
-    const k = await crypto.subtle.importKey('jwk', jwk, { name: 'RSASSA-PKCS1-v1_5', hash: 'SHA-256' }, false, ['verify']);
-    const ok = await crypto.subtle.verify('RSASSA-PKCS1-v1_5', k, b64url(a), new TextEncoder().encode(h + '.' + c));
-    return ok ? { uid: dado.sub, email: String(dado.email || '').toLowerCase() } : null;
-  } catch (e) { return null; }
+  return null;
 }
 async function quem(req, u, env) {
   const p = await confereToken(u.searchParams.get('t'), env);
   if (p) return p;
-  if (u.searchParams.get('k') === CHAVE_APP && env.ACEITA_CHAVE !== '0') return { chave: true };
-  return null;
+  return null; /* só quem entrou com e-mail e senha (a chave pública foi fechada em 31/10/2026) */
 }
 function comQuem(req, p) {
   const h = new Headers(req.headers);
   h.set('x-nv-quem', JSON.stringify(p));
   return new Request(req, { headers: h });
 }
-/* Firebase antigo: só para a cópia inicial e para o retrato de conferência */
-const FB = 'https://firestore.googleapis.com/v1/projects/meus-apps-8ca76/databases/(default)/documents', FB_CH = 'AIzaSyDPJvM-XZWfa8HQ7h8v0Usb1Hf3q8sDqpg';
-const FB_COLS = ['rico_vivo', 'plano', 'estudo', 'crm', 'tapete', 'born_rich', 'v2_conflitos', 'v2_adm_config', 'v2_adm_lanc', 'v2_crm_agenda', 'v2_crm_arquivo', 'v2_crm_ativos', 'v2_crm_contatos', 'v2_crm_reunioes', 'v2_plano_procs', 'v2_tap_cadastro', 'v2_tap_clientes', 'v2_tap_config', 'v2_tap_pedidos', 'v2_tap_ruas'];
-/* páginas que usavam o Firestore direto (Pré-venda, Retina, Método OPA, Workshop) */
-const FB_COLS2 = ['pre_venda', 'prevenda_lixeira', 'painel_ia', 'metodo_opa', 'launcher_apps', 'launcher_ck', 'launcher_fm', 'launcher_fm_prefs', 'launcher_trash', 'launcher_ad'];
-function fbVal(f) {
-  if (!f) return null;
-  if ('stringValue' in f) return f.stringValue;
-  if ('integerValue' in f) return +f.integerValue;
-  if ('doubleValue' in f) return f.doubleValue;
-  if ('booleanValue' in f) return f.booleanValue;
-  if ('timestampValue' in f) return f.timestampValue;
-  if ('mapValue' in f) { const o = {}; for (const k of Object.keys(f.mapValue.fields || {})) o[k] = fbVal(f.mapValue.fields[k]); return o; }
-  if ('arrayValue' in f) return (f.arrayValue.values || []).map(fbVal);
-  return null;
-}
-
 /* ---- login próprio (Cloudflare), no lugar do Firebase Auth (2026-10-31) ----
    Senha guardada só como PBKDF2-SHA256 com sal. O passe de acesso ("nv.") vale 1 hora; o de renovação, 90 dias.
    Assinatura HMAC com o segredo AUTH_SECRET (guardado no servidor, nunca no código). */
@@ -283,36 +250,10 @@ export class Conta extends DurableObject {
 
   async cron() {
     const copia = {};
-    for (const [flag, lista] of [['migrou', FB_COLS], ['migrou2', FB_COLS2]]) {
-      if (this.sql.exec('SELECT v FROM meta WHERE k = ?', flag).toArray().length) continue;
-      for (const col of lista) {
-        let pg = '', n = 0;
-        for (let i = 0; i < 50; i++) {
-          const r = await fetch(FB + '/' + col + '?pageSize=300&key=' + FB_CH + pg);
-          if (!r.ok) { copia[col] = 'erro ' + r.status; break; }
-          const j = await r.json();
-          for (const d of j.documents || []) {
-            const id = decodeURIComponent(d.name.split('/').pop());
-            if (this.sql.exec('SELECT 1 FROM docs WHERE col = ? AND id = ?', col, id).toArray().length) continue;
-            const x = {}; for (const k of Object.keys(d.fields || {})) if (k !== 'st') x[k] = fbVal(d.fields[k]);
-            this.seq++; x.st = this.seq;
-            this.sql.exec('INSERT INTO docs (col, id, x, seq) VALUES (?, ?, ?, ?)', col, id, JSON.stringify(x), this.seq);
-            n++;
-          }
-          if (!j.nextPageToken) break;
-          pg = '&pageToken=' + encodeURIComponent(j.nextPageToken);
-        }
-        if (copia[col] === undefined) copia[col] = n;
-      }
-      this.sql.exec("INSERT OR REPLACE INTO meta (k, v) VALUES ('seq', ?)", this.seq);
-      this.sql.exec('INSERT OR REPLACE INTO meta (k, v) VALUES (?, ?)', flag, this.seq);
-    }
     const cols = this.sql.exec('SELECT col, COUNT(*) AS n, MAX(seq) AS seq FROM docs GROUP BY col').toArray();
     const diag = this.sql.exec("SELECT x FROM docs WHERE col = 'diag'").toArray().map(r => JSON.parse(r.x));
     const entradas = this.sql.exec('SELECT quem, chave, t FROM entradas ORDER BY t DESC LIMIT 30').toArray();
     const estado = { t: Date.now(), seq: this.seq, copia, cols, diag, entradas };
-    const w = await fetch(FB + '/cf_estado/agora?key=' + FB_CH, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ fields: { j: { stringValue: JSON.stringify(estado) } } }) });
-    console.log('cron', this.seq, JSON.stringify(copia), 'retrato', w.status, w.ok ? '' : (await w.text()).slice(0, 300));
     return estado;
   }
 
@@ -374,11 +315,8 @@ export class Conta extends DurableObject {
   /* quem é a pessoa: o dono vê tudo; sem login (fase de troca) também; os outros, só as áreas liberadas */
   perfil(q) {
     if (q.chave) return { chave: true, admin: true, areas: ['*'], email: '' };
-    if (q.uid === DONO_UID) return { uid: q.uid, email: q.email, admin: true, areas: ['*'] };
     if (q.uid && q.uid.indexOf('nv:') === 0) { const d = this.sql.exec('SELECT dono FROM credenciais WHERE email = ?', q.email || '').toArray(); if (d.length && d[0].dono) return { uid: q.uid, email: q.email, admin: true, areas: ['*'] }; }
     const r = this.sql.exec('SELECT areas, ativo FROM usuarios WHERE email = ?', q.email || '').toArray();
-    /* fase de troca: login de quem ainda não foi cadastrado entra como antes (vale até ACEITA_CHAVE = "0") */
-    if (!r.length && this.env.ACEITA_CHAVE !== '0') return { uid: q.uid, email: q.email, admin: true, areas: ['*'], transicao: true };
     return { uid: q.uid, email: q.email, admin: false, areas: r.length && r[0].ativo ? JSON.parse(r[0].areas) : [] };
   }
   usuarioDe(ws) { const a = ws.deserializeAttachment() || {}; return a.u ? this.perfil(a.u.chave ? { chave: true } : a.u) : { areas: [] }; }
