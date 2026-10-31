@@ -398,8 +398,8 @@ tbody tr:hover td{background:#fafafa;}
 var db, collection, addDoc, getDocs, updateDoc, deleteDoc, doc, onSnapshot, query, orderBy, writeBatch, getDoc;
 var _firebaseOk = false;
 try {
-  const fbSync = await import("./firebase-sync.js").catch(()=>null);
-  const fbStore = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js").catch(()=>null);
+  const fbSync = await import("./nv-fs.js").catch(()=>null);
+  const fbStore = fbSync;
   if(fbSync && fbStore && fbSync.db) {
     db = fbSync.db;
     ({ collection, addDoc, getDocs, updateDoc, deleteDoc, doc, onSnapshot, query, orderBy, writeBatch, getDoc } = fbStore);

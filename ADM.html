@@ -485,8 +485,7 @@ input[type=date]::-webkit-calendar-picker-indicator{display:none}
 </div>
 
 <script type="module">
-import { db } from "./firebase-sync.js";
-import { doc, getDoc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { db, doc, getDoc, setDoc, onSnapshot } from "./nv-fs.js";
 
 // ===== INDEXEDDB — salva e carrega localmente =====
 var _idb = null;

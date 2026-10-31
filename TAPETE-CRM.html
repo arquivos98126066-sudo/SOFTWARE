@@ -1499,8 +1499,8 @@
 </div>
 
 <script type="module">
-import { db } from "./firebase-sync.js";
-import * as _fs from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { db } from "./nv-fs.js";
+import * as _fs from "./nv-fs.js";
 /* com a camada única (dados.js) ligada, as gravações antigas na nuvem não acontecem mais: quem sobe é a camada */
 const _nv = !!window.Dados, _ok = () => Promise.resolve({ id: null, exists: () => false, data: () => ({}), forEach() {}, docs: [] });
 const collection = _nv ? () => null : _fs.collection, doc = _nv ? () => null : _fs.doc, query = _nv ? () => null : _fs.query, orderBy = _nv ? () => null : _fs.orderBy;
@@ -6458,7 +6458,7 @@ var db, collection, addDoc, getDocs, updateDoc, deleteDoc, doc, onSnapshot, quer
 var _firebaseOk = false;
 try {
   const fbSync = await import("./firebase-sync.js").catch(()=>null);
-  const fbStore = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js").catch(()=>null);
+  const fbStore = await import("./nv-fs.js").catch(()=>null);
   if(!window.Dados && fbSync && fbStore && fbSync.db) {
     db = fbSync.db;
     ({ collection, addDoc, getDocs, updateDoc, deleteDoc, doc, onSnapshot, query, orderBy, writeBatch, getDoc } = fbStore);
