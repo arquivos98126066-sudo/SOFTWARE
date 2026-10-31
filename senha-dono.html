@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8"><title>Criar senha do dono</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no">
+<style>body{font:16px system-ui;background:#faf6ee;color:#14213d;margin:0;padding:24px 16px}h1{font-size:20px}p{line-height:1.5}input{font:inherit;width:100%;box-sizing:border-box;padding:12px;margin:6px 0;border:1px solid #e6dcc6;border-radius:10px;background:#fff}button{font:inherit;width:100%;padding:13px;margin-top:8px;border:0;border-radius:10px;background:#14213d;color:#fff;font-weight:600}button:disabled{opacity:.5}.r{margin-top:14px;white-space:pre-wrap;line-height:1.5}</style></head><body>
+<h1>Criar a senha do dono</h1>
+<p>Primeira vez no login novo. Use o seu e-mail, uma senha de 8 letras ou mais e o código de instalação.</p>
+<input id="e" type="email" autocomplete="username" placeholder="E-mail">
+<input id="s" type="password" autocomplete="new-password" placeholder="Senha (8 ou mais)">
+<input id="s2" type="password" autocomplete="new-password" placeholder="Repita a senha">
+<input id="c" type="password" autocomplete="off" placeholder="Código de instalação">
+<button id="b">Criar senha</button>
+<div class="r" id="r"></div>
+<script>
+var R=document.getElementById('r');function say(t){R.textContent=t}
+document.getElementById('b').onclick=async function(){
+ var b=this,e=document.getElementById('e').value.trim(),s=document.getElementById('s').value,s2=document.getElementById('s2').value,c=document.getElementById('c').value.trim();
+ if(!e||s.length<8){say('Escreva o e-mail e uma senha de 8 letras ou mais.');return}
+ if(s!==s2){say('As duas senhas não são iguais.');return}
+ b.disabled=true;say('Criando...');
+ try{
+  var r=await fetch('/auth/primeira',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:e,senha:s,setup:c})});
+  var j=await r.json();
+  if(!r.ok){say('Não deu: '+(j.erro||r.status));b.disabled=false;return}
+  try{localStorage.setItem('nv.rt2',j.refresh);localStorage.setItem('nv.email2',j.email)}catch(x){}
+  say('Pronto. A senha do dono foi criada para '+j.email+'.\nGuarde esta senha. Pode fechar esta página.');
+ }catch(x){say('Falhou: '+x.message);b.disabled=false}
+};
+</script></body></html>
