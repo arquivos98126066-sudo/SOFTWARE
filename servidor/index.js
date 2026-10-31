@@ -250,6 +250,18 @@ export class Conta extends DurableObject {
 
   async cron() {
     const copia = {};
+    /* cópia diária de todos os dados para o R2 (arquivo novo a cada dia, nunca sobrescreve nem apaga) */
+    try {
+      const ult = this.sql.exec("SELECT v FROM meta WHERE k = 'bk_t'").toArray();
+      if (this.env.MIDIA && (!ult.length || Date.now() - +ult[0].v > 23 * 3600000)) {
+        const dump = { t: Date.now(), seq: this.seq, docs: this.sql.exec('SELECT col, id, x FROM docs').toArray(), usuarios: this.sql.exec('SELECT * FROM usuarios').toArray() };
+        const gz = new Blob([JSON.stringify(dump)]).stream().pipeThrough(new CompressionStream('gzip'));
+        const nome = 'backup-servidor/' + new Date().toISOString().replace(/[-:]/g, '').slice(0, 13) + '.json.gz';
+        if (!(await this.env.MIDIA.head(nome))) await this.env.MIDIA.put(nome, await new Response(gz).arrayBuffer(), { httpMetadata: { contentType: 'application/gzip' } });
+        this.sql.exec("INSERT OR REPLACE INTO meta (k, v) VALUES ('bk_t', ?)", String(Date.now()));
+        copia.backup = nome;
+      }
+    } catch (e) { copia.backup = 'erro ' + String(e).slice(0, 80); }
     const cols = this.sql.exec('SELECT col, COUNT(*) AS n, MAX(seq) AS seq FROM docs GROUP BY col').toArray();
     const diag = this.sql.exec("SELECT x FROM docs WHERE col = 'diag'").toArray().map(r => JSON.parse(r.x));
     const entradas = this.sql.exec('SELECT quem, chave, t FROM entradas ORDER BY t DESC LIMIT 30').toArray();
