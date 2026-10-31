@@ -1129,10 +1129,9 @@
 <div class="toast" id="toast"></div>
 
 <script type="module">
-import { db as firestoreDb } from "./firebase-sync.js";
 import {
-  collection, addDoc, getDocs, updateDoc, deleteDoc, doc, onSnapshot, setDoc, getDoc
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+  db as firestoreDb, collection, addDoc, getDocs, updateDoc, deleteDoc, doc, onSnapshot, setDoc, getDoc
+} from "./nv-fs.js";
 
 // ── CAMADA 1: LOCAL — IndexedDB com fallback localStorage ──────────────
 function saveLocal(key, data) {

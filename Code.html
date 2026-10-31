@@ -2008,48 +2008,20 @@ const LS_PROX   = 'editor_proximoid';
 let timerSave = null;
 let timerFirebase = null;
 
-// ── Firebase setup (lazy load via script tag) ──
-let _db = null;
+// ── Nuvem (Cloudflare, pelo nv-fs.js; mesmos nomes do antigo Firestore) ──
+let _db = null, _nvfs = null;
 
-function _initFirebaseCompat() {
-  return new Promise((resolve) => {
-    if (typeof firebase !== 'undefined' && firebase.firestore) {
-      try { _db = firebase.firestore(); } catch(e) {}
-      resolve();
-      return;
-    }
-    // Carrega scripts compat dinamicamente
-    const scripts = [
-      'https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js',
-      'https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js',
-      './firebase-init.js'
-    ];
-    let loaded = 0;
-    scripts.forEach((src, i) => {
-      const s = document.createElement('script');
-      s.src = src;
-      s.onload = () => {
-        loaded++;
-        if (loaded === scripts.length) {
-          setTimeout(() => {
-            try {
-              if (typeof firebase !== 'undefined' && firebase.firestore) {
-                _db = firebase.firestore();
-              }
-            } catch(e) { console.warn('Firebase init erro:', e); }
-            resolve();
-          }, 300);
-        }
-      };
-      s.onerror = () => { loaded++; if (loaded === scripts.length) resolve(); };
-      document.head.appendChild(s);
-    });
-  });
+async function _initFirebaseCompat() {
+  try { _nvfs = await import('./nv-fs.js'); _db = _nvfs.db; } catch(e) { console.warn('Nuvem indisponível:', e); }
 }
 
 function _fbDocRef() {
-  if (!_db) return null;
-  try { return _db.collection('editor_codigo').doc('principal'); } catch(e) { return null; }
+  if (!_nvfs) return null;
+  const r = _nvfs.doc(_nvfs.db, 'editor_codigo', 'principal');
+  return {
+    set: (p, o) => _nvfs.setDoc(r, p, o),
+    get: () => _nvfs.getDoc(r).then(s => ({ exists: s.exists(), data: () => s.data() }))
+  };
 }
 
 async function salvarNoFirebase() {

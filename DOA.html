@@ -558,18 +558,18 @@ html.plano-carregando #proc-list-overlay .pl-body{visibility:hidden}
 <div id="toast" role="status" aria-live="polite"></div>
 
 <script type="module">
-import { db } from "./firebase-sync.js";
+import { db } from "./nv-fs.js";
 
 async function salvarProcessoNuvem(steps) {
   try {
-    var { setDoc, doc: fsDoc } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js');
+    var { setDoc, doc: fsDoc } = await import('./nv-fs.js');
     await setDoc(fsDoc(db, 'doa_processo', 'steps'), { steps: steps, atualizadoEm: Date.now() });
   } catch(e) { console.warn('Processo nuvem:', e); }
 }
 
 async function carregarProcessoNuvem() {
   try {
-    var { getDoc, doc: fsDoc } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js');
+    var { getDoc, doc: fsDoc } = await import('./nv-fs.js');
     var snap = await getDoc(fsDoc(db, 'doa_processo', 'steps'));
     if (snap.exists()) return snap.data().steps || null;
   } catch(e) { console.warn('Carregar Processo nuvem:', e); }
@@ -832,34 +832,10 @@ var _p_fbReady = false;
 
 async function p_initFirebase(){
   try {
-    const { initializeApp, getApps } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js');
-    const { initializeFirestore, persistentLocalCache, persistentSingleTabManager, getFirestore, doc, getDoc, setDoc, onSnapshot } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js');
+    /* dados pelo servidor da Cloudflare (nv-fs.js), com os mesmos nomes do Firestore */
+    const { db: _nvdb, doc, getDoc, setDoc, onSnapshot } = await import('./nv-fs.js');
+    _p_db = _nvdb;
 
-    const cfg = {
-      apiKey: "AIzaSyDPJvM-XZWfa8HQ7h8v0Usb1Hf3q8sDqpg",
-      authDomain: "meus-apps-8ca76.firebaseapp.com",
-      projectId: "meus-apps-8ca76",
-      storageBucket: "meus-apps-8ca76.firebasestorage.app",
-      messagingSenderId: "768854372271",
-      appId: "1:768854372271:web:467b541baf3c513f03095a"
-    };
-
-    /* dados pelo canal "nv" (não espera o login do celular; o canal antigo travava e nada subia) */
-    const app = getApps().filter(function(a){ return a.name === 'nv'; })[0] || initializeApp({ apiKey: cfg.apiKey, projectId: cfg.projectId, appId: cfg.appId }, 'nv');
-
-    // Ativa cache persistente no IndexedDB do browser
-    // Na segunda visita em diante, onSnapshot entrega dados do cache LOCAL instantaneamente
-    // sem esperar a rede — elimina a tela em branco
-    _p_db = window.__nvDb;
-    if(!_p_db){
-      try { _p_db = initializeFirestore(app, { experimentalAutoDetectLongPolling: true }); }
-      catch(e2){ _p_db = getFirestore(app); }
-      if(window.NV_EMU){ try { (await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js')).connectFirestoreEmulator(_p_db, '127.0.0.1', window.NV_EMU); } catch(e3){} }
-      window.__nvDb = _p_db;
-    }
-
-
-    /* o login confere por trás e não segura os dados; só volta ao menu se nunca entrou */
     (function(){ var ok = false; try { ok = !!localStorage.getItem('nv.rt2'); } catch(e){} if(!ok) location.replace('index.html'); })();
 
     /* camada única (dados.js): cada processo e pasta é um item na nuvem; dois aparelhos mexendo em processos diferentes não se apagam */
@@ -953,7 +929,7 @@ async function p_salvarTudo(){
   // 2. Tenta Firebase
   if(_p_fbReady && _p_docRef){
     try {
-      const { setDoc } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js');
+      const { setDoc } = await import('./nv-fs.js');
       await setDoc(_p_docRef, { procs: p_procs, _t: Date.now() });
       if(window.syncShow) window.syncShow.synced('Processo');
     } catch(e){

@@ -1852,37 +1852,12 @@ html { scroll-behavior: smooth; }
 </footer>
 
 <!-- ===================== FIREBASE INTEGRATION ===================== -->
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-
-const firebaseConfig = {
-  apiKey: "AIzaSyDPJvM-XZWfa8HQ7h8v0Usb1Hf3q8sDqpg",
-  authDomain: "meus-apps-8ca76.firebaseapp.com",
-  projectId: "meus-apps-8ca76",
-  storageBucket: "meus-apps-8ca76.firebasestorage.app",
-  messagingSenderId: "768854372271",
-  appId: "1:768854372271:web:467b541baf3c513f03095a"
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-const auth = getAuth(app);
-signInAnonymously(auth).catch(e => console.warn(e));
-
+<script>
+/* lead do site: vai para o CRM pelo servidor da Cloudflare (sem login; o servidor só cria um contato novo) */
 window.salvarLeadFirebase = async function(nome, numero, email, segmento) {
   try {
-    await addDoc(collection(db, 'meu_crm_contatos'), {
-      nome: nome,
-      numero: numero.replace(/\D/g, ''),
-      obs: 'Email: ' + email + ' | Segmento: ' + segmento + ' | Origem: SoftDelivery',
-      indicado: 'Site SoftDelivery',
-      tentativas: 0,
-      status: 'ativo',
-      createdAt: serverTimestamp(),
-      updatedAt: serverTimestamp()
-    });
+    var r = await fetch('https://apps.v4cless.com/lead', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ nome: nome, numero: numero, email: email, segmento: segmento }) });
+    if (!r.ok) throw new Error('erro ' + r.status);
     console.log('Lead salvo no CRM!');
   } catch(e) {
     console.warn('Erro ao salvar lead:', e);

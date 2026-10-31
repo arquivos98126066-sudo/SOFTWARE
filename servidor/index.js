@@ -118,6 +118,13 @@ export default {
     const conta = contaDe(env);
     if (u.pathname === '/' || u.pathname === '') return env.ASSETS.fetch(new Request(new URL('/index.html', u), req));
     if (u.pathname.startsWith('/auth/')) return cors(await conta.fetch(req));
+    /* formulário público do site: grava só um contato novo no CRM, sem login e sem ler nada */
+    if (u.pathname === '/lead' && req.method === 'POST') {
+      let b = null; try { b = await req.json(); } catch (e) {}
+      const t = (v, n) => String(v == null ? '' : v).slice(0, n);
+      if (!b || !t(b.nome, 120).trim() || !t(b.numero, 40).replace(/\D/g, '')) return cors(json({ erro: 'dados faltando' }, 400));
+      return cors(await conta.fetch(new Request(new URL('/lead', u), { method: 'POST', body: JSON.stringify({ nome: t(b.nome, 120), numero: t(b.numero, 40).replace(/\D/g, ''), email: t(b.email, 160), segmento: t(b.segmento, 120) }) })));
+    }
     if (u.pathname === '/ws') {
       if (req.headers.get('Upgrade') !== 'websocket') return new Response('so websocket', { status: 426 });
       const p = await quem(req, u, env);
@@ -212,6 +219,18 @@ export class Conta extends DurableObject {
     if (this.foi) return new Response('mudou de lugar', { status: 503 });
     if (this.vazio) { await this.ctx.blockConcurrencyWhile(async () => { if (this.vazio) { await this.trazer(); this.vazio = false; } }); }
     if (u.pathname.startsWith('/auth/')) return this.auth(req, u);
+    if (u.pathname === '/lead') {
+      const b = await req.json(), agora = Date.now(), id = 'site_' + agora.toString(36) + Math.random().toString(36).slice(2, 8);
+      const op = { col: 'meu_crm_contatos', id, troca: true, set: [['nome', b.nome], ['numero', b.numero], ['obs', 'Email: ' + b.email + ' | Segmento: ' + b.segmento + ' | Origem: SoftDelivery'], ['indicado', 'Site SoftDelivery'], ['tentativas', 0], ['status', 'ativo'], ['createdAt', agora], ['updatedAt', agora]].map(p => [[p[0]], p[1]]) };
+      const x = this.aplica(op);
+      this.sql.exec("INSERT OR REPLACE INTO meta (k, v) VALUES ('seq', ?)", this.seq);
+      for (const outro of this.ctx.getWebSockets()) {
+        const a = outro.deserializeAttachment() || { subs: [] };
+        if (a.subs.indexOf(op.col) < 0 || !pode(this.usuarioDe(outro), op.col, false)) continue;
+        try { outro.send(JSON.stringify({ t: 'docs', col: op.col, docs: [{ id, x }], seq: this.seq })); } catch (e) {}
+      }
+      return json({ ok: true });
+    }
     if (u.pathname === '/ws') {
       const par = new WebSocketPair();
       this.ctx.acceptWebSocket(par[1]);
