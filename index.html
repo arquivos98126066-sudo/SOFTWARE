@@ -556,7 +556,7 @@ input { -webkit-user-select: text; user-select: text; }
       if (!window.NvCanal) await import('./nv-canal.js');
       var eu = await NvCanal.eu(); if (!eu || eu.admin) return;
       document.querySelectorAll('a.menu-link').forEach(function (a) {
-        var ar = AREA[a.getAttribute('href')]; if (!ar || eu.areas.indexOf(ar) >= 0) return;
+        var ar = AREA[a.getAttribute('href')]; if (!ar || eu.areas.some(function (x) { return x === ar || x.indexOf(ar + ':') === 0; })) return;
         a.addEventListener('click', function (e) { e.preventDefault(); e.stopImmediatePropagation(); alert('Sem acesso a esta área.'); }, true);
       });
     } catch (e) {}
