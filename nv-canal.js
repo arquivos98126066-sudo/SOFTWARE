@@ -3,7 +3,7 @@
    - ouve(col, desde, cb): manda o que mudou depois de "desde" e depois cada mudança nova, ao vivo;
    - grava(ops): envia; o que não foi confirmado é reenviado na ordem quando a conexão volta;
    - caiu a conexão: volta sozinha (na hora quando a internet volta ou o app reabre);
-   - entra com o login do menu (Firebase): o servidor só libera as áreas daquela pessoa. */
+   - entra com o login do menu (Cloudflare): o servidor só libera as áreas daquela pessoa. */
 (function () {
   if (window.NvCanal) return;
   /* no endereço próprio (apps.v4cless.com) o servidor é o mesmo endereço; no GitHub, o endereço da Cloudflare */
@@ -13,8 +13,8 @@
   var ws = null, aberto = false, espera = 500, fila = [], q = 0, subs = {}, ultimo = {}, pedidos = {}, ouvintes = [], pingT = null, pongAte = 0, abrindo = false;
   function estado(v) { aberto = v; ouvintes.forEach(function (f) { try { f(v); } catch (e) {} }); }
   function manda(o) { if (ws && aberto) { try { ws.send(JSON.stringify(o)); return true; } catch (e) {} } return false; }
-  /* login: troca a chave de renovação guardada pelo menu por um passe de 1 hora */
-  var CH = 'AIzaSyDPJvM-XZWfa8HQ7h8v0Usb1Hf3q8sDqpg', passe = null, passeAte = 0;
+  /* login: troca a chave de renovação guardada pelo menu por um passe de 1 hora (Cloudflare) */
+  var passe = null, passeAte = 0;
   function lerLs(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
   function pegaPasse() {
     if (window.NV_TOKEN_TESTE) return Promise.resolve(window.NV_TOKEN_TESTE);
@@ -29,10 +29,7 @@
         })
         .catch(function () { return null; });
     }
-    var rt = lerLs('nv.rt'); if (!rt) return Promise.resolve(null);
-    return Promise.race([fetch('https://securetoken.googleapis.com/v1/token?key=' + CH, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: 'grant_type=refresh_token&refresh_token=' + encodeURIComponent(rt) }).then(function (r) { return r.ok ? r.json() : null; }), new Promise(function (ok) { setTimeout(function () { ok(null); }, 8000); })])
-      .then(function (j) { if (!j || !j.id_token) return null; passe = j.id_token; passeAte = Date.now() + (+j.expires_in || 3600) * 1000; try { if (j.refresh_token) localStorage.setItem('nv.rt', j.refresh_token); } catch (e) {} return passe; })
-      .catch(function () { return null; });
+    return Promise.resolve(null);
   }
   function conecta() {
     if (abrindo || (ws && ws.readyState <= 1)) return;

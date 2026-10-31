@@ -9,12 +9,12 @@
    - diagnóstico em coleção própria (diag), sem acordar os outros celulares.
    r11: o servidor é o da Cloudflare (nv-canal.js), que numera cada mudança; todos recebem na mesma ordem.
    Uso: nuvem-rico.js (Rico) ou nuvem-rico.js?col=plano&k=chave1,prefixo* (&so=1 só recebe). */
-var VER = 'r11', CH = 'AIzaSyDPJvM-XZWfa8HQ7h8v0Usb1Hf3q8sDqpg', PROJ = 'projects/meus-apps-8ca76/databases/(default)/documents';
+var VER = 'r12';
 var QS = new URL(import.meta.url).searchParams, OUTRO = QS.get('col');
-var URL0 = 'https://firestore.googleapis.com/v1/' + PROJ, PRE = self.NV_COL ? self.NV_COL + '_' : '';
+var PRE = self.NV_COL ? self.NV_COL + '_' : '';
 var COL = OUTRO ? PRE + OUTRO : (self.NV_COL || 'rico_vivo'), CONF = PRE + 'v2_conflitos', DIAG = PRE + 'diag';
 var CHAVES = (QS.get('k') || '').split(',').filter(Boolean), SO = OUTRO ? QS.get('so') === '1' : !!self.NV_SORECEBE;
-var NS = OUTRO ? 'nv.' + OUTRO + '.' : 'nv.', LIMITE = 900000, PEND = NS + 'pend.v1', ST = NS + 'seq.cf1', JUNTO = NS + 'junto.v2', RT = 'nv.rt';
+var NS = OUTRO ? 'nv.' + OUTRO + '.' : 'nv.', LIMITE = 900000, PEND = NS + 'pend.v1', ST = NS + 'seq.cf1', JUNTO = NS + 'junto.v2';
 var orig = { set: Storage.prototype.setItem, rem: Storage.prototype.removeItem, get: Storage.prototype.getItem };
 var timer = null, primeiraMudanca = 0, enviando = false, lendo = false, aplicando = false, ultimoToque = Date.now(), iniciado = false;
 var vivo = 0, canal = null, base = {}, baseOk = false, tok = null, tokAte = 0, est = 'carregou', erro = '', envios = 0, recebidos = 0;
@@ -70,26 +70,6 @@ Storage.prototype.removeItem = function (k) {
   if (tinha) { marca(k, true); agenda(); }
   return r;
 };
-
-/* login: usa a chave de renovação guardada pelo menu; sem ela vai sem login (enquanto as regras permitirem) */
-async function token() {
-  if (tok && tokAte > Date.now() + 60000) return tok;
-  var rt = ler(RT); if (!rt) return null;
-  try {
-    var r = await lim(fetch('https://securetoken.googleapis.com/v1/token?key=' + CH, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: 'grant_type=refresh_token&refresh_token=' + encodeURIComponent(rt) }), 15000);
-    if (!r.ok) return null;
-    var j = await r.json(); tok = j.id_token; tokAte = Date.now() + (+j.expires_in || 3600) * 1000; grava(RT, j.refresh_token || rt);
-    return tok;
-  } catch (e) { return null; }
-}
-async function pede(caminho, metodo, corpo) {
-  if (self.NV_EMU) throw new Error('rest desligado no teste');
-  var h = { 'Content-Type': 'application/json' }, t = await token();
-  if (t) h.Authorization = 'Bearer ' + t;
-  var r = await lim(fetch(URL0 + caminho + (caminho.indexOf('?') < 0 ? '?' : '&') + 'key=' + CH, { method: metodo || 'GET', headers: h, body: corpo ? JSON.stringify(corpo) : undefined, cache: 'no-store' }), 20000);
-  if (!r.ok) throw new Error(caminho.split('?')[0].slice(-30) + ' ' + r.status);
-  return r.json();
-}
 
 /* junta por partes. b = base, l = aparelho, r = nuvem. O que só um lado mudou desde a base vale.
    Os dois mudaram o mesmo pedaço: vale o lado "pref" e o outro vai para os conflitos. */

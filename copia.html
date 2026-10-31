@@ -4,9 +4,9 @@
 <style>body{font:16px system-ui;background:#faf6ee;color:#14213d;margin:0;padding:24px 16px}h1{font-size:20px}p{line-height:1.5}.r{background:#fff;border:1px solid #e6dcc6;border-radius:12px;padding:14px;margin-top:12px;word-break:break-word}button{font:inherit;padding:12px 18px;border-radius:10px;border:0;background:#b07a1a;color:#fff}</style>
 <script>var s=document.createElement("script");s.src="app-boost.js?"+Date.now();document.head.appendChild(s);</script></head><body>
 <h1>Cópia dos dados deste aparelho</h1>
-<p>Envia agora para o Firebase o que só existe neste aparelho.</p>
+<p>Envia agora para a nuvem (Cloudflare) o que só existe neste aparelho.</p>
 <button id="b">Enviar agora</button> <button id="t2" style="background:#14213d">Reenviar tudo</button>
-<p style="margin-top:22px"><b>Celular novo ou de outra pessoa:</b> toque abaixo para trazer a sua cópia do Firebase para cá. Isso troca o que este aparelho tem.</p>
+<p style="margin-top:22px"><b>Celular novo ou de outra pessoa:</b> toque abaixo para trazer a sua cópia da nuvem para cá. Isso troca o que este aparelho tem.</p>
 <button id="t3" style="background:#999" disabled>Trazer meus dados para cá (desligado: guardando cópias antes)</button>
 <div class="r" id="r">Nada enviado ainda. Só toque nos botões neste aparelho, se for o seu celular de sempre.</div><div class="r" id="t"></div>
 <script>
@@ -16,7 +16,7 @@ async function vai(){var r=document.getElementById('r');r.textContent='Enviando.
  try{var d={ordem:localStorage.getItem('rico.proc.ordem'),pastasP:localStorage.getItem('rico.pastas.p'),keys:[],sig:localStorage.getItem('backup.ap.sig')?Object.keys(JSON.parse(localStorage.getItem('backup.ap.sig'))).length:0};
  for(var j=0;j<localStorage.length;j++){var kk=localStorage.key(j);if(kk&&kk.indexOf('rico.')===0)d.keys.push([kk,(localStorage.getItem(kk)||'').length])}
  var tk=await window.__tokenBk();
- if(tk)await fetch('https://firestore.googleapis.com/v1/projects/meus-apps-8ca76/databases/(default)/documents/aparelho_backup/_diag?key=AIzaSyDPJvM-XZWfa8HQ7h8v0Usb1Hf3q8sDqpg',{method:'PATCH',headers:{'Content-Type':'application/json','Authorization':'Bearer '+tk},body:JSON.stringify({fields:{v:{stringValue:JSON.stringify(d)},t:{integerValue:String(Date.now())}}})});}catch(e){x+=' (diag falhou: '+e+')'}
+ if(tk)await NvCanal.grava([{col:'aparelho_backup',id:'aparelho_backup/_diag',troca:true,set:[[['k'],'_diag'],[['v'],JSON.stringify(d)],[['t'],Date.now()]]}]);}catch(e){x+=' (diag falhou: '+e+')'}
  r.textContent=x+' | itens rico.* no aparelho: '+n+' | versão '+(window.__v||'');}
 setInterval(function(){var t=document.getElementById('t');if(t)t.textContent=(window.__bk||[]).join(' > ')},500);document.getElementById('t2').onclick=function(){window.__forca=true;try{localStorage.setItem('backup.ap.rest','sim')}catch(e){};try{localStorage.removeItem('backup.ap.sig');localStorage.removeItem('backup.ap.t')}catch(e){};vai()};document.getElementById('t3').onclick=function(){return;try{['backup.ap.sig','backup.ap.t','backup.ap.rest'].forEach(function(k){localStorage.removeItem(k)})}catch(e){};document.getElementById('r').textContent='Trazendo seus dados... a página recarrega sozinha.';setTimeout(function(){location.reload()},400)};document.getElementById('b').onclick=vai;
 </script></body></html>

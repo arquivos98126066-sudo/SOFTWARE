@@ -834,7 +834,6 @@ async function p_initFirebase(){
   try {
     const { initializeApp, getApps } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js');
     const { initializeFirestore, persistentLocalCache, persistentSingleTabManager, getFirestore, doc, getDoc, setDoc, onSnapshot } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js');
-    const { getAuth, onAuthStateChanged } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js');
 
     const cfg = {
       apiKey: "AIzaSyDPJvM-XZWfa8HQ7h8v0Usb1Hf3q8sDqpg",
@@ -847,7 +846,6 @@ async function p_initFirebase(){
 
     /* dados pelo canal "nv" (não espera o login do celular; o canal antigo travava e nada subia) */
     const app = getApps().filter(function(a){ return a.name === 'nv'; })[0] || initializeApp({ apiKey: cfg.apiKey, projectId: cfg.projectId, appId: cfg.appId }, 'nv');
-    const appLogin = getApps().filter(function(a){ return a.name === '[DEFAULT]'; })[0] || initializeApp(cfg);
 
     // Ativa cache persistente no IndexedDB do browser
     // Na segunda visita em diante, onSnapshot entrega dados do cache LOCAL instantaneamente
@@ -860,10 +858,9 @@ async function p_initFirebase(){
       window.__nvDb = _p_db;
     }
 
-    const auth = getAuth(appLogin);
 
     /* o login confere por trás e não segura os dados; só volta ao menu se nunca entrou */
-    onAuthStateChanged(auth, function(user){ if(!(user && !user.isAnonymous)){ var ok = false; try { ok = localStorage.getItem('menu_logado') === '1' || !!localStorage.getItem('nv.rt') || !!localStorage.getItem('nv.rt2'); } catch(e){} if(!ok) location.replace('index.html'); } });
+    (function(){ var ok = false; try { ok = !!localStorage.getItem('nv.rt2'); } catch(e){} if(!ok) location.replace('index.html'); })();
 
     /* camada única (dados.js): cada processo e pasta é um item na nuvem; dois aparelhos mexendo em processos diferentes não se apagam */
     if(window.Dados){

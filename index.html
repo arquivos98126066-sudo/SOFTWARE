@@ -511,28 +511,12 @@ input { -webkit-user-select: text; user-select: text; }
   </div>
 </div>
 
-<!-- FIREBASE — UNTOUCHED -->
+<!-- LOGIN: Cloudflare -->
 <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-  import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-
-  const firebaseConfig = {
-    apiKey: "AIzaSyDPJvM-XZWfa8HQ7h8v0Usb1Hf3q8sDqpg",
-    authDomain: "meus-apps-8ca76.firebaseapp.com",
-    projectId: "meus-apps-8ca76",
-    storageBucket: "meus-apps-8ca76.firebasestorage.app",
-    messagingSenderId: "768854372271",
-    appId: "1:768854372271:web:467b541baf3c513f03095a",
-    measurementId: "G-251F3PL3ET"
-  };
-
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-
-  /* login novo (Cloudflare, 2026-10-31): vale junto com o do Firebase até todos entrarem pelo novo */
+  /* login (Cloudflare): e-mail e senha guardados no servidor; o aparelho guarda só a chave de renovação */
   const BASE_AUTH = /github\.io$/.test(location.hostname) ? 'https://nv-dados.meusapps.workers.dev' : '';
   const temNovo = () => { try { return !!localStorage.getItem('nv.rt2'); } catch (e) { return false; } };
-  onAuthStateChanged(auth, u => (u && !u.isAnonymous) ? mostrarApp(u) : temNovo() ? mostrarApp(null) : mostrarLogin());
+  if (temNovo()) mostrarApp(null); else mostrarLogin();
 
   window.fazerLogin = async function () {
     const email   = document.getElementById('email-input').value;
@@ -544,18 +528,14 @@ input { -webkit-user-select: text; user-select: text; }
     loading.classList.add('show');
     btn.disabled = true;
     try {
-      /* 1º o login novo (Cloudflare); se a pessoa ainda não tem senha nova, o do Firebase */
       let novo = null;
       try {
         const r = await fetch(BASE_AUTH + '/auth/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: email.trim(), senha }) });
         if (r.ok) novo = await r.json();
       } catch (e) {}
-      if (novo && novo.refresh) {
-        try { localStorage.setItem('nv.rt2', novo.refresh); localStorage.setItem('nv.email2', novo.email || ''); } catch (e) {}
-        mostrarApp(null);
-        return;
-      }
-      await signInWithEmailAndPassword(auth, email, senha);
+      if (!novo || !novo.refresh) throw new Error('login recusado');
+      try { localStorage.setItem('nv.rt2', novo.refresh); localStorage.setItem('nv.email2', novo.email || ''); } catch (e) {}
+      mostrarApp(null);
     } catch (e) {
       erro.classList.add('show');
       loading.classList.remove('show');
@@ -567,7 +547,7 @@ input { -webkit-user-select: text; user-select: text; }
     }
   };
 
-  window.fazerLogout = async function () { try { localStorage.removeItem('nv.rt'); localStorage.removeItem('nv.rt2'); localStorage.removeItem('nv.email2'); } catch (e) {} if (window.NvCanal) NvCanal.sair(); try { await signOut(auth); } catch (e) {} mostrarLogin(); };
+  window.fazerLogout = async function () { try { localStorage.removeItem('nv.rt'); localStorage.removeItem('nv.rt2'); localStorage.removeItem('nv.email2'); } catch (e) {} if (window.NvCanal) NvCanal.sair(); mostrarLogin(); };
 
   /* cada pessoa só abre as áreas liberadas para ela (quem libera é o servidor; aqui só avisa no toque) */
   var AREA = { 'TAPETE-CRM.html': 'tapete', 'MEU-CRM.html': 'crm', 'DOA.html': 'plano', 'ADM.html': 'adm', 'RICO.html': 'rico', 'LER.html': 'estudo' };
@@ -582,7 +562,7 @@ input { -webkit-user-select: text; user-select: text; }
     } catch (e) {}
   }
   function mostrarApp(u) {
-    try { localStorage.setItem('menu_logado', '1'); if (u && u.refreshToken) localStorage.setItem('nv.rt', u.refreshToken); } catch (e) {}
+    try { localStorage.setItem('menu_logado', '1'); } catch (e) {}
     liberaAreas();
     document.getElementById('lock-screen').classList.remove('show');
     document.getElementById('app-content').classList.add('show');
