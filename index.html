@@ -7,6 +7,7 @@
 <script>/* entrou pelo menu: nenhuma troca de app pendente (o Plano e o Estudo abrem do começo) */try { sessionStorage.removeItem('troca'); sessionStorage.removeItem('viaPlano'); } catch (e) {}</script>
 <link rel="preload" as="image" href="menu.webp" fetchpriority="high">
 <script>try{if(localStorage.getItem('menu_logado')==='1')document.documentElement.classList.add('dica')}catch(e){}</script>
+<script>try{if(localStorage.getItem('menu_perfil')==='cli')document.documentElement.classList.add('cli')}catch(e){}</script>
 <title>Meus Apps</title>
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icon-192.png">
@@ -402,6 +403,28 @@ body::after {
 #app-content.show .card:nth-child(4) { animation-delay: .16s; }
 #app-content.show .card:nth-child(5) { animation-delay: .20s; }
 
+
+/* menu do cliente: montado na hora so com os apps liberados (modelo aprovado, Estilo B) */
+#menu-cli { display: none; position: fixed; inset: 0; z-index: 3; overflow-y: auto; background: radial-gradient(circle at 20% 0, #1b2a8a, #070a22 62%); }
+html.cli #menu-cli, #menu-cli.on { display: flex; }
+html.cli .menu-tela { display: none; }
+#menu-cli .mc { margin: auto; width: 100%; max-width: 430px; padding: calc(env(safe-area-inset-top, 0px) + 26px) 20px calc(env(safe-area-inset-bottom, 0px) + 30px); display: flex; flex-direction: column; align-items: center; }
+#menu-cli .lg { position: relative; top: 6px; flex: none; margin-bottom: 30px; width: 80px; height: 80px; border-radius: 50%; border: 3px solid #8a7bff; box-shadow: 0 0 18px #6a5cff; display: flex; align-items: center; justify-content: center; color: #fff; font: 800 28px -apple-system, 'Segoe UI', sans-serif; background: #0a0f33; }
+#menu-cli .gd { width: 100%; display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+#menu-cli .gd.k1 { grid-template-columns: 1fr; }
+#menu-cli a.ap { border-radius: 22px; border: 1.5px solid rgba(255,255,255,.33); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; color: #fff; font: 500 15px -apple-system, 'Segoe UI', sans-serif; text-decoration: none; box-shadow: inset 0 0 20px rgba(255,255,255,.13); height: 120px; -webkit-tap-highlight-color: transparent; }
+#menu-cli a.ap:active { filter: brightness(1.2); transform: scale(.97); }
+#menu-cli a.ap svg { width: 34px; height: 34px; stroke: #fff; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+#menu-cli .gd > a.ap:last-child:nth-child(odd) { grid-column: 1 / 3; }
+#menu-cli .k1 a.ap, #menu-cli .k2 a.ap { height: 130px; }
+#menu-cli .k4 a.ap { height: 112px; } #menu-cli .k5 a.ap { height: 96px; } #menu-cli .k6 a.ap { height: 100px; }
+#menu-cli .k7 .gd, #menu-cli .gd.k7 { gap: 11px; }
+#menu-cli .k7 a.ap { height: 76px; font-size: 13px; gap: 5px; } #menu-cli .k7 svg { width: 26px; height: 26px; }
+#menu-cli .k8 a.ap, #menu-cli .k9 a.ap, #menu-cli .k10 a.ap { height: 62px; gap: 3px; font-size: 12px; }
+#menu-cli .k8 svg, #menu-cli .k9 svg, #menu-cli .k10 svg { width: 22px; height: 22px; }
+#menu-cli .gd.k8, #menu-cli .gd.k9, #menu-cli .gd.k10 { gap: 9px; }
+#menu-cli .sair { margin-top: 26px; background: none; border: 0; color: rgba(255,255,255,.35); font-size: 12px; }
+.c-b{background:linear-gradient(145deg,#2a6bff,#123aa8)}.c-v{background:linear-gradient(145deg,#2fbf5a,#126a34)}.c-p{background:linear-gradient(145deg,#8a3bff,#4a14a0)}.c-o{background:linear-gradient(145deg,#ff8a2a,#a8490f)}.c-r{background:linear-gradient(145deg,#ff3b8a,#a01450)}.c-y{background:linear-gradient(145deg,#2ab8ff,#0f6fa8)}
 /* Sair escondido: aparece segurando o dedo em "Workspace" */
 .logout-btn { display: none; }
 .logout-btn.show { display: block; animation: fadeUp .25s ease both; }
@@ -481,6 +504,7 @@ input { -webkit-user-select: text; user-select: text; }
 
 <!-- APP -->
 <div id="app-content">
+  <div id="menu-cli"></div>
   <button class="logout-btn" onclick="fazerLogout()">Sair</button>
   <div class="menu-tela">
     <div class="menu-box">
@@ -551,14 +575,27 @@ input { -webkit-user-select: text; user-select: text; }
 
   /* cada pessoa só abre as áreas liberadas para ela (quem libera é o servidor; aqui só avisa no toque) */
   var AREA = { 'TAPETE-CRM.html': 'tapete', 'MEU-CRM.html': 'crm', 'DOA.html': 'plano', 'ADM.html': 'adm', 'RICO.html': 'rico', 'LER.html': 'estudo' };
+  /* menu do cliente: so os apps liberados; com 1 app abre direto nele; o dono segue com o menu dele */
+  var ICO = { chart: '<path d="M3 17l6-6 4 4 8-8M15 7h6v6"/>', coin: '<circle cx="12" cy="12" r="9"/><path d="M12 7v10M9.5 9.5c0-1 1-1.5 2.5-1.5s2.5.7 2.5 1.7-1 1.5-2.5 1.8-2.5.8-2.5 1.8 1 1.7 2.5 1.7 2.5-.5 2.5-1.5"/>', book: '<path d="M3 5h7a2 2 0 012 2v12a2 2 0 00-2-2H3zM21 5h-7a2 2 0 00-2 2v12a2 2 0 012-2h7z"/>', users: '<circle cx="9" cy="8" r="3.5"/><path d="M2 20c0-4 3-6 7-6s7 2 7 6M17 5a3.5 3.5 0 010 7M22 20c0-3-2-5-4-5.5"/>', rug: '<rect x="3" y="6" width="18" height="12" rx="2"/><path d="M7 6v12M17 6v12M3 12h18"/>', cash: '<rect x="3" y="6" width="18" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/>', bars: '<path d="M4 20V10M10 20V4M16 20v-8M22 20H2"/>', eye: '<path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>', list: '<path d="M6 3h9l4 4v14H6zM9 12h7M9 16h7"/>', tool: '<path d="M14 6a4 4 0 005 5l-9 9a2 2 0 01-3-3l9-9a4 4 0 01-2-2z"/>' };
+  var MENU = [
+    ['plano', 'Plano', 'DOA.html', 'b', 'chart'], ['rico', 'Rico', 'RICO.html', 'v', 'coin'], ['estudo', 'Estudo', 'LER.html', 'p', 'book'],
+    ['crm', 'Meu CRM', 'MEU-CRM.html', 'y', 'users'], ['tapete', 'Tapete CRM', 'TAPETE-CRM.html', 'o', 'rug'], ['adm', 'ADM', 'ADM.html', 'r', 'cash'],
+    ['prevenda', 'Pré-venda', 'PRE-VENDA.html', 'o', 'bars'], ['retina', 'Retina', 'RETINA.html', 'y', 'eye'], ['opa', 'Método OPA', 'METODO-OPA.html', 'p', 'list'], ['workshop', 'Workshop', 'Workshop.html', 'v', 'tool']
+  ];
   async function liberaAreas() {
     try {
       if (!window.NvCanal) await import('./nv-canal.js');
-      var eu = await NvCanal.eu(); if (!eu || eu.admin) return;
-      document.querySelectorAll('a.menu-link').forEach(function (a) {
-        var ar = AREA[a.getAttribute('href')]; if (!ar || eu.areas.some(function (x) { return x === ar || x.indexOf(ar + ':') === 0; })) return;
-        a.addEventListener('click', function (e) { e.preventDefault(); e.stopImmediatePropagation(); alert('Sem acesso a esta área.'); }, true);
-      });
+      var eu = await NvCanal.eu(); if (!eu) return;
+      try { localStorage.setItem('menu_perfil', eu.admin ? 'adm' : 'cli'); } catch (e) {}
+      if (eu.admin) { document.documentElement.classList.remove('cli'); document.getElementById('menu-cli').classList.remove('on'); return; }
+      var livres = MENU.filter(function (m) { return eu.areas.some(function (x) { return x === m[0] || x.indexOf(m[0] + ':') === 0; }); });
+      if (livres.length === 1) { location.replace(livres[0][2]); return; }
+      var n = Math.min(livres.length, 10);
+      document.getElementById('menu-cli').innerHTML = '<div class="mc"><div class="lg">V4</div><div class="gd k' + n + '">' + livres.map(function (m) {
+        return '<a class="ap c-' + m[3] + '" href="' + m[2] + '"><svg viewBox="0 0 24 24">' + ICO[m[4]] + '</svg>' + m[1] + '</a>';
+      }).join('') + '</div></div>';
+      document.getElementById('menu-cli').classList.add('on');
+      document.documentElement.classList.add('cli');
     } catch (e) {}
   }
   function mostrarApp(u) {
