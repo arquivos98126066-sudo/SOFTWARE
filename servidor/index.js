@@ -39,6 +39,7 @@ let chaves = null, chavesAte = 0;
 function b64url(s) { s = s.replace(/-/g, '+').replace(/_/g, '/'); while (s.length % 4) s += '='; return Uint8Array.from(atob(s), c => c.charCodeAt(0)); }
 async function confereToken(t, env) {
   if (!t) return null;
+  if (t.indexOf('nv.') === 0) { const o = await abre(env, t, 'a'); return o ? { uid: 'nv:' + o.e, email: o.e } : null; }
   if (env.TESTE === '1' && t.indexOf('teste:') === 0) { const [, uid, email] = t.split(':'); return { uid, email }; }
   try {
     const [h, c, a] = t.split('.');
@@ -83,12 +84,40 @@ function fbVal(f) {
   return null;
 }
 
+/* ---- login próprio (Cloudflare), no lugar do Firebase Auth (2026-10-31) ----
+   Senha guardada só como PBKDF2-SHA256 com sal. O passe de acesso ("nv.") vale 1 hora; o de renovação, 90 dias.
+   Assinatura HMAC com o segredo AUTH_SECRET (guardado no servidor, nunca no código). */
+const ITER = 100000;
+const enc = new TextEncoder();
+function b64u(bytes) { let s = ''; bytes.forEach(b => { s += String.fromCharCode(b); }); return btoa(s).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, ''); }
+async function hmacChave(env) { return crypto.subtle.importKey('raw', enc.encode(env.AUTH_SECRET), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign', 'verify']); }
+async function assina(env, obj) {
+  const p = b64u(enc.encode(JSON.stringify(obj)));
+  const s = b64u(new Uint8Array(await crypto.subtle.sign('HMAC', await hmacChave(env), enc.encode(p))));
+  return 'nv.' + p + '.' + s;
+}
+async function abre(env, t, tipo) {
+  try {
+    if (!env.AUTH_SECRET || !t || t.indexOf('nv.') !== 0) return null;
+    const [, p, s] = t.split('.');
+    if (!(await crypto.subtle.verify('HMAC', await hmacChave(env), b64url(s), enc.encode(p)))) return null;
+    const o = JSON.parse(new TextDecoder().decode(b64url(p)));
+    return o.k === tipo && o.x > Date.now() && o.e ? o : null;
+  } catch (e) { return null; }
+}
+async function hashSenha(senha, salt) {
+  const k = await crypto.subtle.importKey('raw', enc.encode(senha), 'PBKDF2', false, ['deriveBits']);
+  return new Uint8Array(await crypto.subtle.deriveBits({ name: 'PBKDF2', hash: 'SHA-256', salt, iterations: ITER }, k, 256));
+}
+function igual(a, b) { if (a.length !== b.length) return false; let d = 0; for (let i = 0; i < a.length; i++) d |= a[i] ^ b[i]; return d === 0; }
+
 export default {
   async fetch(req, env) {
     const u = new URL(req.url);
     if (req.method === 'OPTIONS') return cors(new Response(null, { status: 204 }));
     const conta = contaDe(env);
     if (u.pathname === '/' || u.pathname === '') return env.ASSETS.fetch(new Request(new URL('/index.html', u), req));
+    if (u.pathname.startsWith('/auth/')) return cors(await conta.fetch(req));
     if (u.pathname === '/ws') {
       if (req.headers.get('Upgrade') !== 'websocket') return new Response('so websocket', { status: 426 });
       const p = await quem(req, u, env);
@@ -145,6 +174,8 @@ export class Conta extends DurableObject {
     this.sql.exec('CREATE INDEX IF NOT EXISTS docs_seq ON docs (col, seq)');
     this.sql.exec('CREATE TABLE IF NOT EXISTS meta (k TEXT PRIMARY KEY, v INTEGER NOT NULL)');
     this.sql.exec('CREATE TABLE IF NOT EXISTS usuarios (email TEXT PRIMARY KEY, areas TEXT NOT NULL, ativo INTEGER NOT NULL, t INTEGER NOT NULL)');
+    this.sql.exec('CREATE TABLE IF NOT EXISTS credenciais (email TEXT PRIMARY KEY, salt TEXT NOT NULL, hash TEXT NOT NULL, dono INTEGER NOT NULL, t INTEGER NOT NULL)');
+    this.sql.exec('CREATE TABLE IF NOT EXISTS falhas (email TEXT NOT NULL, t INTEGER NOT NULL)');
     this.sql.exec('CREATE TABLE IF NOT EXISTS mudancas (c TEXT NOT NULL, i INTEGER NOT NULL, n INTEGER NOT NULL, dado TEXT NOT NULL, t INTEGER NOT NULL, PRIMARY KEY (c, i))');
     this.sql.exec('CREATE TABLE IF NOT EXISTS entradas (quem TEXT PRIMARY KEY, chave INTEGER NOT NULL, ua TEXT, t INTEGER NOT NULL)');
     const r = this.sql.exec("SELECT v FROM meta WHERE k = 'seq'").toArray();
@@ -180,6 +211,7 @@ export class Conta extends DurableObject {
     }
     if (this.foi) return new Response('mudou de lugar', { status: 503 });
     if (this.vazio) { await this.ctx.blockConcurrencyWhile(async () => { if (this.vazio) { await this.trazer(); this.vazio = false; } }); }
+    if (u.pathname.startsWith('/auth/')) return this.auth(req, u);
     if (u.pathname === '/ws') {
       const par = new WebSocketPair();
       this.ctx.acceptWebSocket(par[1]);
@@ -265,10 +297,66 @@ export class Conta extends DurableObject {
     return estado;
   }
 
+  /* login próprio: primeira (dono), login, refresh, senha, definir (só o dono) */
+  async auth(req, u) {
+    const env = this.env;
+    if (!env.AUTH_SECRET) return json({ erro: 'login ainda não ligado' }, 503);
+    if (req.method !== 'POST') return json({ erro: 'use POST' }, 405);
+    const c = await req.json().catch(() => ({}));
+    const rota = u.pathname.slice(6), email = String(c.email || '').trim().toLowerCase();
+    const quemEh = async (t) => { const o = await abre(env, t, 'a'); return o ? o.e : null; };
+    const dono = (e) => { const r = this.sql.exec('SELECT dono FROM credenciais WHERE email = ?', e).toArray(); return !!(r.length && r[0].dono); };
+    const emite = async (e) => json({ email: e, token: await assina(env, { k: 'a', e, x: Date.now() + 3600000 }), refresh: await assina(env, { k: 'r', e, x: Date.now() + 90 * 86400000 }), expira: 3600 });
+    const grava = async (e, senha, ehDono) => {
+      const salt = crypto.getRandomValues(new Uint8Array(16)), h = await hashSenha(senha, salt);
+      this.sql.exec('INSERT OR REPLACE INTO credenciais (email, salt, hash, dono, t) VALUES (?, ?, ?, ?, ?)', e, b64u(salt), b64u(h), ehDono ? 1 : 0, Date.now());
+    };
+    if (rota === 'primeira') {
+      /* só uma vez: cria o dono, com o código de instalação guardado no servidor */
+      if (!env.SETUP_KEY || c.setup !== env.SETUP_KEY) return json({ erro: 'código de instalação errado' }, 403);
+      if (this.sql.exec('SELECT 1 FROM credenciais WHERE dono = 1').toArray().length) return json({ erro: 'o dono já foi criado' }, 409);
+      if (!email || String(c.senha || '').length < 8) return json({ erro: 'e-mail e senha de 8 letras ou mais' }, 400);
+      await grava(email, String(c.senha), true);
+      return emite(email);
+    }
+    if (rota === 'login') {
+      const agora = Date.now();
+      this.sql.exec('DELETE FROM falhas WHERE t < ?', agora - 600000);
+      if (this.sql.exec('SELECT COUNT(*) AS n FROM falhas WHERE email = ?', email).toArray()[0].n >= 8) return json({ erro: 'muitas tentativas; espere 10 minutos' }, 429);
+      const r = this.sql.exec('SELECT salt, hash FROM credenciais WHERE email = ?', email).toArray();
+      const h = await hashSenha(String(c.senha || ''), r.length ? b64url(r[0].salt) : new Uint8Array(16));
+      if (!r.length || !igual(h, b64url(r[0].hash))) { this.sql.exec('INSERT INTO falhas (email, t) VALUES (?, ?)', email, agora); return json({ erro: 'e-mail ou senha errados' }, 401); }
+      return emite(email);
+    }
+    if (rota === 'refresh') {
+      const o = await abre(env, String(c.refresh || ''), 'r');
+      if (!o || !this.sql.exec('SELECT 1 FROM credenciais WHERE email = ?', o.e).toArray().length) return json({ erro: 'entre de novo' }, 401);
+      return emite(o.e);
+    }
+    if (rota === 'senha') {
+      const e = await quemEh(String(c.token || ''));
+      if (!e) return json({ erro: 'entre de novo' }, 401);
+      const r = this.sql.exec('SELECT salt, hash FROM credenciais WHERE email = ?', e).toArray();
+      if (!r.length || !igual(await hashSenha(String(c.atual || ''), b64url(r[0].salt)), b64url(r[0].hash))) return json({ erro: 'senha atual errada' }, 401);
+      if (String(c.nova || '').length < 8) return json({ erro: 'senha nova com 8 letras ou mais' }, 400);
+      await grava(e, String(c.nova), dono(e));
+      return json({ ok: 1 });
+    }
+    if (rota === 'definir') {
+      const e = await quemEh(String(c.token || ''));
+      if (!e || !dono(e)) return json({ erro: 'só o dono' }, 403);
+      if (!email || String(c.senha || '').length < 8) return json({ erro: 'e-mail e senha de 8 letras ou mais' }, 400);
+      await grava(email, String(c.senha), dono(email));
+      return json({ ok: 1, email });
+    }
+    return json({ erro: 'rota?' }, 404);
+  }
+
   /* quem é a pessoa: o dono vê tudo; sem login (fase de troca) também; os outros, só as áreas liberadas */
   perfil(q) {
     if (q.chave) return { chave: true, admin: true, areas: ['*'], email: '' };
     if (q.uid === DONO_UID) return { uid: q.uid, email: q.email, admin: true, areas: ['*'] };
+    if (q.uid && q.uid.indexOf('nv:') === 0) { const d = this.sql.exec('SELECT dono FROM credenciais WHERE email = ?', q.email || '').toArray(); if (d.length && d[0].dono) return { uid: q.uid, email: q.email, admin: true, areas: ['*'] }; }
     const r = this.sql.exec('SELECT areas, ativo FROM usuarios WHERE email = ?', q.email || '').toArray();
     /* fase de troca: login de quem ainda não foi cadastrado entra como antes (vale até ACEITA_CHAVE = "0") */
     if (!r.length && this.env.ACEITA_CHAVE !== '0') return { uid: q.uid, email: q.email, admin: true, areas: ['*'], transicao: true };
