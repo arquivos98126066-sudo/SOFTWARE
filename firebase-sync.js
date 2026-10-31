@@ -24,6 +24,6 @@ export const authReady = new Promise(resolve => {
   onAuthStateChanged(auth, user => {
     if (user && !user.isAnonymous) { try { if (user.refreshToken) localStorage.setItem('nv.rt', user.refreshToken); } catch (e) {} resolve(user); }
     /* sem login do Google no aparelho, mas já entrou pelo menu: segue com os dados (não volta para o menu) */
-    else { var ok = false; try { ok = localStorage.getItem('menu_logado') === '1' || !!localStorage.getItem('nv.rt'); } catch (e) {} if (ok) resolve(null); else location.replace('index.html'); }
+    else { var ok = false; try { ok = localStorage.getItem('menu_logado') === '1' || !!localStorage.getItem('nv.rt') || !!localStorage.getItem('nv.rt2'); } catch (e) {} if (ok) resolve(null); else location.replace('index.html'); }
   });
 });
