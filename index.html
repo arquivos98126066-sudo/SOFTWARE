@@ -8,6 +8,7 @@
 <link rel="preload" as="image" href="menu.webp" fetchpriority="high">
 <script>try{if(localStorage.getItem('menu_logado')==='1')document.documentElement.classList.add('dica')}catch(e){}</script>
 <script>try{if(localStorage.getItem('menu_perfil')==='cli')document.documentElement.classList.add('cli')}catch(e){}</script>
+<script>try{if(localStorage.getItem('menu_logado')==='1'&&!localStorage.getItem('menu_perfil'))document.documentElement.classList.add('aguarda')}catch(e){}</script>
 <title>Meus Apps</title>
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icon-192.png">
@@ -408,6 +409,7 @@ body::after {
 #menu-cli { display: none; position: fixed; inset: 0; z-index: 3; overflow-y: auto; background: radial-gradient(circle at 20% 0, #1b2a8a, #070a22 62%); }
 html.cli #menu-cli, #menu-cli.on { display: flex; }
 html.cli .menu-tela { display: none; }
+html.aguarda .menu-tela { visibility: hidden; }
 #menu-cli .mc { margin: auto; width: 100%; max-width: 430px; padding: calc(env(safe-area-inset-top, 0px) + 26px) 20px calc(env(safe-area-inset-bottom, 0px) + 30px); display: flex; flex-direction: column; align-items: center; }
 #menu-cli .lg { position: relative; top: 6px; flex: none; margin-bottom: 30px; width: 80px; height: 80px; border-radius: 50%; border: 3px solid #8a7bff; box-shadow: 0 0 18px #6a5cff; display: flex; align-items: center; justify-content: center; color: #fff; font: 800 28px -apple-system, 'Segoe UI', sans-serif; background: #0a0f33; }
 #menu-cli .mc { position: relative; }
@@ -563,6 +565,8 @@ input { -webkit-user-select: text; user-select: text; }
       } catch (e) {}
       if (!novo || !novo.refresh) throw new Error('login recusado');
       try { localStorage.setItem('nv.rt2', novo.refresh); localStorage.setItem('nv.email2', novo.email || ''); } catch (e) {}
+      try { localStorage.removeItem('menu_perfil'); } catch (x) {}
+      document.documentElement.classList.remove('cli'); document.documentElement.classList.add('aguarda');
       mostrarApp(null);
     } catch (e) {
       erro.classList.add('show');
@@ -575,7 +579,7 @@ input { -webkit-user-select: text; user-select: text; }
     }
   };
 
-  window.fazerLogout = async function () { try { localStorage.removeItem('nv.rt'); localStorage.removeItem('nv.rt2'); localStorage.removeItem('nv.email2'); } catch (e) {} if (window.NvCanal) NvCanal.sair(); mostrarLogin(); };
+  window.fazerLogout = async function () { try { localStorage.removeItem('nv.rt'); localStorage.removeItem('nv.rt2'); localStorage.removeItem('nv.email2'); localStorage.removeItem('menu_perfil'); } catch (e) {} document.documentElement.classList.remove('cli', 'aguarda'); if (window.NvCanal) NvCanal.sair(); mostrarLogin(); };
 
   /* cada pessoa só abre as áreas liberadas para ela (quem libera é o servidor; aqui só avisa no toque) */
   var AREA = { 'TAPETE-CRM.html': 'tapete', 'MEU-CRM.html': 'crm', 'DOA.html': 'plano', 'ADM.html': 'adm', 'RICO.html': 'rico', 'LER.html': 'estudo' };
@@ -605,11 +609,13 @@ input { -webkit-user-select: text; user-select: text; }
     sv.setAttribute('viewBox', '0 0 ' + M.width + ' ' + M.height); sv.innerHTML = '<defs>' + defs + '</defs>' + corpo;
   }
   async function liberaAreas() {
+    var solta = function () { document.documentElement.classList.remove('aguarda'); };
+    setTimeout(solta, 5000);
     try {
       if (!window.NvCanal) await import('./nv-canal.js');
-      var eu = await NvCanal.eu(); if (!eu) return;
+      var eu = await NvCanal.eu(); if (!eu) { solta(); return; }
       try { localStorage.setItem('menu_perfil', eu.admin ? 'adm' : 'cli'); } catch (e) {}
-      if (eu.admin) { document.documentElement.classList.remove('cli'); document.getElementById('menu-cli').classList.remove('on'); return; }
+      if (eu.admin) { document.documentElement.classList.remove('cli'); document.getElementById('menu-cli').classList.remove('on'); solta(); return; }
       var livres = MENU.filter(function (m) { return eu.areas.some(function (x) { return x === m[0] || x.indexOf(m[0] + ':') === 0; }); });
       if (livres.length === 1) { location.replace(livres[0][2]); return; }
       var n = Math.min(livres.length, 10);
@@ -617,9 +623,9 @@ input { -webkit-user-select: text; user-select: text; }
         return '<a class="ap c-' + m[3] + '" data-c="' + COR[m[3]] + '" href="' + m[2] + '"><svg viewBox="0 0 24 24">' + ICO[m[4]] + '</svg>' + m[1] + '</a>';
       }).join('') + '</div></div>';
       document.getElementById('menu-cli').classList.add('on');
-      document.documentElement.classList.add('cli');
+      document.documentElement.classList.add('cli'); solta();
       cabos(); setTimeout(cabos, 300); addEventListener('resize', cabos);
-    } catch (e) {}
+    } catch (e) { solta(); }
   }
   function mostrarApp(u) {
     try { localStorage.setItem('menu_logado', '1'); } catch (e) {}
