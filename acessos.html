@@ -57,8 +57,8 @@
   #msg{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:#0f172a;color:#fff;font-size:13px;font-weight:600;padding:11px 16px;border-radius:99px;opacity:0;pointer-events:none;transition:opacity .2s;max-width:90%;text-align:center;z-index:20}
   #msg.ve{opacity:1}#msg.erro{background:#b91c1c}
   .vazio{color:#94a3b8;font-size:14px;padding:30px 0;text-align:center}
-.quem.ed .av{box-shadow:0 0 0 3px #fff,0 0 0 5px #2563eb}.quem.ed b{color:#2563eb}
 body{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}input,textarea{-webkit-user-select:text;user-select:text}
+*,*::before,*::after{-webkit-user-select:none!important;user-select:none!important;-webkit-touch-callout:none!important}input,textarea{-webkit-user-select:text!important;user-select:text!important}::selection{background:transparent}
 </style>
 </head>
 <body>
@@ -153,7 +153,7 @@ function desenha() {
   if ($('abreLista')) {
     let tm = null, longo = false, x0 = 0, y0 = 0;
     const q = $('abreLista');
-    q.onpointerdown = e => { longo = false; x0 = e.clientX; y0 = e.clientY; clearTimeout(tm); tm = setTimeout(() => { longo = true; if (navigator.vibrate) { try { navigator.vibrate(15); } catch (x) {} } editando = !editando; if (editando) msg('Modo edição'); else copiaConvite(); desenha(); }, 550); };
+    q.onpointerdown = e => { longo = false; x0 = e.clientX; y0 = e.clientY; clearTimeout(tm); tm = setTimeout(() => { longo = true; if (navigator.vibrate) { try { navigator.vibrate(15); } catch (x) {} } try { getSelection().removeAllRanges(); } catch (x) {} editando = !editando; if (editando) msg('Modo edição'); else copiaConvite(); desenha(); }, 550); };
     q.onpointermove = e => { if (Math.abs(e.clientX - x0) + Math.abs(e.clientY - y0) > 10) clearTimeout(tm); };
     ['onpointerup', 'onpointercancel', 'onpointerleave'].forEach(k => { q[k] = () => clearTimeout(tm); });
     q.oncontextmenu = e => e.preventDefault();
