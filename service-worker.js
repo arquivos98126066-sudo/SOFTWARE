@@ -1,4 +1,4 @@
-const CACHE_NAME = 'meus-apps-v373';
+const CACHE_NAME = 'meus-apps-v374';
 // HTMLs enviados pelo menu (segurar o app > Enviar um novo): ficam fora da limpeza de versões antigas
 const ENVIADOS = 'apps-enviados';
 
@@ -27,6 +27,7 @@ const URLS_TO_CACHE = [
   './menu.webp',
   './icon-192.png',
   './icon-512.png',
+  './icon-maskable-512.png',
   './open-external.js',
   './auth-check.js',
   './firebase-sync.js',
