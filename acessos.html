@@ -8,24 +8,29 @@
   *{box-sizing:border-box}
   html,body{margin:0;background:#fff;color:#0f172a;font-family:'DM Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;-webkit-tap-highlight-color:transparent}
   main{max-width:460px;margin:0 auto;padding:22px 20px 80px}
-  .pe{display:flex;align-items:center;gap:12px;margin-bottom:0;padding:10px 0;position:sticky;top:0;background:#fff;z-index:4}
+  .pe{display:flex;align-items:center;gap:12px;margin-bottom:8px;padding:10px 0;position:sticky;top:0;background:#fff;z-index:4}
   .quem{display:flex;align-items:center;gap:12px;flex:1;min-width:0;background:none;border:0;padding:0;text-align:left;color:inherit;font:inherit;cursor:pointer}
   .quem b{font-size:15px;font-weight:600;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .av{width:40px;height:40px;border-radius:50%;background:#0f172a;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px;flex:none}
   .av.off{background:#94a3b8}
   .ic{width:38px;height:38px;border-radius:12px;background:#f1f5f9;display:flex;align-items:center;justify-content:center;border:0;flex:none;cursor:pointer;padding:0}
   .ic.novo{background:#fff;border:1.5px dashed #cbd5e1}
-  .sec{font-size:11px;letter-spacing:.08em;color:#94a3b8;font-weight:700;margin:22px 0 2px;text-transform:uppercase}
-  .li{display:flex;align-items:center;padding:15px 0;border-bottom:1px solid #f1f5f9;font-size:15px}
-  .li b{flex:1;font-weight:500}
-  .sw{width:42px;height:25px;border-radius:99px;background:#e2e8f0;position:relative;flex:none;border:0;padding:0;cursor:pointer;transition:background .15s}
-  .sw:after{content:'';position:absolute;top:3px;left:3px;width:19px;height:19px;border-radius:50%;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.15);transition:left .15s}
-  .sw.on{background:#0f172a}.sw.on:after{left:20px}
-  .lista{position:absolute;left:0;right:0;top:48px;background:#fff;border:1px solid #e2e8f0;border-radius:16px;box-shadow:0 8px 24px rgba(15,23,42,.08);z-index:5;overflow:hidden;display:none}
-  .lista.abre{display:block}
-  .lista button{display:flex;align-items:center;gap:12px;width:100%;padding:12px 14px;border:0;background:#fff;font:inherit;font-size:14px;font-weight:600;text-align:left;border-bottom:1px solid #f1f5f9;cursor:pointer;color:inherit}
-  .lista button:last-child{border:0}
-  .lista small{margin-left:auto;color:#94a3b8;font-weight:500;font-size:12px}
+  .ac{background:#fff;border:1px solid #e9ecf2;border-radius:18px;margin-bottom:10px;overflow:hidden}
+  .ah{display:flex;align-items:center;gap:12px;padding:14px;width:100%;background:none;border:0;font:inherit;color:inherit;text-align:left;cursor:pointer}
+  .ah b{flex:1;font-size:15px;font-weight:600}
+  .ib2{width:34px;height:34px;border-radius:11px;background:#f1f5f9;display:flex;align-items:center;justify-content:center;flex:none}
+  .bd{font-size:12px;font-weight:700;color:#475569;background:#f1f5f9;border-radius:99px;padding:4px 9px}
+  .ah .sv{transition:transform .2s}.ac.abre .sv{transform:rotate(180deg)}
+  .cps{display:none;flex-wrap:wrap;gap:8px;padding:0 14px 16px}.ac.abre .cps{display:flex}
+  .cp{font:inherit;font-size:13px;font-weight:600;padding:9px 14px;border-radius:99px;background:#f1f5f9;color:#64748b;border:0;cursor:pointer}.cp.on{background:#0f172a;color:#fff}
+  .trio{display:flex;gap:12px;justify-content:center;margin-top:22px}
+  .tq{width:60px;height:60px;border-radius:20px;background:#f1f5f9;display:flex;align-items:center;justify-content:center;border:0;padding:0;cursor:pointer}
+  .tq.on{background:#0f172a;box-shadow:0 8px 18px rgba(15,23,42,.22)}.tq.bloq{background:#fee2e2}
+  .f .ok{width:38px;height:38px;border-radius:12px;background:#0f172a;display:flex;align-items:center;justify-content:center;border:0;padding:0;margin-left:auto;cursor:pointer;flex:none}
+  .branco{position:fixed;inset:0;background:#fff;z-index:8;display:none;overflow:auto;padding:28px 20px}.branco.abre{display:block}
+  .pc{display:flex;align-items:center;gap:14px;height:68px;padding:0 14px;width:100%;background:#fff;border:0;border-radius:22px;box-shadow:0 6px 20px rgba(15,23,42,.10),0 1px 3px rgba(15,23,42,.06);margin-bottom:14px;font:inherit;color:inherit;cursor:pointer;text-align:left}
+  .pc b{font-size:16px;font-weight:600;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .pc .av{width:40px;height:40px}
   .fundo{position:fixed;inset:0;background:rgba(15,23,42,.35);display:none;align-items:flex-end;justify-content:center;z-index:10}
   .fundo.abre{display:flex}
   .folha{background:#fff;width:100%;max-width:460px;border-radius:24px 24px 0 0;padding:22px 20px 26px}
@@ -56,11 +61,12 @@
 
 <div class="fundo" id="fSenha"><div class="folha">
   <div class="gr"></div>
-  <h2 id="tSenha">Senha</h2>
-  <div class="f"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="3"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg><input type="text" id="nova" placeholder="Nova senha (mínimo 8)" autocomplete="off" autocapitalize="none"></div>
-  <button class="bt" id="defSenha"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"/></svg>Definir senha</button>
-  <button class="bt perigo" id="bloqueia">Bloquear</button>
-  <button class="bt leve" data-fecha><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>Fechado</button>
+  <div class="f"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="3"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg><input type="text" id="nova" placeholder="Nova senha (mínimo 8)" autocomplete="off" autocapitalize="none"><button class="ok" id="defSenha" aria-label="Definir senha"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"/></svg></button></div>
+  <div class="trio">
+    <button class="tq" id="bloqueia" aria-label="Bloquear ou liberar"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#475569" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/></svg></button>
+    <button class="tq on" id="focaSenha" aria-label="Senha"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M2.586 17.414A2 2 0 0 0 2 18.828V21a1 1 0 0 0 1 1h3a1 1 0 0 0 1-1v-1a1 1 0 0 1 1-1h1a1 1 0 0 0 1-1v-1a1 1 0 0 1 1-1h.172a2 2 0 0 0 1.414-.586l.814-.814a6.5 6.5 0 1 0-4-4z"/><circle cx="16.5" cy="7.5" r=".5" fill="currentColor"/></svg></button>
+    <button class="tq" data-fecha aria-label="Fechar"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#475569" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+  </div>
 </div></div>
 
 <div class="fundo" id="fNovo"><div class="folha">
@@ -70,6 +76,8 @@
   <button class="bt" id="criar"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"/></svg>Criando</button>
   <button class="bt leve" data-fecha><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>Fechado</button>
 </div></div>
+
+<div class="branco" id="branco"></div>
 
 <div id="msg"></div>
 
@@ -92,21 +100,41 @@ function ini(e) { return (e || '?').charAt(0).toUpperCase(); }
 function usuario() { return R && R.lista.find(u => u.email === sel); }
 function tem(u, app, parte) { return u.areas.indexOf(app) >= 0 || u.areas.indexOf(app + ':' + parte) >= 0; }
 
+const ICONES = {
+  rico: '<rect x="16" y="16" width="6" height="6" rx="1"/><rect x="2" y="16" width="6" height="6" rx="1"/><rect x="9" y="2" width="6" height="6" rx="1"/><path d="M5 16v-3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3M12 12V8"/>',
+  plano: '<path d="m3 17 2 2 4-4M3 7l2 2 4-4M13 6h8M13 12h8M13 18h8"/>',
+  estudo: '<path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2zM22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>',
+  crm: '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>',
+  tapete: '<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/>',
+  adm: '<path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"/>'
+};
+const ICONE_PADRAO = '<rect x="3" y="3" width="18" height="18" rx="5"/><path d="M8 12h8M12 8v8"/>';
+const abertos = {};
+function icone(app) { return '<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#475569" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">' + (ICONES[app] || ICONE_PADRAO) + '</svg>'; }
 function desenha() {
   if (!R || R.negado || R.t !== 'usuarios') { $('topo').innerHTML = ''; $('partes').innerHTML = '<p class="vazio">Só o dono pode ver esta tela.</p>'; return; }
   if (!sel || !usuario()) sel = R.lista.length ? R.lista[0].email : null;
   const u = usuario();
   $('topo').innerHTML =
     (u ? '<button class="quem" id="abreLista"><div class="av ' + (u.ativo ? '' : 'off') + '">' + ini(u.email) + '</div><b>' + esc(u.email) + '</b>' + SVG.seta + '</button><button class="ic" id="abreSenha" aria-label="Senha">' + SVG.chave + '</button>' : '<span style="flex:1"></span>') +
-    '<button class="ic novo" id="abreNovo" aria-label="Nova pessoa">' + SVG.mais + '</button>' +
-    '<div class="lista" id="lista">' + R.lista.map(p => '<button data-e="' + esc(p.email) + '"><div class="av ' + (p.ativo ? '' : 'off') + '" style="width:32px;height:32px;font-size:14px">' + ini(p.email) + '</div>' + esc(p.email) + (p.ativo ? '' : '<small>bloqueado</small>') + '</button>').join('') + '</div>';
-  $('partes').innerHTML = !u ? '<div class="fant"><div class="fa"><i></i><i></i><i></i></div><div class="ln"></div><div class="ln"></div></div>' : R.apps.map(a => '<div class="sec">' + esc(a.nome) + '</div>' + a.partes.map(p => '<div class="li"><b>' + esc(p.nome) + '</b><button class="sw ' + (tem(u, a.id, p.id) ? 'on' : '') + '" data-a="' + a.id + '" data-p="' + p.id + '" aria-label="' + esc(p.nome) + '"></button></div>').join('')).join('');
-  if ($('abreLista')) $('abreLista').onclick = () => $('lista').classList.toggle('abre');
-  if ($('abreSenha')) $('abreSenha').onclick = () => { $('tSenha').textContent = u.email; $('bloqueia').textContent = u.ativo ? 'Bloquear' : 'Liberar'; $('nova').value = ''; $('fSenha').classList.add('abre'); };
+    '<button class="ic novo" id="abreNovo" aria-label="Nova pessoa">' + SVG.mais + '</button>';
+  $('partes').innerHTML = !u ? '<div class="fant"><div class="fa"><i></i><i></i><i></i></div><div class="ln"></div><div class="ln"></div></div>' : R.apps.map(a => {
+    const lig = a.partes.filter(p => tem(u, a.id, p.id)).length;
+    return '<div class="ac ' + (abertos[a.id] ? 'abre' : '') + '" data-a="' + a.id + '"><button class="ah" data-abre="' + a.id + '"><div class="ib2">' + icone(a.id) + '</div><b>' + esc(a.nome) + '</b><span class="bd">' + lig + '/' + a.partes.length + '</span><span class="sv">' + SVG.seta + '</span></button><div class="cps">' + a.partes.map(p => '<button class="cp ' + (tem(u, a.id, p.id) ? 'on' : '') + '" data-a="' + a.id + '" data-p="' + p.id + '">' + esc(p.nome) + '</button>').join('') + '</div></div>';
+  }).join('');
+  if ($('abreLista')) $('abreLista').onclick = abrePessoas;
+  if ($('abreSenha')) $('abreSenha').onclick = () => { $('bloqueia').classList.toggle('bloq', !u.ativo); $('nova').value = ''; $('fSenha').classList.add('abre'); };
   $('abreNovo').onclick = () => { $('email').value = ''; $('senha').value = ''; $('fNovo').classList.add('abre'); };
-  $('lista').querySelectorAll('button').forEach(b => { b.onclick = () => { sel = b.dataset.e; desenha(); }; });
-  $('partes').querySelectorAll('.sw').forEach(b => { b.onclick = () => alterna(b.dataset.a, b.dataset.p, !b.classList.contains('on')); });
+  $('partes').querySelectorAll('.ah').forEach(b => { b.onclick = () => { const k = b.dataset.abre; abertos[k] = !abertos[k]; b.parentNode.classList.toggle('abre', !!abertos[k]); }; });
+  $('partes').querySelectorAll('.cp').forEach(b => { b.onclick = () => alterna(b.dataset.a, b.dataset.p, !b.classList.contains('on')); });
 }
+/* escolher a pessoa: tela toda branca, cada pessoa num cartão solto; ao escolher, volta ao normal */
+function abrePessoas() {
+  $('branco').innerHTML = R.lista.map(p => '<button class="pc" data-e="' + esc(p.email) + '"><div class="av ' + (p.ativo ? '' : 'off') + '">' + ini(p.email) + '</div><b>' + esc(p.email) + '</b></button>').join('');
+  $('branco').classList.add('abre');
+  $('branco').querySelectorAll('.pc').forEach(b => { b.onclick = (e) => { e.stopPropagation(); sel = b.dataset.e; $('branco').classList.remove('abre'); desenha(); }; });
+}
+$('branco').onclick = () => $('branco').classList.remove('abre');
 async function alterna(app, parte, liga) {
   const u = usuario(), a = R.apps.find(x => x.id === app);
   const ligadas = a.partes.filter(p => (p.id === parte ? liga : tem(u, app, p.id))).map(p => p.id);
@@ -127,6 +155,8 @@ async function definirSenha(email, senha) {
 }
 document.querySelectorAll('[data-fecha]').forEach(b => { b.onclick = () => document.querySelectorAll('.fundo').forEach(f => f.classList.remove('abre')); });
 document.querySelectorAll('.fundo').forEach(f => { f.addEventListener('click', e => { if (e.target === f) f.classList.remove('abre'); }); });
+$('focaSenha').onclick = () => $('nova').focus();
+$('nova').addEventListener('keydown', e => { if (e.key === 'Enter') $('defSenha').click(); });
 $('defSenha').onclick = async () => {
   const s = $('nova').value, u = usuario();
   if (s.length < 8) return msg('Mínimo 8 letras', 'erro');
