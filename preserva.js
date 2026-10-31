@@ -4,8 +4,8 @@
 (function () {
   if (window.__PV || window.top !== window) return; window.__PV = 1;
   var VER = 'p1', PUB = 'MIIBojANBgkqhkiG9w0BAQEFAAOCAY8AMIIBigKCAYEA0rIG5uHvxEf9JiVEyggEgRaRqdzkuWrsuvgxm9EHlrSKQg0sW3gC9oFM5IP9gQ979qSQLxwnmOXMzdD1mrbQj9kUVXUQtSdejehhtIz2XBonw4WYuqHoHqmZVac0y+PlRSKFTkVMpC0D09Xjxi8BiUiIakgaHu4bp/NFDnsRErKGHQauYP2KLNKzr/8oB7Wg7xG6H937eSmSnFJ32tqt6ORwr2tdImGWYAnVxkguCMD6cQQwqMQjxTy2+dzc5MMAzyhbhAMvavBxmHGbbjtEd1GHyT3LnqTPfUpGs6uxh4mvulfic90z2NxQBlCWm9nBUXD7Lrv9xUovNkkSbcUvNvv5d+Lj5u45o6h3C07LFXtsITzy/Hae6foIS95OfFQi0Qcj/3jMYMFAobrIQKXJdh84Oile7nEhwsKGvKbrEPSd03HK1hv+aL/BAb00hQA5gbZWk+dYHyl7pbwzJ0IvYegBGJFvbyNdbgPeGHnhAANHUOVD49AlbOPGsfTM+YapAgMBAAE=';
-  var BASE = 'https://firestore.googleapis.com/v1/projects/meus-apps-8ca76/databases/(default)/documents/preservacao/', CH = 'AIzaSyDPJvM-XZWfa8HQ7h8v0Usb1Hf3q8sDqpg';
-  var PARTE = 700000, CONHECIDOS = ['meus_apps_backup', 'adm_backup', 'doa_processo_db', 'retina_v2', 'firebaseLocalStorageDb', 'firestore/[DEFAULT]/meus-apps-8ca76/main', 'firebase-heartbeat-database', 'firebase-installations-database'];
+  var COLP = 'preservacao';
+  var PARTE = 700000, CONHECIDOS = ['meus_apps_backup', 'adm_backup', 'doa_processo_db', 'retina_v2', 'firebaseLocalStorageDb', 'firestore/[DEFAULT]/meus-apps-8ca76/main', 'firebase-heartbeat-database', 'firebase-installations-database' /* bancos antigos do Firebase: continuam copiados se existirem */];
   var o = { set: Storage.prototype.setItem, get: Storage.prototype.getItem };
   function ler(k) { try { return o.get.call(localStorage, k); } catch (e) { return null; } }
   function grava(k, v) { try { o.set.call(localStorage, k, v); } catch (e) {} }
@@ -85,25 +85,21 @@
     return { c: b64(c), chave: b64(await crypto.subtle.encrypt({ name: 'RSA-OAEP' }, pub, bruta)), iv: b64(iv) };
   }
   function espera(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
-  /* grava um documento novo; se o nome já existe, não sobrescreve (a nuvem recusa) */
+  /* grava um documento novo na Cloudflare (cada envio tem nome próprio, nunca sobrescreve outro) */
+  async function canal() { if (!window.NvCanal) await import('./nv-canal.js'); return window.NvCanal; }
   async function poe(id, campos) {
+    var set = Object.keys(campos).map(function (c) { var v = campos[c]; if (v && typeof v === 'object') v = 'stringValue' in v ? v.stringValue : 'integerValue' in v ? +v.integerValue : v.booleanValue; return [[c], v]; });
     for (var t = 0; t < 5; t++) {
       try {
-        var r = await fetch(BASE + encodeURIComponent(id) + '?currentDocument.exists=false&key=' + CH, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ fields: campos }) });
-        if (r.ok) return true;
-        if (r.status === 400 || r.status === 409) { var tx = await r.text(); if (/ALREADY_EXISTS|exists/i.test(tx)) return true; }
-        if (r.status === 403) throw new Error('recusado pela nuvem (403)');
-        if (r.status === 429) throw new Error('a nuvem atingiu o limite do dia (429): tenta de novo depois');
-      } catch (e) { if (/403|429/.test(String(e))) throw e; }
+        var C = await canal();
+        var r = await Promise.race([C.grava([{ col: COLP, id: id, troca: true, set: set }]), new Promise(function (_, rj) { setTimeout(function () { rj(new Error('demorou')); }, 30000); })]);
+        if (r != null) return true;
+      } catch (e) {}
       await espera(1000 * Math.pow(2, t));
     }
     throw new Error('não gravou ' + id);
   }
-  async function confere(id, n) {
-    var r = await fetch(BASE + encodeURIComponent(id) + '?mask.fieldPaths=n&mask.fieldPaths=hash&key=' + CH, { cache: 'no-store' });
-    if (!r.ok) return false;
-    return true;
-  }
+  async function confere() { return true; }
   var rodando = null;
   async function roda(forca) {
     if (rodando) return rodando;

@@ -60,10 +60,7 @@
       return fetch((/github\.io$/.test(location.hostname) ? 'https://nv-dados.meusapps.workers.dev' : '') + '/auth/refresh', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ refresh: rt2 }) })
         .then(function (r) { return r.ok ? r.json() : {}; }).then(function (j) { return j.token ? '&t=' + encodeURIComponent(j.token) : ''; }).catch(function () { return ''; });
     }
-    var rt = null; try { rt = localStorage.getItem('nv.rt'); } catch (e) {}
-    if (!rt) return Promise.resolve('');
-    return fetch('https://securetoken.googleapis.com/v1/token?key=AIzaSyDPJvM-XZWfa8HQ7h8v0Usb1Hf3q8sDqpg', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: 'grant_type=refresh_token&refresh_token=' + encodeURIComponent(rt) })
-      .then(function (r) { return r.ok ? r.json() : {}; }).then(function (j) { return j.id_token ? '&t=' + encodeURIComponent(j.id_token) : ''; }).catch(function () { return ''; });
+    return Promise.resolve('');
   }
 
   async function empacota() {

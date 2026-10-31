@@ -1,7 +1,7 @@
 /* Versão deste programa (igual ao número do cache do service-worker.js; sobe junto a cada publicação).
    App aberto há tempo: quando volta para a tela (ou a cada 5 min), confere se saiu versão nova; se saiu, troca
    sozinho assim que a pessoa não estiver digitando, uma vez por versão (nunca fica preso recarregando). */
-window.NV_APP = 'meus-apps-v358';
+window.NV_APP = 'meus-apps-v359';
 (function () {
   try {
     if (window.top !== window || /(reparar|exportar|entrar|copia|atualiza)\.html$/i.test(location.pathname)) return;
@@ -515,17 +515,15 @@ window.Alterna = (function () {
 
 /* ===== Cópia automática dos dados que só existem no aparelho =====
    Mapas do Rico, lista de HTMLs do Plano (inclui os enviados), versões enviadas pelo menu, ordem e nomes do Estudo e as conexões
-   do zigue-zague vão para o Firestore (só acrescenta e atualiza, nunca apaga), para entrar nos backups e voltar se o celular se perder. */
+   do zigue-zague vão para o servidor da Cloudflare (só acrescenta e atualiza, nunca apaga), para entrar nos backups e voltar se o celular se perder. */
 (function () {
   if (window.parent !== window) return;
-  var PROJ = 'https://firestore.googleapis.com/v1/projects/meus-apps-8ca76/databases/(default)/documents/';
-  var CHAVE = 'AIzaSyDPJvM-XZWfa8HQ7h8v0Usb1Hf3q8sDqpg';
+  var COLB = 'aparelho_backup';
   var LIMITE = 900000, ESPERA = 10 * 60 * 1000;
   function hash(s) { var h = 5381, i = s.length; while (i) h = (h * 33) ^ s.charCodeAt(--i); return (h >>> 0).toString(36) + ':' + s.length; }
   function idDe(k) { return String(k).replace(/[^A-Za-z0-9_.-]/g, '_').slice(0, 140) || '_'; }
   function ler(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
-  var CFG = { apiKey: CHAVE, authDomain: 'meus-apps-8ca76.firebaseapp.com', projectId: 'meus-apps-8ca76', storageBucket: 'meus-apps-8ca76.firebasestorage.app', messagingSenderId: '768854372271', appId: '1:768854372271:web:467b541baf3c513f03095a' };
-  /* chave de acesso do usuário logado (não anônimo); sem ela o banco, trancado, recusa a cópia */
+  /* login: o passe vem do nv-canal.js (Cloudflare); sem login o servidor recusa a cópia */
   var passos = window.__bk = [];
   function p(x) { passos.push(x); }
   function limite(pr, ms, nome) { return Promise.race([pr, new Promise(function (_, rj) { setTimeout(function () { rj(new Error(nome + ' demorou mais de ' + ms / 1000 + 's')); }, ms); })]); }
@@ -536,23 +534,26 @@ window.Alterna = (function () {
     _tkp = token0().then(function (t) { if (!t) _tkp = null; return t; });
     return _tkp;
   }
+  async function canal() { if (!window.NvCanal) await limite(import('./nv-canal.js'), 8000, 'carregar canal'); return window.NvCanal; }
   async function token0() {
     try {
-      p('carregando firebase');
-      var FA = await limite(import('https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js'), 8000, 'carregar firebase-app');
-      var AU = await limite(import('https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js'), 8000, 'carregar firebase-auth');
-      p('firebase carregado');
-      var ap = FA.getApps().length ? FA.getApps()[0] : FA.initializeApp(CFG);
-      var au = AU.getAuth(ap);
-      await limite(au.authStateReady(), 25000, 'ler login');
-      var u = au.currentUser;
-      p(u ? (u.isAnonymous ? 'login anônimo' : 'login ok') : 'sem login');
-      return u && !u.isAnonymous ? await limite(u.getIdToken(), 8000, 'pegar chave') : null;
+      var C = await canal(), t = await limite(C.passe(), 10000, 'pegar passe');
+      p(t ? 'login ok' : 'sem login');
+      return t || null;
     } catch (e) { p('erro: ' + e); return null; }
   }
   window.__tokenBk = token;
-  function cab(tk) { return { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + tk }; }
-  /* aparelho vazio + login: traz a cópia do Firebase (só preenche o que não existe, nunca apaga) */
+  function pares(o) { return Object.keys(o).map(function (c) { return [[c], o[c]]; }); }
+  function poe(id, o) { return canal().then(function (C) { return limite(C.grava([{ col: COLB, id: id, troca: true, set: pares(o) }]), 20000, 'gravar'); }); }
+  /* lê a coleção da cópia uma vez; devolve {id, x} só dos documentos "<pasta>/<nome>" da pasta pedida */
+  var _todos = null;
+  function todos() {
+    if (_todos) return _todos;
+    _todos = canal().then(function (C) { return limite(new Promise(function (ok) { var acc = [], feito = false; C.ouve(COLB, 0, function (docs, fim) { if (feito) return; acc = acc.concat(docs); if (fim) { feito = true; ok(acc); } }); }), 30000, 'ler a cópia'); });
+    _todos.catch(function () { _todos = null; });
+    return _todos;
+  }
+  /* aparelho vazio + login: traz a cópia do servidor (só preenche o que não existe, nunca apaga) */
   async function restaura() {
     try {
       if (!navigator.onLine || ler('backup.ap.rest')) return false;
@@ -561,19 +562,11 @@ window.Alterna = (function () {
       /* aparelho novo = nunca enviou cópia (sem marca de envio). Os apps já gravaram valores de fábrica aqui, por isso não dá para olhar se está vazio */
       if (ler('backup.ap.sig') || ler('backup.ap.t')) { localStorage.setItem('backup.ap.rest', 'nao'); return false; }
       var tk = await token(); if (!tk) return false;
-      async function lista(col) {
-        var out = [], pg = '';
-        for (var n = 0; n < 8; n++) {
-          var r = await fetch(PROJ + col + '?pageSize=300' + pg, { headers: cab(tk) });
-          if (!r.ok) throw new Error('lista ' + col);
-          var j = await r.json(); out = out.concat(j.documents || []);
-          if (!j.nextPageToken) break; pg = '&pageToken=' + encodeURIComponent(j.nextPageToken);
-        }
-        return out;
-      }
-      function campo(d, c) { return d.fields && d.fields[c] ? d.fields[c].stringValue : null; }
+      var TODOS = await todos();
+      async function lista(col) { return TODOS.filter(function (d) { return d.id.indexOf(col + '/') === 0; }).map(function (d) { return { id: d.id.slice(col.length + 1), x: d.x }; }); }
+      function campo(d, c) { return d.x && d.x[c] != null ? d.x[c] : null; }
       var mudou = false, orig = Storage.prototype.setItem, dest = {};
-      function idDoc(d) { try { return decodeURIComponent(d.name.split('/').pop()); } catch (e) { return ''; } }
+      function idDoc(d) { return d.id; }
       var bk = await lista('aparelho_backup'), man = null;
       bk.forEach(function (d) { if (idDoc(d) === '_chaves') { try { man = JSON.parse(campo(d, 'v')); } catch (e) {} } });
       /* sem a lista de chaves (o aparelho antigo ainda não enviou a nova versão) não traz nada: traria também o que você já apagou */
@@ -640,7 +633,7 @@ window.Alterna = (function () {
   }
 
   async function diario(tk, o) {
-    try { o.t = Date.now(); o.p = location.pathname.split('/').pop(); await fetch(PROJ + 'aparelho_backup/_log?key=' + CHAVE, { method: 'PATCH', headers: cab(tk), body: JSON.stringify({ fields: { v: { stringValue: JSON.stringify(o) }, t: { integerValue: String(Date.now()) } } }) }); } catch (e) {}
+    try { o.t = Date.now(); o.p = location.pathname.split('/').pop(); await poe(COLB + '/_log', { k: '_log', v: JSON.stringify(o), t: Date.now() }); } catch (e) {}
   }
   var rodando = false;
   async function envia(forca) {
@@ -661,23 +654,22 @@ window.Alterna = (function () {
         if (v.length > LIMITE) { grandes.push(d[2]); continue; }
         var h = hash(v);
         if (sig[caminho] === h) continue;
-        var corpo = { fields: { k: { stringValue: d[2] }, v: { stringValue: v }, t: { integerValue: String(Date.now()) } } };
         try {
-          var r = await fetch(PROJ + d[0] + '/' + encodeURIComponent(d[1]) + '?key=' + CHAVE, { method: 'PATCH', headers: cab(tk), body: JSON.stringify(corpo) });
-          if (r.ok) { sig[caminho] = h; mudou = true; enviados++; } else falhas++;
+          var r = await poe(caminho, { k: d[2], v: v, t: Date.now() });
+          if (r != null) { sig[caminho] = h; mudou = true; enviados++; } else falhas++;
         } catch (e) { falhas++; }
       }
       var hg = grandes.length ? hash(JSON.stringify(grandes)) : null;
       if (grandes.length && sig._grandes !== hg) {
         sig._grandes = hg; mudou = true;
-        try { await fetch(PROJ + 'aparelho_backup/_grandes?key=' + CHAVE, { method: 'PATCH', headers: cab(tk), body: JSON.stringify({ fields: { v: { stringValue: JSON.stringify(grandes) }, t: { integerValue: String(Date.now()) } } }) }); } catch (e) {}
+        try { await poe(COLB + '/_grandes', { k: '_grandes', v: JSON.stringify(grandes), t: Date.now() }); } catch (e) {}
       }
       /* lista do que existe agora no aparelho: a restauração só traz o que está nela (o que você apagou não volta) */
       var lc = JSON.stringify(col.docs.map(function (d) { return d[0] + '/' + d[1]; })), hc = hash(lc);
       if (col.docs.length && sig._chaves !== hc) {
         try {
-          var rc = await fetch(PROJ + 'aparelho_backup/_chaves?key=' + CHAVE, { method: 'PATCH', headers: cab(tk), body: JSON.stringify({ fields: { v: { stringValue: lc }, t: { integerValue: String(Date.now()) } } }) });
-          if (rc.ok) { sig._chaves = hc; mudou = true; } else falhas++;
+          var rc = await poe(COLB + '/_chaves', { k: '_chaves', v: lc, t: Date.now() });
+          if (rc != null) { sig._chaves = hc; mudou = true; } else falhas++;
         } catch (e) { falhas++; }
       }
       if (mudou) localStorage.setItem('backup.ap.sig', JSON.stringify(sig));
