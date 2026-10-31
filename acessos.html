@@ -17,12 +17,18 @@
   .ic.novo{background:#fff;border:1.5px dashed #cbd5e1}
   .ac{background:#fff;border:1px solid #e9ecf2;border-radius:18px;margin-bottom:10px;overflow:hidden}
   .ah{display:flex;align-items:center;gap:12px;padding:14px;width:100%;background:none;border:0;font:inherit;color:inherit;text-align:left;cursor:pointer}
+  .ah.um{cursor:default}
   .ah b{flex:1;font-size:15px;font-weight:600}
   .ib2{width:34px;height:34px;border-radius:11px;background:#f1f5f9;display:flex;align-items:center;justify-content:center;flex:none}
-  .bd{font-size:12px;font-weight:700;color:#475569;background:#f1f5f9;border-radius:99px;padding:4px 9px}
+  .bd{font-size:12px;font-weight:700;color:#475569;background:#f1f5f9;border-radius:99px;min-width:42px;text-align:center;padding:5px 0}
   .ah .sv{transition:transform .2s}.ac.abre .sv{transform:rotate(180deg)}
-  .cps{display:none;flex-wrap:wrap;gap:8px;padding:0 14px 16px}.ac.abre .cps{display:flex}
-  .cp{font:inherit;font-size:13px;font-weight:600;padding:9px 14px;border-radius:99px;background:#f1f5f9;color:#64748b;border:0;cursor:pointer}.cp.on{background:#0f172a;color:#fff}
+  .cps{display:none;flex-direction:column;gap:6px;padding:0 12px 12px}.ac.abre .cps{display:flex}
+  .cp{display:flex;align-items:center;gap:12px;width:100%;height:48px;padding:0 12px 0 10px;border-radius:15px;border:1px solid #e9ecf2;background:#fff;font:inherit;font-size:14px;font-weight:600;color:#0f172a;cursor:pointer;text-align:left;position:relative;overflow:hidden}
+  .cp .pi{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex:none}
+  .cp .pn{flex:1}
+  .cp.on{background:#e8efff;border-color:#e8efff}
+  .cp.on:before{content:'';position:absolute;left:0;top:7px;bottom:7px;width:3px;border-radius:0 3px 3px 0;background:#2563eb}
+  .cp.on .pi{background:#0f172a}
   .trio{display:flex;gap:12px;justify-content:center;margin-top:22px}
   .tq{width:60px;height:60px;border-radius:20px;background:#f1f5f9;display:flex;align-items:center;justify-content:center;border:0;padding:0;cursor:pointer}
   .tq.on{background:#0f172a;box-shadow:0 8px 18px rgba(15,23,42,.22)}.tq.bloq{background:#fee2e2}
@@ -108,6 +114,25 @@ const ICONES = {
   tapete: '<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/>',
   adm: '<path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"/>'
 };
+const PARTES = {
+  contatos: '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>',
+  agenda: '<rect x="3" y="4" width="18" height="18" rx="3"/><path d="M16 2v4M8 2v4M3 10h18M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01"/>',
+  reunioes: '<rect x="2" y="6" width="14" height="12" rx="3"/><path d="m22 8-6 4 6 4z"/>',
+  ativos: '<path d="M5 20V10M10 20V4M15 20V12M20 20V7"/>',
+  arquivo: '<path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.7-.9l-.8-1.2A2 2 0 0 0 7.9 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2z"/>',
+  clientes: '<circle cx="12" cy="8" r="4"/><path d="M4 21c.8-4 4-6 8-6s7.2 2 8 6"/>',
+  pedidos: '<rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2M9 14l2 2 4-4"/>',
+  ruas: '<path d="M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/>',
+  cadastro: '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8zM14 2v6h6M12 18v-6M9 15h6"/>',
+  config: '<path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/>',
+  lancamentos: '<path d="M4 2v20l3-2 3 2 3-2 3 2 3-2 1 1V2l-1 1-3-2-3 2-3-2-3 2zM8 8h8M8 12h8"/>',
+  tudo: '<rect x="3" y="3" width="18" height="18" rx="5"/><path d="m8 12 3 3 5-6"/>'
+};
+function iconeParte(app, parte) {
+  const d = parte === 'tudo' && ICONES[app] ? ICONES[app] : (PARTES[parte] || PARTES.tudo);
+  return '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">' + d + '</svg>';
+}
+const SETA_D = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0f172a" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg>';
 const ICONE_PADRAO = '<rect x="3" y="3" width="18" height="18" rx="5"/><path d="M8 12h8M12 8v8"/>';
 const abertos = {};
 function icone(app) { return '<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#475569" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">' + (ICONES[app] || ICONE_PADRAO) + '</svg>'; }
@@ -120,9 +145,17 @@ function desenha() {
     '<button class="ic novo" id="abreNovo" aria-label="Nova pessoa">' + SVG.mais + '</button>';
   $('partes').innerHTML = !u ? '<div class="fant"><div class="fa"><i></i><i></i><i></i></div><div class="ln"></div><div class="ln"></div></div>' : R.apps.map(a => {
     const lig = a.partes.filter(p => tem(u, a.id, p.id)).length;
-    return '<div class="ac ' + (abertos[a.id] ? 'abre' : '') + '" data-a="' + a.id + '"><button class="ah" data-abre="' + a.id + '"><div class="ib2">' + icone(a.id) + '</div><b>' + esc(a.nome) + '</b><span class="bd">' + lig + '/' + a.partes.length + '</span><span class="sv">' + SVG.seta + '</span></button><div class="cps">' + a.partes.map(p => '<button class="cp ' + (tem(u, a.id, p.id) ? 'on' : '') + '" data-a="' + a.id + '" data-p="' + p.id + '">' + esc(p.nome) + '</button>').join('') + '</div></div>';
+    return '<div class="ac ' + (abertos[a.id] ? 'abre' : '') + '" data-a="' + a.id + '"><button class="ah" data-abre="' + a.id + '"><div class="ib2">' + icone(a.id) + '</div><b>' + esc(a.nome) + '</b><span class="bd">' + lig + '/' + a.partes.length + '</span>' + (a.partes.length > 1 ? '<span class="sv">' + SVG.seta + '</span>' : '<span class="sv" style="width:16px;height:16px"></span>') + '</button><div class="cps">' + a.partes.map(p => { const on = tem(u, a.id, p.id); return '<button class="cp ' + (on ? 'on' : '') + '" data-a="' + a.id + '" data-p="' + p.id + '"><span class="pi" style="color:' + (on ? '#fff' : '#0f172a') + '">' + iconeParte(a.id, p.id) + '</span><span class="pn">' + esc(p.nome) + '</span>' + SETA_D + '</button>'; }).join('') + '</div></div>';
   }).join('');
-  if ($('abreLista')) $('abreLista').onclick = abrePessoas;
+  if ($('abreLista')) {
+    let tm = null, longo = false, x0 = 0, y0 = 0;
+    const q = $('abreLista');
+    q.onpointerdown = e => { longo = false; x0 = e.clientX; y0 = e.clientY; clearTimeout(tm); tm = setTimeout(() => { longo = true; if (navigator.vibrate) { try { navigator.vibrate(15); } catch (x) {} } copiaConvite(); }, 550); };
+    q.onpointermove = e => { if (Math.abs(e.clientX - x0) + Math.abs(e.clientY - y0) > 10) clearTimeout(tm); };
+    ['onpointerup', 'onpointercancel', 'onpointerleave'].forEach(k => { q[k] = () => clearTimeout(tm); });
+    q.oncontextmenu = e => e.preventDefault();
+    q.onclick = () => { if (longo) { longo = false; return; } abrePessoas(); };
+  }
   if ($('abreSenha')) $('abreSenha').onclick = () => { $('bloqueia').classList.toggle('bloq', !u.ativo); $('nova').value = ''; $('fSenha').classList.add('abre'); };
   $('abreNovo').onclick = () => { $('email').value = ''; $('senha').value = ''; $('fNovo').classList.add('abre'); };
   $('partes').querySelectorAll('.ah').forEach(b => { b.onclick = () => { const k = b.dataset.abre; abertos[k] = !abertos[k]; b.parentNode.classList.toggle('abre', !!abertos[k]); }; });
@@ -133,6 +166,13 @@ function abrePessoas() {
   $('branco').innerHTML = R.lista.map(p => '<button class="pc" data-e="' + esc(p.email) + '"><div class="av ' + (p.ativo ? '' : 'off') + '">' + ini(p.email) + '</div><b>' + esc(p.email) + '</b></button>').join('');
   $('branco').classList.add('abre');
   $('branco').querySelectorAll('.pc').forEach(b => { b.onclick = (e) => { e.stopPropagation(); sel = b.dataset.e; $('branco').classList.remove('abre'); desenha(); }; });
+}
+/* segurar o e-mail copia na hora: endereço + e-mail. O acesso de verdade vive no servidor, então vale sempre o que estiver ligado agora */
+async function copiaConvite() {
+  const u = usuario(); if (!u) return;
+  const texto = 'https://apps.v4cless.com\nE-mail: ' + u.email;
+  try { await navigator.clipboard.writeText(texto); msg('Convite copiado'); }
+  catch (e) { const t = document.createElement('textarea'); t.value = texto; document.body.appendChild(t); t.select(); try { document.execCommand('copy'); msg('Convite copiado'); } catch (x) { msg('Não consegui copiar', 'erro'); } t.remove(); }
 }
 $('branco').onclick = () => $('branco').classList.remove('abre');
 async function alterna(app, parte, liga) {
