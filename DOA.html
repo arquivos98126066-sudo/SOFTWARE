@@ -1838,8 +1838,10 @@ function htmlRender(){
     rows.appendChild(row);
     if(h.id === _htmlSel){
       var bar = document.createElement('div'); bar.className = 'pl-h-bar';
-      bar.innerHTML = '<div class="pl-h-pill"><button type="button" data-a="add" aria-label="Adicionar HTML abaixo">' + ic('plus') + '</button><button type="button" data-a="ren" aria-label="Renomear">' + ic('pencil') + '</button>' + (pasta ? '' : '<button type="button" data-a="dl" aria-label="Baixar HTML">' + ic('download') + '</button><button type="button" data-a="cp" aria-label="Copiar código">' + ic('copy') + '</button>') + '<button type="button" data-a="del" aria-label="Remover">' + ic('trash') + '</button></div>';
+      bar.innerHTML = '<div class="pl-h-pill"><button type="button" data-a="up" aria-label="Subir">' + ic('arrow-up') + '</button><button type="button" data-a="dn" aria-label="Descer">' + ic('arrow-down') + '</button><button type="button" data-a="add" aria-label="Adicionar HTML abaixo">' + ic('plus') + '</button><button type="button" data-a="ren" aria-label="Renomear">' + ic('pencil') + '</button>' + (pasta ? '' : '<button type="button" data-a="dl" aria-label="Baixar HTML">' + ic('download') + '</button><button type="button" data-a="cp" aria-label="Copiar código">' + ic('copy') + '</button>') + '<button type="button" data-a="del" aria-label="Remover">' + ic('trash') + '</button></div>';
       var q = function(s){ return bar.querySelector('[data-a=' + s + ']'); };
+      q('up').onclick = function(){ htmlMove(h.id, -1); };
+      q('dn').onclick = function(){ htmlMove(h.id, 1); };
       q('add').onclick = function(){ _htmlApos = h.id; document.getElementById('html-file').click(); };
       q('ren').onclick = function(){ htmlEdita(h.id); };
       q('del').onclick = function(){ htmlEdita(h.id, true); };
@@ -1950,6 +1952,16 @@ function htmlLigaLinha(row, h){
     if(h.pasta){ _htmlPasta = h.id; _htmlSel = null; try { history.pushState({htmlPasta: h.id}, ''); } catch(e){} htmlRender(); return; }
     htmlAbre(h.id);
   };
+}
+/* subir e descer: troca de lugar com o vizinho da mesma lista (ou da mesma pasta); a barra de opções continua no item */
+function htmlMove(id, dir){
+  var a = htmlTodos(), x = a.find(function(y){ return y.id === id; });
+  if(!x) return;
+  var irm = htmlFilhos(a, x.pai || null), i = irm.indexOf(x), j = i + dir;
+  if(j < 0 || j >= irm.length){ toast(dir < 0 ? 'Já está no topo' : 'Já está no fim'); return; }
+  var v = irm[j], ia = a.indexOf(x), ib = a.indexOf(v);
+  a[ia] = v; a[ib] = x;
+  _htmlSel = id; htmlSalva(a); htmlRender();
 }
 function htmlSolta(id, alvoId, zona){
   var a = htmlTodos(), x = a.find(function(y){ return y.id === id; });

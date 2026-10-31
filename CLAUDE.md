@@ -130,3 +130,4 @@ Lista do que deu errado ao deixar os apps rápidos, firmes e sem piscar, e a sol
 
 ## 6. Plano e o robô local de WhatsApp (permanente, 2026-10-31)
 - HTML aberto no Plano roda isolado (iframe com sandbox) e não alcança o celular. Por isso o Plano tem uma ponte: dentro do HTML, `fetch('http://127.0.0.1:8787/...')` é repassado ao Plano (`nvLocal`), que faz o pedido e devolve a resposta. Só a porta 8787 (robô de WhatsApp do Termux), só GET e POST. O service worker não mexe em pedidos para 127.0.0.1 e localhost. O navegador pode pedir uma vez a permissão de rede local para o endereço do app. Teste local ok; no celular do Klebson: não confirmei.
+- Plano, HTMLs: a barra de opções do item (segurar sem mexer, ou os três pontinhos) tem setas de subir e descer (`htmlMove`): troca de lugar com o vizinho da mesma lista ou pasta e a barra fica no item; no topo ou no fim avisa e não faz nada. Pedido dele, 2026-10-31 (arrastar com toque longo continua existindo).
