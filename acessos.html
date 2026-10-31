@@ -170,7 +170,8 @@ function abrePessoas() {
 /* segurar o e-mail copia na hora: endereço + e-mail. O acesso de verdade vive no servidor, então vale sempre o que estiver ligado agora */
 async function copiaConvite() {
   const u = usuario(); if (!u) return;
-  const texto = 'https://apps.v4cless.com\nE-mail: ' + u.email;
+  const ap = R.apps.map(x => { const l = x.partes.filter(p => tem(u, x.id, p.id)); return l.length ? x.nome + (l.length === x.partes.length ? '' : ' (' + l.map(p => p.nome).join(', ') + ')') : ''; }).filter(Boolean);
+  const texto = 'https://apps.v4cless.com\nE-mail: ' + u.email + (ap.length ? '\nAcesso: ' + ap.join(', ') : '');
   try { await navigator.clipboard.writeText(texto); msg('Convite copiado'); }
   catch (e) { const t = document.createElement('textarea'); t.value = texto; document.body.appendChild(t); t.select(); try { document.execCommand('copy'); msg('Convite copiado'); } catch (x) { msg('Não consegui copiar', 'erro'); } t.remove(); }
 }
