@@ -3584,7 +3584,7 @@ window.saveAnswer = window.saveAnswer || function(){};
     }
     function notasDe(n) {
       var arr = n.i;
-      if (!Array.isArray(arr) && (KEY === 'rico.mapa.v1' || KEY === 'rico.proc.v1' || KEY.indexOf('rico.proc.') === 0 || KEY.indexOf('rico.mapa.') === 0)) {
+      if (!Array.isArray(arr) && (KEY === 'rico.mapa.v1' || KEY === 'rico.proc.v1')) { /* só os mapas de fábrica; nos outros, célula sem texto sai vazia (antes puxava o texto de outra célula com o mesmo nome) */
         var tx = String(n.text || '').trim();
         for (var j = 0; j < CICLO.length; j++) if (CICLO[j] && String(CICLO[j].t || '').trim() === tx) { arr = CICLO[j].i; break; }
       }
