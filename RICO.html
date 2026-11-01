@@ -3426,7 +3426,7 @@ window.saveAnswer = window.saveAnswer || function(){};
           if (window.rcMapa.total() < 2) { soltaEm('root'); return; }
           if (!window.rcMapa.estaAberto(ix) || PEND.inst === api) window.rcMapa.foca(ix);
           else soltaEm('root');
-        }, 200) };
+        }, 330) };
         return;
       }
       if (el && el.dataset.id) {
@@ -3455,7 +3455,7 @@ window.saveAnswer = window.saveAnswer || function(){};
           return;
         }
         if (tq) { clearTimeout(tq.t); var antes = tq.id; tq = null; acaoToque(antes); }
-        tq = { id: id, t: setTimeout(function() { var x = tq; tq = null; if (x) acaoToque(x.id); }, 200) };
+        tq = { id: id, t: setTimeout(function() { var x = tq; tq = null; if (x) acaoToque(x.id); }, 330) };
       } else {
         if (tq) { clearTimeout(tq.t); tq = null; }
         selId = null; barId = null; render();
@@ -3627,7 +3627,7 @@ window.saveAnswer = window.saveAnswer || function(){};
         /* Duplicar: dois toques no item já marcado duplicam ali mesmo; um toque só desmarca */
         if (m === 'duplicar') {
           if (dupT) { clearTimeout(dupT); dupT = null; window._rcSrc = null; duplicaNo(id); if (window.showToast) window.showToast('Duplicado'); return; }
-          dupT = setTimeout(function() { dupT = null; if (window._rcSrc && window._rcSrc.id === id) { window._rcSrc = null; render(); } }, 380);
+          dupT = setTimeout(function() { dupT = null; if (window._rcSrc && window._rcSrc.id === id) { window._rcSrc = null; render(); } }, 520);
           return;
         }
         window._rcSrc = null; render(); return;
@@ -5043,7 +5043,7 @@ window.saveAnswer = window.saveAnswer || function(){};
         var b = ev.target.closest ? ev.target.closest('button') : null;
         if (b) { ult = 0; return; }
         var agora = Date.now();
-        if (agora - ult < 380) { ult = 0; fecharLeitura(); return; }
+        if (agora - ult < 520) { ult = 0; fecharLeitura(); return; }
         ult = agora;
       });
       /* barra de baixo (só na edição): não tira o foco do texto */
@@ -5147,7 +5147,7 @@ window.saveAnswer = window.saveAnswer || function(){};
         if (_rd.edit && !_rd.tool && !_rd.digita && !_rd.copia && !(ev.target.closest && ev.target.closest('.rd-tools, .ck'))) {
           var c = ev.changedTouches && ev.changedTouches[0]; if (!c) return;
           var agora = Date.now();
-          if (agora - ultToque < 380 && Math.abs(c.clientX - ultX) < 45 && Math.abs(c.clientY - ultY) < 45) {
+          if (agora - ultToque < 520 && Math.abs(c.clientX - ultX) < 45 && Math.abs(c.clientY - ultY) < 45) {
             ultToque = 0;
             if (ev.cancelable) ev.preventDefault();
             clearTimeout(_rd.tm); rdSalva(); _rd.edit = false; _rd.tool = null; _rd.digita = false; rdPinta();
@@ -5959,7 +5959,7 @@ window.saveAnswer = window.saveAnswer || function(){};
       var t = e.target;
       if (t && t.closest && t.closest('button, a, .ck, textarea:not([readonly]), input')) { ult = 0; return; }
       var agora = Date.now();
-      if (agora - ult < 380) { ult = 0; fecharSheet(); return; }
+      if (agora - ult < 520) { ult = 0; fecharSheet(); return; }
       ult = agora;
     });
   })();
@@ -6182,7 +6182,7 @@ window.saveAnswer = window.saveAnswer || function(){};
     clearTimeout(_tq.timer);
     _tq.idx = k;
     var xr = e.clientX - el.getBoundingClientRect().left;
-    _tq.timer = setTimeout(function() { _tq.timer = null; _tq.idx = null; cicloSimples(k, el, xr); }, 200);
+    _tq.timer = setTimeout(function() { _tq.timer = null; _tq.idx = null; cicloSimples(k, el, xr); }, 330);
   });
 
   (function() {
@@ -7158,7 +7158,7 @@ window.saveAnswer = window.saveAnswer || function(){};
         return;
       }
       var agora = Date.now();
-      if (agora - _edToque < 380) { _edToque = 0; edLer(); return; }
+      if (agora - _edToque < 520) { _edToque = 0; edLer(); return; }
       _edToque = agora;
     });
     v.addEventListener('focusout', function() { if (_edModo === 'editar') edLer(); });
