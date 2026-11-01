@@ -4483,60 +4483,50 @@ window.saveAnswer = window.saveAnswer || function(){};
     } catch (e) { return false; }
   }
   /* Divide as listas compridas de Profético, Reavivado e Ouvindo em células-mãe curtas (o conteúdo de cada célula continua o mesmo, só muda de lugar) */
+  /* Divide as listas compridas em células-mãe curtas, SEM mudar a ordem: cada grupo é um trecho seguido da lista original (a ordem é a das aulas) */
   var BIBLICO_GRUPOS = {
-    profetico: [
-      ['Base da Profecia', ['Biblia Sagrada','Dom de Profecia','Estudo Profecia']],
-      ['Profecias de Daniel', ['A Grande Estátua','As 4 besta','O Chifre Pequeno','Carneiro e Bode','As 70 Semanas','O Santuário','O Juízo de Deus']],
-      ['Início do Apocalipse', ['Origem da Revelação','As 7 Igrejas','As 4 Criaturas','Livro e Cordeiro','Os 7 Selos','As 7 Trombetas']],
-      ['Conflito Final', ['O Livro Selado','Anjo com Voz de Leão','Os 7 Tronos','O Misterio de Deus','Doce e amarga','As Duas Testemunhas','A mulher e o Dragão','A Besta do Mar','A Besta da Terra','Os 144 mil','Os 24 Anciãos']],
-      ['Volta de Jesus', ['Primeira Mensagem','Segunda Mensagem','Terceira Mensagem','As 7 Pragas','Mulher na Besta','Enganos Finais','Tempo de Angustia','A Volta de Jesus','Os Mil Anos','A Prisão de Satanás','Morte Final e Definitiva','Nova Terra']]
-    ],
-    reavivado: [
-      ['Espírito Santo', ['As duas obras do Espírito','Um presente precioso','O Espírito e a vida plena','Os 4 beneficios do Espírito','Cristo em você','Intristecendo o Espírito']],
-      ['Preparo do Coração', ['A raiz de nossos problemas','A parabola da 10 virgem','O maior problema de Laodiceia','Batismo e obediência','Batismo e chuva serodia','Batismo e a volta']],
-      ['Vida de Oração', ['O desejo de orar dado','Exemplo de oração de Jesus','Porque a oração e necessaria','Orando no Espírito','Oração unida do Espírito','Oração perseverante','Oração intercesoria','Como pedir o Espírito','Orando com promessa']],
-      ['Evangelismo', ['Evangelho com Espírito','Batismo antes do evangelho','Oração e evangelismo','Metodo de cristo da evangeliza','O caminho para descoberta']],
-      ['Vitória da Igreja', ['A luta do cristão','O poder do pecado quebrado','Cristo da vitória','Justiça pela fé','Permanecer em serviço','O Espírito e a comunhão','A igreja primitiva e comunhão','Batismo e o grupo de comunhão','A igreja','A família de Deus','Os frutos e a comunhão']]
-    ],
-    ouvindo: [
-      ['Salvação', ['Biblia Sagrada','Porque Jesus Morreu','Recebendo Perdao','O Batismo de Deus']],
-      ['Fim dos Tempos', ['Onde Estao os Mortos','A Volta de Jesus','O Santuario de Deus','O Juizo de Deus','A Marca da Besta']],
-      ['Vida Cristã', ['A Lei Moral','Principio de Saude','O Dom de Profecia','Dizimo e Oferta']]
-    ]
+    profetico: { ordem: BIBLICO_PROFETICO, g: [['Base da Profecia', 3], ['Profecias de Daniel', 7], ['Início do Apocalipse', 6], ['Conflito Final', 11], ['Volta de Jesus', 12]] },
+    reavivado: { ordem: BIBLICO_REAVIVADO, g: [['Espírito Santo', 8], ['Preparo do Coração', 4], ['Vida de Oração', 9], ['Evangelismo', 5], ['Vitória da Igreja', 11]] },
+    ouvindo: { ordem: ['Biblia Sagrada','Porque Jesus Morreu','Recebendo Perdao','Onde Estao os Mortos','A Volta de Jesus','O Santuario de Deus','O Juizo de Deus','A Lei Moral','A Marca da Besta','Principio de Saude','O Dom de Profecia','Dizimo e Oferta','O Batismo de Deus'], g: [['Salvação', 3], ['Fim dos Tempos', 4], ['Vida Cristã', 6]] }
   };
+  var BIBLICO_NOMES_GRUPO = ['biblia e dom','daniel','revelacao','besta e povo','fim e volta','espirito santo','preparo','oracao','evangelismo','vitoria e igreja','salvacao','fim dos tempos','vida crista','base da profecia','profecias de daniel','inicio do apocalipse','conflito final','volta de jesus','preparo do coracao','vida de oracao','vitoria da igreja'];
   function biblicoAgrupa() {
     try {
       var fl = parseInt(localStorage.getItem('ui.imp.agrupa.v1') || '0', 10);
       if (fl && Date.now() - fl > 3 * 86400000) return false;
-      var S = SETS.m, mt = metaGet(S), ch = mapasChaves(S), pk = null, mudou = false, renomeou = false;
+      var feitos = {}; try { feitos = JSON.parse(localStorage.getItem('ui.imp.ordem.v2') || '{}') || {}; } catch (e) {}
+      var S = SETS.m, mt = metaGet(S), ch = mapasChaves(S), pk = null, mudou = false;
       var norm = function(t) { return String(t || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim().toLowerCase(); };
       var le = function(k) { try { return JSON.parse(localStorage.getItem(k)); } catch (e) { return null; } };
       ch.forEach(function(k) { if (!pk && mt.f[k]) { var r = le(k); if (r && norm(r.text) === 'biblico') pk = k; } });
       if (!pk) return false;
       ch.forEach(function(k) {
-        if (mt.p[k] !== pk || mt.f[k]) return;
-        var r = le(k); if (!r) return;
-        var def = BIBLICO_GRUPOS[norm(r.text)]; if (!def || !Array.isArray(r.children)) return;
-        var VELHOS = { 'biblia e dom': 'Base da Profecia', 'daniel': 'Profecias de Daniel', 'revelacao': 'Início do Apocalipse', 'besta e povo': 'Conflito Final', 'fim e volta': 'Volta de Jesus', 'preparo': 'Preparo do Coração', 'oracao': 'Vida de Oração', 'vitoria e igreja': 'Vitória da Igreja' };
-        var nomeNovo = {}; def.forEach(function(g) { nomeNovo[norm(g[0])] = g[0]; });
-        r.children.forEach(function(c) { var v = VELHOS[norm(c.text)]; if (v && c.children && c.children.length && nomeNovo[norm(v)] === v && c.text !== v) { c.text = v; renomeou = true; } });
-        if (renomeou) { localStorage.setItem(k, JSON.stringify(r)); mudou = true; renomeou = false; }
-        var nomes = {}; def.forEach(function(g) { nomes[norm(g[0])] = 1; });
-        if (r.children.some(function(c) { return nomes[norm(c.text)]; })) return;
-        var por = {}; r.children.forEach(function(c) { por[norm(c.text)] = c; });
-        var usados = {}, b = Date.now().toString(36), novos = [];
-        def.forEach(function(g, gi) {
-          var fil = [];
-          g[1].forEach(function(t) { var c = por[norm(t)]; if (c && !usados[norm(t)]) { usados[norm(t)] = 1; fil.push(c); } });
-          if (fil.length) novos.push({ id: 'bg' + b + gi, text: g[0], collapsed: true, children: fil });
+        if (feitos[k] || mt.p[k] !== pk || mt.f[k]) return;
+        var r = le(k); if (!r || !Array.isArray(r.children)) return;
+        var def = BIBLICO_GRUPOS[norm(r.text)]; if (!def) return;
+        /* desfaz grupos antigos (os que eu criei), guardando se cada um estava aberto */
+        var folhas = [], aberto = {};
+        r.children.forEach(function(c) {
+          if (BIBLICO_NOMES_GRUPO.indexOf(norm(c.text)) > -1 && c.children && c.children.length && !(Array.isArray(c.i) && c.i.some(function(v) { return String(v || '').trim(); }))) { aberto[norm(c.text)] = !c.collapsed; folhas = folhas.concat(c.children); }
+          else folhas.push(c);
+        });
+        /* volta à ordem original; o que não está na lista fica no fim, na ordem em que estava */
+        var pos = {}; def.ordem.forEach(function(t, j) { if (!(norm(t) in pos)) pos[norm(t)] = j; });
+        var conh = folhas.filter(function(c) { return norm(c.text) in pos; }).sort(function(x, y) { return pos[norm(x.text)] - pos[norm(y.text)]; });
+        var resto = folhas.filter(function(c) { return !(norm(c.text) in pos); });
+        var b = Date.now().toString(36), novos = [], ini = 0;
+        def.g.forEach(function(g, gi) {
+          var de = def.ordem.slice(ini, ini + g[1]).map(norm); ini += g[1];
+          var fil = conh.filter(function(c) { return de.indexOf(norm(c.text)) > -1; });
+          if (fil.length) novos.push({ id: 'bg' + b + gi, text: g[0], collapsed: !aberto[norm(g[0])], children: fil });
         });
         if (!novos.length) return;
-        r.children.forEach(function(c) { if (!usados[norm(c.text)]) novos.push(c); });
-        r.children = novos;
+        r.children = novos.concat(resto);
         localStorage.setItem(k, JSON.stringify(r));
         localStorage.removeItem(k + '.foto');
-        mudou = true;
+        feitos[k] = 1; mudou = true;
       });
+      localStorage.setItem('ui.imp.ordem.v2', JSON.stringify(feitos));
       if (mudou && !fl) localStorage.setItem('ui.imp.agrupa.v1', String(Date.now()));
       return mudou;
     } catch (e) { return false; }
