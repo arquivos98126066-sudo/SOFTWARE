@@ -1,7 +1,7 @@
 /* Versão deste programa (igual ao número do cache do service-worker.js; sobe junto a cada publicação).
    App aberto há tempo: quando volta para a tela (ou a cada 5 min), confere se saiu versão nova; se saiu, troca
    sozinho assim que a pessoa não estiver digitando, uma vez por versão (nunca fica preso recarregando). */
-window.NV_APP = 'meus-apps-v407';
+window.NV_APP = 'meus-apps-v408';
 (function () {
   try {
     if (window.top !== window || /(reparar|exportar|entrar|copia|atualiza)\.html$/i.test(location.pathname)) return;
@@ -456,7 +456,7 @@ window.Alterna = (function () {
     try { chegou = sessionStorage.getItem('troca') === GEN[eu]; } catch (e) {}
     function cam(el) { var p = []; while (el && el !== document.body && el.parentNode) { var i = 0, s2 = el; while ((s2 = s2.previousElementSibling)) i++; p.unshift(i); el = el.parentNode; } return p.join('.'); }
     function ach(c) { var el = document.body, a = c ? c.split('.') : []; for (var i = 0; i < a.length; i++) el = el && el.children[+a[i]]; return el || null; }
-    var SEGURAS = { home: 1, clientes: 1, config: 1, fila: 1, registrar: 1 };
+    var SEGURAS = (eu === 'tapete') ? { clientes: 1, config: 1, fila: 1, registrar: 1 } : { home: 1, clientes: 1, config: 1, fila: 1, registrar: 1 }; /* Tapete abre sempre no Registra (2026-11-01): Hoje não é restaurada */
     function tela() {
       var e;
       if (eu === 'tapete') { e = document.querySelector('.screen.active'); return e && e.id ? e.id.replace('screen-', '') : null; }
