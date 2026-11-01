@@ -8179,6 +8179,41 @@ window.saveAnswer = window.saveAnswer || function(){};
 })();
 </script>
 <script>
+/* Edição com modo texto ligado: tocar no vazio da tela põe o cursor no fim do texto (ou no bloco vazio), sem precisar acertar a linha de cima. */
+(function() {
+  var t0 = null, tm = null;
+  function ov() { var o = document.getElementById('rdOv'); return (o && !o.hidden) ? o : null; }
+  function poeCursor(o) {
+    var b = window.rdGaranteBloco ? window.rdGaranteBloco() : null;
+    if (!b) { var tx = o.querySelectorAll('.rd-tx'); b = tx[tx.length - 1]; }
+    if (!b) return false;
+    if (b.getAttribute('contenteditable') !== 'true') b.setAttribute('contenteditable', 'true');
+    b.focus();
+    var rg = document.createRange(); rg.selectNodeContents(b); rg.collapse(false);
+    var sl = window.getSelection(); sl.removeAllRanges(); sl.addRange(rg);
+    return true;
+  }
+  function semTexto(o) { var t = o.querySelectorAll('.rd-tx'); for (var i = 0; i < t.length; i++) if (t[i].textContent.replace(/\s+/g, '')) return false; return true; }
+  function vazio(o, el) { return el && o.contains(el) && !(el.closest && el.closest('.rd-tools, .rd-tx, .rd-t, .rd-h, .ck, .rd-q, button, a')); }
+  document.addEventListener('touchstart', function(e) {
+    var o = ov(); var r = window._rd;
+    if (!o || !r || !r.edit || !r.digita || r.tool || r.copia || e.touches.length !== 1 || !vazio(o, e.target)) { t0 = null; return; }
+    var t = e.touches[0]; t0 = { x: t.clientX, y: t.clientY, t: Date.now() };
+    clearTimeout(tm);
+    /* segurar no vazio, sem texto nenhum: o cursor vai para o bloco de cima, para o Colar aparecer e colar de cima para baixo */
+    tm = setTimeout(function() { var oo = ov(); if (t0 && oo && semTexto(oo)) { try { poeCursor(oo); } catch (_) {} t0.feito = true; } }, 500);
+  }, { passive: true, capture: true });
+  document.addEventListener('touchmove', function(e) { var c = e.touches && e.touches[0]; if (t0 && c && (Math.abs(c.clientX - t0.x) > 10 || Math.abs(c.clientY - t0.y) > 10)) { clearTimeout(tm); t0 = null; } }, { passive: true, capture: true });
+  document.addEventListener('touchend', function(e) {
+    clearTimeout(tm);
+    var s = t0; t0 = null; var o = ov(); if (!s || !o || !e.changedTouches.length || s.feito) return;
+    var c = e.changedTouches[0];
+    if (Math.abs(c.clientX - s.x) > 10 || Math.abs(c.clientY - s.y) > 10 || Date.now() - s.t > 450) return;
+    try { poeCursor(o); } catch (_) {}
+  }, { passive: true, capture: true });
+})();
+</script>
+<script>
 /* Deslizar para a direita no leitor (leitura ou edição) = sair. Só movimento bem horizontal. */
 (function() {
   var t0 = null;
