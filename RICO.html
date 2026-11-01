@@ -3461,7 +3461,7 @@ window.saveAnswer = window.saveAnswer || function(){};
           return;
         }
         if (tq) { clearTimeout(tq.t); var antes = tq.id; tq = null; acaoToque(antes); }
-        tq = { id: id, t: setTimeout(function() { var x = tq; tq = null; if (x) acaoToque(x.id); }, 330) };
+        acaoToque(id); /* um toque age na hora; o segundo toque seguido (volta ao nível 1) vale pelo relógio __rcDT */
       } else {
         if (tq) { clearTimeout(tq.t); tq = null; }
         selId = null; barId = null; render();
@@ -4453,6 +4453,37 @@ window.saveAnswer = window.saveAnswer || function(){};
     }, true);
     document.addEventListener('pointercancel', function() { g = null; }, true);
   })();
+  /* Uma vez só: cria dentro de BIBLICO as células do Profético e do Reavivado (nomes vindos do Plano) */
+  var BIBLICO_PROFETICO = ['Biblia Sagrada','Dom de Profecia','Estudo Profecia','A Grande Estátua','As 4 besta','O Chifre Pequeno','Carneiro e Bode','As 70 Semanas','O Santuário','O Juízo de Deus','Origem da Revelação','As 7 Igrejas','As 4 Criaturas','Livro e Cordeiro','Os 7 Selos','As 7 Trombetas','O Livro Selado','Anjo com Voz de Leão','Os 7 Tronos','O Misterio de Deus','Doce e amarga','As Duas Testemunhas','A mulher e o Dragão','A Besta do Mar','A Besta da Terra','Os 144 mil','Os 24 Anciãos','Primeira Mensagem','Segunda Mensagem','Terceira Mensagem','As 7 Pragas','Mulher na Besta','Enganos Finais','Tempo de Angustia','A Volta de Jesus','Os Mil Anos','A Prisão de Satanás','Morte Final e Definitiva','Nova Terra'];
+  var BIBLICO_REAVIVADO = ['As duas obras do Espírito','Um presente precioso','O Espírito e a vida plena','A raiz de nossos problemas','A parabola da 10 virgem','Os 4 beneficios do Espírito','O maior problema de Laodiceia','Cristo em você','Batismo e obediência','Intristecendo o Espírito','Batismo e chuva serodia','Batismo e a volta','O desejo de orar dado','Exemplo de oração de Jesus','Porque a oração e necessaria','Orando no Espírito','Oração unida do Espírito','Oração perseverante','Oração intercesoria','Como pedir o Espírito','Orando com promessa','Evangelho com Espírito','Batismo antes do evangelho','Oração e evangelismo','Metodo de cristo da evangeliza','O caminho para descoberta','A luta do cristão','O poder do pecado quebrado','Cristo da vitória','Justiça pela fé','Permanecer em serviço','O Espírito e a comunhão','A igreja primitiva e comunhão','Batismo e o grupo de comunhão','A igreja','A família de Deus','Os frutos e a comunhão'];
+  /* Cria dentro da pasta BIBLICO os mapas Profético e Reavivado, cada um com suas células (nomes vindos do Plano). Repete por 3 dias só se faltar, por causa da nuvem. */
+  function biblicoImporta() {
+    try {
+      var fl = parseInt(localStorage.getItem('ui.imp.biblico.v3') || '0', 10);
+      if (fl && Date.now() - fl > 3 * 86400000) return false;
+      var S = SETS.m, mt = metaGet(S), ch = mapasChaves(S).slice(), pk = null, tem = {};
+      var norm = function(t) { return String(t || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim().toLowerCase(); };
+      var le = function(k) { try { return JSON.parse(localStorage.getItem(k)); } catch (e) { return null; } };
+      ch.forEach(function(k) { if (!pk && mt.f[k]) { var r = le(k); if (r && norm(r.text) === 'biblico') pk = k; } });
+      if (!pk) return false;
+      ch.forEach(function(k) { if (mt.p[k] === pk) { var r = le(k); if (r) tem[norm(r.text)] = 1; } });
+      var mudou = false;
+      [['Profético', BIBLICO_PROFETICO], ['Reavivado', BIBLICO_REAVIVADO]].forEach(function(grp) {
+        if (tem[norm(grp[0])]) return;
+        var k = novaChave(S, ''), b = Date.now().toString(36);
+        var raiz = { id: 'root', text: grp[0], collapsed: false, children: grp[1].map(function(t, j) { return { id: 'bib' + b + j, text: t, collapsed: false, children: [] }; }) };
+        localStorage.setItem(k, JSON.stringify(raiz));
+        ch.push(k); mt.p[k] = pk; mudou = true;
+      });
+      if (!mudou) return false;
+      localStorage.setItem(S.ord, JSON.stringify(ch));
+      metaSet(S, mt);
+      if (!fl) localStorage.setItem('ui.imp.biblico.v3', String(Date.now()));
+      return true;
+    } catch (e) { return false; }
+  }
+  [1500, 5000, 12000].forEach(function(ms) { setTimeout(function() { if (biblicoImporta()) window.rcMapa.recarrega(); }, ms); });
+
   window.rcMapa = {
     ehCopia: function(inst) { return !!(inst && cpOcultas()[inst.key]); },
     /* tocar no número: vai para a próxima versão (original → cópias → coletores → original) */
@@ -6051,31 +6082,8 @@ window.saveAnswer = window.saveAnswer || function(){};
         { t: 'Sucesso definitivo', i: [SEED_SUCESSO], g: 1 });
     }
     cicloHeaderPrimeiro();
-    cicloImportaBiblico();
     renderCiclo();
   };
-
-  /* Uma vez só: cria dentro de BIBLICO as células do Profético e do Reavivado (nomes vindos do Plano) */
-  var BIBLICO_PROFETICO = ['Biblia Sagrada','Dom de Profecia','Estudo Profecia','A Grande Estátua','As 4 besta','O Chifre Pequeno','Carneiro e Bode','As 70 Semanas','O Santuário','O Juízo de Deus','Origem da Revelação','As 7 Igrejas','As 4 Criaturas','Livro e Cordeiro','Os 7 Selos','As 7 Trombetas','O Livro Selado','Anjo com Voz de Leão','Os 7 Tronos','O Misterio de Deus','Doce e amarga','As Duas Testemunhas','A mulher e o Dragão','A Besta do Mar','A Besta da Terra','Os 144 mil','Os 24 Anciãos','Primeira Mensagem','Segunda Mensagem','Terceira Mensagem','As 7 Pragas','Mulher na Besta','Enganos Finais','Tempo de Angustia','A Volta de Jesus','Os Mil Anos','A Prisão de Satanás','Morte Final e Definitiva','Nova Terra'];
-  var BIBLICO_REAVIVADO = ['As duas obras do Espírito','Um presente precioso','O Espírito e a vida plena','A raiz de nossos problemas','A parabola da 10 virgem','Os 4 beneficios do Espírito','O maior problema de Laodiceia','Cristo em você','Batismo e obediência','Intristecendo o Espírito','Batismo e chuva serodia','Batismo e a volta','O desejo de orar dado','Exemplo de oração de Jesus','Porque a oração e necessaria','Orando no Espírito','Oração unida do Espírito','Oração perseverante','Oração intercesoria','Como pedir o Espírito','Orando com promessa','Evangelho com Espírito','Batismo antes do evangelho','Oração e evangelismo','Metodo de cristo da evangeliza','O caminho para descoberta','A luta do cristão','O poder do pecado quebrado','Cristo da vitória','Justiça pela fé','Permanecer em serviço','O Espírito e a comunhão','A igreja primitiva e comunhão','Batismo e o grupo de comunhão','A igreja','A família de Deus','Os frutos e a comunhão'];
-  function cicloImportaBiblico() {
-    try {
-      if (localStorage.getItem('ui.imp.biblico.v1')) return;
-      var norm = function(t) { return String(t || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim().toLowerCase(); };
-      var b = -1;
-      CICLO.forEach(function(e, k) { if (b < 0 && e.g && norm(e.t) === 'biblico') b = k; });
-      if (b < 0) return;
-      var d = (CICLO[b].d || 1) + 1, novos = [];
-      var cel = function(t, dd) { var o = { t: t, i: [], g: 1 }; if (dd > 1) o.d = dd; return o; };
-      [['Profético', BIBLICO_PROFETICO], ['Reavivado', BIBLICO_REAVIVADO]].forEach(function(grp) {
-        novos.push(cel(grp[0], d));
-        grp[1].forEach(function(t) { novos.push(cel(t, d + 1)); });
-      });
-      Array.prototype.splice.apply(CICLO, [cicloFimNo(b) + 1, 0].concat(novos));
-      localStorage.setItem('ui.imp.biblico.v1', '1');
-      salvarAlt();
-    } catch (_) {}
-  }
 
   // toque: abre/entra; dois toques seguidos (só dentro do Complemento): cria um filho
   var _tq = { idx: null, timer: null };
@@ -6223,15 +6231,7 @@ window.saveAnswer = window.saveAnswer || function(){};
     if (window._rcMS && window._rcMS.ativo && !el.classList.contains('cycle-compl')) { msClica(k); return; }
     if (el.classList.contains('cycle-compl') && (_mapa || !_soCompl)) return;
     if (!(_soCompl && (it.g || it.h))) { abrirEtapa(k); return; }
-    if (_tq.timer && _tq.idx === k) {
-      clearTimeout(_tq.timer); _tq.timer = null; _tq.idx = null;
-      cicloFilhoNovo(k);
-      return;
-    }
-    clearTimeout(_tq.timer);
-    _tq.idx = k;
-    var xr = e.clientX - el.getBoundingClientRect().left;
-    _tq.timer = setTimeout(function() { _tq.timer = null; _tq.idx = null; cicloSimples(k, el, xr); }, 330);
+    cicloSimples(k, el, e.clientX - el.getBoundingClientRect().left);
   });
 
   (function() {
