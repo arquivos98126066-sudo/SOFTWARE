@@ -197,7 +197,7 @@ function conv(rolar){
   var pa=m.para!==undefined?(m.enviado?'<div class="para">'+esc(m.para)+'</div><div class="cpb ok">Enviado ao cliente</div>':'<div class="para" contenteditable="true" data-pe="'+m.id+'">'+esc(m.para)+'</div><button class="cpb" data-env="'+m.id+'">ENVIAR AO CLIENTE</button>'):'';
   h+='<div class="m '+lado(m)+'" data-mid="'+m.id+'">'+esc(m.txt||'')+ax+cm+pa+'<span class="h">'+hora(m.t)+'</span></div>';
  });
- $('bPronto').innerHTML='<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>Pronto'+(nn?'<span class="nn">'+nn+'</span>':'');
+ $('bPronto').innerHTML='<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>Pronto';
  var el=$('msgs'),y=el.scrollTop;el.innerHTML=h; el.scrollTop=rolar===false?y:el.scrollHeight;
 }
 function abre(id){S.sel=id;tSel=null;salva();$('rel').classList.remove('ab');$('vLista').classList.remove('ve');$('vConv').classList.add('ve');conv()}
