@@ -3385,12 +3385,8 @@ function regInputChange(el, id){
     else                         masked = digits.slice(0,2)+' '+digits.slice(2,3)+' '+digits.slice(3,7)+'-'+digits.slice(7);
     el.value = masked;
     _regLastVal[id] = masked;
-    if(digits.length >= 11){
-      REG_DATA[id] = masked;
-      regAdvance();
-      return;
-    }
-    REG_DATA[id] = digits;
+    /* não avança sozinho ao completar o número: só no botão Próximo (pedido dele, 2026-11-01) */
+    REG_DATA[id] = digits.length >= 11 ? masked : digits;
     return;
   }
 
