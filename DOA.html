@@ -1985,7 +1985,7 @@ function htmlAbre(id, estado){
   var box = document.getElementById('html-view');
   box.innerHTML = ''; box.style.background = '';
   var fr = document.createElement('iframe'); fr.id = 'html-view-frame';
-  fr.setAttribute('sandbox', 'allow-scripts allow-forms allow-popups allow-downloads');
+  fr.setAttribute('sandbox', 'allow-scripts allow-forms allow-popups allow-downloads allow-modals');
   box.appendChild(fr);
   if(estado){ fr.style.visibility = 'hidden'; setTimeout(function(){ fr.style.visibility = ''; }, 1500); }
   if(h.src){

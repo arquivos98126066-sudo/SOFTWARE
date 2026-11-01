@@ -116,7 +116,6 @@ svg{display:block}
 <div class="fundo" id="fNovo"><div class="folha"><h2>Novo cliente</h2>
  <input id="nNome" placeholder="Nome" autocomplete="off"><input id="nMail" placeholder="E-mail" inputmode="email" autocomplete="off"><input id="nDom" placeholder="Domínio" autocomplete="off">
  <div class="bt"><button id="nCan" style="background:#f1f5f9;color:#0f172a">Cancelar</button><button id="nOk" style="background:#0f172a;color:#fff">Criar</button></div></div></div>
-<div class="fundo" id="fEx"><div class="folha"><h2 id="exT">Excluir?</h2><div class="bt"><button id="exCan" style="background:#f1f5f9;color:#0f172a">Cancelar</button><button id="exOk" style="background:#fee4e2;color:#b42318">Excluir</button></div></div></div>
 <div class="toast" id="toast"></div>
 <script>
 (function(){
@@ -228,11 +227,7 @@ $('nOk').onclick=function(){var n=$('nNome').value.trim(),m=$('nMail').value.tri
 $('fNovo').addEventListener('click',function(e){if(e.target===this)this.classList.remove('ab')});
 
 /* clicar e segurar: aparece Excluir (cliente na lista ou mensagem na conversa) */
-var exAcao=null;
-function pergunta(t,fn){$('exT').textContent=t;exAcao=fn;$('fEx').classList.add('ab')}
-$('exCan').onclick=function(){exAcao=null;$('fEx').classList.remove('ab')};
-$('exOk').onclick=function(){var f=exAcao;exAcao=null;$('fEx').classList.remove('ab');if(f)f()};
-$('fEx').addEventListener('click',function(e){if(e.target===this){exAcao=null;this.classList.remove('ab')}});
+function pergunta(t,fn){ if(window.confirm(t)) fn(); } /* pergunta nativa do sistema */
 var lp={t:null,x:0,y:0,feito:false};
 function seguraIni(e){var el=e.target.closest('.cl,.m');if(!el||e.target.closest('button'))return;lp.feito=false;lp.x=e.clientX;lp.y=e.clientY;clearTimeout(lp.t);
  lp.t=setTimeout(function(){lp.feito=true;try{navigator.vibrate&&navigator.vibrate(15)}catch(x){}
