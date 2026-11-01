@@ -3990,6 +3990,7 @@ window.saveAnswer = window.saveAnswer || function(){};
       movBar = false; montaBar();
       mwEl = mw; mw.style.position = 'relative';
       wrap._rcApi = api;
+      if (ehPasta) wrap.setAttribute('data-pasta','1'); else wrap.removeAttribute('data-pasta');
       wrap.addEventListener('click', toque);
       wrap.addEventListener('contextmenu', function(e) { e.preventDefault(); });
       /* segurar um círculo: a barra de ações aparece ali mesmo */
@@ -5915,6 +5916,19 @@ window.saveAnswer = window.saveAnswer || function(){};
     if (window.rcMapa && window.rcMapa.fechou) window.rcMapa.fechou();
   }
   window.abrirLeitura = abrirLeitura; window.fecharLeitura = fecharLeitura;
+  window.rdAlternaEdicao = function() {
+    if (!_rd) return;
+    var ovx = document.getElementById('rdOv');
+    if (_rd.edit) {
+      clearTimeout(_rd.tm); rdSalva(); _rd.edit = false; _rd.tool = null; _rd.digita = false; if (ovx) ovx.classList.remove('rd-q'); rdPinta();
+      try { var a1 = document.activeElement; if (a1 && a1.blur) a1.blur(); window.getSelection().removeAllRanges(); } catch (_) {}
+    } else {
+      var tp = ovx ? ovx.scrollTop : 0;
+      _rd.edit = true; _rd.tool = null; _rd.digita = false; _rd.copia = false; rdPinta(); try { rdDigita(true); } catch (_) {}
+      if (ovx) ovx.scrollTop = tp;
+    }
+  };
+  window.rdTemEstado = function() { return _rd ? { tool: _rd.tool, copia: _rd.copia, cpAll: _rd.cpAll } : null; };
 
   function sincronizarEtapa() {
     var e = _alvo || CICLO[_etapa];
@@ -8265,8 +8279,10 @@ window.saveAnswer = window.saveAnswer || function(){};
   document.addEventListener('touchend', function(e) {
     var s = t0; t0 = null; if (!s || !ov() || !e.changedTouches.length) return;
     var t = e.changedTouches[0], dx = t.clientX - s.x, dy = t.clientY - s.y;
-    if (dx < 70 || dx < Math.abs(dy) * 2.2) return;
-    var r = window._rd; if (r && (r.tool || r.copia || r.cpAll)) return;
+    if (Math.abs(dx) < 70 || Math.abs(dx) < Math.abs(dy) * 2.2) return;
+    var r = window.rdTemEstado && window.rdTemEstado(); if (r && (r.tool || r.copia || r.cpAll)) return;
+    try { var sl0 = window.getSelection(); if (sl0 && sl0.rangeCount && !sl0.isCollapsed) return; } catch (_) {}
+    if (dx < 0) { try { window.rdAlternaEdicao(); } catch (_) {} return; }
     try { var sl = window.getSelection(); if (sl && sl.rangeCount && !sl.isCollapsed) return; } catch (_) {}
     try { if (window.fecharLeitura) window.fecharLeitura(); } catch (_) {}
   }, { passive: true, capture: true });
@@ -8289,8 +8305,9 @@ window.saveAnswer = window.saveAnswer || function(){};
     /* começou numa célula do mapa aberto (com texto ou sem): abre a leitura dela; fora de célula: volta ao nível 1 */
     try {
       var cel = s.tg && s.tg.closest ? s.tg.closest('.rcm-node') : null;
-      if (!movendo && cel && !cel.classList.contains('root') && cel.dataset.id) {
+      if (!movendo && cel && cel.dataset.id) {
         var wr = cel.closest('.rcm-wrap'), ap = wr && wr._rcApi;
+        if (wr && wr.getAttribute('data-pasta')) ap = null;
         if (ap && ap.key && window.rcMapa && window.rcMapa.abre && window.rcMapa.abre(ap.key, cel.dataset.id)) return;
       }
     } catch (_) {}
