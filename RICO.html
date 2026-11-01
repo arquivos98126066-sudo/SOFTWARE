@@ -844,6 +844,9 @@ if ((sessionStorage.getItem('troca') === (window.RICO_INST === 'p' ? 'RICOP' : '
   body .cycle-block .rcm-wrap.zig:not(:has(.rcm-node:not(.root))) .rcm-node.root.cn{ min-height: 46px; padding: 9px 20px 9px 8px; }
   /* círculos principais (METAS, NOVO...) sem nada aberto embaixo (sem células-filhas): peso da letra mais leve */
   body .cycle-block .rcm-wrap:not(.zig):not(:has(.rcm-node:not(.root))) .rcm-node.root.cn{ font-weight: 500; }
+  /* círculo aberto (o tocado): 0,5px maior que os outros, número proporcional */
+  body .cycle-block .rcm-wrap.t-ativo .rcm-node.root.cn{ height: 40.3px !important; padding: 0.5px 17.55px 0.5px 6.75px !important; font-size: 16px !important; }
+  body .cycle-block .rcm-wrap.t-ativo .rcm-node.root.cn .rn{ width: 26px !important; height: 26px !important; font-size: 12px !important; }
   body .cycle-block .rcm-wrap .rcm-links path, body .cycle-block .rcm-wrap .rcm-links path.tx{ stroke: #b07a14; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
   .rcm-cartao{ max-width: 100%; margin: 18px 0 0; background: #fff; border: 1px solid #e3dccb; border-radius: 28px; padding: 24px 22px 26px; cursor: pointer; animation: rcEntra .45s ease both; }
   .rcm-cartao .traco{ width: 38px; height: 4px; border-radius: 4px; background: #d9b44a; margin-bottom: 16px; }
@@ -4989,7 +4992,7 @@ window.saveAnswer = window.saveAnswer || function(){};
         if (alvoT) { try { alvoT.addEventListener('touchend', function(e) { if (e.cancelable) e.preventDefault(); solta(); }, { once: true, passive: false }); alvoT.addEventListener('touchcancel', solta, { once: true }); } catch (_) {} }
         if (_rd.edit) return;
         var tp = ov.scrollTop;
-        _rd.edit = true; _rd.tool = null; _rd.digita = false; _rd.copia = false; rdPinta(); ov.scrollTop = tp;
+        _rd.edit = true; _rd.tool = null; _rd.digita = false; _rd.copia = false; rdPinta(); try { rdDigita(true); } catch (_) {} ov.scrollTop = tp;
         /* sem cursor nem teclado ao segurar: só liga a edição; o cursor vem do toque seguinte */
         try { var a0 = document.activeElement; if (a0 && a0.blur) a0.blur(); window.getSelection().removeAllRanges(); } catch (_) {}
         _rd.cur = null;
@@ -5239,7 +5242,7 @@ window.saveAnswer = window.saveAnswer || function(){};
     ov.hidden = false;
     /* volta de outro app: reabre a mesma célula, na mesma rolagem e no mesmo modo */
     if (opts && (opts.edit || opts.sc)) {
-      if (opts.edit) { _rd.edit = true; _rd.tool = null; _rd.digita = false; _rd.copia = false; rdPinta(); }
+      if (opts.edit) { _rd.edit = true; _rd.tool = null; _rd.digita = false; _rd.copia = false; rdPinta(); try { rdDigita(true); } catch (_) {} }
       var yy = +opts.sc || 0; ov.scrollTop = yy; requestAnimationFrame(function() { ov.scrollTop = yy; });
     }
   }
@@ -8173,6 +8176,26 @@ window.saveAnswer = window.saveAnswer || function(){};
     } catch (e) { return false; }
   }
   var n = 0, t = setInterval(function() { n++; if (n > 6 || (n >= 3 && tenta())) clearInterval(t); }, 2500);
+})();
+</script>
+<script>
+/* Deslizar para a direita no leitor (leitura ou edição) = sair. Só movimento bem horizontal. */
+(function() {
+  var t0 = null;
+  function ov() { var o = document.getElementById('rdOv'); return (o && !o.hidden) ? o : null; }
+  document.addEventListener('touchstart', function(e) {
+    var o = ov(); if (!o || e.touches.length !== 1 || !o.contains(e.target) || (e.target.closest && e.target.closest('.rd-tools'))) { t0 = null; return; }
+    var t = e.touches[0]; t0 = { x: t.clientX, y: t.clientY };
+  }, { passive: true, capture: true });
+  document.addEventListener('touchcancel', function() { t0 = null; }, { passive: true, capture: true });
+  document.addEventListener('touchend', function(e) {
+    var s = t0; t0 = null; if (!s || !ov() || !e.changedTouches.length) return;
+    var t = e.changedTouches[0], dx = t.clientX - s.x, dy = t.clientY - s.y;
+    if (dx < 70 || dx < Math.abs(dy) * 2.2) return;
+    var r = window._rd; if (r && (r.tool || r.copia || r.cpAll)) return;
+    try { var sl = window.getSelection(); if (sl && sl.rangeCount && !sl.isCollapsed) return; } catch (_) {}
+    try { if (window.fecharLeitura) window.fecharLeitura(); } catch (_) {}
+  }, { passive: true, capture: true });
 })();
 </script>
 <script>
