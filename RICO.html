@@ -4661,6 +4661,13 @@ window.saveAnswer = window.saveAnswer || function(){};
       S.pasta = null; S.aberto = -1;
       renderCiclo();
     },
+    /* arrastar para a direita: volta ao nível 1 (pastas da raiz) */
+    volta1: function() {
+      var S = CUR; mapasGarante(S);
+      if ((S.nv || 1) === 1 && !S.pasta && S.aberto < 0) return;
+      S.nv = 1; S.pasta = null; S.aberto = -1;
+      renderCiclo();
+    },
     recarrega: function() { SETS.m.arr = []; SETS.p.arr = []; PEND = null; ROOTTAP = null; renderCiclo(); },
     cancela: function(semRender) {
       PEND = null; ROOTTAP = null;
@@ -8144,6 +8151,23 @@ window.saveAnswer = window.saveAnswer || function(){};
   var dclr = function(){ carregou = true; espera(); };
   if (document.readyState !== 'loading') dclr(); else document.addEventListener('DOMContentLoaded', dclr);
   tmax = setTimeout(pronto, 800);
+})();
+</script>
+<script>
+/* Arrastar para a direita no bloco do Rico = voltar ao nível 1 (pastas). Só movimento bem horizontal. */
+(function() {
+  var blk = document.querySelector('.cycle-block'); if (!blk) return;
+  var t0 = null;
+  blk.addEventListener('touchstart', function(e) { if (e.touches.length !== 1) { t0 = null; return; } var t = e.touches[0]; t0 = { x: t.clientX, y: t.clientY, tg: e.target }; }, { passive: true });
+  blk.addEventListener('touchcancel', function() { t0 = null; }, { passive: true });
+  blk.addEventListener('touchend', function(e) {
+    var s = t0; t0 = null; if (!s || !e.changedTouches.length) return;
+    var t = e.changedTouches[0], dx = t.clientX - s.x, dy = t.clientY - s.y;
+    if (dx < 60 || dx < Math.abs(dy) * 2) return;
+    if (window._rcModo) return;
+    if (window._rcSelOn !== false && s.tg && s.tg.closest && s.tg.closest('.rcm-wrap[data-v="2"],.rcm-wrap[data-v="3"]')) return;
+    try { if (window.rcMapa && window.rcMapa.volta1) window.rcMapa.volta1(); } catch (_) {}
+  }, { passive: true });
 })();
 </script>
 </body>
