@@ -1,7 +1,7 @@
 /* Versão deste programa (igual ao número do cache do service-worker.js; sobe junto a cada publicação).
    App aberto há tempo: quando volta para a tela (ou a cada 5 min), confere se saiu versão nova; se saiu, troca
    sozinho assim que a pessoa não estiver digitando, uma vez por versão (nunca fica preso recarregando). */
-window.NV_APP = 'meus-apps-v413';
+window.NV_APP = 'meus-apps-v414';
 (function () {
   try {
     if (window.top !== window || /(reparar|exportar|entrar|copia|atualiza)\.html$/i.test(location.pathname)) return;
@@ -508,6 +508,22 @@ window.Alterna = (function () {
     }
   }
   return A;
+})();
+
+/* ===== Teclado nunca pisca ao abrir o app (2026-11-01, regra dele, vale para todos os apps e HTMLs) =====
+   Nos primeiros 2,5 s depois de abrir, qualquer campo que ganhe foco sem um toque ou tecla do usuário perde o foco na hora:
+   o teclado não sobe e desce sozinho. Depois de um toque tudo funciona normal. */
+(function () {
+  if (window.parent !== window) return;
+  var t0 = Date.now(), gesto = 0;
+  function marca() { gesto = Date.now(); }
+  ['touchstart', 'pointerdown', 'mousedown', 'keydown', 'click'].forEach(function (n) { document.addEventListener(n, marca, { capture: true, passive: true }); });
+  document.addEventListener('focusin', function (e) {
+    var el = e.target;
+    if (Date.now() - t0 > 2500 || Date.now() - gesto < 1000) return;
+    if (!el || !/^(INPUT|TEXTAREA)$/.test(el.tagName || '') && !el.isContentEditable) return;
+    try { el.blur(); } catch (x) {}
+  }, true);
 })();
 
 /* ===== Cópia automática dos dados que só existem no aparelho =====

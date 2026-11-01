@@ -2194,8 +2194,9 @@ function showScreen(name, push=true){
 
   if(name==='fila') renderFila();
   if(name==='registrar'){
+    /* sem focar o campo escondido aqui: abria o teclado ao entrar e já fechava (piscava). O campo do passo se foca sozinho quando é de texto. */
     const ghost=document.getElementById('reg-ghost-input');
-    if(ghost){ ghost.value=''; ghost.focus(); }
+    if(ghost){ ghost.value=''; }
   }
 }
 window.showScreen = showScreen;
