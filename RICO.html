@@ -8429,10 +8429,10 @@ window.rcConfirma = function(msg, ok) {
 };
 </script>
 <script>
-/* Arrastar para a ESQUERDA (pedido dele, 2026-11-01): só quando há algo marcado (modo amarelo, origem escolhida, seleção de células), aparece uma pílula com o X para tirar a seleção. Sem nada marcado, não faz nada. */
+/* Arrastar para a ESQUERDA (pedido dele, 2026-11-01): só quando há algo marcado (modo amarelo, origem escolhida, seleção de células), tira tudo na hora e dá um toquinho (vibração curta). Sem nada marcado, não faz nada. */
 (function() {
   var blk = document.querySelector('.cycle-block'); if (!blk) return;
-  var t0 = null, pil = null, tm = null;
+  var t0 = null;
   function modoOn() { return document.querySelector('#modoBar:not([hidden]) .rcm-ib.on[data-m]'); }
   function apis() { return [].slice.call(blk.querySelectorAll('.rcm-wrap')).map(function(w) { return w._rcApi; }).filter(function(a) { return a && a.selTem; }); }
   function temSel() {
@@ -8448,18 +8448,7 @@ window.rcConfirma = function(msg, ok) {
     [].forEach.call(blk.querySelectorAll('.ms-sel, .dsel'), function(el) { el.classList.remove('ms-sel', 'dsel'); });
     try { if (window.rcMapa && window.rcMapa.desfoca) window.rcMapa.desfoca(); } catch (e) {}
     try { window.rcMapa.redesenha(); } catch (e) {}
-  }
-  function fecha() { clearTimeout(tm); if (pil) { pil.remove(); pil = null; } document.removeEventListener('pointerdown', fora, true); }
-  function fora(e) { if (pil && !pil.contains(e.target)) fecha(); }
-  function mostra(x, y) {
-    fecha();
-    pil = document.createElement('div'); pil.className = 'rcm-pill'; pil.id = 'rc-tira-sel';
-    pil.style.cssText = 'position:fixed;z-index:99999;left:' + Math.max(8, Math.min(innerWidth - 64, x - 22)) + 'px;top:' + Math.min(innerHeight - 70, y + 14) + 'px';
-    pil.innerHTML = '<button type="button" class="rcm-ib" aria-label="Tirar seleção"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>';
-    pil.firstChild.addEventListener('click', function(e) { e.stopPropagation(); fecha(); limpa(); });
-    document.body.appendChild(pil);
-    setTimeout(function() { document.addEventListener('pointerdown', fora, true); }, 0);
-    tm = setTimeout(fecha, 8000);
+    if (navigator.vibrate) { try { navigator.vibrate(18); } catch (e) {} }
   }
   blk.addEventListener('touchstart', function(e) { if (e.touches.length !== 1) { t0 = null; return; } var t = e.touches[0]; t0 = { x: t.clientX, y: t.clientY }; }, { passive: true });
   blk.addEventListener('touchcancel', function() { t0 = null; }, { passive: true });
@@ -8467,7 +8456,7 @@ window.rcConfirma = function(msg, ok) {
     var s = t0; t0 = null; if (!s || !e.changedTouches.length) return;
     var t = e.changedTouches[0], dx = t.clientX - s.x, dy = t.clientY - s.y;
     if (dx > -60 || Math.abs(dx) < Math.abs(dy) * 2) return;
-    if (temSel()) mostra(t.clientX, t.clientY);
+    if (temSel()) limpa();
   }, { passive: true });
 })();
 </script>
