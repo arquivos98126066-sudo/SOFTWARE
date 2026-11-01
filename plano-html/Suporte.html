@@ -60,8 +60,8 @@ button{font-family:inherit;cursor:pointer}
 .dia{align-self:center;font-size:11.5px;color:#94a3b8;font-weight:600;letter-spacing:.4px}
 .m{max-width:86%;padding:11px 14px;border-radius:20px;font-size:14.5px;line-height:1.45;word-break:break-word;white-space:pre-wrap}
 .m .h{display:block;font-size:11px;opacity:.6;margin-top:5px;text-align:right}
-.m.c{align-self:flex-start;background:#f1f4f9;border-bottom-left-radius:6px}
-.m.v{align-self:flex-end;background:linear-gradient(135deg,#2f4bff,#5b5cf6);color:#fff;border-bottom-right-radius:6px}
+.m.outro{align-self:flex-start;background:#f1f4f9;border-bottom-left-radius:6px}
+.m.meu{align-self:flex-end;background:linear-gradient(135deg,#2f4bff,#5b5cf6);color:#fff;border-bottom-right-radius:6px}
 .m.e{align-self:flex-end;background:#fff;border:1px solid #d9ddff;border-bottom-right-radius:6px;box-shadow:0 10px 22px -18px rgba(79,70,229,.6);max-width:92%}
 .anexo{margin-top:8px;display:flex;align-items:center;gap:10px;background:#fff;border:1px solid #e0e6ef;border-radius:14px;padding:8px 10px;white-space:normal}
 .anexo i{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#fde68a,#f59e0b);flex:none}
@@ -116,6 +116,7 @@ svg{display:block}
 <div class="fundo" id="fNovo"><div class="folha"><h2>Novo cliente</h2>
  <input id="nNome" placeholder="Nome" autocomplete="off"><input id="nMail" placeholder="E-mail" inputmode="email" autocomplete="off"><input id="nDom" placeholder="Domínio" autocomplete="off">
  <div class="bt"><button id="nCan" style="background:#f1f5f9;color:#0f172a">Cancelar</button><button id="nOk" style="background:#0f172a;color:#fff">Criar</button></div></div></div>
+<div class="fundo" id="fEx"><div class="folha"><h2 id="exT">Excluir?</h2><div class="bt"><button id="exCan" style="background:#f1f5f9;color:#0f172a">Cancelar</button><button id="exOk" style="background:#fee4e2;color:#b42318">Excluir</button></div></div></div>
 <div class="toast" id="toast"></div>
 <script>
 (function(){
@@ -154,6 +155,9 @@ function lista(){
   return '<div class="cl" data-id="'+c.id+'"><div class="av '+c.est+'" style="background:'+c.cor+'">'+esc(c.nome.charAt(0).toUpperCase())+'<i></i></div><div class="t"><b>'+esc(c.nome)+'</b><small>'+esc(c.mail)+'</small></div><span class="nv'+(n?'':' q')+'">'+n+'</span></div>'}).join(''):'<div class="vazio">Nenhum cliente encontrado.</div>';
 }
 var anexo=null, autor='c', tSel=null;
+/* Cores pela visão de quem olha: o que EU mando é azul, à direita; o que recebo é cinza, à esquerda. Aqui é a visão do Klebson ('dono'); a tela do cliente usa 'cliente' (ele vê a própria mensagem azul e a do Klebson cinza). O Claude é sempre branco com borda roxa. */
+var VIS='dono';
+function lado(m){if(m.de==='e')return 'e';if(VIS==='dono')return m.de==='c'?'outro':'meu';return m.de==='c'?'meu':'outro'}
 function svgIco(k,cor){return '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="'+cor+'" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'+ICO[k]+'</svg>'}
 function painel(c){
  var pn=$('pn');
@@ -180,7 +184,7 @@ function conv(rolar){
  c.msgs.forEach(function(m){
   var ax=m.anexo?'<div class="anexo">'+(m.anexo.thumb?'<img src="'+m.anexo.thumb+'" alt="">':'<i></i>')+'<span>'+esc(m.anexo.nome)+'</span></div>':'';
   var cm=m.cmd?'<div class="cmd"><code>'+esc(m.cmd)+'</code><button class="cp" data-cp="'+m.id+'">Copiar</button></div><div class="fe"><button class="ck'+(m.feito?' ok':'')+'" data-fe="'+m.id+'" aria-label="Feito"></button>'+(m.feito?'Feito às '+hora(m.feito):'Marcar como feito')+'</div>':'';
-  h+='<div class="m '+m.de+'">'+esc(m.txt||'')+ax+cm+'<span class="h">'+hora(m.t)+'</span></div>';
+  h+='<div class="m '+lado(m)+'" data-mid="'+m.id+'">'+esc(m.txt||'')+ax+cm+'<span class="h">'+hora(m.t)+'</span></div>';
  });
  var el=$('msgs'),y=el.scrollTop;el.innerHTML=h; el.scrollTop=rolar===false?y:el.scrollHeight;
 }
@@ -222,6 +226,25 @@ $('nOk').onclick=function(){var n=$('nNome').value.trim(),m=$('nMail').value.tri
  S.cl.unshift({id:'c'+Date.now(),nome:n,mail:m,dom:d,cor:cores[S.cl.length%cores.length],est:'of',mau:[],msgs:[]});
  salva();$('fNovo').classList.remove('ab');lista();toast('Cliente criado')};
 $('fNovo').addEventListener('click',function(e){if(e.target===this)this.classList.remove('ab')});
+
+/* clicar e segurar: aparece Excluir (cliente na lista ou mensagem na conversa) */
+var exAcao=null;
+function pergunta(t,fn){$('exT').textContent=t;exAcao=fn;$('fEx').classList.add('ab')}
+$('exCan').onclick=function(){exAcao=null;$('fEx').classList.remove('ab')};
+$('exOk').onclick=function(){var f=exAcao;exAcao=null;$('fEx').classList.remove('ab');if(f)f()};
+$('fEx').addEventListener('click',function(e){if(e.target===this){exAcao=null;this.classList.remove('ab')}});
+var lp={t:null,x:0,y:0,feito:false};
+function seguraIni(e){var el=e.target.closest('.cl,.m');if(!el||e.target.closest('button'))return;lp.feito=false;lp.x=e.clientX;lp.y=e.clientY;clearTimeout(lp.t);
+ lp.t=setTimeout(function(){lp.feito=true;try{navigator.vibrate&&navigator.vibrate(15)}catch(x){}
+  if(el.classList.contains('cl')){var c=cli(el.dataset.id);if(c)pergunta('Excluir '+c.nome+' e a conversa?',function(){S.cl=S.cl.filter(function(k){return k!==c});salva();lista();toast('Cliente excluído')})}
+  else{var cc=cli(S.sel);if(cc&&el.dataset.mid)pergunta('Excluir esta mensagem?',function(){cc.msgs=cc.msgs.filter(function(k){return String(k.id)!==el.dataset.mid});salva();conv(false);toast('Mensagem excluída')})}
+ },520)}
+function seguraFim(){clearTimeout(lp.t)}
+document.addEventListener('pointerdown',seguraIni);
+document.addEventListener('pointermove',function(e){if(lp.t&&(Math.abs(e.clientX-lp.x)+Math.abs(e.clientY-lp.y)>10))clearTimeout(lp.t)});
+['pointerup','pointercancel'].forEach(function(n){document.addEventListener(n,seguraFim)});
+document.addEventListener('contextmenu',function(e){if(e.target.closest('.cl,.m'))e.preventDefault()});
+document.addEventListener('click',function(e){if(lp.feito){lp.feito=false;e.stopPropagation();e.preventDefault()}},true);
 lista();
 })();
 </script></body></html>
