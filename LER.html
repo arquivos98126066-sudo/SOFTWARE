@@ -97,12 +97,21 @@ svg{fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-l
   var IC_SETA = '<svg class="seta" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg>';
 
   /* os estudos ficam abertos em lib/: sem chave nem senha */
-  function carregar(){
+  /* biblioteca guardada no aparelho (IndexedDB): abre na hora, sem esperar os 108 arquivos; só baixa o que mudou */
+  function idbAbre(){ return new Promise(function(ok, no){ try { var r = indexedDB.open('ler', 1); r.onupgradeneeded = function(){ r.result.createObjectStore('k'); }; r.onsuccess = function(){ ok(r.result); }; r.onerror = function(){ no(r.error); }; } catch (e) { no(e); } }); }
+  function idbLe(){ return idbAbre().then(function(db){ return new Promise(function(ok){ var q = db.transaction('k').objectStore('k').get('lib'); q.onsuccess = function(){ ok(q.result || null); }; q.onerror = function(){ ok(null); }; }); }).catch(function(){ return null; }); }
+  function idbGrava(v){ return idbAbre().then(function(db){ return new Promise(function(ok){ var t = db.transaction('k', 'readwrite'); t.objectStore('k').put(v, 'lib'); t.oncomplete = function(){ ok(); }; t.onerror = function(){ ok(); }; }); }).catch(function(){}); }
+  function docsDoCache(c){ return c.ordem.map(function(id){ return c.itens[id] && c.itens[id].d; }).filter(Boolean); }
+  /* os estudos ficam abertos em lib/: sem chave nem senha. Reaproveita o que já está guardado quando a versão é a mesma. */
+  function carregar(antigo){
     return fetch('lib/lista.json', {cache: 'no-cache'}).then(function(r){ return r.json(); }).then(function(l){
-      return Promise.all(Object.keys(l.itens).map(function(id){
-        return fetch('lib/' + id + '.json').then(function(r){ return r.json(); }).catch(function(){ return null; });
-      }));
-    }).then(function(a){ return a.filter(Boolean); });
+      var ordem = Object.keys(l.itens), itens = {};
+      return Promise.all(ordem.map(function(id){
+        var v = l.itens[id], velho = antigo && antigo.itens[id];
+        if (velho && velho.v === v && velho.d) { itens[id] = velho; return null; }
+        return fetch('lib/' + id + '.json').then(function(r){ return r.json(); }).then(function(d){ itens[id] = {v: v, d: d}; }).catch(function(){ if (velho) itens[id] = velho; });
+      })).then(function(){ return {ordem: ordem, itens: itens}; });
+    });
   }
 
   /* árvore de pastas */
@@ -609,8 +618,20 @@ svg{fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-l
     $('carga').hidden = true; $('app').hidden = false;
     if (yLista) window.scrollTo({top: yLista, behavior: 'instant'});
   }
-  carregar().then(entrar).catch(function(){
-    $('carga').innerHTML = '<div class="vazio">Sem conexão. Abra de novo quando estiver online.</div>';
+  function assinatura(c){ return c.ordem.map(function(id){ return id + ':' + (c.itens[id] ? c.itens[id].v : ''); }).join('|'); }
+  var erroCarga = function(){ $('carga').innerHTML = '<div class="vazio">Sem conexão. Abra de novo quando estiver online.</div>'; };
+  idbLe().then(function(c){
+    if (c && c.ordem && c.ordem.length) {
+      entrar(docsDoCache(c));
+      /* confere novidades por trás, sem mexer na tela que você está vendo */
+      carregar(c).then(function(n){
+        if (assinatura(n) === assinatura(c)) return;
+        idbGrava(n);
+        if ($('leitor').hidden) { montar(docsDoCache(n)); desenhar(); }
+      }).catch(function(){});
+    } else {
+      carregar(null).then(function(n){ idbGrava(n); entrar(docsDoCache(n)); }).catch(function(e){ console.error('LER carga:', e && e.stack || e); erroCarga(); });
+    }
   });
 
 
