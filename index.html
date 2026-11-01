@@ -728,9 +728,30 @@ input { -webkit-user-select: text; user-select: text; }
     if (navigator.vibrate) { try { navigator.vibrate(15); } catch (e) {} }
   }
   function fecha() { ov.className = ''; alvo = null; clearTimeout(confirmaTm); }
+  /* arquivo baixado sozinho: traz junto os scripts locais (senão abre em branco fora do app) e uma nuvem vazia no lugar da real */
+  var NUVEM_VAZIA = "const vazio=()=>({exists:()=>false,empty:true,size:0,docs:[],data:()=>undefined,forEach(){},docChanges:()=>[]});export const db={nv:true};export const collection=(d,c)=>({tipo:'col',col:c});export const doc=(a,c,i)=>({tipo:'doc',col:c,id:i});export const serverTimestamp=()=>Date.now();export const orderBy=()=>({});export const limit=()=>({});export const where=()=>({});export const query=r=>r;export class FieldPath{constructor(...p){this.p=p}};export const onSnapshot=(r,cb)=>{try{cb(vazio())}catch(e){};return()=>{}};export const getDoc=async()=>vazio();export const getDocs=async()=>vazio();export const setDoc=async()=>{};export const updateDoc=async()=>{};export const deleteDoc=async()=>{};export const addDoc=async r=>r;export const writeBatch=()=>({set(){return this},update(){return this},delete(){return this},commit:async()=>{}});";
+  function autonomo(html) {
+    var srcs = [], re = /<script\b[^>]*\bsrc=["']([^"']+)["'][^>]*>\s*<\/script>/gi, m;
+    while ((m = re.exec(html))) if (!/^(https?:|data:|\/\/)/i.test(m[1])) srcs.push(m[1]);
+    return Promise.all(srcs.map(function (u) { return fetch(u.replace(/^\.\//, '')).then(function (r) { return r.ok ? r.text() : null; }).catch(function () { return null; }); })).then(function (txt) {
+      var mapa = {}; srcs.forEach(function (u, i) { mapa[u] = txt[i]; });
+      html = html.replace(/<script\b[^>]*\bsrc=["']([^"']+)["'][^>]*>\s*<\/script>/gi, function (t, u) {
+        if (mapa[u] == null) return t;
+        return '<script>' + mapa[u].replace(/<\/script/gi, '<\\/script').replace(/<!--/g, '<\\!--') + '<\/script>';
+      });
+      html = html.replace(/(?:window\.)?location\.replace\(\s*['"]index\.html['"]\s*\)/g, 'void 0'); /* cópia sem login: não volta para o menu */
+      if (/from\s*["']\.\/nv-fs\.js["']/.test(html)) {
+        var b64 = btoa(unescape(encodeURIComponent(NUVEM_VAZIA)));
+        var im = '<script type="importmap">{"imports":{"./nv-fs.js":"data:text/javascript;base64,' + b64 + '"}}<\/script>';
+        html = /<head[^>]*>/i.test(html) ? html.replace(/<head[^>]*>/i, function (h) { return h + im; }) : im + html;
+      }
+      return html;
+    });
+  }
   function baixar(a) {
     var n = NOMES[arq(a)] || [0, arq(a)];
-    fetch(arq(a)).then(function (r) { if (!r.ok) throw 0; return r.blob(); }).then(function (b) {
+    fetch(arq(a)).then(function (r) { if (!r.ok) throw 0; return r.text(); }).then(function (t) { return /\.html?$/i.test(n[1]) ? autonomo(t) : t; }).then(function (t) {
+      var b = new Blob([t], { type: 'text/html;charset=utf-8' });
       var u = URL.createObjectURL(b), l = document.createElement('a');
       l.href = u; l.download = n[1]; document.body.appendChild(l); l.click(); l.remove();
       setTimeout(function () { URL.revokeObjectURL(u); }, 4000);
