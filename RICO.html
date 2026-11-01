@@ -5472,6 +5472,8 @@ window.saveAnswer = window.saveAnswer || function(){};
     var tx = rtDeDom(bl, false);
     var sel = window.getSelection(), at = sel && sel.anchorNode && sel.anchorNode.parentNode && sel.anchorNode.parentNode.closest ? sel.anchorNode.parentNode.closest('.rd-tx') : null;
     bl.innerHTML = rtHtml(rtParse(tx), null);
+    /* repintar sem remarcar os cartões fazia a edição perder o visual da leitura ao tirar o foco */
+    try { rdCartoes(bl); } catch (_) {}
     if (fim && at === bl) rdFoco(bl, true);
   }
   /* modo copiar: seleção nativa sem teclado; trechos selecionados em momentos diferentes se acumulam e ficam marcados */
