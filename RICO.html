@@ -479,6 +479,8 @@ if ((sessionStorage.getItem('troca') === (window.RICO_INST === 'p' ? 'RICOP' : '
   .rd-ov.rd-q{ touch-action: none; }
   .rd-ln-pre, .rd-pre{ background: rgba(33,30,25,.10); border-radius: 6px; }
   html.rd-editando .rd-col{ margin-bottom: calc(var(--rd-kb, 0px) + 96px); }
+  /* teclado aberto: a barra de baixo some, então a folga é só a altura do teclado mais um respiro curto */
+  html.rd-editando .rd-ov.rd-kbd .rd-col{ margin-bottom: calc(var(--rd-kb, 0px) + 6px); }
   html.rd-editando #alterna-base{ display: none !important; }
   .rd-ov.rd-kbd .rd-tools{ display: none; }
   .rd-ov.rd-cp, .rd-ov.rd-cp *{ -webkit-user-select: none !important; user-select: none !important; -webkit-touch-callout: none !important; }
