@@ -16,6 +16,8 @@ try { var _pinY = 0; try { var _pj = JSON.parse(localStorage.getItem(window.RICO
 /* sempre esconde ate os textos guardados no aparelho entrarem nos campos (senao os nomes aparecem carregando) */
 {
   var _e = document.createElement('style'); _e.id = 'rico-esconde'; _e.textContent = 'html{visibility:hidden}'; document.head.appendChild(_e);
+  /* garantia: se algum arquivo externo não chegar, a página nunca fica escondida */
+  setTimeout(function(){ var x = document.getElementById('rico-esconde'); if (x) x.remove(); }, 2500);
 }
 if ((sessionStorage.getItem('troca') === (window.RICO_INST === 'p' ? 'RICOP' : 'RICO') && parseFloat(sessionStorage.getItem('rico.y.' + window.RICO_INST)) > 0) || _pinY > 0) {
   /* durante a volta, a animação de entrada das células já nasce terminada: não pisca ao desenhar de novo */
@@ -333,7 +335,7 @@ if ((sessionStorage.getItem('troca') === (window.RICO_INST === 'p' ? 'RICOP' : '
   .planes-table td:last-child{ color: #4b5563; }
 
   /* ── Ciclo ── */
-  .liga-ciclo + .cycle-block{ margin-top: 0; }
+  .liga-ciclo + .cycle-block{ margin-top: -12px; }
   .cycle-block{ background: var(--dark); border-radius: 24px; padding: 20px; margin: 76px 0 20px; color: #fff; }
   .cycle-block h4{ position: relative; color: var(--gold); font-family: var(--f-title); margin-bottom: 24px; font-size: 18px; font-weight: 600; cursor: pointer; outline: none; }
   .cycle-block h4::before{ content: ''; position: absolute; left: -8px; right: -8px; top: -12px; bottom: -12px; }
@@ -782,6 +784,96 @@ if ((sessionStorage.getItem('troca') === (window.RICO_INST === 'p' ? 'RICOP' : '
   .rcm-conf-card:has(textarea) .rcm-conf-bt button svg{ width: 18px; height: 18px; }
   .rcm-bar{ position: absolute; z-index: 5; display: flex; justify-content: center; margin: 0; left: 0; top: 0; filter: drop-shadow(0 6px 14px rgba(0,0,0,.4)); }
   .rcm-bar[hidden]{ display: none; }
+  /* barra de cima: fica no código (as funções continuam), mas some da tela; os botões vivem no popup de segurar a célula */
+  #modoBar{ display: none !important; }
+  /* ══ Passo 3: visual do modelo "O Ciclo Vencedor" (pastas por níveis) ══ */
+  body .cycle-block{ background: #efeadf; border: 0; border-radius: 28px; padding: 18px 16px 16px; color: #1a1f36; }
+  .cycle-block .titulo{ position: relative; display: flex; align-items: center; gap: 12px; height: 56px; padding: 0 8px; margin: 0 36px 14px; border: 1px solid #e3dccb; border-radius: 999px; background: rgba(255,255,255,.35); }
+  .cycle-block .titulo .icone svg{ width: 26px; height: 26px; }
+  .cycle-block .titulo .icone{ flex: none; width: 43px; height: 43px; border-radius: 50%; background: #fff; border: 1px solid #e3dccb; display: grid; place-items: center; padding: 0; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+  .cycle-block .titulo .icone:active{ transform: scale(.94); }
+  .cycle-block .agulha{ transform-origin: 10px 10px; transition: transform .45s cubic-bezier(.4,1.4,.5,1); }
+  .cycle-block .marcas text{ font: 400 3.7px Roboto, "Helvetica Neue", Arial, sans-serif; fill: #1a1f36; stroke: none; }
+  .cycle-block .titulo h4{ flex: 1; margin: 0; padding: 0 15px 0 0; text-align: center; font-family: inherit; font-size: 15px; font-weight: 600; letter-spacing: .22em; white-space: nowrap; color: #1a1f36; }
+  .cycle-block .titulo h4::before{ display: none; }
+  .cycle-block #ciclo-lista{ margin: 0; }
+  /* nível sem nada: o bloco fica como era; só o vão grande até a citação some (a citação sobe e fica logo abaixo do bloco) */
+  .tela1, .tela1.nv-vazio{ justify-content: flex-start; min-height: 0; }
+  .cycle-block #ciclo-lista.so-compl{ padding: 16px 0 14px; }
+  /* com o popup aberto no primeiro círculo, ele sobe e fica colado no título */
+  .cycle-block #ciclo-lista.so-compl:has(.rcm-t:first-child .rcm-bar:not([hidden])){ padding-top: 0; }
+  /* mesma fonte do modelo (Helvetica Neue / Arial): é ela que dá o peso das letras */
+  body .cycle-block, body .cycle-block .titulo h4, body .cycle-block .rcm-node, body .cycle-block .rcm-node .rn, body .rcm-cartao, body .rcm-cartao p{ font-family: "Helvetica Neue", Arial, sans-serif; }
+  .cycle-block .rcm-wrap{ margin-top: 0; overflow: visible; }
+  .rcm-t{ width: calc(100% - 66px); margin: 0 auto; animation: rcEntra .35s ease both; }
+  .rcm-t + .rcm-t{ margin-top: 35px; }
+  .rcm-t.zo{ transform: translateX(33px); }
+  .rcm-t.ze{ transform: translateX(-33px); }
+  .rcm-t.at{ width: 100%; }
+  .rcm-t.at + .rcm-t{ margin-top: 35px; }
+  @keyframes rcEntra{ from{ opacity: 0; } to{ opacity: 1; } }
+  .cycle-block .rcm-wrap:not(.zig) .rcm-node{ height: 37px; padding: 0 15px; gap: 10px; font-family: inherit; font-size: 15px; font-weight: 500; line-height: 1; background: #fff; border: 1px solid #e3dccb; color: #1a1f36; box-shadow: none; }
+  .cycle-block .rcm-wrap:not(.zig) .rcm-node i{ width: 10px; height: 10px; border: 2.5px solid #e6c26a; background: transparent; }
+  .cycle-block .rcm-wrap:not(.zig) .rcm-node i.fil{ border-color: #e6c26a; }
+  .cycle-block .rcm-wrap:not(.zig) .rcm-node i.tx{ border-color: #3b4a63; }
+  .cycle-block .rcm-wrap:not(.zig) .rcm-node.txt{ border-color: #e3dccb; }
+  .cycle-block .rcm-wrap:not(.zig) .rcm-node.sel{ background: #fff; border-color: #1a1f36; color: #1a1f36; }
+  /* célula sem número, quando selecionada: a palavra fica igual às outras */
+  .cycle-block .rcm-wrap:not(.zig) .rcm-node.sel:not(.root){ font-size: 15.5px; }
+  .cycle-block .rcm-wrap:not(.zig) .rcm-node.sel:not(.root){ font-weight: 500; }
+  /* Passo 6: células selecionadas (só em cópia/coletor): borda dourada, sem mudar tamanho */
+  body .cycle-block .rcm-wrap:not(.zig) .rcm-node.dsel:not(.root){ border-color: #d9b44a; box-shadow: 0 0 0 1px #d9b44a; }
+  .cycle-block:has(.rcm-wrap[data-v="2"]), .cycle-block:has(.rcm-wrap[data-v="3"]){ touch-action: pan-y; }
+  .cycle-block:has(.rcm-wrap[data-v="2"]) .rcm-node:not(.root), .cycle-block:has(.rcm-wrap[data-v="3"]) .rcm-node:not(.root){ -webkit-user-select: none; user-select: none; touch-action: pan-y; }
+  .cycle-block .rcm-wrap:not(.zig) .rcm-node:not(.root){ font-size: 15.5px; }
+  /* círculo com número aberto (ATRACAO...): palavra 15px */
+  .cycle-block .rcm-wrap:not(.zig) .rcm-node.root.cn{ font-size: 16px; }
+  .cycle-block .rcm-wrap:not(.zig) .rcm-node.root{ height: 44.8px; padding: 0 16.8px; font-size: 13.8px; letter-spacing: 0; text-transform: uppercase; background: #fff; border-color: #e3dccb; color: #1a1f36; }
+  .cycle-block .rcm-wrap:not(.zig) .rcm-node.root.cn{ padding: 0 17px 0 6px; gap: 8px; }
+  .cycle-block .rcm-wrap.t-tile:not(.zig) .rcm-node.root{ height: 41.8px; color: #1a1f36; }
+  .cycle-block .rcm-wrap:not(.zig) .rcm-node.root.sel{ border-color: #e3dccb; }
+  /* título da raiz numerada (ex.: METAS): peso 500 (era 600; 550 → 500), pedido do usuário */
+  .cycle-block .rcm-wrap:not(.zig) .rcm-node.root{ font-weight: 500; }
+  .cycle-block .rcm-wrap.t-tile:not(.zig) .rcm-node.root:not(.cn){ padding: 0 16.8px; font-size: 14.5px; letter-spacing: .06em; font-weight: 500; }
+  .rcm-node .rn{ flex: none; width: 30px; height: 30px; border-radius: 50%; background: #9a6c14; color: #fff; font-size: 13px; font-weight: 600; display: grid; place-items: center; }
+  /* número menor => célula menos gorda */
+  body .cycle-block .rcm-wrap:not(.zig) .rcm-node.root.cn, body .cycle-block .rcm-wrap.t-tile:not(.zig) .rcm-node.root.cn{ height: 38.8px; padding: 0.5px 16.8px 0.5px 6px; box-sizing: border-box; }
+  body .cycle-block .rcm-node.root .rn{ width: 26px; height: 26px; font-size: 12px; }
+  /* células das pastas (METAS, NOVO, ATRACAO...): um pouco mais de branco ao redor */
+  body .cycle-block .rcm-wrap:not(.zig):not(:has(.rcm-node:not(.root))) .rcm-node.root.cn{ height: 41px; padding: 0.5px 18px 0.5px 7px; }
+  body .cycle-block .rcm-wrap.zig:not(:has(.rcm-node:not(.root))) .rcm-node.root.cn{ min-height: 46px; padding: 9px 20px 9px 8px; }
+  /* círculos principais (METAS, NOVO...) sem nada aberto embaixo (sem células-filhas): peso da letra mais leve */
+  body .cycle-block .rcm-wrap:not(.zig):not(:has(.rcm-node:not(.root))) .rcm-node.root.cn{ font-weight: 500; }
+  body .cycle-block .rcm-wrap .rcm-links path, body .cycle-block .rcm-wrap .rcm-links path.tx{ stroke: #b07a14; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .rcm-cartao{ max-width: 100%; margin: 18px 0 0; background: #fff; border: 1px solid #e3dccb; border-radius: 28px; padding: 24px 22px 26px; cursor: pointer; animation: rcEntra .45s ease both; }
+  .rcm-cartao .traco{ width: 38px; height: 4px; border-radius: 4px; background: #d9b44a; margin-bottom: 16px; }
+  .rcm-cartao p{ margin: 0; font-size: 17px; line-height: 1.5; color: #1a1f36; white-space: pre-wrap; }
+
+  .cycle-compl.cycle-compl-oculto{ display: none !important; }
+  #modoTitulo{ user-select: none; -webkit-user-select: none; -webkit-tap-highlight-color: transparent; }
+  /* popup agrupado: + e 3 grupos; cada grupo troca o conteúdo do popup no mesmo lugar */
+  .rcm-bar .rcm-pill{ gap: 1px; padding: 4px; }
+  .rcm-bar .rcm-ib{ width: 36px; height: 36px; }
+  .rcm-bar .rcm-ib svg{ width: 17px; height: 17px; }
+  .rcm-bar .rcm-ib[data-a="paraPasta"] svg, .rcm-bar .rcm-ib[data-m="mover"] svg, .rcm-bar .rcm-ib[data-px="mover"] svg{ width: 20px; height: 20px; stroke-width: 1.45; }
+  /* popup que abre ao segurar o Ciclo Vencedor (+, pasta com +, lixeira): menor e mais perto do título */
+  .cycle-block .cycle-cell{ gap: 2px; padding: 4px; margin: 0 0 12px; }
+  .cycle-block .cycle-cell .rcm-ib{ width: 38px; height: 38px; }
+  .cycle-block .cycle-cell .rcm-ib svg{ width: 18px; height: 18px; }
+  /* popup aberto pelo nome "O CICLO VENCEDOR": aparece em cima do próprio título; o nome some enquanto ele está aberto */
+  body .cycle-block{ position: relative; }
+  .cycle-block:has(.cycle-compl[data-mapa] + .cycle-cell) .titulo h4{ visibility: hidden; }
+  /* uma célula só: a pílula branca começa na borda esquerda da bússola e leva a bússola e os três ícones dentro */
+  .cycle-block .cycle-compl[data-mapa] + .cycle-cell{ position: absolute; top: -62px; left: 44px; right: 44px; height: 40px; margin: 0; z-index: 4; animation: none; display: flex; align-items: center; justify-content: flex-end; gap: 2px; padding: 0 6px 0 50px; box-sizing: border-box; background: #fff; border: 1px solid #e3dccb; border-radius: 999px; box-shadow: none; filter: none; width: auto; max-width: none; }
+  .cycle-block .cycle-compl[data-mapa] + .cycle-cell .rcm-ib{ width: 36px; height: 36px; }
+  .cycle-block .cycle-compl[data-mapa] + .cycle-cell .rcm-ib svg{ width: 21px; height: 21px; }
+  .cycle-block .cycle-compl[data-mapa] + .cycle-cell .rcm-ib[aria-label="Pasta"] svg{ width: 26px; height: 26px; }
+  .cycle-block .titulo .icone{ position: relative; z-index: 6; }
+  .cycle-block:has(.cycle-compl[data-mapa] + .cycle-cell) .titulo .icone{ border-color: transparent; background: transparent; }
+  .rcm-bar .gi, .rcm-bar .gb{ display: none; }
+  .rcm-bar[data-gs="1"] .gm, .rcm-bar[data-gs="2"] .gm, .rcm-bar[data-gs="3"] .gm{ display: none; }
+  .rcm-bar[data-gs="1"] .gi1, .rcm-bar[data-gs="2"] .gi2, .rcm-bar[data-gs="3"] .gi3,
+  .rcm-bar[data-gs="1"] .gb, .rcm-bar[data-gs="2"] .gb, .rcm-bar[data-gs="3"] .gb{ display: grid; }
   .rcm-pill{ display: flex; gap: 2px; padding: 5px; background: var(--dark2); border: 1px solid var(--gold); border-radius: 999px; }
   .rcm-ib{ width: 42px; height: 42px; border: 0; border-radius: 50%; background: transparent; display: grid; place-items: center; cursor: pointer; color: var(--gold); padding: 0; }
   .rcm-ib{ position: relative; transition: color .15s; }
@@ -837,6 +929,25 @@ if ((sessionStorage.getItem('troca') === (window.RICO_INST === 'p' ? 'RICOP' : '
   .cycle-block .rcm-node i{ background: transparent; border: 2px solid #b07a14; }
   .cycle-block .rcm-node i.fil{ border-color: #e6c26a; }
   .cycle-block .rcm-node i.tx{ border-color: #3b4a63; }
+
+  /* bolinha em fatias: um círculo só, com a borda dividida em arcos de 1, 2 ou 3 cores (sem círculo dentro de círculo) */
+  body .cycle-block .rcm-wrap.rcm-wrap .rcm-node.rcm-node i{ position: relative; width: 10px; height: 10px; border: 0; box-sizing: border-box; border-radius: 50%; background: #b07a14; flex: none; }
+  body .cycle-block .rcm-wrap.rcm-wrap .rcm-node.rcm-node i::after{ content: ""; position: absolute; left: 2.5px; top: 2.5px; right: 2.5px; bottom: 2.5px; border-radius: 50%; background: #fff; }
+  body .cycle-block .rcm-wrap.rcm-wrap .rcm-node.rcm-node i.c2{ background: conic-gradient(#b07a14 0deg 180deg, #f0c64a 180deg 360deg); }
+  body .cycle-block .rcm-wrap.rcm-wrap .rcm-node.rcm-node i.c3{ background: conic-gradient(#b07a14 0deg 120deg, #f0c64a 120deg 240deg, #1a1f36 240deg 360deg); }
+  body .cycle-block .rcm-wrap.rcm-wrap .rcm-node.rcm-node i.ft{ background: #1a1f36; }
+  body .cycle-block .rcm-wrap.rcm-wrap.zig .rcm-node.rcm-node i{ width: 8px; height: 8px; }
+  body .cycle-block .rcm-wrap.rcm-wrap.zig .rcm-node.rcm-node i::after{ left: 2px; top: 2px; right: 2px; bottom: 2px; }
+  .cycle-block .rcm-wrap:not(.zig) .rcm-node.col{ display: none; }
+  /* Passo 5: versão ativa = só a COR do número (original dourado; cópia marrom-café #6b4a2b; coletor preto), sem bolinha extra; piscada ao criar */
+  .cycle-block .rcm-node .rn{ position: relative; }
+  .cycle-block .rcm-node .rn[data-v="2"]{ background: #6b4a2b; }
+  .cycle-block .rcm-node .rn[data-v="3"]{ background: #1a1f36; }
+  /* os galhos (linhas) acompanham a cor da versão: cópia marrom-café #6b4a2b, coletor preto */
+  body .cycle-block .rcm-wrap[data-v="2"] .rcm-links path, body .cycle-block .rcm-wrap[data-v="2"] .rcm-links path.tx{ stroke: #6b4a2b; }
+  body .cycle-block .rcm-wrap[data-v="3"] .rcm-links path, body .cycle-block .rcm-wrap[data-v="3"] .rcm-links path.tx{ stroke: #1a1f36; }
+  @keyframes cpPisca{ 0%, 100%{ opacity: 1; } 35%{ opacity: .2; } }
+  .cycle-block .rcm-node.cpPisca{ animation: cpPisca .7s ease-in-out 1; }
   .cycle-block .cycle-item, .cycle-block .rcm-node{ background: #fff; border-color: var(--bd); color: var(--tx); }
   .cycle-block .cycle-item.cycle-compl, .cycle-block .cycle-compl.aberto{ background: var(--gold); border-color: var(--gold); color: var(--dark); }
   .cycle-block .rcm-node.root{ background: var(--gold); border-color: var(--gold); color: var(--dark); }
@@ -844,6 +955,9 @@ if ((sessionStorage.getItem('troca') === (window.RICO_INST === 'p' ? 'RICOP' : '
   .cycle-block .rcm-wrap.zig.aberto .rcm-node.root, .cycle-block .rcm-wrap.zig.aberto .rcm-node.root.sel{ background: var(--gold); border-color: var(--gold); color: var(--dark); }
   .cycle-block .rcm-node.txt{ border-color: var(--bd); }
   .cycle-block .rcm-node.sel, .cycle-block .rcm-wrap.zig .rcm-node.sel{ border-color: var(--dark); }
+  /* selecionada: sem borda preta, a célula não mostra que foi tocada */
+  .cycle-block .rcm-wrap:not(.zig) .rcm-node.sel:not(.root){ border-color: #e3dccb; }
+  .cycle-block .rcm-wrap.zig .rcm-node.sel:not(.root){ border-color: var(--bd); }
   .cycle-block .rcm-wrap.zig .rcm-node.foco, .cycle-block .rcm-wrap.zig .rcm-node.foco.sel{ color: var(--gold-deep); }
   .cycle-block .cycle-item.mv, .cycle-block .rcm-node.mv{ background: rgba(224,181,74,.18); box-shadow: 0 0 0 2px var(--gold); }
   .cycle-block .rcm-pill, .cycle-block .cycle-cell{ background: #fff; border-color: var(--bd); filter: none; }
@@ -901,10 +1015,10 @@ if ((sessionStorage.getItem('troca') === (window.RICO_INST === 'p' ? 'RICOP' : '
   </div>
 
   <div class="cycle-block">
-    <h4 id="modoTitulo" role="button" tabindex="0" aria-expanded="false">O CICLO VENCEDOR</h4>
+    <div class="titulo"><button class="icone bussola" id="bussola" type="button" aria-label="Bússola: nível 1"><svg width="26" height="26" viewBox="0 0 20 20" fill="none" stroke="#1a1f36" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="10" r="9"/><g class="marcas"></g><g class="agulha" stroke="none"><path d="M10 7.3L11.1 9.3V10.7L10 12.7L8.9 10.7V9.3Z" fill="#1a1f36"/><circle cx="10" cy="10" r=".45" fill="#fff"/></g></svg></button><h4 id="modoTitulo" role="button" tabindex="0" aria-expanded="false">O CICLO VENCEDOR</h4></div>
     <div class="modo-bar" id="modoBar" hidden>
       <div class="rcm-pill">
-        <button type="button" class="rcm-ib" data-m="mover" aria-label="Mover" data-tip="Mover"><svg viewBox="0 0 24 24"><path d="M4 7.5a1.5 1.5 0 0 1 1.5-1.5H10l2 2.2h6.5A1.5 1.5 0 0 1 20 9.7v8.8a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 18.5z"/><path d="M12 11.5v5M9.8 14.5l2.2 2.2 2.2-2.2"/></svg></button>
+        <button type="button" class="rcm-ib" data-m="mover" aria-label="Mover" data-tip="Mover"><svg viewBox="0 0 24 24"><path d="M3 8.5A3.5 3.5 0 0 1 6.5 5h2.6c.6 0 1.1.2 1.5.6l.9 1c.4.4.9.6 1.5.6h4.5A3.5 3.5 0 0 1 21 10.7v6.8a3.5 3.5 0 0 1-3.5 3.5h-11A3.5 3.5 0 0 1 3 17.5z"/><path d="M12 11.5v5M9.6 14.4l2.4 2.4 2.4-2.4"/></svg></button>
         <button type="button" class="rcm-ib" data-m="duplicar" aria-label="Duplicar" data-tip="Duplicar"><svg viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2.5"/><path d="M5 15V7a2 2 0 0 1 2-2h8"/></svg></button>
         <button type="button" class="rcm-ib" data-m="excluir" aria-label="Excluir" data-tip="Excluir"><svg viewBox="0 0 24 24"><path d="M5 7h14M10 7V5h4v2M7 7l1 12h8l1-12"/></svg></button>
         <button type="button" class="rcm-ib" data-m="copiar" aria-label="Copiar" data-tip="Copiar"><svg viewBox="0 0 24 24"><path d="M4 14v4.5A1.5 1.5 0 0 0 5.5 20h13a1.5 1.5 0 0 0 1.5-1.5V14"/><path d="M12 15V4M8 8l4-4 4 4"/></svg></button>
@@ -1271,7 +1385,7 @@ if ((sessionStorage.getItem('troca') === (window.RICO_INST === 'p' ? 'RICOP' : '
 <script type="module">import('./nuvem-rico.js?v=' + Date.now()).catch(function () {});</script>
 <script type="module">
 /* caderno pelo servidor único (Cloudflare, nv-canal.js): cada pergunta é um campo, gravado na ordem do servidor */
-if (!window.NvCanal) await import('./nv-canal.js');
+try { if (!window.NvCanal) await import('./nv-canal.js'); } catch (e) {}
 var canal = window.NvCanal;
 function cadGrava(o, soDados) {
   var set = [];
@@ -2563,7 +2677,7 @@ window.saveAnswer = window.saveAnswer || function(){};
 
   var _soCompl = true;
   var _mapa = true;
-  var _zig = true;
+  var _zig = false;
   function cicloFimGrupo(k) {
     var f = k;
     while (CICLO[f + 1] && CICLO[f + 1].g) f++;
@@ -2613,20 +2727,18 @@ window.saveAnswer = window.saveAnswer || function(){};
     box.innerHTML = '';
     var cab = -1;
     CICLO.forEach(function(e, k) { if (cab < 0 && e.h && !e.g) cab = k; });
-    if (cab < 0) _soCompl = false;
-    if (!_soCompl) _mapa = false;
-    if (!_mapa) { _zig = false; }
+    /* só existe o Mapa Mental: Processo, Meu Ciclo e Subpasta saíram da tela (os dados continuam guardados) */
+    _soCompl = true; _mapa = true; _zig = false;
     if (!_soCompl || _foco < 0 || !CICLO[_foco] || !CICLO[_foco].g) _foco = -1;
     if (cab >= 0) {
       var h = document.createElement('span');
-      h.className = 'cycle-item cycle-compl' + (_soCompl ? ' aberto' : '');
+      h.className = 'cycle-item cycle-compl cycle-compl-oculto aberto';
       h.dataset.idx = cab;
       h.innerHTML = '<span class="cycle-t"></span>';
-      h.firstChild.textContent = _zig ? 'PROCESSO' : (_mapa ? 'MAPA MENTAL' : (_soCompl ? 'SUBPASTA' : 'MEU CICLO'));
-      if (_mapa && _soCompl) h.dataset.mapa = '0';
+      h.dataset.mapa = '0';
       box.appendChild(h);
     }
-    if (_mapa && _soCompl && cab >= 0) {
+    if (_mapa && _soCompl) {
       var mw = document.createElement('div');
       box.appendChild(mw);
       if (window.rcMapa) window.rcMapa.montar(mw, _zig);
@@ -2709,8 +2821,8 @@ window.saveAnswer = window.saveAnswer || function(){};
     return n;
   }
   function criaMapa(KEY, vazio) {
-    var GY = 10, INDENT = 26;
-    var root = null, selId = null, L = {}, wrap = null, world = null, links = null, bar = null, btnSib = null, btnDel = null, barId = null, focoId = null, camOn = false, focoFix = false, abreId = null, mwEl = null, slot = null, zq0 = 0, zPrev = null, zInfo = null, tPrev = null, tPos = 0, tMulti = false, tInfo = null, semRaiz = false, soRaiz = false;
+    var GY = 12.5, INDENT = 32.5, numR = null, verR = 0, tipoT = '';
+    var root = null, selId = null, ultOculto = null, ultLargo = null, forcaMostra = false, L = {}, wrap = null, world = null, links = null, bar = null, btnSib = null, btnDel = null, barId = null, focoId = null, camOn = false, focoFix = false, abreId = null, mwEl = null, slot = null, zq0 = 0, zPrev = null, zInfo = null, tPrev = null, tPos = 0, tMulti = false, tInfo = null, semRaiz = false, soRaiz = false;
     var sheet = null, scrim = null, txt = null, delB = null, editId = null, zig = false, proc = false;
     function uid() { return 'm' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7); }
     function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
@@ -2864,7 +2976,40 @@ window.saveAnswer = window.saveAnswer || function(){};
         })(root);
       });
     }
-    function filhos(n) { return n.collapsed || (FL[n.id] && !FLK[n.id]) ? [] : n.children; }
+    /* Passo 6 (só cópia/coletor): seleção (SEL: 1 marcada, 0 desmarcada por toque) e visão aprofundada (DV = ids visíveis; DS = pilha das visões anteriores) */
+    var SEL = {}, DV = null, DS = [];
+    function deepOk() { return window._rcSelOn !== false && !soRaiz && window.rcMapa.nivelDe(api) === 2; }
+    function filhos(n) {
+      if (DV && deepOk()) { if (n.id !== 'root') return []; var r = []; DV.forEach(function(id) { var f = acha(id); if (f && f.p) r.push(f.n); }); return r; }
+      return n.collapsed || (FL[n.id] && !FLK[n.id]) ? [] : n.children;
+    }
+    function visCells() { return [].slice.call(world.querySelectorAll('.rcm-node:not(.root)')).sort(function(a, b) { return a.offsetTop - b.offsetTop; }); }
+    function selSnap() { return JSON.parse(JSON.stringify(SEL)); }
+    function selDrag(startId, dx, base, modo) {
+      var cs = visCells(), s0 = -1; cs.forEach(function(el, q) { if (el.dataset.id === startId) s0 = q; });
+      if (s0 < 0) return;
+      /* só a célula onde o dedo começou; para marcar outra, desliza de novo nela */
+      var nb = JSON.parse(JSON.stringify(base || {}));
+      nb[cs[s0].dataset.id] = modo === 0 ? 0 : 1;
+      SEL = nb; cs.forEach(function(el) { el.classList.toggle('dsel', SEL[el.dataset.id] === 1); });
+    }
+    function selTap(id) {
+      if (!deepOk() || id === 'root') return false;
+      if (SEL[id] === 1) { SEL[id] = 0; render(); return true; }
+      if (SEL[id] === 0) { SEL[id] = 1; render(); return true; }
+      return false;
+    }
+    /* aprofundar: ficam só os filhos das células selecionadas (retorna 1 feito, -1 sem filhos, 0 nada selecionado) */
+    function deepIn() {
+      if (!deepOk()) return 0;
+      var ids = Object.keys(SEL).filter(function(k) { return SEL[k] === 1 && acha(k); });
+      if (!ids.length) return 0;
+      var nv = [];
+      (function w(n) { if (ids.indexOf(n.id) > -1) n.children.forEach(function(c) { if (nv.indexOf(c.id) < 0) nv.push(c.id); }); n.children.forEach(w); })(root);
+      if (!nv.length) return -1;
+      DS.push(DV); DV = nv; SEL = {}; render(); return 1;
+    }
+    function deepOut() { if (DV === null || !deepOk()) return false; DV = DS.pop() || null; SEL = {}; render(); return true; }
 
     /* pedacinho final da linha (sem encostar na célula): d0 e d1 = distância do fim, em px */
     function trechoFinal(fn, ex, ey, d0, d1) {
@@ -2880,6 +3025,7 @@ window.saveAnswer = window.saveAnswer || function(){};
     function render() {
       if (!root || !wrap || !wrap.isConnected) return;
       uiSalva();
+      if (!deepOk()) { DV = null; DS = []; SEL = {}; }
       marcaFluxo();
       var velhos = world.querySelectorAll('.rcm-node');
       for (var i = 0; i < velhos.length; i++) velhos[i].remove();
@@ -2894,18 +3040,20 @@ window.saveAnswer = window.saveAnswer || function(){};
       var lista = [];
       (function anda(n, p) {
         var el = document.createElement('div');
-        el.className = 'rcm-node' + (n.id === 'root' ? ' root' : '') + (n.id === selId ? ' sel' : '') + (n.id !== 'root' && temTexto(n) ? ' txt' : '') + (window._rcSrc && window._rcSrc.tipo === 'no' && window._rcSrc.inst === api && window._rcSrc.id === n.id ? ' mv' : '') + (window._rcMS && window._rcMS.ids && window._rcMS.ids[n.id] ? ' ms-sel' : '');
+        el.className = 'rcm-node' + (n.id === 'root' ? ' root' : '') + (n.id === selId ? ' sel' : '') + (n.id !== 'root' && temTexto(n) ? ' txt' : '') + (window._rcSrc && window._rcSrc.tipo === 'no' && window._rcSrc.inst === api && window._rcSrc.id === n.id ? ' mv' : '') + (window._rcMS && window._rcMS.ids && window._rcMS.ids[n.id] ? ' ms-sel' : '') + (SEL[n.id] === 1 && n.id !== 'root' ? ' dsel' : '');
         el.dataset.id = n.id;
         if (zig) el.style.maxWidth = (aw0 - 2) + 'px';
         if (n.id !== 'root' && !zig) {
           var d = document.createElement('i');
-          /* bolinha: célula só conta enquanto está escondida (recolhida ou dentro do fluxo); depois de aberta, já está à vista e não é mais "tem mais dentro" */
-          var _fi = !!(n.children && n.children.length) && !!(n.collapsed || (FL[n.id] && !FLK[n.id])), _tt = temTexto(n);
+          /* bolinha: só conta o que está escondido. Aberta (filhos à vista) = cor padrão; recolhida = 2 cores (tem célula) ou 3 cores (célula e texto). Só texto = preto. */
+          var _fi = !!(n.children && n.children.length) && !!(n.collapsed || (FL[n.id] && !FLK[n.id]) || (DV && deepOk())), _tt = temTexto(n);
           if (VZ[n.id]) { if (vazioReal(n)) { _fi = false; _tt = false; } else delete VZ[n.id]; }
-          if (_fi && _tt) d.className = 'tx';
-          else if (_fi || _tt) d.className = 'fil';
+          if (_fi && _tt) d.className = 'c3';
+          else if (_fi) d.className = 'c2';
+          else if (_tt) d.className = 'ft';
           el.appendChild(d);
         }
+        if (n.id === 'root' && numR != null && !zig) { var rn = document.createElement('b'); rn.className = 'rn'; rn.textContent = numR; if (verR > 0) rn.setAttribute('data-v', String(verR)); el.appendChild(rn); el.classList.add('cn'); el.setAttribute('data-mk', KEY); }
         var sp = document.createElement('span'); sp.textContent = n.text || 'Ideia'; el.appendChild(sp);
         var m = L[n.id] = { n: n, p: p, el: el };
         lista.push(m);
@@ -2938,7 +3086,7 @@ window.saveAnswer = window.saveAnswer || function(){};
         var cs = getComputedStyle(m.el);
         m.el.style.width = Math.ceil(mx + parseFloat(cs.paddingLeft) + parseFloat(cs.paddingRight) + 2) + 'px';
       });
-      lista.forEach(function(m) { m.w = m.el.offsetWidth; m.h = m.n.id === 'root' ? 38 : 31; });
+      lista.forEach(function(m) { m.w = m.el.offsetWidth; m.h = m.n.id === 'root' ? (m.el.classList.contains('cn') ? 39 : (tipoT === 'tile' || (tipoT === 'ativo' && soRaiz) ? 42 : 45)) : 37; });
       if (zig) {
         /* zigue-zague: cada ideia desce uma linha, alternando esquerda e direita; ligações em curva suave */
         var zy = 0, ZG = 36;
@@ -2971,29 +3119,63 @@ window.saveAnswer = window.saveAnswer || function(){};
         posBar();
         return;
       }
-      var y = 0, bw = 1, slotW = null;
-      (function pos(n, prof) {
+      /* Passo 4: o mapa nao encolhe. Se nao cabe na largura, os ancestrais do caminho em foco recolhem (da raiz para dentro) e, no ultimo caso, o texto quebra de linha */
+      var aw = wrap.clientWidth || 280, COLW = 14, bw = 1, slotW = null, y = 0;
+      function profDe(m) { var d = 0, q = m; while (q.p) { d++; q = L[q.p.id]; } return d; }
+      lista.forEach(function(m) { m.dp = profDe(m); m.w0 = m.w; });
+      ultOculto = null; ultLargo = null;
+      /* recolhe NIVEIS inteiros, de TRAS PARA FRENTE: primeiro o nivel logo atras da celula que estourou (o pai), depois o avo... ate o nivel 1. A raiz nunca some. */
+      var dA = 0, kmax = 0, kmin = 1;
+      function lay(k) {
+        var mx = 1, ini = dA - k;
+        lista.forEach(function(m) { m.col = false; });
+        (function pos(n, l) {
+          var m = L[n.id];
+          if (soRaiz && n.id !== 'root') return;
+          if (semRaiz && n.id === 'root') { filhos(n).forEach(function(c) { pos(c, 0); }); return; }
+          m.col = k > 0 && m.dp >= ini && m.dp <= dA - 1; m.l = l; m.w = m.w0;
+          if (!m.col) mx = Math.max(mx, l + m.w);
+          var stp = m.col ? 0 : INDENT;
+          filhos(n).forEach(function(c) { pos(c, l + stp); });
+        })(root, 0);
+        return mx;
+      }
+      lay(0);
+      /* célula que estourou a largura (a mais funda): o botão Voltar fecha o pai dela para devolver os níveis da esquerda sem encolher o mapa */
+      lista.forEach(function(m) { if (m.n.id !== 'root' && m.l + m.w > aw && (!ultLargo || m.dp >= L[ultLargo].dp)) ultLargo = m.n.id; });
+      if (!soRaiz && !forcaMostra) {
+        lista.forEach(function(m) { if (m.l + m.w > aw && m.dp >= dA) dA = m.dp; });
+        lista.forEach(function(m) { if (m.l + m.w > aw && m.dp < dA) kmin = Math.max(kmin, m.dp + 1); }); /* nao esconde nivel que tem celula larga demais */
+        kmax = Math.max(0, dA - kmin);
+      }
+      var kk = 0; for (; kk <= kmax; kk++) { bw = lay(kk); if (bw <= aw) break; }
+      if (kk > kmax) { kk = kmax; bw = lay(kk); }
+      lista.forEach(function(m) { m.el.classList.toggle('col', !!m.col); });
+      if (kk > 0) ultOculto = true;
+      /* sem quebra de linha: se ainda nao cabe depois de recolher os niveis, o mapa inteiro diminui (minimo 40%) */
+      bw = 1; lista.forEach(function(m) { if (!m.col && !(soRaiz && m.n && m.n.id !== 'root')) bw = Math.max(bw, m.l + m.w); }); /* só a raiz aparece (tile/pasta): os filhos escondidos não contam, senão o título diminuía */
+      (function pos(n) {
         var m = L[n.id];
-        if (semRaiz && n.id === 'root') { filhos(n).forEach(function(c) { pos(c, 0); }); return; }
-        m.l = prof * INDENT; m.yc = y + m.h / 2; y += m.h + GY;
-        bw = Math.max(bw, m.l + m.w);
+        if (soRaiz && n.id !== 'root') return;
+        if (semRaiz && n.id === 'root') { filhos(n).forEach(pos); return; }
+        if (m.col) { filhos(n).forEach(pos); return; }
+        m.yc = y + m.h / 2; y += m.h + GY;
         if (n.id === barId) { slotW = { l: m.l + INDENT, y: y }; y += BARH + GY; }
-        filhos(n).forEach(function(c) { pos(c, prof + 1); });
-      })(root, 0);
+        filhos(n).forEach(pos);
+      })(root);
       var bh = Math.max(y - GY, 1);
       lista.forEach(function(m) { m.el.style.left = m.l + 'px'; m.el.style.top = (m.yc - m.h / 2) + 'px'; });
       var paths = '', ov = '';
       for (var q = lista.length - 1; q >= 0; q--) {
         var cm = lista[q]; if (!cm.p) continue;
-        var pm = L[cm.p.id]; if (semRaiz && cm.p.id === 'root') continue;
-        var x1 = pm.l + 16, y1 = pm.yc + pm.h / 2, x2 = cm.l, y2 = cm.yc;
-        var rr = Math.max(0, Math.min(12, y2 - y1, x2 - x1));
-        paths += '<path d="M' + x1 + ' ' + y1 + ' V' + (y2 - rr) + ' Q' + x1 + ' ' + y2 + ' ' + (x1 + rr) + ' ' + y2 + ' H' + x2 + '" fill="none" stroke="rgba(224,181,74,.85)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>';
+        if (cm.col) continue; var pm = L[cm.p.id]; while (pm.col && pm.p) pm = L[pm.p.id]; if (semRaiz && cm.p.id === 'root') continue;
+        var x1 = pm.l + 20, y1 = pm.yc + pm.h / 2, x2 = cm.l, y2 = cm.yc;
+        var rr = Math.max(0, Math.min(15, y2 - y1, x2 - x1));
+        paths += '<path d="M' + x1 + ' ' + y1 + ' V' + (y2 - rr) + ' Q' + x1 + ' ' + y2 + ' ' + (x1 + rr) + ' ' + y2 + ' H' + x2 + '" fill="none" stroke="#b07a14" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>';
         if (cm.n.id !== 'root' && rr >= 6 && temTexto(cm.n)) ov += trechoFinal(function(t) { return [x1 + rr * t * t, y2 - rr * (1 - t) * (1 - t)]; }, x2, y2, 0, 12);
       }
-      var aw = wrap.clientWidth || 280;
-      var s = clamp(aw / bw, .4, 1.25);
-      var tx = (aw - bw * s) / 2;
+      var s = clamp(aw / bw, .4, 1);
+      var tx = Math.max(0, (aw - bw * s) / 2);
       var lm = lista[lista.length - 1];
       tInfo = lm ? { n: lista.length, lastCx: tx + (lm.l + lm.w / 2) * s } : null;
       links.innerHTML = paths + ov;
@@ -3007,7 +3189,7 @@ window.saveAnswer = window.saveAnswer || function(){};
     function posBar() {
       var f = barId ? acha(barId) : null;
       if (!f || !slot || !mwEl || !bar) { if (bar) bar.hidden = true; return; }
-      if (btnSib) btnSib.disabled = false; if (btnLev) btnLev.disabled = btnLev.getAttribute('data-a') === 'etapas' ? false : !f.p; if (btnDel) btnDel.disabled = !f.p && window.rcMapa.total() <= 1;
+      if (btnSib) btnSib.disabled = false; if (btnLev) btnLev.disabled = btnLev.getAttribute('data-a') === 'etapas' ? false : !f.p; if (btnDel) btnDel.disabled = !f.p && window.rcMapa.total() <= 1 && !window.rcMapa.ehCopia(api);
       bar.hidden = false;
       var bw = bar.offsetWidth, aw = wrap.clientWidth || 280;
       var left = clamp(zig ? slot.x - bw / 2 : slot.x, 0, Math.max(0, aw - bw));
@@ -3018,7 +3200,9 @@ window.saveAnswer = window.saveAnswer || function(){};
       var f = acha(id); if (!f) return;
       if (!f.p) {
         // o "Ciclo Vencedor" de um mapa: exclui o mapa inteiro
-        if (window.rcMapa.total() > 1 && confirm(ehPasta ? 'Excluir esta pasta?' : 'Excluir este mapa?')) {
+        /* último mapa que sobrou: não some da lista (precisa existir ao menos um), mas pode ser esvaziado */
+        var _ult = window.rcMapa.total() <= 1 && !window.rcMapa.ehCopia(api);
+        if (confirm(window.rcMapa.ehCopia(api) ? 'Excluir esta cópia?' : (_ult ? 'Este é o último mapa. Limpar o conteúdo dele?' : (ehPasta ? 'Excluir esta pasta?' : 'Excluir este mapa?')))) {
           barId = null;
           window.rcMapa.excluir(window.rcMapa.indice(api)); renderCiclo();
         }
@@ -3175,6 +3359,8 @@ window.saveAnswer = window.saveAnswer || function(){};
     }
     function subeProc() { if (proc && zig && window.ajustaTopoCiclo) window.ajustaTopoCiclo(); }
     function acaoToque(id) {
+      forcaMostra = false; /* tocar na raiz não abre mais todos os níveis: o mapa mantém o estágio em que está */
+      fechaOutras(); /* toque simples (já passou a janela do duplo toque): fecha o popup de outro mapa sem deslocar o segundo toque */
       /* escolher opção no fluxo ou abrir o mapa: bloco vai para a posição ideal; recolher ou abrir um ramo: o círculo tocado fica parado onde estava na tela */
       var f0 = acha(id), fluxo = !!(f0 && (!f0.p || (f0.p.et && f0.p.et.run && !f0.p.collapsed)));
       var el0 = world ? world.querySelector('.rcm-node[data-id="' + id + '"]') : null, y0 = el0 ? el0.getBoundingClientRect().top : null;
@@ -3191,7 +3377,14 @@ window.saveAnswer = window.saveAnswer || function(){};
       return !(Array.isArray(n.i) && n.i.some(function(v) { return String(v == null ? '' : v).trim() !== ''; }));
     }
     function acaoToque0(id) {
+      if (id === 'root' && DV && deepOut()) return;
       if (id !== 'root') VZ[id] = 1;
+      /* Mover ligado com um item de fora marcado: um toque na pasta já solta o item dentro dela */
+      var _Sm = window._rcSrc;
+      if (window._rcModo === 'mover' && ehPasta && id === 'root' && _Sm && _Sm.tipo === 'no' && _Sm.id === 'root' && _Sm.inst !== api) {
+        if (window.rcMapa.soltaPasta(api, _Sm.inst)) window._rcSrc = null;
+        return;
+      }
       var f0 = acha(id);
       if (f0 && f0.p && f0.p.et && f0.p.et.run && !f0.p.collapsed && focoId === id) { focoId = null; focoFix = false; }
       if (focoId && id === focoId) { focoVolta(); return; }
@@ -3214,9 +3407,12 @@ window.saveAnswer = window.saveAnswer || function(){};
       }
       render();
     }
+    /* só um popup de ações na tela: abrir um fecha os dos outros mapas */
+    function fechaOutras() { [SETS.m, SETS.p].forEach(function(S) { S.arr.forEach(function(m) { if (m !== api && m.fechaBar) m.fechaBar(); }); }); }
     function toque(e) {
       if (lp) { lp = false; return; }
-      var el = e.target.closest ? e.target.closest('.rcm-node') : null;
+      if (window._rcDragSel && Date.now() - window._rcDragSel < 450) return;
+            var el = e.target.closest ? e.target.closest('.rcm-node') : null;
       if (PEND) {
         if (!el || !el.dataset.id) return;
         if (PEND.pasta) { window.rcMapa.soltaPasta(api); return; }
@@ -3244,6 +3440,16 @@ window.saveAnswer = window.saveAnswer || function(){};
             if (window.showToast) window.showToast('Duplicado');
             return;
           }
+          /* qualquer modo ativo (mover, duplicar, excluir, copiar): dois toques numa célula trazem o popup de volta, já no grupo do modo, para desligar ou trocar */
+          if (window._rcModo) {
+            fechaOutras(); selId = id; barId = id; movBar = false;
+            gs = window._rcModo === 'mover' ? 1 : 2; gsId = id;
+            if (PEND) window.rcMapa.cancela(true);
+            montaBar(); render();
+            return;
+          }
+          /* Passo 5: dois toques na raiz numerada (número ou texto) de um mapa com cópias trocam de camada, sem abrir o editor; um toque continua recolhendo/abrindo */
+          if (id === 'root' && !window._rcModo && !soRaiz && numR != null && window.rcMapa.temCopias(api)) { window.rcMapa.cicla(api); return; }
           selId = id; barId = null; render();
           abreEditor(id, false);
           return;
@@ -3263,7 +3469,7 @@ window.saveAnswer = window.saveAnswer || function(){};
     var ICO_DESCE = '<svg viewBox="0 0 24 24"><path d="M12 5v14M12 19l-5-5M12 19l5-5"/></svg>';
     var ICO_OK = '<svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7"/></svg>';
     var ICO_DUP = '<svg viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2.5"/><path d="M5 15V7a2 2 0 0 1 2-2h8"/></svg>';
-    var ICO_LEVAR = '<svg viewBox="0 0 24 24"><path d="M4 7.5a1.5 1.5 0 0 1 1.5-1.5H10l2 2.2h6.5A1.5 1.5 0 0 1 20 9.7v8.8a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 18.5z"/><path d="M12 11.5v5M9.8 14.5l2.2 2.2 2.2-2.2"/></svg>';
+    var ICO_LEVAR = '<svg viewBox="0 0 24 24"><path d="M3 8.5A3.5 3.5 0 0 1 6.5 5h2.6c.6 0 1.1.2 1.5.6l.9 1c.4.4.9.6 1.5.6h4.5A3.5 3.5 0 0 1 21 10.7v6.8a3.5 3.5 0 0 1-3.5 3.5h-11A3.5 3.5 0 0 1 3 17.5z"/><path d="M12 11.5v5M9.6 14.4l2.4 2.4 2.4-2.4"/></svg>';
     var ICO_X = '<svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>';
     var movBar = false, movKeep = null, destId = null, btnLev = null, ehPasta = false;
     function clona(n) {
@@ -3695,12 +3901,52 @@ window.saveAnswer = window.saveAnswer || function(){};
     }
     var ICO_PERG = '<svg viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6"/><path d="M15 15l5 5"/><path d="M8 10.5h5"/></svg>';
     var ICO_ETAPAS = '<svg viewBox="0 0 24 24"><path d="M12 4l8 4-8 4-8-4z"/><path d="M4 12l8 4 8-4"/><path d="M4 16l8 4 8-4"/></svg>';
+    var gs = 0, gsId = null;
+    function gReal(px) {
+      var m = document.getElementById('modoBar'); if (!m) return null;
+      return m.querySelector(px === 'fixar' ? '[data-p="fixar"]' : (px === 'desfaz' || px === 'refaz') ? '[data-h="' + px + '"]' : '[data-m="' + px + '"]');
+    }
+    function gSincroniza() {
+      try { if (typeof hVerifica === 'function') hVerifica(); } catch (e) {}
+      [].forEach.call(bar.querySelectorAll('[data-px]'), function(b) {
+        var r = gReal(b.getAttribute('data-px'));
+        if (!r) { b.disabled = true; return; }
+        b.disabled = !!r.disabled; b.classList.toggle('on', r.classList.contains('on'));
+      });
+    }
+    function gAgrupa() {
+      var pill = bar.querySelector('.rcm-pill'); if (!pill || movBar || destId) return;
+      var G1 = ['irmao', 'edita', 'cam', 'copiaAqui', 'camComp', 'parcial', 'pergunta'];
+      [].slice.call(pill.children).forEach(function(b) {
+        var dentro = G1.indexOf(b.getAttribute('data-a')) > -1;
+        b.classList.add(dentro ? 'gi' : 'gm'); if (dentro) b.classList.add('gi1');
+      });
+      function sv(i) { return '<svg viewBox="0 0 24 24">' + i + '</svg>'; }
+      function mk(cls, attr, val, label, html) {
+        var e = document.createElement('button'); e.type = 'button'; e.className = 'rcm-ib ' + cls;
+        e.setAttribute(attr, val); e.setAttribute('aria-label', label); e.innerHTML = html; return e;
+      }
+      function prox(px, label, g) {
+        var r = gReal(px);
+        return mk('gi gi' + g, 'data-px', px, label, r ? r.innerHTML : sv('<circle cx="12" cy="12" r="3"/>'));
+      }
+      var voltar = mk('gb', 'data-g', '0', 'Voltar', ICO_VOLTA); pill.insertBefore(voltar, pill.firstChild);
+      pill.appendChild(mk('gm', 'data-g', '1', 'Pasta', sv('<path d="M4 7.5A1.5 1.5 0 0 1 5.5 6H10l2 2.2h6.5A1.5 1.5 0 0 1 20 9.7v8.8a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 18.5z"/>')));
+      pill.appendChild(mk('gm', 'data-g', '2', 'Ações', sv('<path d="M10.5 5l1.9 5.1L17.5 12l-5.1 1.9-1.9 5.1-1.9-5.1L3.5 12l5.1-1.9z"/><path d="M18.5 3.5v4M16.5 5.5h4"/>')));
+      pill.appendChild(mk('gm', 'data-g', '3', 'Tela', sv('<rect x="4" y="5" width="16" height="14" rx="4"/><path d="M4 10h16"/>')));
+      pill.appendChild(prox('mover', 'Mover para pasta', 1));
+      pill.appendChild(prox('duplicar', 'Duplicar', 2)); pill.appendChild(prox('excluir', 'Excluir', 2)); pill.appendChild(prox('copiar', 'Copiar', 2));
+      pill.appendChild(prox('fixar', 'Fixar tela', 3)); pill.appendChild(prox('desfaz', 'Desfazer', 3)); pill.appendChild(prox('refaz', 'Refazer', 3));
+      if (gsId !== barId) { gs = 0; gsId = barId; }
+      bar.setAttribute('data-gs', String(gs)); gSincroniza();
+    }
     function montaBar() {
       var nb = barId ? acha(barId) : null;
       bar.innerHTML = movBar
         ? '<div class="rcm-pill"><button type="button" class="rcm-ib" data-a="sobe" aria-label="Sobe">' + ICO_SOBE + '</button><button type="button" class="rcm-ib" data-a="desce" aria-label="Desce">' + ICO_DESCE + '</button>' + (nb && !nb.p ? '<button type="button" class="rcm-ib" data-a="paraPasta" aria-label="Pasta">' + ICO_LEVAR + '</button>' : '') + '<button type="button" class="rcm-ib" data-a="pronto" aria-label="Pronto">' + ICO_OK + '</button></div>'
-        : '<div class="rcm-pill">' + (proc && root && root.et && !(root.et.desc && root.et.desc.length) && root.et.cur > 0 ? '<button type="button" class="rcm-ib" data-a="voltaCam" aria-label="Voltar">' + ICO_VOLTA + '</button>' : '') + (false ? '' : (proc && root && root.et && root.et.desc && root.et.desc.length ? '<button type="button" class="rcm-ib" data-a="voltaFluxo" aria-label="Voltar">' + ICO_VOLTA + '</button>' : '')) + (proc && zig && (focoId || (nb && nb.p && nb.p.id !== 'root')) ? '<button type="button" class="rcm-ib" data-a="voltaFoco" aria-label="Voltar">' + ICO_VOLTA + '</button>' : '') + ((proc && soRaiz && nb && !nb.p) || (ehPasta && nb && !nb.p) ? '' : '<button type="button" class="rcm-ib" data-a="filho" aria-label="Adicionar">' + ICO_FILHO + '</button>') + '<button type="button" class="rcm-ib" data-a="irmao" aria-label="Mover">' + ICO_IRMAO + '</button>' + (proc && zig && nb && nb.p ? '<button type="button" class="rcm-ib' + (camOn && focoId === barId ? ' on' : '') + '" data-a="cam" aria-label="Camadas">' + ICO_ETAPAS + '</button>' : '') + (proc && zig && nb && !soRaiz && !camOn && (nb.p ? (focoId || !root.et) : !(nb.n.et && nb.n.et.esc.length)) ? '<button type="button" class="rcm-ib" data-a="copiaAqui" aria-label="Copiar até aqui">' + ICO_DUP + '</button>' : '') + (proc && !soRaiz && nb && !nb.p ? '<button type="button" class="rcm-ib" data-a="camComp" aria-label="Camada compartilhada">' + ICO_ETAPAS + (nb && nb.n.et ? '<b class="rcm-bd">' + ((nb.n.et.desc && (nb.n.et.desc.length || nb.n.et.fim)) ? (nb.n.et.ver == null ? nb.n.et.desc.length : nb.n.et.ver) + 1 : nb.n.et.cur + 1) + '</b>' : '') + '</button>' : '') + (proc && !soRaiz && nb && !nb.p && nb.n.et && nb.n.et.esc.length ? '<button type="button" class="rcm-ib" data-a="parcial" aria-label="Copiar até aqui">' + ICO_DUP + '</button>' : '') + '<button type="button" class="rcm-ib" data-a="edita" aria-label="Editar">' + ICO_EDIT + '</button>' + (proc && zig && nb && nb.p ? '<button type="button" class="rcm-ib' + (nb.n.q ? ' on' : '') + '" data-a="pergunta" aria-label="Pergunta">' + ICO_PERG + '</button>' : '') + '</div>';
+        : '<div class="rcm-pill">' + (proc && root && root.et && !(root.et.desc && root.et.desc.length) && root.et.cur > 0 ? '<button type="button" class="rcm-ib" data-a="voltaCam" aria-label="Voltar">' + ICO_VOLTA + '</button>' : '') + (false ? '' : (proc && root && root.et && root.et.desc && root.et.desc.length ? '<button type="button" class="rcm-ib" data-a="voltaFluxo" aria-label="Voltar">' + ICO_VOLTA + '</button>' : '')) + (proc && zig && (focoId || (nb && nb.p && nb.p.id !== 'root')) ? '<button type="button" class="rcm-ib" data-a="voltaFoco" aria-label="Voltar">' + ICO_VOLTA + '</button>' : '') + (ultOculto && ultLargo && !(proc && zig) ? '<button type="button" class="rcm-ib" data-a="voltaOculto" aria-label="Voltar: mostrar os níveis de antes">' + ICO_VOLTA + '</button>' : '')+ ((proc && soRaiz && nb && !nb.p) || (ehPasta && nb && !nb.p) ? '' : '<button type="button" class="rcm-ib" data-a="filho" aria-label="Adicionar">' + ICO_FILHO + '</button>') + '<button type="button" class="rcm-ib" data-a="irmao" aria-label="Mover">' + ICO_IRMAO + '</button>' + (proc && zig && nb && nb.p ? '<button type="button" class="rcm-ib' + (camOn && focoId === barId ? ' on' : '') + '" data-a="cam" aria-label="Camadas">' + ICO_ETAPAS + '</button>' : '') + (proc && zig && nb && !soRaiz && !camOn && (nb.p ? (focoId || !root.et) : !(nb.n.et && nb.n.et.esc.length)) ? '<button type="button" class="rcm-ib" data-a="copiaAqui" aria-label="Copiar até aqui">' + ICO_DUP + '</button>' : '') + (proc && !soRaiz && nb && !nb.p ? '<button type="button" class="rcm-ib" data-a="camComp" aria-label="Camada compartilhada">' + ICO_ETAPAS + (nb && nb.n.et ? '<b class="rcm-bd">' + ((nb.n.et.desc && (nb.n.et.desc.length || nb.n.et.fim)) ? (nb.n.et.ver == null ? nb.n.et.desc.length : nb.n.et.ver) + 1 : nb.n.et.cur + 1) + '</b>' : '') + '</button>' : '') + (proc && !soRaiz && nb && !nb.p && nb.n.et && nb.n.et.esc.length ? '<button type="button" class="rcm-ib" data-a="parcial" aria-label="Copiar até aqui">' + ICO_DUP + '</button>' : '') + '<button type="button" class="rcm-ib" data-a="edita" aria-label="Editar">' + ICO_EDIT + '</button>' + (proc && zig && nb && nb.p ? '<button type="button" class="rcm-ib' + (nb.n.q ? ' on' : '') + '" data-a="pergunta" aria-label="Pergunta">' + ICO_PERG + '</button>' : '') + '</div>';
       if (destId) bar.innerHTML = '<div class="rcm-pill"><span class="rcm-av">Toque no destino</span><button type="button" class="rcm-ib" data-a="cancela" aria-label="Cancelar">' + ICO_X + '</button></div>';
+      gAgrupa();
       btnSib = bar.querySelector('[data-a="irmao"]');
       btnLev = bar.querySelector('[data-a="levar"],[data-a="etapas"]');
       btnDel = bar.querySelector('[data-a="exclui"]');
@@ -3718,7 +3964,7 @@ window.saveAnswer = window.saveAnswer || function(){};
       salva(); render();
     }
     var ICO_LIXO = '<svg viewBox="0 0 24 24"><path d="M5 7h14M10 7V5h4v2M7 7l1 12h8l1-12"/></svg>';
-    var ICO_EDIT ='<svg viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg>';
+    var ICO_EDIT ='<svg viewBox="0 0 24 24"><g transform="translate(12 12) scale(.88) translate(-12 -12)"><circle cx="7.5" cy="7.5" r="1"/><path d="M3 6v5.172a2 2 0 0 0 .586 1.414l7.71 7.71a2.41 2.41 0 0 0 3.408 0l5.592-5.592a2.41 2.41 0 0 0 0-3.408l-7.71-7.71A2 2 0 0 0 11.172 3H6a3 3 0 0 0-3 3z"/></g></svg>';
 
     function montar(mw, z, o) {
       if (!root) root = carrega();
@@ -3728,13 +3974,16 @@ window.saveAnswer = window.saveAnswer || function(){};
       zPrev = (zig && o && o.prevCx != null) ? o.prevCx : null;
       tPrev = (!zig && o && o.prevCx != null) ? o.prevCx : null;
       tPos = 0; tMulti = false; semRaiz = !!(o && o.semRaiz); soRaiz = !!(o && o.soRaiz); ehPasta = !!(o && o.pasta);
+      numR = (o && o.num != null) ? o.num : null; verR = (o && o.ver) || 0; tipoT = (o && o.tipo) || '';
       mw.innerHTML = '';
-      wrap = document.createElement('div'); wrap.className = 'rcm-wrap' + (zig ? ' zig' : '') + (o && o.cont ? ' cont' : '') + (zig && !soRaiz ? ' aberto' : '') + (zig && o && o.proc ? ' proc' : '');
+      wrap = document.createElement('div'); wrap.className = 'rcm-wrap' + (zig ? ' zig' : '') + (o && o.cont ? ' cont' : '') + (zig && !soRaiz ? ' aberto' : '') + (zig && o && o.proc ? ' proc' : '') + (tipoT ? ' t-' + tipoT : '') + (tipoT === 'ativo' && soRaiz ? ' t-cab t-tile' : '');
       wrap.innerHTML = '<div class="rcm-world"><svg class="rcm-links" xmlns="http://www.w3.org/2000/svg"></svg></div>';
       world = wrap.firstChild; links = world.firstChild;
+      if (verR > 0) wrap.setAttribute('data-v', String(verR));
       bar = document.createElement('div'); bar.className = 'rcm-bar'; bar.hidden = true;
       movBar = false; montaBar();
       mwEl = mw; mw.style.position = 'relative';
+      wrap._rcApi = api;
       wrap.addEventListener('click', toque);
       wrap.addEventListener('contextmenu', function(e) { e.preventDefault(); });
       /* segurar um círculo: a barra de ações aparece ali mesmo */
@@ -3743,12 +3992,15 @@ window.saveAnswer = window.saveAnswer || function(){};
         var el = e.target.closest ? e.target.closest('.rcm-node') : null;
         if (!el || !el.dataset.id) return;
         var id = el.dataset.id;
+        var rnEl = e.target.closest ? e.target.closest('.rn') : null;
         lpXY = [e.clientX, e.clientY];
         lpT = setTimeout(function() {
           lp = true;
           if (tq) { clearTimeout(tq.t); tq = null; }
+          /* Passo 5: segurar o NÚMERO de uma folha cria uma cópia (original → cópia → coletor) */
+          if (rnEl && id === 'root' && numR != null && (!window._rcModo || (window._rcModo === 'duplicar' && window.rcMapa.nivelDe(api) === 3)) && !PEND) { if (navigator.vibrate) navigator.vibrate(15); window.rcMapa.copiaNumero(api); return; }
           if (window._rcModo) { modoNo(id); return; }
-          selId = id; barId = id; movBar = false; if (PEND) window.rcMapa.cancela(true); montaBar(); render();
+          fechaOutras(); selId = id; barId = id; movBar = false; if (PEND) window.rcMapa.cancela(true); montaBar(); render();
         }, 550);
       });
       wrap.addEventListener('pointermove', function(e) {
@@ -3771,6 +4023,21 @@ window.saveAnswer = window.saveAnswer || function(){};
       bar.addEventListener('click', function(e) {
         var b = e.target.closest ? e.target.closest('button') : null;
         if (etHeld) { etHeld = false; return; }
+        if (b && b.getAttribute('data-g') !== null) { gs = +b.getAttribute('data-g'); bar.setAttribute('data-gs', String(gs)); gSincroniza(); posBar(); return; }
+        if (b && b.getAttribute('data-px')) {
+          var px = b.getAttribute('data-px'), rr = gReal(px);
+          var id0 = barId, g0 = gs;
+          /* lixeira do popup: não liga o modo de apagar vários; pergunta e apaga só esta célula */
+          if (px === 'excluir' && id0) { excluiNo(id0); return; }
+          if (px === 'desfaz' || px === 'refaz') { try { if (px === 'desfaz') hDesfaz(); else hRefaz(); } catch (e) {} setTimeout(function() { gSincroniza(); posBar(); }, 80); return; }
+          if (rr && !rr.disabled) rr.click();
+          /* Mover/Duplicar ligados a partir do popup desta célula: ela já fica marcada como origem, falta só tocar no destino */
+          if ((px === 'mover' || px === 'duplicar') && id0 && window._rcModo === px) window._rcSrc = { tipo: 'no', inst: api, id: id0 };
+          /* o modo liga e o popup continua aí (a tela foi redesenhada, então reabre no mesmo lugar); só fecha ao tocar em outra célula ou fora */
+          if (px === 'mover' || px === 'duplicar' || px === 'excluir' || px === 'copiar') { selId = id0; barId = id0; movBar = false; gs = g0; gsId = id0; montaBar(); render(); }
+          else setTimeout(function() { gSincroniza(); posBar(); }, 60);
+          return;
+        }
         if (!b || !barId) return;
         var a = b.getAttribute('data-a'), id = barId;
         selId = id;
@@ -3790,6 +4057,7 @@ window.saveAnswer = window.saveAnswer || function(){};
           if (camOn) { focoFix = true; focoEntra(id); } else { focoFix = false; focoId = null; barId = null; }
           montaBar(); render(); subeProc();
         }
+        else if (a === 'voltaOculto') { var fw = ultLargo ? acha(ultLargo) : null; if (fw && fw.p) { fw.p.collapsed = true; salva(); } forcaMostra = false; barId = null; montaBar(); render(); }
         else if (a === 'voltaFluxo') fluxoVolta();
         else if (a === 'voltaCam') camadaVolta();
         else if (a === 'etapas') etapasVai(id);
@@ -3811,7 +4079,7 @@ window.saveAnswer = window.saveAnswer || function(){};
 
     window.addEventListener('resize', render);
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(render);
-    var api = { key: KEY, leituraDe: function(id) { if (!root) return null; var f = acha(id); if (!f) return null; var n = f.n; if (!Array.isArray(n.i) && (KEY === 'rico.mapa.v1' || KEY === 'rico.proc.v1')) return null; return cicloParaLeitura({ t: n.text, i: n.i || [], m: n.m || [] }); }, rele: function() { if (!root) return; root = carrega(); if (focoId && !acha(focoId)) { focoId = null; focoFix = false; } if (abreId && !acha(abreId)) abreId = null; }, abreLeitura: function(id) { abreEditor(id); }, existe: function(id) { if (!root) root = carrega(); return !!acha(id); }, clonaNo: function(id) { var f = acha(id); return f ? clona(f.n) : null; }, linhas: function() { if (!root) root = carrega(); var o = []; linhasNo(root, 0, o); return o; }, soltaMov: function() { movKeep = null; movBar = false; destId = null; }, destino: function() { movKeep = null; movBar = false; barId = null; destId = 'root'; }, tira: tiraNo, poe: poeNo, visivel: function() { return !!(wrap && wrap.isConnected && PEND && wrap.querySelector('.rcm-node[data-id="' + PEND.id + '"]')); }, serializa: function() { if (!root) root = carrega(); return JSON.stringify(root); }, montar: montar, salvaNota: salvaNota, fechou: fechou, limpar: limpar, info: function() { return zig ? zInfo : tInfo; } };
+    var api = { deepOk: deepOk, deepIn: deepIn, deepOut: deepOut, selDrag: selDrag, selSnap: selSnap, key: KEY, nomeRaiz: function() { if (!root) root = carrega(); return root.text || ''; }, textoRaiz: function() { if (!root) root = carrega(); var t = root.i; return Array.isArray(t) ? t.filter(function(v) { return String(v == null ? '' : v).trim() !== ''; }).join('\n') : ''; }, leituraDe: function(id) { if (!root) return null; var f = acha(id); if (!f) return null; var n = f.n; if (!Array.isArray(n.i) && (KEY === 'rico.mapa.v1' || KEY === 'rico.proc.v1')) return null; return cicloParaLeitura({ t: n.text, i: n.i || [], m: n.m || [] }); }, rele: function() { if (!root) return; root = carrega(); if (focoId && !acha(focoId)) { focoId = null; focoFix = false; } if (abreId && !acha(abreId)) abreId = null; }, abreLeitura: function(id) { abreEditor(id); }, existe: function(id) { if (!root) root = carrega(); return !!acha(id); }, clonaNo: function(id) { var f = acha(id); return f ? clona(f.n) : null; }, linhas: function() { if (!root) root = carrega(); var o = []; linhasNo(root, 0, o); return o; }, fechaBar: function() { if (!barId && !destId) return; barId = null; movBar = false; if (wrap && wrap.isConnected) { montaBar(); render(); } }, soltaMov: function() { movKeep = null; movBar = false; destId = null; }, destino: function() { movKeep = null; movBar = false; barId = null; destId = 'root'; }, tira: tiraNo, poe: poeNo, visivel: function() { return !!(wrap && wrap.isConnected && PEND && wrap.querySelector('.rcm-node[data-id="' + PEND.id + '"]')); }, serializa: function() { if (!root) root = carrega(); return JSON.stringify(root); }, montar: montar, salvaNota: salvaNota, fechou: fechou, limpar: limpar, info: function() { return zig ? zInfo : tInfo; } };
     if (vazio) { root = nd('Novo'); root.id = 'root'; salva(); }
     return api;
   }
@@ -3819,15 +4087,15 @@ window.saveAnswer = window.saveAnswer || function(){};
   /* vários mapas, um abaixo do outro (o + do botão amarelo cria outro).
      Mapa Mental e Processo têm cada um o seu conjunto de dados, independentes. */
   var SETS = {
-    m: { arr: [], ord: 'rico.mapas.ordem', def: 'rico.mapa.v1', pre: 'rico.mapa.', aberto: -1 },
-    p: { arr: [], ord: 'rico.proc.ordem', def: 'rico.proc.v1', pre: 'rico.proc.', aberto: -1 }
+    m: { arr: [], ord: 'rico.mapas.ordem', def: 'rico.mapa.v1', pre: 'rico.mapa.', aberto: -1, nv: 1 },
+    p: { arr: [], ord: 'rico.proc.ordem', def: 'rico.proc.v1', pre: 'rico.proc.', aberto: -1, nv: 1 }
   };
   var CUR = SETS.m;
   /* pastas: células mãe que guardam mapas (e outras pastas). Guardado à parte: f = quais são pasta, p = em que pasta cada uma está */
   function metaChave(S) { return S === SETS.p ? 'rico.pastas.p' : 'rico.pastas.m'; }
   function metaGet(S) {
-    var o = { f: {}, p: {} };
-    try { var v = JSON.parse(localStorage.getItem(metaChave(S))); if (v && typeof v === 'object') { if (v.f && typeof v.f === 'object') o.f = v.f; if (v.p && typeof v.p === 'object') o.p = v.p; } } catch (e) {}
+    var o = { f: {}, p: {}, n: {} };
+    try { var v = JSON.parse(localStorage.getItem(metaChave(S))); if (v && typeof v === 'object') { if (v.f && typeof v.f === 'object') o.f = v.f; if (v.p && typeof v.p === 'object') o.p = v.p; if (v.n && typeof v.n === 'object') o.n = v.n; } } catch (e) {}
     return o;
   }
   function metaSet(S, o) { try { localStorage.setItem(metaChave(S), JSON.stringify(o)); } catch (e) {} }
@@ -4136,13 +4404,105 @@ window.saveAnswer = window.saveAnswer || function(){};
       });
     })(g, sem);
   }
+  /* Passo 5: cópias. Guardadas à parte em 'rico.copias.m': { chaveOriginal: { v: [{k, n}], a } } (n 2 = cópia, 3 = coletor; a = chave da versão ativa, '' = original). Cada cópia é um mapa comum (chave rico.mapa.*) escondido das listas. */
+  function cpGet() { try { var v = JSON.parse(localStorage.getItem('rico.copias.m')); if (v && typeof v === 'object' && !Array.isArray(v)) return v; } catch (e) {} return {}; }
+  function cpSet(o) { try { localStorage.setItem('rico.copias.m', JSON.stringify(o)); } catch (e) {} }
+  function cpOcultas(m) { var r = {}; m = m || cpGet(); Object.keys(m).forEach(function(o) { ((m[o] && m[o].v) || []).forEach(function(x) { if (x && x.k) r[x.k] = o; }); }); return r; }
+  function cpNivel(k) { var m = cpGet(), r = 0; Object.keys(m).forEach(function(o) { ((m[o] && m[o].v) || []).forEach(function(x) { if (x && x.k === k) r = x.n; }); }); return r; }
+  function cpIdx(S, k) { for (var q = 0; q < S.arr.length; q++) if (S.arr[q].key === k) return q; return -1; }
+  /* Passo 6: gestos só em cópia/coletor — arrastar p/ direita sobre uma célula seleciona em sequência; deslizar p/ esquerda (em qualquer ponto) aprofunda; deslizar p/ direita fora de célula volta */
+  (function() {
+    var g = null;
+    function ativos() { return [].slice.call(document.querySelectorAll('.cycle-block .rcm-wrap')).map(function(w) { return w._rcApi; }).filter(function(a) { return a && a.deepOk && a.deepOk(); }); }
+    document.addEventListener('pointerdown', function(e) {
+      g = null;
+      if (!e.target.closest || !e.target.closest('.cycle-block')) return;
+      if (e.pointerType === 'mouse' && e.button !== 0) return;
+      if (!ativos().length) return;
+      var cel = e.target.closest('.rcm-node'), w = e.target.closest('.rcm-wrap'), a = w && w._rcApi && w._rcApi.deepOk && w._rcApi.deepOk() ? w._rcApi : null;
+      g = { x: e.clientX, y: e.clientY, id: (cel && !cel.classList.contains('root') && cel.dataset.id) || null, api: a, sel: false, base: null };
+      if (g.id && a) { g.base = a.selSnap(); g.modo = g.base[g.id] === 1 ? 0 : 1; }
+    }, true);
+    document.addEventListener('pointermove', function(e) {
+      if (!g) return;
+      var dx = e.clientX - g.x, dy = e.clientY - g.y;
+      if (g.id && g.api && !g.sel && dx > 16 && dx > Math.abs(dy) * 1.2) g.sel = true;
+      if (g.sel) g.api.selDrag(g.id, dx, g.base, g.modo);
+    }, true);
+    document.addEventListener('pointerup', function(e) {
+      if (!g) return;
+      var dx = e.clientX - g.x, dy = e.clientY - g.y, was = g; g = null;
+      if (was.sel) { window._rcDragSel = Date.now(); return; }
+      if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.5) {
+        if (dx > 0 && was.id) return;
+        window._rcDragSel = Date.now();
+        if (dx < 0) {
+          var any = false, semFilho = false;
+          ativos().forEach(function(a) { var q = a.deepIn(); if (q === 1) any = true; else if (q === -1) semFilho = true; });
+          if (!any && window.showToast) window.showToast(semFilho ? 'As células selecionadas não têm filhos' : 'Selecione células arrastando para a direita');
+        } else ativos().forEach(function(a) { a.deepOut(); });
+      }
+    }, true);
+    document.addEventListener('pointercancel', function() { g = null; }, true);
+  })();
   window.rcMapa = {
+    ehCopia: function(inst) { return !!(inst && cpOcultas()[inst.key]); },
+    /* tocar no número: vai para a próxima versão (original → cópias → coletores → original) */
+    temCopias: function(inst) { var m = cpGet(), o = cpOcultas(m)[inst.key] || inst.key, inf = m[o]; return !!(inf && inf.v && inf.v.length); },
+    cicla: function(inst) {
+      var S = CUR, m = cpGet(), o = cpOcultas(m)[inst.key] || inst.key, inf = m[o];
+      if (!inf || !inf.v || !inf.v.length) return false;
+      var ent = null; inf.v.forEach(function(x) { if (x.k === inst.key) ent = x; });
+      var cur = (ent && ent.p) ? ent.p : inst.key;
+      var lst = [o].concat(inf.v.filter(function(x) { return !x.p; }).map(function(x) { return x.k; })), nx = lst[(lst.indexOf(cur) + 1) % lst.length];
+      inf.a = nx === o ? '' : nx; cpSet(m);
+      var ix = cpIdx(S, nx); if (ix < 0) return false;
+      S.aberto = ix; renderCiclo(); return true;
+    },
+    /* segurar o número: original → cria cópia (nível 2); cópia → cria coletor (nível 3); coletor → nada */
+    copiaNumero: function(inst) {
+      var S = CUR; mapasGarante(S);
+      var m = cpGet(), o = cpOcultas(m)[inst.key] || inst.key, inf = m[o] || (m[o] = { v: [], a: '' });
+      var niv = inst.key === o ? 1 : cpNivel(inst.key);
+      if (niv >= 3) {
+        /* no coletor: segurar o número duplica aquele número (com tudo dentro) logo abaixo, também preto */
+        var src = -1, ent3 = null; inf.v.forEach(function(x, q) { if (x.k === inst.key) { src = q; ent3 = x; } });
+        var host = (ent3 && ent3.p) ? ent3.p : inst.key, k3 = novaChave(S, 'c');
+        try { localStorage.setItem(k3, inst.serializa()); } catch (e) { return; }
+        S.arr.push(criaMapa(k3, false)); mapasSalvaOrdem(S);
+        var pos = src + 1;
+        if (!ent3 || !ent3.p) { pos = inf.v.length; inf.v.forEach(function(x, q) { if (x.p === host && q < pos) pos = q; }); }
+        inf.v.splice(pos, 0, { k: k3, n: 3, p: host }); cpSet(m);
+        renderCiclo();
+        setTimeout(function() { var e = document.querySelector('.cycle-block .rcm-node.root[data-mk="' + inst.key + '"]'); if (e) { e.classList.remove('cpPisca'); void e.offsetWidth; e.classList.add('cpPisca'); setTimeout(function() { e.classList.remove('cpPisca'); }, 900); } }, 30);
+        if (window.showToast) window.showToast('Duplicado abaixo');
+        return;
+      }
+      /* já existe a versão deste nível: não recria; para refazer, o usuário apaga o conteúdo dela manualmente */
+      if (inf.v.some(function(x) { return x.n === niv + 1 && !x.p; })) {
+        if (window.showToast) window.showToast(niv === 1 ? 'Já existe uma cópia. Para refazer, apague manualmente tudo o que há nela.' : 'Já existe o coletor. Para refazer, apague manualmente tudo o que há nele.');
+        return;
+      }
+      var k = novaChave(S, 'c'), dado;
+      /* a cópia da cópia (coletor) nasce idêntica à versão de onde foi feita: tudo o que há nela vem junto */
+      dado = inst.serializa();
+      try { localStorage.setItem(k, dado); } catch (e) { return; }
+      S.arr.push(criaMapa(k, false)); mapasSalvaOrdem(S);
+      inf.v.push({ k: k, n: niv + 1 }); inf.a = k; cpSet(m);
+      var aberto = S.aberto >= 0;
+      if (aberto) S.aberto = cpIdx(S, k);
+      renderCiclo();
+      var alvo = aberto ? k : o;
+      setTimeout(function() { var e = document.querySelector('.cycle-block .rcm-node.root[data-mk="' + alvo + '"]'); if (e) { e.classList.remove('cpPisca'); void e.offsetWidth; e.classList.add('cpPisca'); setTimeout(function() { e.classList.remove('cpPisca'); }, 900); } }, 30);
+      if (window.showToast) window.showToast(niv === 1 ? 'Cópia criada' : 'Coletor criado');
+    },
+    fechaBarras: function() { [SETS.m, SETS.p].forEach(function(S) { S.arr.forEach(function(m) { if (m.fechaBar) m.fechaBar(); }); }); },
     /* chegou mudança de outro aparelho: relê só os mapas que mudaram e redesenha no mesmo lugar, sem recarregar a página */
     ocupado: function() { var ov = document.getElementById('rdOv'); return !!(PEND || window._rcSrc || (window._rcMS && window._rcMS.ativo) || document.querySelector('.rcm-sheet.on') || (ov && !ov.hidden && ov.contains(document.activeElement) && document.activeElement !== ov)); },
     nuvem: function(ks) {
       var tocou = false, estrut = false;
       ks.forEach(function(k) {
-        if (/^rico\.(mapas\.ordem|proc\.ordem|pastas\.[pm])$/.test(k)) { estrut = true; return; }
+        if (/^rico\.(mapas\.ordem|proc\.ordem|pastas\.[pm]|copias\.m)$/.test(k)) { estrut = true; return; }
         if (k.indexOf('rico.mapa.') !== 0 && k.indexOf('rico.proc.') !== 0) return;
         var ach = false;
         [SETS.m, SETS.p].forEach(function(S) { S.arr.forEach(function(m) { if (m.key === k) { ach = true; m.rele(); } }); });
@@ -4170,19 +4530,61 @@ window.saveAnswer = window.saveAnswer || function(){};
       return false;
     },
     tela: function() { return CUR === SETS.p ? 'Processo' : 'Mapa mental'; },
-    todasLinhas: function() { var mt = metaGet(CUR); return [].concat.apply([], CUR.arr.filter(function(m) { return !mt.f[m.key]; }).map(function(m) { return m.linhas(); })); },
-    raizes: function() { var mt = metaGet(CUR); return CUR.arr.filter(function(m) { return !mt.f[m.key]; }).map(function(m) { try { return JSON.parse(m.serializa()); } catch (e) { return null; } }).filter(Boolean); },
+    todasLinhas: function() { var mt = metaGet(CUR), oc = cpOcultas(); return [].concat.apply([], CUR.arr.filter(function(m) { return !mt.f[m.key] && !oc[m.key]; }).map(function(m) { return m.linhas(); })); },
+    raizes: function() { var mt = metaGet(CUR), oc = cpOcultas(); return CUR.arr.filter(function(m) { return !mt.f[m.key] && !oc[m.key]; }).map(function(m) { try { return JSON.parse(m.serializa()); } catch (e) { return null; } }).filter(Boolean); },
     montar: function(mw, z) {
       CUR = z ? SETS.p : SETS.m;
       var S = CUR, MAPAS = S.arr;
       mapasGarante(S); MAPAS = S.arr; mw.innerHTML = '';
       if (S.aberto >= MAPAS.length) S.aberto = -1;
-      var mt = metaGet(S), par = S.pasta || null, pi = -1, idx = [];
+      var mt = metaGet(S), par = S.pasta || null, pi = -1, idx = [], oc = cpOcultas(), cpm = cpGet();
+      function origIdxDe(ix) { var k = MAPAS[ix] && MAPAS[ix].key, ok = k && oc[k]; if (!ok) return ix; return cpIdx(S, ok); }
       MAPAS.forEach(function(m, i) { if (par && m.key === par && mt.f[par]) pi = i; });
       if (par && pi < 0) { par = S.pasta = null; }
-      MAPAS.forEach(function(m, i) { if (i !== pi && (mt.p[m.key] || null) === par) idx.push(i); });
+      MAPAS.forEach(function(m, i) { if (i !== pi && !oc[m.key] && (mt.p[m.key] || null) === par && (par || (mt.n[m.key] || 1) === (S.nv || 1))) idx.push(i); });
       var lst = (pi >= 0 ? [pi] : []).concat(idx);
-      if (S.aberto >= 0 && lst.indexOf(S.aberto) < 0) S.aberto = -1;
+      if (S.aberto >= 0 && lst.indexOf(origIdxDe(S.aberto)) < 0) S.aberto = -1;
+      if (!z) {
+        var cart0 = document.getElementById('rcCartao'); if (cart0) cart0.remove();
+        var ab = (S.aberto >= 0 && lst.indexOf(origIdxDe(S.aberto)) > -1 && !mt.f[MAPAS[S.aberto].key]) ? S.aberto : -1;
+        S.aberto = ab;
+        var corpo = lst.filter(function(x) { return x !== pi && !mt.f[MAPAS[x].key]; }), seq = 0;
+        var exI = [];
+        if (ab >= 0) window.rcMapa.extrasDe(MAPAS[ab].key).forEach(function(k) { var q = cpIdx(S, k); if (q > -1) exI.push(q); });
+        (ab >= 0 ? [ab].concat(exI) : lst.filter(function(x) { return !(x === pi && corpo.length); })).forEach(function(i) {
+          var m = MAPAS[i], ehF = !!mt.f[m.key], cab = (i === pi), folha = (ab === i) || exI.indexOf(i) > -1;
+          var num = (cab || ehF) ? null : corpo.indexOf(origIdxDe(i)) + 1;
+          if (exI.indexOf(i) > -1) num = corpo.indexOf(origIdxDe(ab)) + 1 + exI.indexOf(i) + 1;
+          var ver = folha ? cpNivel(m.key) : ((cpm[m.key] && cpm[m.key].a) ? cpNivel(cpm[m.key].a) : 0);
+          var tipo = (folha || cab) ? 'ativo' : 'tile';
+          var box = document.createElement('div');
+          box.className = 'rcm-t' + (tipo === 'tile' ? (seq++ % 2 === 0 ? ' zo' : ' ze') : ' at');
+          if (exI.indexOf(i) > -1) box.style.marginTop = '28px';
+          mw.appendChild(box);
+          m.montar(box, false, { num: num, ver: ver, tipo: tipo === 'tile' ? 'tile' : 'ativo', soRaiz: !folha, pasta: ehF, proc: false, cont: true });
+        });
+        /* cartão "Escreva aqui o texto de ..." removido: não aparece mais abaixo do bloco */
+        if (false && ab >= 0) {
+          var blk = document.querySelector('.cycle-block');
+          if (blk) {
+            var tx = MAPAS[ab].textoRaiz ? MAPAS[ab].textoRaiz() : '';
+            var ct = document.createElement('div'); ct.id = 'rcCartao'; ct.className = 'rcm-cartao';
+            ct.innerHTML = '<div class="traco"></div><p></p>';
+            ct.lastChild.textContent = tx || ('Escreva aqui o texto de ' + String(MAPAS[ab].nomeRaiz()).toUpperCase() + '.');
+            ct.addEventListener('click', function() { window.rcMapa.abre(MAPAS[ab].key, 'root'); });
+            blk.insertAdjacentElement('afterend', ct);
+          }
+        }
+        if (PEND && !PEND.inst.visivel()) {
+          var bn0 = document.createElement('div');
+          bn0.className = 'rcm-pill rcm-banner';
+          bn0.innerHTML = '<span class="rcm-av">Toque no destino</span><button type="button" class="rcm-ib" aria-label="Cancelar"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>';
+          bn0.querySelector('button').addEventListener('click', function() { window.rcMapa.cancela(); });
+          mw.insertBefore(bn0, mw.firstChild);
+        }
+        if (window.rcBussolaAtualiza) window.rcBussolaAtualiza();
+        return;
+      }
       var acc = lst.length > 1;
       var q0 = 0, prevCx = null;
       var ordem = lst.slice();
@@ -4213,13 +4615,52 @@ window.saveAnswer = window.saveAnswer || function(){};
         S0.pasta = (S0.pasta === m0.key) ? (mt0.p[m0.key] || null) : m0.key;
         S0.aberto = -1; renderCiclo(); return true;
       }
-      var n0 = S0.arr.filter(function(m) { return (mt0.p[m.key] || null) === (S0.pasta || null) && m.key !== S0.pasta; }).length + (S0.pasta ? 1 : 0);
-      if (n0 < 2) return false;
-      CUR.aberto = (CUR.aberto === i) ? -1 : i;
+      if (!m0) return false;
+      var cpa = cpGet()[m0.key], tgt = (cpa && cpa.a) ? cpIdx(S0, cpa.a) : -1; if (tgt < 0) tgt = i;
+      CUR.aberto = (CUR.aberto === i || CUR.aberto === tgt) ? -1 : tgt;
       renderCiclo();
       return true;
     },
     estaAberto: function(i) { return CUR.aberto === i; },
+    nivelDe: function(inst) { return inst ? cpNivel(inst.key) : 0; },
+    /* dentro do coletor (preto): colar pelo título cria o próximo número ali mesmo, abaixo do 1, também preto (não vai para a lista de fora) */
+    colaColetor: function(mover) {
+      var S = CUR, Sr = window._rcSrc; mapasGarante(S);
+      if (!Sr || Sr.tipo !== 'no' || !Sr.inst || !Sr.inst.existe(Sr.id)) return false;
+      var ab = S.aberto >= 0 ? S.arr[S.aberto] : null; if (!ab) return false;
+      var m = cpGet(), o = cpOcultas(m)[ab.key], inf = o && m[o], ent = null;
+      if (!inf) return false;
+      inf.v.forEach(function(x) { if (x.k === ab.key) ent = x; });
+      if (!ent || ent.n !== 3) return false;
+      if (mover && Sr.id === 'root') return false;
+      var host = ent.p || ent.k;
+      var c = Sr.inst.clonaNo(Sr.id); if (!c) return false;
+      c.id = 'root'; if (S === SETS.m) planifica(c);
+      var k = novaChave(S, 'c');
+      try { localStorage.setItem(k, JSON.stringify(c)); } catch (e) { return false; }
+      S.arr.push(criaMapa(k, false)); mapasSalvaOrdem(S);
+      inf.v.push({ k: k, n: 3, p: host }); cpSet(m);
+      if (mover) Sr.inst.tira(Sr.id);
+      window._rcSrc = null;
+      return true;
+    },
+    extrasDe: function(k) { var m = cpGet(), o = cpOcultas(m)[k], r = []; if (!o) return r; ((m[o] && m[o].v) || []).forEach(function(x) { if (x.p === k) r.push(x.k); }); return r; },
+    fechaAberto: function() { CUR.aberto = -1; },
+    /* caminho atual: pastas abertas (da raiz para dentro) e, se houver, o mapa aberto */
+    caminho: function() {
+      var S = CUR, mt = metaGet(S), p = [], k = S.pasta || null, g = 0;
+      while (k && g++ < 8) { p.unshift(k); k = mt.p[k] || null; }
+      if (S.aberto >= 0 && S.arr[S.aberto]) p.push(S.arr[S.aberto].key);
+      return p;
+    },
+    nivel: function() { return Math.max(1, Math.min(4, CUR.nv || 1)); },
+    /* toque na bússola: 1 → 2 → 3 → 4 → 1, descendo pelo último caminho aberto (ou pelo primeiro de cada lista) */
+    bussola: function() {
+      var S = CUR; mapasGarante(S);
+      S.nv = ((S.nv || 1) % 4) + 1;
+      S.pasta = null; S.aberto = -1;
+      renderCiclo();
+    },
     recarrega: function() { SETS.m.arr = []; SETS.p.arr = []; PEND = null; ROOTTAP = null; renderCiclo(); },
     cancela: function(semRender) {
       PEND = null; ROOTTAP = null;
@@ -4231,6 +4672,17 @@ window.saveAnswer = window.saveAnswer || function(){};
       var S = window._rcSrc;
       if (!S || S.tipo !== 'no' || !S.inst || !S.inst.existe(S.id)) return false;
       var P = CUR; mapasGarante(P);
+      /* mover uma pasta/mapa inteiro dentro da mesma tela: não copia, só muda de lugar (a pasta continua pasta, com tudo dentro) */
+      if (mover && S.id === 'root' && P.arr.indexOf(S.inst) > -1) {
+        var mtm = metaGet(P), sk = S.inst.key, ok = true;
+        for (var c = P.pasta || null, n = 0; c && n < 99; c = mtm.p[c] || null, n++) if (c === sk) { ok = false; break; }
+        if (!ok) return false;
+        if (P.pasta) { mtm.p[sk] = P.pasta; delete mtm.n[sk]; }
+        else { delete mtm.p[sk]; if ((P.nv || 1) > 1) mtm.n[sk] = P.nv; else delete mtm.n[sk]; }
+        metaSet(P, mtm);
+        window._rcSrc = null; P.aberto = -1;
+        return true;
+      }
       var c = S.inst.clonaNo(S.id); if (!c) return false;
       c.id = 'root';
       if (P === SETS.m) planifica(c);
@@ -4238,7 +4690,7 @@ window.saveAnswer = window.saveAnswer || function(){};
       try { localStorage.setItem(k, JSON.stringify(c)); } catch (e) { return false; }
       P.arr.push(criaMapa(k, false));
       mapasSalvaOrdem(P);
-      if (P.pasta) { var mtc = metaGet(P); mtc.p[k] = P.pasta; metaSet(P, mtc); }
+      { var mtc = metaGet(P); if (P.pasta) mtc.p[k] = P.pasta; else if ((P.nv || 1) > 1) mtc.n[k] = P.nv; metaSet(P, mtc); }
       if (mover) {
         if (S.id === 'root') {
           var oS = SETS.m.arr.indexOf(S.inst) > -1 ? SETS.m : (SETS.p.arr.indexOf(S.inst) > -1 ? SETS.p : null);
@@ -4264,23 +4716,23 @@ window.saveAnswer = window.saveAnswer || function(){};
       S.arr.splice(i + 1, 0, criaMapa(k, false));
       mapasSalvaOrdem(S);
       var mtd = metaGet(S), kd = src.key;
-      if (mtd.p[kd]) mtd.p[k] = mtd.p[kd];
+      if (mtd.p[kd]) mtd.p[k] = mtd.p[kd]; else if (mtd.n[kd]) mtd.n[k] = mtd.n[kd];
       if (mtd.f[kd]) mtd.f[k] = 1;
       metaSet(S, mtd);
     },
-    estado: function() { return { m: { pasta: SETS.m.pasta || null, aberto: SETS.m.aberto }, p: { pasta: SETS.p.pasta || null, aberto: SETS.p.aberto } }; },
-    restaura: function(e) { if (!e) return; ['m', 'p'].forEach(function(k) { if (e[k]) { SETS[k].pasta = e[k].pasta || null; SETS[k].aberto = typeof e[k].aberto === 'number' ? e[k].aberto : -1; } }); },
+    estado: function() { return { m: { pasta: SETS.m.pasta || null, aberto: SETS.m.aberto, nv: SETS.m.nv || 1 }, p: { pasta: SETS.p.pasta || null, aberto: SETS.p.aberto, nv: SETS.p.nv || 1 } }; },
+    restaura: function(e) { if (!e) return; ['m', 'p'].forEach(function(k) { if (e[k]) { SETS[k].pasta = e[k].pasta || null; SETS[k].nv = e[k].nv || 1; SETS[k].aberto = typeof e[k].aberto === 'number' ? e[k].aberto : -1; } }); },
     desfoca: function() { SETS.m.pasta = null; SETS.p.pasta = null; PEND = null; ROOTTAP = null; SETS.m.aberto = -1; SETS.p.aberto = -1; SETS.m.arr.concat(SETS.p.arr).forEach(function(m) { m.soltaMov(); }); },
     salvaNota: function(e) { if (e && e._inst) e._inst.salvaNota(e); },
     indice: function(m) { return CUR.arr.indexOf(m); },
-    total: function() { mapasGarante(CUR); return CUR.arr.length; },
+    total: function() { mapasGarante(CUR); var oc = cpOcultas(); return CUR.arr.filter(function(m) { return !oc[m.key]; }).length; },
     fechou: function() { SETS.m.arr.concat(SETS.p.arr).forEach(function(m) { m.fechou(); }); },
     adicionar: function(i) {
       var S = CUR; mapasGarante(S);
       var k = S.pre + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
       S.arr.splice(i + 1, 0, criaMapa(k, true));
       mapasSalvaOrdem(S);
-      if (S.pasta) { var mta = metaGet(S); mta.p[k] = S.pasta; metaSet(S, mta); }
+      { var mta = metaGet(S); if (S.pasta) mta.p[k] = S.pasta; else if ((S.nv || 1) > 1) mta.n[k] = S.nv; metaSet(S, mta); }
     },
     pastaNova: function() {
       var S = CUR; mapasGarante(S);
@@ -4288,7 +4740,7 @@ window.saveAnswer = window.saveAnswer || function(){};
       try { localStorage.setItem(k, JSON.stringify({ id: 'root', text: 'Pasta', collapsed: false, children: [] })); } catch (e) { return; }
       S.arr.push(criaMapa(k, false));
       mapasSalvaOrdem(S);
-      var mt = metaGet(S); mt.f[k] = 1; if (S.pasta) mt.p[k] = S.pasta; metaSet(S, mt);
+      var mt = metaGet(S); mt.f[k] = 1; if (S.pasta) mt.p[k] = S.pasta; else if ((S.nv || 1) > 1) mt.n[k] = S.nv; metaSet(S, mt);
       S.aberto = -1;
     },
     /* mover um mapa para cima de outro mapa (não pasta): nasce uma pasta nova no lugar do alvo, com os dois dentro */
@@ -4314,6 +4766,26 @@ window.saveAnswer = window.saveAnswer || function(){};
       PEND = { inst: inst, id: 'root', pasta: true }; ROOTTAP = null;
       inst.destino(); CUR.aberto = -1; renderCiclo();
     },
+    /* toque no vazio do bloco com algo na mão: solta no primeiro nível da tela em que você está */
+    soltaNivel: function() {
+      var S = CUR, P = PEND, md = window._rcModo, sr = window._rcSrc;
+      if (P && P.pasta && P.inst) {
+        var mt = metaGet(S), sk = P.inst.key;
+        delete mt.p[sk]; if ((S.nv || 1) > 1) mt.n[sk] = S.nv; else delete mt.n[sk];
+        metaSet(S, mt);
+        PEND = null; ROOTTAP = null;
+        SETS.m.arr.concat(SETS.p.arr).forEach(function(m) { m.soltaMov(); });
+        S.pasta = null; S.aberto = -1; renderCiclo();
+        if (window.showToast) window.showToast('Movido');
+        return true;
+      }
+      if ((md === 'mover' || md === 'duplicar') && sr && sr.tipo === 'no' && window.rcMapa.colaMapa(md === 'mover')) {
+        S.pasta = null; S.aberto = -1; renderCiclo();
+        if (window.showToast) window.showToast(md === 'mover' ? 'Movido' : 'Duplicado');
+        return true;
+      }
+      return false;
+    },
     soltaPasta: function(dest, srcInst) {
       var S = CUR, P = PEND;
       if (!srcInst && (!P || !P.pasta)) return false;
@@ -4323,7 +4795,7 @@ window.saveAnswer = window.saveAnswer || function(){};
       if (!mt.f[dk]) return true;
       var alvo = (S.pasta === dk) ? (mt.p[dk] || null) : dk;
       for (var c = alvo, n = 0; c && n < 99; c = mt.p[c] || null, n++) if (c === sk) return true;
-      if (alvo) mt.p[sk] = alvo; else delete mt.p[sk];
+      if (alvo) mt.p[sk] = alvo; else { delete mt.p[sk]; if ((S.nv || 1) > 1) mt.n[sk] = S.nv; else delete mt.n[sk]; }
       metaSet(S, mt);
       PEND = null; ROOTTAP = null;
       SETS.m.arr.concat(SETS.p.arr).forEach(function(m) { m.soltaMov(); });
@@ -4333,14 +4805,31 @@ window.saveAnswer = window.saveAnswer || function(){};
     },
     excluir: function(i) {
       var S = CUR; mapasGarante(S);
-      if (S.arr.length <= 1) { S.arr[0].limpar(); return; }
+      var cpM = cpGet(), oc0 = cpOcultas(cpM), mk0 = S.arr[i] && S.arr[i].key;
+      if (mk0 && oc0[mk0]) {
+        /* apagou uma cópia/coletor: some só ela e volta para o original aberto */
+        var o0 = oc0[mk0], inf0 = cpM[o0], ent0 = null;
+        inf0.v.forEach(function(x) { if (x.k === mk0) ent0 = x; });
+        var fora = [mk0].concat(inf0.v.filter(function(x) { return x.p === mk0; }).map(function(x) { return x.k; }));
+        var dest0 = (ent0 && ent0.p) ? ent0.p : o0;
+        inf0.v = inf0.v.filter(function(x) { return fora.indexOf(x.k) < 0; }); if (fora.indexOf(inf0.a) > -1) inf0.a = '';
+        if (!inf0.v.length) delete cpM[o0]; cpSet(cpM);
+        fora.forEach(function(fk) { var fi = cpIdx(S, fk); if (fi > -1) S.arr.splice(fi, 1); try { localStorage.removeItem(fk); } catch (e) {} });
+        mapasSalvaOrdem(S); S.aberto = cpIdx(S, dest0); return;
+      }
+      var reais = S.arr.filter(function(m) { return !oc0[m.key]; });
+      if (reais.length <= 1) { reais[0].limpar(); return; }
+      if (cpM[mk0]) {
+        cpM[mk0].v.forEach(function(x) { var xi = cpIdx(S, x.k); if (xi > -1) { S.arr.splice(xi, 1); try { localStorage.removeItem(x.k); } catch (e) {} } });
+        delete cpM[mk0]; cpSet(cpM); i = cpIdx(S, mk0);
+      }
       S.aberto = -1;
       var m = S.arr.splice(i, 1)[0];
       try { localStorage.removeItem(m.key); } catch (e) {}
       /* apagou uma pasta: o que estava dentro sobe para o nível dela */
       var mte = metaGet(S), pai = mte.p[m.key] || null;
-      Object.keys(mte.p).forEach(function(k) { if (mte.p[k] === m.key) { if (pai) mte.p[k] = pai; else delete mte.p[k]; } });
-      delete mte.p[m.key]; delete mte.f[m.key];
+      Object.keys(mte.p).forEach(function(k) { if (mte.p[k] === m.key) { if (pai) mte.p[k] = pai; else { delete mte.p[k]; if (mte.n[m.key]) mte.n[k] = mte.n[m.key]; } } });
+      delete mte.p[m.key]; delete mte.f[m.key]; delete mte.n[m.key];
       if (S.pasta === m.key) S.pasta = pai;
       metaSet(S, mte);
       mapasSalvaOrdem(S);
@@ -4349,7 +4838,7 @@ window.saveAnswer = window.saveAnswer || function(){};
       var S = CUR; mapasGarante(S);
       var mtm = metaGet(S), parm = S.arr[i] ? (mtm.p[S.arr[i].key] || null) : null;
       var j = i + d;
-      while (j >= 0 && j < S.arr.length && (mtm.p[S.arr[j].key] || null) !== parm) j += d;
+      var ocm = cpOcultas(); while (j >= 0 && j < S.arr.length && ((mtm.p[S.arr[j].key] || null) !== parm || ocm[S.arr[j].key])) j += d;
       if (j < 0 || j >= S.arr.length) return i;
       var t = S.arr[i]; S.arr[i] = S.arr[j]; S.arr[j] = t;
       mapasSalvaOrdem(S);
@@ -4357,6 +4846,12 @@ window.saveAnswer = window.saveAnswer || function(){};
     }
   };
 
+  /* toque fora dos mapas fecha o popup de ações (os toques no próprio mapa, no popup e nos botões escondidos não contam) */
+  document.addEventListener('click', function(e) {
+    var t = e.target; if (!t || !t.closest || !t.isConnected) return;
+    if (t.closest('.rcm-wrap, .rcm-bar, #modoBar, .rcm-sheet, .rcm-scrim, .rcm-conf, .rd-ov, #sheet, #sheetOv')) return;
+    if (window.rcMapa && window.rcMapa.fechaBarras) window.rcMapa.fechaBarras();
+  });
   /* altura do teclado guardada no aparelho: a janelinha do nome já abre no lugar final, sem pulo */
   function rcKbGet() { var v = 0; try { v = +localStorage.getItem('ui.kbh') || 0; } catch (_) {} return v > 150 ? v : Math.round(window.innerHeight * 0.49); }
   function rcKbAjusta(sh) {
@@ -5669,7 +6164,63 @@ window.saveAnswer = window.saveAnswer || function(){};
     _tq.timer = setTimeout(function() { _tq.timer = null; _tq.idx = null; cicloSimples(k, el, xr); }, 200);
   });
 
+  (function() {
+    var btn = document.getElementById('bussola'); if (!btn) return;
+    var ag = btn.querySelector('.agulha'), mk = btn.querySelector('.marcas'), ang = 0, atual = 0;
+    var pos = [[10, 1.6, 10, 2.9], [18.4, 10, 17.1, 10], [10, 18.4, 10, 17.1], [1.6, 10, 2.9, 10]], txt = [[10, 4.1], [15.9, 10], [10, 15.9], [4.1, 10]], NS = 'http://www.w3.org/2000/svg';
+    function desenha(n) {
+      mk.innerHTML = '';
+      for (var i = 0; i < 4; i++) {
+        if (i === n) { var t = document.createElementNS(NS, 'text'); t.setAttribute('x', txt[i][0]); t.setAttribute('y', txt[i][1]); t.setAttribute('text-anchor', 'middle'); t.setAttribute('dominant-baseline', 'central'); t.textContent = i + 1; mk.appendChild(t); }
+        else { var l = document.createElementNS(NS, 'line'); l.setAttribute('x1', pos[i][0]); l.setAttribute('y1', pos[i][1]); l.setAttribute('x2', pos[i][2]); l.setAttribute('y2', pos[i][3]); mk.appendChild(l); }
+      }
+      btn.setAttribute('aria-label', 'Bússola: nível ' + (n + 1));
+    }
+    window.rcBussolaAtualiza = function() {
+      var n = window.rcMapa && window.rcMapa.nivel ? window.rcMapa.nivel() - 1 : 0;
+      if (n !== atual) { ang += 90 * (((n - atual) + 4) % 4 || 4); ag.style.transform = 'rotate(' + ang + 'deg)'; atual = n; }
+      desenha(n);
+    };
+    var segT = null, segF = false, sx = 0, sy = 0;
+    btn.addEventListener('contextmenu', function(e) { e.preventDefault(); });
+    btn.addEventListener('pointerdown', function(e) {
+      segF = false; sx = e.clientX; sy = e.clientY; clearTimeout(segT);
+      segT = setTimeout(function() {
+        segT = null; segF = true;
+        if (navigator.vibrate) { try { navigator.vibrate(15); } catch (_) {} }
+        if (window.rcMapa) { window.rcMapa.pastaNova(); renderCiclo(); }
+      }, 500);
+    });
+    btn.addEventListener('pointermove', function(e) { if (segT && (Math.abs(e.clientX - sx) > 8 || Math.abs(e.clientY - sy) > 8)) { clearTimeout(segT); segT = null; } });
+    ['pointerup', 'pointercancel', 'pointerleave'].forEach(function(n) { btn.addEventListener(n, function() { clearTimeout(segT); segT = null; }); });
+    btn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      if (segF) { segF = false; return; }
+      if (window.rcMapa) window.rcMapa.bussola();
+    });
+    window.rcBussolaAtualiza();
+  })();
+  (function() {
+    var L = document.getElementById('ciclo-lista'), T = document.querySelector('.tela1');
+    if (!L || !T) return;
+    function sync() { var v = !L.querySelector('.rcm-t'); if (T.classList.contains('nv-vazio') !== v) { T.classList.toggle('nv-vazio', v); try { window.dispatchEvent(new Event('resize')); } catch (e) {} } }
+    new MutationObserver(sync).observe(L, { childList: true, subtree: true });
+    sync();
+  })();
   cicloHeaderPrimeiro();
+  (function() {
+    var d0 = null, ign = false;
+    function vazio(t) { return t && t.closest && t.closest('.cycle-block') && !t.closest('.titulo, .rcm-node, .rcm-bar, .rcm-pill, button, #modoBar, #bussola'); }
+    document.addEventListener('pointerdown', function(e) { d0 = vazio(e.target) ? { x: e.clientX, y: e.clientY } : null; }, true);
+    document.addEventListener('pointerup', function(e) {
+      var d = d0; d0 = null;
+      if (!d || !window.rcMapa || !window.rcMapa.soltaNivel || !vazio(e.target)) return;
+      if (Math.abs(e.clientX - d.x) > 10 || Math.abs(e.clientY - d.y) > 10) return;
+      if (window.rcMapa.soltaNivel()) { ign = true; setTimeout(function() { ign = false; }, 400); }
+    }, true);
+    document.addEventListener('click', function(e) { if (ign) { e.stopPropagation(); e.preventDefault(); ign = false; } }, true);
+    document.addEventListener('contextmenu', function(e) { if (vazio(e.target) && window.rcMapa && window.rcMapa.soltaNivel) e.preventDefault(); }, true);
+  })();
   document.getElementById('sheet').addEventListener('input', sincronizarEtapa);
   document.getElementById('sheet').addEventListener('focusout', function(e) {
     var t = e.target;
@@ -5700,60 +6251,21 @@ window.saveAnswer = window.saveAnswer || function(){};
       if (!abre) { window._rcModo = null; window._rcSrc = null; }
       marca(); renderCiclo();
     }
-    /* um toque no título: seletor com as 4 telas; dois toques: modos (Mover, Duplicar, Excluir, Copiar) */
-    var VIEWS = [
-      ['proc', 'Processo', '<rect x="3" y="3.5" width="8" height="5" rx="1.8"/><rect x="14" y="15.5" width="7" height="5" rx="1.8"/><path d="M7 8.5V16a2 2 0 0 0 2 2h2.3M9.4 16.3l2 1.7-2 1.7"/>'],
-      ['mapa', 'Mapa Mental', '<circle cx="12" cy="12" r="3"/><circle cx="5" cy="6" r="1.8"/><circle cx="19" cy="7" r="1.8"/><circle cx="12" cy="20" r="1.8"/><path d="M9.8 10.2L6.3 7.2M14.8 10.8l3-2.6M12 15v3.2"/>'],
-      ['meu', 'Meu Ciclo', '<path d="M19.5 12a7.5 7.5 0 1 1-2.4-5.5"/><path d="M19.5 4.5v4h-4"/>'],
-      ['sub', 'Subpasta', '<path d="M4 7.5A1.5 1.5 0 0 1 5.5 6H10l2 2.2h6.5A1.5 1.5 0 0 1 20 9.7v8.8a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 18.5z"/>']
-    ];
-    function viewAtual() { return _zig ? 'proc' : (_mapa ? 'mapa' : (_soCompl ? 'sub' : 'meu')); }
-    function cicloVai(v) {
-      _soCompl = v !== 'meu'; _mapa = v === 'proc' || v === 'mapa'; _zig = v === 'proc'; _foco = -1;
+    /* só existe o Mapa Mental: não há mais seletor de telas; dois toques no título abrem os modos */
+    function viewAtual() { return 'mapa'; }
+    function cicloVai() {
+      _soCompl = true; _mapa = true; _zig = false; _foco = -1;
       if (!(window._rcModo && window._rcSrc && window._rcSrc.tipo === 'no')) window._rcSrc = null;
       if (window.rcMapa) window.rcMapa.desfoca();
       renderCiclo(); cicloAnima();
     }
-    var sel = null;
-    function fechaSel() {
-      if (sel) { sel.remove(); sel = null; document.removeEventListener('keydown', escSel, true); }
-      var l = document.getElementById('ciclo-lista'); if (l) l.hidden = false;
-    }
-    function escSel(e) { if (e.key === 'Escape') fechaSel(); }
-    function abreSel(semMarca) {
-      if (sel) { fechaSel(); return; }
-      var lista = document.getElementById('ciclo-lista'); if (!lista || !lista.parentNode) return;
-      if (!document.getElementById('seletorCss')) {
-        var st = document.createElement('style'); st.id = 'seletorCss';
-        st.textContent = '#modoTitulo{user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent}' +
-          '#ciclo-lista[hidden]{display:none!important}' +
-          '.vsel-p{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:6px 0 4px}' +
-          '.vsel-p.on{opacity:1;transform:none}' +
-          '.vsel-c{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;aspect-ratio:1/1;padding:10px;background:#fff;border:1px solid #e8e3d6;border-radius:22px;color:#0f1b2d;font:600 11.5px/1.2 "DM Sans",system-ui,sans-serif;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;-webkit-tap-highlight-color:transparent;white-space:nowrap}' +
-          '.vsel-c svg{width:34px;height:34px;fill:none;stroke:#c4952d;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round}' +
-          '.vsel-c.at{border-color:#0f1b2d;box-shadow:inset 0 0 0 1px #0f1b2d}' +
-          '.vsel-c:active{background:#f1ece0}';
-        document.head.appendChild(st);
-      }
-      var at = semMarca === true ? '' : viewAtual();
-      sel = document.createElement('div'); sel.className = 'vsel-p';
-      VIEWS.forEach(function(v) {
-        var b = document.createElement('button'); b.type = 'button';
-        b.className = 'vsel-c' + (v[0] === at ? ' at' : ''); b.setAttribute('aria-label', v[1]);
-        b.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true">' + v[2] + '</svg><span></span>';
-        b.lastChild.textContent = v[1];
-        b.addEventListener('click', function(e) { e.stopPropagation(); fechaSel(); cicloVai(v[0]); });
-        sel.appendChild(b);
-      });
-      lista.hidden = true;
-      lista.parentNode.insertBefore(sel, lista);
-      document.addEventListener('keydown', escSel, true);
-      requestAnimationFrame(function() { if (sel) sel.classList.add('on'); });
-    }
+    function fechaSel() { var l = document.getElementById('ciclo-lista'); if (l) l.hidden = false; }
     var tapT = null;
+    /* um toque no nome "O CICLO VENCEDOR" abre (ou fecha) o popup com +, pasta e lixeira, logo embaixo dele */
     t.addEventListener('click', function() {
-      if (tapT) { clearTimeout(tapT); tapT = null; alterna(); return; }
-      tapT = setTimeout(function() { tapT = null; abreSel(); }, 280);
+      var hh = document.querySelector('#ciclo-lista .cycle-compl[data-mapa]');
+      if (_cel && _celAnchor === hh) { fecharCelula(); return; }
+      if (hh) abrirMenuItem(hh);
     });
     /* ao abrir ou voltar para o app: só os 4 cards, nenhum marcado */
     /* Fixar tela: lembra a visão escolhida e reabre nela ao atualizar/sair, até desativar */
@@ -5803,8 +6315,7 @@ window.saveAnswer = window.saveAnswer || function(){};
       if (typeof pv.f === 'number') _foco = pv.f;
       renderCiclo();
       irY(); requestAnimationFrame(irY); setTimeout(irY, 300); setTimeout(irY, 800); setTimeout(irY, 1800);
-    } else { pronto = true; abreSel(true); }
-    window.addEventListener('pageshow', function(e) { if (e.persisted && !sel && !pinGet()) abreSel(true); });
+    } else { pronto = true; }
     t.addEventListener('keydown', function(e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); alterna(); } });
     bar.addEventListener('click', function(e) {
       var b = e.target.closest ? e.target.closest('.rcm-ib') : null;
@@ -5892,6 +6403,7 @@ window.saveAnswer = window.saveAnswer || function(){};
   var _acao = null;
   var _pressTimer = null, _pressX = 0, _pressY = 0, _pressFired = false;
   function alvoSegurar(t) {
+    if (t && t.closest && t.closest('#modoTitulo')) { var hh = document.querySelector('#ciclo-lista .cycle-compl[data-mapa]'); if (hh) return hh; }
     return t && t.closest ? (t.closest('.cycle-item') || t.closest('.meta-badge') || t.closest('.q-number') || t.closest('.list-field-row > .list-num') || t.closest('.list-field-row') || t.closest('label.fld.area')) : null;
   }
   function salvarAlt() { if (window.agendarSalvamento) window.agendarSalvamento(document.body); }
@@ -6001,7 +6513,8 @@ window.saveAnswer = window.saveAnswer || function(){};
       if ((m === 'mover' || m === 'duplicar') && temSrc && el.dataset.mapa === undefined) { cicloSolta(k); return true; }
       /* segurar o botão PROCESSO ou MAPA MENTAL com uma célula guardada no Duplicar: ela entra como mapa novo daquela tela */
       if ((m === 'duplicar' || m === 'mover') && el.dataset.mapa !== undefined && S && S.tipo === 'no' && window.rcMapa) {
-        if (window.rcMapa.colaMapa(m === 'mover')) { renderCiclo(); if (window.showToast) window.showToast(m === 'mover' ? 'Movido' : 'Duplicado'); }
+        if (window.rcMapa.colaColetor && window.rcMapa.colaColetor(m === 'mover')) { renderCiclo(); if (window.showToast) window.showToast(m === 'mover' ? 'Movido' : 'Duplicado'); }
+        else if (window.rcMapa.colaMapa(m === 'mover')) { if (window.rcMapa.fechaAberto) window.rcMapa.fechaAberto(); renderCiclo(); if (window.showToast) window.showToast(m === 'mover' ? 'Movido' : 'Duplicado'); }
         return true;
       }
       return false;
@@ -6025,7 +6538,8 @@ window.saveAnswer = window.saveAnswer || function(){};
         mapa: +el.dataset.mapa,
         adicionar: function() { window.rcMapa.adicionar(_acao.mapa); renderCiclo(); },
         excluir: function() { window.rcMapa.excluir(_acao.mapa); renderCiclo(); },
-        pasta: function() { window.rcMapa.pastaNova(); renderCiclo(); }
+        pasta: function() { window.rcMapa.pastaNova(); renderCiclo(); },
+        selecao: function() { window._rcSelOn = (window._rcSelOn === false); renderCiclo(); if (window.showToast) window.showToast(window._rcSelOn ? 'Seleção ativada' : 'Seleção desativada'); }
       };
       abrirCelula(el);
       return;
@@ -6293,8 +6807,8 @@ window.saveAnswer = window.saveAnswer || function(){};
       if (_acao && _acao.numerar) ib(ICONES_ACAO.hash, 'Número', function() { if (_acao) { _acao.numerar(); renderAcoes(false); } });
       if (_acao && _acao.titulo) ib(ICONES_ACAO.tit, 'Título', function() { if (_acao) { _acao.titulo(); renderAcoes(false); } });
       if (_acao && _acao.mover) ib('<path d="M8 20V5M8 5L4.5 8.5M8 5l3.5 3.5M16 4v15M16 19l-3.5-3.5M16 19l3.5-3.5"/>', 'Mover', function() { renderAcoes(true); });
-      if (_acao && _acao.adicionar) ib('<path d="M12 5v14M5 12h14"/>', 'Adicionar', function() { if (_acao) { _acao.adicionar(); fecharAcoes(); } });
-      if (_acao && _acao.pasta) ib('<path d="M4 7.5a1.5 1.5 0 0 1 1.5-1.5H10l2 2.2h6.5A1.5 1.5 0 0 1 20 9.7v8.8a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 18.5z"/><path d="M12 11.5v5M9.5 14h5"/>', 'Pasta', function() { if (_acao) { _acao.pasta(); fecharAcoes(); } });
+      if (_acao && _acao.adicionar) ib(_acao.mapa !== undefined ? '<circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/>' : '<path d="M12 5v14M5 12h14"/>', 'Adicionar', function() { if (_acao) { _acao.adicionar(); fecharAcoes(); } });
+      if (_acao && _acao.pasta) ib('<rect x=\"9\" y=\"9\" width=\"11\" height=\"11\" rx=\"3\"/><path d=\"M5.5 15A1.5 1.5 0 0 1 4 13.5V7a3 3 0 0 1 3-3h6.5A1.5 1.5 0 0 1 15 5.5\"/>', 'Pasta', function() { if (_acao) { _acao.pasta(); fecharAcoes(); } });
       if (_acao && (_acao.linhaRef || _acao.cartaoRef)) ib('<rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h8"/>', 'Copiar texto', function() {
         var ref = _acao && (_acao.linhaRef || _acao.cartaoRef);
         var tas = ref ? ref.querySelectorAll('textarea') : [], v = [];
@@ -6302,7 +6816,7 @@ window.saveAnswer = window.saveAnswer || function(){};
         copiaBloco(v.join('\n'));
         fecharAcoes();
       });
-      if (!(_acao && _acao.semModo)) ib('<path d="M5 7h14M10 7V5h4v2M7 7l1 12h8l1-12"/>', 'Excluir', function() {
+      if (!(_acao && (_acao.semModo || _acao.mapa !== undefined))) ib('<path d="M5 7h14M10 7V5h4v2M7 7l1 12h8l1-12"/>', 'Excluir', function() {
         if (!_acao || !confirm('Excluir este item?')) return;
         var f = _acao.excluir;
         f();
@@ -7065,7 +7579,7 @@ window.saveAnswer = window.saveAnswer || function(){};
     if (_pressFired && alvoSegurar(e.target)) { e.preventDefault(); e.stopPropagation(); _pressFired = false; return; }
     if (_pressFired) { _pressFired = false; e.preventDefault(); e.stopPropagation(); return; }
     // célula de ações aberta: toque fora dela fecha
-    if (_cel && Date.now() - (window._acaoT || 0) > 400 && !(e.target.closest && e.target.closest('.cycle-cell'))) {
+    if (_cel && Date.now() - (window._acaoT || 0) > 400 && !(e.target.closest && e.target.closest('.cycle-cell button'))) {
       e.preventDefault(); e.stopPropagation(); fecharAcoes(); return;
     }
     // menu de ações aberto: toque fora dele fecha
@@ -7579,7 +8093,7 @@ window.saveAnswer = window.saveAnswer || function(){};
       p[1].setAttribute('d','M99 '+(H-14)+'l7 7.5 7-7.5');
     }
     /* a frase de baixo só aparece ao rolar: começa depois do fim da tela */
-    var q=document.querySelector('.quote-block'); if(q){ q.style.marginTop='0px'; var fim=cyc.getBoundingClientRect().bottom+window.scrollY; var falta=window.innerHeight+12-(q.getBoundingClientRect().top+window.scrollY); q.style.marginTop=Math.max(0,Math.round(falta))+'px'; }
+    var q=document.querySelector('.quote-block'); if(q){ q.style.marginTop='0px'; } else if(false){ q.style.marginTop='0px'; var fim=cyc.getBoundingClientRect().bottom+window.scrollY; var falta=window.innerHeight+12-(q.getBoundingClientRect().top+window.scrollY); q.style.marginTop=Math.max(0,Math.round(falta))+'px'; }
   }
   var feitos = 0;
   window.__ricoRevela = function(){ revela(); };
