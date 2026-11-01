@@ -3384,10 +3384,6 @@ window.saveAnswer = window.saveAnswer || function(){};
       if (id !== 'root') VZ[id] = 1;
       /* Mover ligado com um item de fora marcado: um toque na pasta já solta o item dentro dela */
       var _Sm = window._rcSrc;
-      if (window._rcModo === 'mover' && ehPasta && id === 'root' && _Sm && _Sm.tipo === 'no' && _Sm.id === 'root' && _Sm.inst !== api) {
-        if (window.rcMapa.soltaPasta(api, _Sm.inst)) window._rcSrc = null;
-        return;
-      }
       var f0 = acha(id);
       if (f0 && f0.p && f0.p.et && f0.p.et.run && !f0.p.collapsed && focoId === id) { focoId = null; focoFix = false; }
       if (focoId && id === focoId) { focoVolta(); return; }
@@ -3418,7 +3414,7 @@ window.saveAnswer = window.saveAnswer || function(){};
             var el = e.target.closest ? e.target.closest('.rcm-node') : null;
       if (PEND) {
         if (!el || !el.dataset.id) return;
-        if (PEND.pasta) { window.rcMapa.soltaPasta(api); return; }
+        if (PEND.pasta) { if (ehPasta && el.dataset.id === 'root') { var ixp = window.rcMapa.indice(api); if (ixp > -1) window.rcMapa.foca(ixp); } return; }
         if (el.dataset.id !== 'root') { soltaEm(el.dataset.id); return; }
         /* círculo de topo: um toque navega pelos mapas; dois toques soltam no primeiro nível dele */
         if (ROOTTAP && ROOTTAP.inst === api) { clearTimeout(ROOTTAP.t); ROOTTAP = null; soltaEm('root'); return; }
@@ -3638,7 +3634,7 @@ window.saveAnswer = window.saveAnswer || function(){};
       /* círculo de fora (mapa ou pasta): só pode ir para uma pasta */
       if (S.id === 'root' && m === 'mover') {
         if (id !== 'root') return;
-        if (ehPasta) { if (window.rcMapa.soltaPasta(api, S.inst)) window._rcSrc = null; return; }
+        if (ehPasta) { if (window.rcMapa.soltaPasta(api, S.inst, true)) window._rcSrc = null; return; }
         if (S.inst !== api && window.rcMapa.agrupaPasta(api, S.inst)) {
           window._rcSrc = null; renderCiclo();
           if (window.showToast) window.showToast('Movido para Pasta');
@@ -4002,6 +3998,7 @@ window.saveAnswer = window.saveAnswer || function(){};
           if (tq) { clearTimeout(tq.t); tq = null; }
           /* Passo 5: segurar o NÚMERO de uma folha cria uma cópia (original → cópia → coletor) */
           if (rnEl && id === 'root' && numR != null && (!window._rcModo || (window._rcModo === 'duplicar' && window.rcMapa.nivelDe(api) === 3)) && !PEND) { if (navigator.vibrate) navigator.vibrate(15); window.rcMapa.copiaNumero(api); return; }
+          if (PEND && PEND.pasta && ehPasta && id === 'root') { if (navigator.vibrate) navigator.vibrate(15); window.rcMapa.soltaPasta(api, null, true); return; }
           if (window._rcModo) { modoNo(id); return; }
           fechaOutras(); selId = id; barId = id; movBar = false; if (PEND) window.rcMapa.cancela(true); montaBar(); render();
         }, 550);
@@ -4796,14 +4793,15 @@ window.saveAnswer = window.saveAnswer || function(){};
       }
       return false;
     },
-    soltaPasta: function(dest, srcInst) {
+    pendente: function() { return !!PEND; },
+    soltaPasta: function(dest, srcInst, dentro) {
       var S = CUR, P = PEND;
       if (!srcInst && (!P || !P.pasta)) return false;
       if (!dest) return false;
       var src = srcInst || P.inst; if (dest === src) return true;
       var mt = metaGet(S), dk = dest.key, sk = src.key;
       if (!mt.f[dk]) return true;
-      var alvo = (S.pasta === dk) ? (mt.p[dk] || null) : dk;
+      var alvo = (S.pasta === dk && !dentro) ? (mt.p[dk] || null) : dk;
       for (var c = alvo, n = 0; c && n < 99; c = mt.p[c] || null, n++) if (c === sk) return true;
       if (alvo) mt.p[sk] = alvo; else { delete mt.p[sk]; if ((S.nv || 1) > 1) mt.n[sk] = S.nv; else delete mt.n[sk]; }
       metaSet(S, mt);
@@ -8243,13 +8241,14 @@ window.saveAnswer = window.saveAnswer || function(){};
   blk.addEventListener('touchend', function(e) {
     var s = t0; t0 = null; if (!s || !e.changedTouches.length) return;
     var t = e.changedTouches[0], dx = t.clientX - s.x, dy = t.clientY - s.y;
-    if (dx < 60 || dx < Math.abs(dy) * 2) return;
-    if (window._rcModo) return;
+    var movendo = !!(window._rcModo || (window.rcMapa && window.rcMapa.pendente && window.rcMapa.pendente()));
+    if (Math.abs(dx) < 60 || Math.abs(dx) < Math.abs(dy) * 2 || (dx < 0 && !movendo)) return;
+    if (window._rcModo && !movendo) return;
     if (window._rcSelOn !== false && s.tg && s.tg.closest && s.tg.closest('.rcm-wrap[data-v="2"],.rcm-wrap[data-v="3"]')) return;
     /* começou numa célula do mapa aberto (com texto ou sem): abre a leitura dela; fora de célula: volta ao nível 1 */
     try {
       var cel = s.tg && s.tg.closest ? s.tg.closest('.rcm-node') : null;
-      if (cel && !cel.classList.contains('root') && cel.dataset.id) {
+      if (!movendo && cel && !cel.classList.contains('root') && cel.dataset.id) {
         var wr = cel.closest('.rcm-wrap'), ap = wr && wr._rcApi;
         if (ap && ap.key && window.rcMapa && window.rcMapa.abre && window.rcMapa.abre(ap.key, cel.dataset.id)) return;
       }
