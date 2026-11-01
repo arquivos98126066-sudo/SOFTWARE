@@ -3456,7 +3456,8 @@ window.saveAnswer = window.saveAnswer || function(){};
           }
           /* Passo 5: dois toques na raiz numerada (número ou texto) de um mapa com cópias trocam de camada, sem abrir o editor; um toque continua recolhendo/abrindo */
           /* (troca de camada agora é arrastando para a esquerda no círculo) */
-          /* dois toques não abrem mais o editor (agora é arrastar para a direita): vale como um toque só */
+          /* dois toques (em cima de célula ou fora dela) voltam ao nível 1 */
+          try { if (window.rcMapa && window.rcMapa.volta1) window.rcMapa.volta1(); } catch (_) {}
           return;
         }
         if (tq) { clearTimeout(tq.t); var antes = tq.id; tq = null; acaoToque(antes); }
@@ -8295,6 +8296,21 @@ window.saveAnswer = window.saveAnswer || function(){};
   var t0 = null;
   blk.addEventListener('touchstart', function(e) { if (e.touches.length !== 1) { t0 = null; return; } var t = e.touches[0]; t0 = { x: t.clientX, y: t.clientY, tg: e.target }; }, { passive: true });
   blk.addEventListener('touchcancel', function() { t0 = null; }, { passive: true });
+  /* dois toques fora de célula (no fundo do bloco) voltam ao nível 1 */
+  var ult = null;
+  blk.addEventListener('touchend', function(e) {
+    if (!e.changedTouches.length || !t0) return;
+    var t = e.changedTouches[0], tg = t0.tg;
+    if (Math.abs(t.clientX - t0.x) > 10 || Math.abs(t.clientY - t0.y) > 10) { ult = null; return; }
+    if (tg && tg.closest && tg.closest('.rcm-node, .rcm-pill, .rcm-bar, button, a, input, textarea, .rcm-conf')) { ult = null; return; }
+    var agora = Date.now();
+    if (ult && agora - ult.t < 330 && Math.abs(t.clientX - ult.x) < 45 && Math.abs(t.clientY - ult.y) < 45) {
+      ult = null;
+      if (!window._rcModo && !(window.rcMapa && window.rcMapa.pendente && window.rcMapa.pendente())) { try { if (window.rcMapa && window.rcMapa.volta1) window.rcMapa.volta1(); } catch (_) {} }
+      return;
+    }
+    ult = { t: agora, x: t.clientX, y: t.clientY };
+  }, { passive: true });
   blk.addEventListener('touchend', function(e) {
     var s = t0; t0 = null; if (!s || !e.changedTouches.length) return;
     var t = e.changedTouches[0], dx = t.clientX - s.x, dy = t.clientY - s.y;
@@ -8322,6 +8338,8 @@ window.saveAnswer = window.saveAnswer || function(){};
         if (ap && ap.key && window.rcMapa && window.rcMapa.abre && window.rcMapa.abre(ap.key, cel.dataset.id)) return;
       }
     } catch (_) {}
+    /* fora de célula, arrastar para a direita não volta mais (agora são dois toques); só no modo Mover ainda volta */
+    if (!movendo) return;
     try { if (window.rcMapa && window.rcMapa.volta1) window.rcMapa.volta1(); } catch (_) {}
   }, { passive: true });
 })();
