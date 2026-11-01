@@ -1,7 +1,7 @@
 /* Versão deste programa (igual ao número do cache do service-worker.js; sobe junto a cada publicação).
    App aberto há tempo: quando volta para a tela (ou a cada 5 min), confere se saiu versão nova; se saiu, troca
    sozinho assim que a pessoa não estiver digitando, uma vez por versão (nunca fica preso recarregando). */
-window.NV_APP = 'meus-apps-v404';
+window.NV_APP = 'meus-apps-v405';
 (function () {
   try {
     if (window.top !== window || /(reparar|exportar|entrar|copia|atualiza)\.html$/i.test(location.pathname)) return;
@@ -245,7 +245,7 @@ window.AlternaGestos = {
   vaiVolta: function gestoVaiVolta(aoFazer){
     var pts = null, t0 = 0;
     function ehVaiVolta(p){
-      if (p.length < 4) return false;
+      if (p.length < 3) return false;
       var x0 = p[0].x, m = 0, minY = p[0].y, maxY = p[0].y, i;
       for (i = 1; i < p.length; i++){
         if (Math.abs(p[i].x - x0) > Math.abs(p[m].x - x0)) m = i;
@@ -253,16 +253,16 @@ window.AlternaGestos = {
         if (p[i].y > maxY) maxY = p[i].y;
       }
       var ida = p[m].x - x0, aida = Math.abs(ida), fim = p[p.length - 1];
-      if (aida < 40) return false;
+      if (aida < 26) return false;
       if (m < 1 || m > p.length - 2) return false;
       if ((fim.x - p[m].x) * ida > 0) return false;
-      if (Math.abs(p[m].x - fim.x) < aida * 0.6) return false;
-      if (maxY - minY > Math.max(45, aida * 0.8)) return false;
+      if (Math.abs(p[m].x - fim.x) < aida * 0.45) return false;
+      if (maxY - minY > Math.max(60, aida * 1.1)) return false;
       return true;
     }
     function fimToque(){
       var p = pts; pts = null;
-      if (p && Date.now() - t0 <= 2200 && ehVaiVolta(p)) aoFazer();
+      if (p && Date.now() - t0 <= 2600 && ehVaiVolta(p)) aoFazer();
     }
     document.addEventListener('touchstart', function(e){
       if (e.touches.length !== 1 || (e.target === document.activeElement && /^(INPUT|TEXTAREA|SELECT)$/.test((e.target.tagName || '')))) { pts = null; return; }
@@ -389,6 +389,7 @@ window.Alterna = (function () {
       vibra(25); A.ir('menu');
     },
     quebra: function () {
+      return; /* dois dedos desativado (2026-11-01) */
       if (!eu) return;
       var s = ler();
       if (s.p[eu]) { desliga(s, eu); vibra([60, 40, 60]); }
@@ -397,7 +398,7 @@ window.Alterna = (function () {
   };
   if (eu) {
     window.AlternaGestos.vaiVolta(A.zig);
-    window.AlternaGestos.doisDedos(A.quebra);
+    /* dois dedos desativado (2026-11-01, pedido dele): sem conexão entre apps não há o que desfazer */
     /* faixa transparente no lado direito, no meio da altura (nada na base da tela: la ficam os botoes do app); o toque nao passa para o que esta embaixo */
     var faixa = function () {
       if (document.getElementById('alterna-base')) return;
