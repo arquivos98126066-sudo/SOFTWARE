@@ -1,7 +1,7 @@
 /* Versão deste programa (igual ao número do cache do service-worker.js; sobe junto a cada publicação).
    App aberto há tempo: quando volta para a tela (ou a cada 5 min), confere se saiu versão nova; se saiu, troca
    sozinho assim que a pessoa não estiver digitando, uma vez por versão (nunca fica preso recarregando). */
-window.NV_APP = 'meus-apps-v387';
+window.NV_APP = 'meus-apps-v388';
 (function () {
   try {
     if (window.top !== window || /(reparar|exportar|entrar|copia|atualiza)\.html$/i.test(location.pathname)) return;
@@ -438,7 +438,8 @@ window.Alterna = (function () {
       d.addEventListener('mousedown', function (e) { e.stopPropagation(); });
       document.documentElement.appendChild(d);
     };
-    if (document.documentElement) faixa(); else document.addEventListener('DOMContentLoaded', faixa);
+    /* faixa do lado direito REMOVIDA (pedido do Klebson, 2026-11-01): tocar ali não sai mais do app; a troca de apps segue só pelo zigue-zague */
+    /* if (document.documentElement) faixa(); else document.addEventListener('DOMContentLoaded', faixa); */
   }
 
   /* Tapete, Meu CRM e ADM: nao mostra a pagina enquanto os dados do aparelho ainda estao entrando (senao os nomes aparecem carregando) */
