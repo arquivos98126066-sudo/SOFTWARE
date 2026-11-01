@@ -8314,6 +8314,10 @@ window.saveAnswer = window.saveAnswer || function(){};
       var cel = s.tg && s.tg.closest ? s.tg.closest('.rcm-node') : null;
       if (!movendo && cel && cel.dataset.id) {
         var wr = cel.closest('.rcm-wrap'), ap = wr && wr._rcApi;
+        /* pasta: arrastar para a direita entra nela (como um toque) */
+        if (wr && wr.getAttribute('data-pasta') && cel.classList.contains('root') && ap && window.rcMapa.indice) { var ixp = window.rcMapa.indice(ap); if (ixp > -1) { window.rcMapa.foca(ixp); return; } }
+        /* cópia da cópia (nível 3): fica como antes, volta ao nível 1 */
+        if (cel.classList.contains('root') && ap && window.rcMapa.nivelDe && window.rcMapa.nivelDe(ap) === 3) ap = null;
         if (wr && wr.getAttribute('data-pasta')) ap = null;
         if (ap && ap.key && window.rcMapa && window.rcMapa.abre && window.rcMapa.abre(ap.key, cel.dataset.id)) return;
       }
