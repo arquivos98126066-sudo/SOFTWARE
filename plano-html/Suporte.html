@@ -161,7 +161,7 @@ function painel(c){
  var ruim=c.mau.indexOf(tSel)>-1, d=ruim?MAU[tSel]:OK[tSel], i=ORD.indexOf(tSel);
  pn.style.setProperty('--ar','calc('+(12.5+25*i)+'% - 6px)');
  pn.className='pn ab';
- pn.innerHTML='<span class="tag '+(ruim?'r':'v')+'">'+d[0]+'</span><div class="xa">'+d[1].map(function(r){return '<div>'+esc(r[0])+'<span>'+esc(r[1])+'</span></div>'}).join('')+'</div><button class="an '+(ruim?'r':'v')+'" id="bAn">'+(ruim?'Analisar com Claude':'Tudo certo')+'</button>';
+ pn.innerHTML='<span class="tag '+(ruim?'r':'v')+'">'+d[0]+'</span><div class="xa">'+d[1].map(function(r){return '<div>'+esc(r[0])+'<span>'+esc(r[1])+'</span></div>'}).join('')+'</div><button class="an '+(ruim?'r':'v')+'" id="bAn">'+(ruim?'ANALISAR COM CLAUDE':'Tudo certo')+'</button>';
 }
 function relatorio(c){
  var mau=c.mau.length>0, rel=$('rel');
