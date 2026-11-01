@@ -1,7 +1,7 @@
 /* Versão deste programa (igual ao número do cache do service-worker.js; sobe junto a cada publicação).
    App aberto há tempo: quando volta para a tela (ou a cada 5 min), confere se saiu versão nova; se saiu, troca
    sozinho assim que a pessoa não estiver digitando, uma vez por versão (nunca fica preso recarregando). */
-window.NV_APP = 'meus-apps-v409';
+window.NV_APP = 'meus-apps-v410';
 (function () {
   try {
     if (window.top !== window || /(reparar|exportar|entrar|copia|atualiza)\.html$/i.test(location.pathname)) return;
@@ -486,7 +486,10 @@ window.Alterna = (function () {
       var revela = function () { if (estilo) { estilo.remove(); estilo = null; } };
       setTimeout(revela, 1600);
       var feito = false;
+      var espTapete = 0;
       var aplica = function () {
+        /* Tapete: espera o app montar a primeira tela (o módulo pode terminar depois do DOMContentLoaded) */
+        if (eu === 'tapete' && !window.__tapeteIniciou && espTapete++ < 40) { setTimeout(aplica, 100); return; }
         if (feito) return; feito = true;
         var s2 = null;
         try { sessionStorage.removeItem('troca'); s2 = JSON.parse(localStorage.getItem(KE) || 'null'); } catch (e) {}
