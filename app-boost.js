@@ -1,7 +1,7 @@
 /* Versão deste programa (igual ao número do cache do service-worker.js; sobe junto a cada publicação).
    App aberto há tempo: quando volta para a tela (ou a cada 5 min), confere se saiu versão nova; se saiu, troca
    sozinho assim que a pessoa não estiver digitando, uma vez por versão (nunca fica preso recarregando). */
-window.NV_APP = 'meus-apps-v403';
+window.NV_APP = 'meus-apps-v404';
 (function () {
   try {
     if (window.top !== window || /(reparar|exportar|entrar|copia|atualiza)\.html$/i.test(location.pathname)) return;
@@ -368,15 +368,8 @@ window.Alterna = (function () {
     },
     zig: function () {
       if (!eu) return;
-      var s = ler(), par = s.p[eu];
-      if (par && URLS[par]) { vibra(25); A.ir(par); return; }
-      if (s.o && s.o !== eu && URLS[s.o] && Date.now() - s.t < VALE) {
-        var alvo = s.o;
-        desliga(s, eu); desliga(s, alvo);
-        s.p[eu] = alvo; s.p[alvo] = eu; s.o = null; grava(s);
-        vibra([30, 60, 30]); A.ir(alvo); return;
-      }
-      s.o = eu; s.t = Date.now(); grava(s);
+      /* (2026-11-01) sem alternar entre dois apps: o zigue-zague só sai para o menu */
+      var s = ler(); s.o = eu; s.t = Date.now(); grava(s);
       vibra(25); A.ir('menu');
     },
     /* V: de qualquer app (ou HTML do Plano) volta ao menu dos 6, sem mexer nas conexões */
