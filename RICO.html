@@ -4884,6 +4884,7 @@ window.saveAnswer = window.saveAnswer || function(){};
     },
     pendente: function() { return !!PEND; },
     redesenha: function() { renderCiclo(); },
+    soltaSel: function() { PEND = null; ROOTTAP = null; SETS.m.arr.concat(SETS.p.arr).forEach(function(m) { m.soltaMov(); }); },
     soltaPasta: function(dest, srcInst, dentro) {
       var S = CUR, P = PEND;
       if (!srcInst && (!P || !P.pasta)) return false;
@@ -8447,7 +8448,7 @@ window.rcConfirma = function(msg, ok) {
     var M = window._rcMS; if (M) { M.ativo = false; M.sessao = false; M.sel = []; M.ids = {}; M.ult = null; }
     apis().forEach(function(a) { a.selLimpa(); });
     [].forEach.call(blk.querySelectorAll('.ms-sel, .dsel'), function(el) { el.classList.remove('ms-sel', 'dsel'); });
-    try { if (window.rcMapa && window.rcMapa.desfoca) window.rcMapa.desfoca(); } catch (e) {}
+    try { window.rcMapa.soltaSel(); } catch (e) {}
     try { window.rcMapa.redesenha(); } catch (e) {}
     if (navigator.vibrate) { try { navigator.vibrate(18); } catch (e) {} }
   }
