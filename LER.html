@@ -563,6 +563,18 @@ svg{fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-l
   }
   /* troca o quadro por um novo: mudar o srcdoc de um quadro já carregado cria passos extras no histórico e o voltar "pula devagar" */
   var docY = 0;
+  /* posição de leitura de cada estudo (como um livro no Kindle): guarda onde parou e volta no mesmo ponto */
+  var KP = 'ler.pos.v1';
+  function posLe(){ try { return JSON.parse(localStorage.getItem(KP) || '{}') || {}; } catch(e){ return {}; } }
+  function posDe(d){ var v = d && posLe()[d.p]; return v && v.y > 0 ? v.y : 0; }
+  function posGrava(y){
+    var d = estado && estado.doc !== null && docs[estado.doc]; if (!d) return;
+    try {
+      var m = posLe(); if (y > 40) m[d.p] = {y: Math.round(y), t: Date.now()}; else delete m[d.p];
+      var ks = Object.keys(m); if (ks.length > 300) { ks.sort(function(a, b){ return m[a].t - m[b].t; }); ks.slice(0, ks.length - 300).forEach(function(k){ delete m[k]; }); }
+      localStorage.setItem(KP, JSON.stringify(m));
+    } catch(e){}
+  }
   function quadro(h, y){
     var q = $('quadro'), n = document.createElement('iframe');
     n.id = 'quadro'; n.setAttribute('sandbox', q.getAttribute('sandbox'));
@@ -575,12 +587,12 @@ svg{fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-l
   function abrir(d, empurrar, y){
     estado = {cam: estado.cam, doc: docs.indexOf(d)};
     if (empurrar) history.pushState(estado, '');
-    quadro(d.h, y);
+    quadro(d.h, y == null ? posDe(d) : y);
     $('leitor').hidden = false;
   }
   function mostrar(){
     var d = estado.doc !== null && docs[estado.doc];
-    if (d){ quadro(d.h); $('leitor').hidden = false; }
+    if (d){ quadro(d.h, posDe(d)); $('leitor').hidden = false; }
     else { $('leitor').hidden = true; quadro(''); desenhar(); }
   }
   window.addEventListener('popstate', function(e){
@@ -639,7 +651,7 @@ svg{fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-l
     else if (e.data.alternaMenu) Alterna.menu();
     else if (e.data.alternaQuebra) Alterna.quebra();
     else if (e.data.estudoPronto) q.style.visibility = '';
-    else if (typeof e.data.estudoY === 'number') docY = e.data.estudoY;
+    else if (typeof e.data.estudoY === 'number') { docY = e.data.estudoY; posGrava(docY); }
   });
 
   if ('serviceWorker' in navigator) navigator.serviceWorker.register('service-worker.js').catch(function(){});

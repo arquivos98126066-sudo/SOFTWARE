@@ -1,4 +1,4 @@
-const CACHE_NAME = 'meus-apps-v405';
+const CACHE_NAME = 'meus-apps-v406';
 // HTMLs enviados pelo menu (segurar o app > Enviar um novo): ficam fora da limpeza de versões antigas
 const ENVIADOS = 'apps-enviados';
 
@@ -42,12 +42,26 @@ const URLS_TO_CACHE = [
 const BASE = new URL('./', self.location).pathname;
 const PRE = new Set(URLS_TO_CACHE);
 
+/* Leitura (LER): guarda a lista e todos os estudos para abrir sem internet */
+async function guardaBiblioteca(cache) {
+  try {
+    const rl = await fetch(new Request('./lib/lista.json', {cache: 'reload'}));
+    if (!rl.ok) return;
+    await cache.put('./lib/lista.json', rl.clone());
+    const l = await rl.json();
+    const ids = Object.keys((l && l.itens) || {});
+    for (let i = 0; i < ids.length; i += 8) {
+      await Promise.all(ids.slice(i, i + 8).map(id => fetch(new Request('./lib/' + id + '.json')).then(r => r.ok ? cache.put('./lib/' + id + '.json', r) : null).catch(() => null)));
+    }
+  } catch (e) {}
+}
+
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME).then(cache => {
       return Promise.all(URLS_TO_CACHE.map(u => fetch(new Request(u, {cache: 'reload'})).then(r => r.ok ? cache.put(u, r) : null))).catch(err => {
         console.warn('Alguns arquivos nao cacheados:', err);
-      });
+      }).then(() => guardaBiblioteca(cache));
     })
   );
   self.skipWaiting();
@@ -95,7 +109,7 @@ self.addEventListener('fetch', event => {
     }
     /* abrir na hora: o que já está guardado nesta versão abre direto da memória, sem esperar a internet.
        Versão nova chega pelo número do cache (publicar sobe o número), toda de uma vez, na abertura seguinte. */
-    const cached0 = await caches.match(req, {ignoreSearch: true});
+    const cached0 = await caches.match(req.url, {ignoreSearch: true});
     if (cached0 && (!isLocal || PRE.has(url.pathname.replace(BASE, './')))) return cached0;
     const rede = fetch(req.url, isLocal ? {cache: 'no-store'} : undefined).then(response => {
       if (response && (response.status === 200 || response.type === 'opaque')) {
@@ -105,7 +119,7 @@ self.addEventListener('fetch', event => {
       return response;
     });
     event.waitUntil(rede.catch(() => {}));
-    const cached = await caches.match(req, {ignoreSearch: true});
+    const cached = await caches.match(req.url, {ignoreSearch: true});
     /* o resto deste site (fora da lista, como a conferência de versão): a rede primeiro (até 1,5 s); sem rede, o guardado */
     const codigo = isLocal && (req.mode === 'navigate' || /\.(html|js|json)$/i.test(url.pathname) || url.pathname.endsWith('/'));
     if (codigo && cached) {
