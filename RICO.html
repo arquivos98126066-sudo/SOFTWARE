@@ -424,10 +424,11 @@ if ((sessionStorage.getItem('troca') === (window.RICO_INST === 'p' ? 'RICOP' : '
   /* ── Janela de etapa do Ciclo (sobe de baixo) ── */
   .sheet-ov{ position: fixed; inset: 0; z-index: 99970; background: var(--chip); }
   /* leitura: dois toques no círculo do mapa abrem o texto limpo, como o estudo; segurar mostra o lápis */
-  .rd-ov{ position: fixed; inset: 0; z-index: 99975; background: var(--chip); overflow-y: auto; overscroll-behavior: contain; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; touch-action: pan-y; overflow-anchor: none; scroll-behavior: auto; }
+  .rd-ov{ position: fixed; inset: 0; z-index: 99975; background: #fbfaf7; box-sizing: border-box; padding: calc(12px + env(safe-area-inset-top)) 16px calc(16px + env(safe-area-inset-bottom)); overflow-y: auto; overscroll-behavior: contain; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; touch-action: pan-y; overflow-anchor: none; scroll-behavior: auto; }
   .rd-ov[hidden]{ display: none; }
-  .rd-col{ max-width: 560px; margin: 0 auto; padding: calc(14px + env(safe-area-inset-top)) 22px calc(22px + env(safe-area-inset-bottom)); color: var(--tx); }
-  .rd-t, .rd-h{ display: table; margin-left: auto; margin-right: auto; text-align: center; font-family: 'Inter', system-ui, sans-serif; font-style: normal; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: #211e19; line-height: 1.2; padding-bottom: 12px; border-bottom: 1px solid #c9c2b0; overflow-wrap: anywhere; }
+  .rd-col{ max-width: 680px; margin: 14px auto 0; padding: 22px 20px; background: #f3f0e8; border: 1px solid #e2ddd1; border-radius: 24px; color: var(--tx); }
+  .rd-col > .rd-t:first-child{ margin-top: 0; }
+  .rd-t, .rd-h{ display: table; margin-left: auto; margin-right: auto; text-align: center; font-family: 'Inter', system-ui, sans-serif; font-style: normal; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: #211e19; line-height: 1.2; padding-bottom: 10px; border-bottom: 1px solid #e2ddd1; overflow-wrap: anywhere; }
   .rd-t{ font-size: 15.5px; margin-top: 18px; margin-bottom: 0; }
   .rd-t + .rd-tx, .rd-h + .rd-tx{ margin-top: 13px; }
   .rd-h{ font-size: 14px; margin-top: 30px; margin-bottom: 0; }
@@ -477,7 +478,7 @@ if ((sessionStorage.getItem('troca') === (window.RICO_INST === 'p' ? 'RICOP' : '
   .rd-tx[data-q] + .rd-tx[data-q]{ margin-top: 0; }
   .rd-ov.rd-q{ touch-action: none; }
   .rd-ln-pre, .rd-pre{ background: rgba(33,30,25,.10); border-radius: 6px; }
-  html.rd-editando .rd-col{ padding-bottom: calc(var(--rd-kb, 0px) + 45vh); }
+  html.rd-editando .rd-col{ margin-bottom: calc(var(--rd-kb, 0px) + 45vh); }
   html.rd-editando #alterna-base{ display: none !important; }
   .rd-ov.rd-kbd .rd-tools{ display: none; }
   .rd-ov.rd-cp, .rd-ov.rd-cp *{ -webkit-user-select: none !important; user-select: none !important; -webkit-touch-callout: none !important; }
@@ -489,7 +490,7 @@ if ((sessionStorage.getItem('troca') === (window.RICO_INST === 'p' ? 'RICOP' : '
   .rd-edit .rd-tx, .rd-edit .rd-t, .rd-edit .rd-h{ outline: none; caret-color: #211e19; }
     .rd-edit .rd-tx > div:has(> br:only-child){ height: var(--gap, 18px); line-height: var(--gap, 18px); }
   .rd-tx .ln.gap{ --gap: 18px; }
-  .rd-edit .rd-t, .rd-edit .rd-h{ display: block; width: fit-content; min-width: 90px; max-width: 100%; }
+  .rd-edit .rd-t, .rd-edit .rd-h{ min-width: 90px; max-width: 100%; }
   .rd-edit .rd-t:empty::before, .rd-edit .rd-h:empty::before{ content: attr(data-ph); color: #9a948a; }
   .rd-tools{ position: fixed; left: 0; right: 0; bottom: calc(14px + env(safe-area-inset-bottom) + var(--rd-kb, 0px)); z-index: 3; padding: 0 12px; pointer-events: none; }
   .rd-linha{ display: flex; align-items: center; justify-content: space-between; gap: 2px; pointer-events: auto; background: #fff; border-radius: 999px; padding: 5px 12px; box-shadow: 0 14px 30px -12px rgba(15,27,45,.45), 0 0 0 1px rgba(33,30,25,.06); }
@@ -5421,6 +5422,18 @@ window.saveAnswer = window.saveAnswer || function(){};
       if (vazio) { c.classList.add('gap'); if (!c.querySelector('br')) { c.textContent = ''; c.appendChild(document.createElement('br')); } }
       else c.classList.remove('gap');
     });
+    /* espaço duro (nbsp) do teclado entre palavras impede a quebra de linha: troca por espaço normal, sem mexer no cursor */
+    try {
+      var tw = document.createTreeWalker(bl, NodeFilter.SHOW_TEXT), nd, sl2 = window.getSelection();
+      while ((nd = tw.nextNode())) {
+        var v = nd.nodeValue; if (v.indexOf('\u00a0') < 0) continue;
+        var nv = v.replace(/\u00a0(?=[^\s\u00a0])/g, ' ').replace(/\u00a0(?=\u00a0)/g, ' ');
+        if (nv === v) continue;
+        var ao = (sl2 && sl2.anchorNode === nd) ? sl2.anchorOffset : -1;
+        nd.nodeValue = nv;
+        if (ao > -1) { try { var rr = document.createRange(); rr.setStart(nd, Math.min(ao, nv.length)); rr.collapse(true); sl2.removeAllRanges(); sl2.addRange(rr); } catch (_) {} }
+      }
+    } catch (_) {}
     rdCartoes(bl);
   }
   function rdFoco(el, fim) {
