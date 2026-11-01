@@ -4898,7 +4898,8 @@ window.saveAnswer = window.saveAnswer || function(){};
     var solta = function() { if (!buf.length) return; var o = {}; if (mt) { o.t = mt; mt = null; } out.i.push(buf.join('')); out.m.push(o); buf = []; bufNum = false; };
     rows.forEach(function(v, idx) {
       var m = ms[idx] || {}, tx = String(v == null ? '' : v).replace(/\s+$/, '');
-      if (m.t || m.q) solta();
+      if (m.t || m.q || m.l) solta();
+      if (m.l && !m.q) { var ol = { l: 1 }; if (m.t) ol.t = m.t; out.i.push(tx); out.m.push(ol); mt = null; return; }
       if (m.q) { var oq = { q: 1 }; if (m.t) oq.t = m.t; out.i.push(tx); out.m.push(oq); return; }
       if (m.t) mt = m.t;
       if (!tx.trim()) return;
@@ -5262,10 +5263,10 @@ window.saveAnswer = window.saveAnswer || function(){};
     return { ctx: _rd.ctx, edit: !!_rd.edit, sc: ov.scrollTop };
   };
   function rdEsc(x) { return String(x == null ? '' : x).replace(/[&<>]/g, function(c) { return c === '&' ? '&amp;' : (c === '<' ? '&lt;' : '&gt;'); }); }
-  function rdBloco(v, idx, c, ed, q, off) {
+  function rdBloco(v, idx, c, ed, q, off, lv) {
     var corpo = rtHtml(rtParse(String(v || '')), null, off);
     if (c && !ed) { corpo = corpo.replace(/^(<div class="ln[^"]*" data-l="\d+">)/, '$1<span class="nm" data-rc="1" contenteditable="false">' + c + '</span>'); }
-    return '<div class="rd-tx" data-i="' + idx + '"' + (off ? ' data-n="' + off + '"' : '') + (q ? ' data-q' : '') + (ed ? ' contenteditable="true"' : '') + '>' + corpo + '</div>';
+    return '<div class="rd-tx" data-i="' + idx + '"' + (off ? ' data-n="' + off + '"' : '') + (q ? ' data-q' : '') + (lv ? ' data-livre' : '') + (ed ? ' contenteditable="true"' : '') + '>' + corpo + '</div>';
   }
   function rdPinta() {
     var ov = document.getElementById('rdOv'), e = _rd.e, ed = _rd.edit, h = '<div class="rd-col">';
@@ -5283,7 +5284,7 @@ window.saveAnswer = window.saveAnswer || function(){};
       if (!ed && !String(v || '').trim()) return;
       var offC = corre;
       rtParse(String(v || '')).lines.forEach(function(l1) { if (l1.m === 'n') { if (l1.r) corre = 1; else corre++; } });
-      h += rdBloco(v, idx, m.c ? nl : 0, ed, m.q, offC);
+      h += rdBloco(v, idx, m.c ? nl : 0, ed, m.q, offC, m.l);
     });
     if (ed) h += '<div class="rd-tools"><div class="rd-linha"><div class="rd-grupo" data-g="main"><button type="button" data-t="T" aria-label="Título"><b>T</b></button><button type="button" data-t="n" aria-label="Numeração"><svg viewBox="0 0 24 24"><path d="M11 6h9M11 12h9M11 18h9M4.5 5.5l1.5-1v5M4 14.2c.6-1 2.3-.8 2.1.4-.3 1-1.6 1.5-2.1 2.4h2.4"/></svg></button><button type="button" data-t="p" aria-label="Marcadores"><svg viewBox="0 0 24 24"><path d="M11 6h9M11 12h9M11 18h9"/><circle cx="5.5" cy="6" r=".9" fill="currentColor"/><circle cx="5.5" cy="12" r=".9" fill="currentColor"/><circle cx="5.5" cy="18" r=".9" fill="currentColor"/></svg></button><button type="button" data-t="d" aria-label="Traço"><svg viewBox="0 0 24 24"><path d="M4 6h3M11 6h9M4 12h3M11 12h9M4 18h3M11 18h9"/></svg></button><button type="button" data-t="q" aria-label="Citação"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button></div><div class="rd-grupo" data-g="estilo" hidden><button type="button" data-t="b" aria-label="Negrito"><svg viewBox="0 0 24 24"><path d="M7 5h6a3.5 3.5 0 010 7H7zM7 12h7a3.5 3.5 0 010 7H7z"/></svg></button><button type="button" data-t="i" aria-label="Itálico"><svg viewBox="0 0 24 24"><path d="M10 5h7M7 19h7M14 5l-4 14"/></svg></button><button type="button" data-t="c" aria-label="Check"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M8.2 12.4l2.6 2.6 5-5.2"/></svg></button><button type="button" data-t="lixo" hidden aria-label="Apagar o marcado"><svg viewBox="0 0 24 24"><path d="M5 7h14M10 7V5h4v2M7 7l1 12h8l1-12"/></svg></button><button type="button" data-t="cpall" aria-label="Copiar tudo"><svg viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2.5"/><path d="M5 15V7a2.5 2.5 0 012.5-2.5H15M12.5 14.5h4M14.5 12.5v4"/></svg></button><button type="button" data-t="copia" aria-label="Modo copiar"><svg viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2.5"/><path d="M5 15V7a2.5 2.5 0 012.5-2.5H15"/></svg></button></div><button type="button" data-t="estilo" aria-label="Alternar ferramentas"><svg viewBox="0 0 24 24"><rect x="4.5" y="4.5" width="6" height="6" rx="1.5"/><rect x="13.5" y="4.5" width="6" height="6" rx="1.5"/><rect x="4.5" y="13.5" width="6" height="6" rx="1.5"/><rect x="13.5" y="13.5" width="6" height="6" rx="1.5"/></svg></button></div></div>';
     h += '<button type="button" data-fechar hidden onclick="fecharLeitura()" aria-label="Fechar"></button></div>';
@@ -5453,6 +5454,7 @@ window.saveAnswer = window.saveAnswer || function(){};
       var idx = +el.getAttribute('data-i'), txt = rtDeDom(el, false).replace(/​/g, '');
       var o = {}, v = velho[idx]; if (v && v.c) o.c = 1;
       if (el.hasAttribute('data-q')) o.q = 1;
+      if (el.hasAttribute('data-livre')) o.l = 1;
       var nm1 = el.querySelector('.ln > .nm:not([data-rc])'); if (nm1 && +nm1.textContent > 1 && nm1.getAttribute('data-r') !== '1') o.n = (+nm1.textContent) - 1;
       if (pend) o.t = pend;
       pend = null;
@@ -8201,13 +8203,27 @@ window.saveAnswer = window.saveAnswer || function(){};
   var t0 = null, tm = null;
   function ov() { var o = document.getElementById('rdOv'); return (o && !o.hidden) ? o : null; }
   function poeCursor(o) {
-    /* o cursor vai para o FIM do ÚLTIMO bloco (tocou embaixo); com a tela vazia, cria o bloco */
-    var tx = o.querySelectorAll('.rd-tx'), b = tx.length ? tx[tx.length - 1] : (window.rdGaranteBloco ? window.rdGaranteBloco() : null);
+    /* tocou embaixo de tudo: se o último bloco já tem texto (numerado, traço...), nasce um bloco NOVO e solto, sem marcador; se está vazio, usa ele */
+    var tx = o.querySelectorAll('.rd-tx'), b = tx.length ? tx[tx.length - 1] : null;
+    if (!b) b = window.rdGaranteBloco ? window.rdGaranteBloco() : null;
+    else if (b.textContent.replace(/[\s\u200b]+/g, '') && !b.hasAttribute('data-livre')) {
+      var nb = document.createElement('div'); nb.className = 'rd-tx rd-solo'; nb.setAttribute('contenteditable', 'true'); nb.setAttribute('data-i', '-1'); nb.setAttribute('data-livre', '1');
+      nb.innerHTML = '<div class="ln gap" data-l="0"><br></div>';
+      b.parentNode.insertBefore(nb, b.nextSibling); b = nb;
+    }
     if (!b) return false;
     if (b.getAttribute('contenteditable') !== 'true') b.setAttribute('contenteditable', 'true');
     try { b.focus({ preventScroll: true }); } catch (_) { b.focus(); }
     var rg = document.createRange(); rg.selectNodeContents(b); rg.collapse(false);
     var sl = window.getSelection(); sl.removeAllRanges(); sl.addRange(rg);
+    /* com o teclado subindo, rola só o necessário para a linha nova ficar visível acima dele */
+    [350, 800].forEach(function(ms) { setTimeout(function() {
+      try {
+        var oo = ov(); if (!oo || !b.isConnected) return;
+        var vv = window.visualViewport, base = (vv ? vv.height + vv.offsetTop : window.innerHeight) - 24, rc = b.getBoundingClientRect();
+        if (rc.bottom > base) oo.scrollTo({ top: oo.scrollTop + (rc.bottom - base), behavior: 'instant' });
+      } catch (_) {}
+    }, ms); });
     return true;
   }
   function semTexto(o) { var t = o.querySelectorAll('.rd-tx'); for (var i = 0; i < t.length; i++) if (t[i].textContent.replace(/\s+/g, '')) return false; return true; }
