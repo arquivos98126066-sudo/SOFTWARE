@@ -737,7 +737,7 @@ input { -webkit-user-select: text; user-select: text; }
       var mapa = {}; srcs.forEach(function (u, i) { mapa[u] = txt[i]; });
       html = html.replace(/<script\b[^>]*\bsrc=["']([^"']+)["'][^>]*>\s*<\/script>/gi, function (t, u) {
         if (mapa[u] == null) return t;
-        return '<script>' + mapa[u].replace(/<\/script/gi, '<\\/script').replace(/<!--/g, '<\\!--') + '<\/script>';
+        return '<script>' + mapa[u].replace(/<\/script/gi, '<\\/script').replace(new RegExp('<' + '!--', 'g'), '<' + '\\!--') + '<\/script>';
       });
       html = html.replace(/(?:window\.)?location\.replace\(\s*['"]index\.html['"]\s*\)/g, 'void 0'); /* cópia sem login: não volta para o menu */
       if (/from\s*["']\.\/nv-fs\.js["']/.test(html)) {
