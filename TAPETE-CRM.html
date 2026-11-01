@@ -3469,6 +3469,8 @@ function regEscolheCor(nome){
   const steps = regActiveSteps();
   const s = steps[regCurStep];
   REG_DATA[s ? s.id : 'cor'] = nome;
+  /* cor da borda: só marca (o prompt pode ser copiado antes); quem avança é o botão Próximo */
+  if (s && s.id === 'borda-cor') { renderRegStep(); return; }
   regAdvance();
 }
 window.regEscolheCor = regEscolheCor;
