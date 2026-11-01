@@ -5149,8 +5149,10 @@ window.saveAnswer = window.saveAnswer || function(){};
         }
         if (_rd.edit && (_rd.tool === 'q' || _rd.tool === 'n') && !(ev.target.closest && ev.target.closest('.rd-tools'))) { if (ev.cancelable) ev.preventDefault(); return; }
         /* duas batidas rápidas no texto: sai da edição e volta para a leitura */
-        if (_rd.edit && !_rd.tool && !_rd.digita && !_rd.copia && !(ev.target.closest && ev.target.closest('.rd-tools, .ck'))) {
+        if (_rd.edit && !_rd.tool && !_rd.copia && !(ev.target.closest && ev.target.closest('.rd-tools, .ck'))) {
           var c = ev.changedTouches && ev.changedTouches[0]; if (!c) return;
+          /* só vale toque de verdade (sem arrastar), para rolar a tela não contar como toque */
+          if (tx0 && (Math.abs(c.clientX - tx0.x) > 10 || Math.abs(c.clientY - tx0.y) > 10)) { ultToque = 0; return; }
           var agora = Date.now();
           if (agora - ultToque < 520 && Math.abs(c.clientX - ultX) < 45 && Math.abs(c.clientY - ultY) < 45) {
             ultToque = 0;
