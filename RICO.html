@@ -6051,8 +6051,31 @@ window.saveAnswer = window.saveAnswer || function(){};
         { t: 'Sucesso definitivo', i: [SEED_SUCESSO], g: 1 });
     }
     cicloHeaderPrimeiro();
+    cicloImportaBiblico();
     renderCiclo();
   };
+
+  /* Uma vez só: cria dentro de BIBLICO as células do Profético e do Reavivado (nomes vindos do Plano) */
+  var BIBLICO_PROFETICO = ['Biblia Sagrada','Dom de Profecia','Estudo Profecia','A Grande Estátua','As 4 besta','O Chifre Pequeno','Carneiro e Bode','As 70 Semanas','O Santuário','O Juízo de Deus','Origem da Revelação','As 7 Igrejas','As 4 Criaturas','Livro e Cordeiro','Os 7 Selos','As 7 Trombetas','O Livro Selado','Anjo com Voz de Leão','Os 7 Tronos','O Misterio de Deus','Doce e amarga','As Duas Testemunhas','A mulher e o Dragão','A Besta do Mar','A Besta da Terra','Os 144 mil','Os 24 Anciãos','Primeira Mensagem','Segunda Mensagem','Terceira Mensagem','As 7 Pragas','Mulher na Besta','Enganos Finais','Tempo de Angustia','A Volta de Jesus','Os Mil Anos','A Prisão de Satanás','Morte Final e Definitiva','Nova Terra'];
+  var BIBLICO_REAVIVADO = ['As duas obras do Espírito','Um presente precioso','O Espírito e a vida plena','A raiz de nossos problemas','A parabola da 10 virgem','Os 4 beneficios do Espírito','O maior problema de Laodiceia','Cristo em você','Batismo e obediência','Intristecendo o Espírito','Batismo e chuva serodia','Batismo e a volta','O desejo de orar dado','Exemplo de oração de Jesus','Porque a oração e necessaria','Orando no Espírito','Oração unida do Espírito','Oração perseverante','Oração intercesoria','Como pedir o Espírito','Orando com promessa','Evangelho com Espírito','Batismo antes do evangelho','Oração e evangelismo','Metodo de cristo da evangeliza','O caminho para descoberta','A luta do cristão','O poder do pecado quebrado','Cristo da vitória','Justiça pela fé','Permanecer em serviço','O Espírito e a comunhão','A igreja primitiva e comunhão','Batismo e o grupo de comunhão','A igreja','A família de Deus','Os frutos e a comunhão'];
+  function cicloImportaBiblico() {
+    try {
+      if (localStorage.getItem('ui.imp.biblico.v1')) return;
+      var norm = function(t) { return String(t || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim().toLowerCase(); };
+      var b = -1;
+      CICLO.forEach(function(e, k) { if (b < 0 && e.g && norm(e.t) === 'biblico') b = k; });
+      if (b < 0) return;
+      var d = (CICLO[b].d || 1) + 1, novos = [];
+      var cel = function(t, dd) { var o = { t: t, i: [], g: 1 }; if (dd > 1) o.d = dd; return o; };
+      [['Profético', BIBLICO_PROFETICO], ['Reavivado', BIBLICO_REAVIVADO]].forEach(function(grp) {
+        novos.push(cel(grp[0], d));
+        grp[1].forEach(function(t) { novos.push(cel(t, d + 1)); });
+      });
+      Array.prototype.splice.apply(CICLO, [cicloFimNo(b) + 1, 0].concat(novos));
+      localStorage.setItem('ui.imp.biblico.v1', '1');
+      salvarAlt();
+    } catch (_) {}
+  }
 
   // toque: abre/entra; dois toques seguidos (só dentro do Complemento): cria um filho
   var _tq = { idx: null, timer: null };
