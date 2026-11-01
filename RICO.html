@@ -478,7 +478,7 @@ if ((sessionStorage.getItem('troca') === (window.RICO_INST === 'p' ? 'RICOP' : '
   .rd-tx[data-q] + .rd-tx[data-q]{ margin-top: 0; }
   .rd-ov.rd-q{ touch-action: none; }
   .rd-ln-pre, .rd-pre{ background: rgba(33,30,25,.10); border-radius: 6px; }
-  html.rd-editando .rd-col{ margin-bottom: calc(var(--rd-kb, 0px) + 45vh); }
+  html.rd-editando .rd-col{ margin-bottom: calc(var(--rd-kb, 0px) + 96px); }
   html.rd-editando #alterna-base{ display: none !important; }
   .rd-ov.rd-kbd .rd-tools{ display: none; }
   .rd-ov.rd-cp, .rd-ov.rd-cp *{ -webkit-user-select: none !important; user-select: none !important; -webkit-touch-callout: none !important; }
@@ -8197,11 +8197,11 @@ window.saveAnswer = window.saveAnswer || function(){};
   var t0 = null, tm = null;
   function ov() { var o = document.getElementById('rdOv'); return (o && !o.hidden) ? o : null; }
   function poeCursor(o) {
-    var b = window.rdGaranteBloco ? window.rdGaranteBloco() : null;
-    if (!b) { var tx = o.querySelectorAll('.rd-tx'); b = tx[tx.length - 1]; }
+    /* o cursor vai para o FIM do ÚLTIMO bloco (tocou embaixo); com a tela vazia, cria o bloco */
+    var tx = o.querySelectorAll('.rd-tx'), b = tx.length ? tx[tx.length - 1] : (window.rdGaranteBloco ? window.rdGaranteBloco() : null);
     if (!b) return false;
     if (b.getAttribute('contenteditable') !== 'true') b.setAttribute('contenteditable', 'true');
-    b.focus();
+    try { b.focus({ preventScroll: true }); } catch (_) { b.focus(); }
     var rg = document.createRange(); rg.selectNodeContents(b); rg.collapse(false);
     var sl = window.getSelection(); sl.removeAllRanges(); sl.addRange(rg);
     return true;
@@ -8219,11 +8219,13 @@ window.saveAnswer = window.saveAnswer || function(){};
   document.addEventListener('touchmove', function(e) { var c = e.touches && e.touches[0]; if (t0 && c && (Math.abs(c.clientX - t0.x) > 10 || Math.abs(c.clientY - t0.y) > 10)) { clearTimeout(tm); t0 = null; } }, { passive: true, capture: true });
   document.addEventListener('touchend', function(e) {
     clearTimeout(tm);
-    var s = t0; t0 = null; var o = ov(); if (!s || !o || !e.changedTouches.length || s.feito) return;
+    var s = t0; t0 = null; var o = ov(); if (!s || !o || !e.changedTouches.length) return;
+    /* impede o toque falso do navegador (mousedown) de tirar o foco logo depois de eu pôr o cursor */
+    if (s.feito) { if (e.cancelable) e.preventDefault(); return; }
     var c = e.changedTouches[0];
     if (Math.abs(c.clientX - s.x) > 10 || Math.abs(c.clientY - s.y) > 10 || Date.now() - s.t > 450) return;
-    try { poeCursor(o); } catch (_) {}
-  }, { passive: true, capture: true });
+    try { if (poeCursor(o) && e.cancelable) e.preventDefault(); } catch (_) {}
+  }, { passive: false, capture: true });
 })();
 </script>
 <script>
