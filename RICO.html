@@ -3455,9 +3455,8 @@ window.saveAnswer = window.saveAnswer || function(){};
             return;
           }
           /* Passo 5: dois toques na raiz numerada (número ou texto) de um mapa com cópias trocam de camada, sem abrir o editor; um toque continua recolhendo/abrindo */
-          if (id === 'root' && !window._rcModo && !soRaiz && numR != null && window.rcMapa.temCopias(api)) { window.rcMapa.cicla(api); return; }
+          /* (troca de camada agora é arrastando para a esquerda no círculo) */
           /* dois toques não abrem mais o editor (agora é arrastar para a direita): vale como um toque só */
-          acaoToque(id);
           return;
         }
         if (tq) { clearTimeout(tq.t); var antes = tq.id; tq = null; acaoToque(antes); }
@@ -8299,6 +8298,14 @@ window.saveAnswer = window.saveAnswer || function(){};
     var s = t0; t0 = null; if (!s || !e.changedTouches.length) return;
     var t = e.changedTouches[0], dx = t.clientX - s.x, dy = t.clientY - s.y;
     var movendo = !!(window._rcModo || (window.rcMapa && window.rcMapa.pendente && window.rcMapa.pendente()));
+    if (Math.abs(dx) >= 60 && Math.abs(dx) >= Math.abs(dy) * 2 && dx < 0 && !movendo && !window._rcModo) {
+      /* arrastar para a esquerda num círculo numerado com cópias: troca de camada (original, cópia, cópia da cópia) */
+      try {
+        var c0 = s.tg && s.tg.closest ? s.tg.closest('.rcm-node.root') : null, w0 = c0 && c0.closest('.rcm-wrap'), a0 = w0 && w0._rcApi;
+        if (a0 && !w0.getAttribute('data-pasta') && window.rcMapa.temCopias(a0)) window.rcMapa.cicla(a0);
+      } catch (_) {}
+      return;
+    }
     if (Math.abs(dx) < 60 || Math.abs(dx) < Math.abs(dy) * 2 || (dx < 0 && !movendo)) return;
     if (window._rcModo && !movendo) return;
     if (window._rcSelOn !== false && s.tg && s.tg.closest && s.tg.closest('.rcm-wrap[data-v="2"],.rcm-wrap[data-v="3"]')) return;
