@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="pt-br"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<script src="app-boost.js"></script>
+<script src="dados.js"></script>
+<meta name="theme-color" content="#070a22"><title>Cardápio Jonathan Ferreira</title>
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}html,body{margin:0;min-height:100%}
+body{background:radial-gradient(circle at 20% 0,#1b2a8a,#070a22 62%) fixed;color:#fff;font:15px/1.4 -apple-system,'Segoe UI',sans-serif;padding-bottom:90px;overscroll-behavior-y:contain}
+header{text-align:center;padding:calc(env(safe-area-inset-top,0px) + 22px) 16px 6px}header h1{font-size:19px;margin:6px 0 0}header small{color:#9db4ff;font-size:12px}
+.tabs{display:flex;gap:8px;margin:12px 16px}.tabs button{flex:1;padding:9px;border-radius:14px;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.06);color:#fff;font:600 13px inherit}.tabs button.on{background:#2a6bff;border-color:#2a6bff}
+.t{margin:16px 16px 8px;font-size:13px;letter-spacing:1px;color:#9db4ff}
+.i{display:flex;justify-content:space-between;align-items:center;gap:10px;border:1px solid rgba(255,255,255,.25);border-radius:18px;padding:12px 14px;margin:0 16px 10px;background:rgba(255,255,255,.07)}
+.i b{display:block}.i span{font-size:12px;color:#b9c4f0}.p{font-weight:700;color:#ffc02a;white-space:nowrap}
+.q{display:flex;align-items:center;gap:8px}.q button{width:32px;height:32px;border-radius:50%;border:0;background:#2a6bff;color:#fff;font-size:18px}.q em{min-width:14px;text-align:center;font-style:normal}
+.bt{position:fixed;left:16px;right:16px;bottom:calc(env(safe-area-inset-bottom,0px) + 16px);height:50px;border-radius:16px;border:0;background:linear-gradient(145deg,#2fbf5a,#126a34);color:#fff;font:700 15px inherit;z-index:5}
+.fd{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:9;align-items:flex-end}.fd.on{display:flex}
+.fl{width:100%;max-height:85%;overflow:auto;background:#0e1440;border-radius:22px 22px 0 0;padding:16px;border-top:1px solid rgba(255,255,255,.25)}
+input,select{width:100%;padding:11px;margin:5px 0;border-radius:12px;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.07);color:#fff;font:15px inherit}
+.b2{width:100%;padding:12px;margin-top:8px;border-radius:14px;border:0;background:#2a6bff;color:#fff;font:700 15px inherit}.b2.g{background:#2fbf5a}.b2.x{background:rgba(255,255,255,.12)}
+.tag{font-size:11px;padding:2px 8px;border-radius:10px;background:#ffc02a;color:#000;margin-left:6px}.vz{text-align:center;color:#9db4ff;margin:30px 16px}
+</style></head><body>
+<header><svg width="76" height="76" viewBox="0 0 100 100"><circle cx="50" cy="50" r="48" fill="#1b5e20"/><circle cx="50" cy="50" r="34" fill="#ffc02a" stroke="#e8a000" stroke-width="3"/><circle cx="50" cy="50" r="28" fill="#f4a300"/><circle cx="40" cy="40" r="5" fill="#c0392b"/><circle cx="60" cy="44" r="5" fill="#c0392b"/><circle cx="46" cy="62" r="5" fill="#c0392b"/><circle cx="62" cy="62" r="3.5" fill="#c0392b"/><path d="M50 16V84M16 50H84" stroke="#e8a000" stroke-width="1.5" opacity=".7"/></svg>
+<h1>Jonathan Ferreira</h1><small>Cardápio digital</small></header>
+<div class="tabs"><button id="tC" class="on">Cardápio</button><button id="tP">Pedidos</button><button id="tE">Editar</button></div>
+<div id="v"></div><button class="bt" id="ver">Ver pedido (0)</button>
+<div class="fd" id="fd"><div class="fl" id="fl"></div></div>
+<script>
+var K1='cardapio.itens',K2='cardapio.pedidos',itens=[],pedidos=[],cart={},aba='C';
+function ld(k,d){try{return JSON.parse(localStorage.getItem(k))||d}catch(e){return d}}
+function sv(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
+itens=ld(K1,null);if(!itens){itens=[{id:1,cat:'Pizzas',nome:'Calabresa',desc:'Mussarela, calabresa, cebola',preco:45},{id:2,cat:'Pizzas',nome:'Mussarela',desc:'Mussarela e orégano',preco:40},{id:3,cat:'Pizzas',nome:'Portuguesa',desc:'Presunto, ovo, cebola',preco:50},{id:4,cat:'Bebidas',nome:'Refrigerante 2L',desc:'Cola ou guaraná',preco:12}];sv(K1,itens)}
+pedidos=ld(K2,[]);
+var $=function(i){return document.getElementById(i)},R=function(n){return 'R$ '+Number(n).toFixed(2).replace('.',',')};
+function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+function salva(){sv(K1,itens);sv(K2,pedidos);if(window.Dados){Dados.mudou('cardapio_itens');Dados.mudou('cardapio_pedidos')}}
+function total(){var n=0,t=0;itens.forEach(function(i){var q=cart[i.id]||0;n+=q;t+=q*i.preco});return[n,t]}
+function pinta(){var h='',cats=[];itens.forEach(function(i){if(cats.indexOf(i.cat)<0)cats.push(i.cat)});
+ if(aba==='C'){cats.forEach(function(c){h+='<div class="t">'+esc(c.toUpperCase())+'</div>';itens.filter(function(i){return i.cat===c}).forEach(function(i){var q=cart[i.id]||0;h+='<div class="i"><div><b>'+esc(i.nome)+'</b><span>'+esc(i.desc)+'</span><div class="p">'+R(i.preco)+'</div></div><div class="q"><button data-m="'+i.id+'">−</button><em>'+q+'</em><button data-a="'+i.id+'">+</button></div></div>'})});if(!itens.length)h='<div class="vz">Cardápio vazio. Toque em Editar.</div>'}
+ else if(aba==='P'){if(!pedidos.length)h='<div class="vz">Nenhum pedido ainda.</div>';pedidos.slice().reverse().forEach(function(p){h+='<div class="i"><div><b>'+esc(p.cliente||'Cliente')+(p.feito?'':'<span class="tag">novo</span>')+'</b><span>'+p.linhas.map(esc).join(', ')+'</span><div class="p">'+R(p.total)+'</div></div><div class="q"><button data-f="'+p.id+'">'+(p.feito?'↺':'✓')+'</button></div></div>'})}
+ else{h='<div style="margin:0 16px"><button class="b2" id="novo">+ Novo item</button></div>';itens.forEach(function(i){h+='<div class="i" data-e="'+i.id+'"><div><b>'+esc(i.nome)+'</b><span>'+esc(i.cat)+'</span></div><div class="p">'+R(i.preco)+'</div></div>'})}
+ $('v').innerHTML=h;var t=total();$('ver').textContent='Ver pedido ('+t[0]+')';$('ver').style.display=aba==='C'?'':'none'}
+function abre(h){$('fl').innerHTML=h;$('fd').classList.add('on')}function fecha(){$('fd').classList.remove('on')}
+$('fd').onclick=function(e){if(e.target===$('fd'))fecha()};
+['C','P','E'].forEach(function(a){$('t'+a).onclick=function(){aba=a;['C','P','E'].forEach(function(b){$('t'+b).classList.toggle('on',b===a)});pinta()}});
+$('v').onclick=function(e){var t=e.target,id;
+ if(id=t.getAttribute('data-a')){cart[id]=(cart[id]||0)+1;pinta()}
+ else if(id=t.getAttribute('data-m')){cart[id]=Math.max(0,(cart[id]||0)-1);pinta()}
+ else if(id=t.getAttribute('data-f')){pedidos.forEach(function(p){if(String(p.id)===id)p.feito=!p.feito});salva();pinta()}
+ else if(t.id==='novo')edita(null);
+ else{var c=t.closest('[data-e]');if(c)edita(+c.getAttribute('data-e'))}};
+function edita(id){var i=itens.filter(function(x){return x.id===id})[0]||{cat:'Pizzas',nome:'',desc:'',preco:''};
+ abre('<b>'+(id?'Editar item':'Novo item')+'</b><input id="eN" placeholder="Nome" value="'+esc(i.nome)+'"><input id="eC" placeholder="Categoria (ex.: Pizzas)" value="'+esc(i.cat)+'"><input id="eD" placeholder="Descrição" value="'+esc(i.desc)+'"><input id="eP" type="number" step="0.01" placeholder="Preço" value="'+esc(i.preco)+'"><button class="b2 g" id="eS">Salvar</button>'+(id?'<button class="b2 x" id="eX">Apagar item</button>':'')+'<button class="b2 x" id="eF">Fechar</button>');
+ $('eF').onclick=fecha;$('eS').onclick=function(){var n=$('eN').value.trim(),p=parseFloat($('eP').value);if(!n||isNaN(p))return;
+  if(id){i.nome=n;i.cat=$('eC').value.trim()||'Outros';i.desc=$('eD').value;i.preco=p}else itens.push({id:Date.now(),nome:n,cat:$('eC').value.trim()||'Outros',desc:$('eD').value,preco:p});salva();fecha();pinta()};
+ if($('eX'))$('eX').onclick=function(){itens=itens.filter(function(x){return x.id!==id});salva();fecha();pinta()}}
+$('ver').onclick=function(){var t=total();if(!t[0]){abre('<div class="vz">Pedido vazio. Toque no + de um item.</div><button class="b2 x" id="eF">Fechar</button>');$('eF').onclick=fecha;return}
+ abre('<b>Seu pedido</b>'+itens.filter(function(i){return cart[i.id]}).map(function(i){return'<div class="i" style="margin:8px 0"><div><b>'+cart[i.id]+'x '+esc(i.nome)+'</b></div><div class="p">'+R(cart[i.id]*i.preco)+'</div></div>'}).join('')+'<div class="p" style="text-align:right;margin:6px 0">Total '+R(t[1])+'</div><input id="cN" placeholder="Nome do cliente"><button class="b2 g" id="env">Enviar pedido</button><button class="b2 x" id="eF">Fechar</button>');
+ $('eF').onclick=fecha;$('env').onclick=function(){var linhas=itens.filter(function(i){return cart[i.id]}).map(function(i){return cart[i.id]+'x '+i.nome});pedidos.push({id:Date.now(),cliente:$('cN').value.trim(),linhas:linhas,total:t[1],feito:false});cart={};salva();fecha();aba='P';['C','P','E'].forEach(function(b){$('t'+b).classList.toggle('on',b==='P')});pinta()}};
+if(window.Dados){var pt=window.AoVivo?AoVivo.pinta:function(n,f){f()};
+ Dados.liga({nome:'cardapio_itens',area:'cardapio',rotulo:'Cardápio',ler:function(){return itens},escrever:function(l){itens=l;sv(K1,l);pt('cd',pinta)}});
+ Dados.liga({nome:'cardapio_pedidos',area:'cardapio',rotulo:'Cardápio',ler:function(){return pedidos},escrever:function(l){pedidos=l;sv(K2,l);pt('cd',pinta)}})}
+pinta();
+</script></body></html>

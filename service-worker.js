@@ -16,6 +16,7 @@ const URLS_TO_CACHE = [
   './OUTROS.html',
   './RICO.html',
   './Workshop.html',
+  './CARDAPIO.html',
   './DOA.html',
   './plano-hub.js',
   './plano-html/Leads.html',

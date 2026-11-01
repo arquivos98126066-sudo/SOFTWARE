@@ -26,7 +26,8 @@ const APPS = {
   prevenda: { nome: 'Pré-venda', partes: { tudo: ['Tudo', ['pre_venda', 'prevenda_lixeira']] } },
   retina: { nome: 'Retina', partes: { tudo: ['Tudo', ['painel_ia']] } },
   opa: { nome: 'Método OPA', partes: { tudo: ['Tudo', ['metodo_opa']] } },
-  workshop: { nome: 'Workshop', partes: { tudo: ['Tudo', [/^launcher_/]] } }
+  workshop: { nome: 'Workshop', partes: { tudo: ['Tudo', [/^launcher_/]] } },
+  cardapio: { nome: 'Cardápio', partes: { tudo: ['Tudo', ['v2_cardapio_itens', 'v2_cardapio_pedidos']] } }
 };
 function casa(x, col) { return typeof x === 'string' ? x === col : x.test(col); }
 /* devolve [app, parte] da coleção, ou ['outros', null] */
