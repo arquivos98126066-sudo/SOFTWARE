@@ -4485,18 +4485,18 @@ window.saveAnswer = window.saveAnswer || function(){};
   /* Divide as listas compridas de Profético, Reavivado e Ouvindo em células-mãe curtas (o conteúdo de cada célula continua o mesmo, só muda de lugar) */
   var BIBLICO_GRUPOS = {
     profetico: [
-      ['Bíblia e Dom', ['Biblia Sagrada','Dom de Profecia','Estudo Profecia']],
-      ['Daniel', ['A Grande Estátua','As 4 besta','O Chifre Pequeno','Carneiro e Bode','As 70 Semanas','O Santuário','O Juízo de Deus']],
-      ['Revelação', ['Origem da Revelação','As 7 Igrejas','As 4 Criaturas','Livro e Cordeiro','Os 7 Selos','As 7 Trombetas']],
-      ['Besta e Povo', ['O Livro Selado','Anjo com Voz de Leão','Os 7 Tronos','O Misterio de Deus','Doce e amarga','As Duas Testemunhas','A mulher e o Dragão','A Besta do Mar','A Besta da Terra','Os 144 mil','Os 24 Anciãos']],
-      ['Fim e Volta', ['Primeira Mensagem','Segunda Mensagem','Terceira Mensagem','As 7 Pragas','Mulher na Besta','Enganos Finais','Tempo de Angustia','A Volta de Jesus','Os Mil Anos','A Prisão de Satanás','Morte Final e Definitiva','Nova Terra']]
+      ['Base da Profecia', ['Biblia Sagrada','Dom de Profecia','Estudo Profecia']],
+      ['Profecias de Daniel', ['A Grande Estátua','As 4 besta','O Chifre Pequeno','Carneiro e Bode','As 70 Semanas','O Santuário','O Juízo de Deus']],
+      ['Início do Apocalipse', ['Origem da Revelação','As 7 Igrejas','As 4 Criaturas','Livro e Cordeiro','Os 7 Selos','As 7 Trombetas']],
+      ['Conflito Final', ['O Livro Selado','Anjo com Voz de Leão','Os 7 Tronos','O Misterio de Deus','Doce e amarga','As Duas Testemunhas','A mulher e o Dragão','A Besta do Mar','A Besta da Terra','Os 144 mil','Os 24 Anciãos']],
+      ['Volta de Jesus', ['Primeira Mensagem','Segunda Mensagem','Terceira Mensagem','As 7 Pragas','Mulher na Besta','Enganos Finais','Tempo de Angustia','A Volta de Jesus','Os Mil Anos','A Prisão de Satanás','Morte Final e Definitiva','Nova Terra']]
     ],
     reavivado: [
       ['Espírito Santo', ['As duas obras do Espírito','Um presente precioso','O Espírito e a vida plena','Os 4 beneficios do Espírito','Cristo em você','Intristecendo o Espírito']],
-      ['Preparo', ['A raiz de nossos problemas','A parabola da 10 virgem','O maior problema de Laodiceia','Batismo e obediência','Batismo e chuva serodia','Batismo e a volta']],
-      ['Oração', ['O desejo de orar dado','Exemplo de oração de Jesus','Porque a oração e necessaria','Orando no Espírito','Oração unida do Espírito','Oração perseverante','Oração intercesoria','Como pedir o Espírito','Orando com promessa']],
+      ['Preparo do Coração', ['A raiz de nossos problemas','A parabola da 10 virgem','O maior problema de Laodiceia','Batismo e obediência','Batismo e chuva serodia','Batismo e a volta']],
+      ['Vida de Oração', ['O desejo de orar dado','Exemplo de oração de Jesus','Porque a oração e necessaria','Orando no Espírito','Oração unida do Espírito','Oração perseverante','Oração intercesoria','Como pedir o Espírito','Orando com promessa']],
       ['Evangelismo', ['Evangelho com Espírito','Batismo antes do evangelho','Oração e evangelismo','Metodo de cristo da evangeliza','O caminho para descoberta']],
-      ['Vitória e Igreja', ['A luta do cristão','O poder do pecado quebrado','Cristo da vitória','Justiça pela fé','Permanecer em serviço','O Espírito e a comunhão','A igreja primitiva e comunhão','Batismo e o grupo de comunhão','A igreja','A família de Deus','Os frutos e a comunhão']]
+      ['Vitória da Igreja', ['A luta do cristão','O poder do pecado quebrado','Cristo da vitória','Justiça pela fé','Permanecer em serviço','O Espírito e a comunhão','A igreja primitiva e comunhão','Batismo e o grupo de comunhão','A igreja','A família de Deus','Os frutos e a comunhão']]
     ],
     ouvindo: [
       ['Salvação', ['Biblia Sagrada','Porque Jesus Morreu','Recebendo Perdao','O Batismo de Deus']],
@@ -4508,7 +4508,7 @@ window.saveAnswer = window.saveAnswer || function(){};
     try {
       var fl = parseInt(localStorage.getItem('ui.imp.agrupa.v1') || '0', 10);
       if (fl && Date.now() - fl > 3 * 86400000) return false;
-      var S = SETS.m, mt = metaGet(S), ch = mapasChaves(S), pk = null, mudou = false;
+      var S = SETS.m, mt = metaGet(S), ch = mapasChaves(S), pk = null, mudou = false, renomeou = false;
       var norm = function(t) { return String(t || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim().toLowerCase(); };
       var le = function(k) { try { return JSON.parse(localStorage.getItem(k)); } catch (e) { return null; } };
       ch.forEach(function(k) { if (!pk && mt.f[k]) { var r = le(k); if (r && norm(r.text) === 'biblico') pk = k; } });
@@ -4517,6 +4517,10 @@ window.saveAnswer = window.saveAnswer || function(){};
         if (mt.p[k] !== pk || mt.f[k]) return;
         var r = le(k); if (!r) return;
         var def = BIBLICO_GRUPOS[norm(r.text)]; if (!def || !Array.isArray(r.children)) return;
+        var VELHOS = { 'biblia e dom': 'Base da Profecia', 'daniel': 'Profecias de Daniel', 'revelacao': 'Início do Apocalipse', 'besta e povo': 'Conflito Final', 'fim e volta': 'Volta de Jesus', 'preparo': 'Preparo do Coração', 'oracao': 'Vida de Oração', 'vitoria e igreja': 'Vitória da Igreja' };
+        var nomeNovo = {}; def.forEach(function(g) { nomeNovo[norm(g[0])] = g[0]; });
+        r.children.forEach(function(c) { var v = VELHOS[norm(c.text)]; if (v && c.children && c.children.length && nomeNovo[norm(v)] === v && c.text !== v) { c.text = v; renomeou = true; } });
+        if (renomeou) { localStorage.setItem(k, JSON.stringify(r)); mudou = true; renomeou = false; }
         var nomes = {}; def.forEach(function(g) { nomes[norm(g[0])] = 1; });
         if (r.children.some(function(c) { return nomes[norm(c.text)]; })) return;
         var por = {}; r.children.forEach(function(c) { por[norm(c.text)] = c; });
