@@ -4005,7 +4005,7 @@ window.saveAnswer = window.saveAnswer || function(){};
           lp = true;
           if (tq) { clearTimeout(tq.t); tq = null; }
           /* Passo 5: segurar o NÚMERO de uma folha cria uma cópia (original → cópia → coletor) */
-          if (rnEl && id === 'root' && numR != null && (!window._rcModo || (window._rcModo === 'duplicar' && window.rcMapa.nivelDe(api) === 3)) && !PEND) { if (navigator.vibrate) navigator.vibrate(15); window.rcMapa.copiaNumero(api); return; }
+          if (rnEl && id === 'root' && numR != null && (!window._rcModo || (window._rcModo === 'duplicar' && window.rcMapa.nivelDe(api) === 3)) && !PEND) { if (navigator.vibrate) navigator.vibrate(15); window.rcConfirma('Criar uma cópia?', function() { window.rcMapa.copiaNumero(api); }); return; }
           if (PEND && PEND.pasta && ehPasta && id === 'root') { if (navigator.vibrate) navigator.vibrate(15); window.rcMapa.soltaPasta(api, null, true); return; }
           if (window._rcModo) { modoNo(id); return; }
           fechaOutras(); selId = id; barId = id; movBar = false; if (PEND) window.rcMapa.cancela(true); montaBar(); render();
@@ -8314,6 +8314,17 @@ window.saveAnswer = window.saveAnswer || function(){};
     try { if (window.rcMapa && window.rcMapa.volta1) window.rcMapa.volta1(); } catch (_) {}
   }, { passive: true });
 })();
+</script>
+<script>
+/* Pedido de confirmação simples (sim / não) no mesmo desenho das janelas do Rico */
+window.rcConfirma = function(msg, ok) {
+  var velho = document.querySelector('.rcm-conf'); if (velho) velho.remove();
+  var ov = document.createElement('div'); ov.className = 'rcm-conf';
+  ov.innerHTML = '<div class="rcm-conf-card"><h3>' + msg + '</h3><div class="rcm-conf-bt"><button type="button" class="sim" aria-label="Sim" title="Sim"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></button><button type="button" class="nao" aria-label="Não" title="Não"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div></div>';
+  document.body.appendChild(ov);
+  ov.querySelector('.nao').onclick = function() { ov.remove(); };
+  ov.querySelector('.sim').onclick = function() { ov.remove(); try { ok(); } catch (_) {} };
+};
 </script>
 </body>
           </html>
