@@ -4441,6 +4441,7 @@ window.saveAnswer = window.saveAnswer || function(){};
       if (!g) return;
       var dx = e.clientX - g.x, dy = e.clientY - g.y, was = g; g = null;
       if (was.sel) { window._rcDragSel = Date.now(); return; }
+      if (window.rcTiraSel && window.rcTiraSel(dx, dy)) { window._rcDragSel = Date.now(); return; }
       if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.5) {
         if (dx > 0 && was.id) return;
         window._rcDragSel = Date.now();
@@ -8388,6 +8389,7 @@ window.saveAnswer = window.saveAnswer || function(){};
     var s = t0; t0 = null; if (!s || !e.changedTouches.length) return;
     var t = e.changedTouches[0], dx = t.clientX - s.x, dy = t.clientY - s.y;
     var movendo = !!(window._rcModo || (window.rcMapa && window.rcMapa.pendente && window.rcMapa.pendente()));
+    if (window.rcTiraSel && window.rcTiraSel(dx, dy)) return;
     if (Math.abs(dx) >= 60 && Math.abs(dx) >= Math.abs(dy) * 2 && dx < 0 && !movendo && !window._rcModo) {
       /* arrastar para a esquerda num círculo numerado com cópias: troca de camada (original, cópia, cópia da cópia) */
       try {
@@ -8396,7 +8398,7 @@ window.saveAnswer = window.saveAnswer || function(){};
       } catch (_) {}
       return;
     }
-    if (Math.abs(dx) < 60 || Math.abs(dx) < Math.abs(dy) * 2 || (dx < 0 && !movendo)) return;
+    if (Math.abs(dx) < 60 || Math.abs(dx) < Math.abs(dy) * 2 || dx < 0) return; /* arrastar para a esquerda nunca volta ao nível 1 (agora são dois toques) */
     if (window._rcModo && !movendo) return;
     if (window._rcSelOn !== false && s.tg && s.tg.closest && s.tg.closest('.rcm-wrap[data-v="2"],.rcm-wrap[data-v="3"]')) return;
     /* começou numa célula do mapa aberto (com texto ou sem): abre a leitura dela; fora de célula: volta ao nível 1 */
@@ -8432,7 +8434,6 @@ window.rcConfirma = function(msg, ok) {
 /* Arrastar para a ESQUERDA (pedido dele, 2026-11-01): só quando há algo marcado (modo amarelo, origem escolhida, seleção de células), tira tudo na hora e dá um toquinho (vibração curta). Sem nada marcado, não faz nada. */
 (function() {
   var blk = document.querySelector('.cycle-block'); if (!blk) return;
-  var t0 = null;
   function modoOn() { return document.querySelector('#modoBar:not([hidden]) .rcm-ib.on[data-m]'); }
   function apis() { return [].slice.call(blk.querySelectorAll('.rcm-wrap')).map(function(w) { return w._rcApi; }).filter(function(a) { return a && a.selTem; }); }
   function temSel() {
@@ -8450,14 +8451,14 @@ window.rcConfirma = function(msg, ok) {
     try { window.rcMapa.redesenha(); } catch (e) {}
     if (navigator.vibrate) { try { navigator.vibrate(18); } catch (e) {} }
   }
-  blk.addEventListener('touchstart', function(e) { if (e.touches.length !== 1) { t0 = null; return; } var t = e.touches[0]; t0 = { x: t.clientX, y: t.clientY }; }, { passive: true });
-  blk.addEventListener('touchcancel', function() { t0 = null; }, { passive: true });
-  blk.addEventListener('touchend', function(e) {
-    var s = t0; t0 = null; if (!s || !e.changedTouches.length) return;
-    var t = e.changedTouches[0], dx = t.clientX - s.x, dy = t.clientY - s.y;
-    if (dx > -60 || Math.abs(dx) < Math.abs(dy) * 2) return;
-    if (temSel()) limpa();
-  }, { passive: true });
+  /* chamado pelos gestos de arrastar para a esquerda: com algo marcado, só tira a marcação (e o gesto normal não acontece nessa vez) */
+  var ult = 0;
+  window.rcTiraSel = function(dx, dy) {
+    if (dx > -60 || Math.abs(dx) < Math.abs(dy) * 2) return false;
+    if (Date.now() - ult < 700) return true;
+    if (!temSel()) return false;
+    ult = Date.now(); limpa(); return true;
+  };
 })();
 </script>
 </body>
