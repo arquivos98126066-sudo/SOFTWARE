@@ -3456,8 +3456,8 @@ window.saveAnswer = window.saveAnswer || function(){};
           }
           /* Passo 5: dois toques na raiz numerada (número ou texto) de um mapa com cópias trocam de camada, sem abrir o editor; um toque continua recolhendo/abrindo */
           if (id === 'root' && !window._rcModo && !soRaiz && numR != null && window.rcMapa.temCopias(api)) { window.rcMapa.cicla(api); return; }
-          selId = id; barId = null; render();
-          abreEditor(id, false);
+          /* dois toques não abrem mais o editor (agora é arrastar para a direita): vale como um toque só */
+          acaoToque(id);
           return;
         }
         if (tq) { clearTimeout(tq.t); var antes = tq.id; tq = null; acaoToque(antes); }
