@@ -3431,8 +3431,12 @@ window.saveAnswer = window.saveAnswer || function(){};
       }
       if (el && el.dataset.id) {
         var id = el.dataset.id;
-        if (tq && tq.id === id) {
-          clearTimeout(tq.t); tq = null;
+        /* duplo toque confiável: além do relógio deste mapa, vale o último toque no mesmo item (mesmo que o relógio tenha sido zerado por outra coisa) */
+        var dtv = window.__rcDT, dupla = !!(dtv && dtv.k === KEY && dtv.id === id && Date.now() - dtv.t < 330);
+        window.__rcDT = { k: KEY, id: id, t: Date.now() };
+        if ((tq && tq.id === id) || dupla) {
+          window.__rcDT = null;
+          if (tq) { clearTimeout(tq.t); tq = null; }
           /* modo Duplicar com este item já marcado: dois toques duplicam ali mesmo (em vez de abrir o editor) */
           var _S = window._rcSrc;
           if (window._rcModo === 'duplicar' && _S && _S.tipo === 'no' && _S.inst === api && _S.id === id) {
